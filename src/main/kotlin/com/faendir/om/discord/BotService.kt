@@ -25,11 +25,11 @@ class BotService(private val jdaProperties: JdaProperties, private val gitServic
 
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
         val message = event.message.contentRaw
-        if(message.startsWith("!height") || message.startsWith("!width")) {
+        if (message.startsWith("!height") || message.startsWith("!width")) {
             val regex =
                 Regex("!(?<hw>height|width)\\s+(?<name>[^:]*)(:|\\s)\\s*(?<score>[\\d.]+/\\d+/\\d+)\\s+(?<link>http.*\\.(?<format>gif|mp4|webm))")
             val matches = regex.findAll(message).toList()
-            if(matches.isEmpty()) {
+            if (matches.isEmpty()) {
                 event.channel.sendMessage("${event.author.asMention} sorry, I did not understand your command.\nPlease use the format `!<width|height> <name>:<width-or-height-score>/<cycles>/<cost> <link>`.")
                     .mention(event.author).queue()
             }
@@ -43,34 +43,51 @@ class BotService(private val jdaProperties: JdaProperties, private val gitServic
                     val normalizedName = name.replace(Regex("\\s"), "_")
                     val puzzleDir = File(directory, "gif").walkTopDown().filter { it.isDirectory }
                         .find { it.name.contains(normalizedName) }
-                    if(puzzleDir != null) {
-                        val prefix = if(isHeight) "H" else "W"
+                    if (puzzleDir != null) {
+                        val prefix = if (isHeight) "H" else "W"
                         val existingFile = puzzleDir.listFiles()?.find { it.name.startsWith(prefix) }
-                        if(existingFile == null || score.isBetterScoreThan(existingFile.getScore())) {
+                        if (existingFile == null || score.isBetterScoreThan(existingFile.getScore())) {
                             try {
                                 val img = CUrl(link).exec()
-                                File(puzzleDir, "${prefix}_${numberFormat.format(score[0])}_${numberFormat.format(score[1])}_${numberFormat.format(score[2])}.${format}")
+                                File(puzzleDir, "${prefix}_${score.toScoreString("_")}.${format}")
                                     .writeBytes(img)
                                 existingFile?.delete()
                                 Runtime.getRuntime().exec("/bin/bash ./generate.sh", null, directory).waitFor()
-                                event.channel.sendMessage("${event.author.asMention} thanks, the site will be updated shortly.").mention(event.author).queue()
+                                event.channel.sendMessage(
+                                    "${event.author.asMention} thanks, the site will be updated shortly with $name ${prefix}${
+                                        score.toScoreString("/")
+                                    }."
+                                ).mention(event.author).queue()
                             } catch (e: Exception) {
-                                event.channel.sendMessage("${event.author.asMention} sorry, I could not load the file at $link.").mention(event.author).queue()
+                                event.channel.sendMessage("${event.author.asMention} sorry, I could not load the file at $link.")
+                                    .mention(event.author).queue()
                             }
                         } else {
-                            event.channel.sendMessage("${event.author.asMention} sorry, there is already a better score for \"$name\".").mention(event.author).queue()
+                            event.channel.sendMessage(
+                                "${event.author.asMention} sorry, there is already a better score for \"$name\": ${prefix}${
+                                    existingFile.getScore().toScoreString("/")
+                                }."
+                            )
+                                .mention(event.author).queue()
                         }
                     } else {
-                        event.channel.sendMessage("${event.author.asMention} sorry, I did not recognize the puzzle \"$name\".").mention(event.author).queue()
+                        event.channel.sendMessage("${event.author.asMention} sorry, I did not recognize the puzzle \"$name\".")
+                            .mention(event.author).queue()
                     }
                 }
             }
         }
     }
 
+    private fun List<Double>.toScoreString(separator: String) = joinToString(separator) { numberFormat.format(it) }
+
     private fun File.getScore(): List<Double> {
         return Regex("[HW]_(?<hw>[\\d.]+)_(?<cycles>\\d+)_(?<cost>\\d+).*").matchEntire(name)!!.let {
-            listOf(it.groups["hw"]!!.value.toDouble(), it.groups["cycles"]!!.value.toDouble(), it.groups["cost"]!!.value.toDouble())
+            listOf(
+                it.groups["hw"]!!.value.toDouble(),
+                it.groups["cycles"]!!.value.toDouble(),
+                it.groups["cost"]!!.value.toDouble()
+            )
         }
     }
 
