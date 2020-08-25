@@ -27,8 +27,8 @@ class GitService(private val gitProperties: GitProperties) {
                 git.pull().call()
                 changeData(repo)
                 git.add().addFilepattern(".").call()
-                git.rm().let { git.status().call().missing.fold(it, { rm, missing -> rm.addFilepattern(missing) }) }
-                    .call()
+                val missingStatus = git.status().call().missing
+                missingStatus.takeIf { it.isNotEmpty() }?.fold(git.rm()) { rm, missing -> rm.addFilepattern(missing) }?.call()
                 if (git.status().call().run { added.isNotEmpty() }) {
                     git.commit().setAuthor("om-leaderboard-discord-bot", "om-leaderboard-discord-bot@faendir.com")
                         .setCommitter("om-leaderboard-discord-bot", "om-leaderboard-discord-bot@faendir.com")

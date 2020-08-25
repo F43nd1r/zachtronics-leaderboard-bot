@@ -46,7 +46,8 @@ class BotService(private val jdaProperties: JdaProperties, private val gitServic
                     if (puzzleDir != null) {
                         val prefix = if (isHeight) "H" else "W"
                         val existingFile = puzzleDir.listFiles()?.find { it.name.startsWith(prefix) }
-                        if (existingFile == null || score.isBetterScoreThan(existingFile.getScore())) {
+                        val existingScore = existingFile?.getScore()
+                        if (existingScore == null || score.isBetterScoreThan(existingScore)) {
                             try {
                                 val img = CUrl(link).exec()
                                 File(puzzleDir, "${prefix}_${score.toScoreString("_")}.${format}")
@@ -56,7 +57,9 @@ class BotService(private val jdaProperties: JdaProperties, private val gitServic
                                 event.channel.sendMessage(
                                     "${event.author.asMention} thanks, the site will be updated shortly with $name ${prefix}${
                                         score.toScoreString("/")
-                                    }."
+                                    } " + if (existingScore != null) "(previously ${prefix}${
+                                        existingScore.toScoreString("/")
+                                    })." else "."
                                 ).mention(event.author).queue()
                             } catch (e: Exception) {
                                 event.channel.sendMessage("${event.author.asMention} sorry, I could not load the file at $link.")
@@ -65,7 +68,7 @@ class BotService(private val jdaProperties: JdaProperties, private val gitServic
                         } else {
                             event.channel.sendMessage(
                                 "${event.author.asMention} sorry, there is already a better score for \"$name\": ${prefix}${
-                                    existingFile.getScore().toScoreString("/")
+                                    existingScore.toScoreString("/")
                                 }."
                             )
                                 .mention(event.author).queue()
@@ -94,7 +97,7 @@ class BotService(private val jdaProperties: JdaProperties, private val gitServic
     private fun List<Double>.isBetterScoreThan(other: List<Double>): Boolean {
         check(this.size == 3)
         check(other.size == 3)
-        return this[0] < other[0] || (this[0] == other[0] && (this[1] < other[1] || (this[1] == other[1] && this[2] < other[2])))
+        return this[0] < other[0] || (this[0] == other[0] && (this[1] < other[1] || (this[1] == other[1] && this[2] <= other[2])))
     }
 
     @PreDestroy
