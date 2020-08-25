@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.GatewayIntent
 import org.springframework.stereotype.Service
 import java.io.File
+import java.net.URLEncoder
 import java.text.DecimalFormat
 import javax.annotation.PreDestroy
 
@@ -72,6 +73,52 @@ class BotService(private val jdaProperties: JdaProperties, private val gitServic
                                 }."
                             )
                                 .mention(event.author).queue()
+                        }
+                    } else {
+                        event.channel.sendMessage("${event.author.asMention} sorry, I did not recognize the puzzle \"$name\".")
+                            .mention(event.author).queue()
+                    }
+                }
+            }
+        }
+        if (message.startsWith("!show")) {
+            val regex =
+                Regex("!show (?<hw>height|width)\\s+(?<name>.*)")
+            val matches = regex.findAll(message).toList()
+            if (matches.isEmpty()) {
+                event.channel.sendMessage("${event.author.asMention} sorry, I did not understand your command.\nPlease use the format `!show <width|height> <name>`.")
+                    .mention(event.author).queue()
+            }
+            matches.forEach { result ->
+                val isHeight = result.groups["hw"]!!.value == "height"
+                val name = result.groups["name"]!!.value
+                gitService.read { directory ->
+                    val normalizedName = name.replace(Regex("\\s"), "_")
+                    val puzzleDir = File(directory, "gif").walkTopDown().filter { it.isDirectory }
+                        .find { it.name.contains(normalizedName) }
+                    if (puzzleDir != null) {
+                        val prefix = if (isHeight) "H" else "W"
+                        val file = puzzleDir.listFiles()?.find { it.name.startsWith(prefix) }
+                        when {
+                            file == null -> {
+                                event.channel.sendMessage(
+                                    "${event.author.asMention} sorry, there is no score for \"$name\" $prefix."
+                                ).mention(event.author).queue()
+                            }
+                            file.name.endsWith(".block") -> {
+                                event.channel.sendMessage(
+                                    "${event.author.asMention} sorry, width scores for infinites are not recorded (\"$name\")."
+                                ).mention(event.author).queue()
+                            }
+                            else -> {
+                                event.channel.sendMessage(
+                                    "${event.author.asMention} here you go: $name $prefix${
+                                        file.getScore().toScoreString("/")
+                                    } https://f43nd1r.github.io/om-leaderboard/${puzzleDir.relativeTo(directory).path}/${
+                                        URLEncoder.encode(file.name, Charsets.US_ASCII).replace("+", "%20")
+                                    }"
+                                ).mention(event.author).queue()
+                            }
                         }
                     } else {
                         event.channel.sendMessage("${event.author.asMention} sorry, I did not recognize the puzzle \"$name\".")

@@ -44,4 +44,13 @@ class GitService(private val gitProperties: GitProperties) {
             }
         }
     }
+
+    fun read(readData: (File) -> Unit) {
+        synchronized(repo) {
+            Git.open(repo).use { git ->
+                git.pull().call()
+                readData(repo)
+            }
+        }
+    }
 }
