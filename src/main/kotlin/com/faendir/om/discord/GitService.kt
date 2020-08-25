@@ -20,16 +20,17 @@ class GitService(private val gitProperties: GitProperties) {
     }
 
     fun update(puzzle: String, username: String, changeData: (File) -> Unit) {
-        Git.open(repo).use {
-            it.pull().call()
+        Git.open(repo).use { git ->
+            git.pull().call()
             changeData(repo)
-            it.add().addFilepattern(".").call()
-            if(!it.status().call().isClean) {
-                it.commit().setAuthor("om-leaderboard-discord-bot", "om-leaderboard-discord-bot@faendir.com")
+            git.add().addFilepattern(".").call()
+            git.rm().let { git.status().call().missing.fold(it, { rm, missing -> rm.addFilepattern(missing)}) }.call()
+            if(git.status().call().run { added.isNotEmpty() }) {
+                git.commit().setAuthor("om-leaderboard-discord-bot", "om-leaderboard-discord-bot@faendir.com")
                     .setCommitter("om-leaderboard-discord-bot", "om-leaderboard-discord-bot@faendir.com")
                     .setMessage("Automated update with solution for $puzzle by $username")
                     .call()
-                it.push().setCredentialsProvider(
+                git.push().setCredentialsProvider(
                     UsernamePasswordCredentialsProvider(
                         gitProperties.username,
                         gitProperties.accessToken
