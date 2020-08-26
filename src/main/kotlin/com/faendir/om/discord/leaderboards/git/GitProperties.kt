@@ -1,4 +1,4 @@
-package com.faendir.om.discord
+package com.faendir.om.discord.leaderboards.git
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration

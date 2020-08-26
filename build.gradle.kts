@@ -24,6 +24,7 @@ dependencies {
     implementation("net.dv8tion:JDA:4.2.0_198")
     implementation("org.eclipse.jgit:org.eclipse.jgit:5.8.1.202007141445-r")
     implementation("com.github.rockswang:java-curl:1.2.2.2")
+    implementation("net.dean.jraw:JRAW:1.1.0")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }

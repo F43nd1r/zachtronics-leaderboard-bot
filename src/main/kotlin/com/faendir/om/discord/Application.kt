@@ -1,11 +1,12 @@
 package com.faendir.om.discord
 
+import com.faendir.om.discord.jda.JdaService
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 
 @SpringBootApplication
-class Application(private val botService: BotService) : CommandLineRunner {
+class Application(private val jdaService: JdaService) : CommandLineRunner {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
@@ -14,6 +15,6 @@ class Application(private val botService: BotService) : CommandLineRunner {
     }
 
     override fun run(vararg args: String?) {
-        botService.start()
+        jdaService.start()
     }
 }
