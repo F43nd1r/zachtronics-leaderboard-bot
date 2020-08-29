@@ -3,6 +3,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     kotlin("jvm") version "1.4.0"
+    kotlin("plugin.serialization") version "1.4.0"
     id("org.springframework.boot") version "2.3.3.RELEASE"
     id("io.spring.dependency-management") version "1.0.7.RELEASE"
     id("org.jetbrains.kotlin.plugin.spring") version "1.4.0"
@@ -15,16 +16,19 @@ version = "1.0-SNAPSHOT"
 repositories {
     jcenter()
     mavenCentral()
+    maven { setUrl("https://dl.bintray.com/f43nd1r/maven") }
 }
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("net.dv8tion:JDA:4.2.0_198")
     implementation("org.eclipse.jgit:org.eclipse.jgit:5.8.1.202007141445-r")
     implementation("com.github.rockswang:java-curl:1.2.2.2")
-    implementation("net.dean.jraw:JRAW:1.1.0")
+    implementation("com.faendir.jraw:JRAW:1.2.0")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }

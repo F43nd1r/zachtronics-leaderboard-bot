@@ -2,3 +2,4 @@
 .idea
 build
 docker-compose.yml
+docker-compose-debug.yml

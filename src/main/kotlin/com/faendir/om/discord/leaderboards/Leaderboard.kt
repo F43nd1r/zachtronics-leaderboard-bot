@@ -1,31 +1,23 @@
 package com.faendir.om.discord.leaderboards
 
-import com.faendir.om.discord.utils.Score
-import com.faendir.om.discord.categories.Category
+import com.faendir.om.discord.model.Category
+import com.faendir.om.discord.model.Score
+import com.faendir.om.discord.puzzle.Puzzle
 
-interface Leaderboard<P> {
+interface Leaderboard {
     val supportedCategories: Collection<Category>
 
-    fun findPuzzle(puzzle: String): PuzzleResult<P>
+    fun update(user: String, puzzle: Puzzle, categories: List<Category>, score: Score, link: String) : UpdateResult
 
-    fun update(user: String, puzzle: P, category: Category, score: Score, link: String) : UpdateResult
-
-    fun get(puzzle: P, category: Category) : GetResult
-}
-
-sealed class PuzzleResult<T> {
-    class Success<T>(val puzzle: T) : PuzzleResult<T>()
-
-    class NotFound<T>() : PuzzleResult<T>()
-
-    class Ambiguous<T>(vararg val puzzles : String) : PuzzleResult<T>()
-
+    fun get(puzzle: Puzzle, category: Category) : GetResult
 }
 
 sealed class UpdateResult {
-    class Success(val puzzle: String, val oldScore: Score?) : UpdateResult()
+    class Success(val oldScores: Map<Category,Score?>) : UpdateResult()
 
-    class BetterExists(val puzzle: String, val score: Score) : UpdateResult()
+    object ParetoUpdate : UpdateResult()
+
+    class BetterExists(val scores: Map<Category,Score>) : UpdateResult()
 
     object BrokenLink : UpdateResult()
 
@@ -33,10 +25,8 @@ sealed class UpdateResult {
 }
 
 sealed class GetResult {
-    class Success(val puzzle: String, val score: Score, val link: String) : GetResult()
+    class Success(val score: Score, val link: String) : GetResult()
 
-    class NoScore(val puzzle: String) : GetResult()
-
-    class ScoreNotRecorded(val puzzle: String, val reason: String) : GetResult()
+    object NoScore : GetResult()
 }
 

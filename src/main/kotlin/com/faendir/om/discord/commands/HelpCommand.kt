@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 
 @Component
-class HelpCommand(@Lazy private val commands: List<Command>, @Lazy private val leaderboards: List<Leaderboard<*>>) :
+class HelpCommand(@Lazy private val commands: List<Command>, @Lazy private val leaderboards: List<Leaderboard>) :
     Command {
     override val regex: Regex = Regex("!help")
     override val name: String = "help"
@@ -29,7 +29,7 @@ class HelpCommand(@Lazy private val commands: List<Command>, @Lazy private val l
     }
 
     private fun makeCategoryList(): String {
-        return leaderboards.flatMap { it.supportedCategories }
-            .joinToString("\n") { category -> "${category.name} (${category.requiredParts.joinToString("/") { it.key.toString() }})" }
+        return leaderboards.flatMap { it.supportedCategories }.distinctBy { it.displayName }
+            .joinToString("\n") { category -> "${category.displayName} (${category.requiredParts.joinToString("/") { it.key.toString() }})" }
     }
 }

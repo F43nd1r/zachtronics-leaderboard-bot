@@ -2,17 +2,15 @@ package com.faendir.om.discord.commands
 
 import com.faendir.om.discord.leaderboards.GetResult
 import com.faendir.om.discord.leaderboards.Leaderboard
-import com.faendir.om.discord.leaderboards.PuzzleResult
-import com.faendir.om.discord.utils.find
+import com.faendir.om.discord.puzzle.Puzzle
 import com.faendir.om.discord.utils.reply
-import com.faendir.om.discord.utils.toScoreString
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.TextChannel
 import net.dv8tion.jda.api.entities.User
 import org.springframework.stereotype.Component
 
 @Component
-class ShowCommand(private val leaderboards: List<Leaderboard<*>>) : Command {
+class ShowCommand(private val leaderboards: List<Leaderboard>) : Command {
     override val regex = Regex("!show\\s+(?<category>\\S+)\\s+(?<puzzle>.+)")
     override val name: String = "show"
     override val helpText: String = "!show <category> <puzzle>"
@@ -20,31 +18,33 @@ class ShowCommand(private val leaderboards: List<Leaderboard<*>>) : Command {
     override fun handleMessage(author: User, channel: TextChannel, message: Message, command: MatchResult) {
         val categoryString = command.groups["category"]!!.value
         val (leaderboard, category) = leaderboards.flatMap { leaderboard -> leaderboard.supportedCategories.map { leaderboard to it } }
-            .find { pair -> pair.second.name.equals(categoryString, ignoreCase = true) } ?: return Unit.also {
+            .find { pair -> pair.second.displayName.equals(categoryString, ignoreCase = true) } ?: return Unit.also {
             channel.reply(author, "sorry, I could not find the category \"$categoryString\"")
         }
-        val puzzle = command.groups["puzzle"]!!.value
+        val puzzleName = command.groups["puzzle"]!!.value
+        val puzzles = Puzzle.findByName(puzzleName)
 
-        fun <T> handle(leaderboard: Leaderboard<T>) {
-            channel.reply(
-                author, when (val puzzleResult = leaderboard.findPuzzle(puzzle)) {
-                    is PuzzleResult.Success -> {
-                        when (val getResult = leaderboard.get(puzzleResult.puzzle, category)) {
-                            is GetResult.Success -> "here you go: ${getResult.puzzle} ${category.name} ${
-                                getResult.score.toScoreString("/")
-                            } ${getResult.link}"
-                            is GetResult.NoScore -> "sorry, there is no score for ${getResult.puzzle} ${category.name}."
-                            is GetResult.ScoreNotRecorded -> "sorry, ${getResult.reason} (${getResult.puzzle})."
-                        }
+        channel.reply(author, when (puzzles.size) {
+            1 -> {
+                val puzzle = puzzles.first()
+                if(!category.supportedTypes.contains(puzzle.type)) {
+                    "sorry, the category ${category.displayName} does not support puzzles of type ${puzzle.type.name.toLowerCase()}."
+                } else if(!category.supportedGroups.contains(puzzle.group)){
+                    "sorry, the category ${category.displayName} does not support puzzles in ${puzzle.group.name.replace("_", " ").toLowerCase().capitalize()}."
+                } else {
+                    when (val getResult = leaderboard.get(puzzle, category)) {
+                        is GetResult.Success -> "here you go: ${puzzle.displayName} ${category.displayName} ${
+                            getResult.score.toString("/")
+                        } ${getResult.link}"
+                        is GetResult.NoScore -> "sorry, there is no score for ${puzzle.displayName} ${category.displayName}."
                     }
-                    is PuzzleResult.NotFound -> "sorry, I did not recognize the puzzle \"$puzzle\"."
-                    is PuzzleResult.Ambiguous -> "sorry, your request for \"$puzzle\" was not accurate enough. " +
-                            if (puzzleResult.puzzles.size <= 5) "Use one of:\n${
-                                puzzleResult.puzzles.joinToString("\n")
-                            }" else "${puzzleResult.puzzles.size} matches."
                 }
-            )
-        }
-        handle(leaderboard)
+            }
+            0 -> "sorry, I did not recognize the puzzle \"$puzzleName\"."
+            else -> "sorry, your request for \"$puzzleName\" was not accurate enough. " +
+                    if (puzzles.size <= 5) "Use one of:\n${
+                        puzzles.joinToString("\n") { it.displayName }
+                    }" else "${puzzles.size} matches."
+        })
     }
 }
