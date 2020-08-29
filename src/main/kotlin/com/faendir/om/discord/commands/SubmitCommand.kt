@@ -65,15 +65,21 @@ class SubmitCommand(private val leaderboards: List<Leaderboard>) : Command {
                 successes.isNotEmpty() -> "thanks, the site will be updated shortly with ${puzzle.displayName} ${
                     successes.flatMap { it.oldScores.keys }.map { it.displayName }
                 } ${
-                    score.toString("/")
+                    score.reorderToStandard().toString("/")
                 } (previously ${
                     successes.flatMap { it.oldScores.entries }
-                        .joinToString { "`${it.key.displayName} ${it.value?.toString("/") ?: "none"}`" }
+                        .joinToString {
+                            "`${it.key.displayName} ${
+                                it.value?.reorderToStandard()?.toString("/") ?: "none"
+                            }`"
+                        }
                 })."
-                pareto.isNotEmpty() -> "thanks, your submission for ${puzzle.displayName} (${score.toString("/")}) was included in the pareto frontier."
+                pareto.isNotEmpty() -> "thanks, your submission for ${puzzle.displayName} (${
+                    score.reorderToStandard().toString("/")
+                }) was included in the pareto frontier."
                 betterExists.isNotEmpty() -> "sorry, your submission did not beat any of the existing scores for ${puzzle.displayName} ${
                     betterExists.flatMap { it.scores.entries }
-                        .joinToString { "`${it.key.displayName} ${it.value.toString("/")}`" }
+                        .joinToString { "`${it.key.displayName} ${it.value.reorderToStandard().toString("/")}`" }
                 }"
                 brokenLink.isNotEmpty() -> "sorry, I could not load the file at $link."
                 else -> "sorry, something went wrong."

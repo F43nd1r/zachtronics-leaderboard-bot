@@ -1,7 +1,7 @@
 package com.faendir.om.discord.model
 
 enum class ScorePart(val key: Char) {
-    COST('g'), CYCLES('c'), AREA('a'), INSTRUCTIONS('i'), HEIGHT('h'), WIDTH('w'), COMPUTED('#');
+    HEIGHT('h'), WIDTH('w'), COST('g'), CYCLES('c'), AREA('a'), INSTRUCTIONS('i'), COMPUTED('#');
 
     companion object {
         fun parse(string: String): Pair<ScorePart, Double>? {

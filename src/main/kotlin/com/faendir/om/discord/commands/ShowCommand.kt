@@ -34,7 +34,7 @@ class ShowCommand(private val leaderboards: List<Leaderboard>) : Command {
                 } else {
                     when (val getResult = leaderboard.get(puzzle, category)) {
                         is GetResult.Success -> "here you go: ${puzzle.displayName} ${category.displayName} ${
-                            getResult.score.toString("/")
+                            getResult.score.reorderToStandard().toString("/")
                         } ${getResult.link}"
                         is GetResult.NoScore -> "sorry, there is no score for ${puzzle.displayName} ${category.displayName}."
                     }
