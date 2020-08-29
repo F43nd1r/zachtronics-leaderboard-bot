@@ -61,22 +61,22 @@ class GitLeaderboard(private val gitProperties: GitProperties) : Leaderboard {
                             File(puzzleDir, "${prefix}_${category.normalizeScore(score).toString("_", false)}.${link.substringAfterLast('.')}")
                         file.writeBytes(linkContent)
                         if (file != existingFile) {
-                            existingFile?.let { git.rm().addFilepattern(it.name).call() }
+                            existingFile?.let { git.rm().addFilepattern(it.relativeTo(repo).path).call() }
                         }
                         success[category] = existingScore
                     } else {
                         betterExists[category] = existingScore
                     }
                 }
-                if (success.isNotEmpty()) {
+                return if (success.isNotEmpty()) {
                     Runtime.getRuntime().exec("/bin/bash ./generate.sh", null, repo).waitFor()
                     git.add().addFilepattern(".").call()
                     if (git.status().call().run { added.isNotEmpty() }) {
                         git.commitAndPushChanges(user, puzzle, success.keys.map { it.displayName }, gitProperties)
                     }
-                    return UpdateResult.Success(success)
+                    UpdateResult.Success(success)
                 } else {
-                    return UpdateResult.BetterExists(betterExists)
+                    UpdateResult.BetterExists(betterExists)
                 }
             }
         }
