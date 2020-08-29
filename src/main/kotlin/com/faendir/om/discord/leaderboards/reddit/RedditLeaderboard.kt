@@ -21,9 +21,7 @@ import org.eclipse.jgit.api.Git
 import org.springframework.stereotype.Component
 import java.io.File
 import java.time.OffsetDateTime
-import java.time.ZoneId
 import java.time.ZoneOffset
-import java.time.ZonedDateTime
 
 @Component
 class RedditLeaderboard(private val redditService: RedditService, private val gitProperties: GitProperties) :
@@ -124,18 +122,10 @@ class RedditLeaderboard(private val redditService: RedditService, private val gi
                     }
                 }##)"
 
-                val costScores =
-                    entry.records.filter { costCategories.contains(it.category) }
-                        .reversed().distinctBy { it.link }.reversed().toMutableList()
-                val cycleScores =
-                    entry.records.filter { cycleCategories.contains(it.category) }
-                        .reversed().distinctBy { it.link }.reversed().toMutableList()
-                val areaInstructionScores =
-                    entry.records.filter { areaInstructionCategories.contains(it.category) }
-                        .reversed().distinctBy { it.link }.reversed().toMutableList()
-                val sumScores =
-                    entry.records.filter { sumCategories.contains(it.category) }
-                        .reversed().distinctBy { it.link }.reversed().toMutableList()
+                val costScores = filterRecords(entry.records, costCategories)
+                val cycleScores = filterRecords(entry.records, cycleCategories)
+                val areaInstructionScores = filterRecords(entry.records, areaInstructionCategories)
+                val sumScores = filterRecords(entry.records, sumCategories)
                 while (costScores.isNotEmpty() || cycleScores.isNotEmpty() ||
                     areaInstructionScores.isNotEmpty() || sumScores.isNotEmpty()
                 ) {
@@ -154,6 +144,11 @@ class RedditLeaderboard(private val redditService: RedditService, private val gi
         val suffix = File(repo, "suffix.md").readText()
         redditService.reddit.subreddit("opus_magnum").wiki()
             .update("index", "$prefix\n$table\n$suffix", "bot update")
+    }
+
+    private fun filterRecords(records: List<Record>, filter: List<Category>): MutableList<Record> {
+        return records.filter { filter.contains(it.category) }.sortedBy { it.category.ordinal }
+            .reversed().distinctBy { it.link }.reversed().toMutableList()
     }
 
     private fun Record?.toMarkdown(): String {
