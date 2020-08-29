@@ -28,7 +28,7 @@ class RedditLeaderboard(private val redditService: RedditService, private val gi
     Leaderboard {
 
     override val supportedCategories: Collection<Category> = listOf(
-        GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SUM, SUMP
+        GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SG, SGP, SC, SCP, SA, SI
     )
 
     override fun update(
@@ -97,7 +97,7 @@ class RedditLeaderboard(private val redditService: RedditService, private val gi
     private val costCategories = listOf(GC, GA, GX, GCP, GI, GXP)
     private val cycleCategories = listOf(CG, CA, CX, CGP, CI, CXP)
     private val areaInstructionCategories = listOf(AG, AC, AX, IG, IC, IX)
-    private val sumCategories = listOf(SUM, SUMP)
+    private val sumCategories = listOf(SG, SGP, SC, SCP, SA, SI)
 
     private fun updateRedditWiki(recordList: RecordList, repo: File) {
         var table = ""

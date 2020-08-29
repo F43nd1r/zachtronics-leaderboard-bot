@@ -20,7 +20,7 @@ data class Score(val parts: LinkedHashMap<ScorePart, Double>) {
         }
 
     fun isBetterOrEqualTo(category: Category, other: Score): Boolean {
-        return category.sort.isBetterOrEqual(category.normalizeScore(this), category.normalizeScore(other))
+        return category.isBetterOrEqual(category.normalizeScore(this), category.normalizeScore(other))
     }
 
     companion object {
