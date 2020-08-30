@@ -146,16 +146,16 @@ class RedditLeaderboard(private val redditService: RedditService, private val gi
             .update("index", "$prefix\n$table\n$suffix", "bot update")
     }
 
-    private fun filterRecords(records: List<Record>, filter: List<Category>): MutableList<Record> {
-        return records.filter { filter.contains(it.category) }.sortedBy { it.category.ordinal }
-            .reversed().distinctBy { it.link }.reversed().toMutableList()
+    private fun filterRecords(records: List<Record>, filter: List<Category>): MutableList<List<Record>> {
+        return records.filter { filter.contains(it.category) }.groupBy { it.link }.values
+            .map { it.sortedBy(Record::category) }.sortedBy { it.first().category }.toMutableList()
     }
 
-    private fun Record?.toMarkdown(): String {
-        if (this == null) return ""
+    private fun List<Record>?.toMarkdown(): String {
+        if (this == null || isEmpty()) return ""
         return "[${
-            score.reorderToStandard().toString("/", false)
-        }]($link)${if (category.name.contains("X")) "*" else ""}"
+            first().score.reorderToStandard().toString("/", false)
+        }](${first().link})${if (any { it.category.name.contains("X") }) "*" else ""}"
     }
 
     override fun get(puzzle: Puzzle, category: Category): GetResult {
