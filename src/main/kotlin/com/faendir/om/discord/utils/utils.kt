@@ -25,6 +25,7 @@ fun List<Leaderboard>.find(puzzle: Puzzle, score: Score): Map<Leaderboard, List<
 fun Git.commitAndPushChanges(
     user: String,
     puzzle: Puzzle,
+    score: Score,
     updated: Collection<String>,
     gitProperties: GitProperties
 ) {
@@ -34,7 +35,7 @@ fun Git.commitAndPushChanges(
             "om-leaderboard-discord-bot",
             "om-leaderboard-discord-bot@faendir.com"
         )
-        .setMessage("Automated update with solution for ${puzzle.displayName} $updated by $user")
+        .setMessage("[BOT] ${puzzle.displayName} ${score.reorderToStandard().toString("/")} $updated by $user")
         .call()
     push().setCredentialsProvider(
         UsernamePasswordCredentialsProvider(

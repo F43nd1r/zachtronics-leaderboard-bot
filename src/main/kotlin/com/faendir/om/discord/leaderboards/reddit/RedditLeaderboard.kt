@@ -69,11 +69,11 @@ class RedditLeaderboard(private val redditService: RedditService, private val gi
             }
             when {
                 success.isNotEmpty() -> {
-                    updateRemote(scoreFile, recordList, git, repo, user, puzzle, success.keys.map { it.displayName })
+                    updateRemote(scoreFile, recordList, git, repo, user, puzzle, score, success.keys.map { it.displayName })
                     UpdateResult.Success(success)
                 }
                 paretoUpdate -> {
-                    updateRemote(scoreFile, recordList, git, repo, user, puzzle, listOf("pareto"))
+                    updateRemote(scoreFile, recordList, git, repo, user, puzzle, score, listOf("pareto"))
                     UpdateResult.ParetoUpdate
                 }
                 else -> {
@@ -85,12 +85,12 @@ class RedditLeaderboard(private val redditService: RedditService, private val gi
 
     private fun updateRemote(
         scoreFile: File, recordList: RecordList,
-        git: Git, repo: File, user: String, puzzle: Puzzle,
+        git: Git, repo: File, user: String, puzzle: Puzzle, score: Score,
         updated: Collection<String>
     ) {
         scoreFile.writeText(Json.encodeToString(recordList))
         git.add().addFilepattern(scoreFile.name).call()
-        git.commitAndPushChanges(user, puzzle, updated, gitProperties)
+        git.commitAndPushChanges(user, puzzle, score, updated, gitProperties)
         updateRedditWiki(recordList, repo)
     }
 

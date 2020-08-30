@@ -72,7 +72,7 @@ class GitLeaderboard(private val gitProperties: GitProperties) : Leaderboard {
                     Runtime.getRuntime().exec("/bin/bash ./generate.sh", null, repo).waitFor()
                     git.add().addFilepattern(".").call()
                     if (git.status().call().run { added.isNotEmpty() }) {
-                        git.commitAndPushChanges(user, puzzle, success.keys.map { it.displayName }, gitProperties)
+                        git.commitAndPushChanges(user, puzzle, score, success.keys.map { it.displayName }, gitProperties)
                     }
                     UpdateResult.Success(success)
                 } else {
