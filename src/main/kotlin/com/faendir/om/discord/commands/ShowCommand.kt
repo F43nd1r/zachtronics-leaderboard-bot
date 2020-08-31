@@ -1,6 +1,5 @@
 package com.faendir.om.discord.commands
 
-import com.faendir.om.discord.leaderboards.GetResult
 import com.faendir.om.discord.leaderboards.Leaderboard
 import com.faendir.om.discord.puzzle.Puzzle
 import com.faendir.om.discord.utils.reply
@@ -27,17 +26,21 @@ class ShowCommand(private val leaderboards: List<Leaderboard>) : Command {
         channel.reply(author, when (puzzles.size) {
             1 -> {
                 val puzzle = puzzles.first()
-                if(!category.supportedTypes.contains(puzzle.type)) {
+                if (!category.supportedTypes.contains(puzzle.type)) {
                     "sorry, the category ${category.displayName} does not support puzzles of type ${puzzle.type.name.toLowerCase()}."
-                } else if(!category.supportedGroups.contains(puzzle.group)){
-                    "sorry, the category ${category.displayName} does not support puzzles in ${puzzle.group.name.replace("_", " ").toLowerCase().capitalize()}."
+                } else if (!category.supportedGroups.contains(puzzle.group)) {
+                    "sorry, the category ${category.displayName} does not support puzzles in ${
+                        puzzle.group.name.replace(
+                            "_",
+                            " "
+                        ).toLowerCase().capitalize()
+                    }."
                 } else {
-                    when (val getResult = leaderboard.get(puzzle, category)) {
-                        is GetResult.Success -> "here you go: ${puzzle.displayName} ${category.displayName} ${
-                            getResult.score.reorderToStandard().toString("/")
-                        } ${getResult.link}"
-                        is GetResult.NoScore -> "sorry, there is no score for ${puzzle.displayName} ${category.displayName}."
-                    }
+                    leaderboard.get(puzzle, category)?.let {
+                        "here you go: ${puzzle.displayName} ${category.displayName} ${
+                            it.score.reorderToStandard().toString("/")
+                        } ${it.link}"
+                    } ?: "sorry, there is no score for ${puzzle.displayName} ${category.displayName}."
                 }
             }
             0 -> "sorry, I did not recognize the puzzle \"$puzzleName\"."

@@ -1,11 +1,11 @@
 package com.faendir.om.discord.leaderboards.reddit
 
-import com.faendir.om.discord.leaderboards.GetResult
 import com.faendir.om.discord.leaderboards.Leaderboard
 import com.faendir.om.discord.leaderboards.UpdateResult
 import com.faendir.om.discord.leaderboards.git.GitProperties
 import com.faendir.om.discord.model.Category
 import com.faendir.om.discord.model.Category.*
+import com.faendir.om.discord.model.Record
 import com.faendir.om.discord.model.Score
 import com.faendir.om.discord.model.ScorePart
 import com.faendir.om.discord.puzzle.Group
@@ -92,8 +92,7 @@ class RedditLeaderboard(private val redditService: RedditService, private val gi
     }
 
     private fun updateRemote(
-        scoreFile: File, recordList: RecordList,
-        git: Git, repo: File, user: String, puzzle: Puzzle, score: Score,
+        scoreFile: File, recordList: RecordList, git: Git, repo: File, user: String, puzzle: Puzzle, score: Score,
         updated: Collection<String>
     ) {
         scoreFile.writeText(Json { prettyPrint = true }.encodeToString(recordList))
@@ -166,18 +165,14 @@ class RedditLeaderboard(private val redditService: RedditService, private val gi
         }](${first().link})${if (any { it.category.name.contains("X") }) "*" else ""}"
     }
 
-    override fun get(puzzle: Puzzle, category: Category): GetResult {
+    override fun get(puzzle: Puzzle, category: Category): Record? {
         return redditService.accessRepo { _, repo ->
             val scoreFile = File(repo, "scores.json")
             val recordList: RecordList = Json.decodeFromString(scoreFile.readText())
-            recordList[puzzle]?.records?.find { it.category == category }?.let { GetResult.Success(it.score, it.link) }
-                ?: GetResult.NoScore
+            recordList[puzzle]?.records?.find { it.category == category }?.let { Record(category, it.score, it.link) }
         }
     }
 }
-
-@Serializable
-data class Record(val category: Category, val score: Score, val link: String)
 
 @Serializable
 data class PuzzleEntry(val records: MutableList<Record>, val pareto: MutableList<Score>)

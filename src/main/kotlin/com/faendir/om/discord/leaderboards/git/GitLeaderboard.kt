@@ -1,9 +1,9 @@
 package com.faendir.om.discord.leaderboards.git
 
-import com.faendir.om.discord.leaderboards.GetResult
 import com.faendir.om.discord.leaderboards.Leaderboard
 import com.faendir.om.discord.leaderboards.UpdateResult
 import com.faendir.om.discord.model.Category
+import com.faendir.om.discord.model.Record
 import com.faendir.om.discord.model.Score
 import com.faendir.om.discord.model.ScorePart.*
 import com.faendir.om.discord.puzzle.Puzzle
@@ -82,19 +82,19 @@ class GitLeaderboard(private val gitProperties: GitProperties) : Leaderboard {
         }
     }
 
-    override fun get(puzzle: Puzzle, category: Category): GetResult {
+    override fun get(puzzle: Puzzle, category: Category): Record? {
         synchronized(repo) {
             Git.open(repo).use { git ->
                 git.pull().call()
                 val prefix = category.displayName
                 val puzzleDir = puzzle.findPuzzleDir()
                 return puzzleDir.listFiles()?.find { it.name.startsWith(prefix) }?.let {
-                    GetResult.Success(
+                    Record(category,
                         it.getScore(), "https://f43nd1r.github.io/om-leaderboard/${
                             puzzleDir.relativeTo(repo).path
                         }/${URLEncoder.encode(it.name, Charsets.US_ASCII).replace("+", "%20")}"
                     )
-                } ?: GetResult.NoScore
+                }
             }
         }
     }
