@@ -1,4 +1,4 @@
-package com.faendir.om.discord.jda
+package com.faendir.om.discord.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration

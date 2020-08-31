@@ -3,8 +3,10 @@ package com.faendir.om.discord.reddit
 import com.faendir.om.discord.leaderboards.Leaderboard
 import com.faendir.om.discord.model.Score
 import com.faendir.om.discord.puzzle.Puzzle
-import com.faendir.om.discord.utils.find
-import net.dean.jraw.models.SubredditSort
+import com.faendir.om.discord.utils.findCategories
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -16,18 +18,16 @@ import java.util.*
 @Service
 @EnableScheduling
 class RedditPostScraper(private val redditService: RedditService, private val leaderboards: List<Leaderboard>) {
+    companion object {
+        private const val timestampFile = "last_update.json"
+    }
+
     private lateinit var trustedUsers: List<String>
-    val reddit
-        get() = redditService.reddit
-    private var lastUpdate: Date? = null
     val mainRegex = Regex("\\s*(?<puzzle>[^:]*)[:\\s]\\s*(\\[[^]]*]\\([^)]*\\)[,\\s]*)+")
-    val scoreRegex =
-        Regex("\\[(?<score>[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?(/[\\d.]+[a-zA-Z]?)?)]\\((?<link>http.*)\\)[,\\s]*")
+    val scoreRegex = Regex("\\[(?<score>[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?(/[\\d.]+[a-zA-Z]?)?)]\\((?<link>http.*)\\)[,\\s]*")
 
     init {
-        redditService.accessRepo { _, repo ->
-            trustedUsers = File(repo, "trusted_users.txt").readLines().filter { !it.isBlank() }.map { it.trim() }
-        }
+        redditService.access { trustedUsers = File(repo, "trusted_users.txt").readLines().filter { !it.isBlank() }.map { it.trim() } }
     }
 
     /*@PostConstruct
@@ -68,10 +68,9 @@ class RedditPostScraper(private val redditService: RedditService, private val le
 
     @Scheduled(fixedRate = 1000 * 60 * 60)
     fun pullFromReddit() {
-        val submissionThread =
-            reddit.subreddit("opus_magnum").posts().sorting(SubredditSort.HOT).limit(5).build().asSequence().flatten()
-                .find { it.title.contains("official record submission thread", ignoreCase = true) }
-        submissionThread?.toReference(reddit)?.comments()?.walkTree()?.forEach { commentNode ->
+        val submissionThread = redditService.hotPosts().find { it.title.contains("official record submission thread", ignoreCase = true) }
+        val lastUpdate: Date? = redditService.access { File(repo, timestampFile).takeIf { it.exists() }?.readText() }?.let { Json.decodeFromString(it) }
+        submissionThread?.toReference(redditService.reddit)?.comments()?.walkTree()?.forEach { commentNode ->
             val comment = commentNode.subject
             if (comment.body != null && comment.body != "[deleted]" && trustedUsers.contains(comment.author)) {
                 if (lastUpdate == null || (comment.edited ?: comment.created).after(lastUpdate)) {
@@ -86,25 +85,17 @@ class RedditPostScraper(private val redditService: RedditService, private val le
                         command.groupValues.drop(2).forEach inner@{ group ->
                             val subCommand = scoreRegex.matchEntire(group) ?: return@inner
                             val score: Score = Score.parse(puzzle, subCommand.groups["score"]!!.value) ?: return@inner
-                            val leaderboardCategories = leaderboards.find(puzzle, score)
+                            val leaderboardCategories = leaderboards.findCategories(puzzle, score)
                             if (leaderboardCategories.isEmpty()) {
                                 return@inner
                             }
                             val link = subCommand.groups["link"]!!.value
-                            leaderboardCategories.forEach { (leaderboard, categories) ->
-                                leaderboard.update(
-                                    comment.author,
-                                    puzzle,
-                                    categories,
-                                    score,
-                                    link
-                                )
-                            }
+                            leaderboardCategories.forEach { (leaderboard, categories) -> leaderboard.update(comment.author, puzzle, categories, score, link) }
                         }
                     }
                 }
             }
         }
-        lastUpdate = Date.from(Instant.now().minus(5, ChronoUnit.MINUTES))
+        redditService.access { File(repo, timestampFile).writeText(Json.encodeToString(Date.from(Instant.now().minus(5, ChronoUnit.MINUTES)))) }
     }
 }

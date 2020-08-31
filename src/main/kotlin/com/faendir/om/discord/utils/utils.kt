@@ -1,7 +1,7 @@
 package com.faendir.om.discord.utils
 
 import com.faendir.om.discord.leaderboards.Leaderboard
-import com.faendir.om.discord.leaderboards.git.GitProperties
+import com.faendir.om.discord.config.GitProperties
 import com.faendir.om.discord.model.Category
 import com.faendir.om.discord.model.Score
 import com.faendir.om.discord.puzzle.Puzzle
@@ -10,9 +10,7 @@ import net.dv8tion.jda.api.entities.User
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 
-fun TextChannel.reply(user: User, message: String) = sendMessage("${user.asMention} $message").mention(user).queue()
-
-fun List<Leaderboard>.find(puzzle: Puzzle, score: Score): Map<Leaderboard, List<Category>> =
+fun List<Leaderboard>.findCategories(puzzle: Puzzle, score: Score): Map<Leaderboard, List<Category>> =
     mapNotNull { leaderboard ->
         val categories = leaderboard.supportedCategories.filter {
             it.supportedGroups.contains(puzzle.group) &&
@@ -21,26 +19,3 @@ fun List<Leaderboard>.find(puzzle: Puzzle, score: Score): Map<Leaderboard, List<
         }
         if (categories.isNotEmpty()) leaderboard to categories else null
     }.toMap()
-
-fun Git.commitAndPushChanges(
-    user: String,
-    puzzle: Puzzle,
-    score: Score,
-    updated: Collection<String>,
-    gitProperties: GitProperties
-) {
-    commit()
-        .setAuthor("om-leaderboard-discord-bot", "om-leaderboard-discord-bot@faendir.com")
-        .setCommitter(
-            "om-leaderboard-discord-bot",
-            "om-leaderboard-discord-bot@faendir.com"
-        )
-        .setMessage("[BOT] ${puzzle.displayName} ${score.reorderToStandard().toString("/")} $updated by $user")
-        .call()
-    push().setCredentialsProvider(
-        UsernamePasswordCredentialsProvider(
-            gitProperties.username,
-            gitProperties.accessToken
-        )
-    ).setTimeout(120).call()
-}

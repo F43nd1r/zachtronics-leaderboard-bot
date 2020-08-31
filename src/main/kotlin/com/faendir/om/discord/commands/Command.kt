@@ -14,5 +14,5 @@ interface Command {
     val requiresRoles: List<String>
         get() = emptyList()
 
-    fun handleMessage(author: User, channel: TextChannel, message: Message, command: MatchResult)
+    fun handleMessage(author: User, channel: TextChannel, message: Message, command: MatchResult) : String
 }

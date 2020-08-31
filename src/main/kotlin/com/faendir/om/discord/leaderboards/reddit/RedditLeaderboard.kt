@@ -1,8 +1,9 @@
 package com.faendir.om.discord.leaderboards.reddit
 
+import com.faendir.om.discord.config.GitProperties
+import com.faendir.om.discord.git.GitRepository
 import com.faendir.om.discord.leaderboards.Leaderboard
 import com.faendir.om.discord.leaderboards.UpdateResult
-import com.faendir.om.discord.leaderboards.git.GitProperties
 import com.faendir.om.discord.model.Category
 import com.faendir.om.discord.model.Category.*
 import com.faendir.om.discord.model.Record
@@ -12,30 +13,32 @@ import com.faendir.om.discord.puzzle.Group
 import com.faendir.om.discord.puzzle.Puzzle
 import com.faendir.om.discord.puzzle.Type
 import com.faendir.om.discord.reddit.RedditService
-import com.faendir.om.discord.utils.commitAndPushChanges
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.eclipse.jgit.api.Git
 import org.springframework.stereotype.Component
 import java.io.File
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
+import javax.annotation.PostConstruct
 
 @Component
-class RedditLeaderboard(private val redditService: RedditService, private val gitProperties: GitProperties) :
-    Leaderboard {
+class RedditLeaderboard(private val redditService: RedditService, private val gitProperties: GitProperties) : Leaderboard {
+    companion object {
+        private const val scoreFileName = "scores.json"
+    }
 
-    override val supportedCategories: Collection<Category> = listOf(
-        GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SG, SGP, SC, SCP, SA, SI
-    )
+    @PostConstruct
+    fun onStartUp() {
+        redditService.access { File(repo, scoreFileName).takeIf { it.exists() }?.readText()?.let { updateRedditWiki(Json.decodeFromString(it), repo) } }
+    }
 
-    override fun update(
-        user: String, puzzle: Puzzle, categories: List<Category>, score: Score, link: String
-    ): UpdateResult {
-        return redditService.accessRepo { git, repo ->
-            val scoreFile = File(repo, "scores.json")
+    override val supportedCategories: Collection<Category> = listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SG, SGP, SC, SCP, SA, SI)
+
+    override fun update(user: String, puzzle: Puzzle, categories: List<Category>, score: Score, link: String): UpdateResult {
+        return redditService.access {
+            val scoreFile = File(repo, scoreFileName)
             val recordList: RecordList = Json.decodeFromString(scoreFile.readText())
             val betterExists = mutableMapOf<Category, Score>()
             val success = mutableMapOf<Category, Score?>()
@@ -52,11 +55,7 @@ class RedditLeaderboard(private val redditService: RedditService, private val gi
                 }
             }
             var paretoUpdate = false
-            val requiredParts = listOf(
-                ScorePart.COST,
-                ScorePart.CYCLES,
-                if (puzzle.type == Type.PRODUCTION) ScorePart.INSTRUCTIONS else ScorePart.AREA
-            )
+            val requiredParts = listOf(ScorePart.COST, ScorePart.CYCLES, if (puzzle.type == Type.PRODUCTION) ScorePart.INSTRUCTIONS else ScorePart.AREA)
             if (score.parts.keys.containsAll(requiredParts)) {
                 val paretoScore = Score(requiredParts.map { it to score.parts[it]!! }.toMap(LinkedHashMap()))
                 val entry = (recordList[puzzle] ?: PuzzleEntry(mutableListOf(), mutableListOf()))
@@ -69,19 +68,11 @@ class RedditLeaderboard(private val redditService: RedditService, private val gi
             }
             when {
                 success.isNotEmpty() -> {
-                    updateRemote(
-                        scoreFile,
-                        recordList,
-                        git,
-                        repo,
-                        user,
-                        puzzle,
-                        score,
-                        success.keys.map { it.displayName })
+                    updateRemote(scoreFile, recordList, user, puzzle, score, success.keys.map { it.displayName })
                     UpdateResult.Success(success)
                 }
                 paretoUpdate -> {
-                    updateRemote(scoreFile, recordList, git, repo, user, puzzle, score, listOf("pareto"))
+                    updateRemote(scoreFile, recordList, user, puzzle, score, listOf("PARETO"))
                     UpdateResult.ParetoUpdate
                 }
                 else -> {
@@ -91,13 +82,10 @@ class RedditLeaderboard(private val redditService: RedditService, private val gi
         }
     }
 
-    private fun updateRemote(
-        scoreFile: File, recordList: RecordList, git: Git, repo: File, user: String, puzzle: Puzzle, score: Score,
-        updated: Collection<String>
-    ) {
+    private fun GitRepository.AccessScope.updateRemote(scoreFile: File, recordList: RecordList, user: String, puzzle: Puzzle, score: Score, updated: Collection<String>) {
         scoreFile.writeText(Json { prettyPrint = true }.encodeToString(recordList))
-        git.add().addFilepattern(scoreFile.name).call()
-        git.commitAndPushChanges(user, puzzle, score, updated, gitProperties)
+        add(scoreFile)
+        commitAndPush(user, puzzle, score, updated)
         updateRedditWiki(recordList, repo)
     }
 
@@ -122,10 +110,7 @@ class RedditLeaderboard(private val redditService: RedditService, private val gi
                 val entry = recordList[puzzle] ?: PuzzleEntry(mutableListOf(), mutableListOf())
                 table += "[**${puzzle.displayName}**](##Frontier: ${
                     entry.pareto.joinToString(" ") {
-                        it.toString(
-                            "/",
-                            false
-                        )
+                        it.toString("/", false)
                     }
                 }##)"
 
@@ -133,9 +118,7 @@ class RedditLeaderboard(private val redditService: RedditService, private val gi
                 val cycleScores = filterRecords(entry.records, cycleCategories)
                 val areaInstructionScores = filterRecords(entry.records, areaInstructionCategories)
                 val sumScores = filterRecords(entry.records, sumCategories)
-                while (costScores.isNotEmpty() || cycleScores.isNotEmpty() ||
-                    areaInstructionScores.isNotEmpty() || sumScores.isNotEmpty()
-                ) {
+                while (costScores.isNotEmpty() || cycleScores.isNotEmpty() || areaInstructionScores.isNotEmpty() || sumScores.isNotEmpty()) {
                     table += "|${costScores.removeFirstOrNull().toMarkdown()}|${
                         cycleScores.removeFirstOrNull().toMarkdown()
                     }|${areaInstructionScores.removeFirstOrNull().toMarkdown()}|${
@@ -149,13 +132,11 @@ class RedditLeaderboard(private val redditService: RedditService, private val gi
         table += "Table built on ${OffsetDateTime.now(ZoneOffset.UTC)}"
         val prefix = File(repo, "prefix.md").readText()
         val suffix = File(repo, "suffix.md").readText()
-        redditService.reddit.subreddit("opus_magnum").wiki()
-            .update("index", "$prefix\n$table\n$suffix", "bot update")
+        redditService.reddit.subreddit("opus_magnum").wiki().update("index", "$prefix\n$table\n$suffix", "bot update")
     }
 
     private fun filterRecords(records: List<Record>, filter: List<Category>): MutableList<List<Record>> {
-        return records.filter { filter.contains(it.category) }.groupBy { it.link }.values
-            .map { it.sortedBy(Record::category) }.sortedBy { it.first().category }.toMutableList()
+        return records.filter { filter.contains(it.category) }.groupBy { it.link }.values.map { it.sortedBy(Record::category) }.sortedBy { it.first().category }.toMutableList()
     }
 
     private fun List<Record>?.toMarkdown(): String {
@@ -166,8 +147,8 @@ class RedditLeaderboard(private val redditService: RedditService, private val gi
     }
 
     override fun get(puzzle: Puzzle, category: Category): Record? {
-        return redditService.accessRepo { _, repo ->
-            val scoreFile = File(repo, "scores.json")
+        return redditService.access {
+            val scoreFile = File(repo, scoreFileName)
             val recordList: RecordList = Json.decodeFromString(scoreFile.readText())
             recordList[puzzle]?.records?.find { it.category == category }?.let { Record(category, it.score, it.link) }
         }

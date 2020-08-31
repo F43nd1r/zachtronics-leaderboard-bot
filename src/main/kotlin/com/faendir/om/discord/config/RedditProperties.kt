@@ -1,11 +1,13 @@
-package com.faendir.om.discord.leaderboards.git
+package com.faendir.om.discord.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-@ConfigurationProperties(prefix = "git")
-class GitProperties {
+@ConfigurationProperties(prefix = "reddit")
+class RedditProperties {
     lateinit var accessToken: String
+    lateinit var clientId: String
     lateinit var username: String
+    lateinit var password: String
 }
