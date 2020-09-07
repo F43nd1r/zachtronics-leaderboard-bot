@@ -20,7 +20,8 @@ private val whGroups = setOf(
     Group.JOURNAL_V,
     Group.JOURNAL_VII,
     Group.JOURNAL_VIII,
-    Group.JOURNAL_IX
+    Group.JOURNAL_IX,
+    Group.TOURNAMENT_2019
 )
 
 enum class Category(
