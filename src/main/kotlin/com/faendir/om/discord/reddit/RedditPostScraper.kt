@@ -96,6 +96,9 @@ class RedditPostScraper(private val redditService: RedditService, private val le
                 }
             }
         }
-        redditService.access { File(repo, timestampFile).writeText(Json.encodeToString(Date.from(Instant.now().minus(5, ChronoUnit.MINUTES)))) }
+        redditService.access {
+            File(repo, timestampFile).writeText(Json.encodeToString(Date.from(Instant.now().minus(5, ChronoUnit.MINUTES))))
+            commitAndPush("[BOT] timestamp update")
+        }
     }
 }
