@@ -3,6 +3,7 @@ package com.faendir.om.discord.reddit
 import com.faendir.om.discord.leaderboards.Leaderboard
 import com.faendir.om.discord.model.Score
 import com.faendir.om.discord.puzzle.Puzzle
+import com.faendir.om.discord.utils.DateSerializer
 import com.faendir.om.discord.utils.findCategories
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -69,7 +70,7 @@ class RedditPostScraper(private val redditService: RedditService, private val le
     @Scheduled(fixedRate = 1000 * 60 * 60)
     fun pullFromReddit() {
         val submissionThread = redditService.hotPosts().find { it.title.contains("official record submission thread", ignoreCase = true) }
-        val lastUpdate: Date? = redditService.access { File(repo, timestampFile).takeIf { it.exists() }?.readText() }?.let { Json.decodeFromString(it) }
+        val lastUpdate: Date? = redditService.access { File(repo, timestampFile).takeIf { it.exists() }?.readText() }?.let { Json.decodeFromString(DateSerializer, it) }
         submissionThread?.toReference(redditService.reddit)?.comments()?.walkTree()?.forEach { commentNode ->
             val comment = commentNode.subject
             if (comment.body != null && comment.body != "[deleted]" && trustedUsers.contains(comment.author)) {
@@ -97,7 +98,9 @@ class RedditPostScraper(private val redditService: RedditService, private val le
             }
         }
         redditService.access {
-            File(repo, timestampFile).writeText(Json.encodeToString(Date.from(Instant.now().minus(5, ChronoUnit.MINUTES))))
+            val timestamp = File(repo, timestampFile)
+            timestamp.writeText(Json.encodeToString(DateSerializer, Date.from(Instant.now().minus(5, ChronoUnit.MINUTES))))
+            add(timestamp)
             commitAndPush("[BOT] timestamp update")
         }
     }
