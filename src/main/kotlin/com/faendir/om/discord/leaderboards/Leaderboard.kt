@@ -1,27 +1,26 @@
 package com.faendir.om.discord.leaderboards
 
-import com.faendir.om.discord.model.Category
-import com.faendir.om.discord.model.Record
-import com.faendir.om.discord.model.Score
-import com.faendir.om.discord.puzzle.Puzzle
+import com.faendir.om.discord.model.*
 
-interface Leaderboard {
-    val supportedCategories: Collection<Category>
+interface Leaderboard<C : Category<C, S, *>, S : Score<S, *>, P : Puzzle> {
+    val game: Game<S, P>
 
-    fun update(user: String, puzzle: Puzzle, categories: List<Category>, score: Score, link: String) : UpdateResult
+    val supportedCategories: Collection<C>
 
-    fun get(puzzle: Puzzle, category: Category) : Record?
+    fun update(user: String, puzzle: P, categories: List<C>, score: S, link: String): UpdateResult<C, S> = UpdateResult.NotSupported()
+
+    fun get(puzzle: P, category: C): Record?
 }
 
-sealed class UpdateResult {
-    class Success(val oldScores: Map<Category,Score?>) : UpdateResult()
+sealed class UpdateResult<C : Category<C, S, *>, S : Score<S, *>> {
+    class Success<C : Category<C, S, *>, S : Score<S, *>>(val oldScores: Map<C, S?>) : UpdateResult<C, S>()
 
-    object ParetoUpdate : UpdateResult()
+    class ParetoUpdate<C : Category<C, S, *>, S : Score<S, *>> : UpdateResult<C, S>()
 
-    class BetterExists(val scores: Map<Category,Score>) : UpdateResult()
+    class BetterExists<C : Category<C, S, *>, S : Score<S, *>>(val scores: Map<C, S>) : UpdateResult<C, S>()
 
-    object BrokenLink : UpdateResult()
+    class BrokenLink<C : Category<C, S, *>, S : Score<S, *>> : UpdateResult<C, S>()
 
-    class GenericFailure(val exception: Exception) : UpdateResult()
+    class NotSupported<C : Category<C, S, *>, S : Score<S, *>> : UpdateResult<C, S>()
 }
 

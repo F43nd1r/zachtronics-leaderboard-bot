@@ -1,36 +1,12 @@
-package com.faendir.om.discord.puzzle
+package com.faendir.om.discord.model.om
 
-import com.faendir.om.discord.puzzle.Group.*
-import com.faendir.om.discord.puzzle.Type.*
-
-enum class Group(val displayName: String) {
-    CHAPTER_1("Chapter 1"),
-    CHAPTER_2("Chapter 2"),
-    CHAPTER_3("Chapter 3"),
-    CHAPTER_4("Chapter 4"),
-    CHAPTER_5("Chapter 5"),
-    CHAPTER_PRODUCTION("Production Alchemy"),
-    JOURNAL_I("Journal I"),
-    JOURNAL_II("Journal II"),
-    JOURNAL_III("Journal III"),
-    JOURNAL_IV("Journal IV"),
-    JOURNAL_V("Journal V"),
-    JOURNAL_VI("Journal VI"),
-    JOURNAL_VII("Journal VII"),
-    JOURNAL_VIII("Journal VIII"),
-    JOURNAL_IX("Journal IX"),
-    TOURNAMENT_2019("Tournament");
-}
-
-enum class Type {
-    NORMAL,
-    INFINITE,
-    PRODUCTION,
-}
+import com.faendir.om.discord.model.Puzzle
+import com.faendir.om.discord.model.om.OmGroup.*
+import com.faendir.om.discord.model.om.OmType.*
 
 
 @Suppress("unused", "SpellCheckingInspection")
-enum class Puzzle(val group: Group, val type: Type, val displayName:String) {
+enum class OmPuzzle(override val group: OmGroup, override val type: OmType, override val displayName: String) : Puzzle {
     STABILIZED_WATER(CHAPTER_1, NORMAL, "Stabilized Water"),
     REFINED_GOLD(CHAPTER_1, NORMAL, "Refined Gold"),
     FACE_POWDER(CHAPTER_1, NORMAL, "Face Powder"),
@@ -71,7 +47,7 @@ enum class Puzzle(val group: Group, val type: Type, val displayName:String) {
     UNSTABLE_COMPOUND(CHAPTER_5, NORMAL, "Unstable Compound"),
     CURIOUS_LIPSTICK(CHAPTER_5, NORMAL, "Curious Lipstick"),
     UNIVERSAL_SOLVENT(CHAPTER_5, NORMAL, "Universal Solvent"),
-    
+
     SILVER_PAINT(CHAPTER_PRODUCTION, PRODUCTION, "Silver Paint"),
     VISCOUS_SLUDGE(CHAPTER_PRODUCTION, PRODUCTION, "Viscous Sludge"),
     FRAGRANT_POWDERS(CHAPTER_PRODUCTION, PRODUCTION, "Fragrant Powders"),
@@ -83,25 +59,25 @@ enum class Puzzle(val group: Group, val type: Type, val displayName:String) {
     PARADE_ROCKET_FUEL(CHAPTER_PRODUCTION, PRODUCTION, "Parade-Rocket Fuel"),
     AETHER_DETECTOR(CHAPTER_PRODUCTION, PRODUCTION, "Aether Detector"),
     RECONSTRUCTED_SOLVENT(CHAPTER_PRODUCTION, PRODUCTION, "Reconstructed Solvent"),
-    
+
     VAN_BERLO_S_WHEEL(JOURNAL_I, NORMAL, "Van Berlo's Wheel"),
     VAN_BERLO_S_CHAIN(JOURNAL_I, INFINITE, "Van Berlo's Chain"),
     REACTIVE_CINNABAR(JOURNAL_I, NORMAL, "Reactive Cinnabar"),
     SILVER_CAUSTIC(JOURNAL_I, NORMAL, "Silver Caustic"),
     LAMBENT_II_IX(JOURNAL_I, NORMAL, "Lambent II/IX"),
-    
+
     EXPLORER_S_SALVE(JOURNAL_II, NORMAL, "Explorer's Salve"),
     PRESERVATIVE_SALT(JOURNAL_II, NORMAL, "Preservative Salt"),
     SAILCLOTH_THREAD(JOURNAL_II, INFINITE, "Sailcloth Thread"),
     BUOYANT_CABLE(JOURNAL_II, INFINITE, "Buoyant Cable"),
     SPYGLASS_CRYSTAL(JOURNAL_II, NORMAL, "Spyglass Crystal"),
-    
+
     RAVARI_S_WHEEL(JOURNAL_III, NORMAL, "Ravari's Wheel"),
     LUBRICATING_FILAMENT(JOURNAL_III, INFINITE, "Lubricating Filament"),
     RESONANT_CRYSTAL(JOURNAL_III, NORMAL, "Resonant Crystal"),
     REFINED_BRONZE(JOURNAL_III, INFINITE, "Refined Bronze"),
     ABLATIVE_CRYSTAL(JOURNAL_III, NORMAL, "Ablative Crystal"),
-    
+
     PROOF_OF_COMPLETENESS(JOURNAL_IV, NORMAL, "Proof of Completeness"),
     WHEEL_REPRESENTATION(JOURNAL_IV, NORMAL, "Wheel Representation"),
     SYNTHESIS_VIA_ALCOHOL(JOURNAL_IV, NORMAL, "Synthesis via Alcohol"),
@@ -112,7 +88,7 @@ enum class Puzzle(val group: Group, val type: Type, val displayName:String) {
     SUTURE_THREAD(JOURNAL_V, INFINITE, "Suture Thread"),
     BLOOD_STANCHING_POWDER(JOURNAL_V, NORMAL, "Blood-Stanching Powder"),
     TONIC_OF_HYDRATION(JOURNAL_V, NORMAL, "Tonic of Hydration"),
-    
+
     HEXSTABILIZED_SALT(JOURNAL_VI, PRODUCTION, "Hexstabilized Salt"),
     LUSTRE(JOURNAL_VI, PRODUCTION, "Lustre"),
     LAMPLIGHT_GAS(JOURNAL_VI, PRODUCTION, "Lamplight Gas"),
@@ -145,11 +121,5 @@ enum class Puzzle(val group: Group, val type: Type, val displayName:String) {
     MIRACULOUS_AUTOSALT(TOURNAMENT_2019, NORMAL, "Miraculous Autosalt"),
     DO_YOU_REMEMBER(TOURNAMENT_2019, NORMAL, "Do You Remember"),
     EVIL_ORE(TOURNAMENT_2019, NORMAL, "Evil Ore"),
-    PANACEA(TOURNAMENT_2019, NORMAL, "Panacea")
-    ;
-
-
-    companion object {
-        fun findByName(name: String): List<Puzzle> = values().filter { it.displayName.contains(name, ignoreCase = true) }
-    }
+    PANACEA(TOURNAMENT_2019, NORMAL, "Panacea");
 }

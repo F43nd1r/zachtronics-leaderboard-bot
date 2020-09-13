@@ -1,8 +1,8 @@
 package com.faendir.om.discord.git
 
 import com.faendir.om.discord.config.GitProperties
+import com.faendir.om.discord.model.Puzzle
 import com.faendir.om.discord.model.Score
-import com.faendir.om.discord.puzzle.Puzzle
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.Status
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
@@ -42,7 +42,7 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
 
         fun status(): Status = git.status().call()
 
-        fun commitAndPush(user: String, puzzle: Puzzle, score: Score, updated: Collection<String>) {
+        fun commitAndPush(user: String, puzzle: Puzzle, score: Score<*, *>, updated: Collection<String>) {
             commitAndPush("[BOT] ${puzzle.displayName} ${score.reorderToStandard().toString("/")} $updated by $user")
         }
 

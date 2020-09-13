@@ -1,9 +1,10 @@
 package com.faendir.om.discord.commands
 
-import com.faendir.om.discord.puzzle.Puzzle
+import com.faendir.om.discord.model.Game
+import com.faendir.om.discord.model.Puzzle
 
-fun findPuzzle(puzzleName: String, processPuzzle: (Puzzle) -> String): String {
-    val puzzles = Puzzle.findByName(puzzleName)
+fun <P: Puzzle> findPuzzle(game: Game<*, P>, puzzleName: String, processPuzzle: (P) -> String): String {
+    val puzzles = game.findPuzzleByName(puzzleName)
     return when (val size = puzzles.size) {
         0 -> "sorry, I did not recognize the puzzle \"$puzzleName\"."
         1 -> processPuzzle(puzzles.first())

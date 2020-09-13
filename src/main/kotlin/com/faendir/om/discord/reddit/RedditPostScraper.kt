@@ -1,12 +1,12 @@
 package com.faendir.om.discord.reddit
 
 import com.faendir.om.discord.leaderboards.Leaderboard
-import com.faendir.om.discord.model.Score
-import com.faendir.om.discord.puzzle.Puzzle
+import com.faendir.om.discord.model.om.OmCategory
+import com.faendir.om.discord.model.om.OmPuzzle
+import com.faendir.om.discord.model.om.OmScore
+import com.faendir.om.discord.model.om.OpusMagnum
 import com.faendir.om.discord.utils.DateSerializer
 import com.faendir.om.discord.utils.findCategories
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
@@ -18,7 +18,7 @@ import java.util.*
 
 @Service
 @EnableScheduling
-class RedditPostScraper(private val redditService: RedditService, private val leaderboards: List<Leaderboard>) {
+class RedditPostScraper(private val redditService: RedditService, private val leaderboards: List<Leaderboard<OmCategory, OmScore, OmPuzzle>>) {
     companion object {
         private const val timestampFile = "last_update.json"
     }
@@ -78,20 +78,20 @@ class RedditPostScraper(private val redditService: RedditService, private val le
                     comment.body!!.lines().forEach loop@{ line ->
                         val command = mainRegex.matchEntire(line) ?: return@loop
                         val puzzleName = command.groups["puzzle"]!!.value
-                        val puzzles = Puzzle.findByName(puzzleName)
+                        val puzzles = OpusMagnum.findPuzzleByName(puzzleName)
                         if (puzzles.isEmpty() || puzzles.size > 1) {
                             return@loop
                         }
                         val puzzle = puzzles.first()
                         command.groupValues.drop(2).forEach inner@{ group ->
                             val subCommand = scoreRegex.matchEntire(group) ?: return@inner
-                            val score: Score = Score.parse(puzzle, subCommand.groups["score"]!!.value) ?: return@inner
-                            val leaderboardCategories = leaderboards.findCategories(puzzle, score)
+                            val score: OmScore = OpusMagnum.parseScore(puzzle, subCommand.groups["score"]!!.value) ?: return@inner
+                            val leaderboardCategories = leaderboards.mapNotNull { it.findCategories(puzzle, score) }
                             if (leaderboardCategories.isEmpty()) {
                                 return@inner
                             }
                             val link = subCommand.groups["link"]!!.value
-                            leaderboardCategories.forEach { (leaderboard, categories) -> leaderboard.update(comment.author, puzzle, categories, score, link) }
+                            leaderboardCategories.forEach { (leaderboard, categories) -> leaderboard.update(comment.author, puzzle, categories.toList(), score, link) }
                         }
                     }
                 }
