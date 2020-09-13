@@ -10,8 +10,8 @@ plugins {
     id("com.palantir.docker") version "0.25.0"
 }
 
-group = "com.faendir.om.discord"
-version = "1.0-SNAPSHOT"
+group = "com.faendir.zachtronics.bot"
+version = "1.1-SNAPSHOT"
 
 repositories {
     jcenter()
