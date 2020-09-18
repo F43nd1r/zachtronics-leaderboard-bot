@@ -43,12 +43,12 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
         fun status(): Status = git.status().call()
 
         fun commitAndPush(user: String, puzzle: Puzzle, score: Score<*, *>, updated: Collection<String>) {
-            commitAndPush("[BOT] ${puzzle.displayName} ${score.reorderToStandard().toString("/")} $updated by $user")
+            commitAndPush("${puzzle.displayName} ${score.reorderToStandard().toString("/")} $updated by $user")
         }
 
         fun commitAndPush(message: String) {
             git.commit().setAuthor("om-leaderboard-discord-bot", "om-leaderboard-discord-bot@faendir.com")
-                .setCommitter("om-leaderboard-discord-bot", "om-leaderboard-discord-bot@faendir.com").setMessage(message).call()
+                .setCommitter("om-leaderboard-discord-bot", "om-leaderboard-discord-bot@faendir.com").setMessage("[BOT] $message").call()
             git.push().setCredentialsProvider(UsernamePasswordCredentialsProvider(gitProperties.username, gitProperties.accessToken)).setTimeout(120).call()
         }
     }

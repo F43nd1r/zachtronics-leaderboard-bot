@@ -8,6 +8,8 @@ import com.faendir.zachtronics.bot.model.om.OpusMagnum
 import com.faendir.zachtronics.bot.utils.DateSerializer
 import com.faendir.zachtronics.bot.utils.findCategories
 import kotlinx.serialization.json.Json
+import net.dean.jraw.models.PublicContribution
+import net.dean.jraw.tree.CommentNode
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -21,14 +23,17 @@ import java.util.*
 class RedditPostScraper(private val redditService: RedditService, private val leaderboards: List<Leaderboard<OmCategory, OmScore, OmPuzzle>>) {
     companion object {
         private const val timestampFile = "last_update.json"
+        private const val trustFile = "trusted_users.txt"
     }
 
     private lateinit var trustedUsers: List<String>
     val mainRegex = Regex("\\s*(?<puzzle>[^:]*)[:\\s]\\s*(\\[[^]]*]\\([^)]*\\)[,\\s]*)+")
     val scoreRegex = Regex("\\[(?<score>[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?(/[\\d.]+[a-zA-Z]?)?)]\\((?<link>http.*)\\)[,\\s]*")
 
+    private val moderators by lazy { redditService.subreddit().moderators() }
+
     init {
-        redditService.access { trustedUsers = File(repo, "trusted_users.txt").readLines().filter { !it.isBlank() }.map { it.trim() } }
+        redditService.access { trustedUsers = File(repo, trustFile).readLines().filter { !it.isBlank() }.map { it.trim() } }
     }
 
     /*@PostConstruct
@@ -73,25 +78,26 @@ class RedditPostScraper(private val redditService: RedditService, private val le
         val lastUpdate: Date? = redditService.access { File(repo, timestampFile).takeIf { it.exists() }?.readText() }?.let { Json.decodeFromString(DateSerializer, it) }
         submissionThread?.toReference(redditService.reddit)?.comments()?.walkTree()?.forEach { commentNode ->
             val comment = commentNode.subject
-            if (comment.body != null && comment.body != "[deleted]" && trustedUsers.contains(comment.author)) {
-                if (lastUpdate == null || (comment.edited ?: comment.created).after(lastUpdate)) {
-                    comment.body!!.lines().forEach loop@{ line ->
-                        val command = mainRegex.matchEntire(line) ?: return@loop
-                        val puzzleName = command.groups["puzzle"]!!.value
-                        val puzzles = OpusMagnum.findPuzzleByName(puzzleName)
-                        if (puzzles.isEmpty() || puzzles.size > 1) {
-                            return@loop
+            if (lastUpdate == null || (comment.edited ?: comment.created).after(lastUpdate)) {
+                comment.body?.let { body ->
+                    if (body != "[deleted]") {
+                        if (trustedUsers.contains(comment.author)) {
+                            parseComment(comment)
+                        } else if (body.lines().any { mainRegex.matches(it) }) {
+                            comment.toReference(redditService.reddit).reply("sorry, you're not a trusted user. Wait for a moderator to reply with `!trust-score` or `!trust-user`.")
                         }
-                        val puzzle = puzzles.first()
-                        command.groupValues.drop(2).forEach inner@{ group ->
-                            val subCommand = scoreRegex.matchEntire(group) ?: return@inner
-                            val score: OmScore = OpusMagnum.parseScore(puzzle, subCommand.groups["score"]!!.value) ?: return@inner
-                            val leaderboardCategories = leaderboards.mapNotNull { it.findCategories(puzzle, score) }
-                            if (leaderboardCategories.isEmpty()) {
-                                return@inner
+                        if (body.trim() == "!trust-user" && moderators.contains(comment.author)) {
+                            val trust = getNonBotParentComment(commentNode)
+                            parseComment(trust)
+                            trustedUsers = trustedUsers + trust.author
+                            redditService.access {
+                                val file = File(repo, trustFile)
+                                file.appendText("\n${trust.author}\n")
+                                commitAndPush("added trusted user \"${trust.author}\"")
                             }
-                            val link = subCommand.groups["link"]!!.value
-                            leaderboardCategories.forEach { (leaderboard, categories) -> leaderboard.update(comment.author, puzzle, categories.toList(), score, link) }
+                        }
+                        if (body.trim() == "!trust-score" && moderators.contains(comment.author)) {
+                            parseComment(getNonBotParentComment(commentNode))
                         }
                     }
                 }
@@ -101,7 +107,40 @@ class RedditPostScraper(private val redditService: RedditService, private val le
             val timestamp = File(repo, timestampFile)
             timestamp.writeText(Json.encodeToString(DateSerializer, Date.from(Instant.now().minus(5, ChronoUnit.MINUTES))))
             add(timestamp)
-            commitAndPush("[BOT] timestamp update")
+            commitAndPush("timestamp update")
+        }
+    }
+
+    private fun getNonBotParentComment(commentNode: CommentNode<PublicContribution<*>>): PublicContribution<*> {
+        return commentNode.parent.let { if (it.subject.author == redditService.reddit.me().username) it.parent else it }.subject
+    }
+
+    private fun parseComment(comment: PublicContribution<*>) {
+        var update = false
+        comment.body?.lines()?.forEach loop@{ line ->
+            val command = mainRegex.matchEntire(line) ?: return@loop
+            val puzzleName = command.groups["puzzle"]!!.value
+            val puzzles = OpusMagnum.findPuzzleByName(puzzleName)
+            if (puzzles.isEmpty() || puzzles.size > 1) {
+                return@loop
+            }
+            val puzzle = puzzles.first()
+            command.groupValues.drop(2).forEach inner@{ group ->
+                val subCommand = scoreRegex.matchEntire(group) ?: return@inner
+                val score: OmScore = OpusMagnum.parseScore(puzzle, subCommand.groups["score"]!!.value) ?: return@inner
+                val leaderboardCategories = leaderboards.mapNotNull { it.findCategories(puzzle, score) }
+                if (leaderboardCategories.isEmpty()) {
+                    return@inner
+                }
+                val link = subCommand.groups["link"]!!.value
+                leaderboardCategories.forEach { (leaderboard, categories) ->
+                    leaderboard.update(comment.author, puzzle, categories.toList(), score, link)
+                    update = true
+                }
+            }
+        }
+        if (update) {
+            comment.toReference(redditService.reddit).reply("thanks, your submission(s) have been recorded!")
         }
     }
 }
