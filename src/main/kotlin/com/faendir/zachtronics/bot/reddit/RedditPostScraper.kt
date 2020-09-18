@@ -1,6 +1,8 @@
 package com.faendir.zachtronics.bot.reddit
 
+import com.faendir.zachtronics.bot.discord.DiscordService
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard
+import com.faendir.zachtronics.bot.leaderboards.UpdateResult
 import com.faendir.zachtronics.bot.model.om.OmCategory
 import com.faendir.zachtronics.bot.model.om.OmPuzzle
 import com.faendir.zachtronics.bot.model.om.OmScore
@@ -20,7 +22,8 @@ import java.util.*
 
 @Service
 @EnableScheduling
-class RedditPostScraper(private val redditService: RedditService, private val leaderboards: List<Leaderboard<OmCategory, OmScore, OmPuzzle>>) {
+class RedditPostScraper(private val redditService: RedditService, private val discordService: DiscordService,
+                        private val leaderboards: List<Leaderboard<OmCategory, OmScore, OmPuzzle>>) {
     companion object {
         private const val timestampFile = "last_update.json"
         private const val trustFile = "trusted_users.txt"
@@ -84,7 +87,7 @@ class RedditPostScraper(private val redditService: RedditService, private val le
                         if (trustedUsers.contains(comment.author)) {
                             parseComment(comment)
                         } else if (body.lines().any { mainRegex.matches(it) }) {
-                            comment.toReference(redditService.reddit).reply("sorry, you're not a trusted user. Wait for a moderator to reply with `!trust-score` or `!trust-user`.")
+                            comment.toReference(redditService.reddit).reply("[BOT] sorry, you're not a trusted user. Wait for a moderator to reply with `!trust-score` or `!trust-user`.")
                         }
                         if (body.trim() == "!trust-user" && moderators.contains(comment.author)) {
                             val trust = getNonBotParentComment(commentNode)
@@ -93,6 +96,7 @@ class RedditPostScraper(private val redditService: RedditService, private val le
                             redditService.access {
                                 val file = File(repo, trustFile)
                                 file.appendText("\n${trust.author}\n")
+                                add(file)
                                 commitAndPush("added trusted user \"${trust.author}\"")
                             }
                         }
@@ -133,14 +137,22 @@ class RedditPostScraper(private val redditService: RedditService, private val le
                     return@inner
                 }
                 val link = subCommand.groups["link"]!!.value
-                leaderboardCategories.forEach { (leaderboard, categories) ->
-                    leaderboard.update(comment.author, puzzle, categories.toList(), score, link)
+                val results = leaderboardCategories.map { (leaderboard, categories) ->
                     update = true
+                    leaderboard.update(comment.author, puzzle, categories.toList(), score, link)
+                }
+                val successes = results.filterIsInstance<UpdateResult.Success<*, *>>()
+                if (successes.isNotEmpty()) {
+                    discordService.sendMessage(OpusMagnum.discordChannel, "New submission by ${comment.author} on reddit: ${puzzle.displayName} ${
+                        successes.flatMap { it.oldScores.keys }.map { it.displayName }
+                    } ${score.reorderToStandard().toString("/")} (previously ${
+                        successes.flatMap { it.oldScores.entries }.joinToString { "`${it.key.displayName} ${it.value?.reorderToStandard()?.toString("/") ?: "none"}`" }
+                    }) $link")
                 }
             }
         }
         if (update) {
-            comment.toReference(redditService.reddit).reply("thanks, your submission(s) have been recorded!")
+            comment.toReference(redditService.reddit).reply("[BOT] thanks, your submission(s) have been recorded!")
         }
     }
 }
