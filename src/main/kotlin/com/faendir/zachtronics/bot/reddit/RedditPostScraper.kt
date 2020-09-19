@@ -29,7 +29,7 @@ class RedditPostScraper(private val redditService: RedditService, private val di
     val mainRegex = Regex("\\s*(?<puzzle>[^:]*)[:\\s]\\s*(\\[[^]]*]\\([^)]*\\)[,\\s]*)+")
     val scoreRegex = Regex("\\[(?<score>[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?(/[\\d.]+[a-zA-Z]?)?)]\\((?<link>http.*)\\)[,\\s]*")
 
-    private val moderators by lazy { redditService.subreddit().moderators() }
+    private val moderators by lazy { redditService.subreddit("opus_magnum").moderators() }
 
     init {
         redditService.access { trustedUsers = File(repo, trustFile).readLines().filter { !it.isBlank() }.map { it.trim() } }

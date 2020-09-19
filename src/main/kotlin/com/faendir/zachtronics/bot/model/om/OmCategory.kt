@@ -8,10 +8,10 @@ import com.faendir.zachtronics.bot.model.om.OmType.NORMAL
 
 enum class OmCategory(
     override val displayName: String,
-    val requiredParts: List<OmScorePart>,
+    private val requiredParts: List<OmScorePart>,
     private val isBetterOrEqualImpl: OmCategory.(OmScore, OmScore) -> Boolean,
-    val supportedTypes: Set<OmType> = OmType.values().toSet(),
-    val supportedGroups: Set<OmGroup> = OmGroup.values().toSet(),
+    private val supportedTypes: Set<OmType> = OmType.values().toSet(),
+    private val supportedGroups: Set<OmGroup> = OmGroup.values().toSet(),
 ) : Category<OmCategory, OmScore, OmPuzzle> {
     WIDTH("W", listOf(OmScorePart.WIDTH, CYCLES, COST), OmCategory::normalSort, setOf(NORMAL)),
     HEIGHT("H", listOf(OmScorePart.HEIGHT, CYCLES, COST), OmCategory::normalSort, setOf(NORMAL, INFINITE)),

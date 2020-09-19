@@ -19,7 +19,7 @@ class RedditService(redditProperties: RedditProperties, gitProperties: GitProper
     internal val reddit: RedditClient = OAuthHelper.automatic(OkHttpNetworkAdapter(UserAgent("bot", "com.faendir.zachtronics.bot", "1.0", redditProperties.username)),
         Credentials.script(redditProperties.username, redditProperties.password, redditProperties.clientId, redditProperties.accessToken))
 
-    fun hotPosts() = subreddit().posts().sorting(SubredditSort.HOT).limit(5).build().asSequence().flatten()
+    fun hotPosts() = subreddit("opus_magnum").posts().sorting(SubredditSort.HOT).limit(5).build().asSequence().flatten()
 
-    fun subreddit() = reddit.subreddit("opus_magnum")
+    fun subreddit(name: String) = reddit.subreddit(name)
 }
