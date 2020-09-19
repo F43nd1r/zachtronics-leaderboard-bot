@@ -1,11 +1,8 @@
-import com.faendir.zachtronics.bot.config.GitProperties;
-import com.faendir.zachtronics.bot.config.RedditProperties;
+import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.leaderboards.ScLeaderboard;
 import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.model.sc.ScCategory;
 import com.faendir.zachtronics.bot.model.sc.ScPuzzle;
-import com.faendir.zachtronics.bot.model.sc.SpaceChem;
-import com.faendir.zachtronics.bot.reddit.RedditService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +14,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@EnableConfigurationProperties({RedditProperties.class, GitProperties.class})
-@SpringBootTest(classes = {ScLeaderboard.class, RedditService.class, SpaceChem.class})
+@EnableConfigurationProperties
+@SpringBootTest(classes = Application.class, properties = "spring.main.lazy-initialization=true")
 public class ScLeaderboardTest {
 
     @Autowired
@@ -39,7 +36,7 @@ public class ScLeaderboardTest {
     public void testBadRecord() {
         Record badRecord = scLeaderboard.get(ScPuzzle.research_example_1, ScCategory.RC);
         assertNull(badRecord);
-        badRecord = scLeaderboard.get(ScPuzzle.tf2_1, ScCategory.CNB);
+        badRecord = scLeaderboard.get(ScPuzzle.bonding_7, ScCategory.RCNB);
         assertNull(badRecord);
     }
 
