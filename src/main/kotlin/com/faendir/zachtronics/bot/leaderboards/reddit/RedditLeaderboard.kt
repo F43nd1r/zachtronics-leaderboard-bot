@@ -29,8 +29,6 @@ class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<
         redditService.access { File(repo, scoreFileName).takeIf { it.exists() }?.readText()?.let { updateRedditWiki(Json.decodeFromString(it), repo) } }
     }
 
-    override val game = OpusMagnum
-
     override val supportedCategories: Collection<OmCategory> = listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SG, SGP, SC, SCP, SA, SI)
 
     override fun update(user: String, puzzle: OmPuzzle, categories: List<OmCategory>, score: OmScore, link: String): UpdateResult<OmCategory, OmScore> {
@@ -105,11 +103,7 @@ class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<
             table += "Name|Cost|Cycles|${thirdCategory}|Sum\n:-|:-|:-|:-|:-\n"
             for (puzzle in puzzles) {
                 val entry = recordList[puzzle] ?: PuzzleEntry(mutableListOf(), mutableListOf())
-                table += "[**${puzzle.displayName}**](##Frontier: ${
-                    entry.pareto.joinToString(" ") {
-                        it.toString("/", false)
-                    }
-                }##)"
+                table += "[**${puzzle.displayName}**](##Frontier: ${entry.pareto.joinToString(" ") { it.toShortDisplayString() }}##)"
 
                 val costScores = filterRecords(entry.records, costCategories)
                 val cycleScores = filterRecords(entry.records, cycleCategories)
@@ -138,9 +132,7 @@ class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<
 
     private fun List<OmRecord>?.toMarkdown(): String {
         if (this == null || isEmpty()) return ""
-        return "[${
-            first().score.reorderToStandard().toString("/", false)
-        }](${first().link})${if (any { it.category.name.contains("X") }) "*" else ""}"
+        return "[${first().score.toShortDisplayString()}](${first().link})${if (any { it.category.name.contains("X") }) "*" else ""}"
     }
 
     override fun get(puzzle: OmPuzzle, category: OmCategory): OmRecord? {

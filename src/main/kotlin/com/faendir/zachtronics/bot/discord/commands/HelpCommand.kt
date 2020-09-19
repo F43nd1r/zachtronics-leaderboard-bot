@@ -1,6 +1,7 @@
 package com.faendir.zachtronics.bot.discord.commands
 
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard
+import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Game
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Score
@@ -16,9 +17,8 @@ class HelpCommand(@Lazy private val commands: List<Command>) : Command {
     override val name: String = "help"
     override val helpText: String = "This command"
 
-    override fun <S : Score<S, *>, P : Puzzle> handleMessage(game: Game<S, P>, leaderboards: List<Leaderboard<*, S, P>>, author: User, channel: TextChannel, message: Message,
-                                                             command: MatchResult): String =
-        "Available commands:\n```${makeCommandTable()}```\nSupported categories:\n```${makeCategoryList(leaderboards)}```"
+    override fun <C : Category<C, S, P>, S : Score, P : Puzzle> handleMessage(game: Game<C, S, P>, author: User, channel: TextChannel, message: Message, command: MatchResult) =
+        "Available commands:\n```${makeCommandTable()}```\nSupported categories:\n```${makeCategoryList(game.leaderboards)}```"
 
     private fun makeCommandTable(): String {
         val nameLength = commands.maxOf { it.name.length } + 4
@@ -27,7 +27,8 @@ class HelpCommand(@Lazy private val commands: List<Command>) : Command {
     }
 
     private fun makeCategoryList(leaderboards: List<Leaderboard<*, *, *>>): String {
-        return leaderboards.flatMap { it.supportedCategories }.distinctBy { it.displayName }
-            .joinToString("\n") { category -> "${category.displayName} (${category.requiredParts.joinToString("/") { it.key.toString() }})" }
+        return leaderboards.flatMap { it.supportedCategories }
+            .distinctBy { it.displayName }
+            .joinToString("\n") { category -> "${category.displayName} (${category.contentDescription})" }
     }
 }

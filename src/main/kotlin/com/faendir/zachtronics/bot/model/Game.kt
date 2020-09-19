@@ -1,9 +1,13 @@
 package com.faendir.zachtronics.bot.model
 
-interface Game<S: Score<S, *>, P: Puzzle> {
+import com.faendir.zachtronics.bot.leaderboards.Leaderboard
+
+interface Game<C : Category<C, S, P>, S : Score, P : Puzzle> {
     val discordChannel: String
 
-    fun findPuzzleByName(name: String) : List<P>
+    val leaderboards: List<Leaderboard<C, S, P>>
 
-    fun parseScore(puzzle: P, string: String) : S?
+    fun findPuzzleByName(name: String): List<P>
+
+    fun parseScore(puzzle: P, string: String): S?
 }

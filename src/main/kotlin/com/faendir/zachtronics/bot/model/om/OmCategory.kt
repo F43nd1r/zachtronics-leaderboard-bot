@@ -6,30 +6,15 @@ import com.faendir.zachtronics.bot.model.om.OmType.INFINITE
 import com.faendir.zachtronics.bot.model.om.OmType.NORMAL
 
 
-private val whGroups = setOf(OmGroup.CHAPTER_1,
-    OmGroup.CHAPTER_2,
-    OmGroup.CHAPTER_3,
-    OmGroup.CHAPTER_4,
-    OmGroup.CHAPTER_5,
-    OmGroup.JOURNAL_I,
-    OmGroup.JOURNAL_II,
-    OmGroup.JOURNAL_III,
-    OmGroup.JOURNAL_IV,
-    OmGroup.JOURNAL_V,
-    OmGroup.JOURNAL_VII,
-    OmGroup.JOURNAL_VIII,
-    OmGroup.JOURNAL_IX,
-    OmGroup.TOURNAMENT_2019)
-
 enum class OmCategory(
     override val displayName: String,
-    override val requiredParts: List<OmScorePart>,
+    val requiredParts: List<OmScorePart>,
     private val isBetterOrEqualImpl: OmCategory.(OmScore, OmScore) -> Boolean,
-    override val supportedTypes: Set<OmType> = OmType.values().toSet(),
-    override val supportedGroups: Set<OmGroup> = OmGroup.values().toSet(),
-) : Category<OmCategory, OmScore, OmScorePart> {
-    WIDTH("W", listOf(OmScorePart.WIDTH, CYCLES, COST), OmCategory::normalSort, setOf(NORMAL), whGroups),
-    HEIGHT("H", listOf(OmScorePart.HEIGHT, CYCLES, COST), OmCategory::normalSort, setOf(NORMAL, INFINITE), whGroups),
+    val supportedTypes: Set<OmType> = OmType.values().toSet(),
+    val supportedGroups: Set<OmGroup> = OmGroup.values().toSet(),
+) : Category<OmCategory, OmScore, OmPuzzle> {
+    WIDTH("W", listOf(OmScorePart.WIDTH, CYCLES, COST), OmCategory::normalSort, setOf(NORMAL)),
+    HEIGHT("H", listOf(OmScorePart.HEIGHT, CYCLES, COST), OmCategory::normalSort, setOf(NORMAL, INFINITE)),
 
     GC("GC", listOf(COST, CYCLES, AREA), OmCategory::normalSort, setOf(NORMAL, INFINITE)),
     GA("GA", listOf(COST, AREA, CYCLES), OmCategory::normalSort, setOf(NORMAL, INFINITE)),
@@ -55,6 +40,12 @@ enum class OmCategory(
     SCP("SUM", listOf(COST, CYCLES, INSTRUCTIONS), { s1, s2 -> sumSort(s1, s2, CYCLES) }, setOf(OmType.PRODUCTION)),
     SA("SUM", listOf(COST, CYCLES, AREA), { s1, s2 -> sumSort(s1, s2, AREA) }, setOf(NORMAL, INFINITE)),
     SI("SUM", listOf(COST, CYCLES, INSTRUCTIONS), { s1, s2 -> sumSort(s1, s2, INSTRUCTIONS) }, setOf(OmType.PRODUCTION)), ;
+
+    override val contentDescription: String = requiredParts.joinToString("/") { it.key.toString() }
+
+    override fun supportsPuzzle(puzzle: OmPuzzle) = supportedTypes.contains(puzzle.type) && supportedGroups.contains(puzzle.group)
+
+    override fun supportsScore(score: OmScore) = score.parts.keys.containsAll(requiredParts)
 
     override fun isBetterOrEqual(s1: OmScore, s2: OmScore): Boolean {
         return isBetterOrEqualImpl(s1, s2)
@@ -86,5 +77,10 @@ enum class OmCategory(
         val sum1 = s1.parts.map { it.value }.sum()
         val sum2 = s2.parts.map { it.value }.sum()
         return sum1 < sum2 || (sum1 == sum2 && s1.parts[tieBreaker]!! <= s2.parts[tieBreaker]!!)
+    }
+
+    fun normalizeScore(score: OmScore): OmScore {
+        check(score.parts.keys.containsAll(requiredParts))
+        return OmScore(requiredParts.map { it to score.parts[it]!! }.toMap(LinkedHashMap()))
     }
 }

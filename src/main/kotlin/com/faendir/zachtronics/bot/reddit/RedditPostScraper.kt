@@ -1,14 +1,11 @@
 package com.faendir.zachtronics.bot.reddit
 
 import com.faendir.zachtronics.bot.discord.DiscordService
-import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult
-import com.faendir.zachtronics.bot.model.om.OmCategory
-import com.faendir.zachtronics.bot.model.om.OmPuzzle
 import com.faendir.zachtronics.bot.model.om.OmScore
 import com.faendir.zachtronics.bot.model.om.OpusMagnum
 import com.faendir.zachtronics.bot.utils.DateSerializer
-import com.faendir.zachtronics.bot.utils.findCategories
+import com.faendir.zachtronics.bot.utils.findCategoriesSupporting
 import kotlinx.serialization.json.Json
 import net.dean.jraw.models.PublicContribution
 import net.dean.jraw.tree.CommentNode
@@ -22,8 +19,7 @@ import java.util.*
 
 @Service
 @EnableScheduling
-class RedditPostScraper(private val redditService: RedditService, private val discordService: DiscordService,
-                        private val leaderboards: List<Leaderboard<OmCategory, OmScore, OmPuzzle>>) {
+class RedditPostScraper(private val redditService: RedditService, private val discordService: DiscordService, private val opusMagnum: OpusMagnum) {
     companion object {
         private const val timestampFile = "last_update.json"
         private const val trustFile = "trusted_users.txt"
@@ -87,7 +83,8 @@ class RedditPostScraper(private val redditService: RedditService, private val di
                         if (trustedUsers.contains(comment.author)) {
                             parseComment(comment)
                         } else if (body.lines().any { mainRegex.matches(it) }) {
-                            comment.toReference(redditService.reddit).reply("[BOT] sorry, you're not a trusted user. Wait for a moderator to reply with `!trust-score` or `!trust-user`.")
+                            comment.toReference(redditService.reddit)
+                                .reply("[BOT] sorry, you're not a trusted user. Wait for a moderator to reply with `!trust-score` or `!trust-user`.")
                         }
                         if (body.trim() == "!trust-user" && moderators.contains(comment.author)) {
                             val trust = getNonBotParentComment(commentNode)
@@ -124,15 +121,15 @@ class RedditPostScraper(private val redditService: RedditService, private val di
         comment.body?.lines()?.forEach loop@{ line ->
             val command = mainRegex.matchEntire(line) ?: return@loop
             val puzzleName = command.groups["puzzle"]!!.value
-            val puzzles = OpusMagnum.findPuzzleByName(puzzleName)
+            val puzzles = opusMagnum.findPuzzleByName(puzzleName)
             if (puzzles.isEmpty() || puzzles.size > 1) {
                 return@loop
             }
             val puzzle = puzzles.first()
             command.groupValues.drop(2).forEach inner@{ group ->
                 val subCommand = scoreRegex.matchEntire(group) ?: return@inner
-                val score: OmScore = OpusMagnum.parseScore(puzzle, subCommand.groups["score"]!!.value) ?: return@inner
-                val leaderboardCategories = leaderboards.mapNotNull { it.findCategories(puzzle, score) }
+                val score: OmScore = opusMagnum.parseScore(puzzle, subCommand.groups["score"]!!.value) ?: return@inner
+                val leaderboardCategories = opusMagnum.leaderboards.mapNotNull { it.findCategoriesSupporting(puzzle, score) }
                 if (leaderboardCategories.isEmpty()) {
                     return@inner
                 }
@@ -143,10 +140,10 @@ class RedditPostScraper(private val redditService: RedditService, private val di
                 }
                 val successes = results.filterIsInstance<UpdateResult.Success<*, *>>()
                 if (successes.isNotEmpty()) {
-                    discordService.sendMessage(OpusMagnum.discordChannel, "New submission by ${comment.author} on reddit: ${puzzle.displayName} ${
+                    discordService.sendMessage(opusMagnum.discordChannel, "New record by ${comment.author} on reddit: ${puzzle.displayName} ${
                         successes.flatMap { it.oldScores.keys }.map { it.displayName }
-                    } ${score.reorderToStandard().toString("/")} (previously ${
-                        successes.flatMap { it.oldScores.entries }.joinToString { "`${it.key.displayName} ${it.value?.reorderToStandard()?.toString("/") ?: "none"}`" }
+                    } ${score.toDisplayString()} (previously ${
+                        successes.flatMap { it.oldScores.entries }.joinToString { "`${it.key.displayName} ${it.value?.toDisplayString() ?: "none"}`" }
                     }) $link")
                 }
             }

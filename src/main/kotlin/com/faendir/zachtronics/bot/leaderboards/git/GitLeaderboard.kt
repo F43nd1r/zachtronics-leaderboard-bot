@@ -5,17 +5,23 @@ import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult
 import com.faendir.zachtronics.bot.model.Puzzle
-import com.faendir.zachtronics.bot.model.om.*
+import com.faendir.zachtronics.bot.model.om.OmCategory
+import com.faendir.zachtronics.bot.model.om.OmPuzzle
+import com.faendir.zachtronics.bot.model.om.OmRecord
+import com.faendir.zachtronics.bot.model.om.OmScore
 import com.faendir.zachtronics.bot.model.om.OmScorePart.*
 import com.roxstudio.utils.CUrl
 import org.springframework.stereotype.Component
 import java.io.File
 import java.net.URLEncoder
+import java.text.DecimalFormat
 
 @Component
 class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties, "om-leaderboard", "https://github.com/F43nd1r/om-leaderboard.git"),
                                                      Leaderboard<OmCategory, OmScore, OmPuzzle> {
-    override val game = OpusMagnum
+    companion object {
+        private val numberFormat = DecimalFormat("0.#")
+    }
 
     override val supportedCategories: Collection<OmCategory> = listOf(OmCategory.WIDTH, OmCategory.HEIGHT)
 
@@ -40,7 +46,7 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
                 val existingFile = puzzleDir.listFiles()?.find { it.name.startsWith(prefix) }
                 val existingScore = existingFile?.getScore()
                 if (existingScore == null || category.isBetterOrEqual(score, existingScore) && !linkContent.contentEquals(existingFile.readBytes())) {
-                    val file = File(puzzleDir, "${prefix}_${category.normalizeScore(score).toString("_", false)}.${link.substringAfterLast('.')}")
+                    val file = File(puzzleDir, "${prefix}_${score.toFileName(category)}.${link.substringAfterLast('.')}")
                     file.writeBytes(linkContent)
                     if (file != existingFile) {
                         existingFile?.let { rm(it) }
@@ -63,6 +69,8 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
         }
     }
 
+    private fun OmScore.toFileName(category: OmCategory) = category.normalizeScore(this).parts.asIterable().joinToString("_") { (_, value) -> numberFormat.format(value) }
+
     override fun get(puzzle: OmPuzzle, category: OmCategory): OmRecord? {
         return access {
             val prefix = category.displayName
@@ -75,9 +83,12 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
         }
     }
 
-    private fun findPuzzleDirMatches(repo: File, name: String): List<File> =
-        File(repo, "gif").listFiles()?.sorted()?.flatMap { it.listFiles()?.asIterable()?.sorted() ?: emptyList() }?.filter { it.isDirectory }
-            ?.filter { it.name.contains(name, ignoreCase = true) }?.toList() ?: emptyList()
+    private fun findPuzzleDirMatches(repo: File, name: String): List<File> = File(repo, "gif").listFiles()
+        ?.sorted()
+        ?.flatMap { it.listFiles()?.asIterable()?.sorted() ?: emptyList() }
+        ?.filter { it.isDirectory }
+        ?.filter { it.name.contains(name, ignoreCase = true) }
+        ?.toList() ?: emptyList()
 
     private fun File.getScore(): OmScore {
         return Regex("(?<category>[HW])_(?<hw>[\\d.]+)_(?<cycles>\\d+)_(?<cost>\\d+).*").matchEntire(name)!!.let {

@@ -1,9 +1,11 @@
 package com.faendir.zachtronics.bot.leaderboards
 
-import com.faendir.zachtronics.bot.model.*
+import com.faendir.zachtronics.bot.model.Category
+import com.faendir.zachtronics.bot.model.Puzzle
+import com.faendir.zachtronics.bot.model.Record
+import com.faendir.zachtronics.bot.model.Score
 
-interface Leaderboard<C : Category<C, S, *>, S : Score<S, *>, P : Puzzle> {
-    val game: Game<S, P>
+interface Leaderboard<C : Category<C, S, P>, S : Score, P : Puzzle> {
 
     val supportedCategories: Collection<C>
 
@@ -12,15 +14,15 @@ interface Leaderboard<C : Category<C, S, *>, S : Score<S, *>, P : Puzzle> {
     fun get(puzzle: P, category: C): Record?
 }
 
-sealed class UpdateResult<C : Category<C, S, *>, S : Score<S, *>> {
-    class Success<C : Category<C, S, *>, S : Score<S, *>>(val oldScores: Map<C, S?>) : UpdateResult<C, S>()
+sealed class UpdateResult<C : Category<C, S, *>, S : Score> {
+    class Success<C : Category<C, S, *>, S : Score>(val oldScores: Map<C, S?>) : UpdateResult<C, S>()
 
-    class ParetoUpdate<C : Category<C, S, *>, S : Score<S, *>> : UpdateResult<C, S>()
+    class ParetoUpdate<C : Category<C, S, *>, S : Score> : UpdateResult<C, S>()
 
-    class BetterExists<C : Category<C, S, *>, S : Score<S, *>>(val scores: Map<C, S>) : UpdateResult<C, S>()
+    class BetterExists<C : Category<C, S, *>, S : Score>(val scores: Map<C, S>) : UpdateResult<C, S>()
 
-    class BrokenLink<C : Category<C, S, *>, S : Score<S, *>> : UpdateResult<C, S>()
+    class BrokenLink<C : Category<C, S, *>, S : Score> : UpdateResult<C, S>()
 
-    class NotSupported<C : Category<C, S, *>, S : Score<S, *>> : UpdateResult<C, S>()
+    class NotSupported<C : Category<C, S, *>, S : Score> : UpdateResult<C, S>()
 }
 

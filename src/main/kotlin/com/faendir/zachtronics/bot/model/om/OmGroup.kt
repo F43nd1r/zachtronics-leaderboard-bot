@@ -2,7 +2,7 @@ package com.faendir.zachtronics.bot.model.om
 
 import com.faendir.zachtronics.bot.model.Group
 
-enum class OmGroup(override val displayName: String) : Group<OmGroup> {
+enum class OmGroup(override val displayName: String) : Group {
     CHAPTER_1("Chapter 1"),
     CHAPTER_2("Chapter 2"),
     CHAPTER_3("Chapter 3"),

@@ -1,8 +1,6 @@
 package com.faendir.zachtronics.bot.model.om
 
-import com.faendir.zachtronics.bot.model.ScorePart
-
-enum class OmScorePart(override val key: Char) : ScorePart<OmScorePart> {
+enum class OmScorePart(val key: Char) {
     HEIGHT('h'), WIDTH('w'), COST('g'), CYCLES('c'), AREA('a'), INSTRUCTIONS('i'), COMPUTED('#');
 
     companion object {
