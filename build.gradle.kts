@@ -8,6 +8,7 @@ plugins {
     id("io.spring.dependency-management") version "1.0.7.RELEASE"
     id("org.jetbrains.kotlin.plugin.spring") version "1.4.0"
     id("com.palantir.docker") version "0.25.0"
+    id("io.freefair.lombok") version "5.2.1"
 }
 
 group = "com.faendir.zachtronics.bot"
@@ -31,10 +32,15 @@ dependencies {
     implementation("com.faendir.jraw:JRAW:1.2.0")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs += "-Xjvm-default=enable"
+    }
 }
 
 tasks.getByName<BootJar>("bootJar") {

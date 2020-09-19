@@ -9,6 +9,7 @@ interface Leaderboard<C : Category<C, S, P>, S : Score, P : Puzzle> {
 
     val supportedCategories: Collection<C>
 
+    @JvmDefault
     fun update(user: String, puzzle: P, categories: List<C>, score: S, link: String): UpdateResult<C, S> = UpdateResult.NotSupported()
 
     fun get(puzzle: P, category: C): Record?
