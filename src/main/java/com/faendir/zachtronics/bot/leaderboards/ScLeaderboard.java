@@ -1,6 +1,5 @@
 package com.faendir.zachtronics.bot.leaderboards;
 
-import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
 import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.model.sc.*;
 import com.faendir.zachtronics.bot.reddit.RedditService;
@@ -46,8 +45,8 @@ public class ScLeaderboard implements Leaderboard<ScCategory, ScScore, ScPuzzle>
                 scoreCell = tableCols[column - 1];
             else if (scoreCell.equals("←←"))
                 scoreCell = tableCols[column - 2];
-            Pattern scoreRegex = Pattern
-                    .compile("\\[?(?<score>" + SpaceChem.SCORE_REGEX.pattern() + ")\\s+[^]]+(?:]\\((?<link>[^)]+)\\).*?)?");
+            Pattern scoreRegex = Pattern.compile("(?:†\\s*)?\\[?(?<score>" + SpaceChem.SCORE_REGEX.pattern() +
+                                                 ")\\s+[^]]+(?:]\\((?<link>[^)]+)\\).*?)?");
             Matcher m = scoreRegex.matcher(scoreCell);
             if (m.matches()) {
                 ScScore score = SpaceChem.parseScore(m.group("score"));
@@ -59,7 +58,7 @@ public class ScLeaderboard implements Leaderboard<ScCategory, ScScore, ScPuzzle>
         return null;
     }
 
-    private int findColumn(ScCategory category, int numCols) {
+    private static int findColumn(ScCategory category, int numCols) {
         assert (numCols == 4) || (numCols == 6);
         switch (category) {
             case CYCLES:
