@@ -5,7 +5,7 @@ A discord & reddit bot for automating solution submission/display for [Zachtroni
 Currently included:
  - Opus Magnum
  
-#Build
+# Build
 0. Set up docker-compose, create a discord bot, create a reddit app, get a github personal access token. Follow respective guides.
 
 1. Run gradle:
