@@ -13,10 +13,11 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.GatewayIntent
 import org.springframework.stereotype.Service
+import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 
 @Service
-class DiscordService(discordProperties: DiscordProperties, private val commands: List<Command>, games: List<Game<*, *, *>>) {
+class DiscordService(private val discordProperties: DiscordProperties, private val commands: List<Command>, private val games: List<Game<*, *, *>>) {
     private val adapter = object : ListenerAdapter() {
         override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
             if (!event.author.isBot) {
@@ -26,6 +27,13 @@ class DiscordService(discordProperties: DiscordProperties, private val commands:
         }
     }
     private val jda: JDA = JDABuilder.createLight(discordProperties.token, GatewayIntent.GUILD_MESSAGES).addEventListeners(adapter).build().awaitReady()
+
+    @PostConstruct
+    fun onStartup() {
+        if(discordProperties.debugMessages) {
+            games.forEach { sendMessage(it.discordChannel, "Hello, I\'m now listening to this channel!") }
+        }
+    }
 
     private fun <C : Category<C, S, P>, S : Score, P : Puzzle> handleMessage(event: GuildMessageReceivedEvent, game: Game<C, S, P>) {
         val message = event.message.contentRaw
@@ -50,6 +58,9 @@ class DiscordService(discordProperties: DiscordProperties, private val commands:
 
     @PreDestroy
     fun stop() {
+        if(discordProperties.debugMessages) {
+            games.forEach { sendMessage(it.discordChannel, "Leaving now, bye!") }
+        }
         jda.shutdown()
     }
 }
