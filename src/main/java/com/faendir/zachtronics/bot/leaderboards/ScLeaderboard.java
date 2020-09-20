@@ -29,7 +29,7 @@ public class ScLeaderboard implements Leaderboard<ScCategory, ScScore, ScPuzzle>
     @Override
     public Record get(@NotNull ScPuzzle puzzle, @NotNull ScCategory category) {
         boolean needsReactors = category.name().startsWith("R") && puzzle.getType() != ScType.PRODUCTION_TRIVIAL;
-        String puzzleHeader = puzzle.getDisplayName() + (needsReactors ? " - \\d Reactors?" : "");
+        String puzzleHeader = Pattern.quote(puzzle.getDisplayName()) + (needsReactors ? " - \\d Reactors?" : "");
         Pattern puzzleRegex = Pattern.compile(puzzleHeader);
 
         SubredditReference sc = redditService.subreddit(Subreddit.SPACECHEM);
