@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -30,8 +31,17 @@ public class SpaceChem implements Game<ScCategory, ScScore, ScPuzzle> {
     @Override
     public List<ScPuzzle> findPuzzleByName(@NotNull String name) {
         String nameLower = name.toLowerCase();
-        return Arrays.stream(ScPuzzle.values()).filter(p -> p.getDisplayName().toLowerCase().contains(nameLower))
-                     .collect(Collectors.toList());
+        List<ScPuzzle> result = new ArrayList<>();
+        for (ScPuzzle puzzle : ScPuzzle.values()) {
+            String puzzleNameLower = puzzle.getDisplayName().toLowerCase();
+            if (puzzleNameLower.contains(nameLower)) {
+                if (puzzleNameLower.equals(nameLower))
+                    return Collections.singletonList(puzzle);
+                else
+                    result.add(puzzle);
+            }
+        }
+        return result;
     }
 
     @Nullable
