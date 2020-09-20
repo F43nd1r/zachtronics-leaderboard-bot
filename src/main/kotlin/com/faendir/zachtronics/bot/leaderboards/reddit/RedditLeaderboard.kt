@@ -8,6 +8,7 @@ import com.faendir.zachtronics.bot.model.om.OmCategory.*
 import com.faendir.zachtronics.bot.model.om.OmScorePart.*
 import com.faendir.zachtronics.bot.model.om.OmType.PRODUCTION
 import com.faendir.zachtronics.bot.reddit.RedditService
+import com.faendir.zachtronics.bot.reddit.Subreddit
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -22,6 +23,7 @@ import javax.annotation.PostConstruct
 class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<OmCategory, OmScore, OmPuzzle> {
     companion object {
         private const val scoreFileName = "scores.json"
+        private const val wikiPage = "index"
     }
 
     @PostConstruct
@@ -123,7 +125,11 @@ class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<
         table += "Table built on ${OffsetDateTime.now(ZoneOffset.UTC)}"
         val prefix = File(repo, "prefix.md").readText()
         val suffix = File(repo, "suffix.md").readText()
-        redditService.reddit.subreddit("opus_magnum").wiki().update("index", "$prefix\n$table\n$suffix", "bot update")
+        val wiki = redditService.subreddit(Subreddit.OPUS_MAGNUM).wiki()
+        val content = "$prefix\n$table\n$suffix"
+        if(content != wiki.page(wikiPage).content) {
+            wiki.update(wikiPage, content, "bot update")
+        }
     }
 
     private fun filterRecords(records: List<OmRecord>, filter: List<OmCategory>): MutableList<List<OmRecord>> {
