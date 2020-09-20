@@ -24,6 +24,8 @@ class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<
     companion object {
         private const val scoreFileName = "scores.json"
         private const val wikiPage = "index"
+        private const val dateLinePrefix = "Table built on "
+        private val dateLineRegex = Regex("$dateLinePrefix.*\n")
     }
 
     @PostConstruct
@@ -122,12 +124,12 @@ class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<
             }
             table += "\n"
         }
-        table += "Table built on ${OffsetDateTime.now(ZoneOffset.UTC)}"
+        table += dateLinePrefix + OffsetDateTime.now(ZoneOffset.UTC)
         val prefix = File(repo, "prefix.md").readText()
         val suffix = File(repo, "suffix.md").readText()
         val wiki = redditService.subreddit(Subreddit.OPUS_MAGNUM).wiki()
         val content = "$prefix\n$table\n$suffix"
-        if(content != wiki.page(wikiPage).content) {
+        if(content.lines().filter { !dateLineRegex.matches(it) } != wiki.page(wikiPage).content.lines().filter { !dateLineRegex.matches(it) }) {
             wiki.update(wikiPage, content, "bot update")
         }
     }
