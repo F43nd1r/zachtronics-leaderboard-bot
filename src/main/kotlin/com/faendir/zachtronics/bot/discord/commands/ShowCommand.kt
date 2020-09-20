@@ -24,7 +24,7 @@ class ShowCommand : Command {
                 .find { it.second.supportsPuzzle(puzzle) }
                 ?: return@findPuzzle "sorry, the category \"${categoryString.toLowerCase()}\" does not support the puzzle ${puzzle.displayName}."
             return@findPuzzle leaderboard.get(puzzle, category)?.let {
-                "here you go: ${puzzle.displayName} ${it.category.displayName} ${it.score.toDisplayString()} ${it.link}"
+                "here you go: ${puzzle.displayName} ${it.toDisplayString()}"
             } ?: "sorry, there is no score for ${puzzle.displayName} ${category.displayName}."
         }
     }

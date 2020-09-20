@@ -4,4 +4,6 @@ import com.faendir.zachtronics.bot.model.Record
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class OmRecord(override val category: OmCategory, override val score: OmScore, override val link: String) : Record
+data class OmRecord(val category: OmCategory, val score: OmScore, val link: String) : Record {
+    override fun toDisplayString(): String = "${category.displayName} ${score.toDisplayString()} $link"
+}
