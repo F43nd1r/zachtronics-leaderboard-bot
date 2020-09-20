@@ -3,6 +3,7 @@ package com.faendir.zachtronics.bot.leaderboards;
 import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.model.sc.*;
 import com.faendir.zachtronics.bot.reddit.RedditService;
+import com.faendir.zachtronics.bot.reddit.Subreddit;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.dean.jraw.models.WikiPage;
@@ -31,7 +32,7 @@ public class ScLeaderboard implements Leaderboard<ScCategory, ScScore, ScPuzzle>
         String puzzleHeader = puzzle.getDisplayName() + (needsReactors ? " - \\d Reactors?" : "");
         Pattern puzzleRegex = Pattern.compile(puzzleHeader);
 
-        SubredditReference sc = redditService.subreddit("spacechem");
+        SubredditReference sc = redditService.subreddit(Subreddit.SPACECHEM);
         WikiPage page = sc.wiki().page(puzzle.getGroup().getWikiPage());
         String[] lines = page.getContent().split("\\r?\\n");
 

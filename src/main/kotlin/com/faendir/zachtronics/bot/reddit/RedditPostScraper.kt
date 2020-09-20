@@ -8,6 +8,7 @@ import com.faendir.zachtronics.bot.utils.DateSerializer
 import com.faendir.zachtronics.bot.utils.findCategoriesSupporting
 import kotlinx.serialization.json.Json
 import net.dean.jraw.models.PublicContribution
+import net.dean.jraw.models.SubredditSort
 import net.dean.jraw.tree.CommentNode
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
@@ -29,7 +30,7 @@ class RedditPostScraper(private val redditService: RedditService, private val di
     val mainRegex = Regex("\\s*(?<puzzle>[^:]*)[:\\s]\\s*(\\[[^]]*]\\([^)]*\\)[,\\s]*)+")
     val scoreRegex = Regex("\\[(?<score>[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?(/[\\d.]+[a-zA-Z]?)?)]\\((?<link>http.*)\\)[,\\s]*")
 
-    private val moderators by lazy { redditService.subreddit("opus_magnum").moderators() }
+    private val moderators by lazy { redditService.subreddit(Subreddit.OPUS_MAGNUM).moderators() }
 
     init {
         redditService.access { trustedUsers = File(repo, trustFile).readLines().filter { !it.isBlank() }.map { it.trim() } }
@@ -73,7 +74,8 @@ class RedditPostScraper(private val redditService: RedditService, private val di
 
     @Scheduled(fixedRate = 1000 * 60 * 60)
     fun pullFromReddit() {
-        val submissionThread = redditService.hotPosts().find { it.title.contains("official record submission thread", ignoreCase = true) }
+        val submissionThread = redditService.subreddit(Subreddit.OPUS_MAGNUM).posts().sorting(SubredditSort.HOT).limit(5).build().asSequence().flatten()
+            .find { it.title.contains("official record submission thread", ignoreCase = true) }
         val lastUpdate: Date? = redditService.access { File(repo, timestampFile).takeIf { it.exists() }?.readText() }?.let { Json.decodeFromString(DateSerializer, it) }
         submissionThread?.toReference(redditService.reddit)?.comments()?.walkTree()?.forEach { commentNode ->
             val comment = commentNode.subject
