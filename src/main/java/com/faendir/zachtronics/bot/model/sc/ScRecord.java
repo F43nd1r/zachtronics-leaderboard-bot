@@ -10,11 +10,12 @@ import org.jetbrains.annotations.NotNull;
 public class ScRecord implements Record {
     ScCategory category;
     ScScore score;
+    String author;
     String link;
 
     @NotNull
     @Override
     public String toDisplayString() {
-        return "TODO";
+        return category.getDisplayName() + " " + score.toDisplayString() + " by " + author + " " + link;
     }
 }

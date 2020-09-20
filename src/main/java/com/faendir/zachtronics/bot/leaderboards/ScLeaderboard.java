@@ -47,12 +47,11 @@ public class ScLeaderboard implements Leaderboard<ScCategory, ScScore, ScPuzzle>
             else if (scoreCell.equals("←←"))
                 scoreCell = tableCols[column - 2];
             Pattern scoreRegex = Pattern.compile("(?:†\\s*)?\\[?(?<score>" + SpaceChem.SCORE_REGEX.pattern() +
-                                                 ")\\s+[^]]+(?:]\\((?<link>[^)]+)\\).*?)?");
+                                                 ")\\s+(?<author>[^]]+)(?:]\\((?<link>[^)]+)\\).*?)?");
             Matcher m = scoreRegex.matcher(scoreCell);
             if (m.matches()) {
                 ScScore score = SpaceChem.parseScore(m.group("score"));
-                String link = m.group("link");
-                return new ScRecord(category, score, link);
+                return new ScRecord(category, score, m.group("author"), m.group("link"));
             }
             break;
         }
