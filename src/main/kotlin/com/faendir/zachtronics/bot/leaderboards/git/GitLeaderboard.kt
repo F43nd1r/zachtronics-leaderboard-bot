@@ -4,64 +4,62 @@ import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult
+import com.faendir.zachtronics.bot.leaderboards.reddit.RedditLeaderboard
 import com.faendir.zachtronics.bot.model.Puzzle
-import com.faendir.zachtronics.bot.model.om.OmCategory
-import com.faendir.zachtronics.bot.model.om.OmPuzzle
-import com.faendir.zachtronics.bot.model.om.OmRecord
-import com.faendir.zachtronics.bot.model.om.OmScore
+import com.faendir.zachtronics.bot.model.om.*
 import com.faendir.zachtronics.bot.model.om.OmScorePart.*
-import com.roxstudio.utils.CUrl
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.springframework.stereotype.Component
 import java.io.File
 import java.net.URLEncoder
 import java.text.DecimalFormat
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import javax.annotation.PostConstruct
 
 @Component
 class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties, "om-leaderboard", "https://github.com/F43nd1r/om-leaderboard.git"),
                                                      Leaderboard<OmCategory, OmScore, OmPuzzle> {
     companion object {
         private val numberFormat = DecimalFormat("0.#")
+        private const val scoreFileName = "scores.json"
     }
 
     override val supportedCategories: Collection<OmCategory> = listOf(OmCategory.WIDTH, OmCategory.HEIGHT)
 
-    private fun Puzzle.findPuzzleDir(repo: File): File {
-        val puzzleDirs = findPuzzleDirMatches(repo, displayName.replace(Regex("\\s"), "_"))
-        check(puzzleDirs.size == 1)
-        return puzzleDirs.first()
+    @PostConstruct
+    fun onStartUp() {
+        access {
+            File(repo, scoreFileName).takeIf { it.exists() }?.let { file ->
+                generatePage(Json.decodeFromString(file.readText()))
+                commitAndPush("Update page formatting")
+            }
+        }
     }
 
     override fun update(user: String, puzzle: OmPuzzle, categories: List<OmCategory>, score: OmScore, link: String): UpdateResult<OmCategory, OmScore> {
         return access {
-            val linkContent = try {
-                CUrl(link).exec()
-            } catch (e: Exception) {
-                return@access UpdateResult.BrokenLink()
-            }
+            val scoreFile = File(repo, scoreFileName)
+            val recordList: RecordList = Json.decodeFromString(scoreFile.readText())
             val betterExists = mutableMapOf<OmCategory, OmScore>()
             val success = mutableMapOf<OmCategory, OmScore?>()
             for (category in categories) {
-                val prefix = category.displayName
-                val puzzleDir = puzzle.findPuzzleDir(repo)
-                val existingFile = puzzleDir.listFiles()?.find { it.name.startsWith(prefix) }
-                val existingScore = existingFile?.getScore()
-                if (existingScore == null || category.isBetterOrEqual(score, existingScore) && !linkContent.contentEquals(existingFile.readBytes())) {
-                    val file = File(puzzleDir, "${prefix}_${score.toFileName(category)}.${link.substringAfterLast('.')}")
-                    file.writeBytes(linkContent)
-                    if (file != existingFile) {
-                        existingFile?.let { rm(it) }
+                val oldRecord = recordList[puzzle]?.records?.find { it.category == category }
+                if (oldRecord == null || category.isBetterOrEqual(category.normalizeScore(score), category.normalizeScore(oldRecord.score)) && oldRecord.link != link) {
+                    recordList[puzzle] = (recordList[puzzle] ?: PuzzleEntry(mutableListOf())).apply {
+                        if (oldRecord != null) records.remove(oldRecord)
+                        records.add(OmRecord(category, category.normalizeScore(score), link))
                     }
-                    success[category] = existingScore
+                    success[category] = oldRecord?.score
                 } else {
-                    betterExists[category] = existingScore
+                    betterExists[category] = oldRecord.score
                 }
             }
             return@access if (success.isNotEmpty()) {
-                Runtime.getRuntime().exec("/bin/bash ./generate.sh", null, repo).waitFor()
-                addAll()
-                if (status().added.isNotEmpty()) {
-                    commitAndPush(user, puzzle, score, success.keys.map { it.displayName })
-                }
+                updateRemote(scoreFile, recordList, user, puzzle, score, success.keys.map { it.displayName })
                 UpdateResult.Success(success)
             } else {
                 UpdateResult.BetterExists(betterExists)
@@ -69,32 +67,57 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
         }
     }
 
-    private fun OmScore.toFileName(category: OmCategory) = category.normalizeScore(this).parts.asIterable().joinToString("_") { (_, value) -> numberFormat.format(value) }
+    private fun GitRepository.AccessScope.updateRemote(scoreFile: File, recordList: RecordList, user: String, puzzle: OmPuzzle, score: OmScore, updated: Collection<String>) {
+        scoreFile.writeText(Json { prettyPrint = true }.encodeToString(recordList))
+        add(scoreFile)
+        generatePage(recordList)
+        commitAndPush(user, puzzle, score, updated)
+    }
+
+    private fun AccessScope.generatePage(recordList: RecordList) {
+        val folder = File(repo, "templates")
+        val mainTemplate = File(folder, "main.html").readText()
+        val groupTemplate = File(folder, "group.html").readText()
+        val puzzleTemplate = File(folder, "puzzle.html").readText()
+        val blockTemplate = File(folder, "block.html").readText()
+        val scoreTemplate = File(folder, "score.html").readText()
+        val gifTemplate = File(folder, "gif.html").readText()
+        val videoTemplate = File(folder, "video.html").readText()
+        fun generateRecord(record: OmRecord): String {
+            return scoreTemplate.format(record.link, record.score.toShortDisplayString(), if (record.link.endsWith("mp4") || record.link.endsWith("webm")) {
+                videoTemplate.format(record.link)
+            } else {
+                gifTemplate.format(record.link)
+            })
+        }
+
+        val text = mainTemplate.format(OffsetDateTime.now(ZoneOffset.UTC), OmGroup.values().map { group ->
+            groupTemplate.format(group.displayName, OmPuzzle.values().map { puzzle ->
+                val heightRecord = recordList[puzzle]?.records?.find { it.category == OmCategory.HEIGHT }
+                val widthRecord = recordList[puzzle]?.records?.find { it.category == OmCategory.WIDTH }
+                puzzleTemplate.format(puzzle.name,
+                    heightRecord?.let { generateRecord(it) } ?: "",
+                    if (puzzle.type == OmType.INFINITE) blockTemplate else widthRecord?.let { generateRecord(it) } ?: "")
+            })
+        })
+        val file = File(repo, "index.html")
+        val old = file.readText()
+        if (old.lines().filter { !it.contains("last updated on") } != text.lines().filter { !it.contains("last updated on") }) {
+            file.writeText(text)
+            add(file)
+        }
+    }
 
     override fun get(puzzle: OmPuzzle, category: OmCategory): OmRecord? {
         return access {
-            val prefix = category.displayName
-            val puzzleDir = puzzle.findPuzzleDir(repo)
-            puzzleDir.listFiles()?.find { it.name.startsWith(prefix) }?.let {
-                OmRecord(category, it.getScore(), "https://f43nd1r.github.io/om-leaderboard/${
-                    puzzleDir.relativeTo(repo).path
-                }/${URLEncoder.encode(it.name, Charsets.US_ASCII).replace("+", "%20")}")
-            }
-        }
-    }
-
-    private fun findPuzzleDirMatches(repo: File, name: String): List<File> = File(repo, "gif").listFiles()
-        ?.sorted()
-        ?.flatMap { it.listFiles()?.asIterable()?.sorted() ?: emptyList() }
-        ?.filter { it.isDirectory }
-        ?.filter { it.name.contains(name, ignoreCase = true) }
-        ?.toList() ?: emptyList()
-
-    private fun File.getScore(): OmScore {
-        return Regex("(?<category>[HW])_(?<hw>[\\d.]+)_(?<cycles>\\d+)_(?<cost>\\d+).*").matchEntire(name)!!.let {
-            OmScore(linkedMapOf((if (it.groups["category"]!!.value == "H") HEIGHT else WIDTH) to it.groups["hw"]!!.value.toDouble(),
-                CYCLES to it.groups["cycles"]!!.value.toDouble(),
-                COST to it.groups["cost"]!!.value.toDouble()))
+            val scoreFile = File(repo, scoreFileName)
+            val recordList: RecordList = Json.decodeFromString(scoreFile.readText())
+            recordList[puzzle]?.records?.find { it.category == category }?.let { OmRecord(category, it.score, it.link) }
         }
     }
 }
+
+@Serializable
+data class PuzzleEntry(val records: MutableList<OmRecord>)
+
+typealias RecordList = MutableMap<OmPuzzle, PuzzleEntry>
