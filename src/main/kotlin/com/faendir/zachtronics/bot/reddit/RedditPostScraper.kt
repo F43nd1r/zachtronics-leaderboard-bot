@@ -72,7 +72,7 @@ class RedditPostScraper(private val redditService: RedditService, private val di
         }
     }*/
 
-    @Scheduled(fixedRate = 1000 * 60 * 60)
+    @Scheduled(fixedRate = 1000L * 60 * 60)
     fun pullFromReddit() {
         val now = Instant.now() //capture timestamp before processing
         val submissionThread = redditService.subreddit(Subreddit.OPUS_MAGNUM).posts().sorting(SubredditSort.HOT).limit(5).build().asSequence().flatten()
