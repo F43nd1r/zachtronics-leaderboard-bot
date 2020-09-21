@@ -4,17 +4,13 @@ import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult
-import com.faendir.zachtronics.bot.leaderboards.reddit.RedditLeaderboard
-import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.om.*
-import com.faendir.zachtronics.bot.model.om.OmScorePart.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.springframework.stereotype.Component
 import java.io.File
-import java.net.URLEncoder
 import java.text.DecimalFormat
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -91,14 +87,17 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
             })
         }
 
-        val text = mainTemplate.format(OffsetDateTime.now(ZoneOffset.UTC), OmGroup.values().map { group ->
-            groupTemplate.format(group.displayName, OmPuzzle.values().map { puzzle ->
-                val heightRecord = recordList[puzzle]?.records?.find { it.category == OmCategory.HEIGHT }
-                val widthRecord = recordList[puzzle]?.records?.find { it.category == OmCategory.WIDTH }
-                puzzleTemplate.format(puzzle.name,
-                    heightRecord?.let { generateRecord(it) } ?: "",
-                    if (puzzle.type == OmType.INFINITE) blockTemplate else widthRecord?.let { generateRecord(it) } ?: "")
-            })
+        val text = mainTemplate.format(OffsetDateTime.now(ZoneOffset.UTC), OmGroup.values().joinToString("\n") { group ->
+            val puzzles = OmPuzzle.values().filter { it.group == group && it.type != OmType.PRODUCTION}
+            if (puzzles.isNotEmpty()) {
+                groupTemplate.format(group.displayName, puzzles.joinToString("\n") { puzzle ->
+                    val heightRecord = recordList[puzzle]?.records?.find { it.category == OmCategory.HEIGHT }
+                    val widthRecord = recordList[puzzle]?.records?.find { it.category == OmCategory.WIDTH }
+                    puzzleTemplate.format(puzzle.displayName, heightRecord?.let { generateRecord(it) } ?: "", if (puzzle.type == OmType.INFINITE) blockTemplate else widthRecord?.let { generateRecord(it) } ?: "")
+                })
+            } else {
+                ""
+            }
         })
         val file = File(repo, "index.html")
         val old = file.readText()
