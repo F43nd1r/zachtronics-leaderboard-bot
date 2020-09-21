@@ -74,12 +74,15 @@ class RedditPostScraper(private val redditService: RedditService, private val di
 
     @Scheduled(fixedRate = 1000 * 60 * 60)
     fun pullFromReddit() {
+        val now = Instant.now() //capture timestamp before processing
         val submissionThread = redditService.subreddit(Subreddit.OPUS_MAGNUM).posts().sorting(SubredditSort.HOT).limit(5).build().asSequence().flatten()
             .find { it.title.contains("official record submission thread", ignoreCase = true) }
         val lastUpdate: Date? = redditService.access { File(repo, timestampFile).takeIf { it.exists() }?.readText() }?.let { Json.decodeFromString(DateSerializer, it) }
+        var hasNewComment = false
         submissionThread?.toReference(redditService.reddit)?.comments()?.walkTree()?.forEach { commentNode ->
             val comment = commentNode.subject
             if (lastUpdate == null || (comment.edited ?: comment.created).after(lastUpdate)) {
+                hasNewComment = true
                 comment.body?.let { body ->
                     if (body != "[deleted]") {
                         if (trustedUsers.contains(comment.author)) {
@@ -106,11 +109,13 @@ class RedditPostScraper(private val redditService: RedditService, private val di
                 }
             }
         }
-        redditService.access {
-            val timestamp = File(repo, timestampFile)
-            timestamp.writeText(Json.encodeToString(DateSerializer, Date.from(Instant.now().minus(5, ChronoUnit.MINUTES))))
-            add(timestamp)
-            commitAndPush("timestamp update")
+        if(hasNewComment) {
+            redditService.access {
+                val timestamp = File(repo, timestampFile)
+                timestamp.writeText(Json.encodeToString(DateSerializer, Date.from(now)))
+                add(timestamp)
+                commitAndPush("timestamp update")
+            }
         }
     }
 
