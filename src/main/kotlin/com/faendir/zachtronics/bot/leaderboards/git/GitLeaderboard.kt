@@ -20,7 +20,6 @@ import javax.annotation.PostConstruct
 class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties, "om-leaderboard", "https://github.com/F43nd1r/om-leaderboard.git"),
                                                      Leaderboard<OmCategory, OmScore, OmPuzzle> {
     companion object {
-        private val numberFormat = DecimalFormat("0.#")
         private const val scoreFileName = "scores.json"
     }
 
@@ -31,7 +30,9 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
         access {
             File(repo, scoreFileName).takeIf { it.exists() }?.let { file ->
                 generatePage(Json.decodeFromString(file.readText()))
-                commitAndPush("Update page formatting")
+                if(status().changed.isNotEmpty()) {
+                    commitAndPush("Update page formatting")
+                }
             }
         }
     }
