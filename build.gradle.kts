@@ -34,6 +34,7 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("net.sf.trove4j:trove4j:3.0.3")
 }
 
 tasks.withType<KotlinCompile> {
