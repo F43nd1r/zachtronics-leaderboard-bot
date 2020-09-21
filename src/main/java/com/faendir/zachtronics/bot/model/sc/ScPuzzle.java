@@ -122,7 +122,7 @@ public enum ScPuzzle implements Puzzle {
     published_12_3(ScGroup.RESEARCHNET1, ScType.RESEARCH, "Waste Treatment", false),
 
     published_13_1(ScGroup.RESEARCHNET1, ScType.RESEARCH, "Pyridine", true),
-    published_13_2(ScGroup.RESEARCHNET1, ScType.RESEARCH, "Breakdown", true),
+    published_13_2(ScGroup.RESEARCHNET1, ScType.RESEARCH, "Breakdown (2-1-2)", true),
     published_13_3(ScGroup.RESEARCHNET1, ScType.RESEARCH, "Vitamin B3 (2-1-3)", true),
     published_14_1(ScGroup.RESEARCHNET1, ScType.RESEARCH, "PVC", true),
     published_14_2(ScGroup.RESEARCHNET1, ScType.RESEARCH, "PVA", true),
@@ -239,7 +239,7 @@ public enum ScPuzzle implements Puzzle {
     published_50_2(ScGroup.RESEARCHNET2, ScType.PRODUCTION, "Break-up", false),
     published_50_3(ScGroup.RESEARCHNET2, ScType.PRODUCTION, "Average Out", false),
     published_51_1(ScGroup.RESEARCHNET2, ScType.PRODUCTION, "Fake-out", false),
-    published_51_2(ScGroup.RESEARCHNET2, ScType.PRODUCTION, "Breakdown", false),
+    published_51_2(ScGroup.RESEARCHNET2, ScType.PRODUCTION, "Breakdown (5-3-2)", false),
     published_51_3(ScGroup.RESEARCHNET2, ScType.PRODUCTION, "Master of Disguise", false),
     published_52_1(ScGroup.RESEARCHNET2, ScType.RESEARCH, "Thermoplastic", true),
     published_52_2(ScGroup.RESEARCHNET2, ScType.PRODUCTION, "Contaminated", false),
