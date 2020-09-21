@@ -48,7 +48,7 @@ enum class OmCategory(
     override fun supportsScore(score: OmScore) = score.parts.keys.containsAll(requiredParts)
 
     override fun isBetterOrEqual(s1: OmScore, s2: OmScore): Boolean {
-        return isBetterOrEqualImpl(s1, s2)
+        return isBetterOrEqualImpl(normalizeScore(s1), normalizeScore(s2))
     }
 
     private fun normalSort(s1: OmScore, s2: OmScore): Boolean {
@@ -79,8 +79,10 @@ enum class OmCategory(
         return sum1 < sum2 || (sum1 == sum2 && s1.parts[tieBreaker]!! <= s2.parts[tieBreaker]!!)
     }
 
-    fun normalizeScore(score: OmScore): OmScore {
-        check(score.parts.keys.containsAll(requiredParts))
-        return OmScore(requiredParts.map { it to score.parts[it]!! }.toMap(LinkedHashMap()))
+    fun normalizeScore(score: OmScore): OmScore = OmScore(sortScoreParts(score.parts.asIterable()).map { it.key to it.value }.toMap(LinkedHashMap()))
+
+    fun sortScoreParts(parts: Iterable<Map.Entry<OmScorePart, Double>>): Iterable<Map.Entry<OmScorePart, Double>> = parts.sortedBy {
+        check(requiredParts.contains(it.key))
+        requiredParts.indexOf(it.key)
     }
 }

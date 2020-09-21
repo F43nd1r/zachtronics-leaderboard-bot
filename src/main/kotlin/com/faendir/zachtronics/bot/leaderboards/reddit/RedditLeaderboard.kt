@@ -42,7 +42,7 @@ class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<
             val success = mutableMapOf<OmCategory, OmScore?>()
             for (category in categories) {
                 val oldRecord = recordList[puzzle]?.records?.find { it.category == category }
-                if (oldRecord == null || category.isBetterOrEqual(category.normalizeScore(score), category.normalizeScore(oldRecord.score)) && oldRecord.link != link) {
+                if (oldRecord == null || category.isBetterOrEqual(score, oldRecord.score) && oldRecord.link != link) {
                     recordList[puzzle] = (recordList[puzzle] ?: PuzzleEntry(mutableListOf(), mutableListOf())).apply {
                         if (oldRecord != null) records.remove(oldRecord)
                         records.add(OmRecord(category, category.normalizeScore(score), link))

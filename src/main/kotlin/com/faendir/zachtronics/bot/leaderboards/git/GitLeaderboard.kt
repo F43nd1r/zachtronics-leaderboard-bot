@@ -11,7 +11,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.springframework.stereotype.Component
 import java.io.File
-import java.text.DecimalFormat
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import javax.annotation.PostConstruct
@@ -30,7 +29,7 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
         access {
             File(repo, scoreFileName).takeIf { it.exists() }?.let { file ->
                 generatePage(Json.decodeFromString(file.readText()))
-                if(status().changed.isNotEmpty()) {
+                if (status().changed.isNotEmpty()) {
                     commitAndPush("Update page formatting")
                 }
             }
@@ -45,7 +44,7 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
             val success = mutableMapOf<OmCategory, OmScore?>()
             for (category in categories) {
                 val oldRecord = recordList[puzzle]?.records?.find { it.category == category }
-                if (oldRecord == null || category.isBetterOrEqual(category.normalizeScore(score), category.normalizeScore(oldRecord.score)) && oldRecord.link != link) {
+                if (oldRecord == null || category.isBetterOrEqual(score, oldRecord.score) && oldRecord.link != link) {
                     recordList[puzzle] = (recordList[puzzle] ?: PuzzleEntry(mutableListOf())).apply {
                         if (oldRecord != null) records.remove(oldRecord)
                         records.add(OmRecord(category, category.normalizeScore(score), link))
@@ -81,20 +80,24 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
         val gifTemplate = File(folder, "gif.html").readText()
         val videoTemplate = File(folder, "video.html").readText()
         fun generateRecord(record: OmRecord): String {
-            return scoreTemplate.format(record.link, record.score.toShortDisplayString(), if (record.link.endsWith("mp4") || record.link.endsWith("webm")) {
-                videoTemplate.format(record.link)
-            } else {
-                gifTemplate.format(record.link)
-            })
+            return scoreTemplate.format(record.link,
+                record.score.toDisplayString({ record.category.sortScoreParts(this) }) { _, value -> format(value) },
+                if (record.link.endsWith("mp4") || record.link.endsWith("webm")) {
+                    videoTemplate.format(record.link)
+                } else {
+                    gifTemplate.format(record.link)
+                })
         }
 
         val text = mainTemplate.format(OffsetDateTime.now(ZoneOffset.UTC), OmGroup.values().joinToString("\n") { group ->
-            val puzzles = OmPuzzle.values().filter { it.group == group && it.type != OmType.PRODUCTION}
+            val puzzles = OmPuzzle.values().filter { it.group == group && it.type != OmType.PRODUCTION }
             if (puzzles.isNotEmpty()) {
                 groupTemplate.format(group.displayName, puzzles.joinToString("\n") { puzzle ->
                     val heightRecord = recordList[puzzle]?.records?.find { it.category == OmCategory.HEIGHT }
                     val widthRecord = recordList[puzzle]?.records?.find { it.category == OmCategory.WIDTH }
-                    puzzleTemplate.format(puzzle.displayName, heightRecord?.let { generateRecord(it) } ?: "", if (puzzle.type == OmType.INFINITE) blockTemplate else widthRecord?.let { generateRecord(it) } ?: "")
+                    puzzleTemplate.format(puzzle.displayName,
+                        heightRecord?.let { generateRecord(it) } ?: "",
+                        if (puzzle.type == OmType.INFINITE) blockTemplate else widthRecord?.let { generateRecord(it) } ?: "")
                 })
             } else {
                 ""

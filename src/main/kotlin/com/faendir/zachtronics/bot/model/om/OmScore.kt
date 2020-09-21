@@ -10,11 +10,18 @@ data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>) : Score {
         private val numberFormat = DecimalFormat("0.#")
     }
 
-    override fun toDisplayString(): String = reorderToStandard().parts.asIterable().joinToString("/") { (part, value) -> numberFormat.format(value) + part.key }
+    fun toDisplayString(preprocess: Iterable<Map.Entry<OmScorePart, Double>>.() -> Iterable<Map.Entry<OmScorePart, Double>> = { this }, separator: String = "/",
+                        format: DecimalFormat.(OmScorePart, Double) -> String): String {
+        return parts.asIterable().preprocess().joinToString(separator) { (part, value) -> numberFormat.format(part, value) }
+    }
 
-    fun toShortDisplayString() = reorderToStandard().parts.asIterable().joinToString("/") { (_, value) -> numberFormat.format(value) }
+    private fun toStandardDisplayString(separator: String = "/", format: DecimalFormat.(OmScorePart, Double) -> String): String {
+        return toDisplayString({ sortedBy { it.key } }, separator, format)
+    }
 
-    private fun reorderToStandard(): OmScore = OmScore(parts.asIterable().sortedBy { it.key }.map { it.key to it.value }.toMap(LinkedHashMap()))
+    override fun toDisplayString(): String = toStandardDisplayString { part, value -> format(value) + part.key }
+
+    fun toShortDisplayString() = toStandardDisplayString { _, value -> format(value) }
 
     override val contentDescription: String
         get() = parts.keys.joinToString("/") { it.key.toString() }
