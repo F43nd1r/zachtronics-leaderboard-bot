@@ -5,14 +5,13 @@ import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.Score
 
-interface Leaderboard<C : Category<C, S, P>, S : Score, P : Puzzle> {
-
-    val supportedCategories: Collection<C>
+interface Leaderboard<C : Category<C, S, P>, S : Score, P : Puzzle, R : Record<S>> {
+    val supportedCategories: List<C>
 
     @JvmDefault
-    fun update(user: String, puzzle: P, categories: List<C>, score: S, link: String): UpdateResult<C, S> = UpdateResult.NotSupported()
+    fun update(puzzle: P, record: R): UpdateResult<C, S> = UpdateResult.NotSupported()
 
-    fun get(puzzle: P, category: C): Record?
+    fun get(puzzle: P, category: C): R?
 }
 
 sealed class UpdateResult<C : Category<C, S, *>, S : Score> {

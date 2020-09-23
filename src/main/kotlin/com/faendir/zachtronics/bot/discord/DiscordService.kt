@@ -5,6 +5,7 @@ import com.faendir.zachtronics.bot.discord.commands.Command
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Game
 import com.faendir.zachtronics.bot.model.Puzzle
+import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.Score
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
@@ -17,7 +18,7 @@ import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 
 @Service
-class DiscordService(private val discordProperties: DiscordProperties, private val commands: List<Command>, private val games: List<Game<*, *, *>>) {
+class DiscordService(private val discordProperties: DiscordProperties, private val commands: List<Command>, private val games: List<Game<*, *, *, *>>) {
     private val adapter = object : ListenerAdapter() {
         override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
             if (!event.author.isBot) {
@@ -35,15 +36,13 @@ class DiscordService(private val discordProperties: DiscordProperties, private v
         }
     }
 
-    private fun <C : Category<C, S, P>, S : Score, P : Puzzle> handleMessage(event: GuildMessageReceivedEvent, game: Game<C, S, P>) {
+    private fun <C : Category<C, S, P>, S : Score, P : Puzzle, R: Record<S>> handleMessage(event: GuildMessageReceivedEvent, game: Game<C, S, P, R>) {
         val message = event.message.contentRaw
         commands.forEach { command ->
             if (message.startsWith("!${command.name}")) {
                 event.channel.sendMessage("${event.author.asMention} ${
                     if (command.requiresRoles.isEmpty() || event.member?.roles?.map { it.name }?.containsAll(command.requiresRoles) == true) {
-                        command.regex.find(message)?.let {
-                            command.handleMessage(game, event.author, event.channel, event.message, it)
-                        } ?: "sorry, could not parse your command. Type `!help` to see the syntax."
+                        command.handleMessage(game, event.message)
                     } else {
                         "sorry, you do not have all required roles for this command ${command.requiresRoles.joinToString(separator = "`, `", prefix = "(`", postfix = "`)")}."
                     }

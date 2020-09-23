@@ -5,6 +5,7 @@ import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult
 import com.faendir.zachtronics.bot.model.om.*
+import com.faendir.zachtronics.bot.model.om.OmCategory.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -17,12 +18,12 @@ import javax.annotation.PostConstruct
 
 @Component
 class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties, "om-leaderboard", "https://github.com/F43nd1r/om-leaderboard.git"),
-                                                     Leaderboard<OmCategory, OmScore, OmPuzzle> {
+                                                     Leaderboard<OmCategory, OmScore, OmPuzzle, OmRecord> {
     companion object {
         private const val scoreFileName = "scores.json"
     }
 
-    override val supportedCategories: Collection<OmCategory> = listOf(OmCategory.WIDTH, OmCategory.HEIGHT)
+    override val supportedCategories: List<OmCategory> = listOf(WIDTH, HEIGHT)
 
     @PostConstruct
     fun onStartUp() {
@@ -36,18 +37,18 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
         }
     }
 
-    override fun update(user: String, puzzle: OmPuzzle, categories: List<OmCategory>, score: OmScore, link: String): UpdateResult<OmCategory, OmScore> {
+    override fun update(puzzle: OmPuzzle, record: OmRecord): UpdateResult<OmCategory, OmScore> {
         return access {
             val scoreFile = File(repo, scoreFileName)
             val recordList: RecordList = Json.decodeFromString(scoreFile.readText())
             val betterExists = mutableMapOf<OmCategory, OmScore>()
             val success = mutableMapOf<OmCategory, OmScore?>()
+            val categories = supportedCategories.filter { it.supportsPuzzle(puzzle) && it.supportsScore(record.score) }
             for (category in categories) {
-                val oldRecord = recordList[puzzle]?.records?.find { it.category == category }
-                if (oldRecord == null || category.isBetterOrEqual(score, oldRecord.score) && oldRecord.link != link) {
-                    recordList[puzzle] = (recordList[puzzle] ?: PuzzleEntry(mutableListOf())).apply {
-                        if (oldRecord != null) records.remove(oldRecord)
-                        records.add(OmRecord(category, category.normalizeScore(score), link))
+                val oldRecord = recordList[puzzle]?.get(category)
+                if (oldRecord == null || category.isBetterOrEqual(record.score, oldRecord.score) && oldRecord.link != record.link) {
+                    recordList[puzzle] = (recordList[puzzle] ?: mutableMapOf()).also { records ->
+                        records[category] = OmRecord(category.normalizeScore(record.score), record.link)
                     }
                     success[category] = oldRecord?.score
                 } else {
@@ -55,7 +56,7 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
                 }
             }
             return@access if (success.isNotEmpty()) {
-                updateRemote(scoreFile, recordList, user, puzzle, score, success.keys.map { it.displayName })
+                updateRemote(scoreFile, recordList, record.author, puzzle, record.score, success.keys.map { it.displayName })
                 UpdateResult.Success(success)
             } else {
                 UpdateResult.BetterExists(betterExists)
@@ -63,7 +64,7 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
         }
     }
 
-    private fun GitRepository.AccessScope.updateRemote(scoreFile: File, recordList: RecordList, user: String, puzzle: OmPuzzle, score: OmScore, updated: Collection<String>) {
+    private fun GitRepository.AccessScope.updateRemote(scoreFile: File, recordList: RecordList, user: String?, puzzle: OmPuzzle, score: OmScore, updated: Collection<String>) {
         scoreFile.writeText(Json { prettyPrint = true }.encodeToString(recordList))
         add(scoreFile)
         generatePage(recordList)
@@ -79,9 +80,9 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
         val scoreTemplate = File(folder, "score.html").readText()
         val gifTemplate = File(folder, "gif.html").readText()
         val videoTemplate = File(folder, "video.html").readText()
-        fun generateRecord(record: OmRecord): String {
+        fun generateRecord(category: OmCategory, record: OmRecord): String {
             return scoreTemplate.format(record.link,
-                record.score.toDisplayString({ record.category.sortScoreParts(this) }) { _, value -> format(value) },
+                record.score.toDisplayString({ category.sortScoreParts(this) }) { _, value -> format(value) },
                 if (record.link.endsWith("mp4") || record.link.endsWith("webm")) {
                     videoTemplate.format(record.link)
                 } else {
@@ -93,11 +94,11 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
             val puzzles = OmPuzzle.values().filter { it.group == group && it.type != OmType.PRODUCTION }
             if (puzzles.isNotEmpty()) {
                 groupTemplate.format(group.displayName, puzzles.joinToString("\n") { puzzle ->
-                    val heightRecord = recordList[puzzle]?.records?.find { it.category == OmCategory.HEIGHT }
-                    val widthRecord = recordList[puzzle]?.records?.find { it.category == OmCategory.WIDTH }
+                    val heightRecord = recordList[puzzle]?.get(HEIGHT)
+                    val widthRecord = recordList[puzzle]?.get(WIDTH)
                     puzzleTemplate.format(puzzle.displayName,
-                        heightRecord?.let { generateRecord(it) } ?: "",
-                        if (puzzle.type == OmType.INFINITE) blockTemplate else widthRecord?.let { generateRecord(it) } ?: "")
+                        heightRecord?.let { generateRecord(HEIGHT, it) } ?: "",
+                        if (puzzle.type == OmType.INFINITE) blockTemplate else widthRecord?.let { generateRecord(WIDTH, it) } ?: "")
                 })
             } else {
                 ""
@@ -115,12 +116,9 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
         return access {
             val scoreFile = File(repo, scoreFileName)
             val recordList: RecordList = Json.decodeFromString(scoreFile.readText())
-            recordList[puzzle]?.records?.find { it.category == category }?.let { OmRecord(category, it.score, it.link) }
+            recordList[puzzle]?.get(category)?.let { OmRecord(it.score, it.link) }
         }
     }
 }
 
-@Serializable
-data class PuzzleEntry(val records: MutableList<OmRecord>)
-
-typealias RecordList = MutableMap<OmPuzzle, PuzzleEntry>
+typealias RecordList = MutableMap<OmPuzzle, MutableMap<OmCategory, OmRecord>>

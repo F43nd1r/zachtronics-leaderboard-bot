@@ -1,31 +1,32 @@
 package com.faendir.zachtronics.bot.discord.commands
 
-import com.faendir.zachtronics.bot.model.Category
-import com.faendir.zachtronics.bot.model.Game
-import com.faendir.zachtronics.bot.model.Puzzle
-import com.faendir.zachtronics.bot.model.Score
+import com.faendir.zachtronics.bot.model.*
+import com.faendir.zachtronics.bot.utils.Result
+import com.faendir.zachtronics.bot.utils.message
 import net.dv8tion.jda.api.entities.Message
-import net.dv8tion.jda.api.entities.TextChannel
-import net.dv8tion.jda.api.entities.User
 import org.springframework.stereotype.Component
 
 @Component
 class ShowCommand : Command {
-    override val regex = Regex("!show\\s+(?<category>\\S+)\\s+(?<puzzle>.+)")
+    val regex = Regex("!show\\s+(?<category>\\S+)\\s+(?<puzzle>.+)")
     override val name: String = "show"
-    override val helpText: String = "!show <category> <puzzle>"
+    override fun helpText(game: Game<*, *, *, *>): String = "!show <category> <puzzle>"
 
-    override fun <C : Category<C, S, P>, S : Score, P : Puzzle> handleMessage(game: Game<C, S, P>, author: User, channel: TextChannel, message: Message, command: MatchResult): String {
-        val categoryString = command.groups["category"]!!.value
-        return findPuzzle(game, command.groups["puzzle"]!!.value) { puzzle ->
-            val (leaderboard, category) = game.leaderboards.flatMap { leaderboard -> leaderboard.supportedCategories.map { leaderboard to it } }
-                .filter { (_, category) -> category.displayName.equals(categoryString, ignoreCase = true) }
-                .ifEmpty { return@findPuzzle "sorry, I could not find the category \"$categoryString\"" }
-                .find { it.second.supportsPuzzle(puzzle) }
-                ?: return@findPuzzle "sorry, the category \"${categoryString.toLowerCase()}\" does not support the puzzle ${puzzle.displayName}."
-            return@findPuzzle leaderboard.get(puzzle, category)?.let {
-                "here you go: ${puzzle.displayName} ${it.toDisplayString()}"
-            } ?: "sorry, there is no score for ${puzzle.displayName} ${category.displayName}."
-        }
+    override fun <C : Category<C, S, P>, S : Score, P : Puzzle, R : Record<S>> handleMessage(game: Game<C, S, P, R>, message: Message): String {
+        return message.match(regex).flatMap { command ->
+            val categoryString = command.groups["category"]!!.value
+            val categories = game.parseCategory(categoryString).ifEmpty {
+                return@flatMap Result.Failure("sorry, could not find category \"$categoryString\"")
+            }
+            game.parsePuzzle(command.groups["puzzle"]!!.value).getSinglePuzzle().map puzzle@{ puzzle ->
+                val category = categories.find { it.supportsPuzzle(puzzle) }
+                    ?: return@puzzle "sorry, the category \"${categories.first().displayName}\" does not support the puzzle ${puzzle.displayName}."
+                for (leaderboard in game.leaderboards) {
+                    val record = leaderboard.get(puzzle, category)
+                    if (record != null) return@puzzle "here you go: ${puzzle.displayName} ${record.toDisplayString()}"
+                }
+                return@puzzle "sorry, there is no score for ${puzzle.displayName} ${category.displayName}."
+            }
+        }.message
     }
 }

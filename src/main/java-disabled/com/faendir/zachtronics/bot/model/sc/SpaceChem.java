@@ -29,7 +29,7 @@ public class SpaceChem implements Game<ScCategory, ScScore, ScPuzzle> {
 
     @NotNull
     @Override
-    public List<ScPuzzle> findPuzzleByName(@NotNull String name) {
+    public List<ScPuzzle> parsePuzzle(@NotNull String name) {
         String nameLower = name.toLowerCase();
         List<ScPuzzle> result = new ArrayList<>();
         for (ScPuzzle puzzle : ScPuzzle.values()) {

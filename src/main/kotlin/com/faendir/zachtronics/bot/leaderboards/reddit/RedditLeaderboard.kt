@@ -9,6 +9,8 @@ import com.faendir.zachtronics.bot.model.om.OmScorePart.*
 import com.faendir.zachtronics.bot.model.om.OmType.PRODUCTION
 import com.faendir.zachtronics.bot.reddit.RedditService
 import com.faendir.zachtronics.bot.reddit.Subreddit
+import com.faendir.zachtronics.bot.utils.toMap
+import jdk.jfr.Category
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -20,7 +22,7 @@ import java.time.ZoneOffset
 import javax.annotation.PostConstruct
 
 @Component
-class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<OmCategory, OmScore, OmPuzzle> {
+class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<OmCategory, OmScore, OmPuzzle, OmRecord> {
     companion object {
         private const val scoreFileName = "scores.json"
         private const val wikiPage = "index"
@@ -32,20 +34,19 @@ class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<
         redditService.access { File(repo, scoreFileName).takeIf { it.exists() }?.readText()?.let { updateRedditWiki(Json.decodeFromString(it), repo) } }
     }
 
-    override val supportedCategories: Collection<OmCategory> = listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SG, SGP, SC, SCP, SA, SI)
-
-    override fun update(user: String, puzzle: OmPuzzle, categories: List<OmCategory>, score: OmScore, link: String): UpdateResult<OmCategory, OmScore> {
+    override val supportedCategories: List<OmCategory> = listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SG, SGP, SC, SCP, SA, SI)
+    override fun update(puzzle: OmPuzzle, record: OmRecord): UpdateResult<OmCategory, OmScore> {
         return redditService.access {
             val scoreFile = File(repo, scoreFileName)
             val recordList: RecordList = Json.decodeFromString(scoreFile.readText())
             val betterExists = mutableMapOf<OmCategory, OmScore>()
             val success = mutableMapOf<OmCategory, OmScore?>()
+            val categories = supportedCategories.filter { it.supportsPuzzle(puzzle) && it.supportsScore(record.score) }
             for (category in categories) {
-                val oldRecord = recordList[puzzle]?.records?.find { it.category == category }
-                if (oldRecord == null || category.isBetterOrEqual(score, oldRecord.score) && oldRecord.link != link) {
-                    recordList[puzzle] = (recordList[puzzle] ?: PuzzleEntry(mutableListOf(), mutableListOf())).apply {
-                        if (oldRecord != null) records.remove(oldRecord)
-                        records.add(OmRecord(category, category.normalizeScore(score), link))
+                val oldRecord = recordList[puzzle]?.records?.get(category)
+                if (oldRecord == null || category.isBetterOrEqual(record.score, oldRecord.score) && oldRecord.link != record.link) {
+                    recordList[puzzle] = (recordList[puzzle] ?: PuzzleEntry()).apply {
+                        records[category] = OmRecord(category.normalizeScore(record.score), record.link)
                     }
                     success[category] = oldRecord?.score
                 } else {
@@ -54,9 +55,9 @@ class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<
             }
             var paretoUpdate = false
             val requiredParts = listOf(COST, CYCLES, if (puzzle.type == PRODUCTION) INSTRUCTIONS else AREA)
-            if (score.parts.keys.containsAll(requiredParts)) {
-                val paretoScore = OmScore(requiredParts.map { it to score.parts[it]!! }.toMap(LinkedHashMap()))
-                val entry = (recordList[puzzle] ?: PuzzleEntry(mutableListOf(), mutableListOf()))
+            if (record.score.parts.keys.containsAll(requiredParts)) {
+                val paretoScore = OmScore(requiredParts.map { it to record.score.parts[it]!! }.toMap(LinkedHashMap()))
+                val entry = (recordList[puzzle] ?: PuzzleEntry())
                 if (!entry.pareto.contains(paretoScore) && entry.pareto.all { !it.isStrictlyBetter(paretoScore) }) {
                     entry.pareto.removeIf { paretoScore.isStrictlyBetter(it) }
                     entry.pareto.add(paretoScore)
@@ -66,11 +67,11 @@ class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<
             }
             when {
                 success.isNotEmpty() -> {
-                    updateRemote(scoreFile, recordList, user, puzzle, score, success.keys.map { it.displayName })
+                    updateRemote(scoreFile, recordList, record.author, puzzle, record.score, success.keys.map { it.displayName })
                     UpdateResult.Success(success)
                 }
                 paretoUpdate -> {
-                    updateRemote(scoreFile, recordList, user, puzzle, score, listOf("PARETO"))
+                    updateRemote(scoreFile, recordList, record.author, puzzle, record.score, listOf("PARETO"))
                     UpdateResult.ParetoUpdate()
                 }
                 else -> {
@@ -80,7 +81,7 @@ class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<
         }
     }
 
-    private fun GitRepository.AccessScope.updateRemote(scoreFile: File, recordList: RecordList, user: String, puzzle: OmPuzzle, score: OmScore, updated: Collection<String>) {
+    private fun GitRepository.AccessScope.updateRemote(scoreFile: File, recordList: RecordList, user: String?, puzzle: OmPuzzle, score: OmScore, updated: Collection<String>) {
         scoreFile.writeText(Json { prettyPrint = true }.encodeToString(recordList))
         add(scoreFile)
         commitAndPush(user, puzzle, score, updated)
@@ -105,7 +106,7 @@ class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<
             }.distinct().joinToString("/")
             table += "Name|Cost|Cycles|${thirdCategory}|Sum\n:-|:-|:-|:-|:-\n"
             for (puzzle in puzzles) {
-                val entry = recordList[puzzle] ?: PuzzleEntry(mutableListOf(), mutableListOf())
+                val entry = recordList[puzzle] ?: PuzzleEntry()
                 table += "[**${puzzle.displayName}**](##Frontier: ${entry.pareto.joinToString(" ") { it.toShortDisplayString() }}##)"
 
                 val costScores = filterRecords(entry.records, costCategories)
@@ -133,26 +134,27 @@ class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<
         }
     }
 
-    private fun filterRecords(records: List<OmRecord>, filter: List<OmCategory>): MutableList<List<OmRecord>> {
-        return records.filter { filter.contains(it.category) }.groupBy { it.link }.values.map { it.sortedBy(OmRecord::category) }.sortedBy { it.first().category }.toMutableList()
+    private fun filterRecords(records: Map<OmCategory, OmRecord>, filter: List<OmCategory>): MutableList<Map<OmCategory, OmRecord>> {
+        return records.filter { filter.contains(it.key) }.entries.groupBy { it.value.link }.values.map { list -> list.sortedBy{ it.key}.toMap() }.sortedBy { it.keys.first() }.toMutableList()
     }
 
-    private fun List<OmRecord>?.toMarkdown(): String {
+    private fun Map<OmCategory, OmRecord>?.toMarkdown(): String {
         if (this == null || isEmpty()) return ""
-        return "[${first().score.toShortDisplayString()}](${first().link})${if (any { it.category.name.contains("X") }) "*" else ""}"
+        return "[${values.first().score.toShortDisplayString()}](${values.first().link})${if (any { it.key.name.contains("X") }) "*" else ""}"
     }
 
     override fun get(puzzle: OmPuzzle, category: OmCategory): OmRecord? {
+        if(!supportedCategories.contains(category)) return null
         return redditService.access {
             val scoreFile = File(repo, scoreFileName)
             val recordList: RecordList = Json.decodeFromString(scoreFile.readText())
-            recordList[puzzle]?.records?.find { it.category == category }?.let { OmRecord(category, it.score, it.link) }
+            recordList[puzzle]?.records?.get(category)?.let { OmRecord(it.score, it.link) }
         }
     }
 }
 
 @Serializable
-data class PuzzleEntry(val records: MutableList<OmRecord>, val pareto: MutableList<OmScore>)
+data class PuzzleEntry(val records: MutableMap<OmCategory, OmRecord> = mutableMapOf(), val pareto: MutableList<OmScore> = mutableListOf())
 
 typealias RecordList = MutableMap<OmPuzzle, PuzzleEntry>
 

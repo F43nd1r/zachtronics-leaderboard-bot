@@ -42,8 +42,8 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
 
         fun status(): Status = git.status().call()
 
-        fun commitAndPush(user: String, puzzle: Puzzle, score: Score, updated: Collection<String>) {
-            commitAndPush("${puzzle.displayName} ${score.toDisplayString()} $updated by $user")
+        fun commitAndPush(user: String?, puzzle: Puzzle, score: Score, updated: Collection<String>) {
+            commitAndPush("${puzzle.displayName} ${score.toDisplayString()} $updated by ${user ?: "unknown"}")
         }
 
         fun commitAndPush(message: String) {

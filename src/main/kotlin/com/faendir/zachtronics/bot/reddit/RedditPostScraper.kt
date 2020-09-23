@@ -2,10 +2,10 @@ package com.faendir.zachtronics.bot.reddit
 
 import com.faendir.zachtronics.bot.discord.DiscordService
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult
+import com.faendir.zachtronics.bot.model.om.OmRecord
 import com.faendir.zachtronics.bot.model.om.OmScore
 import com.faendir.zachtronics.bot.model.om.OpusMagnum
 import com.faendir.zachtronics.bot.utils.DateSerializer
-import com.faendir.zachtronics.bot.utils.findCategoriesSupporting
 import kotlinx.serialization.json.Json
 import net.dean.jraw.models.PublicContribution
 import net.dean.jraw.models.SubredditSort
@@ -15,7 +15,6 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.io.File
 import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.util.*
 
 @Service
@@ -128,7 +127,7 @@ class RedditPostScraper(private val redditService: RedditService, private val di
         comment.body?.lines()?.forEach loop@{ line ->
             val command = mainRegex.matchEntire(line) ?: return@loop
             val puzzleName = command.groups["puzzle"]!!.value
-            val puzzles = opusMagnum.findPuzzleByName(puzzleName)
+            val puzzles = opusMagnum.parsePuzzle(puzzleName)
             if (puzzles.isEmpty() || puzzles.size > 1) {
                 return@loop
             }
@@ -136,14 +135,10 @@ class RedditPostScraper(private val redditService: RedditService, private val di
             command.groupValues.drop(2).forEach inner@{ group ->
                 val subCommand = scoreRegex.matchEntire(group) ?: return@inner
                 val score: OmScore = opusMagnum.parseScore(puzzle, subCommand.groups["score"]!!.value) ?: return@inner
-                val leaderboardCategories = opusMagnum.leaderboards.mapNotNull { it.findCategoriesSupporting(puzzle, score) }
-                if (leaderboardCategories.isEmpty()) {
-                    return@inner
-                }
                 val link = subCommand.groups["link"]!!.value
-                val results = leaderboardCategories.map { (leaderboard, categories) ->
+                val results = opusMagnum.leaderboards.map { leaderboard ->
                     update = true
-                    leaderboard.update(comment.author, puzzle, categories.toList(), score, link)
+                    leaderboard.update(puzzle, OmRecord(score, link, comment.author))
                 }
                 val successes = results.filterIsInstance<UpdateResult.Success<*, *>>()
                 if (successes.isNotEmpty()) {

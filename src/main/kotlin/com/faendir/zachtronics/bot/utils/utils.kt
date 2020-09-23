@@ -1,15 +1,9 @@
 package com.faendir.zachtronics.bot.utils
 
-import com.faendir.zachtronics.bot.leaderboards.Leaderboard
-import com.faendir.zachtronics.bot.model.Category
-import com.faendir.zachtronics.bot.model.Puzzle
-import com.faendir.zachtronics.bot.model.Score
+inline fun <T, R> Collection<T>.ifNotEmpty(block: (Collection<T>) -> R): R? = takeIf { it.isNotEmpty() }?.let(block)
 
-fun <C : Category<C, S, P>, S : Score, P : Puzzle> Leaderboard<C, S, P>.findCategoriesSupporting(puzzle: P, score: S): Pair<Leaderboard<C, S, P>, List<C>>? {
-    val categories = supportedCategories.filter { it.supportsPuzzle(puzzle) && it.supportsScore(score) }
-    return if (categories.isNotEmpty()) {
-        this to categories
-    } else {
-        null
-    }
-}
+inline fun <reified T> Iterable<*>.findInstance() : T? = filterIsInstance<T>().firstOrNull()
+
+inline fun <reified T> Iterable<*>.findInstance(block: (T) -> Unit) = findInstance<T>()?.let(block)
+
+fun <T : Map.Entry<K, V>, K, V> Iterable<T>.toMap() = map { it.key to it.value }.toMap()
