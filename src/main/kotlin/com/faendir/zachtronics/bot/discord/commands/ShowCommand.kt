@@ -16,9 +16,9 @@ class ShowCommand : Command {
         return message.match(regex).flatMap { command ->
             val categoryString = command.groups["category"]!!.value
             val categories = game.parseCategory(categoryString).ifEmpty {
-                return@flatMap Result.Failure("sorry, could not find category \"$categoryString\"")
+                return@flatMap Result.Failure("sorry, could not find the category \"$categoryString\"")
             }
-            game.parsePuzzle(command.groups["puzzle"]!!.value).getSinglePuzzle().map puzzle@{ puzzle ->
+            game.parsePuzzle(command.groups["puzzle"]!!.value).map puzzle@{ puzzle ->
                 val category = categories.find { it.supportsPuzzle(puzzle) }
                     ?: return@puzzle "sorry, the category \"${categories.first().displayName}\" does not support the puzzle ${puzzle.displayName}."
                 for (leaderboard in game.leaderboards) {

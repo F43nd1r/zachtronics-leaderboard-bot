@@ -6,6 +6,7 @@ import com.faendir.zachtronics.bot.model.om.OmRecord
 import com.faendir.zachtronics.bot.model.om.OmScore
 import com.faendir.zachtronics.bot.model.om.OpusMagnum
 import com.faendir.zachtronics.bot.utils.DateSerializer
+import com.faendir.zachtronics.bot.utils.Result
 import kotlinx.serialization.json.Json
 import net.dean.jraw.models.PublicContribution
 import net.dean.jraw.models.SubredditSort
@@ -127,11 +128,9 @@ class RedditPostScraper(private val redditService: RedditService, private val di
         comment.body?.lines()?.forEach loop@{ line ->
             val command = mainRegex.matchEntire(line) ?: return@loop
             val puzzleName = command.groups["puzzle"]!!.value
-            val puzzles = opusMagnum.parsePuzzle(puzzleName)
-            if (puzzles.isEmpty() || puzzles.size > 1) {
-                return@loop
-            }
-            val puzzle = puzzles.first()
+            val puzzleResult = opusMagnum.parsePuzzle(puzzleName)
+            if(puzzleResult is Result.Failure) return@loop
+            val puzzle = (puzzleResult as Result.Success).result
             command.groupValues.drop(2).forEach inner@{ group ->
                 val subCommand = scoreRegex.matchEntire(group) ?: return@inner
                 val score: OmScore = opusMagnum.parseScore(puzzle, subCommand.groups["score"]!!.value) ?: return@inner

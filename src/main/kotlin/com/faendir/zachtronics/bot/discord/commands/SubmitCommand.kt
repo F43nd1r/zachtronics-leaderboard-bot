@@ -15,7 +15,7 @@ class SubmitCommand : Command {
     override val requiresRoles: List<String> = listOf("trusted-leaderboard-poster")
 
     override fun <C : Category<C, S, P>, S : Score, P : Puzzle, R : Record<S>> handleMessage(game: Game<C, S, P, R>, message: Message): String {
-        return game.parseSubmission(message).flatMap { (puzzles, record) -> puzzles.getSinglePuzzle().map { it to record } }.map { (puzzle, record) ->
+        return game.parseSubmission(message).map { (puzzle, record) ->
             val results = game.leaderboards.map { it.update(puzzle, record) }
             results.filterIsInstance<UpdateResult.Success<C, S>>().ifNotEmpty { successes ->
                 return@map "thanks, the site will be updated shortly with ${puzzle.displayName} ${

@@ -11,11 +11,11 @@ interface Game<C : Category<C, S, P>, S : Score, P : Puzzle, R : Record<S>> {
 
     val submissionSyntax : String
 
-    fun parseSubmission(message: Message): Result<Pair<List<P>, R>>
+    fun parseSubmission(message: Message): Result<Pair<P, R>>
 
     fun parseCategory(name: String): List<C>
 
-    fun parsePuzzle(name: String): List<P>
+    fun parsePuzzle(name: String): Result<P>
 
     fun parseScore(puzzle: P, string: String): S?
 }

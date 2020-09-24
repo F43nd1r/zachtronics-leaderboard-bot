@@ -96,7 +96,11 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
         val explanation = File(dir, "explanation.html").readText()
         fun generateRecord(category: OmCategory, record: OmRecord): String {
             return scoreTemplate.format(record.link,
-                record.score.toDisplayString({ category.sortScoreParts(this) }) { _, value -> format(value) },
+                if(category == HEIGHT || category == WIDTH) {
+                    record.score.toDisplayString({ category.sortScoreParts(this) }) { _, value -> format(value) }
+                } else {
+                    record.score.toShortDisplayString()
+                },
                 if (record.link.endsWith("mp4") || record.link.endsWith("webm")) {
                     videoTemplate.format(record.link)
                 } else {
@@ -111,11 +115,11 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
                     headerTemplate.format(tableHeaders[category])
                 }, puzzles.joinToString("\n") { puzzle ->
                     puzzleTemplate.format(puzzle.displayName, categories.joinToString("\n") { category ->
-                        if (category.supportsPuzzle(puzzle)) {
-                            cellTemplate.format(recordList[puzzle]?.get(category)?.let { generateRecord(category, it) } ?: "")
+                        cellTemplate.format(if (category.supportsPuzzle(puzzle)) {
+                            recordList[puzzle]?.get(category)?.let { generateRecord(category, it) } ?: ""
                         } else {
                             blockTemplate
-                        }
+                        })
                     })
                 })
             } else {
