@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 @Serializable
 @Value
 public class ScRecord implements Record<ScScore> {
-    ScCategory category;
     ScScore score;
     String author;
     String link;
@@ -16,6 +15,6 @@ public class ScRecord implements Record<ScScore> {
     @NotNull
     @Override
     public String toDisplayString() {
-        return category.getDisplayName() + " " + score.toDisplayString() + " by " + author + " " + link;
+        return score.toDisplayString() + " by " + author + " " + link;
     }
 }

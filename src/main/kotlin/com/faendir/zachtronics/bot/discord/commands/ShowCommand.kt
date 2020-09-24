@@ -23,7 +23,7 @@ class ShowCommand : Command {
                     ?: return@puzzle "sorry, the category \"${categories.first().displayName}\" does not support the puzzle ${puzzle.displayName}."
                 for (leaderboard in game.leaderboards) {
                     val record = leaderboard.get(puzzle, category)
-                    if (record != null) return@puzzle "here you go: ${puzzle.displayName} ${record.toDisplayString()}"
+                    if (record != null) return@puzzle "here you go: ${puzzle.displayName} ${category.displayName} ${record.toDisplayString()}"
                 }
                 return@puzzle "sorry, there is no score for ${puzzle.displayName} ${category.displayName}."
             }

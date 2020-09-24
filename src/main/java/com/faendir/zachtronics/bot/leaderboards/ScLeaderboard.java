@@ -51,7 +51,7 @@ public class ScLeaderboard implements Leaderboard<ScCategory, ScScore, ScPuzzle,
             Matcher m = scoreRegex.matcher(scoreCell);
             if (m.matches()) {
                 ScScore score = SpaceChem.parseScore(m.group("score"));
-                return new ScRecord(category, score, m.group("author"), m.group("link"));
+                return new ScRecord(score, m.group("author"), m.group("link"));
             }
             break;
         }
