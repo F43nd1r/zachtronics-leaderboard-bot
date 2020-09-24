@@ -2,6 +2,7 @@ package com.faendir.zachtronics.bot.model.sc;
 
 import com.faendir.zachtronics.bot.model.Category;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -11,21 +12,22 @@ import java.util.function.ToIntFunction;
 
 import static com.faendir.zachtronics.bot.model.sc.ScCategory.ScScoreComparators.*;
 
+@RequiredArgsConstructor
 public enum ScCategory implements Category<ScCategory, ScScore, ScPuzzle> {
-    CYCLES("C", comparatorCRS, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), false),
-    SYMBOLS("S", comparatorSRC, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), false),
-    RC("RC", comparatorRCS, Collections.singleton(ScType.PRODUCTION), false),
-    RS("RS", comparatorRSC, Collections.singleton(ScType.PRODUCTION), false),
+    CYCLES("C", "c/r/s[/BP]", comparatorCRS, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), false),
+    SYMBOLS("S", "c/r/s[/BP]", comparatorSRC, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), false),
+    RC("RC", "c/r/s[/BP]", comparatorRCS, Collections.singleton(ScType.PRODUCTION), false),
+    RS("RS", "c/r/s[/BP]", comparatorRSC, Collections.singleton(ScType.PRODUCTION), false),
 
-    CNB("CNB", comparatorCRS, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), false),
-    SNB("SNB", comparatorSRC, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), false),
-    RCNB("RCNB", comparatorRCS, Collections.singleton(ScType.PRODUCTION), false),
-    RSNB("RSNB", comparatorRSC, Collections.singleton(ScType.PRODUCTION), false),
+    CNB("CNB", "c/r/s[/P]", comparatorCRS, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), false),
+    SNB("SNB", "c/r/s[/P]", comparatorSRC, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), false),
+    RCNB("RCNB", "c/r/s[/P]", comparatorRCS, Collections.singleton(ScType.PRODUCTION), false),
+    RSNB("RSNB", "c/r/s[/P]", comparatorRSC, Collections.singleton(ScType.PRODUCTION), false),
 
-    CNP("CNP", comparatorCRS, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), true),
-    SNP("SNP", comparatorSRC, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), true),
-    RCNP("RCNP", comparatorRCS, Collections.singleton(ScType.PRODUCTION), true),
-    RSNP("RSNP", comparatorRSC, Collections.singleton(ScType.PRODUCTION), true);
+    CNP("CNP", "c/r/s[/B]", comparatorCRS, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), true),
+    SNP("SNP", "c/r/s[/B]", comparatorSRC, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), true),
+    RCNP("RCNP", "c/r/s[/B]", comparatorRCS, Collections.singleton(ScType.PRODUCTION), true),
+    RSNP("RSNP", "c/r/s[/B]", comparatorRSC, Collections.singleton(ScType.PRODUCTION), true);
 
     @Getter
     private final String displayName;
@@ -34,14 +36,6 @@ public enum ScCategory implements Category<ScCategory, ScScore, ScPuzzle> {
     private final Comparator<ScScore> comparator;
     private final Set<ScType> supportedTypes;
     private final boolean needsRandomness;
-
-    ScCategory(String displayName, Comparator<ScScore> comparator, Set<ScType> supportedTypes, boolean needsRandomness) {
-        this.displayName = displayName;
-        this.contentDescription = needsRandomness ? "c/r/s[/BP]" : "c/r/s[/B]";
-        this.comparator = comparator;
-        this.supportedTypes = supportedTypes;
-        this.needsRandomness = needsRandomness;
-    }
 
     @Override
     public boolean isBetterOrEqual(@NotNull ScScore s1, @NotNull ScScore s2) {
