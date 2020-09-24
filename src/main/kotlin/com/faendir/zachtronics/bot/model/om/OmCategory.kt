@@ -13,6 +13,10 @@ enum class OmCategory(
     private val supportedTypes: Set<OmType> = OmType.values().toSet(),
     private val supportedGroups: Set<OmGroup> = OmGroup.values().toSet(),
 ) : Category<OmCategory, OmScore, OmPuzzle> {
+    OCG("OCG", listOf(OVERLAP_CYCLES, COST, AREA), OmCategory::normalSort, setOf(NORMAL, INFINITE)),
+    OCA("OCA", listOf(OVERLAP_CYCLES, AREA, COST), OmCategory::normalSort, setOf(NORMAL, INFINITE)),
+    OCX("OCX", listOf(OVERLAP_CYCLES, COST, AREA), OmCategory::lastTwoProductSort, setOf(NORMAL, INFINITE)),
+
     WIDTH("W", listOf(OmScorePart.WIDTH, CYCLES, COST), OmCategory::normalSort, setOf(NORMAL)),
     HEIGHT("H", listOf(OmScorePart.HEIGHT, CYCLES, COST), OmCategory::normalSort, setOf(NORMAL, INFINITE)),
 
