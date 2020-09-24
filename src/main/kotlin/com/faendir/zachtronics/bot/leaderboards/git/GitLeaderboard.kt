@@ -37,10 +37,10 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
                 val dir = File(repo, dirName)
                 File(dir, scoreFileName).takeIf { it.exists() }?.let { file ->
                     generatePage(dir, directories.filter { it.value == dirName }.keys.toList(), Json.decodeFromString(file.readText()))
-                    if (status().changed.isNotEmpty()) {
-                        commitAndPush("Update page formatting")
-                    }
                 }
+            }
+            if (status().changed.isNotEmpty()) {
+                commitAndPush("Update page formatting")
             }
         }
     }
