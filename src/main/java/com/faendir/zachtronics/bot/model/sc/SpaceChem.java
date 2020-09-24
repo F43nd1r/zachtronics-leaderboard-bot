@@ -35,7 +35,7 @@ public class SpaceChem implements Game<ScCategory, ScScore, ScPuzzle, ScRecord> 
     @NotNull
     @Override
     public Result<Pair<ScPuzzle, ScRecord>> parseSubmission(@NotNull Message message) {
-        throw new UnsupportedOperationException();
+        return new Result.Failure<>("Operation not implemented yet");
     }
 
     @NotNull
