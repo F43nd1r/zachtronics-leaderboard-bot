@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 class OpusMagnum(gitLeaderboard: GitLeaderboard, redditLeaderboard: RedditLeaderboard) : Game<OmCategory, OmScore, OmPuzzle, OmRecord> {
     override val discordChannel = "opus-magnum"
     override fun parsePuzzle(name: String): Result<OmPuzzle> = OmPuzzle.values().filter { it.displayName.contains(name, ignoreCase = true) }.getSinglePuzzle(name)
-    override fun parseScore(puzzle: OmPuzzle, string: String): OmScore? {
+    fun parseScore(puzzle: OmPuzzle, string: String): OmScore? {
         if (string.isBlank()) return null
         val parts = string.split('/')
         if (parts.size < 3) return null

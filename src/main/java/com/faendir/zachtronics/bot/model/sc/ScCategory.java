@@ -2,7 +2,6 @@ package com.faendir.zachtronics.bot.model.sc;
 
 import com.faendir.zachtronics.bot.model.Category;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -12,7 +11,6 @@ import java.util.function.ToIntFunction;
 
 import static com.faendir.zachtronics.bot.model.sc.ScCategory.ScScoreComparators.*;
 
-@RequiredArgsConstructor
 public enum ScCategory implements Category<ScCategory, ScScore, ScPuzzle> {
     CYCLES("C", comparatorCRS, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), false),
     SYMBOLS("S", comparatorSRC, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), false),
@@ -30,12 +28,20 @@ public enum ScCategory implements Category<ScCategory, ScScore, ScPuzzle> {
     RSNP("RSNP", comparatorRSC, Collections.singleton(ScType.PRODUCTION), true);
 
     @Getter
-    private final String contentDescription = "c/r/s";
-    @Getter
     private final String displayName;
+    @Getter
+    private final String contentDescription;
     private final Comparator<ScScore> comparator;
     private final Set<ScType> supportedTypes;
     private final boolean needsRandomness;
+
+    ScCategory(String displayName, Comparator<ScScore> comparator, Set<ScType> supportedTypes, boolean needsRandomness) {
+        this.displayName = displayName;
+        this.contentDescription = needsRandomness ? "c/r/s[/BP]" : "c/r/s[/B]";
+        this.comparator = comparator;
+        this.supportedTypes = supportedTypes;
+        this.needsRandomness = needsRandomness;
+    }
 
     @Override
     public boolean isBetterOrEqual(@NotNull ScScore s1, @NotNull ScScore s2) {
@@ -49,7 +55,7 @@ public enum ScCategory implements Category<ScCategory, ScScore, ScPuzzle> {
 
     @Override
     public boolean supportsScore(@NotNull ScScore score) {
-        return true;
+        return !score.usesPrecognition() || needsRandomness;
     }
 
     static class ScScoreComparators {

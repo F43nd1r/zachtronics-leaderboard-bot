@@ -22,7 +22,4 @@ data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>) : Score {
     override fun toDisplayString(): String = toStandardDisplayString { part, value -> format(value) + part.key }
 
     fun toShortDisplayString() = toStandardDisplayString { _, value -> format(value) }
-
-    override val contentDescription: String
-        get() = parts.keys.joinToString("/") { it.key.toString() }
 }

@@ -16,6 +16,4 @@ interface Game<C : Category<C, S, P>, S : Score, P : Puzzle, R : Record<S>> {
     fun parseCategory(name: String): List<C>
 
     fun parsePuzzle(name: String): Result<P>
-
-    fun parseScore(puzzle: P, string: String): S?
 }

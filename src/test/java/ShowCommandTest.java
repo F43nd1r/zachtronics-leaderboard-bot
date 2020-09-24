@@ -35,15 +35,12 @@ public class ShowCommandTest {
     public void testHandleMessage() {
         String command = "!show c Two By Two";
 
-        User author = new UserById(-1);
-        GuildImpl guild = new GuildImpl(null, -1);
-        TextChannel channel = new TextChannelImpl(-1, guild);
         Message message = new ReceivedMessage(-1, null, null, false, false, new TLongHashSet(), new TLongHashSet(),
-                                              false, false, "", "", author, null, null, null, Collections.emptyList(),
-                                              Collections.emptyList(), Collections.emptyList(), 0);
+                                              false, false, command, "", new UserById(-1), null, null, null,
+                                              Collections.emptyList(), Collections.emptyList(), Collections.emptyList(),
+                                              0);
 
-        String result = showCommand.handleMessage(spaceChem, author, channel, message,
-                                                  Objects.requireNonNull(showCommand.getRegex().find(command, 0)));
+        String result = showCommand.handleMessage(spaceChem, message);
         System.out.println(result);
         assertNotNull(result);
     }
