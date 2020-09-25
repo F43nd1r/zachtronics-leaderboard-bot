@@ -1,6 +1,5 @@
 package com.faendir.zachtronics.bot.leaderboards;
 
-import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.model.sc.*;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
@@ -13,21 +12,21 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
 @RequiredArgsConstructor
-public class ScLeaderboard implements Leaderboard<ScCategory, ScScore, ScPuzzle> {
+public class ScLeaderboard implements Leaderboard<ScCategory, ScScore, ScPuzzle, ScRecord> {
     @Getter
-    private final Collection<ScCategory> supportedCategories = Arrays.asList(ScCategory.values());
+    private final List<ScCategory> supportedCategories = Arrays.asList(ScCategory.values());
 
     private final RedditService redditService;
 
     @Nullable
     @Override
-    public Record get(@NotNull ScPuzzle puzzle, @NotNull ScCategory category) {
+    public ScRecord get(@NotNull ScPuzzle puzzle, @NotNull ScCategory category) {
         boolean needsReactors = category.name().startsWith("R") && puzzle.getType() != ScType.PRODUCTION_TRIVIAL;
         String puzzleHeader = Pattern.quote(puzzle.getDisplayName()) + (needsReactors ? " - \\d Reactors?" : "");
         Pattern puzzleRegex = Pattern.compile(puzzleHeader);
@@ -46,12 +45,13 @@ public class ScLeaderboard implements Leaderboard<ScCategory, ScScore, ScPuzzle>
                 scoreCell = tableCols[column - 1];
             else if (scoreCell.equals("←←"))
                 scoreCell = tableCols[column - 2];
-            Pattern scoreRegex = Pattern.compile("(?:†\\s*)?\\[?(?<score>" + SpaceChem.SCORE_REGEX.pattern() +
-                                                 ")\\s+(?<author>[^]]+)(?:]\\((?<link>[^)]+)\\).*?)?");
+            Pattern scoreRegex = Pattern.compile("(?:†\\s*)?\\[?\\((?<score>" +
+                                                 "\\**(?<cycles>\\d+)\\**/\\**(?<reactors>\\d+)\\**/\\**(?<symbols>\\d+)\\**" +
+                                                 ")\\)\\s+(?<author>[^]]+)(?:]\\((?<link>[^)]+)\\).*?)?");
             Matcher m = scoreRegex.matcher(scoreCell);
             if (m.matches()) {
                 ScScore score = SpaceChem.parseScore(m.group("score"));
-                return new ScRecord(category, score, m.group("author"), m.group("link"));
+                return new ScRecord(score, m.group("author"), m.group("link"));
             }
             break;
         }

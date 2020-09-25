@@ -2,10 +2,11 @@ package com.faendir.zachtronics.bot.reddit
 
 import com.faendir.zachtronics.bot.discord.DiscordService
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult
+import com.faendir.zachtronics.bot.model.om.OmRecord
 import com.faendir.zachtronics.bot.model.om.OmScore
 import com.faendir.zachtronics.bot.model.om.OpusMagnum
 import com.faendir.zachtronics.bot.utils.DateSerializer
-import com.faendir.zachtronics.bot.utils.findCategoriesSupporting
+import com.faendir.zachtronics.bot.utils.Result
 import kotlinx.serialization.json.Json
 import net.dean.jraw.models.PublicContribution
 import net.dean.jraw.models.SubredditSort
@@ -15,7 +16,6 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.io.File
 import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.util.*
 
 @Service
@@ -72,14 +72,17 @@ class RedditPostScraper(private val redditService: RedditService, private val di
         }
     }*/
 
-    @Scheduled(fixedRate = 1000 * 60 * 60)
+    @Scheduled(fixedRate = 1000L * 60 * 60)
     fun pullFromReddit() {
+        val now = Instant.now() //capture timestamp before processing
         val submissionThread = redditService.subreddit(Subreddit.OPUS_MAGNUM).posts().sorting(SubredditSort.HOT).limit(5).build().asSequence().flatten()
             .find { it.title.contains("official record submission thread", ignoreCase = true) }
         val lastUpdate: Date? = redditService.access { File(repo, timestampFile).takeIf { it.exists() }?.readText() }?.let { Json.decodeFromString(DateSerializer, it) }
+        var hasNewComment = false
         submissionThread?.toReference(redditService.reddit)?.comments()?.walkTree()?.forEach { commentNode ->
             val comment = commentNode.subject
             if (lastUpdate == null || (comment.edited ?: comment.created).after(lastUpdate)) {
+                hasNewComment = true
                 comment.body?.let { body ->
                     if (body != "[deleted]") {
                         if (trustedUsers.contains(comment.author)) {
@@ -106,11 +109,13 @@ class RedditPostScraper(private val redditService: RedditService, private val di
                 }
             }
         }
-        redditService.access {
-            val timestamp = File(repo, timestampFile)
-            timestamp.writeText(Json.encodeToString(DateSerializer, Date.from(Instant.now().minus(5, ChronoUnit.MINUTES))))
-            add(timestamp)
-            commitAndPush("timestamp update")
+        if(hasNewComment) {
+            redditService.access {
+                val timestamp = File(repo, timestampFile)
+                timestamp.writeText(Json.encodeToString(DateSerializer, Date.from(now)))
+                add(timestamp)
+                commitAndPush("timestamp update")
+            }
         }
     }
 
@@ -123,22 +128,16 @@ class RedditPostScraper(private val redditService: RedditService, private val di
         comment.body?.lines()?.forEach loop@{ line ->
             val command = mainRegex.matchEntire(line) ?: return@loop
             val puzzleName = command.groups["puzzle"]!!.value
-            val puzzles = opusMagnum.findPuzzleByName(puzzleName)
-            if (puzzles.isEmpty() || puzzles.size > 1) {
-                return@loop
-            }
-            val puzzle = puzzles.first()
+            val puzzleResult = opusMagnum.parsePuzzle(puzzleName)
+            if(puzzleResult is Result.Failure) return@loop
+            val puzzle = (puzzleResult as Result.Success).result
             command.groupValues.drop(2).forEach inner@{ group ->
                 val subCommand = scoreRegex.matchEntire(group) ?: return@inner
                 val score: OmScore = opusMagnum.parseScore(puzzle, subCommand.groups["score"]!!.value) ?: return@inner
-                val leaderboardCategories = opusMagnum.leaderboards.mapNotNull { it.findCategoriesSupporting(puzzle, score) }
-                if (leaderboardCategories.isEmpty()) {
-                    return@inner
-                }
                 val link = subCommand.groups["link"]!!.value
-                val results = leaderboardCategories.map { (leaderboard, categories) ->
+                val results = opusMagnum.leaderboards.map { leaderboard ->
                     update = true
-                    leaderboard.update(comment.author, puzzle, categories.toList(), score, link)
+                    leaderboard.update(puzzle, OmRecord(score, link, comment.author))
                 }
                 val successes = results.filterIsInstance<UpdateResult.Success<*, *>>()
                 if (successes.isNotEmpty()) {

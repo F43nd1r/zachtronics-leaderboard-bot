@@ -1,14 +1,18 @@
 package com.faendir.zachtronics.bot.discord.commands
 
-import com.faendir.zachtronics.bot.model.Game
 import com.faendir.zachtronics.bot.model.Puzzle
+import com.faendir.zachtronics.bot.utils.Result
+import net.dv8tion.jda.api.entities.Message
 
-fun <P : Puzzle> findPuzzle(game: Game<*, *, P>, puzzleName: String, processPuzzle: (P) -> String): String {
-    val puzzles = game.findPuzzleByName(puzzleName)
-    return when (val size = puzzles.size) {
-        0 -> "sorry, I did not recognize the puzzle \"$puzzleName\"."
-        1 -> processPuzzle(puzzles.first())
-        in 2..5 -> "sorry, your request for \"$puzzleName\" was not accurate enough. Use one of:\n${puzzles.joinToString("\n") { it.displayName }}"
-        else -> "sorry, your request for \"$puzzleName\" was not accurate enough. $size matches."
+fun <P : Puzzle> List<P>.getSinglePuzzle(name: String): Result<P> {
+    return when (val size = this.size) {
+        0 -> Result.Failure("sorry, I did not recognize the puzzle \"$name\".")
+        1 -> Result.Success(first())
+        in 2..5 -> Result.Failure("sorry, your request for \"$name\" was not precise enough. Use one of:\n${joinToString("\n") { it.displayName }}")
+        else -> Result.Failure("sorry, your request for \"$name\" was not precise enough. $size matches.")
     }
+}
+
+fun Message.match(regex: Regex): Result<MatchResult> {
+    return regex.matchEntire(contentRaw)?.let { Result.Success(it) } ?: Result.Failure("sorry, I could not parse your command. Type `!help` to see the syntax.")
 }

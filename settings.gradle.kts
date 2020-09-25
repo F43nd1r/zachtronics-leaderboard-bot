@@ -1,2 +1,2 @@
-rootProject.name = "om-leaderboard-discord-bot"
+rootProject.name = "zachtronics-leaderboard-bot"
 
