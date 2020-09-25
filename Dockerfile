@@ -6,6 +6,7 @@ RUN java -Djarmode=layertools -jar application.jar extract
 
 FROM adoptopenjdk:14-jre-hotspot
 WORKDIR application
+RUN apt-get update && apt-get install -y ffmpeg
 COPY --from=builder application/dependencies/ ./
 RUN true
 COPY --from=builder application/spring-boot-loader/ ./

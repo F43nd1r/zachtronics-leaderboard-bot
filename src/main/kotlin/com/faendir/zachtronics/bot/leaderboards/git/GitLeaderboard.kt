@@ -2,6 +2,7 @@ package com.faendir.zachtronics.bot.leaderboards.git
 
 import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.git.GitRepository
+import com.faendir.zachtronics.bot.imgur.ImgurService
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult
 import com.faendir.zachtronics.bot.model.om.*
@@ -16,7 +17,7 @@ import java.time.ZoneOffset
 import javax.annotation.PostConstruct
 
 @Component
-class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties, "om-leaderboard", "https://github.com/F43nd1r/om-leaderboard.git"),
+class GitLeaderboard(gitProperties: GitProperties, private val imgurService: ImgurService) : GitRepository(gitProperties, "om-leaderboard", "https://github.com/F43nd1r/om-leaderboard.git"),
                                                      Leaderboard<OmCategory, OmScore, OmPuzzle, OmRecord> {
     companion object {
         private const val scoreFileName = "scores.json"
@@ -59,7 +60,7 @@ class GitLeaderboard(gitProperties: GitProperties) : GitRepository(gitProperties
                     val oldRecord = recordList[puzzle]?.get(category)
                     if (oldRecord == null || category.isBetterOrEqual(record.score, oldRecord.score) && oldRecord.link != record.link) {
                         recordList[puzzle] = (recordList[puzzle] ?: mutableMapOf()).also { records ->
-                            records[category] = OmRecord(category.normalizeScore(record.score), record.link)
+                            records[category] = OmRecord(category.normalizeScore(record.score), imgurService.tryRehost(record.link))
                             changed = true
                         }
                         success[category] = oldRecord?.score

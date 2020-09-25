@@ -1,6 +1,7 @@
 package com.faendir.zachtronics.bot.leaderboards.reddit
 
 import com.faendir.zachtronics.bot.git.GitRepository
+import com.faendir.zachtronics.bot.imgur.ImgurService
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult
 import com.faendir.zachtronics.bot.model.om.*
@@ -10,7 +11,6 @@ import com.faendir.zachtronics.bot.model.om.OmType.PRODUCTION
 import com.faendir.zachtronics.bot.reddit.RedditService
 import com.faendir.zachtronics.bot.reddit.Subreddit
 import com.faendir.zachtronics.bot.utils.toMap
-import jdk.jfr.Category
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -22,7 +22,7 @@ import java.time.ZoneOffset
 import javax.annotation.PostConstruct
 
 @Component
-class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<OmCategory, OmScore, OmPuzzle, OmRecord> {
+class RedditLeaderboard(private val redditService: RedditService, private val imgurService: ImgurService) : Leaderboard<OmCategory, OmScore, OmPuzzle, OmRecord> {
     companion object {
         private const val scoreFileName = "scores.json"
         private const val wikiPage = "index"
@@ -46,7 +46,7 @@ class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<
                 val oldRecord = recordList[puzzle]?.records?.get(category)
                 if (oldRecord == null || category.isBetterOrEqual(record.score, oldRecord.score) && oldRecord.link != record.link) {
                     recordList[puzzle] = (recordList[puzzle] ?: PuzzleEntry()).apply {
-                        records[category] = OmRecord(category.normalizeScore(record.score), record.link)
+                        records[category] = OmRecord(category.normalizeScore(record.score), imgurService.tryRehost(record.link))
                     }
                     success[category] = oldRecord?.score
                 } else {
@@ -129,13 +129,15 @@ class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<
         val suffix = File(repo, "suffix.md").readText()
         val wiki = redditService.subreddit(Subreddit.OPUS_MAGNUM).wiki()
         val content = "$prefix\n$table\n$suffix".trim()
-        if(content.lines().filter { !it.contains(dateLinePrefix) } != wiki.page(wikiPage).content.lines().filter { !it.contains(dateLinePrefix) }) {
+        if (content.lines().filter { !it.contains(dateLinePrefix) } != wiki.page(wikiPage).content.lines().filter { !it.contains(dateLinePrefix) }) {
             wiki.update(wikiPage, content, "bot update")
         }
     }
 
     private fun filterRecords(records: Map<OmCategory, OmRecord>, filter: List<OmCategory>): MutableList<Map<OmCategory, OmRecord>> {
-        return records.filter { filter.contains(it.key) }.entries.groupBy { it.value.link }.values.map { list -> list.sortedBy{ it.key}.toMap() }.sortedBy { it.keys.first() }.toMutableList()
+        return records.filter { filter.contains(it.key) }.entries.groupBy { it.value.link }.values.map { list -> list.sortedBy { it.key }.toMap() }
+            .sortedBy { it.keys.first() }
+            .toMutableList()
     }
 
     private fun Map<OmCategory, OmRecord>?.toMarkdown(): String {
@@ -144,7 +146,7 @@ class RedditLeaderboard(private val redditService: RedditService) : Leaderboard<
     }
 
     override fun get(puzzle: OmPuzzle, category: OmCategory): OmRecord? {
-        if(!supportedCategories.contains(category)) return null
+        if (!supportedCategories.contains(category)) return null
         return redditService.access {
             val scoreFile = File(repo, scoreFileName)
             val recordList: RecordList = Json.decodeFromString(scoreFile.readText())
