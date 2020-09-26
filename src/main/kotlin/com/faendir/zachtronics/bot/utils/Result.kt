@@ -9,11 +9,9 @@ sealed class Result<T> {
         is Failure -> @Suppress("UNCHECKED_CAST") (this as Failure<R>)
     }
 
-    fun <R> flatMap(block: (T) -> Result<R>): Result<R> {
-        return when (this) {
-            is Success -> block(this.result)
-            is Failure -> @Suppress("UNCHECKED_CAST") (this as Failure<R>)
-        }
+    fun <R> flatMap(block: (T) -> Result<R>): Result<R> = when (this) {
+        is Success -> block(this.result)
+        is Failure -> @Suppress("UNCHECKED_CAST") (this as Failure<R>)
     }
 }
 
@@ -22,3 +20,13 @@ val Result<String>.message
         is Result.Success -> result
         is Result.Failure -> message
     }
+
+fun <T, U, V> Result<Pair<T, U>>.and(block: (T, U) -> Result<V>): Result<Triple<T, U, V>> = when (this) {
+    is Result.Success -> block(this.result.first, this.result.second).map { Triple(this.result.first, this.result.second, it) }
+    is Result.Failure -> @Suppress("UNCHECKED_CAST") (this as Result.Failure<Triple<T, U, V>>)
+}
+
+fun <T, U> Result<T>.and(block: (T) -> Result<U>): Result<Pair<T, U>> = when (this) {
+    is Result.Success -> block(this.result).map { this.result to it }
+    is Result.Failure -> @Suppress("UNCHECKED_CAST") (this as Result.Failure<Pair<T, U>>)
+}
