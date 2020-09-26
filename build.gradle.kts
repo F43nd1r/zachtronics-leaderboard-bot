@@ -54,3 +54,8 @@ docker {
     files(tasks.getByName<BootJar>("bootJar").outputs)
     copySpec.into("build/libs")
 }
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
