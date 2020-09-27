@@ -59,5 +59,5 @@ class OpusMagnum(gitLeaderboard: GitLeaderboard, redditLeaderboard: RedditLeader
 
     override fun parseCategory(name: String): List<OmCategory> = OmCategory.values().filter { it.displayName.equals(name, ignoreCase = true) }
 
-    override fun hasWritePermission(member: Member?): Boolean = member?.roles?.any { it.name == "trusted-leaderboard-poster" } == true
+    override fun hasWritePermission(member: Member?): Boolean = member?.roles?.any { it.name == "trusted-leaderboard-poster" } ?: false
 }
