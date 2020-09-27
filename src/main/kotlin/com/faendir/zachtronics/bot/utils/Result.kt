@@ -13,6 +13,11 @@ sealed class Result<T> {
         is Success -> block(this.result)
         is Failure -> @Suppress("UNCHECKED_CAST") (this as Failure<R>)
     }
+
+    inline fun onFailure(block: () -> T): T = when (this) {
+        is Success -> this.result
+        is Failure -> block()
+    }
 }
 
 val Result<String>.message

@@ -18,7 +18,7 @@ class OpusMagnum(gitLeaderboard: GitLeaderboard, redditLeaderboard: RedditLeader
 
     override fun parsePuzzle(name: String): Result<OmPuzzle> = OmPuzzle.values().filter { it.displayName.contains(name, ignoreCase = true) }.getSinglePuzzle(name)
 
-    private fun parseScore(puzzle: OmPuzzle, string: String): Result<OmScore> {
+    internal fun parseScore(puzzle: OmPuzzle, string: String): Result<OmScore> {
         if (string.isBlank()) return Failure("sorry, I didn't find a score in your command.")
         val parts = string.split('/')
         if (parts.size < 3) return Failure("sorry, your score must have at least three parts.")

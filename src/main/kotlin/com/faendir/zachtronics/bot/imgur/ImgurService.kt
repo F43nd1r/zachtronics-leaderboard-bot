@@ -25,14 +25,14 @@ class ImgurService(private val imgurProperties: ImgurProperties) {
 
     fun tryRehost(link: String): String {
         if (link.startsWith("https://i.imgur.com/")) return link
-        try {
+        return try {
             val filename = link.substringAfterLast("/")
             val input = File.createTempFile(filename.substringBeforeLast("."), ".${filename.substringAfterLast(".")}")
             input.writeBytes(CUrl(link).exec())
-            return upload(input)
+            upload(input)
         } catch (e: Throwable) {
             logger.info("Rehosting failed for $link", e)
-            return link
+            link
         }
     }
 

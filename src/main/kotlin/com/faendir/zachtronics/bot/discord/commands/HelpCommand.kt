@@ -1,14 +1,8 @@
 package com.faendir.zachtronics.bot.discord.commands
 
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard
-import com.faendir.zachtronics.bot.model.Category
-import com.faendir.zachtronics.bot.model.Game
-import com.faendir.zachtronics.bot.model.Puzzle
-import com.faendir.zachtronics.bot.model.Record
-import com.faendir.zachtronics.bot.model.Score
+import com.faendir.zachtronics.bot.model.*
 import net.dv8tion.jda.api.entities.Message
-import net.dv8tion.jda.api.entities.TextChannel
-import net.dv8tion.jda.api.entities.User
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 

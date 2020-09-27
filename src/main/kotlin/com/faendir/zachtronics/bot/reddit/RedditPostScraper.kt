@@ -133,7 +133,7 @@ class RedditPostScraper(private val redditService: RedditService, private val di
             val puzzle = (puzzleResult as Result.Success).result
             command.groupValues.drop(2).forEach inner@{ group ->
                 val subCommand = scoreRegex.matchEntire(group) ?: return@inner
-                val score: OmScore = opusMagnum.parseScore(puzzle, subCommand.groups["score"]!!.value) ?: return@inner
+                val score: OmScore = opusMagnum.parseScore(puzzle, subCommand.groups["score"]!!.value).onFailure { return@inner }
                 val link = subCommand.groups["link"]!!.value
                 val results = opusMagnum.leaderboards.map { leaderboard ->
                     update = true

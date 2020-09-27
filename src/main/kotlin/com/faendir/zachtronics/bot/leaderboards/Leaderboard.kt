@@ -21,8 +21,6 @@ sealed class UpdateResult<C : Category<C, S, *>, S : Score> {
 
     class BetterExists<C : Category<C, S, *>, S : Score>(val scores: Map<C, S>) : UpdateResult<C, S>()
 
-    class BrokenLink<C : Category<C, S, *>, S : Score> : UpdateResult<C, S>()
-
     class NotSupported<C : Category<C, S, *>, S : Score> : UpdateResult<C, S>()
 }
 
