@@ -1,4 +1,4 @@
-# Zachtronics Bot
+# Zachtronics Leaderboard Bot
 
 A discord & reddit bot for automating solution submission/display for [Zachtronics](http://www.zachtronics.com/) games.
 
@@ -22,13 +22,14 @@ services:
     build: .
     container_name: om-discord-bot
     environment:
-      JDA_TOKEN: abcdef
-      GIT_USERNAME: xyz
-      GIT_ACCESS_TOKEN: abcdef
-      REDDIT_USERNAME: xyz
-      REDDIT_ACCESS_TOKEN: abcdef
-      REDDIT_CLIENT_ID: qwert
-      REDDIT_PASSWORD: yxcvb
+      JDA_TOKEN: abc
+      GIT_USERNAME: def
+      GIT_ACCESS_TOKEN: ghi
+      REDDIT_USERNAME: jkl
+      REDDIT_ACCESS_TOKEN: mno
+      REDDIT_CLIENT_ID: pqr
+      REDDIT_PASSWORD: stu
+      IMGUR_CLIENT_ID: wvx
 ```
 Alternatively to `build .` you can use prebuilt `image: f43nd1r/om-leaderboard-discord-bot:latest`. This makes the gradle build obsolete.
 
