@@ -14,10 +14,20 @@ import org.springframework.stereotype.Component
 
 @Component
 class OpusMagnum(override val leaderboards: List<OmLeaderboard>) : Game<OmCategory, OmScore, OmPuzzle, OmRecord> {
+    companion object {
+        private val wordSeparator = Regex("[\\s-/]+")
+    }
     override val discordChannel = "opus-magnum"
 
     override fun parsePuzzle(name: String): Result<OmPuzzle> =
-        OmPuzzle.values().filter { it.displayName.contains(name, ignoreCase = true) }.getSinglePuzzle(name)
+        OmPuzzle.values().filter { puzzle ->
+            val words = name.split(wordSeparator).toMutableList()
+            puzzle.displayName.split(wordSeparator).forEach {
+                if(it.contains(words.first(), ignoreCase = true)) words.removeFirst()
+                if(words.isEmpty()) return@filter true
+            }
+            false
+        }.getSinglePuzzle(name)
 
     internal fun parseScore(puzzle: OmPuzzle, string: String): Result<OmScore> {
         if (string.isBlank()) return Failure("sorry, I didn't find a score in your command.")
