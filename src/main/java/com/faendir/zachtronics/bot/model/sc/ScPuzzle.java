@@ -196,7 +196,7 @@ public enum ScPuzzle implements Puzzle {
     published_36_3(ScGroup.RESEARCHNET1, ScType.RESEARCH, "Nano Electric Motor", true),
 
     published_37_1(ScGroup.RESEARCHNET1, ScType.RESEARCH, "Count", true),
-    published_37_2(ScGroup.RESEARCHNET1, ScType.PRODUCTION, "Sharing is Caring", false),
+    published_37_2(ScGroup.RESEARCHNET1, ScType.PRODUCTION, "Sharing Is Caring", false),
     published_37_3(ScGroup.RESEARCHNET1, ScType.PRODUCTION, "Reassembly", true),
     published_38_1(ScGroup.RESEARCHNET1, ScType.RESEARCH, "Cyanogen", true),
     published_38_2(ScGroup.RESEARCHNET1, ScType.RESEARCH, "Chloromethylsilane", true),
@@ -270,7 +270,7 @@ public enum ScPuzzle implements Puzzle {
     published_60_3(ScGroup.RESEARCHNET2, ScType.PRODUCTION, "Rags to Riches", false),
 
     published_61_1(ScGroup.RESEARCHNET2, ScType.RESEARCH, "Plutonium Separation", false),
-    published_61_2(ScGroup.RESEARCHNET2, ScType.RESEARCH, "You're doing it wrong", true),
+    published_61_2(ScGroup.RESEARCHNET2, ScType.RESEARCH, "You're Doing It Wrong", true),
     published_61_3(ScGroup.RESEARCHNET2, ScType.RESEARCH, "Synthetic Elerium", true),
     published_62_1(ScGroup.RESEARCHNET2, ScType.RESEARCH, "Deadly Soft Drinks", true),
     published_62_2(ScGroup.RESEARCHNET2, ScType.RESEARCH, "Deadly Fluorinated Water", true),

@@ -1,14 +1,11 @@
 import com.faendir.zachtronics.bot.Application;
-import com.faendir.zachtronics.bot.discord.commands.ShowCommand;
+import com.faendir.zachtronics.bot.discord.commands.Command;
 import com.faendir.zachtronics.bot.model.sc.SpaceChem;
 import gnu.trove.set.hash.TLongHashSet;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.internal.entities.GuildImpl;
 import net.dv8tion.jda.internal.entities.ReceivedMessage;
-import net.dv8tion.jda.internal.entities.TextChannelImpl;
 import net.dv8tion.jda.internal.entities.UserById;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,31 +14,36 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Collections;
-import java.util.Objects;
-
-import static org.junit.Assert.assertNotNull;
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @EnableConfigurationProperties
 @SpringBootTest(classes = Application.class, properties = "spring.main.lazy-initialization=true")
-public class ShowCommandTest {
+public class CommandTest {
 
     @Autowired
-    private ShowCommand showCommand;
+    private List<Command> commands;
     @Autowired
     private SpaceChem spaceChem;
 
     @Test
     public void testHandleMessage() {
-        String command = "!show c Two By Two";
+        String text = "!show C Freon";
 
-        Message message = new ReceivedMessage(-1, null, null, false, false, new TLongHashSet(), new TLongHashSet(),
-                                              false, false, command, "", new UserById(-1), null, null, null,
-                                              Collections.emptyList(), Collections.emptyList(), Collections.emptyList(),
-                                              0);
-
-        String result = showCommand.handleMessage(spaceChem, message);
+        String result = runCommand(text);
         System.out.println(result);
-        assertNotNull(result);
+
+    }
+
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    @NotNull
+    private String runCommand(String text) {
+        Message message = new ReceivedMessage(-1, null, null, false, false, new TLongHashSet(), new TLongHashSet(),
+                                              false, false, text, "", new UserById(295868901042946048L), null, null,
+                                              null, Collections.emptyList(), Collections.emptyList(),
+                                              Collections.emptyList(), 0);
+
+        return commands.stream().filter(c -> text.startsWith("!" + c.getName())).findFirst().get()
+                       .handleMessage(spaceChem, message);
     }
 }

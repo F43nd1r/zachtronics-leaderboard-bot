@@ -11,23 +11,25 @@ import java.util.Set;
 import java.util.function.ToIntFunction;
 
 import static com.faendir.zachtronics.bot.model.sc.ScCategory.ScScoreComparators.*;
+import static com.faendir.zachtronics.bot.model.sc.ScCategory.ScScoreFormatStrings.*;
+import static com.faendir.zachtronics.bot.model.sc.ScType.*;
 
 @RequiredArgsConstructor
 public enum ScCategory implements Category<ScCategory, ScScore, ScPuzzle> {
-    CYCLES("C", "c/r/s[/BP]", comparatorCRS, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), false),
-    SYMBOLS("S", "c/r/s[/BP]", comparatorSRC, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), false),
-    RC("RC", "c/r/s[/BP]", comparatorRCS, Collections.singleton(ScType.PRODUCTION), false),
-    RS("RS", "c/r/s[/BP]", comparatorRSC, Collections.singleton(ScType.PRODUCTION), false),
+    C("C", "c/r/s[/BP]", comparatorCRS, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), false, false, F100),
+    S("S", "c/r/s[/BP]", comparatorSRC, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), false, false, F001),
+    RC("RC", "c/r/s[/BP]", comparatorRCS, Collections.singleton(PRODUCTION), false, false, F110),
+    RS("RS", "c/r/s[/BP]", comparatorRSC, Collections.singleton(PRODUCTION), false, false, F011),
 
-    CNB("CNB", "c/r/s[/P]", comparatorCRS, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), false),
-    SNB("SNB", "c/r/s[/P]", comparatorSRC, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), false),
-    RCNB("RCNB", "c/r/s[/P]", comparatorRCS, Collections.singleton(ScType.PRODUCTION), false),
-    RSNB("RSNB", "c/r/s[/P]", comparatorRSC, Collections.singleton(ScType.PRODUCTION), false),
+    CNB("CNB", "c/r/s[/P]", comparatorCRS, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), true, false, F100),
+    SNB("SNB", "c/r/s[/P]", comparatorSRC, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), true, false, F001),
+    RCNB("RCNB", "c/r/s[/P]", comparatorRCS, Collections.singleton(PRODUCTION), true, false, F110),
+    RSNB("RSNB", "c/r/s[/P]", comparatorRSC, Collections.singleton(PRODUCTION), true, false, F011),
 
-    CNP("CNP", "c/r/s[/B]", comparatorCRS, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), true),
-    SNP("SNP", "c/r/s[/B]", comparatorSRC, Set.of(ScType.RESEARCH, ScType.PRODUCTION, ScType.PRODUCTION_TRIVIAL), true),
-    RCNP("RCNP", "c/r/s[/B]", comparatorRCS, Collections.singleton(ScType.PRODUCTION), true),
-    RSNP("RSNP", "c/r/s[/B]", comparatorRSC, Collections.singleton(ScType.PRODUCTION), true);
+    CNP("CNP", "c/r/s[/B]", comparatorCRS, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), false, true, F100),
+    SNP("SNP", "c/r/s[/B]", comparatorSRC, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), false, true, F001),
+    RCNP("RCNP", "c/r/s[/B]", comparatorRCS, Collections.singleton(PRODUCTION), false, true, F110),
+    RSNP("RSNP", "c/r/s[/B]", comparatorRSC, Collections.singleton(PRODUCTION), false, true, F011);
 
     @Getter
     private final String displayName;
@@ -35,7 +37,10 @@ public enum ScCategory implements Category<ScCategory, ScScore, ScPuzzle> {
     private final String contentDescription;
     private final Comparator<ScScore> comparator;
     private final Set<ScType> supportedTypes;
-    private final boolean needsRandomness;
+    private final boolean bugFree;
+    private final boolean precogFree;
+    @Getter
+    private final String formatStringLb;
 
     @Override
     public boolean isBetterOrEqual(@NotNull ScScore s1, @NotNull ScScore s2) {
@@ -44,12 +49,12 @@ public enum ScCategory implements Category<ScCategory, ScScore, ScPuzzle> {
 
     @Override
     public boolean supportsPuzzle(@NotNull ScPuzzle puzzle) {
-        return supportedTypes.contains(puzzle.getType()) && !(puzzle.isDeterministic() && needsRandomness);
+        return supportedTypes.contains(puzzle.getType()) && !(puzzle.isDeterministic() && precogFree);
     }
 
     @Override
     public boolean supportsScore(@NotNull ScScore score) {
-        return !score.usesPrecognition() || needsRandomness;
+        return !(score.isBugged() && bugFree) && !(score.isPrecognitive() && precogFree);
     }
 
     static class ScScoreComparators {
@@ -61,5 +66,12 @@ public enum ScCategory implements Category<ScCategory, ScScore, ScPuzzle> {
         static final Comparator<ScScore> comparatorRCS = makeComparator3(ScScore::getReactors, ScScore::getCycles, ScScore::getSymbols);
         static final Comparator<ScScore> comparatorRSC = makeComparator3(ScScore::getReactors, ScScore::getSymbols, ScScore::getCycles);
 
+    }
+
+    static class ScScoreFormatStrings {
+        static final String F100 = "**%s**%s/%d/%d";
+        static final String F001 = "%s%s/%d/**%d**";
+        static final String F110 = "**%s**%s/**%d**/%d";
+        static final String F011 = "%s%s/**%d**/**%d**";
     }
 }

@@ -1,8 +1,8 @@
 import com.faendir.zachtronics.bot.Application;
-import com.faendir.zachtronics.bot.leaderboards.ScLeaderboard;
-import com.faendir.zachtronics.bot.model.Record;
+import com.faendir.zachtronics.bot.leaderboards.sc.ScLocalLeaderboard;
 import com.faendir.zachtronics.bot.model.sc.ScCategory;
 import com.faendir.zachtronics.bot.model.sc.ScPuzzle;
+import com.faendir.zachtronics.bot.model.sc.ScRecord;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +19,13 @@ import static org.junit.Assert.assertNull;
 public class ScLeaderboardTest {
 
     @Autowired
-    private ScLeaderboard scLeaderboard;
+    private ScLocalLeaderboard scLeaderboard;
 
     @Test
     public void testGoodRecords() {
-        Record goodRecord = scLeaderboard.get(ScPuzzle.research_example_1, ScCategory.CYCLES);
+        ScRecord goodRecord = scLeaderboard.get(ScPuzzle.research_example_1, ScCategory.C);
         System.out.println(goodRecord);
-        goodRecord = scLeaderboard.get(ScPuzzle.published_1_1, ScCategory.SYMBOLS);
+        goodRecord = scLeaderboard.get(ScPuzzle.published_1_1, ScCategory.S);
         System.out.println(goodRecord);
         goodRecord = scLeaderboard.get(ScPuzzle.published_101_3, ScCategory.RC);
         System.out.println(goodRecord);
@@ -34,10 +34,24 @@ public class ScLeaderboardTest {
 
     @Test
     public void testBadRecord() {
-        Record badRecord = scLeaderboard.get(ScPuzzle.research_example_1, ScCategory.RC);
+        ScRecord badRecord = scLeaderboard.get(ScPuzzle.research_example_1, ScCategory.RC);
         assertNull(badRecord);
         badRecord = scLeaderboard.get(ScPuzzle.bonding_7, ScCategory.RCNB);
         assertNull(badRecord);
+    }
+
+    @Test
+    public void testFullIO() {
+        for (ScPuzzle p : ScPuzzle.values()) {
+            for (ScCategory c : ScCategory.values()) {
+                if (c.supportsPuzzle(p)) {
+                    ScRecord r = scLeaderboard.get(p, c);
+                    if (r != null)
+                        scLeaderboard.update(p, r);
+                }
+            }
+            System.out.println("Done " + p.getDisplayName());
+        }
     }
 
 }
