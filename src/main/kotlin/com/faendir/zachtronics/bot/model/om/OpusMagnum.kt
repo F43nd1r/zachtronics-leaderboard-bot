@@ -17,17 +17,23 @@ class OpusMagnum(override val leaderboards: List<OmLeaderboard>) : Game<OmCatego
     companion object {
         private val wordSeparator = Regex("[\\s-/]+")
     }
+
     override val discordChannel = "opus-magnum"
 
-    override fun parsePuzzle(name: String): Result<OmPuzzle> =
-        OmPuzzle.values().filter { puzzle ->
-            val words = name.split(wordSeparator).toMutableList()
-            puzzle.displayName.split(wordSeparator).forEach {
-                if(it.contains(words.first(), ignoreCase = true)) words.removeFirst()
-                if(words.isEmpty()) return@filter true
-            }
+    override fun parsePuzzle(name: String): Result<OmPuzzle> = OmPuzzle.values().filter { puzzle ->
+        val words = name.split(wordSeparator).toMutableList()
+        val puzzleWords = puzzle.displayName.split(wordSeparator)
+        puzzleWords.forEach {
+            if (it.contains(words.first(), ignoreCase = true)) words.removeFirst()
+            if (words.isEmpty()) return@filter true
+        }
+        if (name.length <= 4 && name.length == puzzleWords.size) {
+            //check abbreviation
+            name.foldIndexed(true) { index, acc, char -> acc && puzzleWords[index].startsWith(char, ignoreCase = true) }
+        } else {
             false
-        }.getSinglePuzzle(name)
+        }
+    }.getSinglePuzzle(name)
 
     internal fun parseScore(puzzle: OmPuzzle, string: String): Result<OmScore> {
         if (string.isBlank()) return Failure("sorry, I didn't find a score in your command.")
