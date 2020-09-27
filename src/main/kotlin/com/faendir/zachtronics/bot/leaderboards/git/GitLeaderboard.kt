@@ -17,8 +17,8 @@ import java.time.ZoneOffset
 import javax.annotation.PostConstruct
 
 @Component
-class GitLeaderboard(gitProperties: GitProperties, private val imgurService: ImgurService) : GitRepository(gitProperties, "om-leaderboard", "https://github.com/F43nd1r/om-leaderboard.git"),
-                                                     Leaderboard<OmCategory, OmScore, OmPuzzle, OmRecord> {
+class GitLeaderboard(gitProperties: GitProperties, private val imgurService: ImgurService) :
+    GitRepository(gitProperties, "om-leaderboard", "https://github.com/F43nd1r/om-leaderboard.git"), Leaderboard<OmCategory, OmScore, OmPuzzle, OmRecord> {
     companion object {
         private const val scoreFileName = "scores.json"
         private const val whDir = "wh"
@@ -50,6 +50,7 @@ class GitLeaderboard(gitProperties: GitProperties, private val imgurService: Img
         return access {
             val betterExists = mutableMapOf<OmCategory, OmScore>()
             val success = mutableMapOf<OmCategory, OmScore?>()
+            val rehostedLink by lazy { imgurService.tryRehost(record.link) }
             directories.asIterable().groupBy { it.value }.mapValues { entry -> entry.value.map { it.key } }.forEach { (dirName, dirCategories) ->
                 val dir = File(repo, dirName)
                 val scoreFile = File(dir, scoreFileName)
@@ -60,7 +61,7 @@ class GitLeaderboard(gitProperties: GitProperties, private val imgurService: Img
                     val oldRecord = recordList[puzzle]?.get(category)
                     if (oldRecord == null || category.isBetterOrEqual(record.score, oldRecord.score) && oldRecord.link != record.link) {
                         recordList[puzzle] = (recordList[puzzle] ?: mutableMapOf()).also { records ->
-                            records[category] = OmRecord(category.normalizeScore(record.score), imgurService.tryRehost(record.link))
+                            records[category] = OmRecord(category.normalizeScore(record.score), rehostedLink)
                             changed = true
                         }
                         success[category] = oldRecord?.score
@@ -96,17 +97,15 @@ class GitLeaderboard(gitProperties: GitProperties, private val imgurService: Img
         val cellTemplate = File(folder, "cell.html").readText()
         val explanation = File(dir, "explanation.html").readText()
         fun generateRecord(category: OmCategory, record: OmRecord): String {
-            return scoreTemplate.format(record.link,
-                if(category == HEIGHT || category == WIDTH) {
-                    record.score.toDisplayString({ category.sortScoreParts(this) }) { _, value -> format(value) }
-                } else {
-                    record.score.toShortDisplayString()
-                },
-                if (record.link.endsWith("mp4") || record.link.endsWith("webm")) {
-                    videoTemplate.format(record.link)
-                } else {
-                    gifTemplate.format(record.link)
-                })
+            return scoreTemplate.format(record.link, if (category == HEIGHT || category == WIDTH) {
+                record.score.toDisplayString({ category.sortScoreParts(this) }) { _, value -> format(value) }
+            } else {
+                record.score.toShortDisplayString()
+            }, if (record.link.endsWith("mp4") || record.link.endsWith("webm")) {
+                videoTemplate.format(record.link)
+            } else {
+                gifTemplate.format(record.link)
+            })
         }
 
         val text = mainTemplate.format(explanation, OffsetDateTime.now(ZoneOffset.UTC), OmGroup.values().joinToString("\n") { group ->

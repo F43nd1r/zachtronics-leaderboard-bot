@@ -41,12 +41,13 @@ class RedditLeaderboard(private val redditService: RedditService, private val im
             val recordList: RecordList = Json.decodeFromString(scoreFile.readText())
             val betterExists = mutableMapOf<OmCategory, OmScore>()
             val success = mutableMapOf<OmCategory, OmScore?>()
+            val rehostedLink by lazy { imgurService.tryRehost(record.link) }
             val categories = supportedCategories.filter { it.supportsPuzzle(puzzle) && it.supportsScore(record.score) }
             for (category in categories) {
                 val oldRecord = recordList[puzzle]?.records?.get(category)
                 if (oldRecord == null || category.isBetterOrEqual(record.score, oldRecord.score) && oldRecord.link != record.link) {
                     recordList[puzzle] = (recordList[puzzle] ?: PuzzleEntry()).apply {
-                        records[category] = OmRecord(category.normalizeScore(record.score), imgurService.tryRehost(record.link))
+                        records[category] = OmRecord(category.normalizeScore(record.score), rehostedLink)
                     }
                     success[category] = oldRecord?.score
                 } else {
