@@ -2,8 +2,7 @@ package com.faendir.zachtronics.bot.model.om
 
 import com.faendir.zachtronics.bot.discord.commands.getSinglePuzzle
 import com.faendir.zachtronics.bot.discord.commands.match
-import com.faendir.zachtronics.bot.leaderboards.git.GitLeaderboard
-import com.faendir.zachtronics.bot.leaderboards.reddit.RedditLeaderboard
+import com.faendir.zachtronics.bot.leaderboards.om.OmLeaderboard
 import com.faendir.zachtronics.bot.model.Game
 import com.faendir.zachtronics.bot.utils.Result
 import com.faendir.zachtronics.bot.utils.Result.Failure
@@ -14,10 +13,11 @@ import net.dv8tion.jda.api.entities.Message
 import org.springframework.stereotype.Component
 
 @Component
-class OpusMagnum(gitLeaderboard: GitLeaderboard, redditLeaderboard: RedditLeaderboard) : Game<OmCategory, OmScore, OmPuzzle, OmRecord> {
+class OpusMagnum(override val leaderboards: List<OmLeaderboard>) : Game<OmCategory, OmScore, OmPuzzle, OmRecord> {
     override val discordChannel = "opus-magnum"
 
-    override fun parsePuzzle(name: String): Result<OmPuzzle> = OmPuzzle.values().filter { it.displayName.contains(name, ignoreCase = true) }.getSinglePuzzle(name)
+    override fun parsePuzzle(name: String): Result<OmPuzzle> =
+        OmPuzzle.values().filter { it.displayName.contains(name, ignoreCase = true) }.getSinglePuzzle(name)
 
     internal fun parseScore(puzzle: OmPuzzle, string: String): Result<OmScore> {
         if (string.isBlank()) return Failure("sorry, I didn't find a score in your command.")
@@ -45,7 +45,6 @@ class OpusMagnum(gitLeaderboard: GitLeaderboard, redditLeaderboard: RedditLeader
             ?: Failure("sorry, I could not find a valid link or attachment in your message.")
     }
 
-    override val leaderboards = listOf(gitLeaderboard, redditLeaderboard)
     override val submissionSyntax: String = "<puzzle>:<score1/score2/score3>(e.g. 3.5w/320c/400g) <link>(or attach file to message)"
     val regex = Regex("!submit\\s+(?<puzzle>[^:]*)(:|\\s)\\s*(?<score>[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?(/[\\d.]+[a-zA-Z]?)?)(\\s+(?<link>http.*))?\\s*")
 

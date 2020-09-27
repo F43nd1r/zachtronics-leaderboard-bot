@@ -1,10 +1,16 @@
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.reddit.om
 
+import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.discord.DiscordService
+import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult
 import com.faendir.zachtronics.bot.model.om.OmRecord
 import com.faendir.zachtronics.bot.model.om.OmScore
 import com.faendir.zachtronics.bot.model.om.OpusMagnum
+import com.faendir.zachtronics.bot.reddit.RedditService
+import com.faendir.zachtronics.bot.reddit.Subreddit
+import com.faendir.zachtronics.bot.reddit.moderators
+import com.faendir.zachtronics.bot.reddit.toReference
 import com.faendir.zachtronics.bot.utils.DateSerializer
 import com.faendir.zachtronics.bot.utils.Result
 import kotlinx.serialization.json.Json
@@ -20,11 +26,15 @@ import java.util.*
 
 @Service
 @EnableScheduling
-class RedditPostScraper(private val redditService: RedditService, private val discordService: DiscordService, private val opusMagnum: OpusMagnum) {
+class OmRedditPostScraper(private val redditService: RedditService, private val discordService: DiscordService, private val opusMagnum: OpusMagnum,
+                          gitProperties: GitProperties) {
     companion object {
-        private const val timestampFile = "last_update.json"
-        private const val trustFile = "trusted_users.txt"
+        private const val timestampFile = "om-reddit-scraper/last_update.json"
+        private const val trustFile = "om-reddit-scraper/trusted_users.txt"
     }
+
+    private val gitRepo =
+            GitRepository(gitProperties, "zachtronics-leaderboard-bot-config", "https://github.com/F43nd1r/zachtronics-leaderboard-bot-config.git")
 
     private lateinit var trustedUsers: List<String>
     val mainRegex = Regex("\\s*(?<puzzle>[^:]*)[:\\s]\\s*(\\[[^]]*]\\([^)]*\\)[,\\s]*)+")
@@ -33,7 +43,7 @@ class RedditPostScraper(private val redditService: RedditService, private val di
     private val moderators by lazy { redditService.subreddit(Subreddit.OPUS_MAGNUM).moderators() }
 
     init {
-        redditService.access { trustedUsers = File(repo, trustFile).readLines().filter { !it.isBlank() }.map { it.trim() } }
+        gitRepo.access { trustedUsers = File(repo, trustFile).readLines().filter { !it.isBlank() }.map { it.trim() } }
     }
 
     /*@PostConstruct
@@ -76,10 +86,11 @@ class RedditPostScraper(private val redditService: RedditService, private val di
     fun pullFromReddit() {
         val now = Instant.now() //capture timestamp before processing
         val submissionThread = redditService.subreddit(Subreddit.OPUS_MAGNUM).posts().sorting(SubredditSort.HOT).limit(5).build().asSequence().flatten()
-            .find { it.title.contains("official record submission thread", ignoreCase = true) }
-        val lastUpdate: Date? = redditService.access { File(repo, timestampFile).takeIf { it.exists() }?.readText() }?.let { Json.decodeFromString(DateSerializer, it) }
+                .find { it.title.contains("official record submission thread", ignoreCase = true) }
+        val lastUpdate: Date? =
+                gitRepo.access { File(repo, timestampFile).takeIf { it.exists() }?.readText() }?.let { Json.decodeFromString(DateSerializer, it) }
         var hasNewComment = false
-        submissionThread?.toReference(redditService.reddit)?.comments()?.walkTree()?.forEach { commentNode ->
+        submissionThread?.toReference(redditService)?.comments()?.walkTree()?.forEach { commentNode ->
             val comment = commentNode.subject
             if (lastUpdate == null || (comment.edited ?: comment.created).after(lastUpdate)) {
                 hasNewComment = true
@@ -88,14 +99,14 @@ class RedditPostScraper(private val redditService: RedditService, private val di
                         if (trustedUsers.contains(comment.author)) {
                             parseComment(comment)
                         } else if (body.lines().any { mainRegex.matches(it) }) {
-                            comment.toReference(redditService.reddit)
-                                .reply("[BOT] sorry, you're not a trusted user. Wait for a moderator to reply with `!trust-score` or `!trust-user`.")
+                            comment.toReference(redditService)
+                                    .reply("[BOT] sorry, you're not a trusted user. Wait for a moderator to reply with `!trust-score` or `!trust-user`.")
                         }
                         if (body.trim() == "!trust-user" && moderators.contains(comment.author)) {
                             val trust = getNonBotParentComment(commentNode)
                             parseComment(trust)
                             trustedUsers = trustedUsers + trust.author
-                            redditService.access {
+                            gitRepo.access {
                                 val file = File(repo, trustFile)
                                 file.appendText("\n${trust.author}\n")
                                 add(file)
@@ -109,8 +120,8 @@ class RedditPostScraper(private val redditService: RedditService, private val di
                 }
             }
         }
-        if(hasNewComment) {
-            redditService.access {
+        if (hasNewComment) {
+            gitRepo.access {
                 val timestamp = File(repo, timestampFile)
                 timestamp.writeText(Json.encodeToString(DateSerializer, Date.from(now)))
                 add(timestamp)
@@ -120,7 +131,7 @@ class RedditPostScraper(private val redditService: RedditService, private val di
     }
 
     private fun getNonBotParentComment(commentNode: CommentNode<PublicContribution<*>>): PublicContribution<*> {
-        return commentNode.parent.let { if (it.subject.author == redditService.reddit.me().username) it.parent else it }.subject
+        return commentNode.parent.let { if (it.subject.author == redditService.me().username) it.parent else it }.subject
     }
 
     private fun parseComment(comment: PublicContribution<*>) {
@@ -129,7 +140,7 @@ class RedditPostScraper(private val redditService: RedditService, private val di
             val command = mainRegex.matchEntire(line) ?: return@loop
             val puzzleName = command.groups["puzzle"]!!.value
             val puzzleResult = opusMagnum.parsePuzzle(puzzleName)
-            if(puzzleResult is Result.Failure) return@loop
+            if (puzzleResult is Result.Failure) return@loop
             val puzzle = (puzzleResult as Result.Success).result
             command.groupValues.drop(2).forEach inner@{ group ->
                 val subCommand = scoreRegex.matchEntire(group) ?: return@inner
@@ -150,7 +161,7 @@ class RedditPostScraper(private val redditService: RedditService, private val di
             }
         }
         if (update) {
-            comment.toReference(redditService.reddit).reply("[BOT] thanks, your submission(s) have been recorded!")
+            comment.toReference(redditService).reply("[BOT] thanks, your submission(s) have been recorded!")
         }
     }
 }
