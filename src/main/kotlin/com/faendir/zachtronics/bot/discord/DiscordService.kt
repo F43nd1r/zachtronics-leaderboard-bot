@@ -52,10 +52,10 @@ class DiscordService(private val discordProperties: DiscordProperties, private v
         commands.forEach { command ->
             if (message.contentRaw.startsWith("!${command.name}")) {
                 createMessageAction("${message.author.asMention} ${
-                    if (command.requiresRoles.isEmpty() || message.member?.roles?.map { it.name }?.containsAll(command.requiresRoles) == true) {
+                    if (command.isReadOnly || game.hasWritePermission(message.member)) {
                         command.handleMessage(game, message)
                     } else {
-                        "sorry, you do not have all required roles for this command ${command.requiresRoles.joinToString(separator = "`, `", prefix = "(`", postfix = "`)")}."
+                        "sorry, you do not have the permission to use this command."
                     }
                 }").mention(message.author).queue {
                     messageCache[message.idLong] = it

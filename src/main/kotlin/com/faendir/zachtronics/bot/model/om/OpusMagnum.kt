@@ -9,6 +9,7 @@ import com.faendir.zachtronics.bot.utils.Result
 import com.faendir.zachtronics.bot.utils.Result.Failure
 import com.faendir.zachtronics.bot.utils.Result.Success
 import com.faendir.zachtronics.bot.utils.and
+import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
 import org.springframework.stereotype.Component
 
@@ -57,4 +58,6 @@ class OpusMagnum(gitLeaderboard: GitLeaderboard, redditLeaderboard: RedditLeader
     }
 
     override fun parseCategory(name: String): List<OmCategory> = OmCategory.values().filter { it.displayName.equals(name, ignoreCase = true) }
+
+    override fun hasWritePermission(member: Member?): Boolean = member?.roles?.any { it.name == "trusted-leaderboard-poster" } == true
 }

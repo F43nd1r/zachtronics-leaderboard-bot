@@ -9,8 +9,7 @@ interface Command {
 
     fun helpText(game: Game<*, *, *, *>) : String
 
-    val requiresRoles: List<String>
-        get() = emptyList()
+    val isReadOnly : Boolean
 
     fun <C : Category<C, S, P>, S : Score, P : Puzzle, R : Record<S>> handleMessage(game: Game<C, S, P, R>, message: Message): String
 }
