@@ -1,28 +1,23 @@
 package com.faendir.zachtronics.bot.model.om
 
-import com.faendir.zachtronics.bot.discord.commands.getMatchingPuzzles
-import com.faendir.zachtronics.bot.discord.commands.getSinglePuzzle
-import com.faendir.zachtronics.bot.discord.commands.match
 import com.faendir.zachtronics.bot.leaderboards.om.OmLeaderboard
 import com.faendir.zachtronics.bot.model.Game
 import com.faendir.zachtronics.bot.utils.Result
 import com.faendir.zachtronics.bot.utils.Result.Failure
 import com.faendir.zachtronics.bot.utils.Result.Success
 import com.faendir.zachtronics.bot.utils.and
+import com.faendir.zachtronics.bot.utils.getSingleMatchingPuzzle
+import com.faendir.zachtronics.bot.utils.match
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
 import org.springframework.stereotype.Component
 
 @Component
 class OpusMagnum(override val leaderboards: List<OmLeaderboard>) : Game<OmCategory, OmScore, OmPuzzle, OmRecord> {
-    companion object {
-        private val wordSeparator = Regex("[\\s-/]+")
-    }
 
     override val discordChannel = "opus-magnum"
 
-    override fun parsePuzzle(name: String): Result<OmPuzzle> =
-        OmPuzzle.values().getMatchingPuzzles(name, wordSeparator).getSinglePuzzle(name);
+    override fun parsePuzzle(name: String): Result<OmPuzzle> = OmPuzzle.values().getSingleMatchingPuzzle(name)
 
     internal fun parseScore(puzzle: OmPuzzle, string: String): Result<OmScore> {
         if (string.isBlank()) return Failure("sorry, I didn't find a score in your command.")

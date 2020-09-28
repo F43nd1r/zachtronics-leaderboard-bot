@@ -1,12 +1,11 @@
 package com.faendir.zachtronics.bot.model.sc;
 
-import com.faendir.zachtronics.bot.discord.commands.UtilsKt;
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
 import com.faendir.zachtronics.bot.leaderboards.sc.ScRedditLeaderboard;
 import com.faendir.zachtronics.bot.model.Game;
 import com.faendir.zachtronics.bot.utils.Result;
+import com.faendir.zachtronics.bot.utils.UtilsKt;
 import kotlin.Pair;
-import kotlin.text.Regex;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -68,8 +67,7 @@ public class SpaceChem implements Game<ScCategory, ScScore, ScPuzzle, ScRecord> 
                      .filter(p -> p.getDisplayName().equalsIgnoreCase(name))
                      .findFirst()
                      .<Result<ScPuzzle>>map(Result.Success::new)
-                     .orElse(UtilsKt.getSinglePuzzle(UtilsKt.getMatchingPuzzles(ScPuzzle.values(),
-                                                                                name, new Regex("[\\s-/,:]+")), name));
+                     .orElse(UtilsKt.getSingleMatchingPuzzle(ScPuzzle.values(), name));
     }
 
     private static final Set<Long> WIKI_ADMINS = Set.of(295868901042946048L, // 12345ieee,
