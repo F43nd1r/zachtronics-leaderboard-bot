@@ -1,5 +1,6 @@
 package com.faendir.zachtronics.bot.model.om
 
+import com.faendir.zachtronics.bot.discord.commands.getMatchingPuzzles
 import com.faendir.zachtronics.bot.discord.commands.getSinglePuzzle
 import com.faendir.zachtronics.bot.discord.commands.match
 import com.faendir.zachtronics.bot.leaderboards.om.OmLeaderboard
@@ -20,20 +21,8 @@ class OpusMagnum(override val leaderboards: List<OmLeaderboard>) : Game<OmCatego
 
     override val discordChannel = "opus-magnum"
 
-    override fun parsePuzzle(name: String): Result<OmPuzzle> = OmPuzzle.values().filter { puzzle ->
-        val words = name.split(wordSeparator).toMutableList()
-        val puzzleWords = puzzle.displayName.split(wordSeparator)
-        puzzleWords.forEach {
-            if (it.contains(words.first(), ignoreCase = true)) words.removeFirst()
-            if (words.isEmpty()) return@filter true
-        }
-        if (name.length <= 4 && name.length == puzzleWords.size) {
-            //check abbreviation
-            name.foldIndexed(true) { index, acc, char -> acc && puzzleWords[index].startsWith(char, ignoreCase = true) }
-        } else {
-            false
-        }
-    }.getSinglePuzzle(name)
+    override fun parsePuzzle(name: String): Result<OmPuzzle> =
+        OmPuzzle.values().getMatchingPuzzles(name, wordSeparator).getSinglePuzzle(name);
 
     internal fun parseScore(puzzle: OmPuzzle, string: String): Result<OmScore> {
         if (string.isBlank()) return Failure("sorry, I didn't find a score in your command.")

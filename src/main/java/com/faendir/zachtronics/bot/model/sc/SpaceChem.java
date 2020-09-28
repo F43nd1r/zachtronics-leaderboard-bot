@@ -6,6 +6,7 @@ import com.faendir.zachtronics.bot.leaderboards.sc.ScRedditLeaderboard;
 import com.faendir.zachtronics.bot.model.Game;
 import com.faendir.zachtronics.bot.utils.Result;
 import kotlin.Pair;
+import kotlin.text.Regex;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -63,18 +64,12 @@ public class SpaceChem implements Game<ScCategory, ScScore, ScPuzzle, ScRecord> 
     @NotNull
     @Override
     public Result<ScPuzzle> parsePuzzle(@NotNull String name) {
-        String nameLower = name.toLowerCase();
-        List<ScPuzzle> result = new ArrayList<>();
-        for (ScPuzzle puzzle : ScPuzzle.values()) {
-            String puzzleNameLower = puzzle.getDisplayName().toLowerCase();
-            if (puzzleNameLower.contains(nameLower)) {
-                if (puzzleNameLower.equals(nameLower))
-                    return new Result.Success<>(puzzle);
-                else
-                    result.add(puzzle);
-            }
-        }
-        return UtilsKt.getSinglePuzzle(result, name);
+        return Arrays.stream(ScPuzzle.values())
+                     .filter(p -> p.getDisplayName().equalsIgnoreCase(name))
+                     .findFirst()
+                     .<Result<ScPuzzle>>map(Result.Success::new)
+                     .orElse(UtilsKt.getSinglePuzzle(UtilsKt.getMatchingPuzzles(ScPuzzle.values(),
+                                                                                name, new Regex("[\\s-/,:]+")), name));
     }
 
     private static final Set<Long> WIKI_ADMINS = Set.of(295868901042946048L, // 12345ieee,
