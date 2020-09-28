@@ -7,3 +7,5 @@ inline fun <reified T> Iterable<*>.findInstance() : T? = filterIsInstance<T>().f
 inline fun <reified T> Iterable<*>.findInstance(block: (T) -> Unit) = findInstance<T>()?.let(block)
 
 fun <T : Map.Entry<K, V>, K, V> Iterable<T>.toMap() = map { it.key to it.value }.toMap()
+
+fun <T> Iterable<T>.plusIf(condition: Boolean, element: T) : List<T> = if(condition) plus(element) else toList()

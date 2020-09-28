@@ -7,6 +7,7 @@ import com.faendir.zachtronics.bot.model.om.OmCategory
 import com.faendir.zachtronics.bot.model.om.OmPuzzle
 import com.faendir.zachtronics.bot.model.om.OmRecord
 import com.faendir.zachtronics.bot.model.om.OmScore
+import com.faendir.zachtronics.bot.utils.plusIf
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -67,6 +68,9 @@ abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, 
                     updatePage(dir, dirCategories, records)
                 }
                 paretoUpdate = paretoUpdate || localParetoUpdate
+            }
+            if (status().run { added.isNotEmpty() || changed.isNotEmpty() }) {
+                commitAndPush(record.author, puzzle, record.score, success.map { it.key.displayName }.plusIf(paretoUpdate, "PARETO"))
             }
             when {
                 success.isNotEmpty() -> {
