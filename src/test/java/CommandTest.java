@@ -28,7 +28,7 @@ public class CommandTest {
 
     @Test
     public void testHandleMessage() {
-        String text = "!show C Freon";
+        String text = "!show C fission I";
 
         String result = runCommand(text);
         System.out.println(result);

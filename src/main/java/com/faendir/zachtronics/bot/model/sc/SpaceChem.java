@@ -26,15 +26,15 @@ public class SpaceChem implements Game<ScCategory, ScScore, ScPuzzle, ScRecord> 
     private final List<Leaderboard<ScCategory, ScScore, ScPuzzle, ScRecord>> leaderboards;
     @Getter
     private final String submissionSyntax =
-            "<puzzle>: <cycles/reactors/symbols[/BP]> (e.g. 100/1/20 or 100/3/41/B) by <author> <youtube link>";
+            "<puzzle> (<cycles/reactors/symbols[/BP]>) by <author> <youtube link>";
 
     public SpaceChem(ScRedditLeaderboard scLeaderboard) {
         leaderboards = Collections.singletonList(scLeaderboard);
     }
 
     private static final Pattern submissionRegex = Pattern.compile(
-            "!submit\\s+(?<puzzle>.+)\\s*:\\s*(?<score>" + ScScore.REGEX_BP_SCORE +
-            ")\\s+by\\s+(?<author>.+?)\\s+(?<link>\\S+)\\s*",
+            "!submit\\s+(?<puzzle>.+)\\s+\\((?<score>" + ScScore.REGEX_BP_SCORE +
+            ")\\)\\s+(?:by\\s+)?(?<author>.+?)\\s+(?<link>\\S+)\\s*",
             Pattern.CASE_INSENSITIVE);
 
     @NotNull

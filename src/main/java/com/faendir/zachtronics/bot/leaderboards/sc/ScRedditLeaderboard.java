@@ -44,7 +44,9 @@ public class ScRedditLeaderboard extends AbstractScLeaderboard {
         Map<ScCategory, ScScore> beatenScores = super.update(lines, puzzle, record);
 
         if (!beatenScores.isEmpty()) {
-            wiki.update(puzzle.getGroup().getWikiPage(), String.join("\r\n", lines), puzzle.getDisplayName());
+            wiki.update(puzzle.getGroup().getWikiPage(), String.join("\r\n", lines),
+                        puzzle.getDisplayName() + " " + record.getScore().toDisplayString() + " by " +
+                        record.getAuthor());
             return new UpdateResult.Success<>(beatenScores);
         }
         else {
