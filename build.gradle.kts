@@ -36,6 +36,12 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("net.sf.trove4j:trove4j:3.0.3")
+    testImplementation("com.ninja-squad:springmockk:2.0.3")
+    testImplementation("io.strikt:strikt-core:0.27.0")
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
 
 tasks.withType<KotlinCompile> {

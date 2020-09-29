@@ -1,22 +1,17 @@
 package com.faendir.zachtronics.bot.reddit.om
 
-import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.discord.DiscordService
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult
 import com.faendir.zachtronics.bot.model.om.OmRecord
 import com.faendir.zachtronics.bot.model.om.OmScore
 import com.faendir.zachtronics.bot.model.om.OpusMagnum
-import com.faendir.zachtronics.bot.reddit.RedditService
-import com.faendir.zachtronics.bot.reddit.Subreddit
-import com.faendir.zachtronics.bot.reddit.moderators
-import com.faendir.zachtronics.bot.reddit.toReference
+import com.faendir.zachtronics.bot.reddit.*
 import com.faendir.zachtronics.bot.utils.DateSerializer
+import com.faendir.zachtronics.bot.utils.Forest
 import com.faendir.zachtronics.bot.utils.Result
 import kotlinx.serialization.json.Json
-import net.dean.jraw.models.PublicContribution
-import net.dean.jraw.models.SubredditSort
-import net.dean.jraw.tree.CommentNode
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -27,20 +22,17 @@ import java.util.*
 @Service
 @EnableScheduling
 class OmRedditPostScraper(private val redditService: RedditService, private val discordService: DiscordService, private val opusMagnum: OpusMagnum,
-                          gitProperties: GitProperties) {
+                          @Qualifier("configRepository") private val gitRepo : GitRepository) {
     companion object {
         private const val timestampFile = "om-reddit-scraper/last_update.json"
         private const val trustFile = "om-reddit-scraper/trusted_users.txt"
     }
 
-    private val gitRepo =
-            GitRepository(gitProperties, "zachtronics-leaderboard-bot-config", "https://github.com/F43nd1r/zachtronics-leaderboard-bot-config.git")
-
     private lateinit var trustedUsers: List<String>
     val mainRegex = Regex("\\s*(?<puzzle>[^:]*)[:\\s]\\s*(\\[[^]]*]\\([^)]*\\)[,\\s]*)+")
     val scoreRegex = Regex("\\[(?<score>[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?(/[\\d.]+[a-zA-Z]?)?)]\\((?<link>http.*)\\)[,\\s]*")
 
-    private val moderators by lazy { redditService.subreddit(Subreddit.OPUS_MAGNUM).moderators() }
+    private val moderators by lazy { redditService.getModerators(Subreddit.OPUS_MAGNUM) }
 
     init {
         gitRepo.access { trustedUsers = File(repo, trustFile).readLines().filter { !it.isBlank() }.map { it.trim() } }
@@ -85,13 +77,11 @@ class OmRedditPostScraper(private val redditService: RedditService, private val 
     @Scheduled(fixedRate = 1000L * 60 * 60)
     fun pullFromReddit() {
         val now = Instant.now() //capture timestamp before processing
-        val submissionThread = redditService.subreddit(Subreddit.OPUS_MAGNUM).posts().sorting(SubredditSort.HOT).limit(5).build().asSequence().flatten()
-                .find { it.title.contains("official record submission thread", ignoreCase = true) }
         val lastUpdate: Date? =
                 gitRepo.access { File(repo, timestampFile).takeIf { it.exists() }?.readText() }?.let { Json.decodeFromString(DateSerializer, it) }
         var hasNewComment = false
-        submissionThread?.toReference(redditService)?.comments()?.walkTree()?.forEach { commentNode ->
-            val comment = commentNode.subject
+        val comments = redditService.findCommentsOnPost(Subreddit.OPUS_MAGNUM, "official record submission thread")
+        comments.walkTrees().forEach { comment ->
             if (lastUpdate == null || (comment.edited ?: comment.created).after(lastUpdate)) {
                 hasNewComment = true
                 comment.body?.let { body ->
@@ -99,22 +89,23 @@ class OmRedditPostScraper(private val redditService: RedditService, private val 
                         if (trustedUsers.contains(comment.author)) {
                             parseComment(comment)
                         } else if (body.lines().any { mainRegex.matches(it) }) {
-                            comment.toReference(redditService)
-                                    .reply("[BOT] sorry, you're not a trusted user. Wait for a moderator to reply with `!trust-score` or `!trust-user`.")
+                            redditService.reply(comment, "[BOT] sorry, you're not a trusted user. Wait for a moderator to reply with `!trust-score` or " +
+                                    "`!trust-user`.")
                         }
                         if (body.trim() == "!trust-user" && moderators.contains(comment.author)) {
-                            val trust = getNonBotParentComment(commentNode)
-                            parseComment(trust)
-                            trustedUsers = trustedUsers + trust.author
-                            gitRepo.access {
-                                val file = File(repo, trustFile)
-                                file.appendText("\n${trust.author}\n")
-                                add(file)
-                                commitAndPush("added trusted user \"${trust.author}\"")
+                            getNonBotParentComment(comments, comment)?.let { trust ->
+                                parseComment(trust)
+                                trustedUsers = trustedUsers + trust.author
+                                gitRepo.access {
+                                    val file = File(repo, trustFile)
+                                    file.appendText("\n${trust.author}\n")
+                                    add(file)
+                                    commitAndPush("added trusted user \"${trust.author}\"")
+                                }
                             }
                         }
                         if (body.trim() == "!trust-score" && moderators.contains(comment.author)) {
-                            parseComment(getNonBotParentComment(commentNode))
+                            getNonBotParentComment(comments, comment)?.let { parseComment(it) }
                         }
                     }
                 }
@@ -130,11 +121,11 @@ class OmRedditPostScraper(private val redditService: RedditService, private val 
         }
     }
 
-    private fun getNonBotParentComment(commentNode: CommentNode<PublicContribution<*>>): PublicContribution<*> {
-        return commentNode.parent.let { if (it.subject.author == redditService.me().username) it.parent else it }.subject
+    private fun getNonBotParentComment(forest: Forest<Comment>, commentNode: Comment): Comment? {
+        return forest.parentOf(commentNode)?.let { if (it.author == redditService.myUsername()) forest.parentOf(it) else it }
     }
 
-    private fun parseComment(comment: PublicContribution<*>) {
+    private fun parseComment(comment: Comment) {
         var update = false
         comment.body?.lines()?.forEach loop@{ line ->
             val command = mainRegex.matchEntire(line) ?: return@loop
@@ -161,7 +152,7 @@ class OmRedditPostScraper(private val redditService: RedditService, private val 
             }
         }
         if (update) {
-            comment.toReference(redditService).reply("[BOT] thanks, your submission(s) have been recorded!")
+            redditService.reply(comment, "[BOT] thanks, your submission(s) have been recorded!")
         }
     }
 }

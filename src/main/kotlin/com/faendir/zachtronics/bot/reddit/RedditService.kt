@@ -1,25 +1,15 @@
 package com.faendir.zachtronics.bot.reddit
 
-import com.faendir.zachtronics.bot.config.RedditProperties
-import net.dean.jraw.RedditClient
-import net.dean.jraw.http.OkHttpNetworkAdapter
-import net.dean.jraw.http.UserAgent
-import net.dean.jraw.oauth.Credentials
-import net.dean.jraw.oauth.OAuthHelper
-import net.dean.jraw.references.Referenceable
-import org.springframework.stereotype.Service
+import com.faendir.zachtronics.bot.utils.Forest
+import java.util.*
 
-@Service
-class RedditService(redditProperties: RedditProperties) {
-    private val reddit: RedditClient =
-            OAuthHelper.automatic(OkHttpNetworkAdapter(UserAgent("bot", "com.faendir.zachtronics.bot", "1.0", redditProperties.username)),
-                    Credentials.script(redditProperties.username, redditProperties.password, redditProperties.clientId, redditProperties.accessToken))
-
-    fun subreddit(subreddit: Subreddit) = reddit.subreddit(subreddit.id)
-
-    fun me() = reddit.me()
-
-    fun <R : Referenceable<T>, T> toReference(r : R) : T = r.toReference(reddit)
+interface RedditService {
+    fun getWikiPage(subreddit: Subreddit, page: String): String
+    fun updateWikiPage(subreddit: Subreddit, page: String, content: String, reason: String)
+    fun findCommentsOnPost(subreddit: Subreddit, title: String): Forest<Comment>
+    fun getModerators(subreddit: Subreddit) : List<String>
+    fun reply(comment: Comment, text: String)
+    fun myUsername(): String
 }
 
-fun <R : Referenceable<T>, T> R.toReference(redditService: RedditService) : T = redditService.toReference(this)
+data class Comment(val id: String, val body: String?, val author: String, val created: Date, val edited: Date?)

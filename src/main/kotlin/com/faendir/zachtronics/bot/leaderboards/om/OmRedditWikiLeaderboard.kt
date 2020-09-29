@@ -1,6 +1,5 @@
 package com.faendir.zachtronics.bot.leaderboards.om
 
-import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.imgur.ImgurService
 import com.faendir.zachtronics.bot.model.om.*
@@ -8,24 +7,25 @@ import com.faendir.zachtronics.bot.model.om.OmCategory.*
 import com.faendir.zachtronics.bot.model.om.OmScorePart.*
 import com.faendir.zachtronics.bot.model.om.OmType.PRODUCTION
 import com.faendir.zachtronics.bot.reddit.RedditService
-import com.faendir.zachtronics.bot.reddit.Subreddit
+import com.faendir.zachtronics.bot.reddit.Subreddit.OPUS_MAGNUM
 import com.faendir.zachtronics.bot.utils.toMap
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.serializer
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import java.io.File
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
 @Component
-class OmRedditWikiLeaderboard(private val redditService: RedditService, imgurService: ImgurService, gitProperties: GitProperties) :
-    AbstractOmJsonLeaderboard<MutableMap<OmPuzzle, PuzzleEntry>>(GitRepository(gitProperties, "om-wiki", "https://github.com/F43nd1r/OM-wiki.git"),
-        imgurService,
-        mapOf("." to listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SG, SGP, SC, SCP, SA, SI)),
-        serializer()) {
+class OmRedditWikiLeaderboard(@Qualifier("omRedditLeaderboardRepository") gitRepository: GitRepository, private val reddit: RedditService,
+                              imgurService: ImgurService) : AbstractOmJsonLeaderboard<MutableMap<OmPuzzle, PuzzleEntry>>(gitRepository,
+    imgurService,
+    mapOf("." to listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SG, SGP, SC, SCP, SA, SI)),
+    serializer()) {
     companion object {
         private const val wikiPage = "index"
-        private const val dateLinePrefix = "Table built on "
+        private const val datePrefix = "Table built on "
     }
 
     private val costCategories = listOf(GC, GA, GX, GCP, GI, GXP)
@@ -81,13 +81,12 @@ class OmRedditWikiLeaderboard(private val redditService: RedditService, imgurSer
             }
             table += "\n"
         }
-        table += dateLinePrefix + OffsetDateTime.now(ZoneOffset.UTC)
+        table += datePrefix + OffsetDateTime.now(ZoneOffset.UTC)
         val prefix = File(repo, "prefix.md").readText()
         val suffix = File(repo, "suffix.md").readText()
-        val wiki = redditService.subreddit(Subreddit.OPUS_MAGNUM).wiki()
         val content = "$prefix\n$table\n$suffix".trim()
-        if (content.lines().filter { !it.contains(dateLinePrefix) } != wiki.page(wikiPage).content.lines().filter { !it.contains(dateLinePrefix) }) {
-            wiki.update(wikiPage, content, "bot update")
+        if (content.lines().filter { !it.contains(datePrefix) } != reddit.getWikiPage(OPUS_MAGNUM, wikiPage).lines().filter { !it.contains(datePrefix) }) {
+            reddit.updateWikiPage(OPUS_MAGNUM, wikiPage, content, "bot update")
         }
     }
 

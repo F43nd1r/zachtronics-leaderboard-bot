@@ -48,7 +48,7 @@ abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, 
             directoryCategories.forEach { (dirName, dirCategories) ->
                 val dir = File(repo, dirName)
                 val scoreFile = File(dir, scoreFileName)
-                val records = Json.decodeFromString(serializer, scoreFile.readText())
+                val records = Json.decodeFromString(serializer, scoreFile.takeIf { it.exists() }?.readText() ?: "{}")
                 val categories = dirCategories.filter { it.supportsPuzzle(puzzle) && it.supportsScore(record.score) }
                 var changed = false
                 for (category in categories) {
@@ -73,15 +73,10 @@ abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, 
                 commitAndPush(record.author, puzzle, record.score, success.map { it.key.displayName }.plusIf(paretoUpdate, "PARETO"))
             }
             when {
-                success.isNotEmpty() -> {
-                    UpdateResult.Success(success)
-                }
-                paretoUpdate -> {
-                    UpdateResult.ParetoUpdate()
-                }
-                else -> {
-                    UpdateResult.BetterExists(betterExists)
-                }
+                success.isNotEmpty() -> UpdateResult.Success(success)
+                paretoUpdate -> UpdateResult.ParetoUpdate()
+                betterExists.isNotEmpty() -> UpdateResult.BetterExists(betterExists)
+                else -> UpdateResult.NotSupported()
             }
         }
     }

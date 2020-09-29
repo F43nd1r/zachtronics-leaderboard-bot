@@ -1,0 +1,24 @@
+{
+  "STABILIZED_WATER": {
+    "HEIGHT": {
+      "score": {
+        "parts": {
+          "HEIGHT": 1.0,
+          "CYCLES": 52.0,
+          "COST": 125.0
+        }
+      },
+      "link": "https://i.imgur.com/ZUxm30s.mp4"
+    },
+    "WIDTH": {
+      "score": {
+        "parts": {
+          "WIDTH": 2.0,
+          "CYCLES": 35.0,
+          "COST": 80.0
+        }
+      },
+      "link": "https://i.imgur.com/BvY5Gw3.gif"
+    }
+  }
+}
