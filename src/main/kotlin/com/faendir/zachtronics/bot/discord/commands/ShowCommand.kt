@@ -2,6 +2,7 @@ package com.faendir.zachtronics.bot.discord.commands
 
 import com.faendir.zachtronics.bot.model.*
 import com.faendir.zachtronics.bot.utils.Result
+import com.faendir.zachtronics.bot.utils.Result.Companion.parseFailure
 import com.faendir.zachtronics.bot.utils.match
 import com.faendir.zachtronics.bot.utils.message
 import net.dv8tion.jda.api.entities.Message
@@ -18,16 +19,20 @@ class ShowCommand : Command {
         return message.match(regex).flatMap { command ->
             val categoryString = command.groups["category"]!!.value
             val categories = game.parseCategory(categoryString).ifEmpty {
-                return@flatMap Result.Failure("sorry, could not find the category \"$categoryString\"")
+                return@flatMap parseFailure("I could not find the category \"$categoryString\".")
             }
-            game.parsePuzzle(command.groups["puzzle"]!!.value).map puzzle@{ puzzle ->
+            game.parsePuzzle(command.groups["puzzle"]!!.value).flatMap puzzle@{ puzzle ->
                 val category = categories.find { it.supportsPuzzle(puzzle) }
-                    ?: return@puzzle "sorry, the category \"${categories.first().displayName}\" does not support the puzzle ${puzzle.displayName}."
+                    ?: return@puzzle parseFailure("the category \"${categories.first().displayName}\" does not support the puzzle ${
+                        puzzle.displayName
+                    }.", "choose another category")
                 for (leaderboard in game.leaderboards) {
                     val record = leaderboard.get(puzzle, category)
-                    if (record != null) return@puzzle "here you go: ${puzzle.displayName} ${category.displayName} ${record.toDisplayString()}"
+                    if (record != null) return@puzzle Result.success("here you go: ${puzzle.displayName} ${category.displayName} ${
+                        record.toDisplayString()
+                    }")
                 }
-                return@puzzle "sorry, there is no score for ${puzzle.displayName} ${category.displayName}."
+                return@puzzle Result.failure("sorry, there is no score for ${puzzle.displayName} ${category.displayName}.")
             }
         }.message
     }

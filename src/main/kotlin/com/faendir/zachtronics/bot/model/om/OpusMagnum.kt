@@ -3,8 +3,8 @@ package com.faendir.zachtronics.bot.model.om
 import com.faendir.zachtronics.bot.leaderboards.om.OmLeaderboard
 import com.faendir.zachtronics.bot.model.Game
 import com.faendir.zachtronics.bot.utils.Result
-import com.faendir.zachtronics.bot.utils.Result.Failure
-import com.faendir.zachtronics.bot.utils.Result.Success
+import com.faendir.zachtronics.bot.utils.Result.Companion.parseFailure
+import com.faendir.zachtronics.bot.utils.Result.Companion.success
 import com.faendir.zachtronics.bot.utils.and
 import com.faendir.zachtronics.bot.utils.getSingleMatchingPuzzle
 import com.faendir.zachtronics.bot.utils.match
@@ -20,29 +20,29 @@ class OpusMagnum(override val leaderboards: List<OmLeaderboard>) : Game<OmCatego
     override fun parsePuzzle(name: String): Result<OmPuzzle> = OmPuzzle.values().getSingleMatchingPuzzle(name)
 
     internal fun parseScore(puzzle: OmPuzzle, string: String): Result<OmScore> {
-        if (string.isBlank()) return Failure("sorry, I didn't find a score in your command.")
+        if (string.isBlank()) return parseFailure("I didn't find a score in your command.")
         val parts = string.split('/')
-        if (parts.size < 3) return Failure("sorry, your score must have at least three parts.")
+        if (parts.size < 3) return parseFailure("your score must have at least three parts.")
         if (string.contains(Regex("[a-zA-Z]"))) {
-            return Success(OmScore((parts.map { OmScorePart.parse(it) ?: return Failure("sorry, I didn't understand \"$it\"") }).toMap(LinkedHashMap())))
+            return success(OmScore((parts.map { OmScorePart.parse(it) ?: return parseFailure("I didn't understand \"$it\".") }).toMap(LinkedHashMap())))
         }
         if (parts.size == 4) {
-            return Success(OmScore(linkedMapOf(OmScorePart.COST to parts[0].toDouble(),
+            return success(OmScore(linkedMapOf(OmScorePart.COST to parts[0].toDouble(),
                 OmScorePart.CYCLES to parts[1].toDouble(),
                 OmScorePart.AREA to parts[2].toDouble(),
                 OmScorePart.INSTRUCTIONS to parts[3].toDouble())))
         }
         if (parts.size == 3) {
-            return Success(OmScore(linkedMapOf(OmScorePart.COST to parts[0].toDouble(),
+            return success(OmScore(linkedMapOf(OmScorePart.COST to parts[0].toDouble(),
                 OmScorePart.CYCLES to parts[1].toDouble(),
                 (if (puzzle.type == OmType.PRODUCTION) OmScorePart.INSTRUCTIONS else OmScorePart.AREA) to parts[2].toDouble())))
         }
-        return Failure("sorry, you need to specify score part identifiers when using more than four values.")
+        return parseFailure("you need to specify score part identifiers when using more than four values.")
     }
 
     private fun findLink(command: MatchResult, message: Message): Result<String> {
-        return (command.groups["link"]?.value ?: message.attachments.firstOrNull()?.url)?.let { Success(it) }
-            ?: Failure("sorry, I could not find a valid link or attachment in your message.")
+        return (command.groups["link"]?.value ?: message.attachments.firstOrNull()?.url)?.let { success(it) }
+            ?: parseFailure("I could not find a valid link or attachment in your message.")
     }
 
     override val submissionSyntax: String = "<puzzle>:<score1/score2/score3>(e.g. 3.5w/320c/400g) <link>(or attach file to message)"

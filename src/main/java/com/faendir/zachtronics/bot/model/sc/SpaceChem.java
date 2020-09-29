@@ -42,14 +42,14 @@ public class SpaceChem implements Game<ScCategory, ScScore, ScPuzzle, ScRecord> 
     public Result<Pair<ScPuzzle, ScRecord>> parseSubmission(@NotNull Message message) {
         Matcher m = submissionRegex.matcher(message.getContentRaw());
         if (!m.matches())
-            return new Result.Failure<>("Couldn't parse request");
+            return Result.failure("Couldn't parse request");
 
         return parsePuzzle(m.group("puzzle")).flatMap(puzzle -> {
             ScScore score = ScScore.parseBPScore(m.group("score"));
             if (score == null)
-                return new Result.Failure<>("Couldn't parse score");
+                return Result.failure("Couldn't parse score");
             ScRecord record = new ScRecord(score, m.group("author"), m.group("link"), m.group("oldRNG") != null);
-            return new Result.Success<>(new Pair<>(puzzle, record));
+            return Result.success(new Pair<>(puzzle, record));
         });
     }
 
@@ -66,7 +66,7 @@ public class SpaceChem implements Game<ScCategory, ScScore, ScPuzzle, ScRecord> 
         return Arrays.stream(ScPuzzle.values())
                      .filter(p -> p.getDisplayName().equalsIgnoreCase(name))
                      .findFirst()
-                     .<Result<ScPuzzle>>map(Result.Success::new)
+                     .map(Result::success)
                      .orElse(UtilsKt.getSingleMatchingPuzzle(ScPuzzle.values(), name));
     }
 

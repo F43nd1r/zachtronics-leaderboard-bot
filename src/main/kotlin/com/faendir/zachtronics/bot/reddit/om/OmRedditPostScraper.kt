@@ -6,10 +6,11 @@ import com.faendir.zachtronics.bot.leaderboards.UpdateResult
 import com.faendir.zachtronics.bot.model.om.OmRecord
 import com.faendir.zachtronics.bot.model.om.OmScore
 import com.faendir.zachtronics.bot.model.om.OpusMagnum
-import com.faendir.zachtronics.bot.reddit.*
+import com.faendir.zachtronics.bot.reddit.Comment
+import com.faendir.zachtronics.bot.reddit.RedditService
+import com.faendir.zachtronics.bot.reddit.Subreddit
 import com.faendir.zachtronics.bot.utils.DateSerializer
 import com.faendir.zachtronics.bot.utils.Forest
-import com.faendir.zachtronics.bot.utils.Result
 import kotlinx.serialization.json.Json
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -131,8 +132,7 @@ class OmRedditPostScraper(private val redditService: RedditService, private val 
             val command = mainRegex.matchEntire(line) ?: return@loop
             val puzzleName = command.groups["puzzle"]!!.value
             val puzzleResult = opusMagnum.parsePuzzle(puzzleName)
-            if (puzzleResult is Result.Failure) return@loop
-            val puzzle = (puzzleResult as Result.Success).result
+            val puzzle = puzzleResult.onFailure { return@loop }
             command.groupValues.drop(2).forEach inner@{ group ->
                 val subCommand = scoreRegex.matchEntire(group) ?: return@inner
                 val score: OmScore = opusMagnum.parseScore(puzzle, subCommand.groups["score"]!!.value).onFailure { return@inner }
