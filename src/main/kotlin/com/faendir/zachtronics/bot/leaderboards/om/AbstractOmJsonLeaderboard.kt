@@ -53,7 +53,9 @@ abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, 
                 var changed = false
                 for (category in categories) {
                     val oldRecord = records.getRecord(puzzle, category)
-                    if (oldRecord == null || category.isBetterOrEqual(record.score, oldRecord.score) && oldRecord.link != record.link) {
+                    if (oldRecord == null || category.scoreComparator.compare(record.score, oldRecord.score).let {
+                            it < 0 || it == 0 && oldRecord.link != record.link
+                        }) {
                         records.setRecord(puzzle, category, OmRecord(category.normalizeScore(record.score), rehostedLink))
                         changed = true
                         success[category] = oldRecord?.score

@@ -101,7 +101,7 @@ abstract class AbstractScLeaderboard implements Leaderboard<ScCategory, ScScore,
                     ScCategory thisCategory = blockCategories[i];
                     row.append(" | ");
                     if (thisCategory.supportsScore(record.getScore()) &&
-                        thisCategory.isBetterOrEqual(record.getScore(), blockRecords[i].getScore())) {
+                        thisCategory.getScoreComparator().compare(record.getScore(), blockRecords[i].getScore()) <= 0) {
                         beatenScores.put(thisCategory, blockRecords[i].getScore());
                         blockRecords[i] = record;
 

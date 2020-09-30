@@ -30,8 +30,8 @@ class OmRedditPostScraper(private val redditService: RedditService, private val 
     }
 
     private lateinit var trustedUsers: List<String>
-    val mainRegex = Regex("\\s*(?<puzzle>[^:]*)[:\\s]\\s*(\\[[^]]*]\\([^)]*\\)[,\\s]*)+")
-    val scoreRegex = Regex("\\[(?<score>[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?(/[\\d.]+[a-zA-Z]?)?)]\\((?<link>http.*)\\)[,\\s]*")
+    val mainRegex = Regex("\\s*(?<puzzle>[^:]*)[:\\s]\\s*(?<scores>(\\[[^]]*]\\([^)]*\\)[,\\s]*)+)")
+    val scoreRegex = Regex("\\[(?<score>[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?(/[\\d.]+[a-zA-Z]?)?)]\\((?<link>http[^,\\s]*)\\)[,\\s]*")
 
     private val moderators by lazy { redditService.getModerators(Subreddit.OPUS_MAGNUM) }
 
@@ -78,40 +78,10 @@ class OmRedditPostScraper(private val redditService: RedditService, private val 
     @Scheduled(fixedRate = 1000L * 60 * 60)
     fun pullFromReddit() {
         val now = Instant.now() //capture timestamp before processing
-        val lastUpdate: Date? =
-                gitRepo.access { File(repo, timestampFile).takeIf { it.exists() }?.readText() }?.let { Json.decodeFromString(DateSerializer, it) }
-        var hasNewComment = false
+        val lastUpdate: Date? = gitRepo.access { File(repo, timestampFile).takeIf { it.exists() }?.readText() }
+            ?.let { Json.decodeFromString(DateSerializer, it) }
         val comments = redditService.findCommentsOnPost(Subreddit.OPUS_MAGNUM, "official record submission thread")
-        comments.walkTrees().forEach { comment ->
-            if (lastUpdate == null || (comment.edited ?: comment.created).after(lastUpdate)) {
-                hasNewComment = true
-                comment.body?.let { body ->
-                    if (body != "[deleted]") {
-                        if (trustedUsers.contains(comment.author)) {
-                            parseComment(comment)
-                        } else if (body.lines().any { mainRegex.matches(it) }) {
-                            redditService.reply(comment, "[BOT] sorry, you're not a trusted user. Wait for a moderator to reply with `!trust-score` or " +
-                                    "`!trust-user`.")
-                        }
-                        if (body.trim() == "!trust-user" && moderators.contains(comment.author)) {
-                            getNonBotParentComment(comments, comment)?.let { trust ->
-                                parseComment(trust)
-                                trustedUsers = trustedUsers + trust.author
-                                gitRepo.access {
-                                    val file = File(repo, trustFile)
-                                    file.appendText("\n${trust.author}\n")
-                                    add(file)
-                                    commitAndPush("added trusted user \"${trust.author}\"")
-                                }
-                            }
-                        }
-                        if (body.trim() == "!trust-score" && moderators.contains(comment.author)) {
-                            getNonBotParentComment(comments, comment)?.let { parseComment(it) }
-                        }
-                    }
-                }
-            }
-        }
+        val hasNewComment = comments.walkTrees().map { comment -> handleComment(lastUpdate, comments, comment) }.toList().any { it }
         if (hasNewComment) {
             gitRepo.access {
                 val timestamp = File(repo, timestampFile)
@@ -119,6 +89,39 @@ class OmRedditPostScraper(private val redditService: RedditService, private val 
                 add(timestamp)
                 commitAndPush("timestamp update")
             }
+        }
+    }
+
+    internal fun handleComment(lastUpdate: Date?, comments: Forest<Comment>, comment: Comment): Boolean {
+        return if (lastUpdate == null || (comment.edited ?: comment.created).after(lastUpdate)) {
+            comment.body?.let { body ->
+                if (body != "[deleted]") {
+                    if (trustedUsers.contains(comment.author)) {
+                        parseComment(comment)
+                    } else if (body.lines().any { mainRegex.matches(it) }) {
+                        redditService.reply(comment,
+                            "[BOT] sorry, you're not a trusted user. Wait for a moderator to reply with `!trust-score` or " + "`!trust-user`.")
+                    }
+                    if (body.trim() == "!trust-user" && moderators.contains(comment.author)) {
+                        getNonBotParentComment(comments, comment)?.let { trust ->
+                            parseComment(trust)
+                            trustedUsers = trustedUsers + trust.author
+                            gitRepo.access {
+                                val file = File(repo, trustFile)
+                                file.appendText("\n${trust.author}\n")
+                                add(file)
+                                commitAndPush("added trusted user \"${trust.author}\"")
+                            }
+                        }
+                    }
+                    if (body.trim() == "!trust-score" && moderators.contains(comment.author)) {
+                        getNonBotParentComment(comments, comment)?.let { parseComment(it) }
+                    }
+                }
+            }
+            true
+        } else {
+            false
         }
     }
 
@@ -130,11 +133,8 @@ class OmRedditPostScraper(private val redditService: RedditService, private val 
         var update = false
         comment.body?.lines()?.forEach loop@{ line ->
             val command = mainRegex.matchEntire(line) ?: return@loop
-            val puzzleName = command.groups["puzzle"]!!.value
-            val puzzleResult = opusMagnum.parsePuzzle(puzzleName)
-            val puzzle = puzzleResult.onFailure { return@loop }
-            command.groupValues.drop(2).forEach inner@{ group ->
-                val subCommand = scoreRegex.matchEntire(group) ?: return@inner
+            val puzzle = opusMagnum.parsePuzzle(command.groups["puzzle"]!!.value).onFailure { return@loop }
+            scoreRegex.findAll(command.groups["scores"]!!.value).forEach inner@{ subCommand ->
                 val score: OmScore = opusMagnum.parseScore(puzzle, subCommand.groups["score"]!!.value).onFailure { return@inner }
                 val link = subCommand.groups["link"]!!.value
                 val results = opusMagnum.leaderboards.map { leaderboard ->

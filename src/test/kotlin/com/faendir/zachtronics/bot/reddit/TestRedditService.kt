@@ -5,7 +5,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.io.File
 
-class TestRedditService(private val directory: File) : RedditService {
+open class TestRedditService(private val directory: File) : RedditService {
     override fun getWikiPage(subreddit: Subreddit, page: String): String {
         return File(directory, "${subreddit.id}/wiki/$page.md").takeIf { it.exists() }?.readText() ?: ""
     }
@@ -15,7 +15,7 @@ class TestRedditService(private val directory: File) : RedditService {
     }
 
     override fun findCommentsOnPost(subreddit: Subreddit, title: String): Forest<Comment> {
-        return Json.decodeFromString(File(directory, "${subreddit.id}/comments/${title.replace(' ', '_')}.json").takeIf { it.exists() }?.readText() ?: "{}")
+        return Forest(emptyList())
     }
 
     override fun getModerators(subreddit: Subreddit): List<String> {

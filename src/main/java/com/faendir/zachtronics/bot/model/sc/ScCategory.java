@@ -35,17 +35,13 @@ public enum ScCategory implements Category<ScScore, ScPuzzle> {
     private final String displayName;
     @Getter
     private final String contentDescription;
-    private final Comparator<ScScore> comparator;
+    @Getter
+    private final Comparator<ScScore> scoreComparator;
     private final Set<ScType> supportedTypes;
     private final boolean bugFree;
     private final boolean precogFree;
     @Getter
     private final String formatStringLb;
-
-    @Override
-    public boolean isBetterOrEqual(@NotNull ScScore s1, @NotNull ScScore s2) {
-        return comparator.compare(s1, s2) <= 0;
-    }
 
     @Override
     public boolean supportsPuzzle(@NotNull ScPuzzle puzzle) {
