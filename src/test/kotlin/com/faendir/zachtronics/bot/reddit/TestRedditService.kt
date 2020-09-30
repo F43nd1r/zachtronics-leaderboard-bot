@@ -7,11 +7,11 @@ import java.io.File
 
 class TestRedditService(private val directory: File) : RedditService {
     override fun getWikiPage(subreddit: Subreddit, page: String): String {
-        return File(directory, "${subreddit.id}/wiki/$page").takeIf { it.exists() }?.readText() ?: ""
+        return File(directory, "${subreddit.id}/wiki/$page.md").takeIf { it.exists() }?.readText() ?: ""
     }
 
     override fun updateWikiPage(subreddit: Subreddit, page: String, content: String, reason: String) {
-        File(directory, "${subreddit.id}/wiki/$page").writeText(page)
+        File(directory, "${subreddit.id}/wiki/$page.md").writeText(page)
     }
 
     override fun findCommentsOnPost(subreddit: Subreddit, title: String): Forest<Comment> {

@@ -1,25 +1,26 @@
-import com.faendir.zachtronics.bot.Application;
-import com.faendir.zachtronics.bot.leaderboards.sc.ScLocalLeaderboard;
+package com.faendir.zachtronics.bot.leaderboards.sc;
+
+import com.faendir.zachtronics.bot.TestConfiguration;
+import com.faendir.zachtronics.bot.leaderboards.sc.ScRedditLeaderboard;
 import com.faendir.zachtronics.bot.model.sc.ScCategory;
 import com.faendir.zachtronics.bot.model.sc.ScPuzzle;
 import com.faendir.zachtronics.bot.model.sc.ScRecord;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@EnableConfigurationProperties
-@SpringBootTest(classes = Application.class, properties = "spring.main.lazy-initialization=true")
+@SpringBootTest
+@ContextConfiguration(classes = TestConfiguration.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class ScLeaderboardTest {
 
     @Autowired
-    private ScLocalLeaderboard scLeaderboard;
+    private ScRedditLeaderboard scLeaderboard;
 
     @Test
     public void testGoodRecords() {
