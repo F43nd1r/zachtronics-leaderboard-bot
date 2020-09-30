@@ -14,7 +14,7 @@ class SubmitCommand : Command {
     override fun helpText(game: Game<*, *, *, *>): String = "!submit ${game.submissionSyntax}"
     override val isReadOnly: Boolean = false
 
-    override fun <C : Category<C, S, P>, S : Score, P : Puzzle, R : Record<S>> handleMessage(game: Game<C, S, P, R>, message: Message): String {
+    override fun <C : Category<S, P>, S : Score, P : Puzzle, R : Record<S>> handleMessage(game: Game<C, S, P, R>, message: Message): String {
         return game.parseSubmission(message).map { (puzzle, record) ->
             val results = game.leaderboards.map { it.update(puzzle, record) }
             results.filterIsInstance<UpdateResult.Success<C, S>>().ifNotEmpty { successes ->

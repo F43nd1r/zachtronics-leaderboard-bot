@@ -12,7 +12,7 @@ class HelpCommand(@Lazy private val commands: List<Command>) : Command {
     override fun helpText(game: Game<*, *, *, *>): String = "This command"
     override val isReadOnly: Boolean = true
 
-    override fun <C : Category<C, S, P>, S : Score, P : Puzzle, R : Record<S>> handleMessage(game: Game<C, S, P, R>, message: Message): String {
+    override fun <C : Category<S, P>, S : Score, P : Puzzle, R : Record<S>> handleMessage(game: Game<C, S, P, R>, message: Message): String {
         return "Available commands:\n```${makeCommandTable(game)}```\nSupported categories:\n```${makeCategoryList(game.leaderboards)}```"
     }
     private fun makeCommandTable(game: Game<*, *, *, *>): String {

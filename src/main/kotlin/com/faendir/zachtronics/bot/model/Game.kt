@@ -5,7 +5,7 @@ import com.faendir.zachtronics.bot.utils.Result
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
 
-interface Game<C : Category<C, S, P>, S : Score, P : Puzzle, R : Record<S>> {
+interface Game<C : Category<S, P>, S : Score, P : Puzzle, R : Record<S>> {
     val discordChannel: String
 
     val leaderboards: List<Leaderboard<C, S, P, R>>

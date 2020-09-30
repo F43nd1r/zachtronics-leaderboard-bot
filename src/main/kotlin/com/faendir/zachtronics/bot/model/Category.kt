@@ -1,6 +1,6 @@
 package com.faendir.zachtronics.bot.model
 
-interface Category<SELF : Category<SELF, S, P>, S : Score, P : Puzzle> : Comparable<SELF> {
+interface Category<S : Score, P : Puzzle> {
     val displayName: String
     val contentDescription: String
 

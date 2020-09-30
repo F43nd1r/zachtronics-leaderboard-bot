@@ -12,7 +12,7 @@ enum class OmCategory(
     private val isBetterOrEqualImpl: OmCategory.(OmScore, OmScore) -> Boolean,
     private val supportedTypes: Set<OmType> = OmType.values().toSet(),
     private val supportedGroups: Set<OmGroup> = OmGroup.values().toSet(),
-) : Category<OmCategory, OmScore, OmPuzzle> {
+) : Category<OmScore, OmPuzzle> {
     OCG("OCG", listOf(OVERLAP_CYCLES, COST, AREA), OmCategory::normalSort, setOf(NORMAL, INFINITE)),
     OCA("OCA", listOf(OVERLAP_CYCLES, AREA, COST), OmCategory::normalSort, setOf(NORMAL, INFINITE)),
     OCX("OCX", listOf(OVERLAP_CYCLES, COST, AREA), OmCategory::lastTwoProductSort, setOf(NORMAL, INFINITE)),

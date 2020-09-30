@@ -38,8 +38,8 @@ class DiscordService(private val jda: JDA, private val commands: List<Command>, 
         override fun removeEldestEntry(eldest: Map.Entry<Long, Message>) = size > 50
     }
 
-    private fun <C : Category<C, S, P>, S : Score, P : Puzzle, R : Record<S>> handleMessage(message: Message, game: Game<C, S, P, R>,
-                                                                                            createMessageAction: (String) -> MessageAction) {
+    private fun <C : Category<S, P>, S : Score, P : Puzzle, R : Record<S>> handleMessage(message: Message, game: Game<C, S, P, R>,
+                                                                                         createMessageAction: (String) -> MessageAction) {
         commands.forEach { command ->
             if (message.contentRaw.startsWith("!${command.name}")) {
                 createMessageAction("${message.author.asMention} ${

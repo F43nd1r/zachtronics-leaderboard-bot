@@ -15,7 +15,7 @@ import static com.faendir.zachtronics.bot.model.sc.ScCategory.ScScoreFormatStrin
 import static com.faendir.zachtronics.bot.model.sc.ScType.*;
 
 @RequiredArgsConstructor
-public enum ScCategory implements Category<ScCategory, ScScore, ScPuzzle> {
+public enum ScCategory implements Category<ScScore, ScPuzzle> {
     C("C", "c/r/s[/BP]", comparatorCRS, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), false, false, F100),
     S("S", "c/r/s[/BP]", comparatorSRC, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), false, false, F001),
     RC("RC", "c/r/s[/BP]", comparatorRCS, Collections.singleton(PRODUCTION), false, false, F110),

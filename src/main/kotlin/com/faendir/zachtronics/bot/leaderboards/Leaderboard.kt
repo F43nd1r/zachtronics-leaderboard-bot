@@ -5,7 +5,7 @@ import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.Score
 
-interface Leaderboard<C : Category<C, S, P>, S : Score, P : Puzzle, R : Record<S>> {
+interface Leaderboard<C : Category<S, P>, S : Score, P : Puzzle, R : Record<S>> {
     val supportedCategories: List<C>
 
     @JvmDefault
@@ -14,13 +14,13 @@ interface Leaderboard<C : Category<C, S, P>, S : Score, P : Puzzle, R : Record<S
     fun get(puzzle: P, category: C): R?
 }
 
-sealed class UpdateResult<C : Category<C, S, *>, S : Score> {
-    class Success<C : Category<C, S, *>, S : Score>(val oldScores: Map<C, S?>) : UpdateResult<C, S>()
+sealed class UpdateResult<C : Category<S, *>, S : Score> {
+    class Success<C : Category<S, *>, S : Score>(val oldScores: Map<C, S?>) : UpdateResult<C, S>()
 
-    class ParetoUpdate<C : Category<C, S, *>, S : Score> : UpdateResult<C, S>()
+    class ParetoUpdate<C : Category<S, *>, S : Score> : UpdateResult<C, S>()
 
-    class BetterExists<C : Category<C, S, *>, S : Score>(val scores: Map<C, S>) : UpdateResult<C, S>()
+    class BetterExists<C : Category<S, *>, S : Score>(val scores: Map<C, S>) : UpdateResult<C, S>()
 
-    class NotSupported<C : Category<C, S, *>, S : Score> : UpdateResult<C, S>()
+    class NotSupported<C : Category<S, *>, S : Score> : UpdateResult<C, S>()
 }
 
