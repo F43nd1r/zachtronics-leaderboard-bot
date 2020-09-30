@@ -2,6 +2,8 @@ package com.faendir.zachtronics.bot
 
 import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.git.GitRepository
+import com.faendir.zachtronics.bot.imgur.ImgurService
+import com.faendir.zachtronics.bot.imgur.TestImgurService
 import com.faendir.zachtronics.bot.reddit.RedditService
 import com.faendir.zachtronics.bot.reddit.TestRedditService
 import net.dv8tion.jda.api.JDA
@@ -35,6 +37,12 @@ class TestConfiguration(private val gitProperties: GitProperties) {
     @Bean
     fun redditService(): RedditService {
         return TestRedditService(extractResourceDirectory("reddit"))
+    }
+
+    @Primary
+    @Bean
+    fun imgurService(): ImgurService {
+        return TestImgurService()
     }
 
     @MockBean
