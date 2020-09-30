@@ -2,7 +2,6 @@ package com.faendir.zachtronics.bot.reddit
 
 import com.faendir.zachtronics.bot.config.RedditProperties
 import com.faendir.zachtronics.bot.utils.Forest
-import com.faendir.zachtronics.bot.utils.MutableTree
 import com.faendir.zachtronics.bot.utils.Tree
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -79,7 +78,7 @@ class ProductionRedditService(redditProperties: RedditProperties) : RedditServic
 
     private fun CommentNode<PublicContribution<*>>.toTree(): Tree<Comment> {
         val comment = subject
-        return MutableTree(Comment(comment.id, comment.body, comment.author, comment.created, comment.edited), replies.map { it.toTree() }.toMutableList())
+        return Tree(Comment(comment.id, comment.body, comment.author, comment.created, comment.edited), replies.map { it.toTree() })
     }
 
     override fun reply(comment: Comment, text: String) {

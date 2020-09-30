@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.util.ResourceUtils
+import java.io.File
 import java.nio.file.Files
 
 @TestConfiguration
@@ -33,16 +34,14 @@ class TestConfiguration(private val gitProperties: GitProperties) {
     @Primary
     @Bean
     fun redditService(): RedditService {
-        return TestRedditService()
+        return TestRedditService(extractResourceDirectory("reddit"))
     }
 
     @MockBean
     lateinit var jda : JDA
 
     private fun createTestGitRepository(dir: String): GitRepository {
-        val resourceDir = ResourceUtils.getFile("classpath:$dir")
-        val target = Files.createTempDirectory(resourceDir.name).toFile()
-        resourceDir.copyRecursively(target)
+        val target = extractResourceDirectory(dir)
         val git = Git.init().setDirectory(target).call()
         git.add().addFilepattern(".").call()
         git.commit()
@@ -51,5 +50,12 @@ class TestConfiguration(private val gitProperties: GitProperties) {
             .setMessage("[BOT] initial commit")
             .call()
         return GitRepository(gitProperties, target.name, target.toURI().toString())
+    }
+
+    private fun extractResourceDirectory(dir: String): File {
+        val resourceDir = ResourceUtils.getFile("classpath:$dir")
+        val target = Files.createTempDirectory(resourceDir.name).toFile()
+        resourceDir.copyRecursively(target)
+        return target
     }
 }
