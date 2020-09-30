@@ -32,6 +32,10 @@ sealed class Result<T> {
     inline fun onFailure(block: () -> T): T {
         return fold({ it }, { block() })
     }
+
+    inline fun mapFailure(block: (String) -> Result<T>): Result<T> {
+        return fold({ this }, { block(it) })
+    }
 }
 
 val Result<String>.message
