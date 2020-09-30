@@ -1,6 +1,6 @@
 package com.faendir.zachtronics.bot.reddit.om
 
-import com.faendir.zachtronics.bot.TestConfiguration
+import com.faendir.zachtronics.bot.BotTest
 import com.faendir.zachtronics.bot.leaderboards.om.OmRedditWikiLeaderboard
 import com.faendir.zachtronics.bot.model.om.OmCategory
 import com.faendir.zachtronics.bot.model.om.OmPuzzle
@@ -10,17 +10,9 @@ import com.faendir.zachtronics.bot.reddit.RedditService
 import com.faendir.zachtronics.bot.utils.Forest
 import com.faendir.zachtronics.bot.utils.Tree
 import com.ninjasquad.springmockk.SpykBean
-import io.mockk.every
-import io.mockk.just
-import io.mockk.runs
 import io.mockk.verify
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.SpyBean
-import org.springframework.test.annotation.DirtiesContext
-import org.springframework.test.context.ContextConfiguration
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import strikt.assertions.isNotEqualTo
@@ -29,9 +21,7 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalUnit
 import java.util.*
 
-@SpringBootTest
-@ContextConfiguration(classes = [TestConfiguration::class])
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@BotTest
 internal class OmRedditPostScraperTest {
 
     @Autowired

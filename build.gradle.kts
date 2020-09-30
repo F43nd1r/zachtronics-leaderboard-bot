@@ -42,6 +42,20 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    addTestListener(object : TestListener {
+        override fun beforeSuite(suite: TestDescriptor) {}
+
+        override fun beforeTest(testDescriptor: TestDescriptor) {}
+
+        override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
+
+        override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+            if(suite.parent == null) {
+                println("Test results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} " +
+                        "failures, ${result.skippedTestCount} skipped)")
+            }
+        }
+    })
 }
 
 tasks.withType<KotlinCompile> {

@@ -1,22 +1,16 @@
 package com.faendir.zachtronics.bot.leaderboards.sc;
 
-import com.faendir.zachtronics.bot.TestConfiguration;
-import com.faendir.zachtronics.bot.leaderboards.sc.ScRedditLeaderboard;
+import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.model.sc.ScCategory;
 import com.faendir.zachtronics.bot.model.sc.ScPuzzle;
 import com.faendir.zachtronics.bot.model.sc.ScRecord;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-@SpringBootTest
-@ContextConfiguration(classes = TestConfiguration.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@BotTest
 public class ScLeaderboardTest {
 
     @Autowired

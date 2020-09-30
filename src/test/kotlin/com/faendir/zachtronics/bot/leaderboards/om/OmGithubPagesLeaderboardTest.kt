@@ -1,6 +1,6 @@
 package com.faendir.zachtronics.bot.leaderboards.om
 
-import com.faendir.zachtronics.bot.TestConfiguration
+import com.faendir.zachtronics.bot.BotTest
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult
 import com.faendir.zachtronics.bot.model.om.OmCategory
 import com.faendir.zachtronics.bot.model.om.OmPuzzle
@@ -9,15 +9,10 @@ import com.faendir.zachtronics.bot.model.om.OmScore
 import com.faendir.zachtronics.bot.model.om.OmScorePart.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.annotation.DirtiesContext
-import org.springframework.test.context.ContextConfiguration
 import strikt.api.expectThat
 import strikt.assertions.*
 
-@SpringBootTest
-@ContextConfiguration(classes = [TestConfiguration::class])
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@BotTest
 internal class OmGithubPagesLeaderboardTest {
 
     @Autowired
