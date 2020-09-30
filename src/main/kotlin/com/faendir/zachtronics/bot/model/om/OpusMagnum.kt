@@ -24,18 +24,18 @@ class OpusMagnum(override val leaderboards: List<OmLeaderboard>) : Game<OmCatego
         val parts = string.split('/')
         if (parts.size < 3) return parseFailure("your score must have at least three parts.")
         if (string.contains(Regex("[a-zA-Z]"))) {
-            return success(OmScore((parts.map { OmScorePart.parse(it) ?: return parseFailure("I didn't understand \"$it\".") }).toMap(LinkedHashMap())))
+            return success(OmScore((parts.map { OmScorePart.parse(it) ?: return parseFailure("I didn't understand \"$it\".") })))
         }
         if (parts.size == 4) {
-            return success(OmScore(linkedMapOf(OmScorePart.COST to parts[0].toDouble(),
+            return success(OmScore(OmScorePart.COST to parts[0].toDouble(),
                 OmScorePart.CYCLES to parts[1].toDouble(),
                 OmScorePart.AREA to parts[2].toDouble(),
-                OmScorePart.INSTRUCTIONS to parts[3].toDouble())))
+                OmScorePart.INSTRUCTIONS to parts[3].toDouble()))
         }
         if (parts.size == 3) {
-            return success(OmScore(linkedMapOf(OmScorePart.COST to parts[0].toDouble(),
+            return success(OmScore(OmScorePart.COST to parts[0].toDouble(),
                 OmScorePart.CYCLES to parts[1].toDouble(),
-                (if (puzzle.type == OmType.PRODUCTION) OmScorePart.INSTRUCTIONS else OmScorePart.AREA) to parts[2].toDouble())))
+                (if (puzzle.type == OmType.PRODUCTION) OmScorePart.INSTRUCTIONS else OmScorePart.AREA) to parts[2].toDouble()))
         }
         return parseFailure("you need to specify score part identifiers when using more than four values.")
     }

@@ -74,7 +74,7 @@ enum class OmCategory(
 
 
     private fun OmScore.transformToLastTwoProduct(): OmScore {
-        return OmScore((parts.toList().dropLast(2) + parts.toList().takeLast(2).let { COMPUTED to it.first().second * it.last().second }).toMap(LinkedHashMap()))
+        return OmScore((parts.toList().dropLast(2) + parts.toList().takeLast(2).let { COMPUTED to it.first().second * it.last().second }))
     }
 
     fun sumSort(s1: OmScore, s2: OmScore, tieBreaker: OmScorePart): Boolean {
@@ -83,7 +83,7 @@ enum class OmCategory(
         return sum1 < sum2 || (sum1 == sum2 && s1.parts[tieBreaker]!! <= s2.parts[tieBreaker]!!)
     }
 
-    fun normalizeScore(score: OmScore): OmScore = OmScore(sortScoreParts(score.parts.asIterable()).map { it.key to it.value }.toMap(LinkedHashMap()))
+    fun normalizeScore(score: OmScore): OmScore = OmScore(sortScoreParts(score.parts.asIterable()).map { it.key to it.value })
 
     fun sortScoreParts(parts: Iterable<Map.Entry<OmScorePart, Double>>): Iterable<Map.Entry<OmScorePart, Double>> = parts.sortedBy {
         check(requiredParts.contains(it.key))

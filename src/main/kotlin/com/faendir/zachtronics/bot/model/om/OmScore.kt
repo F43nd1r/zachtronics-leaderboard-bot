@@ -6,6 +6,9 @@ import java.text.DecimalFormat
 
 @Serializable
 data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>) : Score {
+    constructor(parts: Iterable<Pair<OmScorePart, Double>>) : this(parts.toMap(LinkedHashMap()))
+    constructor(vararg parts: Pair<OmScorePart, Double>) : this(parts.asIterable())
+
     companion object {
         private val numberFormat = DecimalFormat("0.#")
     }

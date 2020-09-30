@@ -93,7 +93,7 @@ class OmRedditWikiLeaderboard(@Qualifier("omRedditLeaderboardRepository") gitRep
     override fun paretoUpdate(puzzle: OmPuzzle, record: OmRecord, records: MutableMap<OmPuzzle, PuzzleEntry>): Boolean {
         val requiredParts = listOf(COST, CYCLES, if (puzzle.type == PRODUCTION) INSTRUCTIONS else AREA)
         if (record.score.parts.keys.containsAll(requiredParts)) {
-            val paretoScore = OmScore(requiredParts.map { it to record.score.parts[it]!! }.toMap(LinkedHashMap()))
+            val paretoScore = OmScore(requiredParts.map { it to record.score.parts[it]!! })
             val entry = (records[puzzle] ?: PuzzleEntry())
             if (!entry.pareto.contains(paretoScore) && entry.pareto.all { !it.isStrictlyBetter(paretoScore) }) {
                 entry.pareto.removeIf { paretoScore.isStrictlyBetter(it) }
