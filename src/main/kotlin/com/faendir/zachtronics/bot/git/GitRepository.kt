@@ -8,6 +8,7 @@ import org.eclipse.jgit.api.Status
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import java.io.File
 import java.nio.file.Files
+import javax.annotation.PreDestroy
 
 open class GitRepository(private val gitProperties: GitProperties, name: String, url: String) {
     private val repo = Files.createTempDirectory(name).toFile()
@@ -54,5 +55,10 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
                 .call()
             git.push().setCredentialsProvider(UsernamePasswordCredentialsProvider(gitProperties.username, gitProperties.accessToken)).setTimeout(120).call()
         }
+    }
+
+    @PreDestroy
+    fun cleanup() {
+        repo.deleteRecursively()
     }
 }

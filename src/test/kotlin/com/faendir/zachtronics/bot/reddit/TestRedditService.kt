@@ -4,6 +4,7 @@ import com.faendir.zachtronics.bot.utils.Forest
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.io.File
+import javax.annotation.PreDestroy
 
 open class TestRedditService(private val directory: File) : RedditService {
     override fun getWikiPage(subreddit: Subreddit, page: String): String {
@@ -28,5 +29,10 @@ open class TestRedditService(private val directory: File) : RedditService {
 
     override fun myUsername(): String {
         return "zachtronics-bot-test"
+    }
+
+    @PreDestroy
+    fun cleanup() {
+        directory.deleteRecursively()
     }
 }

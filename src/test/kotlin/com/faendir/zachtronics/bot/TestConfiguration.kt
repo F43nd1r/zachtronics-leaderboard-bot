@@ -2,6 +2,7 @@ package com.faendir.zachtronics.bot
 
 import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.git.GitRepository
+import com.faendir.zachtronics.bot.git.TestGitRepository
 import com.faendir.zachtronics.bot.imgur.ImgurService
 import com.faendir.zachtronics.bot.imgur.TestImgurService
 import com.faendir.zachtronics.bot.reddit.RedditService
@@ -57,7 +58,7 @@ class TestConfiguration(private val gitProperties: GitProperties) {
             .setCommitter("zachtronics-bot-test", "zachtronics-bot-test@faendir.com")
             .setMessage("[BOT] initial commit")
             .call()
-        return GitRepository(gitProperties, target.name, target.toURI().toString())
+        return TestGitRepository(gitProperties, target)
     }
 
     private fun extractResourceDirectory(dir: String): File {
