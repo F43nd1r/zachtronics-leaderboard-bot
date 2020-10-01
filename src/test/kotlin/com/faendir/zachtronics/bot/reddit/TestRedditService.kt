@@ -1,8 +1,6 @@
 package com.faendir.zachtronics.bot.reddit
 
 import com.faendir.zachtronics.bot.utils.Forest
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import java.io.File
 import javax.annotation.PreDestroy
 
@@ -12,7 +10,7 @@ open class TestRedditService(private val directory: File) : RedditService {
     }
 
     override fun updateWikiPage(subreddit: Subreddit, page: String, content: String, reason: String) {
-        File(directory, "${subreddit.id}/wiki/$page.md").writeText(page)
+        File(directory, "${subreddit.id}/wiki/$page.md").writeText(content)
     }
 
     override fun findCommentsOnPost(subreddit: Subreddit, title: String): Forest<Comment> {
