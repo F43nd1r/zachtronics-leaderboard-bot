@@ -1,6 +1,6 @@
-package com.faendir.zachtronics.bot;
+package com.faendir.zachtronics.bot.discord.commands;
 
-import com.faendir.zachtronics.bot.discord.commands.Command;
+import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.model.sc.SpaceChem;
 import gnu.trove.set.hash.TLongHashSet;
 import net.dv8tion.jda.api.entities.Message;
@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
 
 @BotTest
 public class CommandTest {
@@ -27,7 +29,7 @@ public class CommandTest {
 
         String result = runCommand(text);
         System.out.println(result);
-
+        assertNotNull(result);
     }
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
