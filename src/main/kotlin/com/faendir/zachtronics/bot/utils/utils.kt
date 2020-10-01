@@ -1,6 +1,8 @@
 package com.faendir.zachtronics.bot.utils
 
 import com.faendir.zachtronics.bot.model.Puzzle
+import com.faendir.zachtronics.bot.utils.Result.Companion.parseFailure
+import com.faendir.zachtronics.bot.utils.Result.Companion.success
 import net.dv8tion.jda.api.entities.Message
 
 inline fun <T, R> Collection<T>.ifNotEmpty(block: (Collection<T>) -> R): R? = takeIf { it.isNotEmpty() }?.let(block)
@@ -31,13 +33,13 @@ fun <P : Puzzle> Array<P>.getSingleMatchingPuzzle(name: String): Result<P> {
         }
     }
     return when (val size = matches.size) {
-        0 -> Result.Failure("sorry, I did not recognize the puzzle \"$name\".")
-        1 -> Result.Success(matches.first())
-        in 2..5 -> Result.Failure("sorry, your request for \"$name\" was not precise enough. Use one of:\n${matches.joinToString("\n") { it.displayName }}")
-        else -> Result.Failure("sorry, your request for \"$name\" was not precise enough. $size matches.")
+        0 -> parseFailure("I did not recognize the puzzle \"$name\".")
+        1 -> success(matches.first())
+        in 2..5 -> parseFailure("your request for \"$name\" was not precise enough. Use one of:\n${matches.joinToString("\n") { it.displayName }}")
+        else -> parseFailure("your request for \"$name\" was not precise enough. $size matches.")
     }
 }
 
 fun Message.match(regex: Regex): Result<MatchResult> {
-    return regex.matchEntire(contentRaw)?.let { Result.Success(it) } ?: Result.Failure("sorry, I could not parse your command. Type `!help` to see the syntax.")
+    return regex.matchEntire(contentRaw)?.let { success(it) } ?: parseFailure("I could not parse your command. Type `!help` to see the syntax.")
 }
