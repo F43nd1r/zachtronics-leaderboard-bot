@@ -1,7 +1,14 @@
 package com.faendir.zachtronics.bot.model.om
 
-enum class OmScorePart(val key: Char) {
-    HEIGHT('h'), WIDTH('w'), COST('g'), CYCLES('c'), OVERLAP_CYCLES('o'), AREA('a'), INSTRUCTIONS('i'), COMPUTED('#');
+enum class OmScorePart(val key: Char, val displayName: String?) {
+    HEIGHT('h', "Height"),
+    WIDTH('w', "Width"),
+    COST('g', "Cost"),
+    CYCLES('c', "Cycles"),
+    OVERLAP_CYCLES('o', "Overlap Cycles"),
+    AREA('a', "Area"),
+    INSTRUCTIONS('i', "Instructions"),
+    COMPUTED('#', null);
 
     companion object {
         fun parse(string: String): Pair<OmScorePart, Double>? {

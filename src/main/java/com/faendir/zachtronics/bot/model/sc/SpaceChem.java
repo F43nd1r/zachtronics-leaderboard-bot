@@ -23,10 +23,16 @@ public class SpaceChem implements Game<ScCategory, ScScore, ScPuzzle, ScRecord> 
     @Getter
     private final String discordChannel = "spacechem";
     @Getter
+    private final String displayName = "Spacechem";
+    @Getter
     private final List<Leaderboard<ScCategory, ScScore, ScPuzzle, ScRecord>> leaderboards;
     @Getter
     private final String submissionSyntax =
             "<puzzle> (<cycles/reactors/symbols[/BP]>) by <author> <youtube link>";
+    @Getter
+    private final String categoryHelp = "TODO";
+    @Getter
+    private final String scoreHelp = "TODO";
 
     public SpaceChem(ScRedditLeaderboard scLeaderboard) {
         leaderboards = Collections.singletonList(scLeaderboard);

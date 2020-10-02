@@ -18,20 +18,7 @@ fun <T> Iterable<T>.plusIf(condition: Boolean, element: T): List<T> = if (condit
 private val wordSeparator = Regex("[\\s-/,:]+")
 
 fun <P : Puzzle> Array<P>.getSingleMatchingPuzzle(name: String): Result<P> {
-    val matches = filter { puzzle ->
-        val words = name.split(wordSeparator).toMutableList()
-        val puzzleWords = puzzle.displayName.split(wordSeparator)
-        puzzleWords.forEach {
-            if (it.contains(words.first(), ignoreCase = true)) words.removeFirst()
-            if (words.isEmpty()) return@filter true
-        }
-        if (name.length <= 4 && name.length == puzzleWords.size) {
-            //check abbreviation
-            name.foldIndexed(true) { index, acc, char -> acc && puzzleWords[index].startsWith(char, ignoreCase = true) }
-        } else {
-            false
-        }
-    }
+    val matches = asIterable().fuzzyMatch(name) { it.displayName }
     return when (val size = matches.size) {
         0 -> parseFailure("I did not recognize the puzzle \"$name\".")
         1 -> success(matches.first())
@@ -40,6 +27,29 @@ fun <P : Puzzle> Array<P>.getSingleMatchingPuzzle(name: String): Result<P> {
     }
 }
 
+fun <P> Iterable<P>.fuzzyMatch(search: String, extractName: (P) -> String): List<P> {
+    return filter { puzzle ->
+        val words = search.split(wordSeparator).toMutableList()
+        val elementWords = extractName(puzzle).split(wordSeparator)
+        elementWords.forEach {
+            if (it.contains(words.first(), ignoreCase = true)) words.removeFirst()
+            if (words.isEmpty()) return@filter true
+        }
+        if (search.length <= 4 && search.length == elementWords.size) {
+            //check abbreviation
+            search.foldIndexed(true) { index, acc, char -> acc && elementWords[index].startsWith(char, ignoreCase = true) }
+        } else {
+            false
+        }
+    }
+}
+
 fun Message.match(regex: Regex): Result<MatchResult> {
     return regex.matchEntire(contentRaw)?.let { success(it) } ?: parseFailure("I could not parse your command. Type `!help` to see the syntax.")
+}
+
+fun Message.changeContent(content: String) : Message = ChangedMessage(this, content)
+
+private class ChangedMessage(wrap: Message, private val content: String) : Message by wrap {
+    override fun getContentRaw(): String = content
 }

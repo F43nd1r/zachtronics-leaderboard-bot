@@ -10,6 +10,6 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class DiscordConfiguration(private val discordProperties: DiscordProperties) {
     @Bean(initMethod = "awaitReady", destroyMethod = "shutdown")
-    fun jda() : JDA = JDABuilder.createLight(discordProperties.token, GatewayIntent.GUILD_MESSAGES).build()
+    fun jda() : JDA = JDABuilder.createLight(discordProperties.token, GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES).build()
 
 }

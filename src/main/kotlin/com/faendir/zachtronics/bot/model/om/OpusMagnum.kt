@@ -17,6 +17,8 @@ class OpusMagnum(override val leaderboards: List<OmLeaderboard>) : Game<OmCatego
 
     override val discordChannel = "opus-magnum"
 
+    override val displayName = "Opus Magnum"
+
     override fun parsePuzzle(name: String): Result<OmPuzzle> = OmPuzzle.values().getSingleMatchingPuzzle(name)
 
     internal fun parseScore(puzzle: OmPuzzle, string: String): Result<OmScore> {
@@ -46,7 +48,32 @@ class OpusMagnum(override val leaderboards: List<OmLeaderboard>) : Game<OmCatego
     }
 
     override val submissionSyntax: String = "<puzzle>:<score1/score2/score3>(e.g. 3.5w/320c/400g) <link>(or attach file to message)"
+
+    override val categoryHelp: String = """
+        |Official categories are named after the primary metric and first tiebreaker.
+        |For example `GC` means: best cost with cycles as tiebreaker (and area as secondary tiebreaker).
+        |`X` refers to the product of the two other scores, for example `GX` means best cost with cycles*area as tiebreaker.
+        |`SUM-G` refers to the sum of all three scores, with cost as tiebreaker.
+        |
+        |Height and width are area metrics limited in one direction. For more info see <https://f43nd1r.github.io/om-leaderboard/wh/>
+        |`O` refers to overlap, which violates the rules of the game. Fore more info see <https://f43nd1r.github.io/om-leaderboard/overlap/>
+        |
+        |All categories are:
+        |```
+        |${OmCategory.values().joinToString("\n") { "${it.displayName} (${it.contentDescription})" }}
+        |```
+    """.trimMargin()
+
+    override val scoreHelp: String = """
+        |A score can be either in the standard order (cost/cycles/area/instructions), or be a combination of parts marked with suffixes:
+        |```
+        |${OmScorePart.values().filter { it.displayName != null }.joinToString("\n") { "${it.key} ${it.displayName} " }}
+        |```
+        |Example: `3.5w/320c/400g`
+    """.trimMargin()
+
     val regex = Regex("!submit\\s+(?<puzzle>[^:]*)(:|\\s)\\s*(?<score>[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?(/[\\d.]+[a-zA-Z]?)?)(\\s+(?<link>http.*))?\\s*")
+
 
     override fun parseSubmission(message: Message): Result<Pair<OmPuzzle, OmRecord>> {
         return message.match(regex).flatMap { command ->
@@ -56,7 +83,8 @@ class OpusMagnum(override val leaderboards: List<OmLeaderboard>) : Game<OmCatego
         }
     }
 
-    override fun parseCategory(name: String): List<OmCategory> = OmCategory.values().filter { it.displayName.equals(name, ignoreCase = true) }
+    override fun parseCategory(name: String): List<OmCategory> =
+        OmCategory.values().filter { category -> category.displayNames.any { it.equals(name, ignoreCase = true) } }
 
     override fun hasWritePermission(member: Member?): Boolean = member?.roles?.any { it.name == "trusted-leaderboard-poster" } ?: false
 }

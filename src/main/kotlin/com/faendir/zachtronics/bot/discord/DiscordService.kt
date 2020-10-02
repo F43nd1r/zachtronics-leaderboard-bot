@@ -1,12 +1,14 @@
 package com.faendir.zachtronics.bot.discord
 
 import com.faendir.zachtronics.bot.discord.commands.Command
-import com.faendir.zachtronics.bot.model.*
+import com.faendir.zachtronics.bot.model.Game
+import com.faendir.zachtronics.bot.utils.*
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.entities.ChannelType
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.TextChannel
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
-import net.dv8tion.jda.api.events.message.guild.GuildMessageUpdateEvent
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.events.message.MessageUpdateEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.restaction.MessageAction
 import org.springframework.stereotype.Service
@@ -14,20 +16,19 @@ import org.springframework.stereotype.Service
 @Service
 class DiscordService(private val jda: JDA, private val commands: List<Command>, private val games: List<Game<*, *, *, *>>) {
     private val adapter = object : ListenerAdapter() {
-        override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
+        override fun onMessageReceived(event: MessageReceivedEvent) {
             if (!event.author.isBot) {
-                val game = games.find { it.discordChannel == event.channel.name } ?: return
-                handleMessage(event.message, game) { event.channel.sendMessage(it) }
+                handleMessage(event.message) { event.channel.sendMessage(it) }
             }
         }
 
-        override fun onGuildMessageUpdate(event: GuildMessageUpdateEvent) {
+        override fun onMessageUpdate(event: MessageUpdateEvent) {
             messageCache[event.message.idLong]?.let { response ->
-                val game = games.find { it.discordChannel == event.channel.name } ?: return
-                handleMessage(event.message, game) { response.editMessage(it) }
+                handleMessage(event.message) { response.editMessage(it) }
             }
         }
     }
+    private val privateMessageRegex = Regex("(?<game>[^!:]*)[:\\s]*(?<command>!.*)")
 
     init {
         jda.addEventListener(adapter)
@@ -38,18 +39,46 @@ class DiscordService(private val jda: JDA, private val commands: List<Command>, 
         override fun removeEldestEntry(eldest: Map.Entry<Long, Message>) = size > 50
     }
 
-    private fun <C : Category<S, P>, S : Score, P : Puzzle, R : Record<S>> handleMessage(message: Message, game: Game<C, S, P, R>,
-                                                                                         createMessageAction: (String) -> MessageAction) {
-        commands.forEach { command ->
-            if (message.contentRaw.startsWith("!${command.name}")) {
-                createMessageAction("${message.author.asMention} ${
-                    if (command.isReadOnly || game.hasWritePermission(message.member)) {
-                        command.handleMessage(game, message)
+    private fun handleMessage(message: Message, createMessageAction: (String) -> MessageAction) {
+        val response: String = findGame(message).map { (game, editedMessage) ->
+            commands.asSequence().mapNotNull { command ->
+                if (editedMessage.contentRaw.startsWith("!${command.name}")) {
+                    if (command.isReadOnly || game.hasWritePermission(editedMessage.member)) {
+                        command.handleMessage(game, editedMessage)
                     } else {
                         "sorry, you do not have the permission to use this command."
+                    } + if (command.isReadOnly && editedMessage.channelType != ChannelType.PRIVATE) {
+                        "\n\nᴰᶦᵈ ʸᵒᵘ ᵏⁿᵒʷˀ ʸᵒᵘ ᶜᵃⁿ ᵘˢᵉ ᵗʰᶦˢ ᶜᵒᵐᵐᵃⁿᵈ ᶦⁿ ᵖʳᶦᵛᵃᵗᵉ ᵐᵉˢˢᵃᵍᵉˢ"
+                    } else {
+                        ""
                     }
-                }").mention(message.author).queue {
-                    messageCache[message.idLong] = it
+                } else {
+                    null
+                }
+            }.firstOrNull() ?: ""
+        }.message
+        if (response.isNotBlank()) {
+            createMessageAction("${message.author.asMention} $response").mention(message.author).queue {
+                messageCache[message.idLong] = it
+            }
+        }
+    }
+
+    private fun findGame(message: Message): Result<Pair<Game<*, *, *, *>, Message>> {
+        return if (message.channelType == ChannelType.TEXT) {
+            games.find { it.discordChannel == message.channel.name }?.let { Result.success(it to message) } ?: Result.failure("")
+        } else {
+            message.match(privateMessageRegex).flatMap { input ->
+                val name = input.groups["game"]!!.value.trim()
+                if (name.isBlank()) return Result.parseFailure("In private messages you have to prefix your command with a game, e.g. `OM: !help`.")
+                val matches = games.fuzzyMatch(name) { it.displayName }
+                when (val size = matches.size) {
+                    0 -> Result.parseFailure("I did not recognize the game \"$name\".")
+                    1 -> Result.success(matches.first() to message.changeContent(input.groups["command"]!!.value))
+                    in 2..5 -> Result.parseFailure("your request for \"$name\" was not precise enough. Use one of:\n${
+                        matches.joinToString("\n") { it.displayName }
+                    }")
+                    else -> Result.parseFailure("your request for \"$name\" was not precise enough. $size matches.")
                 }
             }
         }

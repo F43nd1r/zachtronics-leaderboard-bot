@@ -8,9 +8,15 @@ import net.dv8tion.jda.api.entities.Message
 interface Game<C : Category<S, P>, S : Score, P : Puzzle, R : Record<S>> {
     val discordChannel: String
 
+    val displayName: String
+
     val leaderboards: List<Leaderboard<C, S, P, R>>
 
     val submissionSyntax : String
+
+    val categoryHelp : String
+
+    val scoreHelp : String
 
     fun parseSubmission(message: Message): Result<Pair<P, R>>
 
