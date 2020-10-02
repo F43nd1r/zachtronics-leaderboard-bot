@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.File
 import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
 
 @Service
 class ProductionImgurService(private val imgurProperties: ImgurProperties) : ImgurService {
@@ -28,8 +30,19 @@ class ProductionImgurService(private val imgurProperties: ImgurProperties) : Img
         return try {
             val filename = link.substringAfterLast("/")
             val input = File.createTempFile(filename.substringBeforeLast("."), ".${filename.substringAfterLast(".")}")
-            input.writeBytes(CUrl(link).exec())
-            upload(input)
+            if (link.startsWith("https://od.lk")) {
+                //specialcase stupid opendrive links
+                val connection = URL(link).openConnection() as HttpURLConnection
+                connection.instanceFollowRedirects = false
+                connection.connect()
+                val downloadLink = connection.getHeaderField("Location").removeSuffix("?inline=1")
+                input.writeBytes(CUrl(downloadLink).exec())
+                val converted = convertToVideo(input)
+                upload(converted)
+            } else {
+                input.writeBytes(CUrl(link).exec())
+                upload(input)
+            }
         } catch (e: Throwable) {
             logger.info("Rehosting failed for $link", e)
             link
@@ -45,7 +58,7 @@ class ProductionImgurService(private val imgurProperties: ImgurProperties) : Img
         }
         val string = cUrl.exec().decodeToString()
         val response = Json { ignoreUnknownKeys = true }.decodeFromString<Response>(string)
-        return response.data?.link?.takeIf { /*imgur sometimes returns broken links*/ it.endsWith(".gif") || it.endsWith(".gifv") || it.endsWith(".mp4") }
+        return response.data?.link?.let { /*when uploading webm imgur doesn't return a file ending*/if (it.endsWith(".")) "${it}mp4" else it }
             ?: throw IOException("JSON response did not contain image link. $string")
     }
 
