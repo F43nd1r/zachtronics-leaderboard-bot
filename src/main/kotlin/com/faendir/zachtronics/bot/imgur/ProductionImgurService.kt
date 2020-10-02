@@ -70,7 +70,14 @@ class ProductionImgurService(private val imgurProperties: ImgurProperties) : Img
 
     private fun convertToVideo(gif: File): File {
         val output = File.createTempFile(gif.nameWithoutExtension, ".webm")
-        val builder = FFmpegBuilder().setInput(gif.canonicalPath).overrideOutputFiles(true).addOutput(output.canonicalPath).setFormat("webm").setVideoCodec("libvpx").done()
+        val builder = FFmpegBuilder().setInput(gif.canonicalPath)
+            .overrideOutputFiles(true)
+            .addOutput(output.canonicalPath)
+            .setFormat("webm")
+            .setVideoCodec("libvpx")
+            .setConstantRateFactor(10.0)
+            .setVideoBitRate(8 * 1024 * 1024)
+            .done()
         ffmpeg.createJob(builder).run()
         return output
     }

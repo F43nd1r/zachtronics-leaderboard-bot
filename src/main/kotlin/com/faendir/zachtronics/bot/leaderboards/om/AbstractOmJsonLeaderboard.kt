@@ -85,7 +85,7 @@ abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, 
 
     override fun get(puzzle: OmPuzzle, category: OmCategory): OmRecord? {
         return gitRepo.access {
-            val (dirName, dirCategories) = directoryCategories.asIterable().find { it.value.contains(category) } ?: return@access null
+            val (dirName, _) = directoryCategories.asIterable().find { it.value.contains(category) } ?: return@access null
             val dir = File(repo, dirName )
             val scoreFile = File(dir, scoreFileName)
             val records = Json.decodeFromString(serializer, scoreFile.readText())
@@ -93,11 +93,7 @@ abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, 
                 val rehostedLink = imgurService.tryRehost(record.link)
                 if(rehostedLink != record.link) {
                     val rehostedRecord = OmRecord(record.score, rehostedLink)
-                    records.setRecord(puzzle, category, rehostedRecord)
-                    scoreFile.writeText(Json { prettyPrint = true }.encodeToString(serializer, records))
-                    add(scoreFile)
-                    updatePage(dir, dirCategories, records)
-                    commitAndPush(null, puzzle, record.score, listOf("REHOST"))
+                    update(puzzle, rehostedRecord)
                     rehostedRecord
                 } else {
                     record
