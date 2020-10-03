@@ -2,7 +2,14 @@ package com.faendir.zachtronics.bot.discord
 
 import com.faendir.zachtronics.bot.discord.commands.Command
 import com.faendir.zachtronics.bot.model.Game
-import com.faendir.zachtronics.bot.utils.*
+import com.faendir.zachtronics.bot.utils.Result
+import com.faendir.zachtronics.bot.utils.changeContent
+import com.faendir.zachtronics.bot.utils.fuzzyMatch
+import com.faendir.zachtronics.bot.utils.match
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.ChannelType
 import net.dv8tion.jda.api.entities.Message
@@ -40,23 +47,41 @@ class DiscordService(private val jda: JDA, private val commands: List<Command>, 
     }
 
     private fun handleMessage(message: Message, createMessageAction: (String) -> MessageAction) {
-        val response: String = findGame(message).map { (game, editedMessage) ->
-            commands.asSequence().mapNotNull { command ->
-                if (editedMessage.contentRaw.startsWith("!${command.name}")) {
-                    if (command.isReadOnly || game.hasWritePermission(editedMessage.member)) {
-                        command.handleMessage(game, editedMessage)
-                    } else {
-                        "sorry, you do not have the permission to use this command."
-                    } + if (command.isReadOnly && editedMessage.channelType != ChannelType.PRIVATE) {
-                        "\n\nᴰᶦᵈ ʸᵒᵘ ᵏⁿᵒʷˀ ʸᵒᵘ ᶜᵃⁿ ᵘˢᵉ ᵗʰᶦˢ ᶜᵒᵐᵐᵃⁿᵈ ᶦⁿ ᵖʳᶦᵛᵃᵗᵉ ᵐᵉˢˢᵃᵍᵉˢ"
-                    } else {
-                        ""
-                    }
+        val (game, editedMessage) = findGame(message).onFailure {
+            sendResponse(message, it, createMessageAction)
+            return
+        }
+        val command = commands.find { editedMessage.contentRaw.startsWith("!${it.name}") } ?: return
+        GlobalScope.launch {
+            val mainJob = async {
+                if (command.isReadOnly || game.hasWritePermission(editedMessage.member)) {
+                    command.handleMessage(game, editedMessage)
                 } else {
-                    null
+                    "sorry, you do not have the permission to use this command."
+                } + if (command.isReadOnly && editedMessage.channelType != ChannelType.PRIVATE) {
+                    "\n\nᴰᶦᵈ ʸᵒᵘ ᵏⁿᵒʷˀ ʸᵒᵘ ᶜᵃⁿ ᵘˢᵉ ᵗʰᶦˢ ᶜᵒᵐᵐᵃⁿᵈ ᶦⁿ ᵖʳᶦᵛᵃᵗᵉ ᵐᵉˢˢᵃᵍᵉˢ"
+                } else {
+                    ""
                 }
-            }.firstOrNull() ?: ""
-        }.message
+            }
+            val messageJob = async {
+                delay(2000)
+                createMessageAction("${message.author.asMention} processing your request, please wait...").mention(message.author).complete()
+            }
+            val response = mainJob.await()
+            val currentCreateMessageAction: (String) -> MessageAction = if (messageJob.isCompleted) {
+                messageJob.await().let { message -> { message.editMessage(it) } }
+            } else createMessageAction
+            messageJob.cancel()
+            if (response.isNotBlank()) {
+                currentCreateMessageAction("${message.author.asMention} $response").mention(message.author).queue {
+                    messageCache[message.idLong] = it
+                }
+            }
+        }
+    }
+
+    private fun sendResponse(message: Message, response: String, createMessageAction: (String) -> MessageAction) {
         if (response.isNotBlank()) {
             createMessageAction("${message.author.asMention} $response").mention(message.author).queue {
                 messageCache[message.idLong] = it

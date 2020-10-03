@@ -29,8 +29,8 @@ sealed class Result<T> {
 
     inline fun <R> flatMap(block: (T) -> Result<R>): Result<R> = fold(block, { @Suppress("UNCHECKED_CAST") (this as Failure<R>) })
 
-    inline fun onFailure(block: () -> T): T {
-        return fold({ it }, { block() })
+    inline fun onFailure(block: (String) -> T): T {
+        return fold({ it }, { block(it) })
     }
 
     inline fun mapFailure(block: (String) -> Result<T>): Result<T> {
