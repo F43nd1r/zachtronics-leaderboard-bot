@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 class SubmitCommand : Command {
     override val name: String = "submit"
-    override fun helpText(game: Game<*, *, *, *>): String = "!submit ${game.submissionSyntax}"
+    override fun helpText(game: Game<*, *, *, *>): String = game.submissionSyntax
     override val isReadOnly: Boolean = false
 
     override fun <C : Category<S, P>, S : Score, P : Puzzle, R : Record<S>> handleMessage(game: Game<C, S, P, R>, message: Message): String {

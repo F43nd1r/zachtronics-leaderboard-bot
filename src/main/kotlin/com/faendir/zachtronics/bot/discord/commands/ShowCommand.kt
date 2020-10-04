@@ -15,7 +15,7 @@ class ShowCommand : Command {
     val regex = Regex("!show\\s+(?<category>\\S+)\\s+(?<puzzle>.+)")
     val altRegex = Regex("!show\\s+(?<puzzle>.+)\\s+(?<category>\\S+)")
     override val name: String = "show"
-    override fun helpText(game: Game<*, *, *, *>): String = "!show <category> <puzzle>"
+    override fun helpText(game: Game<*, *, *, *>): String = "<category> <puzzle>"
     override val isReadOnly: Boolean = true
 
     override fun <C : Category<S, P>, S : Score, P : Puzzle, R : Record<S>> handleMessage(game: Game<C, S, P, R>, message: Message): String {
