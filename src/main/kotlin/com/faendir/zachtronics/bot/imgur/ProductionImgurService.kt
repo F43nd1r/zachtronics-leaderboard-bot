@@ -77,6 +77,7 @@ class ProductionImgurService(private val imgurProperties: ImgurProperties) : Img
             .setVideoCodec("libvpx")
             .setConstantRateFactor(10.0)
             .setVideoBitRate(8 * 1024 * 1024)
+            .addExtraArgs("-auto-alt-ref", "0")
             .done()
         ffmpeg.createJob(builder).run()
         return output
