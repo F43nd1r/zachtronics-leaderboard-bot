@@ -21,8 +21,7 @@ class GenericHelp(@Lazy private val commands: List<Command>, @Lazy private val t
             |Available Commands:
             |```
             |${availableCommands.joinToString("\n") { "!${it.name} ${it.helpText(game)}" }}
-            |```
-            |${getOtherCommandsText(otherCommands, message)}
+            |```${getOtherCommandsText(otherCommands, message)}
             |To learn more, try `!help <topic>` with one of the following:
             |```
             |${topics.joinToString("\n") { it.id }}
@@ -37,7 +36,6 @@ class GenericHelp(@Lazy private val commands: List<Command>, @Lazy private val t
             |```
             |${otherCommands.joinToString("\n") { "!${it.name}" }}
             |```
-            |
             """.trimMargin()
         } else {
             ""

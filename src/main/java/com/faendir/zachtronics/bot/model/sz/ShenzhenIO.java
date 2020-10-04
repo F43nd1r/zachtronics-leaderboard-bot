@@ -39,7 +39,7 @@ public class ShenzhenIO implements Game<SzCategory, SzScore, SzPuzzle, SzRecord>
                                               .map(c -> c.getDisplayName() + " (" + c.getContentDescription() + ")")
                                               .collect(Collectors.joining("\n", "```", "```"));
     @Getter
-    private final String scoreHelp = "Shores are in the format cost/power/lines.";
+    private final String scoreHelp = "Scores are in the format cost/power/lines.";
 
     private static final Pattern SUBMISSION_REGEX = Pattern.compile(
             "!submit\\s+" +

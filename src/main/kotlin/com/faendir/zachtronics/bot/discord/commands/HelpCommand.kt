@@ -18,8 +18,12 @@ class HelpCommand(private val topics: List<HelpTopic>) : Command {
     override fun <C : Category<S, P>, S : Score, P : Puzzle, R : Record<S>> handleMessage(game: Game<C, S, P, R>, message: Message): String {
         return message.match(regex).flatMap { command ->
             val topicId = command.groups["topic"]?.value ?: ""
-            topics.find { it.id.equals(topicId, ignoreCase = true) }?.let { Result.success(it.getHelpText(game, message)) }
-                ?: Result.parseFailure("I can't help you with " + "\"$topicId\". Try one of these:\n```${topics.joinToString("\n") { it.id }}```")
+            topics.find { it.id.equals(topicId, ignoreCase = true) }?.let { Result.success(it.getHelpText(game, message)) } ?: Result.parseFailure("""
+                    |I can't help you with "$topicId". Try one of these:
+                    |```
+                    |${topics.filter { it.id.isNotBlank() }.joinToString("\n") { it.id }}
+                    |```
+                    """.trimMargin())
         }.message
     }
 }
