@@ -8,11 +8,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Set;
-import java.util.function.ToIntFunction;
 
 import static com.faendir.zachtronics.bot.model.sc.ScCategory.ScScoreComparators.*;
 import static com.faendir.zachtronics.bot.model.sc.ScCategory.ScScoreFormatStrings.*;
 import static com.faendir.zachtronics.bot.model.sc.ScType.*;
+import static com.faendir.zachtronics.bot.utils.Utils.makeComparator3;
 
 @RequiredArgsConstructor
 public enum ScCategory implements Category<ScScore, ScPuzzle> {
@@ -54,14 +54,10 @@ public enum ScCategory implements Category<ScScore, ScPuzzle> {
     }
 
     static class ScScoreComparators {
-        private static <T> Comparator<T> makeComparator3(ToIntFunction<T> c1, ToIntFunction<T> c2, ToIntFunction<T> c3) {
-            return Comparator.comparingInt(c1).thenComparingInt(c2).thenComparingInt(c3);
-        }
         static final Comparator<ScScore> comparatorCRS = makeComparator3(ScScore::getCycles, ScScore::getReactors, ScScore::getSymbols);
         static final Comparator<ScScore> comparatorSRC = makeComparator3(ScScore::getSymbols, ScScore::getReactors, ScScore::getCycles);
         static final Comparator<ScScore> comparatorRCS = makeComparator3(ScScore::getReactors, ScScore::getCycles, ScScore::getSymbols);
         static final Comparator<ScScore> comparatorRSC = makeComparator3(ScScore::getReactors, ScScore::getSymbols, ScScore::getCycles);
-
     }
 
     static class ScScoreFormatStrings {

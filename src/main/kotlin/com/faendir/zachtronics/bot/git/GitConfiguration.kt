@@ -15,4 +15,7 @@ class GitConfiguration(private val gitProperties: GitProperties) {
 
     @Bean("configRepository")
     fun configRepository() = GitRepository(gitProperties, "config", "https://github.com/F43nd1r/zachtronics-leaderboard-bot-config.git")
+
+    @Bean("szLeaderboardRepository")
+    fun szLeaderboardRepository() = GitRepository(gitProperties, "shenzhenIO-leaderboard", "https://github.com/12345ieee/shenzhenIO-leaderboard.git")
 }

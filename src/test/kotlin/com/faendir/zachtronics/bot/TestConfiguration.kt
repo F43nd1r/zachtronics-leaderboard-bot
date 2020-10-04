@@ -34,6 +34,11 @@ class TestConfiguration(private val gitProperties: GitProperties) {
         return createTestGitRepository("repositories/config")
     }
 
+    @Bean("szLeaderboardRepository")
+    fun szLeaderboardRepository(): GitRepository {
+        return createTestGitRepository("repositories/shenzhenIO-leaderboard")
+    }
+
     @Primary
     @Bean
     fun redditService(): RedditService {
