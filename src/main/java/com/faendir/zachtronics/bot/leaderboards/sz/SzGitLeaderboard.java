@@ -54,8 +54,8 @@ public class SzGitLeaderboard implements Leaderboard<SzCategory, SzScore, SzPuzz
             int cost = Integer.parseInt(it.next().replaceFirst("^.+] ", "")) / 100;
             int power = Integer.parseInt(it.next().replaceFirst("^.+] ", ""));
             int lines = Integer.parseInt(it.next().replaceFirst("^.+] ", ""));
-            String link = "https://raw.githubusercontent.com/12345ieee/shenzhenIO-leaderboard/master/first_campaign/" +
-                          solutionFile.getFileName();
+            String link = "https://raw.githubusercontent.com/12345ieee/shenzhenIO-leaderboard/master/" +
+                          puzzle.getGroup().getRepoFolder() + "/" + solutionFile.getFileName();
             return new SzRecord(new SzScore(cost, power, lines), author, link);
         }
         catch (IOException e) {

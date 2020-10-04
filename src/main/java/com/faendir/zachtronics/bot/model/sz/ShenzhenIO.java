@@ -29,10 +29,10 @@ public class ShenzhenIO implements Game<SzCategory, SzScore, SzPuzzle, SzRecord>
     @Getter
     private final List<Leaderboard<SzCategory, SzScore, SzPuzzle, SzRecord>> leaderboards;
     @Getter
-    private final String submissionSyntax = "<puzzle> (<cost/power/lines>) by <author> <youtube link>";
+    private final String submissionSyntax = "<puzzle> (<cost/power/lines>) by <author> <link>";
     @Getter
-    private final String categoryHelp = "Categories are named by Primary metric, then Secondary, " +
-                                        "ties broken by the tertiary.\n" +
+    private final String categoryHelp = "Categories are named by Primary metric, then Secondary.\n" +
+                                        "Ties in both are broken by the remaining metric.\n" +
                                         "\n" +
                                         "All categories are:\n" +
                                         Arrays.stream(SzCategory.values())
