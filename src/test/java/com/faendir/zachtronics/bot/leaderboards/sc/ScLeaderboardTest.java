@@ -1,14 +1,16 @@
 package com.faendir.zachtronics.bot.leaderboards.sc;
 
 import com.faendir.zachtronics.bot.BotTest;
+import com.faendir.zachtronics.bot.leaderboards.UpdateResult;
 import com.faendir.zachtronics.bot.model.sc.ScCategory;
 import com.faendir.zachtronics.bot.model.sc.ScPuzzle;
 import com.faendir.zachtronics.bot.model.sc.ScRecord;
+import com.faendir.zachtronics.bot.model.sc.ScScore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 @BotTest
 public class ScLeaderboardTest {
@@ -36,6 +38,7 @@ public class ScLeaderboardTest {
     }
 
     @Test
+    @Disabled("Massive test only for manual testing")
     public void testFullIO() {
         for (ScPuzzle p : ScPuzzle.values()) {
             for (ScCategory c : ScCategory.values()) {
@@ -47,6 +50,21 @@ public class ScLeaderboardTest {
             }
             System.out.println("Done " + p.getDisplayName());
         }
+    }
+
+    @Test
+    public void testUpdate() {
+        // (**817**/2/104) | ← | (**819**/2/44)
+        ScPuzzle p = ScPuzzle.sensing_4;
+        ScScore s = new ScScore(819, 2, 43);
+        ScRecord r = new ScRecord(s, "auth", "lnk", false);
+
+        UpdateResult<ScCategory, ScScore> ur = scLeaderboard.update(p, r);
+        assertTrue(ur instanceof UpdateResult.BetterExists);
+
+        s.setPrecognitive(false);
+        ur = scLeaderboard.update(p, r);
+        assertTrue(ur instanceof UpdateResult.Success);
     }
 
 }
