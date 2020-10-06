@@ -6,7 +6,7 @@ import com.faendir.zachtronics.bot.model.sc.ScCategory;
 import com.faendir.zachtronics.bot.model.sc.ScPuzzle;
 import com.faendir.zachtronics.bot.model.sc.ScRecord;
 import com.faendir.zachtronics.bot.model.sc.ScScore;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -38,7 +38,7 @@ public class ScLeaderboardTest {
     }
 
     @Test
-    @Ignore("Massive test only for manual testing")
+    @Disabled("Massive test only for manual testing")
     public void testFullIO() {
         for (ScPuzzle p : ScPuzzle.values()) {
             for (ScCategory c : ScCategory.values()) {
