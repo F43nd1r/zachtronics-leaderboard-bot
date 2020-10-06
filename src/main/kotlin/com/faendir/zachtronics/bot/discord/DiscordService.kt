@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.events.message.MessageUpdateEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.restaction.MessageAction
 import org.springframework.stereotype.Service
+import java.util.concurrent.atomic.AtomicBoolean
 
 @Service
 class DiscordService(private val jda: JDA, private val commands: List<Command>, private val games: List<Game<*, *, *, *>>) {
@@ -64,20 +65,23 @@ class DiscordService(private val jda: JDA, private val commands: List<Command>, 
                     ""
                 }
             }
+            val startedMessageSend = AtomicBoolean()
             val messageJob = async {
                 delay(2000)
-                createMessageAction("${message.author.asMention} processing your request, please wait...").mention(message.author).complete()
-            }
-            val response = mainJob.await()
-            val currentCreateMessageAction: (String) -> MessageAction = if (messageJob.isCompleted) {
-                messageJob.await().let { message -> { message.editMessage(it) } }
-            } else createMessageAction
-            messageJob.cancel()
-            if (response.isNotBlank()) {
-                currentCreateMessageAction("${message.author.asMention} $response").mention(message.author).queue {
-                    messageCache[message.idLong] = it
+                if(startedMessageSend.compareAndSet(false, true)) {
+                    createMessageAction("${message.author.asMention} processing your request, please wait...").mention(message.author).complete()
+                } else {
+                    null
                 }
             }
+            val response = mainJob.await()
+            val currentCreateMessageAction: (String) -> MessageAction = if (startedMessageSend.compareAndSet(true, true)) {
+                messageJob.await().let { message -> { message!!.editMessage(it) } }
+            } else {
+                messageJob.cancel()
+                createMessageAction
+            }
+            sendResponse(message, response, currentCreateMessageAction)
         }
     }
 
