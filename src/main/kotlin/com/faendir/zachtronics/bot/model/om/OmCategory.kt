@@ -65,8 +65,8 @@ enum class OmCategory(
 
     fun normalizeScore(score: OmScore): OmScore = OmScore(sortScoreParts(score.parts.asIterable()).map { it.key to it.value })
 
-    fun sortScoreParts(parts: Iterable<Map.Entry<OmScorePart, Double>>): Iterable<Map.Entry<OmScorePart, Double>> = parts.sortedBy {
-        check(requiredParts.contains(it.key))
-        requiredParts.indexOf(it.key)
+    fun sortScoreParts(parts: Iterable<Map.Entry<OmScorePart, Double>>): Iterable<Map.Entry<OmScorePart, Double>> {
+        check(parts.map { it.key }.containsAll(requiredParts))
+        return requiredParts.map { scorePart -> parts.first { it.key == scorePart } }
     }
 }
