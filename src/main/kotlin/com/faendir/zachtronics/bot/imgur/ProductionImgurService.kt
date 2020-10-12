@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service
 import java.io.File
 import java.io.IOException
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
 
 @Service
@@ -21,12 +22,14 @@ class ProductionImgurService(private val imgurProperties: ImgurProperties) : Img
     companion object {
         private const val TEN_MB = 10 * 1000 * 1000
         private val logger = LoggerFactory.getLogger(ProductionImgurService::class.java)
+        private val whitelistedHosts = listOf("i.imgur.com", "youtu.be", "youtube.com", "cdn.discordapp.com")
     }
 
     private val ffmpeg = FFmpegExecutor(FFmpeg("/usr/bin/ffmpeg"), FFprobe("/usr/bin/ffprobe"))
 
     override fun tryRehost(link: String): String {
-        if (link.startsWith("https://i.imgur.com/")) return link
+        val host = URI(link).host
+        if(whitelistedHosts.any { host.contains(it, ignoreCase = true) }) return link
         return try {
             val filename = link.substringAfterLast("/")
             val input = File.createTempFile(filename.substringBeforeLast("."), ".${filename.substringAfterLast(".")}")
