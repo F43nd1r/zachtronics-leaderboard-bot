@@ -1,12 +1,13 @@
 package com.faendir.zachtronics.bot.leaderboards.om
 
 import com.faendir.zachtronics.bot.BotTest
-import com.faendir.zachtronics.bot.leaderboards.UpdateResult
-import com.faendir.zachtronics.bot.model.om.OmCategory
-import com.faendir.zachtronics.bot.model.om.OmPuzzle
-import com.faendir.zachtronics.bot.model.om.OmRecord
-import com.faendir.zachtronics.bot.model.om.OmScore
-import com.faendir.zachtronics.bot.model.om.OmScorePart.*
+import com.faendir.zachtronics.bot.model.UpdateResult
+import com.faendir.zachtronics.bot.om.leaderboards.OmGithubPagesLeaderboard
+import com.faendir.zachtronics.bot.om.model.OmCategory
+import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.om.model.OmScore
+import com.faendir.zachtronics.bot.om.model.OmScorePart.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import strikt.api.expectThat

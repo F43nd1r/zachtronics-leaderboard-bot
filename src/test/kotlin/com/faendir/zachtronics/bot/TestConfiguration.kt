@@ -1,12 +1,12 @@
 package com.faendir.zachtronics.bot
 
-import com.faendir.zachtronics.bot.config.GitProperties
-import com.faendir.zachtronics.bot.git.GitRepository
-import com.faendir.zachtronics.bot.git.TestGitRepository
-import com.faendir.zachtronics.bot.imgur.ImgurService
-import com.faendir.zachtronics.bot.imgur.TestImgurService
-import com.faendir.zachtronics.bot.reddit.RedditService
-import com.faendir.zachtronics.bot.reddit.TestRedditService
+import com.faendir.zachtronics.bot.main.config.GitProperties
+import com.faendir.zachtronics.bot.main.git.GitRepository
+import com.faendir.zachtronics.bot.main.git.TestGitRepository
+import com.faendir.zachtronics.bot.om.imgur.ImgurService
+import com.faendir.zachtronics.bot.om.imgur.TestImgurService
+import com.faendir.zachtronics.bot.main.reddit.RedditService
+import com.faendir.zachtronics.bot.main.reddit.TestRedditService
 import net.dv8tion.jda.api.JDA
 import org.eclipse.jgit.api.Git
 import org.springframework.boot.test.context.TestConfiguration

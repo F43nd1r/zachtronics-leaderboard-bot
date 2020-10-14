@@ -48,7 +48,7 @@ fun Message.match(regex: Regex): Result<MatchResult> {
     return regex.matchEntire(contentRaw)?.let { success(it) } ?: parseFailure("I could not parse your command. Type `!help` to see the syntax.")
 }
 
-fun Message.changeContent(content: String) : Message = ChangedMessage(this, content)
+fun Message.changeContent(content: String): Message = ChangedMessage(this, content)
 
 private class ChangedMessage(wrap: Message, private val content: String) : Message by wrap {
     override fun getContentRaw(): String = content

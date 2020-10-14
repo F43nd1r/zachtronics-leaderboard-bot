@@ -1,11 +1,12 @@
 package com.faendir.zachtronics.bot.leaderboards.sc;
 
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.leaderboards.UpdateResult;
-import com.faendir.zachtronics.bot.model.sc.ScCategory;
-import com.faendir.zachtronics.bot.model.sc.ScPuzzle;
-import com.faendir.zachtronics.bot.model.sc.ScRecord;
-import com.faendir.zachtronics.bot.model.sc.ScScore;
+import com.faendir.zachtronics.bot.model.UpdateResult;
+import com.faendir.zachtronics.bot.sc.model.ScCategory;
+import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
+import com.faendir.zachtronics.bot.sc.model.ScRecord;
+import com.faendir.zachtronics.bot.sc.model.ScScore;
+import com.faendir.zachtronics.bot.sc.leaderboards.ScRedditLeaderboard;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
