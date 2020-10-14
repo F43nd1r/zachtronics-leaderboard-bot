@@ -1,7 +1,8 @@
-package com.faendir.zachtronics.bot.main.discord.commands;
+package com.faendir.zachtronics.bot.sc.discord;
 
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.generic.discord.Command;
+import com.faendir.zachtronics.bot.sc.SpaceChemMarker;
 import com.faendir.zachtronics.bot.sc.model.SpaceChem;
 import gnu.trove.set.hash.TLongHashSet;
 import net.dv8tion.jda.api.entities.Message;
@@ -16,7 +17,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 
-@BotTest
+@BotTest(SpaceChemMarker.SpaceChemConfiguration.class)
 public class CommandTest {
 
     @Autowired

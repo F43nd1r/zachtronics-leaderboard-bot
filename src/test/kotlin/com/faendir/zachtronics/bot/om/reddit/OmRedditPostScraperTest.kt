@@ -1,13 +1,13 @@
-package com.faendir.zachtronics.bot.main.reddit.om
+package com.faendir.zachtronics.bot.om.reddit
 
 import com.faendir.zachtronics.bot.BotTest
 import com.faendir.zachtronics.bot.om.leaderboards.OmRedditWikiLeaderboard
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmScorePart
-import com.faendir.zachtronics.bot.om.reddit.OmRedditPostScraper
 import com.faendir.zachtronics.bot.main.reddit.Comment
 import com.faendir.zachtronics.bot.main.reddit.RedditService
+import com.faendir.zachtronics.bot.om.OpusMagnumConfiguration
 import com.faendir.zachtronics.bot.utils.Forest
 import com.faendir.zachtronics.bot.utils.Tree
 import com.ninjasquad.springmockk.SpykBean
@@ -22,7 +22,7 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalUnit
 import java.util.*
 
-@BotTest
+@BotTest(OpusMagnumConfiguration::class)
 internal class OmRedditPostScraperTest {
 
     @Autowired

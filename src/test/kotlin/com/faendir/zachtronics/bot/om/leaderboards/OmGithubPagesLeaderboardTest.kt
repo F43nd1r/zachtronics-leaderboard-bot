@@ -1,8 +1,9 @@
-package com.faendir.zachtronics.bot.leaderboards.om
+package com.faendir.zachtronics.bot.om.leaderboards
 
 import com.faendir.zachtronics.bot.BotTest
+import com.faendir.zachtronics.bot.generic.GenericConfiguration
 import com.faendir.zachtronics.bot.model.UpdateResult
-import com.faendir.zachtronics.bot.om.leaderboards.OmGithubPagesLeaderboard
+import com.faendir.zachtronics.bot.om.OpusMagnumConfiguration
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
@@ -10,10 +11,11 @@ import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmScorePart.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.test.context.ContextConfiguration
 import strikt.api.expectThat
 import strikt.assertions.*
 
-@BotTest
+@BotTest(OpusMagnumConfiguration::class)
 internal class OmGithubPagesLeaderboardTest {
 
     @Autowired

@@ -1,5 +1,6 @@
 package com.faendir.zachtronics.bot.main
 
+import com.faendir.zachtronics.bot.generic.GenericConfiguration
 import com.faendir.zachtronics.bot.generic.discord.Command
 import com.faendir.zachtronics.bot.model.Game
 import com.faendir.zachtronics.bot.model.Leaderboard
@@ -14,7 +15,7 @@ class GameContext(marker: GamePackageMarker, parent: ApplicationContext) {
 
     private val id = marker.javaClass.name
     private val context = AnnotationConfigApplicationContext().apply {
-        scan(marker.scanPackage, "com.faendir.zachtronics.bot.generic")
+        register(marker.packageConfiguration, GenericConfiguration::class.java)
         this.parent = parent
         refresh()
     }

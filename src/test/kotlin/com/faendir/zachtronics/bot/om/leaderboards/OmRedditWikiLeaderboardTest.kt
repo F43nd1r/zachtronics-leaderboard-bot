@@ -1,8 +1,8 @@
-package com.faendir.zachtronics.bot.leaderboards.om
+package com.faendir.zachtronics.bot.om.leaderboards
 
 import com.faendir.zachtronics.bot.BotTest
 import com.faendir.zachtronics.bot.model.UpdateResult
-import com.faendir.zachtronics.bot.om.leaderboards.OmRedditWikiLeaderboard
+import com.faendir.zachtronics.bot.om.OpusMagnumConfiguration
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import strikt.api.expectThat
 import strikt.assertions.*
 
-@BotTest
+@BotTest(OpusMagnumConfiguration::class)
 internal class OmRedditWikiLeaderboardTest {
 
     @Autowired

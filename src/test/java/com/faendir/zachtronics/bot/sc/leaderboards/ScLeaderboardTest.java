@@ -1,7 +1,8 @@
-package com.faendir.zachtronics.bot.leaderboards.sc;
+package com.faendir.zachtronics.bot.sc.leaderboards;
 
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.model.UpdateResult;
+import com.faendir.zachtronics.bot.sc.SpaceChemMarker;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
@@ -13,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.*;
 
-@BotTest
+@BotTest(SpaceChemMarker.SpaceChemConfiguration.class)
 public class ScLeaderboardTest {
 
     @Autowired
