@@ -3,6 +3,7 @@ package com.faendir.zachtronics.bot.sz;
 import com.faendir.zachtronics.bot.main.GamePackageMarker;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 @SuppressWarnings("unused")
 public class ShenzhenIOMarker implements GamePackageMarker {
@@ -12,6 +13,7 @@ public class ShenzhenIOMarker implements GamePackageMarker {
         return ShenzhenIOConfiguration.class;
     }
 
+    @Configuration
     @ComponentScan
     static class ShenzhenIOConfiguration {
     }

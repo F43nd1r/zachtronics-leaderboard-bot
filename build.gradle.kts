@@ -6,7 +6,7 @@ plugins {
     kotlin("plugin.serialization") version "1.4.0"
     id("org.springframework.boot") version "2.3.3.RELEASE"
     id("io.spring.dependency-management") version "1.0.7.RELEASE"
-    id("org.jetbrains.kotlin.plugin.spring") version "1.4.0"
+    kotlin("plugin.spring") version "1.4.0"
     id("com.palantir.docker") version "0.25.0"
     id("io.freefair.lombok") version "5.2.1"
 }
