@@ -39,11 +39,6 @@ class OpusMagnum : Game<OmCategory, OmScore, OmPuzzle, OmRecord> {
         return parseFailure("you need to specify score part identifiers when using more than four values.")
     }
 
-    internal fun findLink(command: MatchResult, message: Message): Result<String> {
-        return (command.groups["link"]?.value ?: message.attachments.firstOrNull()?.url)?.let { success(it) }
-            ?: parseFailure("I could not find a valid link or attachment in your message.")
-    }
-
     override fun parseCategory(name: String): List<OmCategory> =
         OmCategory.values().filter { category -> category.displayNames.any { it.equals(name, ignoreCase = true) } }
 

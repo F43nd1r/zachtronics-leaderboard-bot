@@ -142,7 +142,7 @@ class OmRedditPostScraper(private val redditService: RedditService, private val 
                     update = true
                     leaderboard.update(puzzle, OmRecord(score, link, comment.author))
                 }
-                val successes = results.filterIsInstance<UpdateResult.Success<*, *>>()
+                val successes = results.filterIsInstance<UpdateResult.Success>()
                 if (successes.isNotEmpty()) {
                     sendDiscordMessage(opusMagnum.discordChannel, "New record by ${comment.author} on reddit: ${puzzle.displayName} ${
                         successes.flatMap { it.oldScores.keys }.map { it.displayName }

@@ -14,10 +14,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
-public class ScSubmitCommand extends AbstractSubmitCommand<ScCategory, ScScore, ScPuzzle, ScRecord> {
+public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
     private final SpaceChem spaceChem;
 
-    public ScSubmitCommand(SpaceChem spaceChem, List<Leaderboard<ScCategory, ScScore, ScPuzzle, ScRecord>> leaderboards) {
+    public ScSubmitCommand(SpaceChem spaceChem, List<Leaderboard<?, ?, ScPuzzle, ScRecord>> leaderboards) {
         super(leaderboards);
         this.spaceChem = spaceChem;
     }

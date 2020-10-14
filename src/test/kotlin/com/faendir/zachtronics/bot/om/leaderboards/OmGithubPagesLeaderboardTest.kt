@@ -1,7 +1,6 @@
 package com.faendir.zachtronics.bot.om.leaderboards
 
 import com.faendir.zachtronics.bot.BotTest
-import com.faendir.zachtronics.bot.generic.GenericConfiguration
 import com.faendir.zachtronics.bot.model.UpdateResult
 import com.faendir.zachtronics.bot.om.OpusMagnumConfiguration
 import com.faendir.zachtronics.bot.om.model.OmCategory
@@ -11,7 +10,6 @@ import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmScorePart.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.ContextConfiguration
 import strikt.api.expectThat
 import strikt.assertions.*
 
@@ -34,19 +32,19 @@ internal class OmGithubPagesLeaderboardTest {
     @Test
     fun update1() {
         val record = OmRecord(OmScore(AREA to 200.0, CYCLES to 200.0, COST to 200.0), "http://fake.link")
-        expectThat(leaderboard.update(OmPuzzle.STABILIZED_WATER, record)).isA<UpdateResult.NotSupported<*, *>>()
+        expectThat(leaderboard.update(OmPuzzle.STABILIZED_WATER, record)).isA<UpdateResult.NotSupported>()
     }
 
     @Test
     fun update2() {
         val record = OmRecord(OmScore(HEIGHT to 200.0, CYCLES to 200.0, COST to 200.0), "http://fake.link")
-        expectThat(leaderboard.update(OmPuzzle.ABLATIVE_CRYSTAL, record)).isA<UpdateResult.Success<*, *>>()
+        expectThat(leaderboard.update(OmPuzzle.ABLATIVE_CRYSTAL, record)).isA<UpdateResult.Success>()
     }
 
     @Test
     fun update3() {
         val record = OmRecord(OmScore(HEIGHT to 200.0, CYCLES to 200.0, COST to 200.0), "http://fake.link")
-        expectThat(leaderboard.update(OmPuzzle.STABILIZED_WATER, record)).isA<UpdateResult.BetterExists<*, *>>().and {
+        expectThat(leaderboard.update(OmPuzzle.STABILIZED_WATER, record)).isA<UpdateResult.BetterExists>().and {
             get { scores.containsKey(OmCategory.HEIGHT) }.isTrue()
             get { scores[OmCategory.HEIGHT] }.isNotNull()
         }

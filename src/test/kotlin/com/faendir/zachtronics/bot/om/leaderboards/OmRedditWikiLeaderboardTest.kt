@@ -32,19 +32,19 @@ internal class OmRedditWikiLeaderboardTest {
     @Test
     fun update1() {
         val record = OmRecord(OmScore(HEIGHT to 200.0, CYCLES to 200.0, COST to 200.0), "http://fake.link")
-        expectThat(leaderboard.update(OmPuzzle.STABILIZED_WATER, record)).isA<UpdateResult.NotSupported<*, *>>()
+        expectThat(leaderboard.update(OmPuzzle.STABILIZED_WATER, record)).isA<UpdateResult.NotSupported>()
     }
 
     @Test
     fun update2() {
         val record = OmRecord(OmScore(COST to 200.0, CYCLES to 200.0, AREA to 200.0), "http://fake.link")
-        expectThat(leaderboard.update(OmPuzzle.ABLATIVE_CRYSTAL, record)).isA<UpdateResult.Success<*, *>>()
+        expectThat(leaderboard.update(OmPuzzle.ABLATIVE_CRYSTAL, record)).isA<UpdateResult.Success>()
     }
 
     @Test
     fun update3() {
         val record = OmRecord(OmScore(COST to 200.0, CYCLES to 200.0, AREA to 200.0), "http://fake.link")
-        expectThat(leaderboard.update(OmPuzzle.STABILIZED_WATER, record)).isA<UpdateResult.BetterExists<*, *>>().and {
+        expectThat(leaderboard.update(OmPuzzle.STABILIZED_WATER, record)).isA<UpdateResult.BetterExists>().and {
             get { scores.containsKey(OmCategory.GC) }.isTrue()
             get { scores[OmCategory.GC] }.isNotNull()
         }

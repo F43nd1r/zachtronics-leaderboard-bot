@@ -7,7 +7,6 @@ import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
-import com.faendir.zachtronics.bot.sc.leaderboards.ScRedditLeaderboard;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +60,7 @@ public class ScLeaderboardTest {
         ScScore s = new ScScore(819, 2, 43);
         ScRecord r = new ScRecord(s, "auth", "lnk", false);
 
-        UpdateResult<ScCategory, ScScore> ur = scLeaderboard.update(p, r);
+        UpdateResult ur = scLeaderboard.update(p, r);
         assertTrue(ur instanceof UpdateResult.BetterExists);
 
         s.setPrecognitive(false);

@@ -57,7 +57,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScScore, ScP
 
     @NotNull
     @Override
-    public UpdateResult<ScCategory, ScScore> update(@NotNull ScPuzzle puzzle, @NotNull ScRecord record) {
+    public UpdateResult update(@NotNull ScPuzzle puzzle, @NotNull ScRecord record) {
         String[] lines = redditService.getWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
         Pattern puzzleRegex = Pattern.compile("^\\s*\\|\\s*" + Pattern.quote(puzzle.getDisplayName()));
 
@@ -142,10 +142,10 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScScore, ScP
             redditService.updateWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage(), String.join("\r\n", lines),
                                          puzzle.getDisplayName() + " " + record.getScore().toDisplayString() + " by " +
                                          record.getAuthor());
-            return new UpdateResult.Success<>(beatenScores);
+            return new UpdateResult.Success(beatenScores);
         }
         else {
-            return new UpdateResult.BetterExists<>(Collections.emptyMap());
+            return new UpdateResult.BetterExists(Collections.emptyMap());
         }
     }
 
