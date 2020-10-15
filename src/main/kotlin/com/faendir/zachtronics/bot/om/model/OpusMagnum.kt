@@ -20,7 +20,7 @@ class OpusMagnum : Game<OmCategory, OmScore, OmPuzzle, OmRecord> {
 
     internal fun parseScore(puzzle: OmPuzzle, string: String): Result<OmScore> {
         if (string.isBlank()) return parseFailure("I didn't find a score in your command.")
-        val parts = string.split('/')
+        val parts = string.split(Regex("[/-]"))
         if (parts.size < 3) return parseFailure("your score must have at least three parts.")
         if (string.contains(Regex("[a-zA-Z]"))) {
             return success(OmScore((parts.map { OmScorePart.parse(it) ?: return parseFailure("I didn't understand \"$it\".") })))

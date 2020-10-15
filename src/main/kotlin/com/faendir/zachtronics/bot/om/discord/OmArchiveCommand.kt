@@ -5,11 +5,8 @@ import com.faendir.om.sp.SolutionParser
 import com.faendir.om.sp.solution.SolvedSolution
 import com.faendir.zachtronics.bot.generic.discord.AbstractArchiveCommand
 import com.faendir.zachtronics.bot.model.Archive
-import com.faendir.zachtronics.bot.om.model.OmScore
-import com.faendir.zachtronics.bot.om.model.OmScorePart
+import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.om.model.OmScorePart.*
-import com.faendir.zachtronics.bot.om.model.OmSolution
-import com.faendir.zachtronics.bot.om.model.OpusMagnum
 import com.faendir.zachtronics.bot.utils.Result
 import com.faendir.zachtronics.bot.utils.and
 import com.faendir.zachtronics.bot.utils.match
@@ -21,7 +18,7 @@ import java.io.ByteArrayInputStream
 
 @Component
 class OmArchiveCommand(archive: Archive<OmSolution>, private val opusMagnum: OpusMagnum) : AbstractArchiveCommand<OmSolution>(archive) {
-    private val regex = Regex("(?<score>\\S+)\\s*(?<link>\\S+)?")
+    private val regex = Regex("!archive\\s+(?<score>\\S+)(\\s+(?<link>\\S+))?")
 
     override fun parseSolution(message: Message): Result<OmSolution> {
         return message.match(regex).flatMap { command ->
@@ -32,17 +29,17 @@ class OmArchiveCommand(archive: Archive<OmSolution>, private val opusMagnum: Opu
                     return@handle Result.parseFailure("I could not parse your solution")
                 }
                 if (solution !is SolvedSolution) return@handle Result.parseFailure("only solved solution are accepted")
-                opusMagnum.parsePuzzle(solution.puzzle).map { puzzle ->
-                    val parts = linkedMapOf(COST to solution.cost.toDouble(),
-                        CYCLES to solution.cycles.toDouble(),
-                        AREA to solution.area.toDouble(),
-                        INSTRUCTIONS to solution.instructions.toDouble())
-                    if (scorePart != null) {
-                        parts[scorePart.first] = scorePart.second
-                        if(scorePart.first == OVERLAP_CYCLES) parts.remove(CYCLES)
-                    }
-                    OmSolution(puzzle, OmScore(parts), DslGenerator.toDsl(solution))
+                val puzzle = OmPuzzle.values().find { it.id == solution.puzzle }
+                    ?: return@handle Result.parseFailure("I do not know the puzzle \"${solution.puzzle}\"")
+                val parts = linkedMapOf(COST to solution.cost.toDouble(),
+                    CYCLES to solution.cycles.toDouble(),
+                    AREA to solution.area.toDouble(),
+                    INSTRUCTIONS to solution.instructions.toDouble())
+                if (scorePart != null) {
+                    parts[scorePart.first] = scorePart.second
+                    if (scorePart.first == OVERLAP_CYCLES) parts.remove(CYCLES)
                 }
+                Result.success(OmSolution(puzzle, OmScore(parts), DslGenerator.toDsl(solution)))
             }
         }
     }
@@ -54,9 +51,9 @@ class OmArchiveCommand(archive: Archive<OmSolution>, private val opusMagnum: Opu
 
     private fun findScorePart(command: MatchResult): Result<Pair<OmScorePart, Double>?> {
         val scoreString = command.groups["score"]!!.value
-        if (scoreString == "#") return Result.success(null)
+        if (scoreString == "?") return Result.success(null)
         return OmScorePart.parse(scoreString)?.let { Result.success(it) } ?: Result.parseFailure("I didn't understand \"$scoreString\".")
     }
 
-    override val helpText: String = "<primary score(e.g. 3.5w or 45o) -or- #(load from file)> <solution link>(or attach file to message)"
+    override val helpText: String = "<primary score(e.g. 3.5w or 45o) -or- ?(load from file)> <solution link>(or attach file to message)"
 }
