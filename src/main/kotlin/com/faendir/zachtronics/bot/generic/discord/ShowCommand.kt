@@ -21,10 +21,10 @@ class ShowCommand<C : Category<S, P>, S : Score, P : Puzzle, R : Record<S>>(@Laz
     override val isReadOnly: Boolean = true
 
     override fun handleMessage(message: Message): String {
-        val firstResult = message.match(regex).flatMap { game.parseCommand(it) }
-        //try permuted arguments on failure
-        val secondResult = firstResult.mapFailure { message.match(altRegex).flatMap { game.parseCommand(it) } }
-        return secondResult.mapFailure { /*use error message of original regex*/ firstResult }.message
+        return message.match(regex).flatMap { game.parseCommand(it) }.onFailureTry {
+            //try permuted arguments on failure
+            message.match(altRegex).flatMap { game.parseCommand(it) }
+        }.message
     }
 
     private fun Game<C, S, P, R>.parseCommand(command: MatchResult): Result<String> {

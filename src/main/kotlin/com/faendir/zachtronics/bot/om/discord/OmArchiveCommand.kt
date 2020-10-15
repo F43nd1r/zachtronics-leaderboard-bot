@@ -22,26 +22,27 @@ class OmArchiveCommand(archive: Archive<OmSolution>, private val opusMagnum: Opu
 
     override fun parseSolution(message: Message): Result<OmSolution> {
         return message.match(regex).flatMap { command ->
-            findScorePart(command).and { findLink(command, message) }.flatMap handle@{ (scorePart, link) ->
-                val solution = try {
-                    SolutionParser.parse(ByteArrayInputStream(CUrl(link).exec()).asInput())
-                } catch (e: Exception) {
-                    return@handle Result.parseFailure("I could not parse your solution")
-                }
-                if (solution !is SolvedSolution) return@handle Result.parseFailure("only solved solution are accepted")
-                val puzzle = OmPuzzle.values().find { it.id == solution.puzzle }
-                    ?: return@handle Result.parseFailure("I do not know the puzzle \"${solution.puzzle}\"")
-                val parts = linkedMapOf(COST to solution.cost.toDouble(),
-                    CYCLES to solution.cycles.toDouble(),
-                    AREA to solution.area.toDouble(),
-                    INSTRUCTIONS to solution.instructions.toDouble())
-                if (scorePart != null) {
-                    parts[scorePart.first] = scorePart.second
-                    if (scorePart.first == OVERLAP_CYCLES) parts.remove(CYCLES)
-                }
-                Result.success(OmSolution(puzzle, OmScore(parts), DslGenerator.toDsl(solution)))
-            }
+            findScorePart(command).and { findLink(command, message) }.flatMap { (scorePart, link) -> parseSolution(scorePart, link) }
         }
+    }
+
+    fun parseSolution(scorePart: Pair<OmScorePart, Double>?, link: String): Result<OmSolution> {
+        val solution = try {
+            SolutionParser.parse(ByteArrayInputStream(CUrl(link).exec()).asInput())
+        } catch (e: Exception) {
+            return Result.parseFailure("I could not parse your solution")
+        }
+        if (solution !is SolvedSolution) return Result.parseFailure("only solved solution are accepted")
+        val puzzle = OmPuzzle.values().find { it.id == solution.puzzle } ?: return Result.parseFailure("I do not know the puzzle \"${solution.puzzle}\"")
+        val parts = linkedMapOf(COST to solution.cost.toDouble(),
+            CYCLES to solution.cycles.toDouble(),
+            AREA to solution.area.toDouble(),
+            INSTRUCTIONS to solution.instructions.toDouble())
+        if (scorePart != null) {
+            parts[scorePart.first] = scorePart.second
+            if (scorePart.first == OVERLAP_CYCLES) parts.remove(CYCLES)
+        }
+        return Result.success(OmSolution(puzzle, OmScore(parts), DslGenerator.toDsl(solution)))
     }
 
     private fun findLink(command: MatchResult, message: Message): Result<String> {
@@ -49,8 +50,8 @@ class OmArchiveCommand(archive: Archive<OmSolution>, private val opusMagnum: Opu
             ?: Result.parseFailure("I could not find a valid link or attachment in your message.")
     }
 
-    private fun findScorePart(command: MatchResult): Result<Pair<OmScorePart, Double>?> {
-        val scoreString = command.groups["score"]!!.value
+    fun findScorePart(command: MatchResult, groupName: String = "score"): Result<Pair<OmScorePart, Double>?> {
+        val scoreString = command.groups[groupName]!!.value
         if (scoreString == "?") return Result.success(null)
         return OmScorePart.parse(scoreString)?.let { Result.success(it) } ?: Result.parseFailure("I didn't understand \"$scoreString\".")
     }
