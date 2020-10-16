@@ -1,3 +1,5 @@
 package com.faendir.zachtronics.bot.model
 
-interface Solution {}
+interface Solution {
+    val score: Score
+}

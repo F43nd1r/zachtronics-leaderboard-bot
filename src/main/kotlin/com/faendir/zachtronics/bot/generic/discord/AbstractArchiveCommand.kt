@@ -14,7 +14,7 @@ abstract class AbstractArchiveCommand<S : Solution>(private val archive: Archive
         return parseSolution(message).flatMap {
             val result = archive.archive(it)
             if (result.isNotEmpty()) {
-                Result.success("thanks, your solution has been archived $result.")
+                Result.success("thanks, your solution has been archived ${it.score.toDisplayString()} $result.")
             } else {
                 Result.failure("sorry, your solution did not qualify for archiving.")
             }
