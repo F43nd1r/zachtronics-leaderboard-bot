@@ -9,6 +9,22 @@ import java.io.File
 
 @Component
 class OmArchive(@Qualifier("omArchiveRepository") private val gitRepo: GitRepository, private val opusMagnum: OpusMagnum) : Archive<OmSolution> {
+
+    /*@PostConstruct
+    fun importOldStuff() {
+        val normalDir = ResourceUtils.getFile("classpath:width")
+        normalDir.listFiles()?.forEach { file ->
+            val solution = SolutionParser.parse(file.inputStream().asInput()) as SolvedSolution
+            archive(OmSolution(OmPuzzle.values().first { it.id == solution.puzzle },
+                OmScore(OmScorePart.WIDTH to file.name.split('_')[2].removePrefix("W").toDouble(),
+                    OmScorePart.COST to solution.cost.toDouble(),
+                    OmScorePart.CYCLES to solution.cycles.toDouble(),
+                    OmScorePart.AREA to solution.area.toDouble(),
+                    OmScorePart.INSTRUCTIONS to solution.instructions.toDouble()),
+                DslGenerator.toDsl(solution)))
+        }
+    }*/
+
     override fun archive(solution: OmSolution): List<String> {
         return gitRepo.access {
             val dir = getPuzzleDir(solution.puzzle)
@@ -29,7 +45,10 @@ class OmArchive(@Qualifier("omArchiveRepository") private val gitRepo: GitReposi
                         dir.mkdirs()
                         file.writeText(solution.solution)
                         add(file)
-                        rm(File(dir, oldFile))
+                        val old = File(dir, oldFile)
+                        if(old != file) {
+                            rm(old)
+                        }
                         true
                     }
                     else -> {
