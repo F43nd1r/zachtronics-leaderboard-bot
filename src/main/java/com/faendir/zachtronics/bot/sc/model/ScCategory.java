@@ -17,18 +17,19 @@ import static com.faendir.zachtronics.bot.utils.Utils.makeComparator3;
 @RequiredArgsConstructor
 public enum ScCategory implements Category<ScScore, ScPuzzle> {
     C("C", "c/r/s[/BP]", comparatorCRS, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), false, false, F100),
-    S("S", "c/r/s[/BP]", comparatorSRC, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), false, false, F001),
-    RC("RC", "c/r/s[/BP]", comparatorRCS, Collections.singleton(PRODUCTION), false, false, F110),
-    RS("RS", "c/r/s[/BP]", comparatorRSC, Collections.singleton(PRODUCTION), false, false, F011),
-
     CNB("CNB", "c/r/s[/P]", comparatorCRS, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), true, false, F100),
-    SNB("SNB", "c/r/s[/P]", comparatorSRC, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), true, false, F001),
-    RCNB("RCNB", "c/r/s[/P]", comparatorRCS, Collections.singleton(PRODUCTION), true, false, F110),
-    RSNB("RSNB", "c/r/s[/P]", comparatorRSC, Collections.singleton(PRODUCTION), true, false, F011),
-
     CNP("CNP", "c/r/s[/B]", comparatorCRS, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), false, true, F100),
+
+    S("S", "c/r/s[/BP]", comparatorSRC, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), false, false, F001),
+    SNB("SNB", "c/r/s[/P]", comparatorSRC, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), true, false, F001),
     SNP("SNP", "c/r/s[/B]", comparatorSRC, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), false, true, F001),
+
+    RC("RC", "c/r/s[/BP]", comparatorRCS, Collections.singleton(PRODUCTION), false, false, F110),
+    RCNB("RCNB", "c/r/s[/P]", comparatorRCS, Collections.singleton(PRODUCTION), true, false, F110),
     RCNP("RCNP", "c/r/s[/B]", comparatorRCS, Collections.singleton(PRODUCTION), false, true, F110),
+
+    RS("RS", "c/r/s[/BP]", comparatorRSC, Collections.singleton(PRODUCTION), false, false, F011),
+    RSNB("RSNB", "c/r/s[/P]", comparatorRSC, Collections.singleton(PRODUCTION), true, false, F011),
     RSNP("RSNP", "c/r/s[/B]", comparatorRSC, Collections.singleton(PRODUCTION), false, true, F011);
 
     @Getter
