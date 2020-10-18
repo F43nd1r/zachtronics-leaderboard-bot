@@ -1,4 +1,6 @@
-package com.faendir.zachtronics.bot.model
+package com.faendir.zachtronics.bot.generic.archive
+
+import com.faendir.zachtronics.bot.model.Solution
 
 interface Archive<S: Solution> {
 

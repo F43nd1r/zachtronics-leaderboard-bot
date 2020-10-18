@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Set;
 
-import static com.faendir.zachtronics.bot.sz.model.SzCategory.ShScoreFormatStrings.*;
+import static com.faendir.zachtronics.bot.sz.model.SzCategory.SzScoreFormatStrings.*;
 import static com.faendir.zachtronics.bot.sz.model.SzType.STANDARD;
 import static com.faendir.zachtronics.bot.utils.Utils.makeComparator3;
 
@@ -46,7 +46,7 @@ public enum SzCategory implements Category<SzScore, SzPuzzle> {
         return true;
     }
 
-    static class ShScoreFormatStrings {
+    static class SzScoreFormatStrings {
         static final String F100 = "**%d**/%d/%d";
         static final String F010 = "%d/**%d**/%d";
         static final String F001 = "%d/%d/**%d**";

@@ -1,4 +1,4 @@
-package com.faendir.zachtronics.bot.sc.discord;
+package com.faendir.zachtronics.bot.sc.discord.topic;
 
 import com.faendir.zachtronics.bot.generic.discord.topic.StaticHelpTopic;
 import org.springframework.stereotype.Component;

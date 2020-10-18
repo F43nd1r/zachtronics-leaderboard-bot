@@ -1,14 +1,15 @@
 package com.faendir.zachtronics.bot.om.archive
 
 import com.faendir.zachtronics.bot.main.git.GitRepository
-import com.faendir.zachtronics.bot.model.Archive
+import com.faendir.zachtronics.bot.generic.archive.Archive
 import com.faendir.zachtronics.bot.om.model.*
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import java.io.File
 
 @Component
-class OmArchive(@Qualifier("omArchiveRepository") private val gitRepo: GitRepository, private val opusMagnum: OpusMagnum) : Archive<OmSolution> {
+class OmArchive(@Qualifier("omArchiveRepository") private val gitRepo: GitRepository, private val opusMagnum: OpusMagnum) :
+    Archive<OmSolution> {
 
     /*@PostConstruct
     fun importOldStuff() {

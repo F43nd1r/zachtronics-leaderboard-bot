@@ -4,7 +4,7 @@ import com.faendir.om.dsl.DslGenerator
 import com.faendir.om.sp.SolutionParser
 import com.faendir.om.sp.solution.SolvedSolution
 import com.faendir.zachtronics.bot.generic.discord.AbstractArchiveCommand
-import com.faendir.zachtronics.bot.model.Archive
+import com.faendir.zachtronics.bot.generic.archive.Archive
 import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.om.model.OmScorePart.*
 import com.faendir.zachtronics.bot.utils.Result

@@ -1,6 +1,6 @@
 package com.faendir.zachtronics.bot.generic.discord
 
-import com.faendir.zachtronics.bot.model.Archive
+import com.faendir.zachtronics.bot.generic.archive.Archive
 import com.faendir.zachtronics.bot.model.Solution
 import com.faendir.zachtronics.bot.utils.Result
 import com.faendir.zachtronics.bot.utils.message
