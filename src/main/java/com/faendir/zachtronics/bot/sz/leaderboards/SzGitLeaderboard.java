@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 public class SzGitLeaderboard implements Leaderboard<SzCategory, SzScore, SzPuzzle, SzRecord> {
     @Getter
     private final List<SzCategory> supportedCategories = Arrays.asList(SzCategory.values());
-    @Qualifier("szLeaderboardRepository")
+    @Qualifier("szRepository")
     private final GitRepository gitRepository;
 
     private static final Pattern NAME_REGEX = Pattern
@@ -36,7 +36,11 @@ public class SzGitLeaderboard implements Leaderboard<SzCategory, SzScore, SzPuzz
     @Nullable
     @Override
     public SzRecord get(@NotNull SzPuzzle puzzle, @NotNull SzCategory category) {
-        Path solutionFile = gitRepository.access(a -> findPuzzleFile(a, puzzle, category));
+        return gitRepository.access(a -> readSolutionFile(findPuzzleFile(a, puzzle, category)));
+    }
+
+    @Nullable
+    private static SzRecord readSolutionFile(Path solutionFile) {
         /*
         [name] Top solution Cost->Power - andersk
         [puzzle] Sz040
@@ -50,7 +54,7 @@ public class SzGitLeaderboard implements Leaderboard<SzCategory, SzScore, SzPuzz
             Matcher m = NAME_REGEX.matcher(it.next());
             if (!m.matches()) return null;
             String author = m.group("author");
-            it.next(); // puzzle
+            SzPuzzle puzzle = SzPuzzle.valueOf(it.next().replaceFirst("^.+] ", ""));
             int cost = Integer.parseInt(it.next().replaceFirst("^.+] ", "")) / 100;
             int power = Integer.parseInt(it.next().replaceFirst("^.+] ", ""));
             int lines = Integer.parseInt(it.next().replaceFirst("^.+] ", ""));

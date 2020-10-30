@@ -9,6 +9,7 @@ sealed class Result<T> {
         fun <T> failure(message: String): Result<T> = Failure(message)
 
         @JvmStatic
+        @JvmOverloads
         fun <T> parseFailure(message: String, fix: String = "fix that") = failure<T>("sorry, $message\n\nYou can edit your command to $fix.")
     }
 

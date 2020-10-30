@@ -7,10 +7,11 @@ import com.faendir.zachtronics.bot.utils.ifNotEmpty
 import com.faendir.zachtronics.bot.utils.message
 import net.dv8tion.jda.api.entities.Message
 
-abstract class AbstractSubmitCommand<P : Puzzle, R : Record<*>>(private val leaderboards: List<Leaderboard<*, *, P, R>>) :
+abstract class AbstractSubmitCommand<P : Puzzle, R : Record<*>> :
     Command {
     override val name: String = "submit"
     override val isReadOnly: Boolean = false
+    protected abstract val leaderboards: List<Leaderboard<*, *, P, R>>
 
     override fun handleMessage(message: Message): String {
         return parseSubmission(message).map { (puzzle, record) ->

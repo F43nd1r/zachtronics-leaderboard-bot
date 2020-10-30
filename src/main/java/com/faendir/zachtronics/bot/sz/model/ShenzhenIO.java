@@ -56,7 +56,7 @@ public class ShenzhenIO implements Game<SzCategory, SzScore, SzPuzzle, SzRecord>
     public Result<Pair<SzPuzzle, SzRecord>> parseSubmission(@NotNull Message message) {
         Matcher m = SUBMISSION_REGEX.matcher(message.getContentRaw());
         if (!m.matches())
-            return Result.failure("Couldn't parse request");
+            return Result.parseFailure("Couldn't parse request");
 
         return parsePuzzle(m.group("puzzle")).flatMap(puzzle -> {
             SzScore score = SzScore.parseSimpleScore(m);

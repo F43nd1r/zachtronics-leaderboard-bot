@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component
 import java.io.ByteArrayInputStream
 
 @Component
-class OmArchiveCommand(archive: Archive<OmSolution>, private val opusMagnum: OpusMagnum) : AbstractArchiveCommand<OmSolution>(archive) {
+class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArchiveCommand<OmSolution>() {
     private val regex = Regex("!archive\\s+(?<score>\\S+)(\\s+(?<link>\\S+))?")
 
     override fun parseSolution(message: Message): Result<OmSolution> {

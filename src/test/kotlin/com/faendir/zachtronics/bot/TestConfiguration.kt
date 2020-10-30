@@ -19,6 +19,12 @@ import java.nio.file.Files
 
 @TestConfiguration
 class TestConfiguration(private val gitProperties: GitProperties) {
+
+    @Bean("configRepository")
+    fun configRepository(): GitRepository {
+        return createTestGitRepository("repositories/config")
+    }
+
     @Bean("omGithubPagesLeaderboardRepository")
     fun omGithubPagesLeaderboardRepository(): GitRepository {
         return createTestGitRepository("repositories/om-leaderboard")
@@ -29,14 +35,14 @@ class TestConfiguration(private val gitProperties: GitProperties) {
         return createTestGitRepository("repositories/om-wiki")
     }
 
-    @Bean("configRepository")
-    fun configRepository(): GitRepository {
-        return createTestGitRepository("repositories/config")
+    @Bean("scArchiveRepository")
+    fun scArchiveRepository(): GitRepository {
+        return createTestGitRepository("repositories/sc-archive")
     }
 
-    @Bean("szLeaderboardRepository")
-    fun szLeaderboardRepository(): GitRepository {
-        return createTestGitRepository("repositories/shenzhenIO-leaderboard")
+    @Bean("szRepository")
+    fun szRepository(): GitRepository {
+        return createTestGitRepository("repositories/sz-leaderboard")
     }
 
     @Primary

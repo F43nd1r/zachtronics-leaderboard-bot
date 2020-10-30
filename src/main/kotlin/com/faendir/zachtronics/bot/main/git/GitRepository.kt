@@ -55,6 +55,11 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
                 .call()
             git.push().setCredentialsProvider(UsernamePasswordCredentialsProvider(gitProperties.username, gitProperties.accessToken)).setTimeout(120).call()
         }
+
+        fun resetAndClean(file: File) {
+            git.reset().addPath(file.relativeTo(repo).path).call();
+            git.clean().setForce(true).setPaths(setOf(file.relativeTo(repo).path)).call();
+        }
     }
 
     @PreDestroy
