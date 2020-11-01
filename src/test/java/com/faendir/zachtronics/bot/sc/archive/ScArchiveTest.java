@@ -33,7 +33,7 @@ public class ScArchiveTest {
         score = new ScScore(1000, 100, 10);
         assertEquals(1, doArchive(score).size()); // new frontier piece
         score = new ScScore(10, 10, 10);
-        assertEquals(1, doArchive(score).size()); // beats them all
+        assertEquals(2, doArchive(score).size()); // beats them both
         score = new ScScore(20, 20, 20);
         assertEquals(0, doArchive(score).size()); // fails flat
         score.setBugged(false);
