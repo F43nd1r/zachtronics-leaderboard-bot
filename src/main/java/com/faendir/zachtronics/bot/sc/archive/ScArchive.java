@@ -31,10 +31,10 @@ public class ScArchive implements Archive<ScSolution> {
     private List<String> performArchive(GitRepository.AccessScope accessScope, @NotNull ScSolution solution) {
         Path repoPath = accessScope.getRepo().toPath();
         Path puzzlePath = repoPath.resolve(solution.getPuzzle().getGroup().name()).resolve(solution.getPuzzle().name());
-        boolean needToUpdate;
+        List<String> archiveResult;
         try {
             SolutionsIndex index = new SolutionsIndex(puzzlePath);
-            needToUpdate = index.add(solution);
+            archiveResult = index.add(solution);
         } catch (IOException e) {
             // failures could happen after we dirtied the repo, so we call reset&clean on the puzzle dir
             accessScope.resetAndClean(puzzlePath.toFile());
@@ -42,14 +42,11 @@ public class ScArchive implements Archive<ScSolution> {
             return Collections.emptyList();
         }
 
-        if (needToUpdate) {
+        if (!archiveResult.isEmpty()) {
             accessScope.add(puzzlePath.toFile());
             accessScope.commitAndPush(
                     "Added " + solution.getScore().toDisplayString() + " for " + solution.getPuzzle());
-            return Collections.singletonList(solution.getScore().toDisplayString());
         }
-        else {
-            return Collections.emptyList();
-        }
+        return archiveResult;
     }
 }

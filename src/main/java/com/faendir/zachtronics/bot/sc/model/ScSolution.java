@@ -2,6 +2,7 @@ package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.Solution;
 import lombok.Value;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,12 +15,12 @@ public class ScSolution implements Solution {
     /** null content is possible, it indicates a score-only solution */
     String content;
 
-    public ScSolution(ScPuzzle puzzle, String content) {
+    public ScSolution(ScPuzzle puzzle, ScScore score, @NotNull String content) {
         Matcher m = Pattern.compile("(SOLUTION:[^,]+),[^,]+,(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+),.+")
                            .matcher(content);
         if (m.find()) {
             this.puzzle = puzzle;
-            score = ScScore.parseSimpleScore(m);
+            this.score = score != null ? score : ScScore.parseSimpleScore(m);
             this.content = m.replaceFirst("$1,Archiver,$2-$3-$4,Archived Solution");
         }
         else {

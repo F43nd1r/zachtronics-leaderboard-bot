@@ -27,8 +27,8 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
 
     private static final Pattern SOLUTION_REGEX = Pattern.compile(
             "!archive\\s+" +
-            "(?<puzzle>.+)\\s+" +
-            "(?:\\((?<score>" + ScScore.REGEX_BP_SCORE + ")\\))?\\s*",
+            "(?<puzzle>.+?)" +
+            "(?:\\s+\\((?<score>" + ScScore.REGEX_BP_SCORE + ")\\))?\\s*",
             Pattern.CASE_INSENSITIVE);
 
     @NotNull
@@ -39,27 +39,32 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
             return Result.parseFailure("Couldn't parse request");
 
         return spaceChem.parsePuzzle(m.group("puzzle")).flatMap(puzzle -> {
+            ScScore score = null;
+            ScSolution solution;
+
+            if (m.group("score") != null) {
+                score = ScScore.parseBPScore(m.group("score"));
+                if (score == null)
+                    return Result.parseFailure("Couldn't parse score");
+            }
+
             if (message.getAttachments().size() == 1) {
                 try (InputStream is = message.getAttachments().get(0).retrieveInputStream().get()) {
                     String content = new String(is.readAllBytes());
-                    ScSolution solution = new ScSolution(puzzle, content);
-                    return Result.success(solution);
+                    solution = new ScSolution(puzzle, score, content);
                 } catch (IOException | InterruptedException | ExecutionException e) {
                     return Result.failure("Discord said the attachment existed but we couldn't read it");
                 } catch (IllegalArgumentException e) {
                     return Result.failure("Could not parse a valid solution");
                 }
             }
-            else if (m.group("score") != null) {
-                ScScore score = ScScore.parseBPScore(m.group("score"));
-                if (score == null)
-                    return Result.parseFailure("Couldn't parse score");
-                ScSolution solution = new ScSolution(puzzle, score);
-                return Result.success(solution);
-            }
             else {
-                return Result.failure("Need one (and only one) attachment or a score");
+                if (score == null) {
+                    return Result.failure("Need one (and only one) attachment or a score (or both), I found neither");
+                }
+                solution = new ScSolution(puzzle, score);
             }
+            return Result.success(solution);
         });
     }
 

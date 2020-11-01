@@ -9,10 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,16 +31,21 @@ class SolutionsIndex {
         }
     }
 
-    boolean add(ScSolution solution) throws IOException {
+    /**
+     * @return list of displaced scores
+     */
+    List<String> add(ScSolution solution) throws IOException {
+        List<String> displacedScores = new ArrayList<>();
         ScScore candidate = solution.getScore();
         ListIterator<ScScore> it = scores.listIterator();
         while (it.hasNext()) {
             ScScore score = it.next();
             int r = dominanceCompare(candidate, score);
             if (r > 0)
-                return false;
+                return Collections.emptyList();
             else if (r < 0) {
                 // remove beaten score
+                displacedScores.add(score.toDisplayString());
                 it.remove();
                 Files.deleteIfExists(puzzlePath.resolve(makeScoreFilename(score)));
             }
@@ -62,7 +64,10 @@ class SolutionsIndex {
             Path solutionPath = puzzlePath.resolve(makeScoreFilename(candidate));
             Files.write(solutionPath, solution.getContent().getBytes(), StandardOpenOption.CREATE_NEW);
         }
-        return true;
+
+        if (displacedScores.isEmpty()) // solution is in the frontier but doesn't outright beat any, we have to fill a placeholder
+            displacedScores.add("-");
+        return displacedScores;
     }
 
     @NotNull
