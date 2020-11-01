@@ -4,7 +4,8 @@ A discord & reddit bot for automating solution submission/display for [Zachtroni
 
 Currently included:
  - Opus Magnum
- - SpaceChem (read-only)
+ - SpaceChem
+ - Shenzen-IO
  
 # Build
 0. Set up docker-compose, create a discord bot, create a reddit app, get a github personal access token. Follow respective guides.
