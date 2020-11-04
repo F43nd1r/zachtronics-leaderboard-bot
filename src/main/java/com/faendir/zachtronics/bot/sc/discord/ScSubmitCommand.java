@@ -2,6 +2,7 @@ package com.faendir.zachtronics.bot.sc.discord;
 
 import com.faendir.zachtronics.bot.generic.discord.AbstractSubmitCommand;
 import com.faendir.zachtronics.bot.model.Leaderboard;
+import com.faendir.zachtronics.bot.sc.archive.ScArchive;
 import com.faendir.zachtronics.bot.sc.model.*;
 import com.faendir.zachtronics.bot.utils.Result;
 import kotlin.Pair;
@@ -19,6 +20,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
     private final SpaceChem spaceChem;
+    private final ScArchive archive;
     @Getter
     private final List<Leaderboard<?, ?, ScPuzzle, ScRecord>> leaderboards;
 
@@ -35,12 +37,15 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
     public Result<Pair<ScPuzzle, ScRecord>> parseSubmission(@NotNull Message message) {
         Matcher m = SUBMISSION_REGEX.matcher(message.getContentRaw());
         if (!m.matches())
-            return Result.parseFailure("Couldn't parse request");
+            return Result.parseFailure("couldn't parse request");
 
         return spaceChem.parsePuzzle(m.group("puzzle")).flatMap(puzzle -> {
             ScScore score = ScScore.parseBPScore(m.group("score"));
             if (score == null)
-                return Result.parseFailure("Couldn't parse score");
+                return Result.parseFailure("couldn't parse score");
+            // we also archive the score here
+            ScSolution solution = new ScSolution(puzzle, score);
+            archive.archive(solution);
             ScRecord record = new ScRecord(score, m.group("author"), m.group("link"), m.group("oldRNG") != null);
             return Result.success(new Pair<>(puzzle, record));
         });

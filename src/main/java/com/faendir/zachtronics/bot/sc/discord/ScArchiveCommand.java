@@ -36,7 +36,7 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
     public Result<ScSolution> parseSolution(@NotNull Message message) {
         Matcher m = SOLUTION_REGEX.matcher(message.getContentRaw());
         if (!m.matches())
-            return Result.parseFailure("Couldn't parse request");
+            return Result.parseFailure("couldn't parse request");
 
         return spaceChem.parsePuzzle(m.group("puzzle")).flatMap(puzzle -> {
             ScScore score = null;
@@ -45,7 +45,7 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
             if (m.group("score") != null) {
                 score = ScScore.parseBPScore(m.group("score"));
                 if (score == null)
-                    return Result.parseFailure("Couldn't parse score");
+                    return Result.parseFailure("couldn't parse score");
             }
 
             if (message.getAttachments().size() == 1) {
