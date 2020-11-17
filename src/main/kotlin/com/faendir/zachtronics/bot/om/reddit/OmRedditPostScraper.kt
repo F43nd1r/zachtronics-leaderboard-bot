@@ -101,7 +101,7 @@ class OmRedditPostScraper(private val redditService: RedditService, private val 
                         parseComment(comment)
                     } else if (body.lines().any { mainRegex.matches(it) }) {
                         redditService.reply(comment,
-                            "[BOT] sorry, you're not a trusted user. Wait for a moderator to reply with `!trust-score` or " + "`!trust-user`.")
+                            "[BOT] sorry, you're not a trusted user. Wait for a moderator to reply with `!trust-score` or `!trust-user`.")
                     }
                     if (body.trim() == "!trust-user" && moderators.contains(comment.author)) {
                         getNonBotParentComment(comments, comment)?.let { trust ->
