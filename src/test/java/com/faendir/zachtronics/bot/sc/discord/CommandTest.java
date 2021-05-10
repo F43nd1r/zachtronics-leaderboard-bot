@@ -5,6 +5,7 @@ import com.faendir.zachtronics.bot.generic.discord.Command;
 import com.faendir.zachtronics.bot.sc.SpaceChemMarker;
 import gnu.trove.set.hash.TLongHashSet;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.internal.entities.ReceivedMessage;
 import net.dv8tion.jda.internal.entities.UserById;
 import org.jetbrains.annotations.NotNull;
@@ -75,8 +76,9 @@ public class CommandTest {
                 null, Collections.emptyList(), attachments,
                 Collections.emptyList(), 0);
 
-        String result = commands.stream().filter(c -> text.startsWith("!" + c.getName())).findFirst().get()
-                .handleMessage(message);
+        MessageEmbed embed = commands.stream().filter(c -> text.startsWith("!" + c.getName())).findFirst().get()
+                .handleMessageEmbed(message).build();
+        String result = embed.getTitle() + embed.getDescription();
         System.out.println(result);
         return result;
     }

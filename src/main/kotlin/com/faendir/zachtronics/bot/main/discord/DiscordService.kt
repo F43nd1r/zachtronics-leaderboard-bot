@@ -51,6 +51,7 @@ class DiscordService(private val jda: JDA, private val gameContexts: List<GameCo
 
     private fun handleMessage(message: Message, createMessageAction: (MessageEmbed) -> MessageAction) {
         val (gameContext, editedMessage) = findGameContext(message).onFailure {
+            if(it.isNotBlank())
             sendResponse(message, EmbedBuilder().setTitle("Failure").setDescription(it).build(), createMessageAction)
             return
         }
