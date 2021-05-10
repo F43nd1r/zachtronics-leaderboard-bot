@@ -1,5 +1,6 @@
 package com.faendir.zachtronics.bot.generic.discord
 
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.Message
 
 interface Command {
@@ -10,5 +11,9 @@ interface Command {
 
     val isReadOnly: Boolean
 
-    fun handleMessage(message: Message): String
+    @JvmDefault
+    fun handleMessage(message: Message): String = ""
+
+    @JvmDefault
+    fun handleMessageEmbed(message: Message) : EmbedBuilder = EmbedBuilder().setDescription(handleMessage(message))
 }

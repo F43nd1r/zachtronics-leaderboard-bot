@@ -17,6 +17,10 @@ version = "1.1-SNAPSHOT"
 repositories {
     jcenter()
     mavenCentral()
+    maven {
+        name = "m2-dv8tion"
+        setUrl("https://m2.dv8tion.net/releases")
+    }
 }
 
 dependencies {
@@ -25,7 +29,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("net.dv8tion:JDA:4.2.0_198")
+    implementation("net.dv8tion:JDA:4.2.1_253")
     implementation("org.eclipse.jgit:org.eclipse.jgit:5.8.1.202007141445-r")
     implementation("com.github.rockswang:java-curl:1.2.2.2")
     implementation("com.faendir.jraw:JRAW:1.2.0")

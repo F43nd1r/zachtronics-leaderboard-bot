@@ -2,6 +2,7 @@ package com.faendir.zachtronics.bot.generic.discord.topic
 
 import com.faendir.zachtronics.bot.generic.discord.Command
 import com.faendir.zachtronics.bot.model.Game
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.ChannelType
 import net.dv8tion.jda.api.entities.Message
 import org.springframework.context.annotation.Lazy
@@ -27,6 +28,21 @@ class MainHelp(@Lazy private val game: Game<*, *, *, *>, @Lazy private val topic
             |${topics.joinToString("\n") { it.id }}
             |```
             """.trimMargin()
+    }
+
+    override fun display(message: Message, embed: EmbedBuilder) {
+        embed.setTitle("Hello, I'm the leaderboard bot!")
+        embed.addField("", "Available Commands:", false)
+        val (availableCommands, otherCommands) = commands.partition {
+            it.isReadOnly || message.channelType == ChannelType.TEXT && game.hasWritePermission(message.member)
+        }
+        availableCommands.forEach { embed.addField("!${it.name}", it.helpText, false) }
+        if (otherCommands.isNotEmpty()) {
+            embed.addField("",
+                "Other Commands (${if (message.channelType == ChannelType.TEXT) "You lack permission to use these" else "Not available in private messages"}):",
+                false)
+            otherCommands.forEach { embed.addField("!${it.name}", it.helpText, false) }
+        }
     }
 
     private fun getOtherCommandsText(otherCommands: List<Command>, message: Message): String {

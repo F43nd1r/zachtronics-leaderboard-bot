@@ -62,7 +62,16 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
         return Result.parseFailure("I didn't understand \"$scoreString\".")
     }
 
-    override val helpText: String = "<primary score(e.g. 3.5w or 45o) -or- ?(load from file)> <solution link>(or attach file to message)"
+    override val helpText: String = """
+        |`<score identifier> <solution link>`
+        |Solutions can also be attached instead of linked.
+        |Score identifier: 
+        |`?` - Normal puzzles
+        |`t` - Trackless
+        |`o` - Overlap
+        |`3.5w` - Width
+        |`4h` - Height
+    """.trimMargin()
 }
 
 sealed class ScoreIdentifier {

@@ -7,6 +7,7 @@ import com.faendir.zachtronics.bot.utils.Result.Companion.success
 import com.faendir.zachtronics.bot.utils.and
 import com.faendir.zachtronics.bot.utils.match
 import com.faendir.zachtronics.bot.utils.message
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.Message
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
@@ -17,25 +18,25 @@ class ShowCommand<C : Category<S, P>, S : Score, P : Puzzle, R : Record<S>>(@Laz
     val regex = Regex("!show\\s+(?<category>\\S+)\\s+(?<puzzle>.+)")
     val altRegex = Regex("!show\\s+(?<puzzle>.+)\\s+(?<category>\\S+)")
     override val name: String = "show"
-    override val helpText: String = "<category> <puzzle>"
+    override val helpText: String = "`<category> <puzzle>`"
     override val isReadOnly: Boolean = true
 
-    override fun handleMessage(message: Message): String {
+    override fun handleMessageEmbed(message: Message): EmbedBuilder {
         return message.match(regex).flatMap { game.parseCommand(it) }.onFailureTry {
             //try permuted arguments on failure
             message.match(altRegex).flatMap { game.parseCommand(it) }
-        }.message
+        }.onFailure { EmbedBuilder().setDescription(it) }
     }
 
-    private fun Game<C, S, P, R>.parseCommand(command: MatchResult): Result<String> {
+    private fun Game<C, S, P, R>.parseCommand(command: MatchResult): Result<EmbedBuilder> {
         return parseCategoryCandidates(command.groups["category"]!!.value).and { parsePuzzle(command.groups["puzzle"]!!.value) }
             .flatMap { (categories, puzzle) -> getSingleCategory(categories, puzzle) }
             .flatMap { (category, puzzle) -> findRecord(puzzle, category) }
     }
 
-    private fun findRecord(puzzle: P, category: C): Result<String> {
+    private fun findRecord(puzzle: P, category: C): Result<EmbedBuilder> {
         return leaderboards.asSequence().mapNotNull { it.get(puzzle, category) }.firstOrNull()?.let {
-            success("here you go: ${puzzle.displayName} ${category.displayName} ${it.toDisplayString()}")
+            success(EmbedBuilder().setTitle("${puzzle.displayName} ${category.displayName}").apply { it.display(this) })
         } ?: Result.failure("sorry, there is no score for ${puzzle.displayName} ${category.displayName}.")
     }
 
