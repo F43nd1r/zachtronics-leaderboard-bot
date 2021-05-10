@@ -20,7 +20,8 @@ class OmGithubPagesLeaderboard(@Qualifier("omGithubPagesLeaderboardRepository") 
             "oc" to listOf(OCG, OCA, OCX),
             "oa" to listOf(OAG, OAC, OAX),
             "s4" to listOf(S4G, S4C, S4A, S4I),
-            "ti" to listOf(TIG, TIC, TIA)
+            "ti" to listOf(TIG, TIC, TIA),
+            "i" to listOf(IGNP, ICNP, IANP, CINP)
         ),
         serializer()) {
 
@@ -42,6 +43,10 @@ class OmGithubPagesLeaderboard(@Qualifier("omGithubPagesLeaderboardRepository") 
         TIG to "Instructions/Cost",
         TIC to "Instructions/Cycles",
         TIA to "Instructions/Area",
+        IGNP to "Instructions/Cost",
+        ICNP to "Instructions/Cycles",
+        IANP to "Instructions/Area",
+        CINP to "Cycles/Instructions",
     )
 
     override fun MutableMap<OmPuzzle, MutableMap<OmCategory, OmRecord>>.getRecord(puzzle: OmPuzzle, category: OmCategory) = get(puzzle)?.get(category)

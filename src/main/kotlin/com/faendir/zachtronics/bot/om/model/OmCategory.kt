@@ -4,8 +4,7 @@ import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.om.model.OmModifier.OVERLAP
 import com.faendir.zachtronics.bot.om.model.OmModifier.TRACKLESS
 import com.faendir.zachtronics.bot.om.model.OmScorePart.*
-import com.faendir.zachtronics.bot.om.model.OmType.INFINITE
-import com.faendir.zachtronics.bot.om.model.OmType.NORMAL
+import com.faendir.zachtronics.bot.om.model.OmType.*
 
 
 enum class OmCategory(
@@ -16,29 +15,29 @@ enum class OmCategory(
     private val modifier: OmModifier? = null
 ) : Category<OmScore, OmPuzzle> {
     GC(listOf("GC"), listOf(COST, CYCLES, AREA), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
-    GCP(listOf("GC"), listOf(COST, CYCLES, INSTRUCTIONS), OmCategory::normalCompare, setOf(OmType.PRODUCTION)),
+    GCP(listOf("GC"), listOf(COST, CYCLES, INSTRUCTIONS), OmCategory::normalCompare, setOf(PRODUCTION)),
     GA(listOf("GA"), listOf(COST, AREA, CYCLES), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
-    GI(listOf("GI"), listOf(COST, INSTRUCTIONS, CYCLES), OmCategory::normalCompare, setOf(OmType.PRODUCTION)),
+    GI(listOf("GI"), listOf(COST, INSTRUCTIONS, CYCLES), OmCategory::normalCompare, setOf(PRODUCTION)),
     GX(listOf("GX"), listOf(COST, CYCLES, AREA), OmCategory::lastTwoProductCompare, setOf(NORMAL, INFINITE)),
-    GXP(listOf("GX"), listOf(COST, CYCLES, INSTRUCTIONS), OmCategory::lastTwoProductCompare, setOf(OmType.PRODUCTION)),
+    GXP(listOf("GX"), listOf(COST, CYCLES, INSTRUCTIONS), OmCategory::lastTwoProductCompare, setOf(PRODUCTION)),
     CG(listOf("CG"), listOf(CYCLES, COST, AREA), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
-    CGP(listOf("CG"), listOf(CYCLES, COST, INSTRUCTIONS), OmCategory::normalCompare, setOf(OmType.PRODUCTION)),
+    CGP(listOf("CG"), listOf(CYCLES, COST, INSTRUCTIONS), OmCategory::normalCompare, setOf(PRODUCTION)),
     CA(listOf("CA"), listOf(CYCLES, AREA, COST), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
-    CI(listOf("CI"), listOf(CYCLES, INSTRUCTIONS, COST), OmCategory::normalCompare, setOf(OmType.PRODUCTION)),
+    CI(listOf("CI"), listOf(CYCLES, INSTRUCTIONS, COST), OmCategory::normalCompare, setOf(PRODUCTION)),
     CX(listOf("CX"), listOf(CYCLES, COST, AREA), OmCategory::lastTwoProductCompare, setOf(NORMAL, INFINITE)),
-    CXP(listOf("CX"), listOf(CYCLES, COST, INSTRUCTIONS), OmCategory::lastTwoProductCompare, setOf(OmType.PRODUCTION)),
+    CXP(listOf("CX"), listOf(CYCLES, COST, INSTRUCTIONS), OmCategory::lastTwoProductCompare, setOf(PRODUCTION)),
     AG(listOf("AG"), listOf(AREA, COST, CYCLES), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
     AC(listOf("AC"), listOf(AREA, CYCLES, COST), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
     AX(listOf("AX"), listOf(AREA, COST, CYCLES), OmCategory::lastTwoProductCompare, setOf(NORMAL, INFINITE)),
-    IG(listOf("IG"), listOf(INSTRUCTIONS, COST, CYCLES), OmCategory::normalCompare, setOf(OmType.PRODUCTION)),
-    IC(listOf("IC"), listOf(INSTRUCTIONS, CYCLES, COST), OmCategory::normalCompare, setOf(OmType.PRODUCTION)),
-    IX(listOf("IX"), listOf(INSTRUCTIONS, COST, CYCLES), OmCategory::lastTwoProductCompare, setOf(OmType.PRODUCTION)),
+    IG(listOf("IG"), listOf(INSTRUCTIONS, COST, CYCLES), OmCategory::normalCompare, setOf(PRODUCTION)),
+    IC(listOf("IC"), listOf(INSTRUCTIONS, CYCLES, COST), OmCategory::normalCompare, setOf(PRODUCTION)),
+    IX(listOf("IX"), listOf(INSTRUCTIONS, COST, CYCLES), OmCategory::lastTwoProductCompare, setOf(PRODUCTION)),
     SG(listOf("SUM-G", "SUM"), listOf(COST, CYCLES, AREA), { s1, s2 -> sumCompare(s1, s2, COST) }, setOf(NORMAL, INFINITE)),
-    SGP(listOf("SUM-G", "SUM"), listOf(COST, CYCLES, INSTRUCTIONS), { s1, s2 -> sumCompare(s1, s2, COST) }, setOf(OmType.PRODUCTION)),
+    SGP(listOf("SUM-G", "SUM"), listOf(COST, CYCLES, INSTRUCTIONS), { s1, s2 -> sumCompare(s1, s2, COST) }, setOf(PRODUCTION)),
     SC(listOf("SUM-C", "SUM"), listOf(COST, CYCLES, AREA), { s1, s2 -> sumCompare(s1, s2, CYCLES) }, setOf(NORMAL, INFINITE)),
-    SCP(listOf("SUM-C", "SUM"), listOf(COST, CYCLES, INSTRUCTIONS), { s1, s2 -> sumCompare(s1, s2, CYCLES) }, setOf(OmType.PRODUCTION)),
+    SCP(listOf("SUM-C", "SUM"), listOf(COST, CYCLES, INSTRUCTIONS), { s1, s2 -> sumCompare(s1, s2, CYCLES) }, setOf(PRODUCTION)),
     SA(listOf("SUM-A", "SUM"), listOf(COST, CYCLES, AREA), { s1, s2 -> sumCompare(s1, s2, AREA) }, setOf(NORMAL, INFINITE)),
-    SI(listOf("SUM-I", "SUM"), listOf(COST, CYCLES, INSTRUCTIONS), { s1, s2 -> sumCompare(s1, s2, INSTRUCTIONS) }, setOf(OmType.PRODUCTION)),
+    SI(listOf("SUM-I", "SUM"), listOf(COST, CYCLES, INSTRUCTIONS), { s1, s2 -> sumCompare(s1, s2, INSTRUCTIONS) }, setOf(PRODUCTION)),
 
     HEIGHT(listOf("Height", "H"), listOf(OmScorePart.HEIGHT, CYCLES, COST), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
     WIDTH(listOf("Width", "W"), listOf(OmScorePart.WIDTH, CYCLES, COST), OmCategory::normalCompare, setOf(NORMAL)),
@@ -53,9 +52,15 @@ enum class OmCategory(
     OAC(listOf("OAC"), listOf(AREA, CYCLES, COST), OmCategory::normalCompare, setOf(NORMAL, INFINITE), OVERLAP),
     OAX(listOf("OAX"), listOf(AREA, COST, CYCLES), OmCategory::lastTwoProductCompare, setOf(NORMAL, INFINITE), OVERLAP),
 
-    TIG(listOf("TIG", "TI"), listOf(INSTRUCTIONS, COST, CYCLES), OmCategory::normalCompare, setOf(NORMAL, INFINITE), TRACKLESS),
-    TIC(listOf("TIC", "TI"), listOf(INSTRUCTIONS, CYCLES, COST), OmCategory::normalCompare, setOf(NORMAL, INFINITE), TRACKLESS),
-    TIA(listOf("TIA", "TI"), listOf(INSTRUCTIONS, COST, CYCLES), OmCategory::lastTwoProductCompare, setOf(NORMAL, INFINITE), TRACKLESS),
+    TIG(listOf("TIG", "TI"), listOf(INSTRUCTIONS, COST, CYCLES, AREA), OmCategory::normalCompare, setOf(NORMAL, INFINITE), TRACKLESS),
+    TIC(listOf("TIC", "TI"), listOf(INSTRUCTIONS, CYCLES, COST, AREA), OmCategory::normalCompare, setOf(NORMAL, INFINITE), TRACKLESS),
+    TIA(listOf("TIA", "TI"), listOf(INSTRUCTIONS, AREA, COST, CYCLES), OmCategory::lastTwoProductCompare, setOf(NORMAL, INFINITE), TRACKLESS),
+
+    IGNP(listOf("IG"), listOf(INSTRUCTIONS, COST, CYCLES, AREA), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
+    ICNP(listOf("IC"), listOf(INSTRUCTIONS, CYCLES, COST, AREA), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
+    IANP(listOf("IA"), listOf(INSTRUCTIONS, AREA, COST, CYCLES), OmCategory::lastTwoProductCompare, setOf(NORMAL, INFINITE)),
+
+    CINP(listOf("CI"), listOf(CYCLES, INSTRUCTIONS, COST, AREA), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
 
     S4G(listOf("SUM4-G", "SUM4"), listOf(COST, CYCLES, AREA, INSTRUCTIONS), { s1, s2 -> sumCompare(s1, s2, COST) }, setOf(NORMAL, INFINITE)),
     S4C(listOf("SUM4-C", "SUM4"), listOf(COST, CYCLES, AREA, INSTRUCTIONS), { s1, s2 -> sumCompare(s1, s2, CYCLES) }, setOf(NORMAL, INFINITE)),

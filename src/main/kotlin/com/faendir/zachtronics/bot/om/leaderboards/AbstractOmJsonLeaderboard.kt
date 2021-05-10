@@ -98,7 +98,7 @@ abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, 
                 } else {
                     record
                 }
-            }
+            }?.also { it.score.displayAsSum = category.name.startsWith("S") }
         }
     }
 
