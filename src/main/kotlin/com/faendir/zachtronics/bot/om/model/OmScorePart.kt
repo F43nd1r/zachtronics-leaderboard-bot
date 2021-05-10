@@ -5,7 +5,6 @@ enum class OmScorePart(val key: Char, val displayName: String?) {
     WIDTH('w', "Width"),
     COST('g', "Cost"),
     CYCLES('c', "Cycles"),
-    OVERLAP_CYCLES('o', "Overlap Cycles"),
     AREA('a', "Area"),
     INSTRUCTIONS('i', "Instructions"),
     COMPUTED('#', null);

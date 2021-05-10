@@ -7,7 +7,7 @@ plugins {
     id("org.springframework.boot") version "2.3.3.RELEASE"
     id("io.spring.dependency-management") version "1.0.7.RELEASE"
     kotlin("plugin.spring") version "1.4.0"
-    id("com.palantir.docker") version "0.25.0"
+    id("com.palantir.docker") version "0.26.0"
     id("io.freefair.lombok") version "5.2.1"
 }
 
@@ -17,7 +17,6 @@ version = "1.1-SNAPSHOT"
 repositories {
     jcenter()
     mavenCentral()
-    maven { setUrl("https://dl.bintray.com/f43nd1r/maven") }
 }
 
 dependencies {
@@ -31,7 +30,7 @@ dependencies {
     implementation("com.github.rockswang:java-curl:1.2.2.2")
     implementation("com.faendir.jraw:JRAW:1.2.0")
     implementation("net.bramp.ffmpeg:ffmpeg:0.6.2")
-    implementation("com.faendir.om:dsl:1.1.5")
+    implementation("com.faendir.om:dsl:1.2.0")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 

@@ -15,10 +15,34 @@ import java.time.ZoneOffset
 class OmGithubPagesLeaderboard(@Qualifier("omGithubPagesLeaderboardRepository") gitRepository: GitRepository, imgurService: ImgurService) :
     AbstractOmJsonLeaderboard<MutableMap<OmPuzzle, MutableMap<OmCategory, OmRecord>>>(gitRepository,
         imgurService,
-        mapOf("wh" to listOf(HEIGHT, WIDTH), "overlap" to listOf(OCG, OCA, OCX)),
+        mapOf("wh" to listOf(HEIGHT, WIDTH),
+            "og" to listOf(OGC, OGA, OGX),
+            "oc" to listOf(OCG, OCA, OCX),
+            "oa" to listOf(OAG, OAC, OAX),
+            "s4" to listOf(S4G, S4C, S4A, S4I),
+            "ti" to listOf(TIG, TIC, TIA)
+        ),
         serializer()) {
 
-    private val tableHeaders = mapOf(HEIGHT to "Height", WIDTH to "Width", OCG to "Cycles/Cost", OCA to "Cycles/Area", OCX to "Cycles/Cost*Area")
+    private val tableHeaders = mapOf(HEIGHT to "Height",
+        WIDTH to "Width",
+        OGC to "Cost/Cycles",
+        OGA to "Cost/Area",
+        OGX to "Cost/Cycles*Area",
+        OCG to "Cycles/Cost",
+        OCA to "Cycles/Area",
+        OCX to "Cycles/Cost*Area",
+        OAG to "Area/Cost",
+        OAC to "Area/Cycles",
+        OAX to "Area/Cost*Cycles",
+        S4G to "Sum 4/Cost",
+        S4C to "Sum 4/Cycles",
+        S4A to "Sum 4/Area",
+        S4I to "Sum 4/Instructions",
+        TIG to "Instructions/Cost",
+        TIC to "Instructions/Cycles",
+        TIA to "Instructions/Area",
+    )
 
     override fun MutableMap<OmPuzzle, MutableMap<OmCategory, OmRecord>>.getRecord(puzzle: OmPuzzle, category: OmCategory) = get(puzzle)?.get(category)
 
@@ -26,7 +50,8 @@ class OmGithubPagesLeaderboard(@Qualifier("omGithubPagesLeaderboardRepository") 
         set(puzzle, (get(puzzle) ?: mutableMapOf()).apply { set(category, record) })
     }
 
-    override fun GitRepository.AccessScope.updatePage(dir: File, categories: List<OmCategory>, records: MutableMap<OmPuzzle, MutableMap<OmCategory, OmRecord>>) {
+    override fun GitRepository.AccessScope.updatePage(dir: File, categories: List<OmCategory>,
+                                                      records: MutableMap<OmPuzzle, MutableMap<OmCategory, OmRecord>>) {
         val templates = File(repo, "templates")
         val mainTemplate = File(templates, "main.html").readText()
         val groupTemplate = File(templates, "group.html").readText()

@@ -2,12 +2,13 @@ package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.Score
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import java.text.DecimalFormat
 
 @Serializable
-data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>) : Score {
-    constructor(parts: Iterable<Pair<OmScorePart, Double>>) : this(parts.toMap(LinkedHashMap()))
-    constructor(vararg parts: Pair<OmScorePart, Double>) : this(parts.asIterable())
+data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>, @Transient val modifier: OmModifier? = null) : Score {
+    constructor(parts: Iterable<Pair<OmScorePart, Double>>, modifier: OmModifier? = null) : this(parts.toMap(LinkedHashMap()), modifier)
+    constructor(vararg parts: Pair<OmScorePart, Double>, modifier: OmModifier? = null) : this(parts.asIterable(), modifier)
 
     companion object {
         private val numberFormat = DecimalFormat("0.#")
