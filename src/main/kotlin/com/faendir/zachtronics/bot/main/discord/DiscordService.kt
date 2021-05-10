@@ -9,15 +9,18 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.ChannelType
 import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.TextChannel
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.restaction.MessageAction
 import org.springframework.stereotype.Service
+import java.net.URL
 import java.util.concurrent.atomic.AtomicBoolean
 
 @Service
@@ -46,35 +49,38 @@ class DiscordService(private val jda: JDA, private val gameContexts: List<GameCo
         override fun removeEldestEntry(eldest: Map.Entry<Long, Message>) = size > 50
     }
 
-    private fun handleMessage(message: Message, createMessageAction: (String) -> MessageAction) {
+    private fun handleMessage(message: Message, createMessageAction: (MessageEmbed) -> MessageAction) {
         val (gameContext, editedMessage) = findGameContext(message).onFailure {
-            sendResponse(message, it, createMessageAction)
+            sendResponse(message, EmbedBuilder().setTitle("Failure").setDescription(it).build(), createMessageAction)
             return
         }
         val command = gameContext.commands.find { editedMessage.contentRaw.startsWith("!${it.name}") } ?: return
         GlobalScope.launch {
             val mainJob = async {
-                if (command.isReadOnly || gameContext.game.hasWritePermission(editedMessage.member)) {
-                    command.handleMessage(editedMessage)
+                val embed = if (command.isReadOnly || gameContext.game.hasWritePermission(editedMessage.member)) {
+                    command.handleMessageEmbed(editedMessage)
                 } else {
-                    "sorry, you do not have the permission to use this command."
-                } + if (command.isReadOnly && editedMessage.channelType != ChannelType.PRIVATE) {
-                    "\n\nᴰᶦᵈ ʸᵒᵘ ᵏⁿᵒʷˀ ʸᵒᵘ ᶜᵃⁿ ᵘˢᵉ ᵗʰᶦˢ ᶜᵒᵐᵐᵃⁿᵈ ᶦⁿ ᵖʳᶦᵛᵃᵗᵉ ᵐᵉˢˢᵃᵍᵉˢ"
-                } else {
-                    ""
+                    EmbedBuilder().setDescription("sorry, you do not have the permission to use this command.")
                 }
+                if (command.isReadOnly && editedMessage.channelType != ChannelType.PRIVATE) {
+                    embed.setFooter("Did you know? You can use this command in private messages")
+                } else {
+                    //force max embed width
+                    embed.setFooter("\u2800".repeat(60))
+                }
+                embed.build()
             }
             val startedMessageSend = AtomicBoolean()
             val messageJob = async {
                 delay(2000)
                 if (startedMessageSend.compareAndSet(false, true)) {
-                    createMessageAction("${message.author.asMention} processing your request, please wait...").mention(message.author).complete()
+                    createMessageAction(EmbedBuilder().setDescription("processing your request, please wait...").build()).mention(message.author).complete()
                 } else {
                     null
                 }
             }
             val response = mainJob.await()
-            val currentCreateMessageAction: (String) -> MessageAction = if (startedMessageSend.compareAndSet(true, true)) {
+            val currentCreateMessageAction: (MessageEmbed) -> MessageAction = if (startedMessageSend.compareAndSet(true, true)) {
                 messageJob.await().let { message -> { message!!.editMessage(it) } }
             } else {
                 messageJob.cancel()
@@ -84,9 +90,22 @@ class DiscordService(private val jda: JDA, private val gameContexts: List<GameCo
         }
     }
 
-    private fun sendResponse(message: Message, response: String, createMessageAction: (String) -> MessageAction) {
-        if (response.isNotBlank()) {
-            createMessageAction("${message.author.asMention} $response").mention(message.author).queue {
+    private fun sendResponse(message: Message, response: MessageEmbed, createMessageAction: (MessageEmbed) -> MessageAction) {
+        if (!response.isEmpty) {
+            val url = response.image?.url
+            val send = if (url != null) {
+                when {
+                    url.endsWith(".mp4") -> createMessageAction(EmbedBuilder(response).setImage(null).build()).addFile(
+                        URL(url).readBytes(),
+                        url.substringAfterLast("/")
+                    )
+                    url.endsWith(".gif") -> createMessageAction(response)
+                    else -> createMessageAction(EmbedBuilder(response).setImage(null).appendDescription(url).build())
+                }
+            } else {
+                createMessageAction(response)
+            }
+            send.mention(message.author).queue {
                 messageCache[message.idLong] = it
             }
         }

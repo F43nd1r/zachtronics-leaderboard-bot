@@ -66,18 +66,17 @@ public class CommandTest {
             Mockito.when(attachment.retrieveInputStream()).thenReturn(
                     CompletableFuture.completedFuture(new ByteArrayInputStream(attachmentContent.getBytes())));
             attachments = Collections.singletonList(attachment);
-        }
-        else {
+        } else {
             attachments = Collections.emptyList();
         }
 
-        Message message = new ReceivedMessage(-1, null, null, false, false, new TLongHashSet(), new TLongHashSet(),
-                                              false, false, text, "", new UserById(295868901042946048L), null, null,
-                                              null, Collections.emptyList(), attachments,
-                                              Collections.emptyList(), 0);
+        Message message = new ReceivedMessage(-1, null, null, null, false, false, new TLongHashSet(), new TLongHashSet(),
+                false, false, text, "", new UserById(295868901042946048L), null, null,
+                null, Collections.emptyList(), attachments,
+                Collections.emptyList(), 0);
 
         String result = commands.stream().filter(c -> text.startsWith("!" + c.getName())).findFirst().get()
-                                .handleMessage(message);
+                .handleMessage(message);
         System.out.println(result);
         return result;
     }

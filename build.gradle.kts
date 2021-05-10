@@ -2,11 +2,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    kotlin("jvm") version "1.4.0"
-    kotlin("plugin.serialization") version "1.4.0"
+    kotlin("jvm") version "1.4.32"
+    kotlin("plugin.serialization") version "1.4.32"
     id("org.springframework.boot") version "2.3.3.RELEASE"
     id("io.spring.dependency-management") version "1.0.7.RELEASE"
-    kotlin("plugin.spring") version "1.4.0"
+    kotlin("plugin.spring") version "1.4.32"
     id("com.palantir.docker") version "0.26.0"
     id("io.freefair.lombok") version "5.2.1"
 }
