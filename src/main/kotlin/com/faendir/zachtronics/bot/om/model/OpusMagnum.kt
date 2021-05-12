@@ -22,7 +22,7 @@ class OpusMagnum : Game<OmCategory, OmScore, OmPuzzle, OmRecord> {
         val outerParts = string.split(':')
         val (modifier, scoreString) = when (outerParts.size) {
             1 -> null to string
-            2 -> (OmModifier.values().find { it.key.toString() == outerParts[0] }
+            2 -> (OmModifier.values().find { it.key.toString().equals(outerParts[0], ignoreCase = true) }
                 ?: return parseFailure("\"${outerParts[0]}\" is not a modifier.")) to outerParts[1]
             else -> return parseFailure("I didn't understand \"$string\".")
         }

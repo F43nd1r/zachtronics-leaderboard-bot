@@ -57,7 +57,7 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
     fun findScoreIdentifier(command: MatchResult, groupName: String = "score"): Result<ScoreIdentifier> {
         val scoreString = command.groups[groupName]!!.value
         if (scoreString == "?") return Result.success(ScoreIdentifier.Normal)
-        if (scoreString.length == 1) OmModifier.values().find { it.key.toString() == scoreString }?.let { return Result.success(ScoreIdentifier.Modifier(it)) }
+        if (scoreString.length == 1) OmModifier.values().find { it.key.toString().equals(scoreString, ignoreCase = true) }?.let { return Result.success(ScoreIdentifier.Modifier(it)) }
         OmScorePart.parse(scoreString)?.let { return Result.success(ScoreIdentifier.Part(it.first, it.second)) }
         return Result.parseFailure("I didn't understand \"$scoreString\".")
     }
