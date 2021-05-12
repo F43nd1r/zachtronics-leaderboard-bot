@@ -5,6 +5,7 @@ import com.faendir.zachtronics.bot.generic.archive.Archive
 import com.faendir.zachtronics.bot.om.model.*
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
+import reactor.core.publisher.Mono
 import java.io.File
 
 @Component
@@ -26,14 +27,14 @@ class OmArchive(@Qualifier("omArchiveRepository") private val gitRepo: GitReposi
         }
     }*/
 
-    override fun archive(solution: OmSolution): List<String> {
+    override fun archive(solution: OmSolution): Mono<List<String>> {
         return gitRepo.access {
             val dir = getPuzzleDir(solution.puzzle)
             val changed = OmCategory.values().filter { it.supportsPuzzle(solution.puzzle) && it.supportsScore(solution.score) }.filter { category ->
                 val oldFile = dir.list()?.find { it.startsWith(category.displayName) }
                 val oldScore = oldFile?.split('_')
                     ?.getOrNull(1)
-                    ?.let { scoreString -> opusMagnum.parseScore(solution.puzzle, scoreString).onFailure { throw IllegalStateException(it) } }
+                    ?.let { scoreString -> opusMagnum.parseScore(solution.puzzle, scoreString) }
                 val file = File(dir, "${category.displayName}_${solution.score.toFileString(category)}_${solution.puzzle.name}.solution.kts")
                 when {
                     oldScore == null -> {

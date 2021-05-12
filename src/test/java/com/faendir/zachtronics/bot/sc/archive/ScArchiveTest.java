@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @BotTest(SpaceChemMarker.SpaceChemConfiguration.class)
 public class ScArchiveTest {
@@ -41,6 +41,6 @@ public class ScArchiveTest {
     }
 
     private @NotNull List<String> doArchive(ScScore score) {
-        return archive.archive(new ScSolution(ScPuzzle.research_example_1, score));
+        return archive.archive(new ScSolution(ScPuzzle.research_example_1, score)).block();
     }
 }

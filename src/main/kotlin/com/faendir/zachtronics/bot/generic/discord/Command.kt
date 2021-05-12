@@ -1,7 +1,10 @@
 package com.faendir.zachtronics.bot.generic.discord
 
-import net.dv8tion.jda.api.EmbedBuilder
-import net.dv8tion.jda.api.entities.Message
+import discord4j.core.`object`.command.ApplicationCommandInteractionOption
+import discord4j.core.`object`.entity.User
+import discord4j.discordjson.json.ApplicationCommandOptionData
+import discord4j.discordjson.json.WebhookExecuteRequest
+import reactor.core.publisher.Mono
 
 interface Command {
 
@@ -11,9 +14,7 @@ interface Command {
 
     val isReadOnly: Boolean
 
-    @JvmDefault
-    fun handleMessage(message: Message): String = ""
+    fun handle(options: List<ApplicationCommandInteractionOption>, user: User) : Mono<WebhookExecuteRequest>
 
-    @JvmDefault
-    fun handleMessageEmbed(message: Message) : EmbedBuilder = EmbedBuilder().setDescription(handleMessage(message))
+    fun buildData() : ApplicationCommandOptionData
 }

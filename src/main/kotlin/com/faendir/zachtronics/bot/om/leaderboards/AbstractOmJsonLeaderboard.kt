@@ -10,6 +10,7 @@ import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.utils.plusIf
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
+import reactor.core.publisher.Mono
 import java.io.File
 import javax.annotation.PostConstruct
 
@@ -36,10 +37,10 @@ abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, 
             if (status().run { added.isNotEmpty() || changed.isNotEmpty() }) {
                 commitAndPush("Update page formatting")
             }
-        }
+        }.block()
     }
 
-    override fun update(puzzle: OmPuzzle, record: OmRecord): UpdateResult {
+    override fun update(puzzle: OmPuzzle, record: OmRecord): Mono<UpdateResult> {
         return gitRepo.access {
             val betterExists = mutableMapOf<OmCategory, OmScore>()
             val success = mutableMapOf<OmCategory, OmScore?>()
@@ -83,7 +84,7 @@ abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, 
         }
     }
 
-    override fun get(puzzle: OmPuzzle, category: OmCategory): OmRecord? {
+    override fun get(puzzle: OmPuzzle, category: OmCategory): Mono<OmRecord> {
         return gitRepo.access {
             val (dirName, _) = directoryCategories.asIterable().find { it.value.contains(category) } ?: return@access null
             val dir = File(repo, dirName)

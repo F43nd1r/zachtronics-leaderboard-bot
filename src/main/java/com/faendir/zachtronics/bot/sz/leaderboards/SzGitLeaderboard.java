@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,7 +36,7 @@ public class SzGitLeaderboard implements Leaderboard<SzCategory, SzScore, SzPuzz
             .compile("\\[name] top solution [a-z]+(?:->[a-z]+)?(?: - (?<author>.+))?", Pattern.CASE_INSENSITIVE);
     @Nullable
     @Override
-    public SzRecord get(@NotNull SzPuzzle puzzle, @NotNull SzCategory category) {
+    public Mono<SzRecord> get(@NotNull SzPuzzle puzzle, @NotNull SzCategory category) {
         return gitRepository.access(a -> readSolutionFile(findPuzzleFile(a, puzzle, category)));
     }
 

@@ -3,17 +3,21 @@ package com.faendir.zachtronics.bot.sc.discord;
 import com.faendir.zachtronics.bot.generic.discord.AbstractSubmitCommand;
 import com.faendir.zachtronics.bot.model.Leaderboard;
 import com.faendir.zachtronics.bot.sc.archive.ScArchive;
-import com.faendir.zachtronics.bot.sc.model.*;
-import com.faendir.zachtronics.bot.utils.Result;
-import kotlin.Pair;
+import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
+import com.faendir.zachtronics.bot.sc.model.ScRecord;
+import com.faendir.zachtronics.bot.sc.model.ScScore;
+import com.faendir.zachtronics.bot.sc.model.SpaceChem;
+import discord4j.core.object.command.ApplicationCommandInteractionOption;
+import discord4j.core.object.entity.User;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
@@ -34,6 +38,18 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
 
     @NotNull
     @Override
+    public Mono<Tuple2<ScPuzzle, ScRecord>> parseSubmission(@NotNull List<? extends ApplicationCommandInteractionOption> options, @NotNull User user) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public ApplicationCommandOptionData buildData() {
+        return null;
+    }
+
+    /*@NotNull
+    @Override
     public Result<Pair<ScPuzzle, ScRecord>> parseSubmission(@NotNull Message message) {
         Matcher m = SUBMISSION_REGEX.matcher(message.getContentRaw());
         if (!m.matches())
@@ -49,7 +65,7 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
             ScRecord record = new ScRecord(score, m.group("author"), m.group("link"), m.group("oldRNG") != null);
             return Result.success(new Pair<>(puzzle, record));
         });
-    }
+    }*/
 
     @NotNull
     @Override

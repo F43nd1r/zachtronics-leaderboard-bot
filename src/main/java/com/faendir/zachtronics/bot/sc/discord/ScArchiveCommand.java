@@ -1,21 +1,22 @@
 package com.faendir.zachtronics.bot.sc.discord;
 
+import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.zachtronics.bot.generic.discord.AbstractArchiveCommand;
 import com.faendir.zachtronics.bot.sc.archive.ScArchive;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import com.faendir.zachtronics.bot.sc.model.SpaceChem;
-import com.faendir.zachtronics.bot.utils.Result;
+import discord4j.core.object.command.ApplicationCommandInteractionOption;
+import discord4j.core.object.entity.User;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.concurrent.ExecutionException;
-import java.util.regex.Matcher;
+import java.util.List;
 import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
@@ -32,6 +33,18 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
             Pattern.CASE_INSENSITIVE);
 
     @NotNull
+    @Override
+    public Mono<ScSolution> parseSolution(@NotNull List<? extends ApplicationCommandInteractionOption> options, @NotNull User user) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public ApplicationCommandOptionData buildData() {
+        return ScArchiveCommand$ScArchiveCommandDataParser.buildData();
+    }
+
+    /*@NotNull
     @Override
     public Result<ScSolution> parseSolution(@NotNull Message message) {
         Matcher m = SOLUTION_REGEX.matcher(message.getContentRaw());
@@ -66,11 +79,27 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
             }
             return Result.success(solution);
         });
-    }
+    }*/
 
     @NotNull
     @Override
     public String getHelpText() {
         return "<puzzle> [(<cycles/reactors/symbols[/BP]>) - or - attach export to message]";
+    }
+
+    @ApplicationCommand(name = "archive", subCommand = true)
+    public static class ScArchiveCommandData {
+        @NonNull
+        @Getter
+        private final String puzzle;
+
+        @NonNull
+        @Getter
+        private final String score;
+
+        public ScArchiveCommandData(@NonNull String puzzle, @NonNull String score) {
+            this.puzzle = puzzle;
+            this.score = score;
+        }
     }
 }

@@ -1,14 +1,14 @@
 package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.Game;
-import com.faendir.zachtronics.bot.utils.Result;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
+import discord4j.core.object.entity.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.dv8tion.jda.api.entities.Member;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +22,8 @@ public class SpaceChem implements Game<ScCategory, ScScore, ScPuzzle, ScRecord> 
     private final String discordChannel = "spacechem";
     @Getter
     private final String displayName = "SpaceChem";
+    @Getter
+    private final String commandName = "sc";
 
     @NotNull
     @Override
@@ -32,11 +34,10 @@ public class SpaceChem implements Game<ScCategory, ScScore, ScPuzzle, ScRecord> 
 
     @NotNull
     @Override
-    public Result<ScPuzzle> parsePuzzle(@NotNull String name) {
+    public ScPuzzle parsePuzzle(@NotNull String name) {
         return Arrays.stream(ScPuzzle.values())
                      .filter(p -> p.getDisplayName().equalsIgnoreCase(name))
                      .findFirst()
-                     .map(Result::success)
                      .orElse(UtilsKt.getSingleMatchingPuzzle(ScPuzzle.values(), name));
     }
 
@@ -45,9 +46,9 @@ public class SpaceChem implements Game<ScCategory, ScScore, ScPuzzle, ScRecord> 
                                                         185983061190508544L  // Zig
     );
     @Override
-    public boolean hasWritePermission(@Nullable Member member) {
-        if (member == null)
-            return false;
-        return WIKI_ADMINS.contains(member.getIdLong());
+    public Mono<Boolean> hasWritePermission(@Nullable User user) {
+        if (user == null)
+            return Mono.just(false);
+        return Mono.just(WIKI_ADMINS.contains(user.getId().asLong()));
     }
 }

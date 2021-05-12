@@ -6,6 +6,10 @@ import com.faendir.zachtronics.bot.model.Score
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.Status
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
+import org.reactivestreams.Subscriber
+import reactor.core.publisher.Mono
+import reactor.core.publisher.Sinks
+import reactor.core.scheduler.Schedulers
 import java.io.File
 import java.nio.file.Files
 import javax.annotation.PreDestroy
@@ -19,7 +23,11 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
         }
     }
 
-    fun <T> access(access: AccessScope.() -> T): T {
+    fun <T> access(access: AccessScope.() -> T?): Mono<T> {
+        return (Mono.fromCallable { doAccess(access) } as Mono<T>).subscribeOn(Schedulers.boundedElastic())
+    }
+
+    private fun <T> doAccess(access: AccessScope.() -> T?) : T?{
         return synchronized(repo) {
             Git.open(repo).use { git ->
                 git.pull().setTimeout(120).call()

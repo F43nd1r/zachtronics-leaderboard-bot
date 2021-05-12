@@ -21,7 +21,7 @@ import java.time.ZoneOffset
 class OmRedditWikiLeaderboard(@Qualifier("omRedditLeaderboardRepository") gitRepository: GitRepository, private val reddit: RedditService,
                               imgurService: ImgurService) : AbstractOmJsonLeaderboard<MutableMap<OmPuzzle, PuzzleEntry>>(gitRepository,
     imgurService,
-    mapOf("." to listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SG, SGP, SC, SCP, SA, SI)),
+    mapOf("." to listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, /*SG, SGP, SC, SCP, SA, SI*/)),
     serializer()) {
     companion object {
         private const val wikiPage = "index"

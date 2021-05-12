@@ -2,25 +2,31 @@ package com.faendir.zachtronics.bot.generic.discord
 
 import com.faendir.zachtronics.bot.generic.archive.Archive
 import com.faendir.zachtronics.bot.model.Solution
-import com.faendir.zachtronics.bot.utils.Result
-import com.faendir.zachtronics.bot.utils.message
-import net.dv8tion.jda.api.entities.Message
+import discord4j.core.`object`.command.ApplicationCommandInteractionOption
+import discord4j.core.`object`.entity.User
+import discord4j.discordjson.json.WebhookExecuteRequest
+import reactor.core.publisher.Mono
 
 abstract class AbstractArchiveCommand<S : Solution> : Command {
     override val name: String = "archive"
     override val isReadOnly: Boolean = false
     protected abstract val archive: Archive<S>
 
-    override fun handleMessage(message: Message): String {
-        return parseSolution(message).flatMap {
-            val result = archive.archive(it)
-            if (result.isNotEmpty()) {
-                Result.success("thanks, your solution has been archived ${it.score.toDisplayString()} $result.")
-            } else {
-                Result.failure("sorry, your solution did not qualify for archiving.")
-            }
-        }.message
+    override fun handle(options: List<ApplicationCommandInteractionOption>, user: User): Mono<WebhookExecuteRequest> {
+        return parseSolution(options, user)
+            .flatMap { solution -> archive(solution) }
+            .map { WebhookExecuteRequest.builder().content(it).build() }
     }
 
-    abstract fun parseSolution(message: Message): Result<S>
+    fun archive(solution: S): Mono<String> = archive.archive(solution).map { result -> getResultMessage(result, solution) }
+
+    private fun getResultMessage(result: List<String>, solution: S): String {
+        return if (result.isNotEmpty()) {
+            "Your solution has been archived ${solution.score.toDisplayString()} $result."
+        } else {
+            throw IllegalArgumentException("Your solution did not qualify for archiving.")
+        }
+    }
+
+    abstract fun parseSolution(options: List<ApplicationCommandInteractionOption>, user: User): Mono<S>
 }
