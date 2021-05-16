@@ -17,20 +17,6 @@ import reactor.util.function.Tuples
 @Component
 class OmSubmitCommand(private val opusMagnum: OpusMagnum, override val leaderboards: List<Leaderboard<*, *, OmPuzzle, OmRecord>>) :
     AbstractSubmitCommand<OmPuzzle, OmRecord>() {
-    override val helpText: String = """
-        |`<puzzle>:<score> <gif link>`
-        |Gifs can also be attached instead of linked.
-        |Score:
-        |`100/32/14` - g/c/a or g/c/i
-        |`100/32/14/22` - g/c/a/i
-        |`3.5w/32c/100g` - named parts can be in any order
-        |`o:100/32c/14a` - overlap
-        |`t:100g/32c/14i` - trackless
-        |Alternative format with integrated archiving:
-        |`<score identifier> <gif link> <solution link>`
-        |Links can be replaced by attached files.
-        |See !archive for score identifier format.
-    """.trimMargin()
 
     val regex =
         Regex("!submit\\s+(?<puzzle>[^:]*)(:|\\s)\\s*(?<score>([a-zA-Z]:)?[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?(/[\\d.]+[a-zA-Z]?)?)(\\s+(?<link>http.*))?\\s*")

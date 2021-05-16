@@ -1,9 +1,6 @@
 package com.faendir.zachtronics.bot.generic.discord
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.zachtronics.bot.model.*
-import com.faendir.zachtronics.bot.om.model.OmMetric
-import com.faendir.zachtronics.bot.om.model.OmModifier
 import com.faendir.zachtronics.bot.utils.throwIfEmpty
 import discord4j.core.`object`.command.ApplicationCommandInteractionOption
 import discord4j.core.`object`.entity.User
@@ -20,7 +17,6 @@ abstract class AbstractShowCommand<C : Category<S, P>, S : Score, P : Puzzle, R 
     val regex = Regex("!show\\s+(?<category>\\S+)\\s+(?<puzzle>.+)")
     val altRegex = Regex("!show\\s+(?<puzzle>.+)\\s+(?<category>\\S+)")
     override val name: String = "show"
-    override val helpText: String = "`<category> <puzzle>`"
     override val isReadOnly: Boolean = true
 
     override fun handle(options: List<ApplicationCommandInteractionOption>, user: User): Mono<WebhookExecuteRequest> {

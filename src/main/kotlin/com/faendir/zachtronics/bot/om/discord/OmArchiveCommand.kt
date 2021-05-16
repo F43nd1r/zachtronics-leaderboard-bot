@@ -77,16 +77,6 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
         }
     }
 
-    override val helpText: String = """
-        |`<score identifier> <solution link>`
-        |Solutions can also be attached instead of linked.
-        |Score identifier: 
-        |`?` - Normal puzzles
-        |`t` - Trackless
-        |`o` - Overlap
-        |`3.5w` - Width
-        |`4h` - Height
-    """.trimMargin()
 }
 
 sealed class ScoreIdentifier {

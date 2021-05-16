@@ -8,9 +8,10 @@ import reactor.core.publisher.Mono
 
 interface Command {
 
+    /**
+     * this name must match the name used in [buildData]
+     */
     val name: String
-
-    val helpText: String
 
     val isReadOnly: Boolean
 

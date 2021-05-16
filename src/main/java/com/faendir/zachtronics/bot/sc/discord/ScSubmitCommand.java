@@ -67,9 +67,4 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
         });
     }*/
 
-    @NotNull
-    @Override
-    public String getHelpText() {
-        return "<puzzle> (<cycles/reactors/symbols[/BP]>) by <author> <youtube link>";
-    }
 }

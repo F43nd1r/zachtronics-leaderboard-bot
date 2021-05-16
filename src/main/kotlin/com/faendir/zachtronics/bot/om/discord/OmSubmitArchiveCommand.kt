@@ -15,7 +15,6 @@ import reactor.kotlin.core.util.function.*
 @Component
 class OmSubmitArchiveCommand(private val archiveCommand: OmArchiveCommand, private val submitCommand: OmSubmitCommand) : Command {
     override val name: String = "submit-archive"
-    override val helpText: String = ""
     override val isReadOnly: Boolean = false
 
     override fun handle(options: List<ApplicationCommandInteractionOption>, user: User): Mono<WebhookExecuteRequest> {

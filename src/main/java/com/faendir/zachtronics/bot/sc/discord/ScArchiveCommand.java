@@ -81,12 +81,6 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
         });
     }*/
 
-    @NotNull
-    @Override
-    public String getHelpText() {
-        return "<puzzle> [(<cycles/reactors/symbols[/BP]>) - or - attach export to message]";
-    }
-
     @ApplicationCommand(name = "archive", subCommand = true)
     public static class ScArchiveCommandData {
         @NonNull
