@@ -59,9 +59,9 @@ abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, 
                         }) {
                         records.setRecord(puzzle, category, OmRecord(category.normalizeScore(record.score), rehostedLink))
                         changed = true
-                        success[category] = oldRecord?.score
+                        success[category] = oldRecord?.score?.also { it.displayAsSum = category.name.startsWith("S") }
                     } else {
-                        betterExists[category] = oldRecord.score
+                        betterExists[category] = oldRecord.score.also { it.displayAsSum = category.name.startsWith("S") }
                     }
                 }
                 val localParetoUpdate = paretoUpdate(puzzle, record, records)

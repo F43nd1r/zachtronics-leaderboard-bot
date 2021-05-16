@@ -10,7 +10,8 @@ import discord4j.discordjson.json.ApplicationCommandOptionData
 import discord4j.discordjson.json.WebhookExecuteRequest
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.util.function.*
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
 
 @Component
 class OmSubmitArchiveCommand(private val archiveCommand: OmArchiveCommand, private val submitCommand: OmSubmitCommand) : Command {
@@ -22,9 +23,7 @@ class OmSubmitArchiveCommand(private val archiveCommand: OmArchiveCommand, priva
             archiveCommand.parseSolution(archiveCommand.findScoreIdentifier(submitArchive), submitArchive.solution).flatMap { solution ->
                 archiveCommand.archive(solution).zipWith(
                     submitCommand.submitToLeaderboards(solution.puzzle, OmRecord(solution.score, submitArchive.gif, user.username))
-                ).map { (archiveOut, submitOut) ->
-                    WebhookExecuteRequest.builder().from(submitOut).content(submitOut.contentOrElse("") + "\n\n" + archiveOut).build()
-                }
+                ).map { (archiveOut, submitOut) -> WebhookExecuteRequest.builder().from(submitOut).content(archiveOut).build() }
             }
         }
     }

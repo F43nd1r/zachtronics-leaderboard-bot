@@ -1,6 +1,7 @@
 package com.faendir.zachtronics.bot.om.discord
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand
+import com.faendir.discord4j.command.annotation.Description
 import com.faendir.zachtronics.bot.generic.discord.AbstractShowCommand
 import com.faendir.zachtronics.bot.model.Leaderboard
 import com.faendir.zachtronics.bot.om.model.*
@@ -39,4 +40,11 @@ class OmShowCommand(private val opusMagnum: OpusMagnum, leaderboards: List<Leade
 }
 
 @ApplicationCommand(subCommand = true)
-data class Show(val puzzle: String, val primaryMetric: OmMetric, val tiebreaker: OmMetric?, val modifier: OmModifier?)
+data class Show(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")
+                val puzzle: String,
+                @Description("Primary Metric")
+                val primaryMetric: OmMetric,
+                @Description("Tiebreaker")
+                val tiebreaker: OmMetric?,
+                @Description("Metric Modifier")
+                val modifier: OmModifier?)

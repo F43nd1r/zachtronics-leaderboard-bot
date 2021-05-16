@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
-@Component
+//@Component
 public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
     private final SpaceChem spaceChem;
     @Getter

@@ -20,7 +20,7 @@ import reactor.util.function.Tuple2;
 import java.util.List;
 import java.util.regex.Pattern;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
     private final SpaceChem spaceChem;
