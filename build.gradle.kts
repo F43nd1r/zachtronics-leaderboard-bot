@@ -39,8 +39,8 @@ dependencies {
     implementation("com.faendir.jraw:JRAW:1.2.0")
     implementation("net.bramp.ffmpeg:ffmpeg:0.6.2")
     implementation("com.faendir.om:dsl:1.2.0")
-    implementation("com.faendir.discord4j-command-parser:annotations:1.0.6")
-    ksp("com.faendir.discord4j-command-parser:processor:1.0.6")
+    implementation("com.faendir.discord4j-command-parser:annotations:1.1.0")
+    ksp("com.faendir.discord4j-command-parser:processor:1.1.0")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
