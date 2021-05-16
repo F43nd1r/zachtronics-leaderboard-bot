@@ -2,15 +2,12 @@ package com.faendir.zachtronics.bot
 
 import com.faendir.zachtronics.bot.generic.GenericConfiguration
 import com.faendir.zachtronics.bot.main.Application
-import org.springframework.boot.test.context.SpringBootContextLoader
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContextInitializer
-import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.core.annotation.AliasFor
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.support.AnnotationConfigContextLoader
 import java.lang.annotation.Inherited
 import kotlin.reflect.KClass
 

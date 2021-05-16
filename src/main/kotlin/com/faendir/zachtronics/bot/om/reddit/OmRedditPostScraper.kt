@@ -47,7 +47,7 @@ class OmRedditPostScraper(
     private val moderators by lazy { redditService.getModerators(Subreddit.OPUS_MAGNUM) }
 
     init {
-        gitRepo.access { trustedUsers = File(repo, trustFile).readLines().filter { !it.isBlank() }.map { it.trim() } }.block()
+        gitRepo.access { trustedUsers = File(repo, trustFile).readLines().filter { it.isNotBlank() }.map { it.trim() } }.block()
     }
 
     /*@PostConstruct

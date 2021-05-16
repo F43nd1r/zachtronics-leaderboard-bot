@@ -26,7 +26,6 @@ import java.io.ByteArrayInputStream
 
 @Component
 class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArchiveCommand<OmSolution>() {
-    private val regex = Regex("!archive\\s+(?<score>\\S+)(\\s+(?<link>\\S+))?")
 
     override fun buildData(): ApplicationCommandOptionData = ArchiveParser.buildData()
 

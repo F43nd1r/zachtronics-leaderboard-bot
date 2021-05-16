@@ -15,10 +15,9 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
-import kotlin.math.log
 
 @Service
-class DiscordService(private val discordClient: GatewayDiscordClient, private val gameContexts: List<GameContext>) {
+class DiscordService(discordClient: GatewayDiscordClient, private val gameContexts: List<GameContext>) {
     companion object {
         private val logger = LoggerFactory.getLogger(DiscordService::class.java)
     }

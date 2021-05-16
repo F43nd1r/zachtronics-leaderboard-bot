@@ -1,6 +1,6 @@
 package com.faendir.zachtronics.bot.om.model
 
-enum class OmMetric(val key: String, val canBePrimary: Boolean = true) {
+enum class OmMetric(val key: String) {
     COST("G"),
     CYCLES("C"),
     AREA("A"),
@@ -9,6 +9,6 @@ enum class OmMetric(val key: String, val canBePrimary: Boolean = true) {
     SUM4("SUM4"),
     HEIGHT("H"),
     Width("W"),
-    PRODUCT("X", false)
+    PRODUCT("X")
 
 }

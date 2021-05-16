@@ -6,9 +6,7 @@ import com.faendir.zachtronics.bot.model.Score
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.Status
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
-import org.reactivestreams.Subscriber
 import reactor.core.publisher.Mono
-import reactor.core.publisher.Sinks
 import reactor.core.scheduler.Schedulers
 import java.io.File
 import java.nio.file.Files
@@ -65,8 +63,8 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
         }
 
         fun resetAndClean(file: File) {
-            git.reset().addPath(file.relativeTo(repo).path).call();
-            git.clean().setForce(true).setPaths(setOf(file.relativeTo(repo).path)).call();
+            git.reset().addPath(file.relativeTo(repo).path).call()
+            git.clean().setForce(true).setPaths(setOf(file.relativeTo(repo).path)).call()
         }
     }
 

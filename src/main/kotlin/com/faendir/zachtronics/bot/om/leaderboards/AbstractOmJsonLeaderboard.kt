@@ -1,12 +1,13 @@
 package com.faendir.zachtronics.bot.om.leaderboards
 
 import com.faendir.zachtronics.bot.main.git.GitRepository
-import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Leaderboard
-import com.faendir.zachtronics.bot.model.Score
 import com.faendir.zachtronics.bot.model.UpdateResult
 import com.faendir.zachtronics.bot.om.imgur.ImgurService
-import com.faendir.zachtronics.bot.om.model.*
+import com.faendir.zachtronics.bot.om.model.OmCategory
+import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.utils.plusIf
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json

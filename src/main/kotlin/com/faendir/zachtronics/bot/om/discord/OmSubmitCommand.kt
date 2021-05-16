@@ -21,7 +21,6 @@ class OmSubmitCommand(private val opusMagnum: OpusMagnum, override val leaderboa
 
     val regex =
         Regex("!submit\\s+(?<puzzle>[^:]*)(:|\\s)\\s*(?<score>([a-zA-Z]:)?[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?/[\\d.]+[a-zA-Z]?(/[\\d.]+[a-zA-Z]?)?)(\\s+(?<link>http.*))?\\s*")
-    val withArchiveRegex = Regex("!submit\\s+(?<score>\\S+)(\\s+(?<link1>\\S+))?(\\s+(?<link2>\\S+))?")
 
     override fun buildData() = SubmitParser.buildData()
 
