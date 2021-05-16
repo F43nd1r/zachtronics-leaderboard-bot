@@ -1,6 +1,7 @@
 package com.faendir.zachtronics.bot.om.discord
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand
+import com.faendir.discord4j.command.annotation.Description
 import com.faendir.om.dsl.DslGenerator
 import com.faendir.om.parser.solution.SolutionParser
 import com.faendir.om.parser.solution.model.SolvedSolution
@@ -91,5 +92,12 @@ interface IArchive {
     val score: String?
 }
 
-@ApplicationCommand(subCommand = true)
-data class Archive(override val solution: String, override val modifier: OmModifier?, override val score: String?) : IArchive
+@ApplicationCommand(description = "Archive a solution", subCommand = true)
+data class Archive(
+    @Description("Link to your solution file")
+    override val solution: String,
+    @Description("Metric Modifier")
+    override val modifier: OmModifier?,
+    @Description("Score part for nonstandard metrics. E.g. `4h`, `3.5w`")
+    override val score: String?
+) : IArchive

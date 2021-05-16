@@ -1,6 +1,7 @@
 package com.faendir.zachtronics.bot.om.discord
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand
+import com.faendir.discord4j.command.annotation.Description
 import com.faendir.zachtronics.bot.generic.discord.Command
 import com.faendir.zachtronics.bot.om.model.OmModifier
 import com.faendir.zachtronics.bot.om.model.OmRecord
@@ -31,5 +32,14 @@ class OmSubmitArchiveCommand(private val archiveCommand: OmArchiveCommand, priva
     override fun buildData(): ApplicationCommandOptionData = SubmitArchiveParser.buildData()
 }
 
-@ApplicationCommand(subCommand = true)
-data class SubmitArchive(override val solution: String, val gif: String, override val modifier: OmModifier?, override val score: String?) : IArchive
+@ApplicationCommand(description = "Submit and archive a solution", subCommand = true)
+data class SubmitArchive(
+    @Description("Link to your solution file")
+    override val solution: String,
+    @Description("Link to your solution gif/mp4")
+    val gif: String,
+    @Description("Metric Modifier")
+    override val modifier: OmModifier?,
+    @Description("Score part for nonstandard metrics. E.g. `4h`, `3.5w`")
+    override val score: String?
+) : IArchive

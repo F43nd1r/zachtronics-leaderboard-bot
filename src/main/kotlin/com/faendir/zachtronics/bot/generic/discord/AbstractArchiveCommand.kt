@@ -24,7 +24,7 @@ abstract class AbstractArchiveCommand<S : Solution> : Command {
         return if (result.isNotEmpty()) {
             "Your solution has been archived ${solution.score.toDisplayString()} $result."
         } else {
-            throw IllegalArgumentException("Your solution did not qualify for archiving.")
+            "Your solution did not qualify for archiving."
         }
     }
 

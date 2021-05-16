@@ -1,6 +1,7 @@
 package com.faendir.zachtronics.bot.om.discord
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand
+import com.faendir.discord4j.command.annotation.Description
 import com.faendir.zachtronics.bot.generic.discord.AbstractSubmitCommand
 import com.faendir.zachtronics.bot.model.Leaderboard
 import com.faendir.zachtronics.bot.om.model.OmModifier
@@ -33,5 +34,13 @@ class OmSubmitCommand(private val opusMagnum: OpusMagnum, override val leaderboa
     }
 }
 
-@ApplicationCommand(subCommand = true)
-data class Submit(val puzzle: String, val score: String, val link: String, val modifier: OmModifier?)
+@ApplicationCommand(description = "Submit a solution",subCommand = true)
+data class Submit(
+    @Description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")
+    val puzzle: String,
+    @Description("Puzzle score. E.g. `100/32/14/22`, `3.5w/32c/100g`")
+    val score: String,
+    @Description("Link to your solution gif/mp4")
+    val link: String,
+    @Description("Metric Modifier")
+    val modifier: OmModifier?)

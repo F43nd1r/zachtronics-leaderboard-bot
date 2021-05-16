@@ -39,7 +39,7 @@ class OmShowCommand(private val opusMagnum: OpusMagnum, leaderboards: List<Leade
     }
 }
 
-@ApplicationCommand(subCommand = true)
+@ApplicationCommand(description = "Show a record", subCommand = true)
 data class Show(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")
                 val puzzle: String,
                 @Description("Primary Metric")
