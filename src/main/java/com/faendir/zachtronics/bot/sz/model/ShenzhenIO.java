@@ -5,7 +5,6 @@ import com.faendir.zachtronics.bot.model.Leaderboard;
 import com.faendir.zachtronics.bot.model.Game;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
 import discord4j.core.object.entity.User;
-import kotlin.Pair;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -15,13 +14,12 @@ import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class ShenzhenIO implements Game<SzCategory, SzScore, SzPuzzle, SzRecord> {
+public class ShenzhenIO implements Game {
     @Getter
     private final String discordChannel = "shenzhen-io";
     @Getter
@@ -68,14 +66,12 @@ public class ShenzhenIO implements Game<SzCategory, SzScore, SzPuzzle, SzRecord>
     }*/
 
     @NotNull
-    @Override
     public List<SzCategory> parseCategory(@NotNull String name) {
         return Arrays.stream(SzCategory.values()).filter(c -> c.getDisplayName().equalsIgnoreCase(name))
                      .collect(Collectors.toList());
     }
 
     @NotNull
-    @Override
     public SzPuzzle parsePuzzle(@NotNull String name) {
         return UtilsKt.getSingleMatchingPuzzle(SzPuzzle.values(), name);
     }

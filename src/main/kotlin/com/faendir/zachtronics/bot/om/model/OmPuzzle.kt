@@ -3,6 +3,7 @@ package com.faendir.zachtronics.bot.om.model
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.om.model.OmGroup.*
 import com.faendir.zachtronics.bot.om.model.OmType.*
+import com.faendir.zachtronics.bot.utils.getSingleMatchingPuzzle
 
 
 @Suppress("unused", "SpellCheckingInspection")
@@ -122,4 +123,8 @@ enum class OmPuzzle(override val group: OmGroup, override val type: OmType, over
     DO_YOU_REMEMBER(TOURNAMENT_2019, NORMAL, "Do You Remember", "w1698787731"),
     EVIL_ORE(TOURNAMENT_2019, NORMAL, "Evil Ore", "w1698788220"),
     PANACEA(TOURNAMENT_2019, NORMAL, "Panacea", "w1698789743");
+
+    companion object {
+        fun parse(name: String): OmPuzzle = values().getSingleMatchingPuzzle(name)
+    }
 }

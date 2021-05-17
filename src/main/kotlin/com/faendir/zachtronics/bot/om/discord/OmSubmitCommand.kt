@@ -4,10 +4,7 @@ import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.Description
 import com.faendir.zachtronics.bot.generic.discord.AbstractSubmitCommand
 import com.faendir.zachtronics.bot.model.Leaderboard
-import com.faendir.zachtronics.bot.om.model.OmModifier
-import com.faendir.zachtronics.bot.om.model.OmPuzzle
-import com.faendir.zachtronics.bot.om.model.OmRecord
-import com.faendir.zachtronics.bot.om.model.OpusMagnum
+import com.faendir.zachtronics.bot.om.model.*
 import discord4j.core.`object`.command.ApplicationCommandInteractionOption
 import discord4j.core.`object`.entity.User
 import org.springframework.stereotype.Component
@@ -27,8 +24,8 @@ class OmSubmitCommand(private val opusMagnum: OpusMagnum, override val leaderboa
     override fun parseSubmission(options: List<ApplicationCommandInteractionOption>, user: User): Mono<Tuple2<OmPuzzle, OmRecord>> {
         return Mono.fromCallable { SubmitParser.parse(options) }
             .map {
-                val puzzle = opusMagnum.parsePuzzle(it.puzzle)
-                Tuples.of(puzzle, OmRecord(opusMagnum.parseScore(puzzle, it.score).copy(modifier = it.modifier), it.link, user.username))
+                val puzzle = OmPuzzle.parse(it.puzzle)
+                Tuples.of(puzzle, OmRecord(OmScore.parse(puzzle, it.score).copy(modifier = it.modifier), it.link, user.username))
             }
     }
 }

@@ -34,7 +34,7 @@ class OmArchive(@Qualifier("omArchiveRepository") private val gitRepo: GitReposi
                 val oldFile = dir.list()?.find { it.startsWith(category.displayName) }
                 val oldScore = oldFile?.split('_')
                     ?.getOrNull(1)
-                    ?.let { scoreString -> opusMagnum.parseScore(solution.puzzle, scoreString) }
+                    ?.let { scoreString -> OmScore.parse(solution.puzzle, scoreString) }
                 val file = File(dir, "${category.displayName}_${solution.score.toFileString(category)}_${solution.puzzle.name}.solution.kts")
                 when {
                     oldScore == null -> {

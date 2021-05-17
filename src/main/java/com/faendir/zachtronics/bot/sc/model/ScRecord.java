@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Serializable
 @Value
-public class ScRecord implements Record<ScScore> {
+public class ScRecord implements Record {
     public static final ScRecord IMPOSSIBLE_CATEGORY = new ScRecord(new ScScore(-1, -1, -1), "", "", false);
 
     ScScore score;

@@ -14,7 +14,7 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import reactor.util.function.Tuple2
 
-abstract class AbstractSubmitCommand<P : Puzzle, R : Record<*>> : Command {
+abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : Command {
     override val name: String = "submit"
     override val isReadOnly: Boolean = false
     protected abstract val leaderboards: List<Leaderboard<*, *, P, R>>

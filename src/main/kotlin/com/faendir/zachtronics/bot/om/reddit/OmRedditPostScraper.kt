@@ -161,10 +161,10 @@ class OmRedditPostScraper(
         return if (comment.body != null) {
             Flux.fromIterable(comment.body.lines())
                 .kMapNotNull { mainRegex.matchEntire(it) }
-                .map { Tuples.of(opusMagnum.parsePuzzle(it.groups["puzzle"]!!.value), it.groups["scores"]!!.value) }
+                .map { Tuples.of(OmPuzzle.parse(it.groups["puzzle"]!!.value), it.groups["scores"]!!.value) }
                 .flatMapIterable { (puzzle, scores) -> scoreRegex.findAll(scores).map { Tuples.of(puzzle, it) }.asIterable() }
                 .map { (puzzle, subCommand) ->
-                    Tuples.of(puzzle, opusMagnum.parseScore(puzzle, subCommand.groups["score"]!!.value), subCommand.groups["link"]!!.value)
+                    Tuples.of(puzzle, OmScore.parse(puzzle, subCommand.groups["score"]!!.value), subCommand.groups["link"]!!.value)
                 }.flatMap { (puzzle, score, link) ->
                     leaderboards.toFlux().flatMap { it.update(puzzle, OmRecord(score, link, comment.author)) }.collectList()
                         .map { results: List<UpdateResult> ->

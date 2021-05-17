@@ -1,7 +1,7 @@
 package com.faendir.zachtronics.bot.model
 
 
-interface Record<S : Score> {
-    val score: S
+interface Record {
+    val score: Score
     fun toDisplayString(): String
 }

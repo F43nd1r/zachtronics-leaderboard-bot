@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class SpaceChem implements Game<ScCategory, ScScore, ScPuzzle, ScRecord> {
+public class SpaceChem implements Game {
     @Getter
     private final String discordChannel = "spacechem";
     @Getter
@@ -26,14 +26,12 @@ public class SpaceChem implements Game<ScCategory, ScScore, ScPuzzle, ScRecord> 
     private final String commandName = "sc";
 
     @NotNull
-    @Override
     public List<ScCategory> parseCategory(@NotNull String name) {
         return Arrays.stream(ScCategory.values()).filter(c -> c.getDisplayName().equalsIgnoreCase(name))
                      .collect(Collectors.toList());
     }
 
     @NotNull
-    @Override
     public ScPuzzle parsePuzzle(@NotNull String name) {
         return Arrays.stream(ScPuzzle.values())
                      .filter(p -> p.getDisplayName().equalsIgnoreCase(name))

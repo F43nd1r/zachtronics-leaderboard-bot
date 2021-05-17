@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Serializable
 @Value
-public class SzRecord implements Record<SzScore> {
+public class SzRecord implements Record {
     SzScore score;
     String author;
     String link;
