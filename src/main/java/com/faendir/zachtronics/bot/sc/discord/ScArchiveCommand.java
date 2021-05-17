@@ -12,6 +12,7 @@ import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -82,14 +83,10 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
     }*/
 
     @ApplicationCommand(name = "archive", subCommand = true)
+    @Value
     public static class ScArchiveCommandData {
-        @NonNull
-        @Getter
-        private final String puzzle;
-
-        @NonNull
-        @Getter
-        private final String score;
+        @NonNull String puzzle;
+        @NonNull String score;
 
         public ScArchiveCommandData(@NonNull String puzzle, @NonNull String score) {
             this.puzzle = puzzle;
