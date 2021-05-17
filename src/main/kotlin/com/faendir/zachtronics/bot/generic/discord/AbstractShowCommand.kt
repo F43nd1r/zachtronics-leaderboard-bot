@@ -11,9 +11,7 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import reactor.util.function.Tuple2
 
-abstract class AbstractShowCommand<C : Category<S, P>, S : Score, P : Puzzle, R : Record>(
-    private val game: Game, private val leaderboards: List<Leaderboard<C, S, P, R>>
-) : Command {
+abstract class AbstractShowCommand<C : Category<S, P>, S : Score, P : Puzzle, R : Record>(private val leaderboards: List<Leaderboard<C, S, P, R>>) : Command {
     val regex = Regex("!show\\s+(?<category>\\S+)\\s+(?<puzzle>.+)")
     val altRegex = Regex("!show\\s+(?<puzzle>.+)\\s+(?<category>\\S+)")
     override val name: String = "show"
@@ -24,7 +22,7 @@ abstract class AbstractShowCommand<C : Category<S, P>, S : Score, P : Puzzle, R 
             leaderboards.toFlux()
                 .flatMap { it.get(puzzle, category) }
                 .next()
-                .throwIfEmpty { "sorry, there is no score for ${puzzle.displayName} ${category.displayName}."}
+                .throwIfEmpty { "sorry, there is no score for ${puzzle.displayName} ${category.displayName}." }
                 .map {
                     WebhookExecuteRequest.builder()
                         .content("*${puzzle.displayName}* **${category.displayName}**\n${it.toDisplayString()}")
@@ -33,5 +31,5 @@ abstract class AbstractShowCommand<C : Category<S, P>, S : Score, P : Puzzle, R 
         }
     }
 
-    abstract fun findPuzzleAndCategory(options: List<ApplicationCommandInteractionOption>) : Mono<Tuple2<P, C>>
+    abstract fun findPuzzleAndCategory(options: List<ApplicationCommandInteractionOption>): Mono<Tuple2<P, C>>
 }

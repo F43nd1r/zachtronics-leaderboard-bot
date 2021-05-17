@@ -1,7 +1,6 @@
 package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.Game
-import com.faendir.zachtronics.bot.utils.getSingleMatchingPuzzle
 import discord4j.core.`object`.entity.Member
 import discord4j.core.`object`.entity.User
 import org.springframework.stereotype.Component

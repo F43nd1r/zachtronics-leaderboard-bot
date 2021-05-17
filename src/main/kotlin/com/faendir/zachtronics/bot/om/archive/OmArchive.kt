@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono
 import java.io.File
 
 @Component
-class OmArchive(@Qualifier("omArchiveRepository") private val gitRepo: GitRepository, private val opusMagnum: OpusMagnum) :
+class OmArchive(@Qualifier("omArchiveRepository") private val gitRepo: GitRepository) :
     Archive<OmSolution> {
 
     /*@PostConstruct

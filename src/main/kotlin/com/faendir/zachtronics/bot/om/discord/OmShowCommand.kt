@@ -3,7 +3,6 @@ package com.faendir.zachtronics.bot.om.discord
 import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
-import com.faendir.discord4j.command.annotation.OptionConverter
 import com.faendir.zachtronics.bot.generic.discord.AbstractShowCommand
 import com.faendir.zachtronics.bot.model.Leaderboard
 import com.faendir.zachtronics.bot.om.model.*
@@ -15,8 +14,8 @@ import reactor.util.function.Tuple2
 import reactor.util.function.Tuples
 
 @Component
-class OmShowCommand(private val opusMagnum: OpusMagnum, leaderboards: List<Leaderboard<OmCategory, OmScore, OmPuzzle, OmRecord>>) :
-    AbstractShowCommand<OmCategory, OmScore, OmPuzzle, OmRecord>(opusMagnum, leaderboards) {
+class OmShowCommand(leaderboards: List<Leaderboard<OmCategory, OmScore, OmPuzzle, OmRecord>>) :
+    AbstractShowCommand<OmCategory, OmScore, OmPuzzle, OmRecord>(leaderboards) {
 
     override fun buildData(): ApplicationCommandOptionData = ShowParser.buildData()
 
@@ -50,6 +49,3 @@ data class Show(
     val modifier: OmModifier?
 )
 
-class PuzzleConverter : OptionConverter<OmPuzzle> {
-    override fun fromString(string: String?): OmPuzzle = OmPuzzle.parse(string!!)
-}
