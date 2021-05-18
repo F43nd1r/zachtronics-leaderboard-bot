@@ -14,8 +14,8 @@ import reactor.util.function.Tuple2
 import reactor.util.function.Tuples
 
 @Component
-class OmShowCommand(override val leaderboards: List<Leaderboard<OmCategory, OmScore, OmPuzzle, OmRecord>>) :
-    AbstractShowCommand<OmCategory, OmScore, OmPuzzle, OmRecord>() {
+class OmShowCommand(override val leaderboards: List<Leaderboard<OmCategory, OmPuzzle, OmRecord>>) :
+    AbstractShowCommand<OmCategory, OmPuzzle, OmRecord>() {
 
     override fun buildData(): ApplicationCommandOptionData = ShowParser.buildData()
 

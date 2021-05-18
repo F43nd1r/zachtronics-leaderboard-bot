@@ -33,7 +33,7 @@ import kotlin.streams.asStream
 class OmRedditPostScraper(
     private val redditService: RedditService, private val discordClient: GatewayDiscordClient, private val opusMagnum: OpusMagnum,
     @Qualifier("configRepository") private val gitRepo: GitRepository,
-    private val leaderboards: List<Leaderboard<OmCategory, OmScore, OmPuzzle, OmRecord>>
+    private val leaderboards: List<Leaderboard<OmCategory, OmPuzzle, OmRecord>>
 ) {
     companion object {
         private const val timestampFile = "om-reddit-scraper/last_update.json"
@@ -170,7 +170,8 @@ class OmRedditPostScraper(
                         .map { results: List<UpdateResult> ->
                             val successes = results.filterIsInstance<UpdateResult.Success>()
                             if (successes.isNotEmpty()) {
-                                sendDiscordMessage(opusMagnum.discordChannel, "New record by ${comment.author} on reddit: ${puzzle.displayName} ${
+                                sendDiscordMessage(
+                                    "opus-magnum", "New record by ${comment.author} on reddit: ${puzzle.displayName} ${
                                     successes.flatMap { it.oldScores.keys }.map { it.displayName }
                                 } ${score.toDisplayString()} (previously ${
                                     successes.flatMap { it.oldScores.entries }

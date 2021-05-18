@@ -21,7 +21,7 @@ import static com.faendir.zachtronics.bot.sc.model.ScCategory.*;
 
 @Component
 @RequiredArgsConstructor
-public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScScore, ScPuzzle, ScRecord> {
+public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, ScRecord> {
     @Getter
     private final List<ScCategory> supportedCategories = Arrays.asList(ScCategory.values());
     private final RedditService redditService;

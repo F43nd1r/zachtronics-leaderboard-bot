@@ -14,7 +14,7 @@ import static com.faendir.zachtronics.bot.sz.model.SzType.STANDARD;
 import static com.faendir.zachtronics.bot.utils.Utils.makeComparator3;
 
 @RequiredArgsConstructor
-public enum SzCategory implements Category<SzScore, SzPuzzle> {
+public enum SzCategory implements Category {
     CP("CP", makeComparator3(SzScore::getCost, SzScore::getPower, SzScore::getLines), F100, 101),
     CL("CL", makeComparator3(SzScore::getCost, SzScore::getLines, SzScore::getPower), F100, 102),
 
@@ -36,12 +36,10 @@ public enum SzCategory implements Category<SzScore, SzPuzzle> {
     @Getter
     private final int repoSuffix;
 
-    @Override
     public boolean supportsPuzzle(@NotNull SzPuzzle puzzle) {
         return supportedTypes.contains(puzzle.getType());
     }
 
-    @Override
     public boolean supportsScore(@NotNull SzScore score) {
         return true;
     }

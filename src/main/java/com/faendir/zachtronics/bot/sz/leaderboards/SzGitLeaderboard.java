@@ -26,7 +26,7 @@ import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
-public class SzGitLeaderboard implements Leaderboard<SzCategory, SzScore, SzPuzzle, SzRecord> {
+public class SzGitLeaderboard implements Leaderboard<SzCategory, SzPuzzle, SzRecord> {
     @Getter
     private final List<SzCategory> supportedCategories = Arrays.asList(SzCategory.values());
     @Qualifier("szRepository")

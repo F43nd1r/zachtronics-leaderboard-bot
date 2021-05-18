@@ -11,10 +11,8 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import reactor.util.function.Tuple2
 
-abstract class AbstractShowCommand<C : Category<S, P>, S : Score, P : Puzzle, R : Record> : Command {
-    abstract val leaderboards: List<Leaderboard<C, S, P, R>>
-    val regex = Regex("!show\\s+(?<category>\\S+)\\s+(?<puzzle>.+)")
-    val altRegex = Regex("!show\\s+(?<puzzle>.+)\\s+(?<category>\\S+)")
+abstract class AbstractShowCommand<C : Category, P : Puzzle, R : Record> : Command {
+    abstract val leaderboards: List<Leaderboard<C, P, R>>
     override val name: String = "show"
     override val isReadOnly: Boolean = true
 

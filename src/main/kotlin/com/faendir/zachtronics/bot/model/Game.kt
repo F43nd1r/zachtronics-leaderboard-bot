@@ -5,7 +5,6 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 
 interface Game {
-    val discordChannel: String
 
     val displayName: String
 

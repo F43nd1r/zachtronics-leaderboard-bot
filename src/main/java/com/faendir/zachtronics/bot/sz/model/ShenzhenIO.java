@@ -27,7 +27,7 @@ public class ShenzhenIO implements Game {
     @Getter
     private final String commandName = "sz";
     @Getter
-    private final List<Leaderboard<SzCategory, SzScore, SzPuzzle, SzRecord>> leaderboards;
+    private final List<Leaderboard<SzCategory, SzPuzzle, SzRecord>> leaderboards;
     @Getter
     private final List<Command> commands;
     @Getter

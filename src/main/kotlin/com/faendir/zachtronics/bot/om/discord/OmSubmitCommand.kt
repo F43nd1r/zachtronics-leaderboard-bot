@@ -14,7 +14,7 @@ import reactor.util.function.Tuple2
 import reactor.util.function.Tuples
 
 @Component
-class OmSubmitCommand(override val leaderboards: List<Leaderboard<*, *, OmPuzzle, OmRecord>>) :
+class OmSubmitCommand(override val leaderboards: List<Leaderboard<*, OmPuzzle, OmRecord>>) :
     AbstractSubmitCommand<OmPuzzle, OmRecord>() {
 
     override fun buildData() = SubmitParser.buildData()

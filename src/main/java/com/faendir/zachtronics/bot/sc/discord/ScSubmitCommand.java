@@ -13,7 +13,6 @@ import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
@@ -26,7 +25,7 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
     private final SpaceChem spaceChem;
     private final ScArchive archive;
     @Getter
-    private final List<Leaderboard<?, ?, ScPuzzle, ScRecord>> leaderboards;
+    private final List<Leaderboard<?, ScPuzzle, ScRecord>> leaderboards;
 
     private static final Pattern SUBMISSION_REGEX = Pattern.compile(
             "!submit\\s+" +

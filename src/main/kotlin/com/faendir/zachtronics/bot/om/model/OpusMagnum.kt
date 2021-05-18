@@ -9,8 +9,6 @@ import reactor.kotlin.core.publisher.toMono
 
 @Component
 class OpusMagnum : Game {
-    override val discordChannel = "opus-magnum"
-
     override val displayName = "Opus Magnum"
 
     override val commandName = "om"

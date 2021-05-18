@@ -17,7 +17,7 @@ import javax.annotation.PostConstruct
 
 abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, private val imgurService: ImgurService,
                                             private val directoryCategories: Map<String, List<OmCategory>>, private val serializer: KSerializer<J>) :
-    Leaderboard<OmCategory, OmScore, OmPuzzle, OmRecord> {
+    Leaderboard<OmCategory, OmPuzzle, OmRecord> {
     companion object {
         private const val scoreFileName = "scores.json"
     }

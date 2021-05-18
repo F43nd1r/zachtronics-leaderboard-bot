@@ -31,7 +31,7 @@ class GameContext(marker: GamePackageMarker, parent: ApplicationContext) {
 
     val game: Game by lazy { runInContext { getBean(Game::class.java) } }
 
-    val leaderboards: Collection<Leaderboard<*, *, *, *>> by lazy { runInContext { getBeansOfType(Leaderboard::class.java).values } }
+    val leaderboards: Collection<Leaderboard<*, *, *>> by lazy { runInContext { getBeansOfType(Leaderboard::class.java).values } }
 
     val commands: Collection<Command> by lazy { runInContext { getBeansOfType(Command::class.java).values } }
 }

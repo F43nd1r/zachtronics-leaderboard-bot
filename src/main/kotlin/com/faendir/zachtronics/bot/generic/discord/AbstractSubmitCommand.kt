@@ -17,7 +17,7 @@ import reactor.util.function.Tuple2
 abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : Command {
     override val name: String = "submit"
     override val isReadOnly: Boolean = false
-    protected abstract val leaderboards: List<Leaderboard<*, *, P, R>>
+    protected abstract val leaderboards: List<Leaderboard<*, P, R>>
 
     override fun handle(options: List<ApplicationCommandInteractionOption>, user: User): Mono<WebhookExecuteRequest> {
         return parseSubmission(options, user).flatMap { (puzzle, record) -> submitToLeaderboards(puzzle, record) }
@@ -53,7 +53,7 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : Command {
                             .title("No Scores beaten by *${puzzle.displayName}* `${record.score.toDisplayString()}`")
                             .description("Existing scores:")
                             .addAllFields(betterExists.flatMap { it.scores.entries }
-                                .sortedBy<Map.Entry<Category<*, *>, Score>, Comparable<*>> { it.key as? Comparable<*> }
+                                .sortedBy<Map.Entry<Category, Score>, Comparable<*>> { it.key as? Comparable<*> }
                                 .map { EmbedFieldData.builder().name(it.key.displayName).value("\n`${it.value.toDisplayString()}`").inline(true).build() })
                             .build()
                     )
