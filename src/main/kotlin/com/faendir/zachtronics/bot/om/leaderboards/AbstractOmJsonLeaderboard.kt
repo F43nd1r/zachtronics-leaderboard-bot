@@ -1,21 +1,23 @@
 package com.faendir.zachtronics.bot.om.leaderboards
 
 import com.faendir.zachtronics.bot.main.git.GitRepository
-import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Leaderboard
-import com.faendir.zachtronics.bot.model.Score
 import com.faendir.zachtronics.bot.model.UpdateResult
 import com.faendir.zachtronics.bot.om.imgur.ImgurService
-import com.faendir.zachtronics.bot.om.model.*
+import com.faendir.zachtronics.bot.om.model.OmCategory
+import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.utils.plusIf
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
+import reactor.core.publisher.Mono
 import java.io.File
 import javax.annotation.PostConstruct
 
 abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, private val imgurService: ImgurService,
                                             private val directoryCategories: Map<String, List<OmCategory>>, private val serializer: KSerializer<J>) :
-    Leaderboard<OmCategory, OmScore, OmPuzzle, OmRecord> {
+    Leaderboard<OmCategory, OmPuzzle, OmRecord> {
     companion object {
         private const val scoreFileName = "scores.json"
     }
@@ -36,10 +38,10 @@ abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, 
             if (status().run { added.isNotEmpty() || changed.isNotEmpty() }) {
                 commitAndPush("Update page formatting")
             }
-        }
+        }.block()
     }
 
-    override fun update(puzzle: OmPuzzle, record: OmRecord): UpdateResult {
+    override fun update(puzzle: OmPuzzle, record: OmRecord): Mono<UpdateResult> {
         return gitRepo.access {
             val betterExists = mutableMapOf<OmCategory, OmScore>()
             val success = mutableMapOf<OmCategory, OmScore?>()
@@ -58,9 +60,9 @@ abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, 
                         }) {
                         records.setRecord(puzzle, category, OmRecord(category.normalizeScore(record.score), rehostedLink))
                         changed = true
-                        success[category] = oldRecord?.score
+                        success[category] = oldRecord?.score?.also { it.displayAsSum = category.name.startsWith("S") }
                     } else {
-                        betterExists[category] = oldRecord.score
+                        betterExists[category] = oldRecord.score.also { it.displayAsSum = category.name.startsWith("S") }
                     }
                 }
                 val localParetoUpdate = paretoUpdate(puzzle, record, records)
@@ -83,7 +85,7 @@ abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, 
         }
     }
 
-    override fun get(puzzle: OmPuzzle, category: OmCategory): OmRecord? {
+    override fun get(puzzle: OmPuzzle, category: OmCategory): Mono<OmRecord> {
         return gitRepo.access {
             val (dirName, _) = directoryCategories.asIterable().find { it.value.contains(category) } ?: return@access null
             val dir = File(repo, dirName)

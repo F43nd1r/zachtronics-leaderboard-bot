@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.text.NumberFormat;
 import java.util.*;
@@ -20,14 +21,13 @@ import static com.faendir.zachtronics.bot.sc.model.ScCategory.*;
 
 @Component
 @RequiredArgsConstructor
-public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScScore, ScPuzzle, ScRecord> {
+public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, ScRecord> {
     @Getter
     private final List<ScCategory> supportedCategories = Arrays.asList(ScCategory.values());
     private final RedditService redditService;
 
-    @Nullable
     @Override
-    public ScRecord get(@NotNull ScPuzzle puzzle, @NotNull ScCategory category) {
+    public Mono<ScRecord> get(@NotNull ScPuzzle puzzle, @NotNull ScCategory category) {
         String[] lines = redditService.getWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
 
         boolean needsReactors = category.name().startsWith("R") && puzzle.getType() != ScType.PRODUCTION_TRIVIAL;
@@ -49,15 +49,15 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScScore, ScP
                                                                                 .endsWith("NB") ? 1 : 0;
             ScRecord record = records[column];
             if (record != null && record != ScRecord.IMPOSSIBLE_CATEGORY)
-                return record;
+                return Mono.just(record);
             break;
         }
-        return null;
+        return Mono.empty();
     }
 
     @NotNull
     @Override
-    public UpdateResult update(@NotNull ScPuzzle puzzle, @NotNull ScRecord record) {
+    public Mono<UpdateResult> update(@NotNull ScPuzzle puzzle, @NotNull ScRecord record) {
         String[] lines = redditService.getWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
         Pattern puzzleRegex = Pattern.compile("^\\s*\\|\\s*" + Pattern.quote(puzzle.getDisplayName()));
 
@@ -142,10 +142,10 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScScore, ScP
             redditService.updateWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage(), String.join("\r\n", lines),
                                          puzzle.getDisplayName() + " " + record.getScore().toDisplayString() + " by " +
                                          record.getAuthor());
-            return new UpdateResult.Success(beatenScores);
+            return Mono.just(new UpdateResult.Success(beatenScores));
         }
         else {
-            return new UpdateResult.BetterExists(Collections.emptyMap());
+            return Mono.just(new UpdateResult.BetterExists(Collections.emptyMap()));
         }
     }
 

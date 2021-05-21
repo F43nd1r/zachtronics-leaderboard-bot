@@ -3,17 +3,19 @@ package com.faendir.zachtronics.bot
 import com.faendir.zachtronics.bot.main.config.GitProperties
 import com.faendir.zachtronics.bot.main.git.GitRepository
 import com.faendir.zachtronics.bot.main.git.TestGitRepository
-import com.faendir.zachtronics.bot.om.imgur.ImgurService
-import com.faendir.zachtronics.bot.om.imgur.TestImgurService
 import com.faendir.zachtronics.bot.main.reddit.RedditService
 import com.faendir.zachtronics.bot.main.reddit.TestRedditService
-import net.dv8tion.jda.api.JDA
+import com.faendir.zachtronics.bot.om.imgur.ImgurService
+import com.faendir.zachtronics.bot.om.imgur.TestImgurService
+import discord4j.core.GatewayDiscordClient
+import io.mockk.every
+import io.mockk.mockk
 import org.eclipse.jgit.api.Git
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.util.ResourceUtils
+import reactor.core.publisher.Flux
 import java.io.File
 import java.nio.file.Files
 
@@ -57,8 +59,13 @@ class TestConfiguration(private val gitProperties: GitProperties) {
         return TestImgurService()
     }
 
-    @MockBean
-    lateinit var jda : JDA
+    @Primary
+    @Bean
+    fun discordClient(): GatewayDiscordClient {
+        val client = mockk<GatewayDiscordClient>()
+        every { client.guilds } returns Flux.empty()
+        return client
+    }
 
     private fun createTestGitRepository(dir: String): GitRepository {
         val target = extractResourceDirectory(dir)

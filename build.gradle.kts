@@ -2,25 +2,28 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    kotlin("jvm") version "1.4.32"
-    kotlin("plugin.serialization") version "1.4.32"
-    id("org.springframework.boot") version "2.3.3.RELEASE"
+    kotlin("jvm") version "1.5.0"
+    kotlin("plugin.serialization") version "1.5.0"
+    id("org.springframework.boot") version "2.4.5"
     id("io.spring.dependency-management") version "1.0.7.RELEASE"
-    kotlin("plugin.spring") version "1.4.32"
+    kotlin("plugin.spring") version "1.5.0"
     id("com.palantir.docker") version "0.26.0"
     id("io.freefair.lombok") version "5.2.1"
+    id("com.google.devtools.ksp") version "1.5.0-1.0.0-alpha09"
 }
 
 group = "com.faendir.zachtronics.bot"
-version = "1.1-SNAPSHOT"
+version = "2.0-SNAPSHOT"
 
 repositories {
     jcenter()
     mavenCentral()
+    google()
     maven {
         name = "m2-dv8tion"
         setUrl("https://m2.dv8tion.net/releases")
     }
+    mavenLocal()
 }
 
 dependencies {
@@ -29,12 +32,15 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("net.dv8tion:JDA:4.2.1_253")
+    implementation("com.discord4j:discord4j-core:3.2.0-M3")
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.3")
     implementation("org.eclipse.jgit:org.eclipse.jgit:5.8.1.202007141445-r")
     implementation("com.github.rockswang:java-curl:1.2.2.2")
     implementation("com.faendir.jraw:JRAW:1.2.0")
     implementation("net.bramp.ffmpeg:ffmpeg:0.6.2")
     implementation("com.faendir.om:dsl:1.2.0")
+    implementation("com.faendir.discord4j-command-parser:annotations:1.1.1")
+    ksp("com.faendir.discord4j-command-parser:processor:1.1.1")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
@@ -65,7 +71,7 @@ tasks.withType<Test> {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         jvmTarget = "1.8"
-        freeCompilerArgs += "-Xjvm-default=enable"
+        freeCompilerArgs = listOf("-Xjvm-default=all", "-Xjsr305=strict")
     }
 }
 
@@ -82,4 +88,17 @@ docker {
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir(file("$buildDir/generated/ksp/main/kotlin"))
+        }
+    }
+    test {
+        java {
+            srcDir(file("$buildDir/generated/ksp/test/kotlin"))
+        }
+    }
 }

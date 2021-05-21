@@ -15,7 +15,7 @@ import static com.faendir.zachtronics.bot.sc.model.ScType.*;
 import static com.faendir.zachtronics.bot.utils.Utils.makeComparator3;
 
 @RequiredArgsConstructor
-public enum ScCategory implements Category<ScScore, ScPuzzle> {
+public enum ScCategory implements Category {
     C("C", "c/r/s[/BP]", comparatorCRS, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), false, false, F100),
     CNB("CNB", "c/r/s[/P]", comparatorCRS, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), true, false, F100),
     CNP("CNP", "c/r/s[/B]", comparatorCRS, Set.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL), false, true, F100),
@@ -44,12 +44,10 @@ public enum ScCategory implements Category<ScScore, ScPuzzle> {
     @Getter
     private final String formatStringLb;
 
-    @Override
     public boolean supportsPuzzle(@NotNull ScPuzzle puzzle) {
         return supportedTypes.contains(puzzle.getType()) && !(puzzle.isDeterministic() && precogFree);
     }
 
-    @Override
     public boolean supportsScore(@NotNull ScScore score) {
         return !(score.isBugged() && bugFree) && !(score.isPrecognitive() && precogFree);
     }

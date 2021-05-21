@@ -6,6 +6,8 @@ import com.faendir.zachtronics.bot.model.Score
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.Status
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
+import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 import java.io.File
 import java.nio.file.Files
 import javax.annotation.PreDestroy
@@ -19,7 +21,11 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
         }
     }
 
-    fun <T> access(access: AccessScope.() -> T): T {
+    fun <T> access(access: AccessScope.() -> T?): Mono<T> {
+        return (Mono.fromCallable { doAccess(access) } as Mono<T>).subscribeOn(Schedulers.boundedElastic())
+    }
+
+    private fun <T> doAccess(access: AccessScope.() -> T?) : T?{
         return synchronized(repo) {
             Git.open(repo).use { git ->
                 git.pull().setTimeout(120).call()
@@ -57,8 +63,8 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
         }
 
         fun resetAndClean(file: File) {
-            git.reset().addPath(file.relativeTo(repo).path).call();
-            git.clean().setForce(true).setPaths(setOf(file.relativeTo(repo).path)).call();
+            git.reset().addPath(file.relativeTo(repo).path).call()
+            git.clean().setForce(true).setPaths(setOf(file.relativeTo(repo).path)).call()
         }
     }
 

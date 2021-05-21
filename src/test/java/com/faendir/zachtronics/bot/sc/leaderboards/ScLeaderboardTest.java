@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @BotTest(SpaceChemMarker.SpaceChemConfiguration.class)
 public class ScLeaderboardTest {
@@ -21,20 +21,20 @@ public class ScLeaderboardTest {
 
     @Test
     public void testGoodRecords() {
-        ScRecord goodRecord = scLeaderboard.get(ScPuzzle.research_example_1, ScCategory.C);
+        ScRecord goodRecord = scLeaderboard.get(ScPuzzle.research_example_1, ScCategory.C).block();
         System.out.println(goodRecord);
-        goodRecord = scLeaderboard.get(ScPuzzle.published_1_1, ScCategory.S);
+        goodRecord = scLeaderboard.get(ScPuzzle.published_1_1, ScCategory.S).block();
         System.out.println(goodRecord);
-        goodRecord = scLeaderboard.get(ScPuzzle.published_101_3, ScCategory.RC);
+        goodRecord = scLeaderboard.get(ScPuzzle.published_101_3, ScCategory.RC).block();
         System.out.println(goodRecord);
         assertNotNull(goodRecord);
     }
 
     @Test
     public void testBadRecord() {
-        ScRecord badRecord = scLeaderboard.get(ScPuzzle.research_example_1, ScCategory.RC);
+        ScRecord badRecord = scLeaderboard.get(ScPuzzle.research_example_1, ScCategory.RC).block();
         assertNull(badRecord);
-        badRecord = scLeaderboard.get(ScPuzzle.bonding_7, ScCategory.RCNB);
+        badRecord = scLeaderboard.get(ScPuzzle.bonding_7, ScCategory.RCNB).block();
         assertNull(badRecord);
     }
 
@@ -44,7 +44,7 @@ public class ScLeaderboardTest {
         for (ScPuzzle p : ScPuzzle.values()) {
             for (ScCategory c : ScCategory.values()) {
                 if (c.supportsPuzzle(p)) {
-                    ScRecord r = scLeaderboard.get(p, c);
+                    ScRecord r = scLeaderboard.get(p, c).block();
                     if (r != null)
                         scLeaderboard.update(p, r);
                 }
@@ -60,11 +60,11 @@ public class ScLeaderboardTest {
         ScScore s = new ScScore(819, 2, 43);
         ScRecord r = new ScRecord(s, "auth", "lnk", false);
 
-        UpdateResult ur = scLeaderboard.update(p, r);
+        UpdateResult ur = scLeaderboard.update(p, r).block();
         assertTrue(ur instanceof UpdateResult.BetterExists);
 
         s.setPrecognitive(false);
-        ur = scLeaderboard.update(p, r);
+        ur = scLeaderboard.update(p, r).block();
         assertTrue(ur instanceof UpdateResult.Success);
     }
 

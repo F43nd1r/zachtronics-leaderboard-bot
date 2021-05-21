@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -23,7 +24,7 @@ public class ScArchive implements Archive<ScSolution> {
 
     @NotNull
     @Override
-    public List<String> archive(@NotNull ScSolution solution) {
+    public Mono<List<String>> archive(@NotNull ScSolution solution) {
         return gitRepo.access(a -> performArchive(a, solution));
     }
 

@@ -1,20 +1,22 @@
 package com.faendir.zachtronics.bot.model
 
-interface Leaderboard<C : Category<S, P>, S : Score, P : Puzzle, R : Record<S>> {
+import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toMono
+
+interface Leaderboard<C : Category, P : Puzzle, R : Record> {
     val supportedCategories: List<C>
 
-    @JvmDefault
-    fun update(puzzle: P, record: R): UpdateResult = UpdateResult.NotSupported()
+    fun update(puzzle: P, record: R): Mono<UpdateResult> = UpdateResult.NotSupported().toMono()
 
-    fun get(puzzle: P, category: C): R?
+    fun get(puzzle: P, category: C): Mono<R>
 }
 
 sealed class UpdateResult {
-    class Success(val oldScores: Map<out Category<*,*>, Score?>) : UpdateResult()
+    class Success(val oldScores: Map<out Category, Score?>) : UpdateResult()
 
     class ParetoUpdate : UpdateResult()
 
-    class BetterExists(val scores: Map<out Category<*,*>, Score>) : UpdateResult()
+    class BetterExists(val scores: Map<out Category, Score>) : UpdateResult()
 
     class NotSupported : UpdateResult()
 }

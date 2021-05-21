@@ -8,83 +8,74 @@ import com.faendir.zachtronics.bot.om.model.OmType.*
 
 
 enum class OmCategory(
-    val displayNames: List<String>,
+    override val displayName: String,
+    val primaryMetric: OmMetric,
+    val tiebreaker: OmMetric,
     private val requiredParts: List<OmScorePart>,
-    private val compare: OmCategory.(OmScore, OmScore) -> Int,
+    comparator: Comparator<OmScore>,
     private val supportedTypes: Set<OmType> = OmType.values().toSet(),
     private val modifier: OmModifier? = null
-) : Category<OmScore, OmPuzzle> {
-    GC(listOf("GC"), listOf(COST, CYCLES, AREA), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
-    GCP(listOf("GC"), listOf(COST, CYCLES, INSTRUCTIONS), OmCategory::normalCompare, setOf(PRODUCTION)),
-    GA(listOf("GA"), listOf(COST, AREA, CYCLES), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
-    GI(listOf("GI"), listOf(COST, INSTRUCTIONS, CYCLES), OmCategory::normalCompare, setOf(PRODUCTION)),
-    GX(listOf("GX"), listOf(COST, CYCLES, AREA), OmCategory::lastTwoProductCompare, setOf(NORMAL, INFINITE)),
-    GXP(listOf("GX"), listOf(COST, CYCLES, INSTRUCTIONS), OmCategory::lastTwoProductCompare, setOf(PRODUCTION)),
-    CG(listOf("CG"), listOf(CYCLES, COST, AREA), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
-    CGP(listOf("CG"), listOf(CYCLES, COST, INSTRUCTIONS), OmCategory::normalCompare, setOf(PRODUCTION)),
-    CA(listOf("CA"), listOf(CYCLES, AREA, COST), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
-    CI(listOf("CI"), listOf(CYCLES, INSTRUCTIONS, COST), OmCategory::normalCompare, setOf(PRODUCTION)),
-    CX(listOf("CX"), listOf(CYCLES, COST, AREA), OmCategory::lastTwoProductCompare, setOf(NORMAL, INFINITE)),
-    CXP(listOf("CX"), listOf(CYCLES, COST, INSTRUCTIONS), OmCategory::lastTwoProductCompare, setOf(PRODUCTION)),
-    AG(listOf("AG"), listOf(AREA, COST, CYCLES), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
-    AC(listOf("AC"), listOf(AREA, CYCLES, COST), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
-    AX(listOf("AX"), listOf(AREA, COST, CYCLES), OmCategory::lastTwoProductCompare, setOf(NORMAL, INFINITE)),
-    IG(listOf("IG"), listOf(INSTRUCTIONS, COST, CYCLES), OmCategory::normalCompare, setOf(PRODUCTION)),
-    IC(listOf("IC"), listOf(INSTRUCTIONS, CYCLES, COST), OmCategory::normalCompare, setOf(PRODUCTION)),
-    IX(listOf("IX"), listOf(INSTRUCTIONS, COST, CYCLES), OmCategory::lastTwoProductCompare, setOf(PRODUCTION)),
-    SG(listOf("SUM-G", "SUM"), listOf(COST, CYCLES, AREA), { s1, s2 -> sumCompare(s1, s2, COST) }, setOf(NORMAL, INFINITE)),
-    SGP(listOf("SUM-G", "SUM"), listOf(COST, CYCLES, INSTRUCTIONS), { s1, s2 -> sumCompare(s1, s2, COST) }, setOf(PRODUCTION)),
-    SC(listOf("SUM-C", "SUM"), listOf(COST, CYCLES, AREA), { s1, s2 -> sumCompare(s1, s2, CYCLES) }, setOf(NORMAL, INFINITE)),
-    SCP(listOf("SUM-C", "SUM"), listOf(COST, CYCLES, INSTRUCTIONS), { s1, s2 -> sumCompare(s1, s2, CYCLES) }, setOf(PRODUCTION)),
-    SA(listOf("SUM-A", "SUM"), listOf(COST, CYCLES, AREA), { s1, s2 -> sumCompare(s1, s2, AREA) }, setOf(NORMAL, INFINITE)),
-    SI(listOf("SUM-I", "SUM"), listOf(COST, CYCLES, INSTRUCTIONS), { s1, s2 -> sumCompare(s1, s2, INSTRUCTIONS) }, setOf(PRODUCTION)),
+) : Category {
+    GC("GC", OmMetric.COST, OmMetric.CYCLES, listOf(COST, CYCLES, AREA), normalComparator(), setOf(NORMAL, INFINITE)),
+    GCP("GC", OmMetric.COST, OmMetric.CYCLES, listOf(COST, CYCLES, INSTRUCTIONS), normalComparator(), setOf(PRODUCTION)),
+    GA("GA", OmMetric.COST, OmMetric.AREA, listOf(COST, AREA, CYCLES), normalComparator(), setOf(NORMAL, INFINITE)),
+    GI("GI", OmMetric.COST, OmMetric.INSTRUCTIONS, listOf(COST, INSTRUCTIONS, CYCLES), normalComparator(), setOf(PRODUCTION)),
+    GX("GX", OmMetric.COST, OmMetric.PRODUCT, listOf(COST, CYCLES, AREA), lastTwoProductComparator(), setOf(NORMAL, INFINITE)),
+    GXP("GX", OmMetric.COST, OmMetric.PRODUCT, listOf(COST, CYCLES, INSTRUCTIONS), lastTwoProductComparator(), setOf(PRODUCTION)),
+    CG("CG", OmMetric.CYCLES, OmMetric.COST, listOf(CYCLES, COST, AREA), normalComparator(), setOf(NORMAL, INFINITE)),
+    CGP("CG", OmMetric.CYCLES, OmMetric.COST, listOf(CYCLES, COST, INSTRUCTIONS), normalComparator(), setOf(PRODUCTION)),
+    CA("CA", OmMetric.CYCLES, OmMetric.AREA, listOf(CYCLES, AREA, COST), normalComparator(), setOf(NORMAL, INFINITE)),
+    CI("CI", OmMetric.CYCLES, OmMetric.INSTRUCTIONS, listOf(CYCLES, INSTRUCTIONS, COST), normalComparator(), setOf(PRODUCTION)),
+    CX("CX", OmMetric.CYCLES, OmMetric.PRODUCT, listOf(CYCLES, COST, AREA), lastTwoProductComparator(), setOf(NORMAL, INFINITE)),
+    CXP("CX", OmMetric.CYCLES, OmMetric.PRODUCT, listOf(CYCLES, COST, INSTRUCTIONS), lastTwoProductComparator(), setOf(PRODUCTION)),
+    AG("AG", OmMetric.AREA, OmMetric.COST, listOf(AREA, COST, CYCLES), normalComparator(), setOf(NORMAL, INFINITE)),
+    AC("AC", OmMetric.AREA, OmMetric.CYCLES, listOf(AREA, CYCLES, COST), normalComparator(), setOf(NORMAL, INFINITE)),
+    AX("AX", OmMetric.AREA, OmMetric.PRODUCT, listOf(AREA, COST, CYCLES), lastTwoProductComparator(), setOf(NORMAL, INFINITE)),
+    IG("IG", OmMetric.INSTRUCTIONS, OmMetric.COST, listOf(INSTRUCTIONS, COST, CYCLES), normalComparator(), setOf(PRODUCTION)),
+    IC("IC", OmMetric.INSTRUCTIONS, OmMetric.CYCLES, listOf(INSTRUCTIONS, CYCLES, COST), normalComparator(), setOf(PRODUCTION)),
+    IX("IX", OmMetric.INSTRUCTIONS, OmMetric.PRODUCT, listOf(INSTRUCTIONS, COST, CYCLES), lastTwoProductComparator(), setOf(PRODUCTION)),
+    SG("SUM-G", OmMetric.SUM, OmMetric.COST, listOf(COST, CYCLES, AREA), sumComparator(COST), setOf(NORMAL, INFINITE)),
+    SGP("SUM-G", OmMetric.SUM, OmMetric.COST, listOf(COST, CYCLES, INSTRUCTIONS), sumComparator(COST), setOf(PRODUCTION)),
+    SC("SUM-C", OmMetric.SUM, OmMetric.CYCLES, listOf(COST, CYCLES, AREA), sumComparator(CYCLES), setOf(NORMAL, INFINITE)),
+    SCP("SUM-C", OmMetric.SUM, OmMetric.CYCLES, listOf(COST, CYCLES, INSTRUCTIONS), sumComparator(CYCLES), setOf(PRODUCTION)),
+    SA("SUM-A", OmMetric.SUM, OmMetric.AREA, listOf(COST, CYCLES, AREA), sumComparator(AREA), setOf(NORMAL, INFINITE)),
+    SI("SUM-I", OmMetric.SUM, OmMetric.INSTRUCTIONS, listOf(COST, CYCLES, INSTRUCTIONS), sumComparator(INSTRUCTIONS), setOf(PRODUCTION)),
 
-    HEIGHT(listOf("Height", "H"), listOf(OmScorePart.HEIGHT, CYCLES, COST), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
-    WIDTH(listOf("Width", "W"), listOf(OmScorePart.WIDTH, CYCLES, COST), OmCategory::normalCompare, setOf(NORMAL)),
+    HEIGHT("Height", OmMetric.HEIGHT, OmMetric.CYCLES, listOf(OmScorePart.HEIGHT, CYCLES, COST), normalComparator(), setOf(NORMAL, INFINITE)),
+    WIDTH("Width", OmMetric.Width, OmMetric.CYCLES, listOf(OmScorePart.WIDTH, CYCLES, COST), normalComparator(), setOf(NORMAL)),
 
-    OGC(listOf("OGC"), listOf(COST, CYCLES, AREA), OmCategory::normalCompare, setOf(NORMAL, INFINITE), OVERLAP),
-    OGA(listOf("OGA"), listOf(COST, AREA, CYCLES), OmCategory::normalCompare, setOf(NORMAL, INFINITE), OVERLAP),
-    OGX(listOf("OGX"), listOf(COST, CYCLES, AREA), OmCategory::lastTwoProductCompare, setOf(NORMAL, INFINITE), OVERLAP),
-    OCG(listOf("OCG"), listOf(CYCLES, COST, AREA), OmCategory::normalCompare, setOf(NORMAL, INFINITE), OVERLAP),
-    OCA(listOf("OCA"), listOf(CYCLES, AREA, COST), OmCategory::normalCompare, setOf(NORMAL, INFINITE), OVERLAP),
-    OCX(listOf("OCX"), listOf(CYCLES, COST, AREA), OmCategory::lastTwoProductCompare, setOf(NORMAL, INFINITE), OVERLAP),
-    OAG(listOf("OAG"), listOf(AREA, COST, CYCLES), OmCategory::normalCompare, setOf(NORMAL, INFINITE), OVERLAP),
-    OAC(listOf("OAC"), listOf(AREA, CYCLES, COST), OmCategory::normalCompare, setOf(NORMAL, INFINITE), OVERLAP),
-    OAX(listOf("OAX"), listOf(AREA, COST, CYCLES), OmCategory::lastTwoProductCompare, setOf(NORMAL, INFINITE), OVERLAP),
+    OGC("OGC", OmMetric.COST, OmMetric.CYCLES, listOf(COST, CYCLES, AREA), normalComparator(), setOf(NORMAL, INFINITE), OVERLAP),
+    OGA("OGA", OmMetric.COST, OmMetric.AREA, listOf(COST, AREA, CYCLES), normalComparator(), setOf(NORMAL, INFINITE), OVERLAP),
+    OGX("OGX", OmMetric.COST, OmMetric.PRODUCT, listOf(COST, CYCLES, AREA), lastTwoProductComparator(), setOf(NORMAL, INFINITE), OVERLAP),
+    OCG("OCG", OmMetric.CYCLES, OmMetric.COST, listOf(CYCLES, COST, AREA), normalComparator(), setOf(NORMAL, INFINITE), OVERLAP),
+    OCA("OCA", OmMetric.CYCLES, OmMetric.AREA, listOf(CYCLES, AREA, COST), normalComparator(), setOf(NORMAL, INFINITE), OVERLAP),
+    OCX("OCX", OmMetric.CYCLES, OmMetric.PRODUCT, listOf(CYCLES, COST, AREA), lastTwoProductComparator(), setOf(NORMAL, INFINITE), OVERLAP),
+    OAG("OAG", OmMetric.AREA, OmMetric.COST, listOf(AREA, COST, CYCLES), normalComparator(), setOf(NORMAL, INFINITE), OVERLAP),
+    OAC("OAC", OmMetric.AREA, OmMetric.CYCLES, listOf(AREA, CYCLES, COST), normalComparator(), setOf(NORMAL, INFINITE), OVERLAP),
+    OAX("OAX", OmMetric.AREA, OmMetric.PRODUCT, listOf(AREA, COST, CYCLES), lastTwoProductComparator(), setOf(NORMAL, INFINITE), OVERLAP),
 
-    TIG(listOf("TIG", "TI"), listOf(INSTRUCTIONS, COST, CYCLES, AREA), OmCategory::normalCompare, setOf(NORMAL, INFINITE), TRACKLESS),
-    TIC(listOf("TIC", "TI"), listOf(INSTRUCTIONS, CYCLES, COST, AREA), OmCategory::normalCompare, setOf(NORMAL, INFINITE), TRACKLESS),
-    TIA(listOf("TIA", "TI"), listOf(INSTRUCTIONS, AREA, COST, CYCLES), OmCategory::lastTwoProductCompare, setOf(NORMAL, INFINITE), TRACKLESS),
+    TIG("TIG", OmMetric.INSTRUCTIONS, OmMetric.COST, listOf(INSTRUCTIONS, COST, CYCLES, AREA), normalComparator(), setOf(NORMAL, INFINITE), TRACKLESS),
+    TIC("TIC", OmMetric.INSTRUCTIONS, OmMetric.CYCLES, listOf(INSTRUCTIONS, CYCLES, COST, AREA), normalComparator(), setOf(NORMAL, INFINITE), TRACKLESS),
+    TIA("TIA", OmMetric.INSTRUCTIONS, OmMetric.AREA, listOf(INSTRUCTIONS, AREA, COST, CYCLES), normalComparator(), setOf(NORMAL, INFINITE), TRACKLESS),
 
-    IGNP(listOf("IG"), listOf(INSTRUCTIONS, COST, CYCLES, AREA), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
-    ICNP(listOf("IC"), listOf(INSTRUCTIONS, CYCLES, COST, AREA), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
-    IANP(listOf("IA"), listOf(INSTRUCTIONS, AREA, COST, CYCLES), OmCategory::lastTwoProductCompare, setOf(NORMAL, INFINITE)),
+    IGNP("IG", OmMetric.INSTRUCTIONS, OmMetric.COST, listOf(INSTRUCTIONS, COST, CYCLES, AREA), normalComparator(), setOf(NORMAL, INFINITE)),
+    ICNP("IC", OmMetric.INSTRUCTIONS, OmMetric.CYCLES, listOf(INSTRUCTIONS, CYCLES, COST, AREA), normalComparator(), setOf(NORMAL, INFINITE)),
+    IANP("IA", OmMetric.INSTRUCTIONS, OmMetric.AREA, listOf(INSTRUCTIONS, AREA, COST, CYCLES), normalComparator(), setOf(NORMAL, INFINITE)),
 
-    CINP(listOf("CI"), listOf(CYCLES, INSTRUCTIONS, COST, AREA), OmCategory::normalCompare, setOf(NORMAL, INFINITE)),
+    CINP("CI", OmMetric.CYCLES, OmMetric.INSTRUCTIONS, listOf(CYCLES, INSTRUCTIONS, COST, AREA), normalComparator(), setOf(NORMAL, INFINITE)),
 
-    S4G(listOf("SUM4-G", "SUM4"), listOf(COST, CYCLES, AREA, INSTRUCTIONS), { s1, s2 -> sumCompare(s1, s2, COST) }, setOf(NORMAL, INFINITE)),
-    S4C(listOf("SUM4-C", "SUM4"), listOf(COST, CYCLES, AREA, INSTRUCTIONS), { s1, s2 -> sumCompare(s1, s2, CYCLES) }, setOf(NORMAL, INFINITE)),
-    S4A(listOf("SUM4-A", "SUM4"), listOf(COST, CYCLES, AREA, INSTRUCTIONS), { s1, s2 -> sumCompare(s1, s2, AREA) }, setOf(NORMAL, INFINITE)),
-    S4I(listOf("SUM4-I", "SUM4"), listOf(COST, CYCLES, AREA, INSTRUCTIONS), { s1, s2 -> sumCompare(s1, s2, INSTRUCTIONS) }, setOf(NORMAL, INFINITE)),
+    S4G("SUM4-G", OmMetric.SUM4, OmMetric.COST, listOf(COST, CYCLES, AREA, INSTRUCTIONS), sumComparator(COST), setOf(NORMAL, INFINITE)),
+    S4C("SUM4-C", OmMetric.SUM4, OmMetric.CYCLES, listOf(COST, CYCLES, AREA, INSTRUCTIONS), sumComparator(CYCLES), setOf(NORMAL, INFINITE)),
+    S4A("SUM4-A", OmMetric.SUM4, OmMetric.AREA, listOf(COST, CYCLES, AREA, INSTRUCTIONS), sumComparator(AREA), setOf(NORMAL, INFINITE)),
+    S4I("SUM4-I", OmMetric.SUM4, OmMetric.INSTRUCTIONS, listOf(COST, CYCLES, AREA, INSTRUCTIONS), sumComparator(INSTRUCTIONS), setOf(NORMAL, INFINITE)),
     ;
 
-    override val displayName: String = displayNames.first()
-    override val contentDescription: String = requiredParts.joinToString("/") { it.key.toString() }
-    override val scoreComparator = Comparator<OmScore> { s1, s2 -> compare(normalizeScore(s1), normalizeScore(s2)) }
+    val contentDescription: String = requiredParts.joinToString("/") { it.key.toString() }
+    val scoreComparator: Comparator<OmScore> = Comparator.comparing({ normalizeScore(it) }, comparator)
 
-    override fun supportsPuzzle(puzzle: OmPuzzle) = supportedTypes.contains(puzzle.type)
+    fun supportsPuzzle(puzzle: OmPuzzle) = supportedTypes.contains(puzzle.type)
 
-    override fun supportsScore(score: OmScore) = score.parts.keys.containsAll(requiredParts) && modifier == score.modifier
-
-    private fun normalCompare(s1: OmScore, s2: OmScore): Int = s1.parts.map { (part, value) -> value.compareTo(s2.parts[part]!!) }.firstOrNull { it != 0 } ?: 0
-
-    private fun lastTwoProductCompare(s1: OmScore, s2: OmScore): Int = normalCompare(s1.transformToLastTwoProduct(), s2.transformToLastTwoProduct())
-
-    private fun OmScore.transformToLastTwoProduct() =
-        OmScore((parts.toList().dropLast(2) + parts.toList().takeLast(2).let { COMPUTED to it.first().second * it.last().second }))
-
-    private fun sumCompare(s1: OmScore, s2: OmScore, tieBreaker: OmScorePart): Int =
-        Comparator.comparingDouble<OmScore> { score -> score.parts.map { it.value }.sum() }.thenComparingDouble { it.parts[tieBreaker]!! }.compare(s1, s2)
+    fun supportsScore(score: OmScore) = score.parts.keys.containsAll(requiredParts) && modifier == score.modifier
 
     fun normalizeScore(score: OmScore): OmScore = OmScore(sortScoreParts(score.parts.asIterable()).map { it.key to it.value }, score.modifier)
 
@@ -93,3 +84,14 @@ enum class OmCategory(
         return requiredParts.map { scorePart -> parts.first { it.key == scorePart } }
     }
 }
+
+private fun normalComparator(): Comparator<OmScore> =
+    Comparator { s1, s2 -> s1.parts.map { (part, value) -> value.compareTo(s2.parts[part]!!) }.firstOrNull { it != 0 } ?: 0 }
+
+private fun lastTwoProductComparator(): Comparator<OmScore> = Comparator.comparing({ it.transformToLastTwoProduct() }, normalComparator())
+
+private fun OmScore.transformToLastTwoProduct() =
+    OmScore((parts.toList().dropLast(2) + parts.toList().takeLast(2).let { COMPUTED to it.first().second * it.last().second }))
+
+private fun sumComparator(tieBreaker: OmScorePart): java.util.Comparator<OmScore> =
+    Comparator.comparingDouble<OmScore> { score -> score.parts.map { it.value }.sum() }.thenComparingDouble { it.parts[tieBreaker]!! }

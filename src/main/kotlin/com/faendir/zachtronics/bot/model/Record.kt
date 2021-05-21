@@ -1,13 +1,9 @@
 package com.faendir.zachtronics.bot.model
 
-import net.dv8tion.jda.api.EmbedBuilder
 
-interface Record<S : Score> {
-    val score: S
-    fun toDisplayString(): String
-
-    @JvmDefault
-    fun display(embed: EmbedBuilder) {
-        embed.appendDescription(toDisplayString())
-    }
+interface Record {
+    val score: Score
+    val link: String
+    val author: String?
+    fun toDisplayString(): String = "${score.toDisplayString()}${author?.let { " by $it" } ?: ""} $link"
 }

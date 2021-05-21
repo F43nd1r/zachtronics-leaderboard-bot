@@ -3,32 +3,31 @@ package com.faendir.zachtronics.bot.sz.model;
 import com.faendir.zachtronics.bot.generic.discord.Command;
 import com.faendir.zachtronics.bot.model.Leaderboard;
 import com.faendir.zachtronics.bot.model.Game;
-import com.faendir.zachtronics.bot.utils.Result;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
-import kotlin.Pair;
+import discord4j.core.object.entity.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class ShenzhenIO implements Game<SzCategory, SzScore, SzPuzzle, SzRecord> {
+public class ShenzhenIO implements Game {
     @Getter
     private final String discordChannel = "shenzhen-io";
     @Getter
     private final String displayName = "Shenzhen I/O";
     @Getter
-    private final List<Leaderboard<SzCategory, SzScore, SzPuzzle, SzRecord>> leaderboards;
+    private final String commandName = "sz";
+    @Getter
+    private final List<Leaderboard<SzCategory, SzPuzzle, SzRecord>> leaderboards;
     @Getter
     private final List<Command> commands;
     @Getter
@@ -52,6 +51,7 @@ public class ShenzhenIO implements Game<SzCategory, SzScore, SzPuzzle, SzRecord>
             "(?<link>\\S+)\\s*",
             Pattern.CASE_INSENSITIVE);
 
+/*
     @NotNull
     public Result<Pair<SzPuzzle, SzRecord>> parseSubmission(@NotNull Message message) {
         Matcher m = SUBMISSION_REGEX.matcher(message.getContentRaw());
@@ -63,26 +63,24 @@ public class ShenzhenIO implements Game<SzCategory, SzScore, SzPuzzle, SzRecord>
             SzRecord record = new SzRecord(score, m.group("author"), m.group("link"));
             return Result.success(new Pair<>(puzzle, record));
         });
-    }
+    }*/
 
     @NotNull
-    @Override
     public List<SzCategory> parseCategory(@NotNull String name) {
         return Arrays.stream(SzCategory.values()).filter(c -> c.getDisplayName().equalsIgnoreCase(name))
                      .collect(Collectors.toList());
     }
 
     @NotNull
-    @Override
-    public Result<SzPuzzle> parsePuzzle(@NotNull String name) {
+    public static SzPuzzle parsePuzzle(@NotNull String name) {
         return UtilsKt.getSingleMatchingPuzzle(SzPuzzle.values(), name);
     }
 
     private static final long WIKI_ADMIN = 295868901042946048L; // 12345ieee
     @Override
-    public boolean hasWritePermission(@Nullable Member member) {
-        if (member == null)
-            return false;
-        return member.getIdLong() == WIKI_ADMIN;
+    public Mono<Boolean> hasWritePermission(@Nullable User user) {
+        if (user == null)
+            return Mono.just(false);
+        return Mono.just(user.getId().asLong() == WIKI_ADMIN);
     }
 }

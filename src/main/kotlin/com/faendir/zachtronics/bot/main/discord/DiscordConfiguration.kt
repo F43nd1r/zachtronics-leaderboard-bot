@@ -1,15 +1,21 @@
 package com.faendir.zachtronics.bot.main.discord
 
 import com.faendir.zachtronics.bot.main.config.DiscordProperties
-import net.dv8tion.jda.api.JDA
-import net.dv8tion.jda.api.JDABuilder
-import net.dv8tion.jda.api.requests.GatewayIntent
+import discord4j.core.DiscordClientBuilder
+import discord4j.core.GatewayDiscordClient
+import discord4j.gateway.intent.Intent
+import discord4j.gateway.intent.IntentSet
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
 class DiscordConfiguration(private val discordProperties: DiscordProperties) {
-    @Bean(initMethod = "awaitReady", destroyMethod = "shutdown")
-    fun jda(): JDA = JDABuilder.createLight(discordProperties.token, GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES).build()
 
+    @Bean
+    fun discordClient(): GatewayDiscordClient = DiscordClientBuilder.create(discordProperties.token)
+        .build()
+        .gateway()
+        .setEnabledIntents(IntentSet.of(Intent.DIRECT_MESSAGES, Intent.GUILD_MESSAGES))
+        .login()
+        .block()!!
 }
