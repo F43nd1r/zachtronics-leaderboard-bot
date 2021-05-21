@@ -32,7 +32,7 @@ public class SpaceChem implements Game {
     }
 
     @NotNull
-    public ScPuzzle parsePuzzle(@NotNull String name) {
+    public static ScPuzzle parsePuzzle(@NotNull String name) {
         return Arrays.stream(ScPuzzle.values())
                      .filter(p -> p.getDisplayName().equalsIgnoreCase(name))
                      .findFirst()

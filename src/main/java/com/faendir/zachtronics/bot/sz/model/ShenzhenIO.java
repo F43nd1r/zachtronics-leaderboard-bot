@@ -72,7 +72,7 @@ public class ShenzhenIO implements Game {
     }
 
     @NotNull
-    public SzPuzzle parsePuzzle(@NotNull String name) {
+    public static SzPuzzle parsePuzzle(@NotNull String name) {
         return UtilsKt.getSingleMatchingPuzzle(SzPuzzle.values(), name);
     }
 
