@@ -98,7 +98,7 @@ interface IArchive {
 
 @ApplicationCommand(description = "Archive a solution", subCommand = true)
 data class Archive(
-    @Description("Link to your solution file, can be `m1` or `m2` to scrape it from your last or second to last message respectively")
+    @Description("Link to your solution file, can be `m1` to scrape it from your last message")
     override val solution: String,
     @Description("Metric Modifier")
     override val modifier: OmModifier?,

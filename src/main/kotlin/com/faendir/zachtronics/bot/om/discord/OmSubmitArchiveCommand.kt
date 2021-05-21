@@ -5,6 +5,7 @@ import com.faendir.discord4j.command.annotation.Description
 import com.faendir.zachtronics.bot.generic.discord.Command
 import com.faendir.zachtronics.bot.om.model.OmModifier
 import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.utils.findLink
 import discord4j.core.`object`.command.ApplicationCommandInteractionOption
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.entity.User
@@ -23,11 +24,14 @@ class OmSubmitArchiveCommand(private val archiveCommand: OmArchiveCommand, priva
 
     override fun handle(options: List<ApplicationCommandInteractionOption>, user: User, previousMessages: Flux<Message>): Mono<WebhookExecuteRequest> {
         return Mono.fromCallable { SubmitArchiveParser.parse(options) }.flatMap { submitArchive ->
-            archiveCommand.parseSolution(archiveCommand.findScoreIdentifier(submitArchive), submitArchive.solution).flatMap { solution ->
-                archiveCommand.archive(solution).zipWith(
-                    submitCommand.submitToLeaderboards(solution.puzzle, OmRecord(solution.score, submitArchive.gif, user.username))
-                ).map { (archiveOut, submitOut) -> WebhookExecuteRequest.builder().from(submitOut).addEmbed(archiveOut).build() }
-            }
+            findLink(submitArchive.solution, previousMessages)
+                .flatMap { archiveCommand.parseSolution(archiveCommand.findScoreIdentifier(submitArchive), it) }
+                .flatMap { solution ->
+                    archiveCommand.archive(solution).zipWith(
+                        findLink(submitArchive.gif, previousMessages)
+                            .flatMap { submitCommand.submitToLeaderboards(solution.puzzle, OmRecord(solution.score, it, user.username)) }
+                    ).map { (archiveOut, submitOut) -> WebhookExecuteRequest.builder().from(submitOut).addEmbed(archiveOut).build() }
+                }
         }
     }
 
@@ -36,9 +40,9 @@ class OmSubmitArchiveCommand(private val archiveCommand: OmArchiveCommand, priva
 
 @ApplicationCommand(description = "Submit and archive a solution", subCommand = true)
 data class SubmitArchive(
-    @Description("Link to your solution file, can be `m1` or `m2` to scrape it from your last or second to last message respectively")
+    @Description("Link to your solution file, can be `m1` to scrape it from your last message")
     override val solution: String,
-    @Description("Link to your solution gif/mp4, can be `m1` or `m2` to scrape it from your last or second to last message respectively")
+    @Description("Link to your solution gif/mp4, can be `m1` to scrape it from your last message")
     val gif: String,
     @Description("Metric Modifier")
     override val modifier: OmModifier?,

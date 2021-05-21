@@ -51,7 +51,7 @@ data class Submit(
     val puzzle: OmPuzzle,
     @Description("Puzzle score. E.g. `100/32/14/22`, `3.5w/32c/100g`")
     val score: String,
-    @Description("Link to your solution gif/mp4, can be `m1` or `m2` to scrape it from your last or second to last message respectively")
+    @Description("Link to your solution gif/mp4, can be `m1` to scrape it from your last message")
     val gif: String,
     @Description("Metric Modifier")
     val modifier: OmModifier?

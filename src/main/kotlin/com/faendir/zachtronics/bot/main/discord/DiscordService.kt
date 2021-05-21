@@ -65,14 +65,16 @@ class DiscordService(discordClient: GatewayDiscordClient, private val gameContex
                                 throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
                             }
                         }
-                    }else {
+                    } else {
                         command.toMono()
                     }
                 }
                 .flatMap { (command, option) ->
-                    val previousMessages = event.interaction.channel.flatMapMany { it.getMessagesBefore(Snowflake.of(Instant.now())) }
-                        .filter { it.author.isPresent && it.author.get() == event.interaction.user }
-                    command.handle(option.options, event.interaction.user, previousMessages) }
+                    val previousMessages = event.interaction.channel
+                        .flatMapMany { it.getMessagesBefore(it.lastMessageId.orElseGet { Snowflake.of(Instant.now()) }) }
+                        .filter { it.author.isPresent && it.author.get() == event.interaction.user }.share()
+                    command.handle(option.options, event.interaction.user, previousMessages)
+                }
                 .flatMap { event.interactionResponse.createFollowupMessage(MultipartRequest.ofRequest(it), true) }
                 .onErrorResume {
                     logger.info("User command failed", it)

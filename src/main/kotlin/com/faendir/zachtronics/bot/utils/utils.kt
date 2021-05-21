@@ -2,8 +2,10 @@ package com.faendir.zachtronics.bot.utils
 
 import com.faendir.zachtronics.bot.model.Puzzle
 import discord4j.core.`object`.entity.Message
+import discord4j.core.`object`.reaction.ReactionEmoji
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.switchIfEmpty
 import reactor.kotlin.core.publisher.toMono
 
 inline fun <T, R> Collection<T>.ifNotEmpty(block: (Collection<T>) -> R): R? = takeIf { it.isNotEmpty() }?.let(block)
@@ -48,7 +50,12 @@ fun <P> Iterable<P>.fuzzyMatch(search: String, extractName: (P) -> String): List
 fun findLink(input: String, messages: Flux<Message>): Mono<String> = Mono.defer {
     if (input.startsWith("m")) {
         val num = input.removePrefix("m").toInt()
-        messages.elementAt(num - 1).map { it.attachments.firstOrNull()?.url ?: throw IllegalArgumentException("Message $num had no attachments") }
+        messages.elementAt(num - 1).flatMap { message ->
+            message.attachments.firstOrNull()?.url?.let { message.addReaction(ReactionEmoji.unicode("\uD83D\uDC4D"/* 👍 */)).then(it.toMono()) }
+                ?: message.guild.map { it.id.asLong().toString() }.switchIfEmpty { "@me".toMono() }.map {
+                    throw IllegalArgumentException("**Failed**: https://discord.com/channels/${it}/${message.channelId.asLong()}/${message.id.asLong()} had no attachments")
+                }
+        }
     } else {
         input.toMono()
     }
