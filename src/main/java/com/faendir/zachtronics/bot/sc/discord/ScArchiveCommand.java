@@ -9,6 +9,7 @@ import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import com.faendir.zachtronics.bot.sc.model.SpaceChem;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
+import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -34,7 +36,7 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
 
     @NotNull
     @Override
-    public Mono<ScSolution> parseSolution(@NotNull List<? extends ApplicationCommandInteractionOption> options, @NotNull User user) {
+    public Mono<ScSolution> parseSolution(@NotNull List<? extends ApplicationCommandInteractionOption> options, @NotNull User user, @NotNull Flux<Message> previousMessages) {
         return Mono.just(options).map(ScArchiveCommand$DataParser::parse).map(data -> {
             ScScore score = null;
             ScSolution solution;

@@ -3,6 +3,7 @@ package com.faendir.zachtronics.bot.main.discord
 import com.faendir.zachtronics.bot.main.GameContext
 import com.faendir.zachtronics.bot.utils.flatMapFirst
 import com.faendir.zachtronics.bot.utils.throwIfEmpty
+import discord4j.common.util.Snowflake
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.User
 import discord4j.core.event.domain.InteractionCreateEvent
@@ -15,6 +16,7 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
+import java.time.Instant
 
 @Service
 class DiscordService(discordClient: GatewayDiscordClient, private val gameContexts: List<GameContext>) {
@@ -67,7 +69,10 @@ class DiscordService(discordClient: GatewayDiscordClient, private val gameContex
                         command.toMono()
                     }
                 }
-                .flatMap { (command, option) -> command.handle(option.options, event.interaction.user) }
+                .flatMap { (command, option) ->
+                    val previousMessages = event.interaction.channel.flatMapMany { it.getMessagesBefore(Snowflake.of(Instant.now())) }
+                        .filter { it.author.isPresent && it.author.get() == event.interaction.user }
+                    command.handle(option.options, event.interaction.user, previousMessages) }
                 .flatMap { event.interactionResponse.createFollowupMessage(MultipartRequest.ofRequest(it), true) }
                 .onErrorResume {
                     logger.info("User command failed", it)

@@ -1,6 +1,10 @@
 package com.faendir.zachtronics.bot.utils
 
 import com.faendir.zachtronics.bot.model.Puzzle
+import discord4j.core.`object`.entity.Message
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toMono
 
 inline fun <T, R> Collection<T>.ifNotEmpty(block: (Collection<T>) -> R): R? = takeIf { it.isNotEmpty() }?.let(block)
 
@@ -38,5 +42,14 @@ fun <P> Iterable<P>.fuzzyMatch(search: String, extractName: (P) -> String): List
         } else {
             false
         }
+    }
+}
+
+fun findLink(input: String, messages: Flux<Message>): Mono<String> = Mono.defer {
+    if (input.startsWith("m")) {
+        val num = input.removePrefix("m").toInt()
+        messages.elementAt(num - 1).map { it.attachments.firstOrNull()?.url ?: throw IllegalArgumentException("Message $num had no attachments") }
+    } else {
+        input.toMono()
     }
 }

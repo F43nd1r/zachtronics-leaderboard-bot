@@ -10,6 +10,7 @@ import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
+import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -33,7 +35,7 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
 
     @NotNull
     @Override
-    public Mono<Tuple2<ScPuzzle, ScRecord>> parseSubmission(@NotNull List<? extends ApplicationCommandInteractionOption> options, @NotNull User user) {
+    public Mono<Tuple2<ScPuzzle, ScRecord>> parseSubmission(@NotNull List<? extends ApplicationCommandInteractionOption> options, @NotNull User user, @NotNull Flux<Message> previousMessages) {
         return Mono.just(options).map(ScSubmitCommand$DataParser::parse).map(data -> {
             ScScore score = ScScore.parseBPScore(data.score);
             if (score == null)
