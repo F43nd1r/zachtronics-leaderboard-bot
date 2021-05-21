@@ -7,6 +7,7 @@ import discord4j.core.`object`.command.ApplicationCommandInteractionOption
 import discord4j.core.`object`.entity.User
 import discord4j.discordjson.json.EmbedData
 import discord4j.discordjson.json.EmbedFieldData
+import discord4j.discordjson.json.EmbedImageData
 import discord4j.discordjson.json.WebhookExecuteRequest
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
@@ -30,6 +31,7 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : Command {
                     EmbedData.builder()
                         .title("Success: *${puzzle.displayName}* ${successes.flatMap { it.oldScores.keys }.joinToString { it.displayName }}")
                         .description("`${record.score.toDisplayString()}`\npreviously:")
+                        .image(EmbedImageData.builder().url(record.link).build())
                         .addAllFields(successes.flatMap { it.oldScores.entries }
                             .map { EmbedFieldData.builder().name(it.key.displayName).value("`${it.value?.toDisplayString() ?: "none"}`").inline(true).build() })
                         .build()
@@ -42,6 +44,7 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : Command {
                         EmbedData.builder()
                             .title("Pareto *${puzzle.displayName}*")
                             .description("${record.score.toDisplayString()} was included in the pareto frontier.")
+                            .image(EmbedImageData.builder().url(record.link).build())
                             .build()
                     )
                     .build()

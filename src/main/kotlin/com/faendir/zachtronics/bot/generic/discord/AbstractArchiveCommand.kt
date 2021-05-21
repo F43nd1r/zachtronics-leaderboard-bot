@@ -25,7 +25,7 @@ abstract class AbstractArchiveCommand<S : Solution> : Command {
     private fun getResultMessage(result: List<String>, solution: S): EmbedData {
         return if (result.isNotEmpty()) {
             EmbedData.builder()
-                .title("Success: *${solution.puzzle}* ${result.joinToString()}")
+                .title("Success: *${solution.puzzle.displayName}* ${result.joinToString()}")
                 .description("`${solution.score.toDisplayString()}` has been archived.")
                 .build()
         } else {
