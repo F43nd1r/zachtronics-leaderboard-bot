@@ -4,6 +4,8 @@ import com.faendir.zachtronics.bot.generic.archive.Archive
 import com.faendir.zachtronics.bot.model.Solution
 import discord4j.core.`object`.command.ApplicationCommandInteractionOption
 import discord4j.core.`object`.entity.User
+import discord4j.discordjson.json.EmbedData
+import discord4j.discordjson.json.ImmutableWebhookExecuteRequest
 import discord4j.discordjson.json.WebhookExecuteRequest
 import reactor.core.publisher.Mono
 
@@ -15,16 +17,22 @@ abstract class AbstractArchiveCommand<S : Solution> : Command {
     override fun handle(options: List<ApplicationCommandInteractionOption>, user: User): Mono<WebhookExecuteRequest> {
         return parseSolution(options, user)
             .flatMap { solution -> archive(solution) }
-            .map { WebhookExecuteRequest.builder().content(it).build() }
+            .map { WebhookExecuteRequest.builder().addEmbed(it).build() }
     }
 
-    fun archive(solution: S): Mono<String> = archive.archive(solution).map { result -> getResultMessage(result, solution) }
+    fun archive(solution: S): Mono<EmbedData> = archive.archive(solution).map { result -> getResultMessage(result, solution) }
 
-    private fun getResultMessage(result: List<String>, solution: S): String {
+    private fun getResultMessage(result: List<String>, solution: S): EmbedData {
         return if (result.isNotEmpty()) {
-            "Your solution has been archived ${solution.score.toDisplayString()} $result."
+            EmbedData.builder()
+                .title("Success: *${solution.puzzle}* ${result.joinToString()}")
+                .description("`${solution.score.toDisplayString()}` has been archived.")
+                .build()
         } else {
-            "Your solution did not qualify for archiving."
+            EmbedData.builder()
+                .title("Failure: *${solution.puzzle}*")
+                .description("`${solution.score.toDisplayString()}` did not qualify for archiving.")
+                .build()
         }
     }
 

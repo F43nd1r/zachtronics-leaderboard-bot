@@ -24,7 +24,7 @@ class OmSubmitArchiveCommand(private val archiveCommand: OmArchiveCommand, priva
             archiveCommand.parseSolution(archiveCommand.findScoreIdentifier(submitArchive), submitArchive.solution).flatMap { solution ->
                 archiveCommand.archive(solution).zipWith(
                     submitCommand.submitToLeaderboards(solution.puzzle, OmRecord(solution.score, submitArchive.gif, user.username))
-                ).map { (archiveOut, submitOut) -> WebhookExecuteRequest.builder().from(submitOut).content(archiveOut).build() }
+                ).map { (archiveOut, submitOut) -> WebhookExecuteRequest.builder().from(submitOut).addEmbed(archiveOut).build() }
             }
         }
     }
