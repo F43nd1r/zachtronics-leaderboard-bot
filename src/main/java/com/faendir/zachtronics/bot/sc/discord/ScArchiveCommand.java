@@ -7,7 +7,6 @@ import com.faendir.zachtronics.bot.sc.archive.ScArchive;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
-import com.faendir.zachtronics.bot.sc.model.SpaceChem;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
@@ -26,7 +25,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Component
@@ -39,12 +37,12 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
     public Mono<ScSolution> parseSolution(@NotNull List<? extends ApplicationCommandInteractionOption> options, @NotNull User user, @NotNull Flux<Message> previousMessages) {
         return Mono.just(options).map(ScArchiveCommand$DataParser::parse).map(data -> {
             ScScore score = null;
-            ScSolution solution;
             if (data.score != null) {
                 score = ScScore.parseBPScore(data.score);
                 if (score == null) throw new IllegalArgumentException("couldn't parse score");
             }
 
+            ScSolution solution;
             if (data.link != null) {
                 try (InputStream is = new URL(data.link).openStream()) {
                     String content = new String(is.readAllBytes());

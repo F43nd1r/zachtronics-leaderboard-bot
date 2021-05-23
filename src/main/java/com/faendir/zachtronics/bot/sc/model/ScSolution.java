@@ -3,6 +3,7 @@ package com.faendir.zachtronics.bot.sc.model;
 import com.faendir.zachtronics.bot.model.Solution;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,12 +11,12 @@ import java.util.regex.Pattern;
 /** Levels with a comma in their name aren't supported */
 @Value
 public class ScSolution implements Solution {
-    ScPuzzle puzzle;
-    ScScore score;
-    /** null content is possible, it indicates a score-only solution */
-    String content;
+    @NotNull ScPuzzle puzzle;
+    @NotNull ScScore score;
+    /** null content indicates a score-only solution */
+    @Nullable String content;
 
-    public ScSolution(ScPuzzle puzzle, ScScore score, @NotNull String content) {
+    public ScSolution(@NotNull ScPuzzle puzzle, ScScore score, @NotNull String content) {
         Matcher m = Pattern.compile("(SOLUTION:[^,]+),[^,]+,(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+),.+")
                            .matcher(content);
         if (m.find()) {
@@ -28,7 +29,7 @@ public class ScSolution implements Solution {
         }
     }
 
-    public ScSolution(ScPuzzle puzzle, ScScore score) {
+    public ScSolution(@NotNull ScPuzzle puzzle, @NotNull ScScore score) {
         this.puzzle = puzzle;
         this.score = score;
         this.content = null;
