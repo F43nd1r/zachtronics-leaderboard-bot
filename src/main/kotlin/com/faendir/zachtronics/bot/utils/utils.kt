@@ -48,7 +48,7 @@ fun <P> Iterable<P>.fuzzyMatch(search: String, extractName: (P) -> String): List
 }
 
 fun findLink(input: String, messages: Flux<Message>): Mono<String> = Mono.defer {
-    if (input.startsWith("m")) {
+    if (Regex("m\\d+").matches(input)) {
         val num = input.removePrefix("m").toInt()
         messages.elementAt(num - 1).flatMap { message ->
             message.attachments.firstOrNull()?.url?.let { message.addReaction(ReactionEmoji.unicode("\uD83D\uDC4D"/* 👍 */)).then(it.toMono()) }
