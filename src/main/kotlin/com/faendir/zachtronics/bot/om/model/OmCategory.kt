@@ -14,7 +14,7 @@ enum class OmCategory(
     private val requiredParts: List<OmScorePart>,
     comparator: Comparator<OmScore>,
     private val supportedTypes: Set<OmType> = OmType.values().toSet(),
-    private val modifier: OmModifier? = null
+    val modifier: OmModifier? = null
 ) : Category {
     GC("GC", OmMetric.COST, OmMetric.CYCLES, listOf(COST, CYCLES, AREA), normalComparator(), setOf(NORMAL, INFINITE)),
     GCP("GC", OmMetric.COST, OmMetric.CYCLES, listOf(COST, CYCLES, INSTRUCTIONS), normalComparator(), setOf(PRODUCTION)),
