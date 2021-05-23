@@ -39,7 +39,7 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
         return Mono.just(options).map(ScSubmitCommand$DataParser::parse).map(data -> {
             ScScore score = ScScore.parseBPScore(data.score);
             if (score == null)
-                throw new IllegalArgumentException("couldn't parse score");
+                throw new IllegalArgumentException("Couldn't parse score: \"" + data.score + "\"");
             // we also archive the score here
             ScSolution solution = new ScSolution(data.puzzle, score);
             archive.archive(solution);

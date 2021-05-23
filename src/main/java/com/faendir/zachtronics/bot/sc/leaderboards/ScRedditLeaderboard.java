@@ -26,6 +26,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
     private final List<ScCategory> supportedCategories = Arrays.asList(ScCategory.values());
     private final RedditService redditService;
 
+    @NotNull
     @Override
     public Mono<ScRecord> get(@NotNull ScPuzzle puzzle, @NotNull ScCategory category) {
         String[] lines = redditService.getWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
@@ -164,7 +165,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                              record.getAuthor(), record.getLink());
     }
 
-    @Nullable
+    @NotNull
     private static ScRecord parseLeaderboardRecord(String recordCell) {
         Pattern scoreRegex = Pattern.compile("(?:†\\s*)?\\[?\\((?<score>" + ScScore.REGEX_SIMPLE_SCORE +
                                              ")\\)\\s+(?<author>[^]]+)(?:]\\((?<link>[^)]+)\\).*?)?");
@@ -173,7 +174,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
             ScScore score = ScScore.parseSimpleScore(m);
             return new ScRecord(score, m.group("author"), m.group("link"), m.group("oldRNG") != null);
         }
-        return null;
+        throw new IllegalStateException("Leaderboard record unparseable" + recordCell);
     }
 
     private static void parseHalfTable(List<String> halfTable, ScRecord[] records) {
@@ -185,25 +186,20 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
             records[1] = records[0];
         else
             records[1] = parseLeaderboardRecord(halfTable.get(1));
-        if (records[1] != null)
-            records[1].getScore().setBugged(false);
+        records[1].getScore().setBugged(false);
 
         if (halfTable.size() == 3 && !halfTable.get(2).startsWith("X")) {
             if (halfTable.get(2).equals("←←"))
                 records[2] = records[0];
             else if (halfTable.get(2).equals("←"))
                 records[2] = records[1];
-            else {
+            else
                 records[2] = parseLeaderboardRecord(halfTable.get(2));
-            }
-            if (records[2] != null)
-                records[2].getScore().setPrecognitive(false);
+            records[2].getScore().setPrecognitive(false);
         }
         else {
-            if (records[0] != null)
-                records[0].getScore().setPrecognitive(false);
-            if (records[1] != null)
-                records[1].getScore().setPrecognitive(false);
+            records[0].getScore().setPrecognitive(false);
+            records[1].getScore().setPrecognitive(false);
             records[2] = ScRecord.IMPOSSIBLE_CATEGORY;
         }
     }
