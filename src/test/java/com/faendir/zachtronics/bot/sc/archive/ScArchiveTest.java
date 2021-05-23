@@ -40,7 +40,7 @@ public class ScArchiveTest {
         assertEquals(1, doArchive(score).size()); // new non bugged record
     }
 
-    private @NotNull List<String> doArchive(ScScore score) {
+    private List<String> doArchive(ScScore score) {
         return archive.archive(new ScSolution(ScPuzzle.research_example_1, score)).block();
     }
 }

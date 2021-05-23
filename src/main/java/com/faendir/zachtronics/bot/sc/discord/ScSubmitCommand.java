@@ -43,7 +43,7 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
             // we also archive the score here
             ScSolution solution = new ScSolution(data.puzzle, score);
             archive.archive(solution);
-            ScRecord record = new ScRecord(score, data.author, data.link, false); //TODO oldRNG
+            ScRecord record = new ScRecord(score, data.author, data.link, false);
             return Tuples.of(data.puzzle, record);
         });
     }
@@ -58,11 +58,12 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
     @Value
     public static class Data {
         @NonNull ScPuzzle puzzle;
-        String score;
-        String link;
-        String author;
+        @NotNull String score;
+        @NotNull String author;
+        @NotNull String link;
 
-        public Data(@Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle, @NonNull String score, String link, String author) {
+        public Data(@Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle, @NonNull String score,
+                    @NotNull String author, @NotNull String link) {
             this.puzzle = puzzle;
             this.score = score;
             this.link = link;

@@ -92,6 +92,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                                      {RC, RCNB, RCNP}, {RS, RSNB, RSNP}};
 
         Map<ScCategory, ScScore> beatenScores = new EnumMap<>(ScCategory.class);
+        Map<ScCategory, ScScore> relatedScores = new EnumMap<>(ScCategory.class);
         // |Puzzle | [(**ccc**/r/ss) author](https://li.nk) | ← | [(ccc/r/**ss**) author](https://li.nk) | ←
         // |Puzzle - 1 Reactor | [(**ccc**/**r**/ss) author](https://li.nk) | ← | [(ccc/**r**/**ss**) author](https://li.nk) | ←
         for (int rowIdx = 0; rowIdx < seenRows; rowIdx++) {
@@ -113,10 +114,11 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                 elemloop:
                 for (int i = 0; i < halfSize; i++) {
                     ScCategory thisCategory = blockCategories[i];
+                    ScScore currentScore = blockRecords[i].getScore();
                     row.append(" | ");
                     if (thisCategory.supportsScore(record.getScore()) &&
-                        thisCategory.getScoreComparator().compare(record.getScore(), blockRecords[i].getScore()) <= 0) {
-                        beatenScores.put(thisCategory, blockRecords[i].getScore());
+                        thisCategory.getScoreComparator().compare(record.getScore(), currentScore) <= 0) {
+                        beatenScores.put(thisCategory, currentScore);
                         blockRecords[i] = record;
 
                         for (int prev = 0; prev < i; prev++) {
@@ -131,6 +133,8 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                         row.append(makeLeaderboardString(blockRecords[i], thisCategory));
                     }
                     else {
+                        if (thisCategory.supportsScore(record.getScore()))
+                            relatedScores.put(thisCategory, currentScore);
                         row.append(prevElems[block * halfSize + i + 2]);
                     }
                 }
@@ -145,7 +149,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
             return Mono.just(new UpdateResult.Success(beatenScores));
         }
         else {
-            return Mono.just(new UpdateResult.BetterExists(Collections.emptyMap()));
+            return Mono.just(new UpdateResult.BetterExists(relatedScores));
         }
     }
 
@@ -202,8 +206,5 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                 records[1].getScore().setPrecognitive(false);
             records[2] = ScRecord.IMPOSSIBLE_CATEGORY;
         }
-
-        if (records[0] == null) // incomplete main score, there is always a certified bugless
-            records[0] = records[1];
     }
 }

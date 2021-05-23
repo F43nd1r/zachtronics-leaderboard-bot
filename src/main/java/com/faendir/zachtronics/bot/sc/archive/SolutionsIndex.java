@@ -79,7 +79,7 @@ class SolutionsIndex {
     private static int dominanceCompare(ScScore s1, ScScore s2) {
         int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
         int r2 = Integer.compare(s1.getReactors(), s2.getReactors());
-        int r3 = Integer.compare(s1.getSymbols(), s2.getReactors());
+        int r3 = Integer.compare(s1.getSymbols(), s2.getSymbols());
         int r4 = Boolean.compare(s1.isBugged(), s2.isBugged());
         int r5 = Boolean.compare(s1.isPrecognitive(), s2.isPrecognitive());
         if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0 && r5 <= 0) {

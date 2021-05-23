@@ -51,6 +51,7 @@ public class ScLeaderboardTest {
             }
             System.out.println("Done " + p.getDisplayName());
         }
+        System.out.println("Done");
     }
 
     @Test

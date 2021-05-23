@@ -18,13 +18,13 @@ Other pages:
 |
 |PAX Challenge 3  | [(**104**/1/48) Zig](https://youtu.be/krMm3TYfaYk) | ← | X | [(226/1/**16**) rezoons](https://youtu.be/RytNtT1UsaE) | ← | X
 |
-|Fill in the Blank              | [(**636**/5/190) serbaldrig](https://youtu.be/O0R2xgz73y4) | ← | X | [(3306/5/**80**) cactus](https://youtu.be/lPj4oWuvr0w) | ← | X
-|Fill in the Blank - 2 Reactors | [(**2048**/**2**/141) whoever314](https://youtu.be/MWSiPiP7Xqo) | ← | X | [(2855/**2**/**106**) whoever314/12345ieee](https://youtu.be/7BKKFstZqWw) | ← | X
+|Fill in the Blank | [(**636**/5/190) serbaldrig](https://youtu.be/O0R2xgz73y4) | ← | X | [(3306/5/**80**) cactus](https://youtu.be/lPj4oWuvr0w) | ← | X
+|Fill in the Blank - 2 Reactors | [(**1949**/**2**/187) whoever314](https://youtu.be/ZGGCheS6vLA) | ← | X | [(2807/**2**/**106**) whoever314](https://youtu.be/lX2SXdmeoPI) | ← | X
 |
 |Break-up              | [(**1301**/6/229) serbaldrig](https://youtu.be/O93xO61uiWU)   | ← | ←← | [(17452/2/**197**) Andy](https://youtu.be/T23w69IHnss) | ← | ←←
 |Break-up - 2 Reactors | [(**8866**\*/**2**/244) whoever314](https://youtu.be/CYVTVFfcfB4) | ← | ←← | [(17452/**2**/**197**) Andy](https://youtu.be/T23w69IHnss) | ← | ←←
 |
-|Average Out | [(**1222**/3/135) serbaldrig](https://youtu.be/XgkQ8XX-ezU) | ← | ←← | [(15964\*/1/**24**) 12345ieee](https://youtu.be/YVh79Y5No8w) | ← | ←←
+|Average Out | [(**1222**/3/135) serbaldrig](https://youtu.be/XgkQ8XX-ezU) | ← | [(**1223**/3/60) serbaldrig](https://youtu.be/dA9T3AepRTY) | [(15964\*/1/**24**) 12345ieee](https://youtu.be/YVh79Y5No8w) | ← | ←←
 |Average Out - 1 Reactor | [(**6405**/**1**/43) whoever314](https://youtu.be/T1hc19dRlLI) | ← | ←← | [(15964\*/**1**/**24**) 12345ieee](https://youtu.be/YVh79Y5No8w) | ← | ←←
 
 
@@ -42,11 +42,11 @@ Other pages:
 |
 |Thermoplastic      | [(**333**/1/51) Andy](https://youtu.be/iUoyAqNdduI) | ← | X | [(836/1/**28**) serbaldrig](https://youtu.be/6splNZa5KFg) | ← | X
 |
-|Contaminated | [(**1218**/4/118) serbaldrig](https://youtu.be/dMXmrJaUniQ) | ← | ←← | [(4424/2/**39**) Zemyla](https://youtu.be/pPuJn40rfv8) | ← | ←←
-|Contaminated - 2 Reactors | [(**2423**/**2**/62) whoever314/12345ieee](https://youtu.be/M4weuMI4oG0) | ← | ←← | [(4424/**2**/**39**) Zemyla](https://youtu.be/pPuJn40rfv8) | ← | ←←
+|Contaminated | [(**1218**/4/87) serbaldrig/12345ieee](https://youtu.be/hlmRQhNVP5g) | ← | ←← | [(4424/2/**39**) Zemyla](https://youtu.be/pPuJn40rfv8) | ← | ←←
+|Contaminated - 2 Reactors | [(**2421**/**2**/55) whoever314/12345ieee](https://youtu.be/g4m4Yivy04c) | ← | ←← | [(4424/**2**/**39**) Zemyla](https://youtu.be/pPuJn40rfv8) | ← | ←←
 |
-|Running Low             | [(**475**/5/161) ToughThought](https://youtu.be/5xHfcPuJKGo) | ← | X | [(826/2/**61**) whoever314](https://youtu.be/RY97CQSIAVI) | ← | X
-|Running Low - 1 Reactor | [(**7103**/**1**/98) Zemyla](https://youtu.be/_n6w1FAnzv8) | ← | X | [(7103/**1**/**98**) Zemyla](https://youtu.be/_n6w1FAnzv8) | ← | X
+|Running Low | [(**475**/5/161) ToughThought](https://youtu.be/5xHfcPuJKGo) | ← | X | [(826/2/**61**) whoever314](https://youtu.be/RY97CQSIAVI) | ← | X
+|Running Low - 1 Reactor | [(**3649**/**1**/86) whoever314/12345ieee](https://youtu.be/vGN0c2A-gmc) | ← | X | [(3977/**1**/**73**) britboy3456](https://youtu.be/60zaYwmBK_M) | ← | X
 
 
 ####Vol 5 Issues 5-6
@@ -80,8 +80,8 @@ Other pages:
 |+1              | [(**223**/4/175) ToughThought](https://youtu.be/ZpH9xIC-JyE) | ← | X | [(493/1/**11**) 12345ieee](https://youtu.be/wa44SK7bMQc) | [(573/1/**13**) 12345ieee](https://youtu.be/24b9si8L37I) | X
 |+1 - 1 Reactor  | [(**413**/**1**/18) 12345ieee](https://youtu.be/wJ1fjxzyHFE) | [(**415**/**1**/20) 12345ieee](https://youtu.be/mdW7H5GWYQI) | X | [(493/**1**/**11**) 12345ieee](https://youtu.be/wa44SK7bMQc) | [(573/**1**/**13**) 12345ieee](https://youtu.be/24b9si8L37I) | X
 |
-|Nuclear Sorting              | [(**1223**/3/60) ToughThought](https://youtu.be/lTj9oUKTja4) | ← | ←← | [(1282\*/2/**39**) 12345ieee](https://youtu.be/8XYTELP2Kjg) | ← | ←←
-|Nuclear Sorting - 2 Reactors | [(**1248**/**2**/45) cearn](https://youtu.be/bhezPWj4ZcA) | ← | ←← | [(1282\*/**2**/**39**) 12345ieee](https://youtu.be/8XYTELP2Kjg) | ← | ←←
+|Nuclear Sorting | [(**1223**/3/60) ToughThought](https://youtu.be/lTj9oUKTja4) | ← | ←← | [(1549/2/**26**) MPete](https://youtu.be/OQFDMCt4d5c) | ← | ←←
+|Nuclear Sorting - 2 Reactors | [(**1248**/**2**/45) cearn](https://youtu.be/bhezPWj4ZcA) | ← | ←← | [(1549/**2**/**26**) MPete](https://youtu.be/OQFDMCt4d5c) | ← | ←←
 |
 |Fun with Oxides             | [(**1634**/4/60) ToughThought](https://youtu.be/oNT7oKulzTA) | ← | ←← | [(2634/2/**35**) darkgiggs/12345ieee](https://youtu.be/X7vBED4WVsg) | ← | ←←
 |Fun with Oxides - 1 Reactor | [(**6754**/**1**/97) Zig/darkgiggs](https://youtu.be/_pnhcgOUmYI) | ← | ←← | [(10548/**1**/**84**) Zig](https://youtu.be/67FB7RsWj_I)  | ← | ←←
@@ -102,8 +102,8 @@ Other pages:
 |Speedster               | [(**797**/6/275) ToughThought](https://youtu.be/8JhMQGTzJGM) | ← | X | [(7009/3/**34**) 12345ieee](https://youtu.be/vzRu5sbbAmY) | ← | X
 |Speedster - 2 Reactors  | [(**1621**/**2**/62) whoever314](https://youtu.be/KpqU525i2XA) | ← | X | [(1621/**2**/**62**) whoever314](https://youtu.be/KpqU525i2XA) | ← | X
 |
-|Carbon Splatter             | [(**4139**/6/175) cearn](https://youtu.be/fvwnECSFpIc) | ← | X | [(4850/3/**88**) mayomizak](https://youtu.be/WgLrJNZD1n8) | ← | X
-|Carbon Splatter - 1 Reactor | [(**24243**/**1**/129) Andy](https://youtu.be/6pNA2WbOJ6Y) | ← | X | [(24243/**1**/**129**) Andy](https://youtu.be/6pNA2WbOJ6Y) | ← | X
+|Carbon Splatter | [(**4139**/6/175) cearn](https://youtu.be/fvwnECSFpIc) | ← | X | [(4847/3/**87**) mayomizak](https://youtu.be/ZhUHrWtzB6k) | ← | X
+|Carbon Splatter - 1 Reactor | [(**22254**/**1**/123) britboy3456](https://youtu.be/896G98wX4Tc) | ← | X | [(23785/**1**/**119**) britboy3456](https://youtu.be/V66voBh2AQY) | ← | X
 |
 |Eth             | [(**757**/6/212) whoever314](https://youtu.be/lwm1_BNHE88) | ← | ←← | [(6609\*/2/**40**) 12345ieee](https://youtu.be/2JAuYyQtkn8) | ← | ←←
 |Eth - 1 Reactor | [(**3959**/**1**/75) whoever314](https://youtu.be/ye08O1m-J5s) | ← | ←← | [(3959/**1**/**75**) whoever314](https://youtu.be/ye08O1m-J5s) | ← | ←←
@@ -111,29 +111,29 @@ Other pages:
 |Large Scale             | [(**329**/6/133) ToughThought](https://youtu.be/a6eueFUhoS8) | ← | ←← | [(2048/2/**33**) ToughThought/12345ieee](https://youtu.be/9LmQq3DaKA4) | ← | ←←
 |Large Scale - 1 Reactor | [(**3130**/**1**/73) whoever314](https://youtu.be/H-Sw6XMjerc) | ← | ←← | [(3374/**1**/**65**) whoever314](https://youtu.be/_FavsiFtLus) | ← | ←←
 |
-|Revenge              | [(**824**/5/144) ToughThought](https://youtu.be/paOgAJSz-jU) | ← | X | [(5214/3/**90**) cactus](https://youtu.be/bwaWntB8_P8) | ← | X
-|Revenge - 2 Reactors | [(**2462**/**2**/149) mayomizak](https://youtu.be/Q2jCPHxXosM) | ← | X | [(5329/**2**/**140**) mayomizak](https://youtu.be/hCvc9rD8ldA) | ← | X
+|Revenge | [(**824**/5/144) ToughThought](https://youtu.be/paOgAJSz-jU) | ← | X | [(5214/3/**90**) cactus](https://youtu.be/bwaWntB8_P8) | ← | X
+|Revenge - 2 Reactors | [(**2423**/**2**/151) mayomizak](https://youtu.be/DUfJco7dTxM) | ← | X | [(5329/**2**/**140**) mayomizak](https://youtu.be/hCvc9rD8ldA) | ← | X
 
 
 ####Vol 5 Issues 11-12
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Cycles - No Precognition |Min Symbols |Min Symbols - No Bugs |Min Symbols - No Precognition
 |:-                       |:-      |:-      |:-      |:-      |:-      |:-
-|Excess | [(**820**/3/70) serbaldrig](https://youtu.be/PI8IYMhgZW0) | ← | ←← | [(11644\*/1/**23**) 12345ieee](https://youtu.be/rY-a7b4eUkM) | ← | ←←
+|Excess | [(**664**/6/199) ToughThought](https://youtu.be/q64_NoGraYY) | ← | ←← | [(11644\*/1/**23**) 12345ieee](https://youtu.be/rY-a7b4eUkM) | ← | ←←
 |Excess - 1 Reactor | [(**1540**\*/**1**/53) whoever314](https://youtu.be/ZOZxepXvXcE) | ← | ←← | [(11644\*/**1**/**23**) 12345ieee](https://youtu.be/rY-a7b4eUkM) | ← | ←←
 |
-|Carbon Compounds | [(**459**/6/217) serbaldrig](https://youtu.be/_aDSuwn5k8g) | ← | ←← | [(3137/1/**23**) gggol](https://youtu.be/Vsr9IEJWsKE) | ← | ←←
+|Carbon Compounds | [(**420**/6/231) Community](https://youtu.be/xXJUCoP08oY) | ← | ←← | [(3137/1/**23**) gggol](https://youtu.be/Vsr9IEJWsKE) | ← | ←←
 |Carbon Compounds - 1 Reactor | [(**1463**/**1**/27) 12345ieee](https://youtu.be/2NCVJn2ujoM) | ← | ←← | [(3137/**1**/**23**) gggol](https://youtu.be/Vsr9IEJWsKE) | ← | ←←
 |
-|Magnesium Bicarbonate        | [(**213**/1/42) Andy](https://youtu.be/BCh8YunEQ8E) | ← | X | [(775/1/**26**) Counterpoint](https://youtu.be/6778ron2Czo) | ← | X
+|Magnesium Bicarbonate | [(**212**/1/40) ToughThought](https://youtu.be/8UWWGSfJbRE) | ← | X | [(775/1/**26**) Counterpoint](https://youtu.be/6778ron2Czo) | ← | X
 |
-|Impostor              | [(**1841**\*/6/245) whoever314](https://youtu.be/7400IucI1K4) | ← | ←← | [(11570/3/**118**) ToughThought](https://youtu.be/dXkl4SX5XP4) | ← | ←←
-|Impostor - 3 Reactors | [(**11570**/**3**/118) ToughThought](https://youtu.be/dXkl4SX5XP4) | ← | ←← | [(11570/**3**/**118**) ToughThought](https://youtu.be/dXkl4SX5XP4) | ← | ←←
+|Impostor | [(**1841**\*/6/245) whoever314](https://youtu.be/7400IucI1K4) | ← | ←← | [(11570/3/**118**) ToughThought](https://youtu.be/dXkl4SX5XP4) | ← | ←←
+|Impostor - 2 Reactors | [(**6225**/**2**/169) Community](https://youtu.be/TYe4J2Yzfkw) | ← | ←← | [(6946/**2**/**151**) whoever314/12345ieee](https://youtu.be/NVBgepFAwQ8) | ← | ←←
 |
 |Master Plan              | [(**2015**/6/344) ToughThought](https://youtu.be/bIEDI0vk888) | ← | ←← | [(17385/2/**108**) darkgiggs/12345ieee](https://youtu.be/u8FHqXcbNNw) | ← | ←←
 |Master Plan - 2 Reactors | [(**9833**/**2**/124) darkgiggs/12345ieee](https://youtu.be/HtUZ9GGhpN8) | ← | ←← | [(17385/**2**/**108**) darkgiggs/12345ieee](https://youtu.be/u8FHqXcbNNw) | ← | ←←
 |
-|Rags to Riches              | [(**1651**/6/225) ToughThought](https://youtu.be/g0SWXGFv2l4) | ← | ←← | [(7656/3/**107**) mayomizak](https://youtu.be/QwMKUbRu2fg) | ← | ←←
-|Rags to Riches - 2 Reactors | [(**9224**/**2**/193) whoever314](https://youtu.be/UbatbdzZp_o) | ← | ←← | [(38760/**2**/**168**) mayomizak](https://youtu.be/UM3p3Tqfjcg) | ← | ←←
+|Rags to Riches | [(**1651**/6/225) ToughThought](https://youtu.be/g0SWXGFv2l4) | ← | ←← | [(7656/3/**107**) mayomizak](https://youtu.be/QwMKUbRu2fg) | ← | ←←
+|Rags to Riches - 2 Reactors | [(**9224**/**2**/193) whoever314](https://youtu.be/UbatbdzZp_o) | ← | ←← | [(48838/**2**/**140**) britboy3456](https://youtu.be/7Xg1GaO__KU) | ← | ←←
 
 
 ###Volume 6
@@ -145,7 +145,7 @@ Other pages:
 |
 |You're Doing It Wrong | [(**207**/1/120) Pseudodude](https://youtu.be/Wehn79Lqf2Q) | ← | X | [(696/1/**23**) serbaldrig](https://youtu.be/byl7EfaqYGI) | ← | X 
 |
-|Synthetic Elerium     | [(**1225**/1/164) Zig](https://youtu.be/A_-_AO8qhIU) | ← | X | [(39119/1/**25**) Pseudodude](https://youtu.be/fCklvQhmtMA?t=7m44s) | ← | X 
+|Synthetic Elerium | [(**1224**/1/198) ToughThought](https://youtu.be/B-kE_izZb4U) | ← | X | [(39119/1/**25**) Pseudodude](https://youtu.be/fCklvQhmtMA?t=7m44s) | ← | X
 |
 |Deadly Soft Drinks       | [(**92**/1/32) Mirroar](https://youtu.be/ziL3CE5Y-tM?t=5m20s) | ← | X | [(742/1/**14**) Andy](https://youtu.be/mlI02phtNyo) | ← | X
 |
@@ -164,8 +164,8 @@ Other pages:
 |
 |Unbonding with no Bonders   | [(**335**/1/53) serbaldrig](https://youtu.be/vFEGhInjyvY?t=11m24s) | ← | X | [(995/1/**33**) ToughThought](https://youtu.be/ByXnfcKMBhc) | ← | X
 |
-|Breeder Reactor             | [(**420**/3/137) mayomizak](https://youtu.be/8s5kZ3zeXdk) | ← | X | [(1449/1/**15**) 12345ieee](https://youtu.be/VAZDlyFEBWE) | ← | X
-|Breeder Reactor - 1 Reactor | [(**808**/**1**/32) 12345ieee](https://youtu.be/lDjCFiC3pWs) | ← | X | [(1449/**1**/**15**) 12345ieee](https://youtu.be/VAZDlyFEBWE) | ← | X
+|Breeder Reactor | [(**416**/3/102) ToughThought](https://youtu.be/zwwJpNaiBog) | ← | X | [(1449/1/**15**) 12345ieee](https://youtu.be/VAZDlyFEBWE) | ← | X
+|Breeder Reactor - 1 Reactor | [(**615**/**1**/44) whoever314](https://youtu.be/cXXtLZUIIJ8) | ← | X | [(1449/**1**/**15**) 12345ieee](https://youtu.be/VAZDlyFEBWE) | ← | X
 |
 |Nightmare Factory              | [(**1161**/6/270) serbaldrig](https://youtu.be/HdmPUDX4lhk?t=6m41s) | ← | ←← | [(9253/3/**44**) WildM](https://youtu.be/HdmPUDX4lhk?t=9m34s) | ← | ←←
 |Nightmare Factory - 3 Reactors | [(**2810**/**3**/74) 12345ieee](https://youtu.be/RY3JWdT41Wo) | ← | ←← | [(9253/**3**/**44**) WildM](https://youtu.be/HdmPUDX4lhk?t=9m34s) | ← | ←←
@@ -213,19 +213,19 @@ Other pages:
 ####Vol 7 Issues 5-6
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Cycles - No Precognition |Min Symbols |Min Symbols - No Bugs |Min Symbols - No Precognition
 |:-                       |:-      |:-      |:-      |:-      |:-      |:-
-|Pertetroxide Synthesis      | [(**282**/1/44) ZndyMinner](https://youtu.be/p0uumIocUAc?t=14m21s)      | ← | X | [(282/1/**44**) ZndyMinner](https://youtu.be/p0uumIocUAc?t=14m21s) | ← | X   Note: tournament version disallowed unbond commands
+|Pertetroxide Synthesis      | [(**282**/1/44) ZndyMinner](https://youtu.be/p0uumIocUAc?t=14m21s) | ← | X | [(283/1/**43**) ZndyMinner](https://youtu.be/hcbWZyUb5tA) | ← | X   Note: tournament version disallowed unbond commands
 |
 |Fantastic Metals              | [(**915**/6/306) ToughThought](https://youtu.be/Z4G8YiwsF80) | ← | X | [(6206/2/**216**) ecco2](https://youtu.be/aIOi4xJJkp0?t=3m35s) | [(2674/6/**240**) JYPark1101](https://youtu.be/SclTd2H3-QY) | X
 |Fantastic Metals - 2 Reactors | [(**6206**/**2**/216) ecco2](https://youtu.be/aIOi4xJJkp0?t=3m35s) | [(**18171**/**2**/272) serbaldrig](https://youtu.be/aIOi4xJJkp0?t=1m26s) | X | [(6206/**2**/**216**) ecco2](https://youtu.be/aIOi4xJJkp0?t=3m35s) | [(18171/**2**/**272**) serbaldrig](https://youtu.be/aIOi4xJJkp0?t=1m26s) | X
 |
-|Reppe Chemistry             | [(**1233**/4/64) Zemyla](https://youtu.be/BnQrRLNlUL0) | ← | ←← | [(2454/4/**45**) Counterpoint](https://youtu.be/gKg1eGpdfq0) | ← | ←←
-|Reppe Chemistry - 1 Reactor | [(**6992**/**1**/133) serbaldrig](https://youtu.be/NOdWf0roKQQ) | ← | ←← | [(16329/**1**/**69**) Pseudodude](https://youtu.be/Slx0WT44Sb8?t=11m29s) | ← | ←←
+|Reppe Chemistry | [(**1233**/4/64) Zemyla](https://youtu.be/BnQrRLNlUL0) | ← | ←← | [(2454/4/**45**) Counterpoint](https://youtu.be/gKg1eGpdfq0) | ← | ←←
+|Reppe Chemistry - 1 Reactor | [(**6992**/**1**/133) serbaldrig](https://youtu.be/NOdWf0roKQQ) | ← | ←← | [(18611/**1**/**65**) britboy3456](https://youtu.be/pla_MNu_ZyU) | ← | ←←
 |
 |Better Than Graphene        | [(**1445**/1/38) Jabor](https://youtu.be/f1q0JO0xpwA?t=5m17s) | ← | X | [(7397/1/**22**) Krackor](https://youtu.be/f1q0JO0xpwA?t=9m51s) | ← | X
 |
 |Magnets                     | [(**273**/1/69) serbaldrig](https://youtu.be/ONnDfi_j6Tw) | [(**522**/1/41) rubyblielsbc](https://youtu.be/pdiNPsTCscA?t=4m52s) | ←← | [(832/1/**26**) Alpha Raptor (tweaked by WildM)](https://youtu.be/pdiNPsTCscA?t=8m55s) | [(1239/1/**26**) gggol](https://youtu.be/pdiNPsTCscA?t=8m1s) | ←←
 |
-|Precious Oxygen             | [(**386**/1/75) mayomizak](https://youtu.be/qBiJvXzxZX4) | ← | X | [(587/1/**51**) GuavaMoment](https://youtu.be/-BBNjYvpJu0?t=12m20s) | ← | X
+|Precious Oxygen | [(**383**/1/74) mayomizak](https://youtu.be/ivphSDsyUzM) | ← | X | [(587/1/**51**) GuavaMoment](https://youtu.be/-BBNjYvpJu0?t=12m20s) | ← | X
 
 
 
@@ -270,15 +270,15 @@ Other pages:
 |Tumbler                  | [(**443**/4/93) serbaldrig](https://youtu.be/B8v6PTnDOGE) | ← | X | [(1278/2/**37**) serbaldrig](https://youtu.be/d9AhUqIpTug?t=26m21s) | ← | X
 |Tumbler - 2 Reactors     | [(**511**/**2**/51) ToughThought](https://youtu.be/RxFRNBfa4qw) | ← | X | [(1278/**2**/**37**) serbaldrig](https://youtu.be/d9AhUqIpTug?t=26m21s) | ← | X
 |
-|Molecular Key Carving              | [(**885**/6/194) GuavaMoment](https://youtu.be/d9AhUqIpTug?t=23m20s) | ← | X | 64 | [(12812/2/**72**) Zig](https://youtu.be/zzEMMtx-rrw) | X 
+|Molecular Key Carving | [(**874**/5/140) ToughThought](https://youtu.be/e-VLxH43ZaE) | ← | X | [(4785/3/**48**) Andy](https://youtu.be/Ls1YCtUJLfA) | ← | X
 |Molecular Key Carving - 2 Reactors | [(**2839**/**2**/195) whoever314](https://youtu.be/iA5wadHara4) | ← | X | [(12812/**2**/**72**) Zig](https://youtu.be/zzEMMtx-rrw) | ← | X
 |
-|Sensitive Explosives I  | [(**434**/4/85) serbaldrig](https://youtu.be/mfwz5gLieYA) | ← | X | [(829/3/**33**) ToughThought](https://youtu.be/P2IvbwYZMOM) | [(434/4/**85**) serbaldrig](https://youtu.be/mfwz5gLieYA) | X
-|Sensitive Explosives I - 3 Reactors | [(**829**/**3**/33) ToughThought](https://youtu.be/P2IvbwYZMOM) | † [(**434**/**4**/85) serbaldrig](https://youtu.be/mfwz5gLieYA) | X | [(829/**3**/**33**) ToughThought](https://youtu.be/P2IvbwYZMOM) | † [(434/**4**/**85**) serbaldrig](https://youtu.be/mfwz5gLieYA) | X
+|Sensitive Explosives I | [(**434**/4/85) serbaldrig](https://youtu.be/mfwz5gLieYA) | ← | X | [(829/3/**33**) ToughThought](https://youtu.be/P2IvbwYZMOM) | [(1179/4/**42**) gggol](https://youtu.be/i_MSprQYULQ) | X
+|Sensitive Explosives I - 3 Reactors | [(**829**/**3**/33) ToughThought](https://youtu.be/P2IvbwYZMOM) | † [(**434**/**4**/85) serbaldrig](https://youtu.be/mfwz5gLieYA) | X | [(829/**3**/**33**) ToughThought](https://youtu.be/P2IvbwYZMOM) | † [(1179/**4**/**42**) gggol](https://youtu.be/i_MSprQYULQ) | X
 |
 |Waste Gas               | [(**98**/1/61) ToughThought](https://youtu.be/YCsDnoEB0gw) | ← | X | [(873/1/**39**) serbaldrig](https://youtu.be/fBouK8sv1qs) | ← | X
 |
-|Ethane Scrubbing             | [(**823**\*/3/72) 12345ieee](https://youtu.be/qqbftExThYA) | ← | ←← | [(1539/2/**25**) Counterpoint](https://youtu.be/EsO6gxxERG8) | ← | ←←
+|Ethane Scrubbing | [(**591**/6/163) ToughThought](https://youtu.be/918mNnCstFM) | ← | ←← | [(1539/2/**25**) Counterpoint](https://youtu.be/EsO6gxxERG8) | ← | ←←
 |Ethane Scrubbing - 1 Reactor | [(**5223**/**1**/78) whoever314](https://youtu.be/QJnhwbOa9E0) | ← | ←← | [(11928/**1**/**33**) cactus](https://youtu.be/vnDsuGW8pxI) | ← | ←←
 |
 |Melanophlogite Clathrates             | [(**241**/5/217) WildM](https://youtu.be/vFEGhInjyvY?t=31m13s) | [(**243**/5/191) whoever314](https://youtu.be/CHuJA7xNQ7o) | ←← | [(1871/2/**20**) darkgiggs](https://youtu.be/mjPHR9n1LiA) | ← | ←←
@@ -305,13 +305,13 @@ Other pages:
 |:-                       |:-      |:-      |:-      |:-      |:-      |:-
 |Shared Space I  | [(**150**/1/28) 12345ieee](https://youtu.be/V-r_Th_UePY) | ← | X | [(497/1/**16**) serbaldrig](https://youtu.be/vvmqkfKKnLs) | ← | X
 |
-|Shared Space II | [(**202**/1/29) 12345ieee](https://youtu.be/x-sYme5y2Kc) | ← | X | [(513/1/**16**) serbaldrig](https://youtu.be/3_aeBA3KCNs) | ← | X
+|Shared Space II | [(**184**/1/32) ToughThought](https://youtu.be/YDCPaSoZC-Y) | ← | X | [(513/1/**16**) serbaldrig](https://youtu.be/3_aeBA3KCNs) | ← | X
 |
 |Taking Turns   | [(**279**/1/40) Zemyla](https://youtu.be/J6FLawE3Teg) | ← | X | [(614/1/**31**) 12345ieee](https://youtu.be/EEzsPUol2JI) | ← | X
 |
 |How Ionic      | [(**195**/1/40) ToughThought/Andy](https://youtu.be/2DBel9NbAwc) | ← | X | [(796/1/**18**) darkgiggs](https://youtu.be/rdpf1eInffg) | ← | X
 |
-|Two by Two     | [(**228**/1/39) Zig](https://youtu.be/6Dmx0XUdsIw) | ← | X | [(488/1/**27**) rezoons](https://youtu.be/XKUE1T04D50) | ← | X
+|Two by Two | [(**200**/1/36) ToughThought/brookieoz](https://youtu.be/QeS4WSrsLbA) | ← | X | [(488/1/**27**) rezoons](https://youtu.be/XKUE1T04D50) | ← | X
 |
 |The Gold Standard | [(**165**/1/54) serbaldrig](https://youtu.be/hx8INF-ZN1M) | ← | [(**758**/1/46) Andy](https://youtu.be/WLE0Ja9k5bc) | [(1723/1/**22**) Andy](https://youtu.be/_0iir8LPNcM) | ← | ←←
 
@@ -335,7 +335,7 @@ Other pages:
 ####Vol 8 Issues 13-14
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Cycles - No Precognition |Min Symbols |Min Symbols - No Bugs |Min Symbols - No Precognition
 |:-                       |:-      |:-      |:-      |:-      |:-      |:-
-|A New Beginning              | [(**2455**/5/334) Community](https://youtu.be/v8veiWxThqg) | ← | ←← | [(7056/3/**275**) whoever314](https://youtu.be/PycqW3_8IyM) | ← | ←←
+|A New Beginning | [(**2455**/5/334) Community](https://youtu.be/v8veiWxThqg) | ← | ←← | [(33725/5/**181**) gggol](https://youtu.be/liV465KhX6s) | ← | ←←
 |A New Beginning - 3 Reactors | [(**6807**/**3**/298) whoever314](https://youtu.be/tcH8FlLhCJg) | ← | ←← | [(7056/**3**/**275**) whoever314](https://youtu.be/PycqW3_8IyM) | ← | ←←
 |
 |Discombobulate              | [(**2939**/4/232) ToughThought](https://youtu.be/7BMZvk5pMbw) | ← | ←← | [(12422/4/**85**) gggol](https://youtu.be/PppJ-5nPFAg) | ← | ←←
@@ -357,7 +357,7 @@ Other pages:
 |Precious Tears              | [(**828**/5/163) ToughThought](https://youtu.be/3b6rcPJSP78) | ← | X | [(24975/1/**73**) Carlbunk](https://youtu.be/aIOi4xJJkp0?t=15m49s) | ← | X
 |Precious Tears - 1 Reactor  | [(**23776**/**1**/93) gggol](https://youtu.be/aIOi4xJJkp0?t=13m57s) | ← | X | [(24975/**1**/**73**) Carlbunk](https://youtu.be/aIOi4xJJkp0?t=15m49s) | ← | X Note: tournament solutions were minimizing waldos used
 |
-|Desperate Measures              | [(**2414**/6/171) whoever314/12345ieee](https://youtu.be/h8M-4nRBpdk) | ← | ←← | [(2414/6/**171**) whoever314/12345ieee](https://youtu.be/h8M-4nRBpdk) | ← | ←←
+|Desperate Measures | [(**2414**/6/171) whoever314/12345ieee](https://youtu.be/h8M-4nRBpdk) | ← | ←← | [(12627/6/**95**) gggol](https://youtu.be/10QORXaoeuI) | ← | ←←
 |Desperate Measures - 3 Reactors | [(**8814**/**3**/196) whoever314/12345ieee](https://youtu.be/D7shi-uaifc) | ← | ←← | [(8814/**3**/**196**) whoever314/12345ieee](https://youtu.be/D7shi-uaifc) | ← | ←←
 |
 |Hydrocarbon Stitch | [(**538**/1/51) ToughThought](https://youtu.be/MwXEcyyL3h4) | ← | ←← | [(2180/1/**28**) Andy](https://youtu.be/BSYE8Tnp-SU) | ← | ←←
@@ -406,7 +406,7 @@ Other pages:
 |:-                       |:-      |:-      |:-      |:-
 |Unlikely           | [(**307**/1/53) Andy](https://youtu.be/7HZmiRnws0U) | ← | [(2043/1/**28**) Andy](https://youtu.be/u3M9KbGjv_I) | ←
 |
-|Chalcogens         | [(**239**/1/47) spagchem](https://youtu.be/0l-nbOVei-g?t=9m10s) | ← | [(390/1/**41**) Counterpoint](https://youtu.be/0l-nbOVei-g?t=3m25s) | ←
+|Chalcogens | [(**239**/1/47) spagchem](https://youtu.be/0l-nbOVei-g?t=9m10s) | ← | [(482/1/**29**) Andy](https://youtu.be/YpdiQGckyhc) | ←
 |
 |Chlorine and Ammonia | [(**189**/1/43) spagchem](https://youtu.be/34jTMGR5C1g) | ← | [(408/1/**22**) Andy](https://youtu.be/Cg50rGhMPWk) | ←
 |
@@ -442,9 +442,9 @@ Other pages:
 |
 |Upscale Downscale | [(**402**/1/114) whoever314/12345ieee](https://youtu.be/qnIiYuk65FY) | ← | [(1847/1/**47**) Counterpoint](https://youtu.be/pxW_Tzb83lU?t=2337) | ←
 |
-|Molting | [(**242**/1/51) gggol](https://youtu.be/qIrlcYTbVRU?t=1704) | ← | [(265/1/**43**) brookieoz](https://youtu.be/qIrlcYTbVRU?t=1291) | ←
+|Molting | [(**242**/1/51) gggol](https://youtu.be/qIrlcYTbVRU?t=1704) | ← | [(8339/1/**27**) Zig](https://youtu.be/DScUSS2lugo) | ←
 |
-|Unpacking | [(**1415**/1/54) Flexo](https://youtu.be/PxMRY0Rmdx0?t=943) | ← | [(2071/1/**30**) rezoons](https://youtu.be/PxMRY0Rmdx0?t=2778) | ←
+|Unpacking | [(**855**/1/78) mayomizak](https://youtu.be/lNuGo_1p8w0) | ← | [(2071/1/**30**) rezoons](https://youtu.be/PxMRY0Rmdx0?t=2778) | ←
 |
 |Unpleasant Dreams | [(**577**/6/271) Andy](https://youtu.be/7iW5btSe2ts) | ← | [(1950/5/**101**) darkgiggs](https://youtu.be/isbJXMJS7js) | ←
 |Unpleasant Dreams - 2 Reactors | [(**4336**/**2**/293) whoever314](https://youtu.be/ymm8unOsQwM) | ← | [(6,272,438/**2**/**109**) Andy](https://youtu.be/7TpGj-1v5Cw) | ←
