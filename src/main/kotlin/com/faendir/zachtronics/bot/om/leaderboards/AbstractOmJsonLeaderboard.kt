@@ -15,8 +15,10 @@ import reactor.core.publisher.Mono
 import java.io.File
 import javax.annotation.PostConstruct
 
-abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, private val imgurService: ImgurService,
-                                            private val directoryCategories: Map<String, List<OmCategory>>, private val serializer: KSerializer<J>) :
+abstract class AbstractOmJsonLeaderboard<J>(
+    private val gitRepo: GitRepository, private val imgurService: ImgurService,
+    private val directoryCategories: Map<String, List<OmCategory>>, private val serializer: KSerializer<J>
+) :
     Leaderboard<OmCategory, OmPuzzle, OmRecord> {
     companion object {
         private const val scoreFileName = "scores.json"
@@ -77,7 +79,10 @@ abstract class AbstractOmJsonLeaderboard<J>(private val gitRepo: GitRepository, 
                 commitAndPush(record.author, puzzle, record.score, success.map { it.key.displayName }.plusIf(paretoUpdate, "PARETO"))
             }
             when {
-                success.isNotEmpty() -> UpdateResult.Success(success)
+                success.isNotEmpty() -> {
+                    record.score.displayAsSum = success.keys.any { it.name.startsWith("S") }
+                    UpdateResult.Success(success)
+                }
                 paretoUpdate -> UpdateResult.ParetoUpdate()
                 betterExists.isNotEmpty() -> UpdateResult.BetterExists(betterExists)
                 else -> UpdateResult.NotSupported()

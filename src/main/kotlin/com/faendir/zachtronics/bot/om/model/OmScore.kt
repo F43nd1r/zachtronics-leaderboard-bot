@@ -10,6 +10,7 @@ data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>, @Transient val
     constructor(parts: Iterable<Pair<OmScorePart, Double>>, modifier: OmModifier? = null) : this(parts.toMap(LinkedHashMap()), modifier)
     constructor(vararg parts: Pair<OmScorePart, Double>, modifier: OmModifier? = null) : this(parts.asIterable(), modifier)
 
+    @Transient
     var displayAsSum = false
 
     fun toDisplayString(preprocess: Iterable<Map.Entry<OmScorePart, Double>>.() -> Iterable<Map.Entry<OmScorePart, Double>> = { this }, separator: String = "/",
