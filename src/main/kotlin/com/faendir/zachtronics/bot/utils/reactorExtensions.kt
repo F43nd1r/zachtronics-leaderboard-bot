@@ -10,7 +10,7 @@ import reactor.kotlin.core.util.function.component2
 import reactor.util.function.Tuple2
 import reactor.util.function.Tuples
 
-fun <T> Mono<T?>.throwIfEmpty(message: () -> String): Mono<T> = switchIfEmpty { throw IllegalArgumentException(message()) }.map { it as T }
+fun <T> Mono<T>.throwIfEmpty(message: () -> String): Mono<T> = switchIfEmpty { throw IllegalArgumentException(message()) }.map { it as T }
 
 fun <T : Any, U : Any, R : Any> Mono<Tuple2<T, U>>.flatMapFirst(map: (T, U) -> Mono<R>): Mono<Tuple2<R, U>> =
     flatMap { (t, u) -> map(t, u).zipWith(u.toMono()) }
@@ -26,4 +26,4 @@ fun Mono<Boolean>.ifTrue(action: () -> Unit): Mono<Boolean> = doOnSuccess { if (
 
 inline fun <reified R : Any> Flux<*>.filterIsInstance() = filter { it is R }.cast<R>()
 
-inline fun <reified R : Any> Mono<*>.filterIsInstance(): Mono<R?> = filter { it is R }.cast(R::class.java)
+inline fun <reified R : Any> Mono<*>.filterIsInstance(): Mono<R> = filter { it is R }.cast(R::class.java)

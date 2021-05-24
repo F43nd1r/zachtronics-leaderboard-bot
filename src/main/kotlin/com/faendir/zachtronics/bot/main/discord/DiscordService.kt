@@ -82,7 +82,7 @@ class DiscordService(discordClient: GatewayDiscordClient, private val gameContex
 
     private fun findGameContext(event: InteractionCreateEvent): Mono<GameContext> {
         val name = event.interaction.commandInteraction.name
-        return Mono.fromCallable { gameContexts.find { it.game.commandName == name } }
+        return Mono.fromCallable<GameContext> { gameContexts.find { it.game.commandName == name } }
             .throwIfEmpty { "I did not recognize the game \"$name\"." }
     }
 }

@@ -32,6 +32,24 @@ data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>, @Transient val
 
     fun toShortDisplayString() = toStandardDisplayString { _, value -> format(value) }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as OmScore
+
+        if (parts.any { other.parts[it.key] != it.value }) return false
+        if (modifier != other.modifier) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = parts.map { it.key.hashCode() * it.value.hashCode() }.sum()
+        result = 31 * result + (modifier?.hashCode() ?: 0)
+        return result
+    }
+
     companion object {
         private val numberFormat = DecimalFormat("0.#")
 

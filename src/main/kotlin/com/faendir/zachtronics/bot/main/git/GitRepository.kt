@@ -22,7 +22,7 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
     }
 
     fun <T> access(access: AccessScope.() -> T?): Mono<T> {
-        return (Mono.fromCallable { doAccess(access) } as Mono<T>).subscribeOn(Schedulers.boundedElastic())
+        return (Mono.fromCallable<T> { doAccess(access) }).subscribeOn(Schedulers.boundedElastic())
     }
 
     private fun <T> doAccess(access: AccessScope.() -> T?) : T?{
@@ -48,6 +48,8 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
         }
 
         fun status(): Status = git.status().call()
+
+        fun currentHash() : String = git.repository.resolve("HEAD").name()
 
         fun commitAndPush(user: String?, puzzle: Puzzle, score: Score, updated: Collection<String>) {
             commitAndPush("${puzzle.displayName} ${score.toDisplayString()} $updated by ${user ?: "unknown"}")

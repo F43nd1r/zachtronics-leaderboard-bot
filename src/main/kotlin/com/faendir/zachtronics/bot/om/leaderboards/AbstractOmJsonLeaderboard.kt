@@ -52,7 +52,7 @@ abstract class AbstractOmJsonLeaderboard<J>(
             directoryCategories.forEach { (dirName, dirCategories) ->
                 val dir = File(repo, dirName)
                 val scoreFile = File(dir, scoreFileName)
-                val records = Json.decodeFromString(serializer, scoreFile.takeIf { it.exists() }?.readText() ?: "{}")
+                val records = getRecords(dirName)
                 val categories = dirCategories.filter { it.supportsPuzzle(puzzle) && it.supportsScore(record.score) }
                 var changed = false
                 for (category in categories) {
@@ -92,20 +92,30 @@ abstract class AbstractOmJsonLeaderboard<J>(
 
     override fun get(puzzle: OmPuzzle, category: OmCategory): Mono<OmRecord> {
         return gitRepo.access {
-            val (dirName, _) = directoryCategories.asIterable().find { it.value.contains(category) } ?: return@access null
-            val dir = File(repo, dirName)
-            val scoreFile = File(dir, scoreFileName)
-            val records = Json.decodeFromString(serializer, scoreFile.readText())
-            return@access records.getRecord(puzzle, category)?.let { record ->
-                val rehostedLink = imgurService.tryRehost(record.link)
-                if (rehostedLink != record.link) {
-                    val rehostedRecord = OmRecord(record.score, rehostedLink)
-                    update(puzzle, rehostedRecord)
-                    rehostedRecord
-                } else {
-                    record
+            getRecords(category)?.getRecord(puzzle, category)?.also { it.score.displayAsSum = category.name.startsWith("S") }
+        }
+    }
+
+    private var cached: MutableMap<String, J> = mutableMapOf()
+    private var hash: String? = null
+
+    private fun GitRepository.AccessScope.getRecords(category: OmCategory): J? {
+        val (dirName, _) = directoryCategories.asIterable().find { it.value.contains(category) } ?: return null
+        return getRecords(dirName)
+    }
+
+    private fun GitRepository.AccessScope.getRecords(dirName: String): J {
+        val currentHash = currentHash()
+        return if (hash == currentHash && cached.containsKey(dirName)) {
+            cached.getValue(dirName)
+        } else {
+            Json.decodeFromString(serializer, File(File(repo, dirName), scoreFileName).takeIf { it.exists() }?.readText() ?: "{}").also {
+                if(hash != currentHash) {
+                    cached.clear()
+                    hash = currentHash
                 }
-            }?.also { it.score.displayAsSum = category.name.startsWith("S") }
+                cached[dirName] = it
+            }
         }
     }
 
