@@ -96,6 +96,20 @@ abstract class AbstractOmJsonLeaderboard<J>(
         }
     }
 
+    override fun getAll(puzzle: OmPuzzle, categories: Iterable<OmCategory>): Mono<Map<OmCategory, OmRecord>> {
+        return gitRepo.access {
+            categories.groupBy { category -> directoryCategories.asIterable().find { it.value.contains(category) }?.key }
+                .flatMap { (dirName, categories) ->
+                    if (dirName != null) {
+                        val records = getRecords(dirName)
+                        categories.mapNotNull { category -> records.getRecord(puzzle, category)?.let { category to it } }
+                    } else {
+                        emptyList()
+                    }
+                }.toMap()
+        }
+    }
+
     private var cached: MutableMap<String, J> = mutableMapOf()
     private var hash: String? = null
 
@@ -110,7 +124,7 @@ abstract class AbstractOmJsonLeaderboard<J>(
             cached.getValue(dirName)
         } else {
             Json.decodeFromString(serializer, File(File(repo, dirName), scoreFileName).takeIf { it.exists() }?.readText() ?: "{}").also {
-                if(hash != currentHash) {
+                if (hash != currentHash) {
                     cached.clear()
                     hash = currentHash
                 }

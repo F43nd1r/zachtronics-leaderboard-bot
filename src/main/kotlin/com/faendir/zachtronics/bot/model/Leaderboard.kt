@@ -1,6 +1,7 @@
 package com.faendir.zachtronics.bot.model
 
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 
 interface Leaderboard<C : Category, P : Puzzle, R : Record> {
@@ -9,6 +10,9 @@ interface Leaderboard<C : Category, P : Puzzle, R : Record> {
     fun update(puzzle: P, record: R): Mono<UpdateResult> = UpdateResult.NotSupported().toMono()
 
     fun get(puzzle: P, category: C): Mono<R>
+
+    fun getAll(puzzle: P, categories: Iterable<C>): Mono<Map<C, R>> =
+        categories.toFlux().flatMap { Mono.zip(it.toMono(), get(puzzle, it)) }.collectMap({ it.t1 }, { it.t2 })
 }
 
 sealed class UpdateResult {

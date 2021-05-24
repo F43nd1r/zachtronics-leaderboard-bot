@@ -10,11 +10,9 @@ import discord4j.discordjson.json.EmbedFieldData
 import discord4j.discordjson.json.WebhookExecuteRequest
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
-import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import reactor.util.function.Tuple2
-import java.util.*
 
 abstract class AbstractListCommand<C : Category, P : Puzzle, R : Record> : Command {
     abstract val leaderboards: List<Leaderboard<C, P, R>>
@@ -23,36 +21,43 @@ abstract class AbstractListCommand<C : Category, P : Puzzle, R : Record> : Comma
 
     override fun handle(interaction: Interaction): Mono<WebhookExecuteRequest> {
         return findPuzzleAndCategories(interaction).flatMap { (puzzle, categories) ->
-            categories.toFlux().flatMap { category ->
-                Mono.zip(
-                    category.toMono(),
-                    getRecord(puzzle, category).map { Optional.of(it) }.switchIfEmpty(Optional.empty<R>().toMono())
-                )
-            }.collectList()
+            leaderboards.toFlux().flatMap { it.getAll(puzzle, categories) }.collectList()
+                .map { it.reduce { acc, map -> acc + map } }
                 .map { records ->
                     WebhookExecuteRequest.builder()
                         .addEmbed(EmbedData.builder()
                             .title("*${puzzle.displayName}*")
                             .addAllFields(
-                                records
-                                    .groupBy ({ it.t2.orElse(null) }, {it.t1})
+                                records.asIterable()
+                                    .groupBy({ it.value }, { it.key })
                                     .map { entry -> entry.key to entry.value.sortedBy<C, Comparable<*>> { it as? Comparable<*> } }
-                                    .sortedBy<Pair<R?, List<C>>, Comparable<*>> { it.second.first() as? Comparable<*> }
+                                    .sortedBy<Pair<R, List<C>>, Comparable<*>> { it.second.first() as? Comparable<*> }
                                     .map { (record, categories) ->
-                                    EmbedFieldData.builder()
-                                        .name(categories.joinToString("/") { it.displayName })
-                                        .value(record?.let { "[${it.score.toDisplayString()}](${it.link})" } ?: "None")
-                                        .inline(true)
-                                        .build()
-                                }
+                                        EmbedFieldData.builder()
+                                            .name(categories.joinToString("/") { it.displayName })
+                                            .value(record.let { "[${it.score.toDisplayString()}](${it.link})" })
+                                            .inline(true)
+                                            .build()
+                                    }
                             )
-                            .build())
+                            .apply {
+                                val missing = categories.minus(records.map { it.key })
+                                if (missing.isNotEmpty()) {
+                                    addField(
+                                        EmbedFieldData.builder()
+                                            .name(missing.joinToString("/") { it.displayName })
+                                            .value("None")
+                                            .inline(false)
+                                            .build()
+                                    )
+                                }
+                            }
+                            .build()
+                        )
                         .build()
                 }
         }
     }
-
-    private fun getRecord(puzzle: P, category: C): Mono<R> = leaderboards.toFlux().flatMap { it.get(puzzle, category) }.next()
 
     abstract fun findPuzzleAndCategories(interaction: Interaction): Mono<Tuple2<P, List<C>>>
 }
