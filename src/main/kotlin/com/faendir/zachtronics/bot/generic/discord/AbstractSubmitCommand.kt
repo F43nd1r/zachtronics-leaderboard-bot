@@ -64,7 +64,7 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : Command {
             throw IllegalArgumentException("sorry, something went wrong")
         }
 
-    private val allowedImageTypes = listOf("gif", "png", "jpg")
+    private val allowedImageTypes = setOf("gif", "png", "jpg")
 
     private fun ImmutableEmbedData.Builder.link(link: String) = apply {
         if (allowedImageTypes.contains(link.substringAfterLast(".", ""))) {
