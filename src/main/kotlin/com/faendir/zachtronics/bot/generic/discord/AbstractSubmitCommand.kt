@@ -4,10 +4,7 @@ import com.faendir.zachtronics.bot.model.*
 import com.faendir.zachtronics.bot.utils.findInstance
 import com.faendir.zachtronics.bot.utils.ifNotEmpty
 import discord4j.core.`object`.command.Interaction
-import discord4j.discordjson.json.EmbedData
-import discord4j.discordjson.json.EmbedFieldData
-import discord4j.discordjson.json.EmbedImageData
-import discord4j.discordjson.json.WebhookExecuteRequest
+import discord4j.discordjson.json.*
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.util.function.component1
@@ -30,9 +27,9 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : Command {
                     EmbedData.builder()
                         .title("Success: *${puzzle.displayName}* ${successes.flatMap { it.oldScores.keys }.joinToString { it.displayName }}")
                         .description("`${record.score.toDisplayString()}`\npreviously:")
-                        .image(EmbedImageData.builder().url(record.link).build())
                         .addAllFields(successes.flatMap { it.oldScores.entries }
                             .map { EmbedFieldData.builder().name(it.key.displayName).value("`${it.value?.toDisplayString() ?: "none"}`").inline(true).build() })
+                        .link(record.link)
                         .build()
                 )
                     .build()
@@ -43,7 +40,7 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : Command {
                         EmbedData.builder()
                             .title("Pareto *${puzzle.displayName}*")
                             .description("${record.score.toDisplayString()} was included in the pareto frontier.")
-                            .image(EmbedImageData.builder().url(record.link).build())
+                            .link(record.link)
                             .build()
                     )
                     .build()
@@ -66,6 +63,16 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : Command {
             }
             throw IllegalArgumentException("sorry, something went wrong")
         }
+
+    private val allowedImageTypes = listOf("gif", "png", "jpg")
+
+    private fun ImmutableEmbedData.Builder.link(link: String) = apply {
+        if (allowedImageTypes.contains(link.substringAfterLast(".", ""))) {
+            image(EmbedImageData.builder().url(link).build())
+        } else {
+            addField(EmbedFieldData.builder().name("Link").value("[$link]($link)").inline(false).build())
+        }
+    }
 
     abstract fun parseSubmission(interaction: Interaction): Mono<Tuple2<P, R>>
 }
