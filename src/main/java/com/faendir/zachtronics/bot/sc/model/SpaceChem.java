@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,13 +37,14 @@ public class SpaceChem implements Game {
         return Arrays.stream(ScPuzzle.values())
                      .filter(p -> p.getDisplayName().equalsIgnoreCase(name))
                      .findFirst()
-                     .orElse(UtilsKt.getSingleMatchingPuzzle(ScPuzzle.values(), name));
+                     .orElseGet(() -> UtilsKt.getSingleMatchingPuzzle(ScPuzzle.values(), name));
     }
 
     private static final Set<Long> WIKI_ADMINS = Set.of(295868901042946048L, // 12345ieee,
                                                         516462621382410260L, // TT
                                                         185983061190508544L  // Zig
     );
+    @NotNull
     @Override
     public Mono<Boolean> hasWritePermission(@Nullable User user) {
         if (user == null)
