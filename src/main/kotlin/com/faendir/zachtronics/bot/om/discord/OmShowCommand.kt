@@ -6,7 +6,7 @@ import com.faendir.discord4j.command.annotation.Description
 import com.faendir.zachtronics.bot.generic.discord.AbstractShowCommand
 import com.faendir.zachtronics.bot.model.Leaderboard
 import com.faendir.zachtronics.bot.om.model.*
-import discord4j.core.`object`.command.ApplicationCommandInteractionOption
+import discord4j.core.`object`.command.Interaction
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
@@ -19,8 +19,8 @@ class OmShowCommand(override val leaderboards: List<Leaderboard<OmCategory, OmPu
 
     override fun buildData(): ApplicationCommandOptionData = ShowParser.buildData()
 
-    override fun findPuzzleAndCategory(options: List<ApplicationCommandInteractionOption>): Mono<Tuple2<OmPuzzle, OmCategory>> {
-        return Mono.fromCallable { ShowParser.parse(options) }.map { show ->
+    override fun findPuzzleAndCategory(interaction: Interaction): Mono<Tuple2<OmPuzzle, OmCategory>> {
+        return ShowParser.parse(interaction).map { show ->
             val puzzle = show.puzzle
             val categories = findCategoryCandidates(show)
             if (categories.isEmpty()) throw IllegalArgumentException("${show.primaryMetric}/${show.tiebreaker ?: ""} is not a tracked category.")

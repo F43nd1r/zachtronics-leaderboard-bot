@@ -3,14 +3,11 @@ package com.faendir.zachtronics.bot.generic.discord
 import com.faendir.zachtronics.bot.model.*
 import com.faendir.zachtronics.bot.utils.findInstance
 import com.faendir.zachtronics.bot.utils.ifNotEmpty
-import discord4j.core.`object`.command.ApplicationCommandInteractionOption
-import discord4j.core.`object`.entity.Message
-import discord4j.core.`object`.entity.User
+import discord4j.core.`object`.command.Interaction
 import discord4j.discordjson.json.EmbedData
 import discord4j.discordjson.json.EmbedFieldData
 import discord4j.discordjson.json.EmbedImageData
 import discord4j.discordjson.json.WebhookExecuteRequest
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.util.function.component1
@@ -22,8 +19,8 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : Command {
     override val isReadOnly: Boolean = false
     protected abstract val leaderboards: List<Leaderboard<*, P, R>>
 
-    override fun handle(options: List<ApplicationCommandInteractionOption>, user: User, previousMessages: Flux<Message>): Mono<WebhookExecuteRequest> {
-        return parseSubmission(options, user, previousMessages).flatMap { (puzzle, record) -> submitToLeaderboards(puzzle, record) }
+    override fun handle(interaction: Interaction): Mono<WebhookExecuteRequest> {
+        return parseSubmission(interaction).flatMap { (puzzle, record) -> submitToLeaderboards(puzzle, record) }
     }
 
     fun submitToLeaderboards(puzzle: P, record: R): Mono<WebhookExecuteRequest> =
@@ -70,5 +67,5 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : Command {
             throw IllegalArgumentException("sorry, something went wrong")
         }
 
-    abstract fun parseSubmission(options: List<ApplicationCommandInteractionOption>, user: User, previousMessages: Flux<Message>): Mono<Tuple2<P, R>>
+    abstract fun parseSubmission(interaction: Interaction): Mono<Tuple2<P, R>>
 }

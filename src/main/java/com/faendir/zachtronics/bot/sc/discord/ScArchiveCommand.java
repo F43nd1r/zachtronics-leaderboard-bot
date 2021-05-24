@@ -3,11 +3,13 @@ package com.faendir.zachtronics.bot.sc.discord;
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.zachtronics.bot.generic.discord.AbstractArchiveCommand;
+import com.faendir.zachtronics.bot.generic.discord.LinkConverter;
 import com.faendir.zachtronics.bot.sc.archive.ScArchive;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
+import discord4j.core.object.command.Interaction;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
@@ -34,8 +36,8 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
 
     @NotNull
     @Override
-    public Mono<ScSolution> parseSolution(@NotNull List<? extends ApplicationCommandInteractionOption> options, @NotNull User user, @NotNull Flux<Message> previousMessages) {
-        return Mono.just(options).map(ScArchiveCommand$DataParser::parse).map(data -> {
+    public Mono<ScSolution> parseSolution(@NotNull Interaction interaction) {
+        return ScArchiveCommand$DataParser.parse(interaction).map(data -> {
             ScScore score = null;
             if (data.score != null) {
                 score = ScScore.parseBPScore(data.score);
@@ -77,7 +79,7 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
         String score;
         String link;
 
-        public Data(@Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle, String score, String link) {
+        public Data(@Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle, String score, @Converter(LinkConverter.class) String link) {
             this.puzzle = puzzle;
             this.score = score;
             this.link = link;

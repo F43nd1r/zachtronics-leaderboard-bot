@@ -46,17 +46,3 @@ fun <P> Iterable<P>.fuzzyMatch(search: String, extractName: (P) -> String): List
         }
     }
 }
-
-fun findLink(input: String, messages: Flux<Message>): Mono<String> = Mono.defer {
-    if (Regex("m\\d+").matches(input)) {
-        val num = input.removePrefix("m").toInt()
-        messages.elementAt(num - 1).flatMap { message ->
-            message.attachments.firstOrNull()?.url?.let { message.addReaction(ReactionEmoji.unicode("\uD83D\uDC4D"/* 👍 */)).then(it.toMono()) }
-                ?: message.guild.map { it.id.asLong().toString() }.switchIfEmpty { "@me".toMono() }.map {
-                    throw IllegalArgumentException("**Failed**: https://discord.com/channels/${it}/${message.channelId.asLong()}/${message.id.asLong()} had no attachments")
-                }
-        }
-    } else {
-        input.toMono()
-    }
-}

@@ -52,10 +52,11 @@ class DiscordService(discordClient: GatewayDiscordClient, private val gameContex
 
     private fun handleCommand(event: InteractionCreateEvent): Mono<Void> {
         return Mono.defer {
-            findGameContext(event).zipWith(Mono.just(event.interaction.commandInteraction.options.first()))
-                .flatMapFirst { gameContext, option ->
+            findGameContext(event)
+                .flatMap { gameContext ->
+                    val option = event.interaction.commandInteraction.options.first()
                     val command = gameContext.commands.find { it.name == option.name }
-                        ?: throw IllegalArgumentException("I did not recognize the command \"${option.name}\".")
+                        ?: return@flatMap Mono.error(IllegalArgumentException("I did not recognize the command \"${option.name}\"."))
 
                     if (!command.isReadOnly) {
                         gameContext.game.hasWritePermission(event.interaction.member.map { it as User }.orElse(event.interaction.user)).map {
@@ -69,16 +70,11 @@ class DiscordService(discordClient: GatewayDiscordClient, private val gameContex
                         command.toMono()
                     }
                 }
-                .flatMap { (command, option) ->
-                    val previousMessages = event.interaction.channel
-                        .flatMapMany { it.getMessagesBefore(it.lastMessageId.orElseGet { Snowflake.of(Instant.now()) }) }
-                        .filter { it.author.isPresent && it.author.get() == event.interaction.user }.share()
-                    command.handle(option.options, event.interaction.user, previousMessages)
-                }
+                .flatMap { command -> command.handle(event.interaction) }
                 .flatMap { event.interactionResponse.createFollowupMessage(MultipartRequest.ofRequest(it), true) }
                 .onErrorResume {
                     logger.info("User command failed", it)
-                    event.interactionResponse.createFollowupMessage(it.message ?: "Something went wrong")
+                    event.interactionResponse.createFollowupMessage("**Failed**: ${it.message ?: "Something went wrong"}")
                 }
                 .then()
         }

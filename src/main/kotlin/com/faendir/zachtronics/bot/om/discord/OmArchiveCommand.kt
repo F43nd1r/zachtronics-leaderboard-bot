@@ -1,26 +1,23 @@
 package com.faendir.zachtronics.bot.om.discord
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand
+import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
 import com.faendir.om.dsl.DslGenerator
 import com.faendir.om.parser.solution.SolutionParser
 import com.faendir.om.parser.solution.model.SolvedSolution
 import com.faendir.zachtronics.bot.generic.archive.Archive
 import com.faendir.zachtronics.bot.generic.discord.AbstractArchiveCommand
+import com.faendir.zachtronics.bot.generic.discord.LinkConverter
 import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.om.model.OmScorePart.*
 import com.faendir.zachtronics.bot.utils.filterIsInstance
-import com.faendir.zachtronics.bot.utils.findLink
-import com.faendir.zachtronics.bot.utils.flatMapSecond
 import com.faendir.zachtronics.bot.utils.throwIfEmpty
 import com.roxstudio.utils.CUrl
-import discord4j.core.`object`.command.ApplicationCommandInteractionOption
-import discord4j.core.`object`.entity.Message
-import discord4j.core.`object`.entity.User
+import discord4j.core.`object`.command.Interaction
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import kotlinx.io.streams.asInput
 import org.springframework.stereotype.Component
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
@@ -33,10 +30,9 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
 
     override fun buildData(): ApplicationCommandOptionData = ArchiveParser.buildData()
 
-    override fun parseSolution(options: List<ApplicationCommandInteractionOption>, user: User, previousMessages: Flux<Message>): Mono<OmSolution> {
-        return Mono.just(ArchiveParser.parse(options))
+    override fun parseSolution(interaction: Interaction): Mono<OmSolution> {
+        return ArchiveParser.parse(interaction)
             .map { Tuples.of(findScoreIdentifier(it), it.solution) }
-            .flatMapSecond { _, link -> findLink(link, previousMessages) }
             .flatMap { (identifier, link) -> parseSolution(identifier, link) }
     }
 
@@ -98,6 +94,7 @@ interface IArchive {
 
 @ApplicationCommand(description = "Archive a solution", subCommand = true)
 data class Archive(
+    @Converter(LinkConverter::class)
     @Description("Link to your solution file, can be `m1` to scrape it from your last message")
     override val solution: String,
     @Description("Metric Modifier")

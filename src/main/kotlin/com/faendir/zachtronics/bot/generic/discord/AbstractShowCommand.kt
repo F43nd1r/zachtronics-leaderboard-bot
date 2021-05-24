@@ -2,11 +2,8 @@ package com.faendir.zachtronics.bot.generic.discord
 
 import com.faendir.zachtronics.bot.model.*
 import com.faendir.zachtronics.bot.utils.throwIfEmpty
-import discord4j.core.`object`.command.ApplicationCommandInteractionOption
-import discord4j.core.`object`.entity.Message
-import discord4j.core.`object`.entity.User
+import discord4j.core.`object`.command.Interaction
 import discord4j.discordjson.json.WebhookExecuteRequest
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.util.function.component1
@@ -18,8 +15,8 @@ abstract class AbstractShowCommand<C : Category, P : Puzzle, R : Record> : Comma
     override val name: String = "show"
     override val isReadOnly: Boolean = true
 
-    override fun handle(options: List<ApplicationCommandInteractionOption>, user: User, previousMessages: Flux<Message>): Mono<WebhookExecuteRequest> {
-        return findPuzzleAndCategory(options).flatMap { (puzzle, category) ->
+    override fun handle(interaction: Interaction): Mono<WebhookExecuteRequest> {
+        return findPuzzleAndCategory(interaction).flatMap { (puzzle, category) ->
             leaderboards.toFlux()
                 .flatMap { it.get(puzzle, category) }
                 .next()
@@ -32,5 +29,5 @@ abstract class AbstractShowCommand<C : Category, P : Puzzle, R : Record> : Comma
         }
     }
 
-    abstract fun findPuzzleAndCategory(options: List<ApplicationCommandInteractionOption>): Mono<Tuple2<P, C>>
+    abstract fun findPuzzleAndCategory(interaction: Interaction): Mono<Tuple2<P, C>>
 }

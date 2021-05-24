@@ -3,6 +3,7 @@ package com.faendir.zachtronics.bot.sc.discord;
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.zachtronics.bot.generic.discord.AbstractSubmitCommand;
+import com.faendir.zachtronics.bot.generic.discord.LinkConverter;
 import com.faendir.zachtronics.bot.model.Leaderboard;
 import com.faendir.zachtronics.bot.sc.archive.ScArchive;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
@@ -10,6 +11,7 @@ import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
+import discord4j.core.object.command.Interaction;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
@@ -35,8 +37,8 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
 
     @NotNull
     @Override
-    public Mono<Tuple2<ScPuzzle, ScRecord>> parseSubmission(@NotNull List<? extends ApplicationCommandInteractionOption> options, @NotNull User user, @NotNull Flux<Message> previousMessages) {
-        return Mono.just(options).map(ScSubmitCommand$DataParser::parse).map(data -> {
+    public Mono<Tuple2<ScPuzzle, ScRecord>> parseSubmission(@NotNull Interaction interaction) {
+        return ScSubmitCommand$DataParser.parse(interaction).map(data -> {
             ScScore score = ScScore.parseBPScore(data.score);
             if (score == null)
                 throw new IllegalArgumentException("Couldn't parse score: \"" + data.score + "\"");
@@ -63,7 +65,7 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
         @NotNull String link;
 
         public Data(@Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle, @NonNull String score,
-                    @NotNull String author, @NotNull String link) {
+                    @NotNull String author, @NotNull @Converter(LinkConverter.class) String link) {
             this.puzzle = puzzle;
             this.score = score;
             this.link = link;
