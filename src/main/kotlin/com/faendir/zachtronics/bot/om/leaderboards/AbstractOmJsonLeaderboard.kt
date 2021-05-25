@@ -96,7 +96,7 @@ abstract class AbstractOmJsonLeaderboard<J>(
         }
     }
 
-    override fun getAll(puzzle: OmPuzzle, categories: Iterable<OmCategory>): Mono<Map<OmCategory, OmRecord>> {
+    override fun getAll(puzzle: OmPuzzle, categories: Collection<OmCategory>): Mono<Map<OmCategory, OmRecord>> {
         return gitRepo.access {
             categories.groupBy { category -> directoryCategories.asIterable().find { it.value.contains(category) }?.key }
                 .flatMap { (dirName, categories) ->

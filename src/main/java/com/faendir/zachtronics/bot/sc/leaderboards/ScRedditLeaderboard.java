@@ -1,6 +1,8 @@
 package com.faendir.zachtronics.bot.sc.leaderboards;
 
+import com.faendir.zachtronics.bot.model.Category;
 import com.faendir.zachtronics.bot.model.Leaderboard;
+import com.faendir.zachtronics.bot.model.Puzzle;
 import com.faendir.zachtronics.bot.model.UpdateResult;
 import com.faendir.zachtronics.bot.main.reddit.RedditService;
 import com.faendir.zachtronics.bot.main.reddit.Subreddit;
@@ -22,6 +24,8 @@ import static com.faendir.zachtronics.bot.sc.model.ScCategory.*;
 @Component
 @RequiredArgsConstructor
 public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, ScRecord> {
+    private static final ScCategory[][] CATEGORIES = {{C,  CNB,  CNP},  {S,  SNB,  SNP},
+                                                      {RC, RCNB, RCNP}, {RS, RSNB, RSNP}};
     @Getter
     private final List<ScCategory> supportedCategories = Arrays.asList(ScCategory.values());
     private final RedditService redditService;
@@ -49,11 +53,54 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
             int column = category.getDisplayName().endsWith("NP") ? 2 : category.getDisplayName()
                                                                                 .endsWith("NB") ? 1 : 0;
             ScRecord record = records[column];
-            if (record != null && record != ScRecord.IMPOSSIBLE_CATEGORY)
+            if (record != ScRecord.IMPOSSIBLE_CATEGORY)
                 return Mono.just(record);
             break;
         }
         return Mono.empty();
+    }
+
+    @NotNull
+    @Override
+    public Mono<Map<ScCategory, ScRecord>> getAll(@NotNull final ScPuzzle puzzle, @NotNull Collection<? extends ScCategory> categories) {
+        String[] lines = redditService.getWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
+        Pattern puzzleRegex = Pattern.compile("^\\s*\\|\\s*" + Pattern.quote(puzzle.getDisplayName()));
+        Map<ScCategory, ScRecord> result = new EnumMap<>(ScCategory.class);
+        int seenRows = 0;
+
+        for (String line : lines) {
+            if (puzzleRegex.matcher(line).find()) {
+                seenRows++;
+                String[] pieces = line.trim().split("\\s*\\|\\s*");
+                List<String> tableCols = Arrays.asList(pieces).subList(2, pieces.length);
+                ScRecord[] records = new ScRecord[3];
+
+                List<String> cyclesHalf = tableCols.subList(0, tableCols.size() / 2);
+                parseHalfTable(cyclesHalf, records);
+                for (int j = 0; j < 3; j++) {
+                    if (records[j] != ScRecord.IMPOSSIBLE_CATEGORY) {
+                        ScCategory category = CATEGORIES[2 * seenRows][j];
+                        if (categories.contains(category))
+                            result.put(category, records[j]);
+                    }
+                }
+
+                List<String> symbolsHalf = tableCols.subList(tableCols.size() / 2, tableCols.size());
+                parseHalfTable(symbolsHalf, records);
+                for (int j = 0; j < 3; j++) {
+                    if (records[j] != ScRecord.IMPOSSIBLE_CATEGORY) {
+                        ScCategory category = CATEGORIES[2 * seenRows + 1][j];
+                        if (categories.contains(category))
+                            result.put(category, records[j]);
+                    }
+                }
+            }
+            else if (seenRows != 0) {
+                // we've already found the point and now we're past it, we're done
+                break;
+            }
+        }
+        return Mono.just(result);
     }
 
     @NotNull
@@ -77,20 +124,17 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                 List<String> symbolsHalf = tableCols.subList(tableCols.size() / 2, tableCols.size());
                 parseHalfTable(symbolsHalf, records[2 * seenRows + 1]);
 
-                if (startingRow == -1) {
+                if (seenRows == 0) {
                     startingRow = i;
                     halfSize = tableCols.size() / 2;
                 }
                 seenRows++;
             }
-            else if (startingRow != -1) {
+            else if (seenRows != 0) {
                 // we've already found the point and now we're past it, we're done
                 break;
             }
         }
-
-        ScCategory[][] categories = {{C,  CNB,  CNP},  {S,  SNB,  SNP},
-                                     {RC, RCNB, RCNP}, {RS, RSNB, RSNP}};
 
         Map<ScCategory, ScScore> beatenScores = new EnumMap<>(ScCategory.class);
         Map<ScCategory, ScScore> relatedScores = new EnumMap<>(ScCategory.class);
@@ -111,7 +155,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
 
             for (int block = 0; block < 2; block++) {
                 ScRecord[] blockRecords = records[2 * rowIdx + block];
-                ScCategory[] blockCategories = categories[2 * rowIdx + block];
+                ScCategory[] blockCategories = CATEGORIES[2 * rowIdx + block];
                 elemloop:
                 for (int i = 0; i < halfSize; i++) {
                     ScCategory thisCategory = blockCategories[i];
@@ -177,7 +221,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
         throw new IllegalStateException("Leaderboard record unparseable" + recordCell);
     }
 
-    private static void parseHalfTable(List<String> halfTable, ScRecord[] records) {
+    private static void parseHalfTable(@NotNull List<String> halfTable, @NotNull ScRecord[] records) {
         records[0] = parseLeaderboardRecord(halfTable.get(0));
 
         if (halfTable.get(1).startsWith("X"))

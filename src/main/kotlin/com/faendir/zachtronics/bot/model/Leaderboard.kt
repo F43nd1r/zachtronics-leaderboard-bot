@@ -11,7 +11,7 @@ interface Leaderboard<C : Category, P : Puzzle, R : Record> {
 
     fun get(puzzle: P, category: C): Mono<R>
 
-    fun getAll(puzzle: P, categories: Iterable<C>): Mono<Map<C, R>> =
+    fun getAll(puzzle: P, categories: Collection<C>): Mono<Map<C, R>> =
         categories.toFlux().flatMap { Mono.zip(it.toMono(), get(puzzle, it)) }.collectMap({ it.t1 }, { it.t2 })
 }
 

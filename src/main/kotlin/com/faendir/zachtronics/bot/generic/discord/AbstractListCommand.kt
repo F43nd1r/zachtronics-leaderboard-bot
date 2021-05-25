@@ -59,5 +59,6 @@ abstract class AbstractListCommand<C : Category, P : Puzzle, R : Record> : Comma
         }
     }
 
+    /** @return pair of Puzzle and all the categories that support it */
     abstract fun findPuzzleAndCategories(interaction: Interaction): Mono<Tuple2<P, List<C>>>
 }
