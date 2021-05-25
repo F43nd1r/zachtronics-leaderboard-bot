@@ -70,7 +70,6 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
 
         for (String line : lines) {
             if (puzzleRegex.matcher(line).find()) {
-                seenRows++;
                 String[] pieces = line.trim().split("\\s*\\|\\s*");
                 List<String> tableCols = Arrays.asList(pieces).subList(2, pieces.length);
                 ScRecord[] records = new ScRecord[3];
@@ -94,6 +93,8 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                             result.put(category, records[j]);
                     }
                 }
+
+                seenRows++;
             }
             else if (seenRows != 0) {
                 // we've already found the point and now we're past it, we're done

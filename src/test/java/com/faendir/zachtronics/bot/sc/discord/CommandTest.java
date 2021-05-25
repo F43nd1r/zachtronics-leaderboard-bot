@@ -40,6 +40,13 @@ public class CommandTest {
     }
 
     @Test
+    public void testList() {
+        Map<String, String> args = Map.of("puzzle", "OPAS");
+        String result = runCommand("list", args);
+        assertTrue(result.contains("Pancakes") && result.contains("C"));
+    }
+
+    @Test
     public void testSubmit() {
         Map<String, String> args = Map.of("puzzle", "fission I",
                                           "score", "1/1/1",

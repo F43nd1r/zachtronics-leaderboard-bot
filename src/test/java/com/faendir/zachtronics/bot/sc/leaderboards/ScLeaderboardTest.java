@@ -11,6 +11,12 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @BotTest(SpaceChemMarker.SpaceChemConfiguration.class)
@@ -39,16 +45,25 @@ public class ScLeaderboardTest {
     }
 
     @Test
+    public void testAllRecords() {
+        Map<ScCategory, ScRecord> allRecords = scLeaderboard
+                .getAll(ScPuzzle.research_example_1, Arrays.asList(ScCategory.values())).block();
+        assertNotNull(allRecords);
+        System.out.println(allRecords);
+        assertEquals(4, allRecords.size());
+    }
+
+    @Test
     @Disabled("Massive test only for manual testing")
     public void testFullIO() {
         for (ScPuzzle p : ScPuzzle.values()) {
-            for (ScCategory c : ScCategory.values()) {
-                if (c.supportsPuzzle(p)) {
-                    ScRecord r = scLeaderboard.get(p, c).block();
-                    if (r != null)
-                        scLeaderboard.update(p, r);
-                }
-            }
+            List<ScCategory> categories = Arrays.stream(ScCategory.values())
+                                                .filter(c -> c.supportsPuzzle(p))
+                                                .collect(Collectors.toList());
+            Collection<ScRecord> records = scLeaderboard.getAll(p, categories).block().values();
+            for (ScRecord r : records)
+                scLeaderboard.update(p, r);
+
             System.out.println("Done " + p.getDisplayName());
         }
         System.out.println("Done");
