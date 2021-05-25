@@ -15,13 +15,14 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
@@ -34,13 +35,22 @@ public class SzGitLeaderboard implements Leaderboard<SzCategory, SzPuzzle, SzRec
 
     private static final Pattern NAME_REGEX = Pattern
             .compile("\\[name] top solution [a-z]+(?:->[a-z]+)?(?: - (?<author>.+))?", Pattern.CASE_INSENSITIVE);
-    @Nullable
+
+    @NotNull
     @Override
     public Mono<SzRecord> get(@NotNull SzPuzzle puzzle, @NotNull SzCategory category) {
         return gitRepository.access(a -> readSolutionFile(findPuzzleFile(a, puzzle, category)));
     }
 
-    @Nullable
+    @NotNull
+    @Override
+    public Mono<Map<SzCategory, SzRecord>> getAll(@NotNull SzPuzzle puzzle, @NotNull Collection<? extends SzCategory> categories) {
+        return gitRepository.access(
+                a -> categories.stream().collect(Collectors.toMap(Function.identity(),
+                                                                  category -> readSolutionFile(
+                                                                          findPuzzleFile(a, puzzle, category)))));
+    }
+
     private static SzRecord readSolutionFile(Path solutionFile) {
         /*
         [name] Top solution Cost->Power - andersk
@@ -53,7 +63,8 @@ public class SzGitLeaderboard implements Leaderboard<SzCategory, SzPuzzle, SzRec
             Iterator<String> it = solutionLines.iterator();
 
             Matcher m = NAME_REGEX.matcher(it.next());
-            if (!m.matches()) return null;
+            if (!m.matches())
+                throw new IllegalStateException("Name does not match standard format: " + m.replaceFirst(""));
             String author = m.group("author");
             SzPuzzle puzzle = SzPuzzle.valueOf(it.next().replaceFirst("^.+] ", ""));
             int cost = Integer.parseInt(it.next().replaceFirst("^.+] ", "")) / 100;
@@ -64,11 +75,12 @@ public class SzGitLeaderboard implements Leaderboard<SzCategory, SzPuzzle, SzRec
             return new SzRecord(new SzScore(cost, power, lines), author, link);
         }
         catch (IOException e) {
-            return null;
+            throw new UncheckedIOException(e);
         }
     }
 
-    private static Path findPuzzleFile(GitRepository.AccessScope accessScope, SzPuzzle puzzle, SzCategory category) {
+    private static Path findPuzzleFile(@NotNull GitRepository.AccessScope accessScope, @NotNull SzPuzzle puzzle,
+                                       @NotNull SzCategory category) {
         Path repo = accessScope.getRepo().toPath();
         Path puzzleFolder = repo.resolve(puzzle.getGroup().getRepoFolder());
         Path puzzleFile = puzzleFolder.resolve(puzzle.getId() + "-" + category.getRepoSuffix() + ".txt");

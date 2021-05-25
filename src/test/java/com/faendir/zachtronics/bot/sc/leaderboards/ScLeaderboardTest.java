@@ -33,6 +33,8 @@ public class ScLeaderboardTest {
         System.out.println(goodRecord);
         goodRecord = scLeaderboard.get(ScPuzzle.published_101_3, ScCategory.RC).block();
         System.out.println(goodRecord);
+        goodRecord = scLeaderboard.get(ScPuzzle.production_tutorial_1, ScCategory.RC).block();
+        System.out.println(goodRecord);
         assertNotNull(goodRecord);
     }
 
