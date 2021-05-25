@@ -9,7 +9,6 @@ import com.faendir.zachtronics.bot.sz.model.SzScore;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -46,7 +45,7 @@ public class SzGitLeaderboard implements Leaderboard<SzCategory, SzPuzzle, SzRec
     @Override
     public Mono<Map<SzCategory, SzRecord>> getAll(@NotNull SzPuzzle puzzle, @NotNull Collection<? extends SzCategory> categories) {
         return gitRepository.access(
-                a -> categories.stream().collect(Collectors.toMap(Function.identity(),
+                a -> categories.stream().collect(Collectors.toMap(category -> category,
                                                                   category -> readSolutionFile(
                                                                           findPuzzleFile(a, puzzle, category)))));
     }
