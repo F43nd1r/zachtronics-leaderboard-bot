@@ -5,6 +5,7 @@ import com.faendir.zachtronics.bot.utils.findInstance
 import com.faendir.zachtronics.bot.utils.ifNotEmpty
 import discord4j.core.`object`.command.Interaction
 import discord4j.discordjson.json.*
+import discord4j.rest.util.MultipartRequest
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.util.function.component1
@@ -16,8 +17,10 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : Command {
     override val isReadOnly: Boolean = false
     protected abstract val leaderboards: List<Leaderboard<*, P, R>>
 
-    override fun handle(interaction: Interaction): Mono<WebhookExecuteRequest> {
-        return parseSubmission(interaction).flatMap { (puzzle, record) -> submitToLeaderboards(puzzle, record) }
+    override fun handle(interaction: Interaction): Mono<MultipartRequest<WebhookExecuteRequest>> {
+        return parseSubmission(interaction)
+            .flatMap { (puzzle, record) -> submitToLeaderboards(puzzle, record) }
+            .map { MultipartRequest.ofRequest(it) }
     }
 
     fun submitToLeaderboards(puzzle: P, record: R): Mono<WebhookExecuteRequest> =

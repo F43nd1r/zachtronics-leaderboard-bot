@@ -8,6 +8,7 @@ import discord4j.core.`object`.command.Interaction
 import discord4j.discordjson.json.EmbedData
 import discord4j.discordjson.json.EmbedFieldData
 import discord4j.discordjson.json.WebhookExecuteRequest
+import discord4j.rest.util.MultipartRequest
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.util.function.component1
@@ -19,7 +20,7 @@ abstract class AbstractListCommand<C : Category, P : Puzzle, R : Record> : Comma
     override val name: String = "list"
     override val isReadOnly: Boolean = true
 
-    override fun handle(interaction: Interaction): Mono<WebhookExecuteRequest> {
+    override fun handle(interaction: Interaction): Mono<MultipartRequest<WebhookExecuteRequest>> {
         return findPuzzleAndCategories(interaction).flatMap { (puzzle, categories) ->
             leaderboards.toFlux().flatMap { it.getAll(puzzle, categories) }.collectList()
                 .map { it.reduce { acc, map -> acc + map } }
@@ -56,7 +57,7 @@ abstract class AbstractListCommand<C : Category, P : Puzzle, R : Record> : Comma
                         )
                         .build()
                 }
-        }
+        }.map { MultipartRequest.ofRequest(it) }
     }
 
     /** @return pair of Puzzle and all the categories that support it */

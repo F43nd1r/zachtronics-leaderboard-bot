@@ -10,6 +10,7 @@ import discord4j.core.object.command.Interaction;
 import discord4j.discordjson.json.WebhookExecuteRequest;
 import discord4j.discordjson.possible.Possible;
 import discord4j.rest.util.ApplicationCommandOptionType;
+import discord4j.rest.util.MultipartRequest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -104,8 +105,10 @@ public class CommandTest {
                                                                 .collect(Collectors.toList());
         Mockito.when(interaction.getCommandInteraction().getOptions()).thenReturn(options);
 
-        WebhookExecuteRequest executeRequest = commands.stream().filter(c -> c.getName().equals(commandName))
-                                                       .findFirst().orElseThrow().handle(interaction).block();
+        MultipartRequest<WebhookExecuteRequest> multipartRequest = commands.stream().filter(c -> c.getName().equals(commandName))
+                .findFirst().orElseThrow().handle(interaction).block();
+        assert multipartRequest != null;
+        WebhookExecuteRequest executeRequest = multipartRequest.getJsonPayload();
         assert executeRequest != null;
         String result = Stream.concat(executeRequest.content().toOptional().stream(),
                                       executeRequest.embeds().toOptional().stream().flatMap(l -> l.stream().flatMap(

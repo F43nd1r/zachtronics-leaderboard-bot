@@ -1,14 +1,11 @@
 package com.faendir.zachtronics.bot.main.discord
 
 import com.faendir.zachtronics.bot.main.GameContext
-import com.faendir.zachtronics.bot.utils.flatMapFirst
 import com.faendir.zachtronics.bot.utils.throwIfEmpty
-import discord4j.common.util.Snowflake
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.User
 import discord4j.core.event.domain.InteractionCreateEvent
 import discord4j.discordjson.json.ApplicationCommandRequest
-import discord4j.rest.util.MultipartRequest
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -16,7 +13,6 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
-import java.time.Instant
 
 @Service
 class DiscordService(discordClient: GatewayDiscordClient, private val gameContexts: List<GameContext>) {
@@ -71,7 +67,7 @@ class DiscordService(discordClient: GatewayDiscordClient, private val gameContex
                     }
                 }
                 .flatMap { command -> command.handle(event.interaction) }
-                .flatMap { event.interactionResponse.createFollowupMessage(MultipartRequest.ofRequest(it), true) }
+                .flatMap { event.interactionResponse.createFollowupMessage(it, true) }
                 .onErrorResume {
                     logger.info("User command failed", it)
                     event.interactionResponse.createFollowupMessage("**Failed**: ${it.message ?: "Something went wrong"}")

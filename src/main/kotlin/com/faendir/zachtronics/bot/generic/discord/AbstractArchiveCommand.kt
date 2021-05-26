@@ -5,6 +5,7 @@ import com.faendir.zachtronics.bot.model.Solution
 import discord4j.core.`object`.command.Interaction
 import discord4j.discordjson.json.EmbedData
 import discord4j.discordjson.json.WebhookExecuteRequest
+import discord4j.rest.util.MultipartRequest
 import reactor.core.publisher.Mono
 
 abstract class AbstractArchiveCommand<S : Solution> : Command {
@@ -12,10 +13,11 @@ abstract class AbstractArchiveCommand<S : Solution> : Command {
     override val isReadOnly: Boolean = false
     protected abstract val archive: Archive<S>
 
-    override fun handle(interaction: Interaction): Mono<WebhookExecuteRequest> {
+    override fun handle(interaction: Interaction): Mono<MultipartRequest<WebhookExecuteRequest>> {
         return parseSolution(interaction)
             .flatMap { solution -> archive(solution) }
             .map { WebhookExecuteRequest.builder().addEmbed(it).build() }
+            .map { MultipartRequest.ofRequest(it) }
     }
 
     fun archive(solution: S): Mono<EmbedData> = archive.archive(solution).map { result -> getResultMessage(result, solution) }
