@@ -14,7 +14,7 @@ enum class OmCategory(
     private val requiredParts: List<OmScorePart>,
     comparator: Comparator<OmScore>,
     private val supportedTypes: Set<OmType> = OmType.values().toSet(),
-    val modifier: OmModifier? = null
+    val modifier: OmModifier = OmModifier.NORMAL
 ) : Category {
     GC("GC", OmMetric.COST, OmMetric.CYCLES, listOf(COST, CYCLES, AREA), normalComparator(), setOf(NORMAL, INFINITE)),
     GCP("GC", OmMetric.COST, OmMetric.CYCLES, listOf(COST, CYCLES, INSTRUCTIONS), normalComparator(), setOf(PRODUCTION)),
@@ -70,12 +70,11 @@ enum class OmCategory(
     S4I("SUM4-I", OmMetric.SUM4, OmMetric.INSTRUCTIONS, listOf(COST, CYCLES, AREA, INSTRUCTIONS), sumComparator(INSTRUCTIONS), setOf(NORMAL, INFINITE)),
     ;
 
-    val contentDescription: String = requiredParts.joinToString("/") { it.key.toString() }
     val scoreComparator: Comparator<OmScore> = Comparator.comparing({ normalizeScore(it) }, comparator)
 
     fun supportsPuzzle(puzzle: OmPuzzle) = supportedTypes.contains(puzzle.type)
 
-    fun supportsScore(score: OmScore) = score.parts.keys.containsAll(requiredParts) && modifier == score.modifier
+    fun supportsScore(score: OmScore) = score.parts.keys.containsAll(requiredParts) && score.modifier <= modifier
 
     fun normalizeScore(score: OmScore): OmScore = OmScore(sortScoreParts(score.parts.asIterable()).map { it.key to it.value }, score.modifier)
 

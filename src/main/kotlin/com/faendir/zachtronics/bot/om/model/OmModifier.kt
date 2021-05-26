@@ -1,5 +1,6 @@
 package com.faendir.zachtronics.bot.om.model
 
 enum class OmModifier(val key: Char) {
-    OVERLAP('o'), TRACKLESS('t')
+    //order is important! Every value is a superset of the values to the left
+    TRACKLESS('t'), NORMAL('?'), OVERLAP('o')
 }

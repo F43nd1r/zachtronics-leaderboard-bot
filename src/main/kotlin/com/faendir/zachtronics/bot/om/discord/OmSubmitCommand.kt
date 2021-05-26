@@ -24,7 +24,12 @@ class OmSubmitCommand(override val leaderboards: List<Leaderboard<*, OmPuzzle, O
 
     override fun parseSubmission(interaction: Interaction): Mono<Tuple2<OmPuzzle, OmRecord>> {
         return SubmitParser.parse(interaction)
-            .map { Tuples.of(it.puzzle, OmRecord(OmScore.parse(it.puzzle, it.score).copy(modifier = it.modifier), it.gif, interaction.user.username)) }
+            .map {
+                Tuples.of(
+                    it.puzzle,
+                    OmRecord(OmScore.parse(it.puzzle, it.score).apply { modifier = it.modifier ?: OmModifier.NORMAL }, it.gif, interaction.user.username)
+                )
+            }
     }
 }
 

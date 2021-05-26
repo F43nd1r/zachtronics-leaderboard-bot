@@ -6,9 +6,10 @@ import kotlinx.serialization.Transient
 import java.text.DecimalFormat
 
 @Serializable
-data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>, @Transient val modifier: OmModifier? = null) : Score {
-    constructor(parts: Iterable<Pair<OmScorePart, Double>>, modifier: OmModifier? = null) : this(parts.toMap(LinkedHashMap()), modifier)
-    constructor(vararg parts: Pair<OmScorePart, Double>, modifier: OmModifier? = null) : this(parts.asIterable(), modifier)
+data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>, @Transient var modifier: OmModifier = OmModifier.NORMAL) : Score {
+    constructor(parts: Iterable<Pair<OmScorePart, Double>>, modifier: OmModifier = OmModifier.NORMAL) : this(parts.toMap(LinkedHashMap()), modifier)
+    constructor(vararg parts: Pair<OmScorePart, Double>, modifier: OmModifier = OmModifier.NORMAL) : this(parts.asIterable(), modifier)
+    constructor(parts: Map<OmScorePart, Double>, modifier: OmModifier = OmModifier.NORMAL) : this(LinkedHashMap(parts), modifier)
 
     @Transient
     var displayAsSum = false
@@ -46,7 +47,7 @@ data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>, @Transient val
 
     override fun hashCode(): Int {
         var result = parts.map { it.key.hashCode() * it.value.hashCode() }.sum()
-        result = 31 * result + (modifier?.hashCode() ?: 0)
+        result = 31 * result + modifier.hashCode()
         return result
     }
 
@@ -57,7 +58,7 @@ data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>, @Transient val
             if (string.isBlank()) throw IllegalArgumentException("I didn't find a score in your command.")
             val outerParts = string.split(':')
             val (modifier, scoreString) = when (outerParts.size) {
-                1 -> null to string
+                1 -> OmModifier.NORMAL to string
                 2 -> (OmModifier.values().find { it.key.toString().equals(outerParts[0], ignoreCase = true) }
                     ?: throw IllegalArgumentException("\"${outerParts[0]}\" is not a modifier.")) to outerParts[1]
                 else -> throw IllegalArgumentException("I didn't understand \"$string\".")

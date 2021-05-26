@@ -62,9 +62,9 @@ abstract class AbstractOmJsonLeaderboard<J>(
                         }) {
                         records.setRecord(puzzle, category, OmRecord(category.normalizeScore(record.score), rehostedLink))
                         changed = true
-                        success[category] = oldRecord?.score?.also { it.displayAsSum = category.name.startsWith("S") }
+                        success[category] = oldRecord?.score
                     } else {
-                        betterExists[category] = oldRecord.score.also { it.displayAsSum = category.name.startsWith("S") }
+                        betterExists[category] = oldRecord.score
                     }
                 }
                 val localParetoUpdate = paretoUpdate(puzzle, record, records)
@@ -92,7 +92,7 @@ abstract class AbstractOmJsonLeaderboard<J>(
 
     override fun get(puzzle: OmPuzzle, category: OmCategory): Mono<OmRecord> {
         return gitRepo.access {
-            getRecords(category)?.getRecord(puzzle, category)?.also { it.score.displayAsSum = category.name.startsWith("S") }
+            getRecords(category)?.getRecord(puzzle, category)
         }
     }
 
@@ -140,4 +140,9 @@ abstract class AbstractOmJsonLeaderboard<J>(
     protected abstract fun J.setRecord(puzzle: OmPuzzle, category: OmCategory, record: OmRecord)
 
     protected abstract fun GitRepository.AccessScope.updatePage(dir: File, categories: List<OmCategory>, records: J)
+
+    protected fun OmScore.updateTransient(category: OmCategory) = apply {
+        modifier = category.modifier
+        displayAsSum = category.name.startsWith("S")
+    }
 }

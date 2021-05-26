@@ -18,11 +18,15 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
 @Component
-class OmRedditWikiLeaderboard(@Qualifier("omRedditLeaderboardRepository") gitRepository: GitRepository, private val reddit: RedditService,
-                              imgurService: ImgurService) : AbstractOmJsonLeaderboard<MutableMap<OmPuzzle, PuzzleEntry>>(gitRepository,
+class OmRedditWikiLeaderboard(
+    @Qualifier("omRedditLeaderboardRepository") gitRepository: GitRepository, private val reddit: RedditService,
+    imgurService: ImgurService
+) : AbstractOmJsonLeaderboard<MutableMap<OmPuzzle, PuzzleEntry>>(
+    gitRepository,
     imgurService,
     mapOf("." to listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SG, SGP, SC, SCP, SA, SI)),
-    serializer()) {
+    serializer()
+) {
     companion object {
         private const val wikiPage = "index"
         private const val datePrefix = "Table built on "
@@ -44,7 +48,8 @@ class OmRedditWikiLeaderboard(@Qualifier("omRedditLeaderboardRepository") gitRep
         return "[${values.first().score.toShortDisplayString()}](${values.first().link})${if (any { it.key.name.contains("X") }) "*" else ""}"
     }
 
-    override fun MutableMap<OmPuzzle, PuzzleEntry>.getRecord(puzzle: OmPuzzle, category: OmCategory) = get(puzzle)?.records?.get(category)
+    override fun MutableMap<OmPuzzle, PuzzleEntry>.getRecord(puzzle: OmPuzzle, category: OmCategory) =
+        get(puzzle)?.records?.get(category)?.apply { score.updateTransient(category) }
 
     override fun MutableMap<OmPuzzle, PuzzleEntry>.setRecord(puzzle: OmPuzzle, category: OmCategory, record: OmRecord) {
         set(puzzle, (get(puzzle) ?: PuzzleEntry()).apply { records[category] = record })
@@ -92,7 +97,7 @@ class OmRedditWikiLeaderboard(@Qualifier("omRedditLeaderboardRepository") gitRep
 
     override fun paretoUpdate(puzzle: OmPuzzle, record: OmRecord, records: MutableMap<OmPuzzle, PuzzleEntry>): Boolean {
         val requiredParts = listOf(COST, CYCLES, if (puzzle.type == PRODUCTION) INSTRUCTIONS else AREA)
-        if (record.score.parts.keys.containsAll(requiredParts)) {
+        if (record.score.parts.keys.containsAll(requiredParts) && record.score.modifier <= OmModifier.NORMAL) {
             val paretoScore = OmScore(requiredParts.map { it to record.score.parts[it]!! })
             val entry = (records[puzzle] ?: PuzzleEntry())
             if (!entry.pareto.contains(paretoScore) && entry.pareto.all { !it.isStrictlyBetter(paretoScore) }) {

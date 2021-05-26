@@ -13,9 +13,11 @@ import java.time.ZoneOffset
 
 @Component
 class OmGithubPagesLeaderboard(@Qualifier("omGithubPagesLeaderboardRepository") gitRepository: GitRepository, imgurService: ImgurService) :
-    AbstractOmJsonLeaderboard<MutableMap<OmPuzzle, MutableMap<OmCategory, OmRecord>>>(gitRepository,
+    AbstractOmJsonLeaderboard<MutableMap<OmPuzzle, MutableMap<OmCategory, OmRecord>>>(
+        gitRepository,
         imgurService,
-        mapOf("wh" to listOf(HEIGHT, WIDTH),
+        mapOf(
+            "wh" to listOf(HEIGHT, WIDTH),
             "og" to listOf(OGC, OGA, OGX),
             "oc" to listOf(OCG, OCA, OCX),
             "oa" to listOf(OAG, OAC, OAX),
@@ -23,9 +25,11 @@ class OmGithubPagesLeaderboard(@Qualifier("omGithubPagesLeaderboardRepository") 
             "ti" to listOf(TIG, TIC, TIA),
             "i" to listOf(IGNP, ICNP, IANP, CINP)
         ),
-        serializer()) {
+        serializer()
+    ) {
 
-    private val tableHeaders = mapOf(HEIGHT to "Height",
+    private val tableHeaders = mapOf(
+        HEIGHT to "Height",
         WIDTH to "Width",
         OGC to "Cost/Cycles",
         OGA to "Cost/Area",
@@ -49,14 +53,17 @@ class OmGithubPagesLeaderboard(@Qualifier("omGithubPagesLeaderboardRepository") 
         CINP to "Cycles/Instructions",
     )
 
-    override fun MutableMap<OmPuzzle, MutableMap<OmCategory, OmRecord>>.getRecord(puzzle: OmPuzzle, category: OmCategory) = get(puzzle)?.get(category)
+    override fun MutableMap<OmPuzzle, MutableMap<OmCategory, OmRecord>>.getRecord(puzzle: OmPuzzle, category: OmCategory) =
+        get(puzzle)?.get(category)?.apply { score.updateTransient(category) }
 
     override fun MutableMap<OmPuzzle, MutableMap<OmCategory, OmRecord>>.setRecord(puzzle: OmPuzzle, category: OmCategory, record: OmRecord) {
         set(puzzle, (get(puzzle) ?: mutableMapOf()).apply { set(category, record) })
     }
 
-    override fun GitRepository.AccessScope.updatePage(dir: File, categories: List<OmCategory>,
-                                                      records: MutableMap<OmPuzzle, MutableMap<OmCategory, OmRecord>>) {
+    override fun GitRepository.AccessScope.updatePage(
+        dir: File, categories: List<OmCategory>,
+        records: MutableMap<OmPuzzle, MutableMap<OmCategory, OmRecord>>
+    ) {
         val templates = File(repo, "templates")
         val mainTemplate = File(templates, "main.html").readText()
         val groupTemplate = File(templates, "group.html").readText()
