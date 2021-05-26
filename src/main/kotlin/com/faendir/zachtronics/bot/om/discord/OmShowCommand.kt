@@ -42,8 +42,6 @@ data class Show(
     @Converter(PuzzleConverter::class)
     val puzzle: OmPuzzle,
     @Description("Category. E.g. `GC`, `sum`")
-    val category: String,
-    @Description("Metric Modifier")
-    val modifier: OmModifier?
+    val category: String
 )
 
