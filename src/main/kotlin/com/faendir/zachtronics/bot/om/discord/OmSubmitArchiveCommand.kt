@@ -43,8 +43,6 @@ data class SubmitArchive(
     @Converter(LinkConverter::class)
     @Description("Link to your solution gif/mp4, can be `m1` to scrape it from your last message")
     val gif: String,
-    @Description("Metric Modifier")
-    override val modifier: OmModifier?,
     @Description("Score part for nonstandard metrics. E.g. `4h`, `3.5w`")
     override val score: String?
 ) : IArchive

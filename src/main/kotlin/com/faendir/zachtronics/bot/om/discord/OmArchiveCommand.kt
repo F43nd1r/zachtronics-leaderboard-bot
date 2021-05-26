@@ -5,7 +5,10 @@ import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
 import com.faendir.om.dsl.DslGenerator
 import com.faendir.om.parser.solution.SolutionParser
+import com.faendir.om.parser.solution.model.Position
+import com.faendir.om.parser.solution.model.Solution
 import com.faendir.om.parser.solution.model.SolvedSolution
+import com.faendir.om.parser.solution.model.part.*
 import com.faendir.zachtronics.bot.generic.archive.Archive
 import com.faendir.zachtronics.bot.generic.discord.AbstractArchiveCommand
 import com.faendir.zachtronics.bot.generic.discord.LinkConverter
@@ -24,6 +27,7 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import reactor.util.function.Tuples
 import java.io.ByteArrayInputStream
+import java.util.*
 
 @Component
 class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArchiveCommand<OmSolution>() {
@@ -56,8 +60,13 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
                         parts[scoreIdentifier.scorePart] = scoreIdentifier.value
                         OmScore(parts)
                     }
-                    is ScoreIdentifier.Modifier -> OmScore(parts, scoreIdentifier.modifier)
-                    is ScoreIdentifier.Normal -> OmScore(parts)
+                    is ScoreIdentifier.Normal -> OmScore(
+                        parts, when {
+                            solution.isOverlap(puzzle) -> OmModifier.OVERLAP
+                            solution.isTrackless() -> OmModifier.TRACKLESS
+                            else -> OmModifier.NORMAL
+                        }
+                    )
                 }
                 OmSolution(puzzle, score, DslGenerator.toDsl(solution))
             }
@@ -69,26 +78,63 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
                 OmScorePart.parse(archive.score!!)?.let { ScoreIdentifier.Part(it.first, it.second) }
                     ?: throw IllegalArgumentException("I didn't understand \"${archive.score}\".")
             }
-            archive.modifier != null -> {
-                ScoreIdentifier.Modifier(archive.modifier!!)
-            }
             else -> {
                 ScoreIdentifier.Normal
             }
         }
     }
 
+    private fun Solution.isTrackless(): Boolean = parts.none { it is Track }
+
+    private fun Solution.isOverlap(puzzle: OmPuzzle): Boolean =
+        parts.flatMapIndexed { index, part -> parts.subList(0, index).map { it to part } }.any { (p1, p2) -> puzzle.overlap(p1, p2) }
+
+
+    private fun OmPuzzle.overlap(p1: Part, p2: Part): Boolean {
+        return when {
+            p1 is Arm && p2 is Arm -> {
+                val s1 = shape(p1)
+                shape(p2).any { s1.contains(it) }
+            }
+            p1 is Arm && p2 is Track || p2 is Arm && p1 is Track -> false
+            p1 is Arm -> shape(p2).contains(p1.position)
+            p2 is Arm -> shape(p1).contains(p2.position)
+            else -> {
+                val s1 = shape(p1)
+                shape(p2).any { s1.contains(it) }
+            }
+        }
+    }
+
+    private fun OmPuzzle.shape(part: Part): List<Position> {
+        return when (part) {
+            is Arm -> if (part.type == ArmType.VAN_BERLOS_WHEEL) {
+                FULL_CIRCLE
+            } else {
+                SINGLE
+            }
+            is Conduit -> part.positions
+            is Glyph -> part.type.shape
+            is IO -> if (part.type == IOType.INPUT) {
+                this.reagentShapes[part.index]
+            } else {
+                this.productShapes[part.index]
+            }
+            is Track -> part.positions
+            else -> throw IllegalArgumentException("Unknown part type ${part.name}")
+        }.map { it.rotate(part.rotation) }.map { it + part.position }
+    }
+
+
 }
 
 sealed class ScoreIdentifier {
     object Normal : ScoreIdentifier()
-    class Modifier(val modifier: OmModifier) : ScoreIdentifier()
     class Part(val scorePart: OmScorePart, val value: Double) : ScoreIdentifier()
 }
 
 interface IArchive {
     val solution: String
-    val modifier: OmModifier?
     val score: String?
 }
 
@@ -97,8 +143,27 @@ data class Archive(
     @Converter(LinkConverter::class)
     @Description("Link to your solution file, can be `m1` to scrape it from your last message")
     override val solution: String,
-    @Description("Metric Modifier")
-    override val modifier: OmModifier?,
     @Description("Score part for nonstandard metrics. E.g. `4h`, `3.5w`")
     override val score: String?
 ) : IArchive
+
+infix operator fun Position.plus(other: Position) = Position(this.x + other.x, this.y + other.y)
+
+data class CubicPosition(val x: Int, val y: Int, val z: Int) {
+
+    fun rotate(times: Int): CubicPosition {
+        val t = Math.floorMod(times, 6)
+        val coords = mutableListOf(x, y, z)
+        if (t % 2 != 0) {
+            coords.replaceAll { -it }
+        }
+        Collections.rotate(coords, t % 3)
+        return CubicPosition(coords[0], coords[1], coords[2])
+    }
+
+    fun toAxial(): Position = Position(x, z)
+}
+
+fun Position.toCubic(): CubicPosition = CubicPosition(x, -x - y, y)
+
+fun Position.rotate(times: Int) = this.toCubic().rotate(times).toAxial()
