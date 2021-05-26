@@ -17,14 +17,14 @@ import java.util.stream.Stream;
  *  We use this to (de)serialize the index that is in each level folder and keep track of the export files.<br>
  *  The index is a list sorted in CRS order of BPScores
  */
-class SolutionsIndex {
+class ScSolutionsIndex {
     private static final Comparator<ScScore> COMPARATOR = ScCategory.C.getScoreComparator()
                                                                       .thenComparing(ScScore::isBugged)
                                                                       .thenComparing(ScScore::isPrecognitive);
     private final Path puzzlePath;
     private final List<ScScore> scores;
 
-    SolutionsIndex(Path puzzlePath) throws IOException {
+    ScSolutionsIndex(@NotNull Path puzzlePath) throws IOException {
         this.puzzlePath = puzzlePath;
         try (Stream<String> lines = Files.lines(puzzlePath.resolve("solutions.txt"))) {
             scores = lines.map(ScScore::parseBPScore).collect(Collectors.toList());
@@ -34,7 +34,7 @@ class SolutionsIndex {
     /**
      * @return list of displaced scores
      */
-    List<String> add(ScSolution solution) throws IOException {
+    List<String> add(@NotNull ScSolution solution) throws IOException {
         List<String> displacedScores = new ArrayList<>();
         ScScore candidate = solution.getScore();
         ListIterator<ScScore> it = scores.listIterator();
@@ -71,12 +71,12 @@ class SolutionsIndex {
     }
 
     @NotNull
-    private static String makeScoreFilename(ScScore score) {
+    private static String makeScoreFilename(@NotNull ScScore score) {
         return score.toDisplayString().replace('/', '-') + ".txt";
     }
 
     /** If equal, s1 dominates */
-    private static int dominanceCompare(ScScore s1, ScScore s2) {
+    private static int dominanceCompare(@NotNull ScScore s1, @NotNull ScScore s2) {
         int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
         int r2 = Integer.compare(s1.getReactors(), s2.getReactors());
         int r3 = Integer.compare(s1.getSymbols(), s2.getSymbols());

@@ -5,24 +5,24 @@ import com.faendir.zachtronics.bot.model.Leaderboard;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
-import com.faendir.zachtronics.bot.sz.model.SzScore;
+import com.faendir.zachtronics.bot.sz.model.SzSolution;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.function.Function;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
@@ -50,32 +50,17 @@ public class SzGitLeaderboard implements Leaderboard<SzCategory, SzPuzzle, SzRec
                                                                           findPuzzleFile(a, puzzle, category)))));
     }
 
+    @NotNull
     private static SzRecord readSolutionFile(Path solutionFile) {
-        /*
-        [name] Top solution Cost->Power - andersk
-        [puzzle] Sz040
-        [production-cost] 1200
-        [power-usage] 679
-        [lines-of-code] 31
-         */
-        try (Stream<String> solutionLines = Files.lines(solutionFile)) {
-            Iterator<String> it = solutionLines.iterator();
+        SzSolution solution = new SzSolution(solutionFile);
+        Matcher m = NAME_REGEX.matcher(solution.getTitle());
+        if (!m.matches())
+            throw new IllegalStateException("Name does not match standard format: " + m.replaceFirst(""));
+        String author = m.group("author");
+        String link = "https://raw.githubusercontent.com/12345ieee/shenzhenIO-leaderboard/master/" +
+                      solution.getPuzzle().getGroup().getRepoFolder() + "/" + solutionFile.getFileName();
+        return new SzRecord(solution.getScore(), author, link);
 
-            Matcher m = NAME_REGEX.matcher(it.next());
-            if (!m.matches())
-                throw new IllegalStateException("Name does not match standard format: " + m.replaceFirst(""));
-            String author = m.group("author");
-            SzPuzzle puzzle = SzPuzzle.valueOf(it.next().replaceFirst("^.+] ", ""));
-            int cost = Integer.parseInt(it.next().replaceFirst("^.+] ", "")) / 100;
-            int power = Integer.parseInt(it.next().replaceFirst("^.+] ", ""));
-            int lines = Integer.parseInt(it.next().replaceFirst("^.+] ", ""));
-            String link = "https://raw.githubusercontent.com/12345ieee/shenzhenIO-leaderboard/master/" +
-                          puzzle.getGroup().getRepoFolder() + "/" + solutionFile.getFileName();
-            return new SzRecord(new SzScore(cost, power, lines), author, link);
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
     }
 
     private static Path findPuzzleFile(@NotNull GitRepository.AccessScope accessScope, @NotNull SzPuzzle puzzle,

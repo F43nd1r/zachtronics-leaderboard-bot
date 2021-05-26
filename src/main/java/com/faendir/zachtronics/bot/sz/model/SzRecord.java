@@ -13,7 +13,6 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
-@Serializable
 @Value
 public class SzRecord implements Record {
     SzScore score;

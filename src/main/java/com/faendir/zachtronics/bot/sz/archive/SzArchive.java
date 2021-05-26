@@ -1,8 +1,8 @@
-package com.faendir.zachtronics.bot.sc.archive;
+package com.faendir.zachtronics.bot.sz.archive;
 
 import com.faendir.zachtronics.bot.generic.archive.Archive;
 import com.faendir.zachtronics.bot.main.git.GitRepository;
-import com.faendir.zachtronics.bot.sc.model.ScSolution;
+import com.faendir.zachtronics.bot.sz.model.SzSolution;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -18,33 +18,33 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ScArchive implements Archive<ScSolution> {
-    @Qualifier("scArchiveRepository")
+public class SzArchive implements Archive<SzSolution> {
+    @Qualifier("szRepository")
     private final GitRepository gitRepo;
 
     @NotNull
     @Override
-    public Mono<List<String>> archive(@NotNull ScSolution solution) {
+    public Mono<List<String>> archive(@NotNull SzSolution solution) {
         return gitRepo.access(a -> performArchive(a, solution));
     }
 
     @NotNull
-    private List<String> performArchive(@NotNull GitRepository.AccessScope accessScope, @NotNull ScSolution solution) {
+    private List<String> performArchive(@NotNull GitRepository.AccessScope accessScope, @NotNull SzSolution solution) {
         Path repoPath = accessScope.getRepo().toPath();
-        Path puzzlePath = repoPath.resolve(solution.getPuzzle().getGroup().name()).resolve(solution.getPuzzle().name());
+        Path folderPath = repoPath.resolve(solution.getPuzzle().getGroup().getRepoFolder());
         List<String> archiveResult;
         try {
-            ScSolutionsIndex index = new ScSolutionsIndex(puzzlePath);
+            SzSolutionsIndex index = new SzSolutionsIndex(folderPath, solution.getPuzzle());
             archiveResult = index.add(solution);
         } catch (IOException e) {
             // failures could happen after we dirtied the repo, so we call reset&clean on the puzzle dir
-            accessScope.resetAndClean(puzzlePath.toFile());
+            accessScope.resetAndClean(folderPath.toFile());
             log.warn("Recoverable error during archive: ", e);
             return Collections.emptyList();
         }
 
         if (!archiveResult.isEmpty() && !accessScope.status().isClean()) {
-            accessScope.add(puzzlePath.toFile());
+            accessScope.add(folderPath.toFile());
             accessScope.commitAndPush(
                     "Added " + solution.getScore().toDisplayString() + " for " + solution.getPuzzle().getDisplayName());
         }
