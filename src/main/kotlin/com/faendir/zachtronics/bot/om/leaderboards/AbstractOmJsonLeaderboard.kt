@@ -69,6 +69,7 @@ abstract class AbstractOmJsonLeaderboard<J>(
                 }
                 val localParetoUpdate = paretoUpdate(puzzle, record, records)
                 if (changed || localParetoUpdate) {
+                    scoreFile.parentFile.mkdirs()
                     scoreFile.writeText(Json { prettyPrint = true }.encodeToString(serializer, records))
                     add(scoreFile)
                     updatePage(dir, dirCategories, records)

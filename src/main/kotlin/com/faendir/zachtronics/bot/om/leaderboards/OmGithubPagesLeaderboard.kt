@@ -74,7 +74,7 @@ class OmGithubPagesLeaderboard(@Qualifier("omGithubPagesLeaderboardRepository") 
         val videoTemplate = File(templates, "video.html").readText()
         val headerTemplate = File(templates, "columnheader.html").readText()
         val cellTemplate = File(templates, "cell.html").readText()
-        val explanation = File(dir, "explanation.html").readText()
+        val explanation = File(dir, "explanation.html").takeIf { it.exists() }?.readText() ?: ""
 
         val text = mainTemplate.format(explanation, OffsetDateTime.now(ZoneOffset.UTC), OmGroup.values().joinToString("\n") { group ->
             val puzzles = OmPuzzle.values().filter { it.group == group && it.type != OmType.PRODUCTION }

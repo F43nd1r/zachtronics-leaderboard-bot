@@ -31,7 +31,7 @@ internal class OmGithubPagesLeaderboardTest {
 
     @Test
     fun update1() {
-        val record = OmRecord(OmScore(AREA to 200.0, CYCLES to 200.0, COST to 200.0), "http://fake.link")
+        val record = OmRecord(OmScore(AREA to 200.0, CYCLES to 200.0), "http://fake.link")
         expectThat(leaderboard.update(OmPuzzle.STABILIZED_WATER, record).block()).isA<UpdateResult.NotSupported>()
     }
 
