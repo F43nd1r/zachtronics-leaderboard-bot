@@ -32,7 +32,9 @@ class OmShowCommand(override val leaderboards: List<Leaderboard<OmCategory, OmPu
 
     private fun findCategoryCandidates(show: Show): List<OmCategory> {
         return OmCategory.values()
-            .filter { show.primaryMetric == it.primaryMetric && (show.tiebreaker == null || show.tiebreaker == it.tiebreaker) && show.modifier == it.modifier }
+            .filter { show.primaryMetric == it.primaryMetric &&
+                    (show.tiebreaker == null || show.tiebreaker == it.tiebreaker) &&
+                    (show.modifier == null && it.modifier == OmModifier.NORMAL || show.modifier == it.modifier) }
     }
 
 }
