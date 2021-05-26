@@ -23,7 +23,7 @@ class OmShowCommand(override val leaderboards: List<Leaderboard<OmCategory, OmPu
         return ShowParser.parse(interaction).map { show ->
             val puzzle = show.puzzle
             val categories = findCategoryCandidates(show)
-            if (categories.isEmpty()) throw IllegalArgumentException("${show.primaryMetric}/${show.tiebreaker ?: ""} is not a tracked category.")
+            if (categories.isEmpty()) throw IllegalArgumentException("${show.category} is not a tracked category.")
             val filtered = categories.filter { it.supportsPuzzle(puzzle) }
             if (filtered.isEmpty()) throw IllegalArgumentException("Category ${categories.first().displayName} does not support ${puzzle.displayName}")
             Tuples.of(puzzle, filtered.first())
@@ -31,10 +31,7 @@ class OmShowCommand(override val leaderboards: List<Leaderboard<OmCategory, OmPu
     }
 
     private fun findCategoryCandidates(show: Show): List<OmCategory> {
-        return OmCategory.values()
-            .filter { show.primaryMetric == it.primaryMetric &&
-                    (show.tiebreaker == null || show.tiebreaker == it.tiebreaker) &&
-                    (show.modifier == null && it.modifier == OmModifier.NORMAL || show.modifier == it.modifier) }
+        return OmCategory.values().filter { it.displayName.startsWith(show.category, ignoreCase = true) }
     }
 
 }
@@ -44,10 +41,8 @@ data class Show(
     @Description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")
     @Converter(PuzzleConverter::class)
     val puzzle: OmPuzzle,
-    @Description("Primary Metric")
-    val primaryMetric: OmMetric,
-    @Description("Tiebreaker")
-    val tiebreaker: OmMetric?,
+    @Description("Category. E.g. `GC`, `sum`")
+    val category: String,
     @Description("Metric Modifier")
     val modifier: OmModifier?
 )
