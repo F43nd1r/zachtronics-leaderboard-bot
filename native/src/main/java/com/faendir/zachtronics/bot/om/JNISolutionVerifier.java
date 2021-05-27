@@ -29,4 +29,10 @@ public class JNISolutionVerifier {
     }
 
     native int getHeight(String puzzleFile, String solutionFile);
+
+    public int getWidth(File puzzle, File solution) {
+        return getWidth(puzzle.getAbsolutePath(), solution.getAbsolutePath());
+    }
+
+    native int getWidth(String puzzleFile, String solutionFile);
 }

@@ -60,7 +60,10 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
                     AREA to solution.area.toDouble(),
                     INSTRUCTIONS to solution.instructions.toDouble()
                 )
-                solution.getHeight(puzzle)?.let { parts[HEIGHT] = it }
+                solution.getWidthAndHeight(puzzle)?.let { (width, height) ->
+                    parts[WIDTH] = width
+                    parts[HEIGHT] = height
+                }
                 val score = when (scoreIdentifier) {
                     is ScoreIdentifier.Part -> {
                         parts[scoreIdentifier.scorePart] = scoreIdentifier.value
@@ -131,10 +134,10 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
         }.map { it.rotate(part.rotation) }.map { it + part.position }
     }
 
-    private fun Solution.getHeight(puzzle: OmPuzzle): Double? {
+    private fun Solution.getWidthAndHeight(puzzle: OmPuzzle): Pair<Double, Double>? {
         val puzzleFile = puzzle.file.takeIf { it.exists() } ?: return null
-        return verifier.getHeight(puzzleFile, File.createTempFile(puzzle.id, ".solution").also { SolutionParser.write(this, it.outputStream().asOutput()) })
-            .toDouble()
+        val solution = File.createTempFile(puzzle.id, ".solution").also { SolutionParser.write(this, it.outputStream().asOutput()) }
+        return verifier.getWidth(puzzleFile, solution).toDouble() / 2 to verifier.getHeight(puzzleFile, solution).toDouble()
     }
 
     private val OmPuzzle.file: File
