@@ -14,7 +14,7 @@ enum class OmCategory(
     private val supportedTypes: Set<OmType> = OmType.values().toSet(),
     vararg val metrics: OmMetric,
     val modifier: OmModifier = OmModifier.NORMAL,
-    override val displayName: String = modifier.displayName + metrics.take(2).joinToString("")
+    override val displayName: String = modifier.displayName + metrics.take(2).joinToString("") { it.displayName }
 ) : Category {
     GC(NORMAL_TYPES, COST, CYCLES, AREA),
     GCP(PRODUCTION_TYPES, COST, CYCLES, INSTRUCTIONS),
