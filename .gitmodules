@@ -1,0 +1,3 @@
+[submodule "native/src/main/c"]
+	path = native/src/main/c
+	url = git@github.com:ianh/omsim.git

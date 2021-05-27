@@ -12,6 +12,7 @@ import com.faendir.om.parser.solution.model.part.*
 import com.faendir.zachtronics.bot.generic.archive.Archive
 import com.faendir.zachtronics.bot.generic.discord.AbstractArchiveCommand
 import com.faendir.zachtronics.bot.generic.discord.LinkConverter
+import com.faendir.zachtronics.bot.om.JNISolutionVerifier
 import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.om.model.OmScorePart.*
 import com.faendir.zachtronics.bot.utils.filterIsInstance
@@ -20,17 +21,21 @@ import com.roxstudio.utils.CUrl
 import discord4j.core.`object`.command.Interaction
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import kotlinx.io.streams.asInput
+import kotlinx.io.streams.asOutput
 import org.springframework.stereotype.Component
+import org.springframework.util.ResourceUtils
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import reactor.util.function.Tuples
 import java.io.ByteArrayInputStream
+import java.io.File
 import java.util.*
 
 @Component
 class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArchiveCommand<OmSolution>() {
+    private val verifier = JNISolutionVerifier()
 
     override fun buildData(): ApplicationCommandOptionData = ArchiveParser.buildData()
 
@@ -55,6 +60,7 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
                     AREA to solution.area.toDouble(),
                     INSTRUCTIONS to solution.instructions.toDouble()
                 )
+                solution.getHeight(puzzle)?.let { parts[HEIGHT] = it }
                 val score = when (scoreIdentifier) {
                     is ScoreIdentifier.Part -> {
                         parts[scoreIdentifier.scorePart] = scoreIdentifier.value
@@ -125,7 +131,14 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
         }.map { it.rotate(part.rotation) }.map { it + part.position }
     }
 
+    private fun Solution.getHeight(puzzle: OmPuzzle): Double? {
+        val puzzleFile = puzzle.file.takeIf { it.exists() } ?: return null
+        return verifier.getHeight(puzzleFile, File.createTempFile(puzzle.id, ".solution").also { SolutionParser.write(this, it.outputStream().asOutput()) })
+            .toDouble()
+    }
 
+    private val OmPuzzle.file: File
+        get() = ResourceUtils.getFile("classpath:puzzle/$id.puzzle")
 }
 
 sealed class ScoreIdentifier {

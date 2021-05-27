@@ -1,4 +1,5 @@
 rootProject.name = "zachtronics-leaderboard-bot"
+include("native")
 
 pluginManagement {
     repositories {
@@ -6,4 +7,3 @@ pluginManagement {
         google() //required for ksp
     }
 }
-

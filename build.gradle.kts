@@ -12,9 +12,6 @@ plugins {
     id("com.google.devtools.ksp") version "1.5.0-1.0.0-alpha09"
 }
 
-group = "com.faendir.zachtronics.bot"
-version = "2.0-SNAPSHOT"
-
 repositories {
     jcenter()
     mavenCentral()
@@ -42,6 +39,7 @@ dependencies {
     implementation("com.faendir.om:parser:2.0.3")
     implementation("com.faendir.discord4j-command-parser:annotations:1.3.2")
     ksp("com.faendir.discord4j-command-parser:processor:1.3.2")
+    implementation(project("native"))
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
