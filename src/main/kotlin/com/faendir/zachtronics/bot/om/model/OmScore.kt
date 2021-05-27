@@ -59,7 +59,7 @@ data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>, @Transient var
             val outerParts = string.split(':')
             val (modifier, scoreString) = when (outerParts.size) {
                 1 -> OmModifier.NORMAL to string
-                2 -> (OmModifier.values().find { it.key.toString().equals(outerParts[0], ignoreCase = true) }
+                2 -> (OmModifier.values().find { it.displayName.toString().equals(outerParts[0], ignoreCase = true) }
                     ?: throw IllegalArgumentException("\"${outerParts[0]}\" is not a modifier.")) to outerParts[1]
                 else -> throw IllegalArgumentException("I didn't understand \"$string\".")
             }

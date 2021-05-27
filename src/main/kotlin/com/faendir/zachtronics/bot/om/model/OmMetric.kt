@@ -1,14 +1,39 @@
 package com.faendir.zachtronics.bot.om.model
 
-enum class OmMetric(val key: String, val scorePart: OmScorePart) {
-    COST("G", OmScorePart.COST),
-    CYCLES("C", OmScorePart.CYCLES),
-    AREA("A",OmScorePart.AREA),
-    INSTRUCTIONS("I", OmScorePart.INSTRUCTIONS),
-    SUM("SUM", OmScorePart.COMPUTED),
-    SUM4("SUM4", OmScorePart.COMPUTED),
-    HEIGHT("H", OmScorePart.HEIGHT),
-    Width("W", OmScorePart.WIDTH),
-    PRODUCT("X", OmScorePart.COMPUTED)
+private const val NOT_FOUND_PLACEHOLDER = 1_000_000_000.0
 
+@Suppress("ClassName")
+sealed class OmMetric(val displayName: String, val scoreParts: List<OmScorePart>) {
+    abstract val comparator: Comparator<OmScore>
+
+    abstract class Basic(identifier: String, scorePart: OmScorePart) : OmMetric(identifier, listOf(scorePart)) {
+        override val comparator: Comparator<OmScore> = Comparator.comparing { it.parts[scorePart] ?: NOT_FOUND_PLACEHOLDER }
+    }
+
+    abstract class Sum(identifier: String, vararg scoreParts: OmScorePart) : OmMetric(identifier, scoreParts.toList()) {
+        override val comparator: Comparator<OmScore> = Comparator.comparing { score -> scoreParts.sumOf { score.parts[it] ?: NOT_FOUND_PLACEHOLDER } }
+    }
+
+    abstract class Product(vararg scoreParts: OmScorePart) : OmMetric("X", scoreParts.toList()) {
+        override val comparator: Comparator<OmScore> =
+            Comparator.comparing { score -> scoreParts.map { score.parts[it] ?: NOT_FOUND_PLACEHOLDER }.reduce { a, b -> a * b } }
+    }
+
+    object COST : Basic("G", OmScorePart.COST)
+    object CYCLES : Basic("C", OmScorePart.CYCLES)
+    object AREA : Basic("A", OmScorePart.AREA)
+    object INSTRUCTIONS : Basic("I", OmScorePart.INSTRUCTIONS)
+    object HEIGHT : Basic("Height", OmScorePart.HEIGHT)
+    object WIDTH : Basic("Width", OmScorePart.WIDTH)
+
+    object SUM3A : Sum("SUM-", OmScorePart.COST, OmScorePart.CYCLES, OmScorePart.AREA)
+    object SUM3I : Sum("SUM-", OmScorePart.COST, OmScorePart.CYCLES, OmScorePart.INSTRUCTIONS)
+    object SUM4 : Sum("SUM4-", OmScorePart.COST, OmScorePart.CYCLES, OmScorePart.AREA, OmScorePart.INSTRUCTIONS)
+
+    object PRODUCT_GC : Product(OmScorePart.COST, OmScorePart.CYCLES)
+    object PRODUCT_GA : Product(OmScorePart.COST, OmScorePart.AREA)
+    object PRODUCT_GI : Product(OmScorePart.COST, OmScorePart.INSTRUCTIONS)
+    object PRODUCT_CA : Product(OmScorePart.CYCLES, OmScorePart.AREA)
+    object PRODUCT_CI : Product(OmScorePart.CYCLES, OmScorePart.INSTRUCTIONS)
+    object PRODUCT_AI : Product(OmScorePart.AREA, OmScorePart.INSTRUCTIONS)
 }
