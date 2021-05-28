@@ -70,7 +70,7 @@ enum class OmCategory(
     S4I(NORMAL_TYPES, SUM4, INSTRUCTIONS),
     ;
 
-    private val requiredParts: Set<OmScorePart> = metrics.flatMap { it.scoreParts }.toSet()
+    internal val requiredParts: Set<OmScorePart> = metrics.flatMap { it.scoreParts }.toSet()
     val scoreComparator: Comparator<OmScore> = metrics.map { it.comparator }.reduce { acc, comparator -> acc.thenComparing(comparator) }
 
     fun supportsPuzzle(puzzle: OmPuzzle) = supportedTypes.contains(puzzle.type)

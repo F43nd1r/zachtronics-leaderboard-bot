@@ -12,10 +12,12 @@ data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>, @Transient var
     constructor(parts: Map<OmScorePart, Double>, modifier: OmModifier = OmModifier.NORMAL) : this(LinkedHashMap(parts), modifier)
 
     @Transient
-    var displayAsSum = false
+    val displaySums: MutableSet<Set<OmScorePart>> = mutableSetOf()
 
-    fun toDisplayString(preprocess: Iterable<Map.Entry<OmScorePart, Double>>.() -> Iterable<Map.Entry<OmScorePart, Double>> = { this }, separator: String = "/",
-                        format: DecimalFormat.(OmScorePart, Double) -> String): String {
+    fun toDisplayString(
+        preprocess: Iterable<Map.Entry<OmScorePart, Double>>.() -> Iterable<Map.Entry<OmScorePart, Double>> = { this }, separator: String = "/",
+        format: DecimalFormat.(OmScorePart, Double) -> String
+    ): String {
         return parts.asIterable().preprocess().joinToString(separator) { (part, value) -> numberFormat.format(part, value) }
     }
 
@@ -24,11 +26,9 @@ data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>, @Transient var
     }
 
     override fun toDisplayString(): String {
-        return if(displayAsSum){
-            toStandardDisplayString("+") { part, value -> format(value) + part.key } + " = " + numberFormat.format(parts.values.sum())
-        }else {
-            toStandardDisplayString { part, value -> format(value) + part.key }
-        }
+        return toStandardDisplayString { part, value -> format(value) + part.key } + if (displaySums.isNotEmpty()) {
+            " (${displaySums.joinToString { set -> "${set.joinToString("+") { it.key.toString() }}=${set.sumOf { parts.getValue(it) }}" }})"
+        } else ""
     }
 
     fun toShortDisplayString() = toStandardDisplayString { _, value -> format(value) }
@@ -59,7 +59,7 @@ data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>, @Transient var
             val outerParts = string.split(':')
             val (modifier, scoreString) = when (outerParts.size) {
                 1 -> OmModifier.NORMAL to string
-                2 -> (OmModifier.values().find { it.displayName.toString().equals(outerParts[0], ignoreCase = true) }
+                2 -> (OmModifier.values().find { it.displayName.equals(outerParts[0], ignoreCase = true) }
                     ?: throw IllegalArgumentException("\"${outerParts[0]}\" is not a modifier.")) to outerParts[1]
                 else -> throw IllegalArgumentException("I didn't understand \"$string\".")
             }
@@ -69,17 +69,21 @@ data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>, @Transient var
                 return OmScore(parts.map { OmScorePart.parse(it) ?: throw IllegalArgumentException("I didn't understand \"$it\".") }, modifier)
             }
             if (parts.size == 4) {
-                return OmScore(OmScorePart.COST to parts[0].toDouble(),
+                return OmScore(
+                    OmScorePart.COST to parts[0].toDouble(),
                     OmScorePart.CYCLES to parts[1].toDouble(),
                     OmScorePart.AREA to parts[2].toDouble(),
                     OmScorePart.INSTRUCTIONS to parts[3].toDouble(),
-                    modifier = modifier)
+                    modifier = modifier
+                )
             }
             if (parts.size == 3) {
-                return OmScore(OmScorePart.COST to parts[0].toDouble(),
+                return OmScore(
+                    OmScorePart.COST to parts[0].toDouble(),
                     OmScorePart.CYCLES to parts[1].toDouble(),
                     (if (puzzle.type == OmType.PRODUCTION) OmScorePart.INSTRUCTIONS else OmScorePart.AREA) to parts[2].toDouble(),
-                    modifier = modifier)
+                    modifier = modifier
+                )
             }
             throw IllegalArgumentException("you need to specify score part identifiers when using more than four values.")
         }

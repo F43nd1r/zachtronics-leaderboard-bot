@@ -81,7 +81,7 @@ abstract class AbstractOmJsonLeaderboard<J>(
             }
             when {
                 success.isNotEmpty() -> {
-                    record.score.displayAsSum = success.keys.any { it.name.startsWith("S") }
+                    success.keys.filter { it.name.startsWith("S") }.forEach { record.score.displaySums.add(it.requiredParts) }
                     UpdateResult.Success(success)
                 }
                 paretoUpdate -> UpdateResult.ParetoUpdate()
@@ -144,6 +144,6 @@ abstract class AbstractOmJsonLeaderboard<J>(
 
     protected fun OmScore.updateTransient(category: OmCategory) = apply {
         modifier = category.modifier
-        displayAsSum = category.name.startsWith("S")
+        if (category.name.startsWith("S")) displaySums.add(category.requiredParts)
     }
 }
