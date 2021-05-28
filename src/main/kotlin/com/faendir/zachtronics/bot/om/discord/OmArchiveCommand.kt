@@ -13,6 +13,7 @@ import com.faendir.zachtronics.bot.generic.archive.Archive
 import com.faendir.zachtronics.bot.generic.discord.AbstractArchiveCommand
 import com.faendir.zachtronics.bot.generic.discord.LinkConverter
 import com.faendir.zachtronics.bot.om.JNISolutionVerifier
+import com.faendir.zachtronics.bot.om.imgur.ProductionImgurService
 import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.om.model.OmScorePart.*
 import com.faendir.zachtronics.bot.utils.filterIsInstance
@@ -22,6 +23,7 @@ import discord4j.core.`object`.command.Interaction
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import kotlinx.io.streams.asInput
 import kotlinx.io.streams.asOutput
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.util.ResourceUtils
 import reactor.core.publisher.Mono
@@ -137,8 +139,17 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
     private fun Solution.getWidthAndHeight(puzzle: OmPuzzle): Pair<Double, Double>? {
         val puzzleFile = puzzle.file?.takeIf { it.exists() } ?: return null
         val solution = File.createTempFile(puzzle.id, ".solution").also { SolutionParser.write(this, it.outputStream().asOutput()) }
-        val width = verifier.getWidth(puzzleFile, solution).takeIf { it != -1 } ?: return null
-        return width.toDouble() / 2 to verifier.getHeight(puzzleFile, solution).toDouble()
+        try {
+            val width = verifier.getWidth(puzzleFile, solution).takeIf { it != -1 } ?: return null
+            return width.toDouble() / 2 to verifier.getHeight(puzzleFile, solution).toDouble()
+        } catch (e : Exception) {
+            logger.info("Verifier threw exception", e)
+            return null
+        }
+    }
+
+    companion object{
+        private val logger = LoggerFactory.getLogger(OmArchiveCommand::class.java)
     }
 }
 

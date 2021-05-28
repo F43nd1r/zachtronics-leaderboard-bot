@@ -38,7 +38,7 @@ fun <P> Iterable<P>.fuzzyMatch(search: String, extractName: (P) -> String): List
             if (it.contains(words.first(), ignoreCase = true)) words.removeFirst()
             if (words.isEmpty()) return@filter true
         }
-        if (search.length <= 4 && search.length == elementWords.size) {
+        if (search.length <= 5 && search.length == elementWords.size) {
             //check abbreviation
             search.foldIndexed(true) { index, acc, char -> acc && elementWords[index].startsWith(char, ignoreCase = true) }
         } else {
