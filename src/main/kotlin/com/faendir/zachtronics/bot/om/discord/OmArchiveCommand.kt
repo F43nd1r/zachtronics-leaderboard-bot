@@ -135,13 +135,17 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
     }
 
     private fun Solution.getWidthAndHeight(puzzle: OmPuzzle): Pair<Double, Double>? {
-        val puzzleFile = puzzle.file.takeIf { it.exists() } ?: return null
+        val puzzleFile = puzzle.file?.takeIf { it.exists() } ?: return null
         val solution = File.createTempFile(puzzle.id, ".solution").also { SolutionParser.write(this, it.outputStream().asOutput()) }
         return verifier.getWidth(puzzleFile, solution).toDouble() / 2 to verifier.getHeight(puzzleFile, solution).toDouble()
     }
 
-    private val OmPuzzle.file: File
-        get() = ResourceUtils.getFile("classpath:puzzle/$id.puzzle")
+    private val OmPuzzle.file: File?
+        get() = try {
+            ResourceUtils.getFile("classpath:puzzle/$id.puzzle")
+        } catch (e : Exception) {
+            null
+        }
 }
 
 sealed class ScoreIdentifier {
