@@ -125,9 +125,9 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
             is Conduit -> part.positions
             is Glyph -> part.type.shape
             is IO -> if (part.type == IOType.INPUT) {
-                this.reagentShapes[part.index]
+                this.getReagentShape(part)
             } else {
-                this.productShapes[part.index]
+                this.getProductShape(part)
             }
             is Track -> part.positions
             else -> throw IllegalArgumentException("Unknown part type ${part.name}")
@@ -140,13 +140,6 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
         val width = verifier.getWidth(puzzleFile, solution).takeIf { it != -1 } ?: return null
         return width.toDouble() / 2 to verifier.getHeight(puzzleFile, solution).toDouble()
     }
-
-    private val OmPuzzle.file: File?
-        get() = try {
-            ResourceUtils.getFile("classpath:puzzle/$id.puzzle")
-        } catch (e : Exception) {
-            null
-        }
 }
 
 sealed class ScoreIdentifier {
