@@ -27,7 +27,7 @@ data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>, @Transient var
 
     override fun toDisplayString(): String {
         return toStandardDisplayString { part, value -> format(value) + part.key } + if (displaySums.isNotEmpty()) {
-            " (${displaySums.joinToString { set -> "${set.joinToString("+") { it.key.toString() }}=${set.sumOf { parts.getValue(it) }}" }})"
+            " (${displaySums.joinToString { set -> "${set.joinToString("+") { it.key.toString() }}=${numberFormat.format(set.sumOf { parts.getValue(it) })}" }})"
         } else ""
     }
 

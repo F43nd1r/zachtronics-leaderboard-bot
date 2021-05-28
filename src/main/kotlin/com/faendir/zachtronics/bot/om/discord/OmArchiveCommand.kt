@@ -137,7 +137,8 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
     private fun Solution.getWidthAndHeight(puzzle: OmPuzzle): Pair<Double, Double>? {
         val puzzleFile = puzzle.file?.takeIf { it.exists() } ?: return null
         val solution = File.createTempFile(puzzle.id, ".solution").also { SolutionParser.write(this, it.outputStream().asOutput()) }
-        return verifier.getWidth(puzzleFile, solution).toDouble() / 2 to verifier.getHeight(puzzleFile, solution).toDouble()
+        val width = verifier.getWidth(puzzleFile, solution).takeIf { it != -1 } ?: return null
+        return width.toDouble() / 2 to verifier.getHeight(puzzleFile, solution).toDouble()
     }
 
     private val OmPuzzle.file: File?
