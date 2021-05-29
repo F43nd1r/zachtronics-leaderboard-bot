@@ -11,26 +11,15 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class SpaceChem implements Game {
     @Getter
-    private final String discordChannel = "spacechem";
-    @Getter
     private final String displayName = "SpaceChem";
     @Getter
     private final String commandName = "sc";
-
-    @NotNull
-    public List<ScCategory> parseCategory(@NotNull String name) {
-        return Arrays.stream(ScCategory.values()).filter(c -> c.getDisplayName().equalsIgnoreCase(name))
-                     .collect(Collectors.toList());
-    }
 
     @NotNull
     public static ScPuzzle parsePuzzle(@NotNull String name) {

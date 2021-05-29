@@ -8,7 +8,6 @@ import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.sz.model.SzSolution;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -33,7 +32,7 @@ public class SzGitLeaderboard implements Leaderboard<SzCategory, SzPuzzle, SzRec
     private final GitRepository gitRepository;
 
     private static final Pattern NAME_REGEX = Pattern
-            .compile("\\[name] top solution [a-z]+(?:->[a-z]+)?(?: - (?<author>.+))?", Pattern.CASE_INSENSITIVE);
+            .compile("top solution (?:cost|power|lines)(?:->(?:cost|power|lines))?(?: - (?<author>.+))?", Pattern.CASE_INSENSITIVE);
 
     @NotNull
     @Override
