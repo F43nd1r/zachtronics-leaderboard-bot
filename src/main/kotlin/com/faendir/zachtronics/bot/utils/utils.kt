@@ -1,12 +1,6 @@
 package com.faendir.zachtronics.bot.utils
 
 import com.faendir.zachtronics.bot.model.Puzzle
-import discord4j.core.`object`.entity.Message
-import discord4j.core.`object`.reaction.ReactionEmoji
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.switchIfEmpty
-import reactor.kotlin.core.publisher.toMono
 
 inline fun <T, R> Collection<T>.ifNotEmpty(block: (Collection<T>) -> R): R? = takeIf { it.isNotEmpty() }?.let(block)
 
@@ -21,7 +15,7 @@ fun <T> Iterable<T>.plusIf(condition: Boolean, element: T): List<T> = if (condit
 private val wordSeparator = Regex("[\\s-/,:]+")
 
 fun <P : Puzzle> Array<P>.getSingleMatchingPuzzle(name: String): P {
-    val matches = asIterable().fuzzyMatch(name) { it.displayName }
+    val matches = toList().fuzzyMatch(name) { displayName }
     return when (val size = matches.size) {
         0 -> throw IllegalArgumentException("I did not recognize the puzzle \"$name\".")
         1 -> matches.first()
@@ -30,19 +24,25 @@ fun <P : Puzzle> Array<P>.getSingleMatchingPuzzle(name: String): P {
     }
 }
 
-fun <P> Iterable<P>.fuzzyMatch(search: String, extractName: (P) -> String): List<P> {
-    return filter { puzzle ->
-        val words = search.split(wordSeparator).toMutableList()
-        val elementWords = extractName(puzzle).split(wordSeparator)
-        elementWords.forEach {
-            if (it.contains(words.first(), ignoreCase = true)) words.removeFirst()
-            if (words.isEmpty()) return@filter true
+fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> {
+    return search.takeIf { it.isEmpty() }?.let { emptyList() }
+        ?: find {
+            // exact match
+            it.name() == search
+        }?.let { listOf(it) }
+        ?: filter {
+            //abbreviation
+            val words = it.name().split(wordSeparator)
+            search.length == words.size && words.zip(search.asIterable()).map { (word, char) -> word.startsWith(char, ignoreCase = true) }.reduce(Boolean::and)
+        }.takeIf { it.isNotEmpty() }
+        ?: filter {
+            //words contain match
+            val words = it.name().split(wordSeparator).iterator()
+            for (part in search.split(wordSeparator)) {
+                while (!words.next().contains(part, ignoreCase = true)) {
+                    if (!words.hasNext()) return@filter false
+                }
+            }
+            true
         }
-        if (search.length <= 5 && search.length == elementWords.size) {
-            //check abbreviation
-            search.foldIndexed(true) { index, acc, char -> acc && elementWords[index].startsWith(char, ignoreCase = true) }
-        } else {
-            false
-        }
-    }
 }
