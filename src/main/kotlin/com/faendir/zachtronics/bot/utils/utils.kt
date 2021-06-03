@@ -39,9 +39,9 @@ fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> 
             //words contain match
             val words = it.name().split(wordSeparator).iterator()
             for (part in search.split(wordSeparator)) {
-                while (!words.next().contains(part, ignoreCase = true)) {
+                do {
                     if (!words.hasNext()) return@filter false
-                }
+                } while (!words.next().contains(part, ignoreCase = true))
             }
             true
         }
