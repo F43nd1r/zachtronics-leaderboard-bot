@@ -28,7 +28,7 @@ fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> 
     return search.takeIf { it.isEmpty() }?.let { emptyList() }
         ?: find {
             // exact match
-            it.name() == search
+            it.name().equals(search, ignoreCase = true)
         }?.let { listOf(it) }
         ?: filter {
             //abbreviation
