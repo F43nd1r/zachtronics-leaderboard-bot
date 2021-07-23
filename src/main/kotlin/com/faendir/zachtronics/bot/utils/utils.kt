@@ -15,7 +15,7 @@ fun <T> Iterable<T>.plusIf(condition: Boolean, element: T): List<T> = if (condit
 private val wordSeparator = Regex("[\\s-/,:]+")
 
 fun <P : Puzzle> Array<P>.getSingleMatchingPuzzle(name: String): P {
-    val matches = toList().fuzzyMatch(name) { displayName }
+    val matches = toList().fuzzyMatch(name.trim()) { displayName }
     return when (val size = matches.size) {
         0 -> throw IllegalArgumentException("I did not recognize the puzzle \"$name\".")
         1 -> matches.first()
