@@ -16,7 +16,7 @@ import java.util.*
 
 class LinkConverter : OptionConverter<String> {
     override fun fromString(context: Interaction, string: String?): Mono<Optional<String>> {
-        return string?.let { s ->
+        return string?.trim()?.let { s ->
             findLink(s, context.channel.flatMapMany { it.getMessagesBefore(it.lastMessageId.orElseGet { Snowflake.of(Instant.now()) }) }
                 .filter { it.author.isPresent && it.author.get() == context.user }).map { Optional.of(it) }
         } ?: Mono.just(Optional.empty())

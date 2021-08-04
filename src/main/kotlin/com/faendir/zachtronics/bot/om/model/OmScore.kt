@@ -55,17 +55,18 @@ data class OmScore(val parts: LinkedHashMap<OmScorePart, Double>, @Transient var
         private val numberFormat = DecimalFormat("0.#")
 
         fun parse(puzzle: OmPuzzle, string: String): OmScore {
-            if (string.isBlank()) throw IllegalArgumentException("I didn't find a score in your command.")
-            val outerParts = string.split(':')
+            val s = string.trim()
+            if (s.isBlank()) throw IllegalArgumentException("I didn't find a score in your command.")
+            val outerParts = s.split(':')
             val (modifier, scoreString) = when (outerParts.size) {
-                1 -> OmModifier.NORMAL to string
+                1 -> OmModifier.NORMAL to s
                 2 -> (OmModifier.values().find { it.displayName.equals(outerParts[0], ignoreCase = true) }
                     ?: throw IllegalArgumentException("\"${outerParts[0]}\" is not a modifier.")) to outerParts[1]
-                else -> throw IllegalArgumentException("I didn't understand \"$string\".")
+                else -> throw IllegalArgumentException("I didn't understand \"$s\".")
             }
             val parts = scoreString.split('/', '-')
             if (parts.size < 3) throw IllegalArgumentException("your score must have at least three parts.")
-            if (string.contains(Regex("[a-zA-Z]"))) {
+            if (s.contains(Regex("[a-zA-Z]"))) {
                 return OmScore(parts.map { OmScorePart.parse(it) ?: throw IllegalArgumentException("I didn't understand \"$it\".") }, modifier)
             }
             if (parts.size == 4) {
