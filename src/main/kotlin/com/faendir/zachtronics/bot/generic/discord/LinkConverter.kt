@@ -40,7 +40,7 @@ class LinkConverter : OptionConverter<String> {
         val valid = try {
             val connection = URL(string).openConnection() as HttpURLConnection
             connection.requestMethod = "HEAD"
-            connection.setRequestProperty("Content-Type", "*/*")
+            connection.setRequestProperty("Accept", "*/*")
             connection.responseCode in (200 until 400) // accept all redirects as well
         } catch (e: Exception) {
             false
