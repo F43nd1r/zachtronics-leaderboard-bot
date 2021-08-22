@@ -44,7 +44,7 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
                 throw new IllegalArgumentException("Couldn't parse score: \"" + data.score + "\"");
             // we also archive the score here
             ScSolution solution = new ScSolution(data.puzzle, score);
-            archive.archive(solution);
+            archive.archive(solution).block();
             ScRecord record = new ScRecord(score, data.author, data.link, false);
             return Tuples.of(data.puzzle, record);
         });
