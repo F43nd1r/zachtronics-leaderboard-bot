@@ -1,0 +1,40 @@
+name: pipeline
+
+on: [push]
+
+jobs:
+  release:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '11'
+
+      - name: Gradle Tests
+        uses: burrunan/gradle-cache-action@v1
+        with:
+          arguments: test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and publish release
+        uses: burrunan/gradle-cache-action@v1
+        with:
+          arguments: dockerPush
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
