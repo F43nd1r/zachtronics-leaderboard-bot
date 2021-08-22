@@ -33,6 +33,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and publish release
+        if: github.ref == 'ref/head/master'
         uses: burrunan/gradle-cache-action@v1
         with:
           arguments: dockerPush
