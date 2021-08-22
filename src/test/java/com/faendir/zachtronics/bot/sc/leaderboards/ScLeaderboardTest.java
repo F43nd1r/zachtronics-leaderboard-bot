@@ -11,10 +11,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -62,9 +59,9 @@ public class ScLeaderboardTest {
             List<ScCategory> categories = Arrays.stream(ScCategory.values())
                                                 .filter(c -> c.supportsPuzzle(p))
                                                 .collect(Collectors.toList());
-            Collection<ScRecord> records = scLeaderboard.getAll(p, categories).block().values();
+            Collection<ScRecord> records = new HashSet<>(scLeaderboard.getAll(p, categories).block().values());
             for (ScRecord r : records)
-                scLeaderboard.update(p, r);
+                scLeaderboard.update(p, r).block();
 
             System.out.println("Done " + p.getDisplayName());
         }

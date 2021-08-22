@@ -8,7 +8,6 @@ import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import discord4j.core.object.command.Interaction;
 import discord4j.discordjson.json.WebhookExecuteRequest;
-import discord4j.discordjson.possible.Possible;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.MultipartRequest;
 import org.jetbrains.annotations.NotNull;
@@ -49,12 +48,12 @@ public class CommandTest {
 
     @Test
     public void testSubmit() {
-        Map<String, String> args = Map.of("puzzle", "fission I",
+        Map<String, String> args = Map.of("puzzle", "Tunnels I",
                                           "score", "1/1/1",
                                           "author", "testMan",
                                           "link", "http://example.com");
         String result = runCommand("submit", args);
-        assertTrue(result.contains("Fission I") && result.contains("1/1/1"));
+        assertTrue(result.contains("Tunnels I") && result.contains("1/1/1"));
     }
 
     /*@Test
