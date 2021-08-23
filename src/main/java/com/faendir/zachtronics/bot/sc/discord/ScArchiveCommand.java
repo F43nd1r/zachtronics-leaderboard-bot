@@ -41,7 +41,7 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
 
             ScSolution solution;
             if (data.link != null) {
-                try (InputStream is = new URL(data.link).openStream()) {
+                try (InputStream is = new URL(rawContentURL(data.link)).openStream()) {
                     String content = new String(is.readAllBytes());
                     solution = new ScSolution(data.puzzle, score, content);
                 } catch (MalformedURLException e) {
@@ -59,6 +59,15 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
             }
             return solution;
         });
+    }
+
+    @NotNull
+    private String rawContentURL(@NotNull String link) {
+        if (link.matches("(?:https?://)?pastebin.com/(\\w+)")) { // pastebin has an easy way to get raw text
+            return link.replace("pastebin.com/", "pastebin.com/raw/");
+        }
+        else
+            return link;
     }
 
     @NotNull

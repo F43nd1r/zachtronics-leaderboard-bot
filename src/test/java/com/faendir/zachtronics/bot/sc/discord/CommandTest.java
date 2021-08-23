@@ -56,23 +56,25 @@ public class CommandTest {
         assertTrue(result.contains("Tunnels I") && result.contains("1/1/1"));
     }
 
-    /*@Test
+    @Test
     public void testArchive() {
-        String text = "!archive Of Pancakes (10/10/10)";
-        String attachment = null;
-        String result = runCommand(text, attachment);
-        assertTrue(result.contains("archived") && result.contains("archived 10/10/10"));
+        // we start at 100/100/100
+        Map<String, String> args = Map.of("puzzle", "Of Pancakes",
+                                          "score", "50/50/50");
+        String result = runCommand("archive", args);
+        assertTrue(result.contains("`50/50/50` has been archived"));
 
-        text = "!archive Of Pancakes";
-        attachment = "SOLUTION:name,author,8-8-8,title\nActual content...";
-        result = runCommand(text, attachment);
-        assertTrue(result.contains("archived") && result.contains("8/8/8/BP"));
+        args = Map.of("puzzle", "Of Pancakes",
+                      "link", "https://pastebin.com/19smCuS8"); // valid 45/1/14
+        result = runCommand("archive", args);
+        assertTrue(result.contains("`45/1/14/BP` has been archived"));
 
-        text = "!archive Of Pancakes (9/9/9)";
-        attachment = "SOLUTION:name,author,9-9-9,title\nActual content...";
-        result = runCommand(text, attachment);
-        assertTrue(result.contains("archived") && result.contains("9/9/9"));
-    }*/
+        args = Map.of("puzzle", "Of Pancakes",
+                      "score", "45/1/14",
+                      "link", "https://pastebin.com/19smCuS8"); // valid 45/1/14
+        result = runCommand("archive", args);
+        assertTrue(result.contains("`45/1/14` has been archived"));
+    }
 
     @NotNull
     private static ApplicationCommandInteractionOption mockOption(String name, String value) {
@@ -87,16 +89,6 @@ public class CommandTest {
 
     @NotNull
     private String runCommand(String commandName, Map<String, String> args) {
-        /*List<Attachment> attachments;
-        if (attachmentContent != null) {
-            Attachment attachment = Mockito.mock(Attachment.class);
-            Mockito.when(attachment.retrieveInputStream()).thenReturn(
-                    CompletableFuture.completedFuture(new ByteArrayInputStream(attachmentContent.getBytes())));
-            attachments = Collections.singletonList(attachment);
-        } else {
-            attachments = Collections.emptyList();
-        }*/
-
         Interaction interaction = Mockito.mock(Interaction.class, Mockito.RETURNS_DEEP_STUBS);
 
         List<ApplicationCommandInteractionOption> options = args.entrySet().stream()

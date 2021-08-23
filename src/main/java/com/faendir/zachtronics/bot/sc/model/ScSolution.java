@@ -17,7 +17,8 @@ public class ScSolution implements Solution {
     @Nullable String content;
 
     public ScSolution(@NotNull ScPuzzle puzzle, ScScore score, @NotNull String content) {
-        Matcher m = Pattern.compile("(SOLUTION:[^,]+),[^,]+,(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+),.+")
+        Matcher m = Pattern.compile("(SOLUTION:" + puzzle.getDisplayName() +
+                                    "),[^,]+,(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)(?:,.+)?\r?\n")
                            .matcher(content);
         if (m.find()) {
             this.puzzle = puzzle;
