@@ -60,20 +60,10 @@ public class CommandTest {
     public void testArchive() {
         // we start at 100/100/100
         Map<String, String> args = Map.of("puzzle", "Of Pancakes",
-                                          "score", "50/50/50");
+                                          "score", "45/1/14",
+                                          "link", "https://pastebin.com/19smCuS8"); // valid 45/1/14
         String result = runCommand("archive", args);
-        assertTrue(result.contains("`50/50/50` has been archived"));
-
-        args = Map.of("puzzle", "Of Pancakes",
-                      "link", "https://pastebin.com/19smCuS8"); // valid 45/1/14
-        result = runCommand("archive", args);
-        assertTrue(result.contains("`45/1/14/BP` has been archived"));
-
-        args = Map.of("puzzle", "Of Pancakes",
-                      "score", "45/1/14",
-                      "link", "https://pastebin.com/19smCuS8"); // valid 45/1/14
-        result = runCommand("archive", args);
-        assertTrue(result.contains("`45/1/14` has been archived"));
+        assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14`"));
     }
 
     @NotNull

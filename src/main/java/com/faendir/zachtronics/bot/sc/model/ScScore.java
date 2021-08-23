@@ -1,7 +1,11 @@
 package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.Score;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,6 +13,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Data
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class ScScore implements Score {
     private final int cycles;
     private final int reactors;

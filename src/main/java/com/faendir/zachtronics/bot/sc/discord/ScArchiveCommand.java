@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Component
@@ -61,10 +63,12 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
         });
     }
 
+    private static final Pattern PASTEBIN_PATTERN = Pattern.compile("(?:https?://)?pastebin.com/(?:raw/)?(\\w+)");
     @NotNull
     private String rawContentURL(@NotNull String link) {
-        if (link.matches("(?:https?://)?pastebin.com/(\\w+)")) { // pastebin has an easy way to get raw text
-            return link.replace("pastebin.com/", "pastebin.com/raw/");
+        Matcher m = PASTEBIN_PATTERN.matcher(link);
+        if (m.matches()) { // pastebin has an easy way to get raw text
+            return "https://pastebin.com/raw/" + m.group(1);
         }
         else
             return link;

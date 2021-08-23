@@ -16,13 +16,25 @@ public class ScSolution implements Solution {
     /** null content indicates a score-only solution */
     @Nullable String content;
 
-    public ScSolution(@NotNull ScPuzzle puzzle, ScScore score, @NotNull String content) {
-        Matcher m = Pattern.compile("(SOLUTION:" + puzzle.getDisplayName() +
+    public ScSolution(@NotNull ScPuzzle puzzle, @Nullable ScScore score, @NotNull String content) {
+        Matcher m = Pattern.compile("^(SOLUTION:" + puzzle.getDisplayName() +
                                     "),[^,]+,(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)(?:,.+)?\r?\n")
                            .matcher(content);
         if (m.find()) {
             this.puzzle = puzzle;
-            this.score = score != null ? score : ScScore.parseSimpleScore(m);
+            ScScore contentScore = ScScore.parseSimpleScore(m);
+            if (score == null) {
+                this.score = contentScore;
+            }
+            else {
+                if (score.getCycles() != contentScore.getCycles() ||
+                    score.getReactors() != contentScore.getReactors() ||
+                    score.getSymbols() != contentScore.getSymbols()) {
+                    // if the given score doesn't match the solution metadata, refuse it
+                    throw new IllegalArgumentException();
+                }
+                this.score = score;
+            }
             this.content = m.replaceFirst("$1,Archiver,$2-$3-$4,Archived Solution");
         }
         else {
