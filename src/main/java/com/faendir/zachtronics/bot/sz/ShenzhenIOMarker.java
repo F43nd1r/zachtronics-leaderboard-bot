@@ -15,6 +15,6 @@ public class ShenzhenIOMarker implements GamePackageMarker {
 
     @Configuration
     @ComponentScan
-    static class ShenzhenIOConfiguration {
+    public static class ShenzhenIOConfiguration {
     }
 }
