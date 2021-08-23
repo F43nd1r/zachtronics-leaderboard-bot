@@ -10,6 +10,7 @@ plugins {
     id("com.palantir.docker") version "0.26.0"
     id("io.freefair.lombok") version "5.2.1"
     id("com.google.devtools.ksp") version "1.5.0-1.0.0-alpha09"
+    id("com.gorylenko.gradle-git-properties") version "2.3.1"
 }
 
 repositories {
