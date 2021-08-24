@@ -35,7 +35,7 @@ public class ScSubmitViaExportCommand extends AbstractSubmitCommand<ScPuzzle, Sc
     @NotNull
     @Override
     public Mono<Tuple2<ScPuzzle, ScRecord>> parseSubmission(@NotNull Interaction interaction) {
-        return ScSubmitExportCommand$DataParser.parse(interaction).map(data -> {
+        return ScSubmitViaExportCommand$DataParser.parse(interaction).map(data -> {
             // we also archive the score here
             ScSolution solution = ScArchiveCommand.makeSolution(data.puzzle, data.score, data.export);
             archive.archive(solution).block();
@@ -47,7 +47,7 @@ public class ScSubmitViaExportCommand extends AbstractSubmitCommand<ScPuzzle, Sc
     @NotNull
     @Override
     public ApplicationCommandOptionData buildData() {
-        return ScSubmitExportCommand$DataParser.buildData();
+        return ScSubmitViaExportCommand$DataParser.buildData();
     }
 
     @ApplicationCommand(name = "submit-via-export", subCommand = true)

@@ -34,7 +34,7 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
     @NotNull
     @Override
     public Mono<Tuple2<ScPuzzle, ScRecord>> parseSubmission(@NotNull Interaction interaction) {
-        return ScSubmitScoreCommand$DataParser.parse(interaction).map(data -> {
+        return ScSubmitCommand$DataParser.parse(interaction).map(data -> {
             // we also archive the score here
             ScSolution solution = ScArchiveCommand.makeSolution(data.puzzle, data.score, null);
             archive.archive(solution).block();
@@ -46,7 +46,7 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
     @NotNull
     @Override
     public ApplicationCommandOptionData buildData() {
-        return ScSubmitScoreCommand$DataParser.buildData();
+        return ScSubmitCommand$DataParser.buildData();
     }
 
     @ApplicationCommand(name = "submit", subCommand = true)
