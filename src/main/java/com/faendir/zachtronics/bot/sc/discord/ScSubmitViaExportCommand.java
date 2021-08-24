@@ -13,7 +13,6 @@ import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import discord4j.core.object.command.Interaction;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +25,9 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
+public class ScSubmitViaExportCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
+    @Getter
+    private final String name = "submit-via-export";
     private final ScArchive archive;
     @Getter
     private final List<Leaderboard<?, ScPuzzle, ScRecord>> leaderboards;
@@ -34,9 +35,9 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
     @NotNull
     @Override
     public Mono<Tuple2<ScPuzzle, ScRecord>> parseSubmission(@NotNull Interaction interaction) {
-        return ScSubmitScoreCommand$DataParser.parse(interaction).map(data -> {
+        return ScSubmitExportCommand$DataParser.parse(interaction).map(data -> {
             // we also archive the score here
-            ScSolution solution = ScArchiveCommand.makeSolution(data.puzzle, data.score, null);
+            ScSolution solution = ScArchiveCommand.makeSolution(data.puzzle, data.score, data.export);
             archive.archive(solution).block();
             ScRecord record = new ScRecord(data.score, data.author, data.video, false);
             return Tuples.of(data.puzzle, record);
@@ -46,24 +47,27 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
     @NotNull
     @Override
     public ApplicationCommandOptionData buildData() {
-        return ScSubmitScoreCommand$DataParser.buildData();
+        return ScSubmitExportCommand$DataParser.buildData();
     }
 
-    @ApplicationCommand(name = "submit", subCommand = true)
+    @ApplicationCommand(name = "submit-via-export", subCommand = true)
     @Value
     public static class Data {
-        @NonNull ScPuzzle puzzle;
-        @NotNull ScScore score;
-        @NotNull String author;
         @NotNull String video;
+        @NotNull String export;
+        @NotNull String author;
+        ScPuzzle puzzle;
+        ScScore score;
 
-        public Data(@Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle,
-                    @Converter(ScBPScoreConverter.class) @NonNull ScScore score,
-                    @NotNull String author, @NotNull @Converter(LinkConverter.class) String video) {
+        public Data(@NotNull @Converter(LinkConverter.class) String video,
+                    @NotNull @Converter(LinkConverter.class) String export, @NotNull String author,
+                    @Converter(ScPuzzleConverter.class) ScPuzzle puzzle,
+                    @Converter(ScBPScoreConverter.class) ScScore score) {
+            this.video = video;
+            this.export = export;
+            this.author = author;
             this.puzzle = puzzle;
             this.score = score;
-            this.video = video;
-            this.author = author;
         }
     }
 }

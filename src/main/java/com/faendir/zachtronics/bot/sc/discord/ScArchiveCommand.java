@@ -11,7 +11,6 @@ import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import discord4j.core.object.command.Interaction;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
@@ -34,39 +33,36 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
     @NotNull
     @Override
     public Mono<ScSolution> parseSolution(@NotNull Interaction interaction) {
-        return ScArchiveCommand$DataParser.parse(interaction).map(data -> {
-            ScScore score = null;
-            if (data.score != null) {
-                score = ScScore.parseBPScore(data.score);
-                if (score == null) throw new IllegalArgumentException("couldn't parse score");
-            }
+        return ScArchiveCommand$DataParser.parse(interaction)
+                                          .map(data -> makeSolution(data.puzzle, data.score, data.export));
+    }
 
-            ScSolution solution;
-            if (data.link != null) {
-                try (InputStream is = new URL(rawContentURL(data.link)).openStream()) {
-                    String content = new String(is.readAllBytes());
-                    solution = new ScSolution(data.puzzle, score, content);
-                } catch (MalformedURLException e) {
-                    throw new IllegalArgumentException("Could not parse your link");
-                } catch (IOException e) {
-                    throw new IllegalArgumentException("Couldn't read your solution");
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException("Could not parse a valid solution");
-                }
+    public static ScSolution makeSolution(ScPuzzle puzzle, ScScore score, String exportLink) {
+        ScSolution solution;
+        if (exportLink != null) {
+            try (InputStream is = new URL(rawContentURL(exportLink)).openStream()) {
+                String content = new String(is.readAllBytes());
+                solution = new ScSolution(puzzle, score, content);
+            } catch (MalformedURLException e) {
+                throw new IllegalArgumentException("Could not parse your link");
+            } catch (IOException e) {
+                throw new IllegalArgumentException("Couldn't read your solution");
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Could not parse a valid solution");
             }
-            else {
-                if (data.puzzle == null || score == null) {
-                    throw new IllegalArgumentException("Need a link or a puzzle-score pair (or both), I found neither");
-                }
-                solution = new ScSolution(data.puzzle, score);
+        }
+        else {
+            if (puzzle == null || score == null) {
+                throw new IllegalArgumentException("Need a link or a puzzle-score pair (or both), I found neither");
             }
-            return solution;
-        });
+            solution = new ScSolution(puzzle, score);
+        }
+        return solution;
     }
 
     private static final Pattern PASTEBIN_PATTERN = Pattern.compile("(?:https?://)?pastebin.com/(?:raw/)?(\\w+)");
     @NotNull
-    private String rawContentURL(@NotNull String link) {
+    private static String rawContentURL(@NotNull String link) {
         Matcher m = PASTEBIN_PATTERN.matcher(link);
         if (m.matches()) { // pastebin has an easy way to get raw text
             return "https://pastebin.com/raw/" + m.group(1);
@@ -85,13 +81,14 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
     @Value
     public static class Data {
         ScPuzzle puzzle;
-        String score;
-        String link;
+        ScScore score;
+        String export;
 
-        public Data(@Converter(ScPuzzleConverter.class) ScPuzzle puzzle, String score, @Converter(LinkConverter.class) String link) {
+        public Data(@Converter(ScPuzzleConverter.class) ScPuzzle puzzle,
+                    @Converter(ScBPScoreConverter.class) ScScore score, @Converter(LinkConverter.class) String export) {
             this.puzzle = puzzle;
             this.score = score;
-            this.link = link;
+            this.export = export;
         }
     }
 }
