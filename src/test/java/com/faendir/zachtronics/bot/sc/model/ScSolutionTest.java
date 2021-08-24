@@ -10,16 +10,16 @@ import static org.junit.jupiter.api.Assertions.*;
 class ScSolutionTest {
     @Test
     public void testCoherentContentScore() {
-        ScSolution s1 = new ScSolution(ScPuzzle.research_example_1, new ScScore(50, 50, 50, false, false),
+        ScSolution s1 = new ScSolution(ScPuzzle.research_example_1, new ScScore(50, 50, 50, true, false),
                                        "SOLUTION:Of Pancakes and Spaceships,12345ieee,50-50-50\nstuff...");
-        ScSolution s2 = new ScSolution(ScPuzzle.research_example_1, new ScScore(50, 50, 50, false, true),
+        ScSolution s2 = new ScSolution(ScPuzzle.research_example_1, new ScScore(50, 50, 50, false, false),
                                        "SOLUTION:Of Pancakes and Spaceships,12345ieee,50-50-50\nstuff...");
         assertNotEquals(s1, s2);
     }
 
     @Test
     public void testInfoFromContent() {
-        ScSolution s1 = new ScSolution(ScPuzzle.research_example_1, new ScScore(50, 50, 50, true, true),
+        ScSolution s1 = new ScSolution(ScPuzzle.research_example_1, new ScScore(50, 50, 50, true, false),
                                        "SOLUTION:Of Pancakes and Spaceships,12345ieee,50-50-50\nstuff...");
         ScSolution s2 = new ScSolution(null, null,
                                        "SOLUTION:Of Pancakes and Spaceships,12345ieee,50-50-50\nstuff...");

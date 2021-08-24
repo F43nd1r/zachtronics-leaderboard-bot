@@ -49,10 +49,10 @@ public class ScArchiveTest {
         assertEquals(1, doArchiveScore(score).size()); // 50/50/50
 
         String content = "SOLUTION:Of Pancakes and Spaceships,12345ieee,45-1-14\nbunch of stuff...";
-        assertEquals(1, doArchiveScoreContent(null, content).size()); // 45/1/14/BP
+        assertEquals(1, doArchiveScoreContent(null, content).size()); // 45/1/14/B
 
-        score = new ScScore(45, 1, 14);
-        assertEquals(1, doArchiveScoreContent(score, content).size()); // 45/1/14
+        score = new ScScore(45, 1, 14, false, false);
+        assertEquals(2, doArchiveScoreContent(score, content).size()); // 45/1/14
     }
 
     private List<String> doArchiveScore(ScScore score) {

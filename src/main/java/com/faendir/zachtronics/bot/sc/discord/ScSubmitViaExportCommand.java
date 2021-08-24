@@ -39,8 +39,8 @@ public class ScSubmitViaExportCommand extends AbstractSubmitCommand<ScPuzzle, Sc
             // we also archive the score here
             ScSolution solution = ScArchiveCommand.makeSolution(data.puzzle, data.score, data.export);
             archive.archive(solution).block();
-            ScRecord record = new ScRecord(data.score, data.author, data.video, false);
-            return Tuples.of(data.puzzle, record);
+            ScRecord record = new ScRecord(solution.getScore(), data.author, data.video, false);
+            return Tuples.of(solution.getPuzzle(), record);
         });
     }
 

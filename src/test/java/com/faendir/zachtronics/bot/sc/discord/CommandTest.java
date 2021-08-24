@@ -51,9 +51,18 @@ public class CommandTest {
         Map<String, String> args = Map.of("puzzle", "Tunnels I",
                                           "score", "1/1/1",
                                           "author", "testMan",
-                                          "link", "http://example.com");
+                                          "video", "http://example.com");
         String result = runCommand("submit", args);
         assertTrue(result.contains("Tunnels I") && result.contains("1/1/1"));
+    }
+
+    @Test
+    public void testSubmitViaExport() {
+        Map<String, String> args = Map.of("video", "http://example.com",
+                                          "export", "https://pastebin.com/19smCuS8", // valid 45/1/14
+                                          "author", "testMan");
+        String result = runCommand("submit-via-export", args);
+        assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("45/1/14"));
     }
 
     @Test
