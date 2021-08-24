@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @BotTest(SpaceChemMarker.SpaceChemConfiguration.class)
 class ScSolutionTest {
     @Test
-    public void testCoherentAttachmentScore() {
+    public void testCoherentContentScore() {
         ScSolution s1 = new ScSolution(ScPuzzle.research_example_1, new ScScore(50, 50, 50, false, false),
                                        "SOLUTION:Of Pancakes and Spaceships,12345ieee,50-50-50\nstuff...");
         ScSolution s2 = new ScSolution(ScPuzzle.research_example_1, new ScScore(50, 50, 50, false, true),
@@ -18,7 +18,16 @@ class ScSolutionTest {
     }
 
     @Test
-    public void testIncoherentAttachmentScore() {
+    public void testInfoFromContent() {
+        ScSolution s1 = new ScSolution(ScPuzzle.research_example_1, new ScScore(50, 50, 50, true, true),
+                                       "SOLUTION:Of Pancakes and Spaceships,12345ieee,50-50-50\nstuff...");
+        ScSolution s2 = new ScSolution(null, null,
+                                       "SOLUTION:Of Pancakes and Spaceships,12345ieee,50-50-50\nstuff...");
+        assertEquals(s1, s2);
+    }
+
+    @Test
+    public void testIncoherentContentScore() {
         ScScore score = new ScScore(50, 50, 50, false, false);
         assertBreaks(ScPuzzle.research_example_1, score,
                      "SOLUTION:Of Pancakes and Spaceships,12345ieee,10-10-10\nstuff...");

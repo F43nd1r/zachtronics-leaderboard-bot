@@ -16,30 +16,39 @@ public class ScSolution implements Solution {
     /** null content indicates a score-only solution */
     @Nullable String content;
 
-    public ScSolution(@NotNull ScPuzzle puzzle, @Nullable ScScore score, @NotNull String content) {
-        Matcher m = Pattern.compile("^(SOLUTION:" + puzzle.getDisplayName() +
-                                    "),[^,]+,(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)(?:,.+)?\r?\n")
+    public ScSolution(@Nullable ScPuzzle puzzle, @Nullable ScScore score, @NotNull String content) {
+        Matcher m = Pattern.compile("^SOLUTION:(?<puzzle>[^,]+),[^,]+," +
+                                    "(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)(?:,.+)?\r?\n")
                            .matcher(content);
-        if (m.find()) {
-            this.puzzle = puzzle;
-            ScScore contentScore = ScScore.parseSimpleScore(m);
-            if (score == null) {
-                this.score = contentScore;
-            }
-            else {
-                if (score.getCycles() != contentScore.getCycles() ||
-                    score.getReactors() != contentScore.getReactors() ||
-                    score.getSymbols() != contentScore.getSymbols()) {
-                    // if the given score doesn't match the solution metadata, refuse it
-                    throw new IllegalArgumentException();
-                }
-                this.score = score;
-            }
-            this.content = m.replaceFirst("$1,Archiver,$2-$3-$4,Archived Solution");
+        if (!m.find()) {
+            throw new IllegalArgumentException("header");
+        }
+
+        if (puzzle == null) {
+            this.puzzle = ScPuzzle.DISPLAY_NAME_2_PUZZLE.get(m.group("puzzle"));
+            if (this.puzzle == null)
+                throw new IllegalArgumentException("puzzle");
         }
         else {
-            throw new IllegalArgumentException();
+            if (!puzzle.getDisplayName().equals(m.group("puzzle")))
+                throw new IllegalArgumentException("puzzle");
+            this.puzzle = puzzle;
         }
+
+        ScScore contentScore = ScScore.parseSimpleScore(m);
+        if (score == null) {
+            this.score = contentScore;
+        }
+        else {
+            if (score.getCycles() != contentScore.getCycles() ||
+                score.getReactors() != contentScore.getReactors() ||
+                score.getSymbols() != contentScore.getSymbols()) {
+                // if the given score doesn't match the solution metadata, refuse it
+                throw new IllegalArgumentException("score");
+            }
+            this.score = score;
+        }
+        this.content = m.replaceFirst("$1,Archiver,$2-$3-$4,Archived Solution");
     }
 
     public ScSolution(@NotNull ScPuzzle puzzle, @NotNull ScScore score) {

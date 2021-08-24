@@ -60,6 +60,6 @@ public class ScArchiveTest {
     }
 
     private List<String> doArchiveScoreContent(ScScore score, String content) {
-        return archive.archive(new ScSolution(ScPuzzle.research_example_1, score, content)).block();
+        return archive.archive(new ScSolution(null, score, content)).block();
     }
 }

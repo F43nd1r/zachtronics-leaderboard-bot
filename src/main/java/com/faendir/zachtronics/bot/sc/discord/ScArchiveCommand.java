@@ -53,9 +53,10 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
                 } catch (IllegalArgumentException e) {
                     throw new IllegalArgumentException("Could not parse a valid solution");
                 }
-            } else {
-                if (score == null) {
-                    throw new IllegalArgumentException("Need a link or a score (or both), I found neither");
+            }
+            else {
+                if (data.puzzle == null || score == null) {
+                    throw new IllegalArgumentException("Need a link or a puzzle-score pair (or both), I found neither");
                 }
                 solution = new ScSolution(data.puzzle, score);
             }
@@ -83,11 +84,11 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
     @ApplicationCommand(name = "archive", subCommand = true)
     @Value
     public static class Data {
-        @NonNull ScPuzzle puzzle;
+        ScPuzzle puzzle;
         String score;
         String link;
 
-        public Data(@Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle, String score, @Converter(LinkConverter.class) String link) {
+        public Data(@Converter(ScPuzzleConverter.class) ScPuzzle puzzle, String score, @Converter(LinkConverter.class) String link) {
             this.puzzle = puzzle;
             this.score = score;
             this.link = link;

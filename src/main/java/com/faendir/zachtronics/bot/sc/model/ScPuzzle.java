@@ -4,6 +4,11 @@ import com.faendir.zachtronics.bot.model.Puzzle;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 @Getter
 @RequiredArgsConstructor
 public enum ScPuzzle implements Puzzle {
@@ -388,4 +393,7 @@ public enum ScPuzzle implements Puzzle {
     private final ScType type;
     private final String displayName;
     private final boolean isDeterministic;
+
+    public static final Map<String, ScPuzzle> DISPLAY_NAME_2_PUZZLE = Arrays.stream(values()).collect(
+            Collectors.toMap(ScPuzzle::getDisplayName, Function.identity()));
 }
