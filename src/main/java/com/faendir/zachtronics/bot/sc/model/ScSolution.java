@@ -49,7 +49,7 @@ public class ScSolution implements Solution {
             }
             this.score = score;
         }
-        this.content = m.replaceFirst("$1,Archiver,$2-$3-$4,Archived Solution$5");
+        this.content = m.replaceFirst("SOLUTION:$1,Archiver,$2-$3-$4,Archived Solution$5");
     }
 
     public ScSolution(@NotNull ScPuzzle puzzle, @NotNull ScScore score) {
