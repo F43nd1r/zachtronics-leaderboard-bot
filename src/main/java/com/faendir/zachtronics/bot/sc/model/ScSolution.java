@@ -18,7 +18,7 @@ public class ScSolution implements Solution {
 
     public ScSolution(@Nullable ScPuzzle puzzle, @Nullable ScScore score, @NotNull String content) {
         Matcher m = Pattern.compile("^SOLUTION:(?<puzzle>[^,]+),[^,]+," +
-                                    "(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)(?:,.+)?\r?\n")
+                                    "(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)(?:,.+)?(\r?\n)")
                            .matcher(content);
         if (!m.find()) {
             throw new IllegalArgumentException("header");
@@ -48,7 +48,7 @@ public class ScSolution implements Solution {
             }
             this.score = score;
         }
-        this.content = m.replaceFirst("$1,Archiver,$2-$3-$4,Archived Solution");
+        this.content = m.replaceFirst("$1,Archiver,$2-$3-$4,Archived Solution$5");
     }
 
     public ScSolution(@NotNull ScPuzzle puzzle, @NotNull ScScore score) {
