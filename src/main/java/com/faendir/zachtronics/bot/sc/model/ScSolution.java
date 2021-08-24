@@ -36,6 +36,7 @@ public class ScSolution implements Solution {
         }
 
         ScScore contentScore = ScScore.parseSimpleScore(m);
+        contentScore.setPrecognitive(!this.puzzle.isDeterministic());
         if (score == null) {
             this.score = contentScore;
         }
