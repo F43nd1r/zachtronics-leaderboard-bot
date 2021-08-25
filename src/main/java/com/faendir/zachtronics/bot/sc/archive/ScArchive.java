@@ -44,7 +44,7 @@ public class ScArchive implements Archive<ScSolution> {
         }
 
         if (!archiveResult.isEmpty() && !accessScope.status().isClean()) {
-            accessScope.add(puzzlePath.toFile());
+            accessScope.addAll(puzzlePath.toFile());
             accessScope.commitAndPush(
                     "Added " + solution.getScore().toDisplayString() + " for " + solution.getPuzzle().getDisplayName());
         }

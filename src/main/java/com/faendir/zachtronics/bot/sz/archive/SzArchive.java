@@ -44,7 +44,7 @@ public class SzArchive implements Archive<SzSolution> {
         }
 
         if (!archiveResult.isEmpty() && !accessScope.status().isClean()) {
-            accessScope.add(folderPath.toFile());
+            accessScope.addAll(folderPath.toFile());
             accessScope.commitAndPush(
                     "Added " + solution.getScore().toDisplayString() + " for " + solution.getPuzzle().getDisplayName());
         }

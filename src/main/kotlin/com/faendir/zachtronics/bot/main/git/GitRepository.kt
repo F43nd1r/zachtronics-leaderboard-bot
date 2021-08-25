@@ -39,8 +39,11 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
             git.add().addFilepattern(file.relativeTo(repo).path).call()
         }
 
-        fun addAll() {
-            git.add().addFilepattern(".").call()
+        /** git add -A $file */
+        fun addAll(file: File) {
+            val relPath = file.relativeTo(repo).path
+            git.add().addFilepattern(relPath).call()
+            git.add().setUpdate(true).addFilepattern(relPath).call()
         }
 
         fun rm(file: File) {
