@@ -1,16 +1,13 @@
 package com.faendir.zachtronics.bot.sc.leaderboards;
 
-import com.faendir.zachtronics.bot.model.Category;
-import com.faendir.zachtronics.bot.model.Leaderboard;
-import com.faendir.zachtronics.bot.model.Puzzle;
-import com.faendir.zachtronics.bot.model.UpdateResult;
 import com.faendir.zachtronics.bot.main.reddit.RedditService;
 import com.faendir.zachtronics.bot.main.reddit.Subreddit;
+import com.faendir.zachtronics.bot.model.Leaderboard;
+import com.faendir.zachtronics.bot.model.UpdateResult;
 import com.faendir.zachtronics.bot.sc.model.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -157,7 +154,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
             for (int block = 0; block < 2; block++) {
                 ScRecord[] blockRecords = records[2 * rowIdx + block];
                 ScCategory[] blockCategories = CATEGORIES[2 * rowIdx + block];
-                elemloop:
+
                 for (int i = 0; i < halfSize; i++) {
                     ScCategory thisCategory = blockCategories[i];
                     ScScore currentScore = blockRecords[i].getScore();
@@ -167,21 +164,19 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                         beatenScores.put(thisCategory, currentScore);
                         blockRecords[i] = record;
 
-                        for (int prev = 0; prev < i; prev++) {
-                            if (blockRecords[i] == blockRecords[prev]) {
-                                row.append("←".repeat(i - prev));
-                                continue elemloop;
-                            }
-                        }
-
-                        if (blockRecords[i].getScore().getReactors() > minReactors)
-                            row.append("† ");
-                        row.append(makeLeaderboardString(blockRecords[i], thisCategory));
+                        row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory));
                     }
                     else {
-                        if (thisCategory.supportsScore(record.getScore()))
-                            relatedScores.put(thisCategory, currentScore);
-                        row.append(prevElems[block * halfSize + i + 2]);
+                        String prevElem = prevElems[block * halfSize + i + 2];
+                        if (beatenScores.containsValue(currentScore) && prevElem.matches("←+")) {
+                            // "dangling" reference to beaten score, we need to write the actual score or change the pointer
+                            row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory));
+                        }
+                        else {
+                            if (thisCategory.supportsScore(record.getScore()))
+                                relatedScores.put(thisCategory, currentScore);
+                            row.append(prevElem);
+                        }
                     }
                 }
             }
@@ -200,7 +195,20 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
     }
 
     @NotNull
-    private static String makeLeaderboardString(ScRecord record, ScCategory category) {
+    private static String makeLeaderboardCell(ScRecord[] blockRecords, int i, int minReactors,
+                                              ScCategory thisCategory) {
+        for (int prev = 0; prev < i; prev++) {
+            if (blockRecords[i] == blockRecords[prev]) {
+                return "←".repeat(i - prev);
+            }
+        }
+
+        String reactorPrefix = (blockRecords[i].getScore().getReactors() > minReactors) ? "† " : "";
+        return reactorPrefix + makeScoreCell(blockRecords[i], thisCategory);
+    }
+
+    @NotNull
+    private static String makeScoreCell(@NotNull ScRecord record, @NotNull ScCategory category) {
         ScScore score = record.getScore();
         String cyclesStr = score.getCycles() >= 100000 ? NumberFormat.getNumberInstance(Locale.ROOT)
                                                                      .format(score.getCycles()) : Integer
