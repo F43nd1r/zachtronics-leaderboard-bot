@@ -3,36 +3,33 @@ package com.faendir.zachtronics.bot.om.discord
 import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
-import com.faendir.zachtronics.bot.generic.discord.Command
+import com.faendir.zachtronics.bot.generic.discord.AbstractSubmitArchiveCommand
 import com.faendir.zachtronics.bot.generic.discord.LinkConverter
+import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.om.model.OmSolution
 import discord4j.core.`object`.command.Interaction
 import discord4j.discordjson.json.ApplicationCommandOptionData
-import discord4j.discordjson.json.WebhookExecuteRequest
-import discord4j.rest.util.MultipartRequest
 import org.springframework.stereotype.Component
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.util.function.component1
-import reactor.kotlin.core.util.function.component2
+import reactor.util.function.Tuples
 
 @Component
-class OmSubmitArchiveCommand(private val archiveCommand: OmArchiveCommand, private val submitCommand: OmSubmitCommand) : Command {
-    override val name: String = "submit-archive"
-    override val isReadOnly: Boolean = false
-
-    override fun handle(interaction: Interaction): Mono<MultipartRequest<WebhookExecuteRequest>> {
-        return SubmitArchiveParser.parse(interaction).flatMap { submitArchive ->
-            archiveCommand.parseSolution(archiveCommand.findScoreIdentifier(submitArchive), submitArchive.solution)
-                .flatMap { solution ->
-                    Mono.zip(
-                        archiveCommand.archive(solution),
-                        submitCommand.submitToLeaderboards(solution.puzzle, OmRecord(solution.score, submitArchive.gif, interaction.user.username))
-                    )
-                }.map { (archiveOut, submitOut) -> WebhookExecuteRequest.builder().from(submitOut).addEmbed(archiveOut).build() }
-        }.map { MultipartRequest.ofRequest(it) }
-    }
+class OmSubmitArchiveCommand(override val archiveCommand: OmArchiveCommand, override val submitCommand: OmSubmitCommand) :
+    AbstractSubmitArchiveCommand<OmPuzzle, OmRecord, OmSolution>() {
 
     override fun buildData(): ApplicationCommandOptionData = SubmitArchiveParser.buildData()
+
+    override fun parseToPRS(interaction: Interaction) =
+        SubmitArchiveParser.parse(interaction).flatMap { submitArchive ->
+            archiveCommand.parseSolution(archiveCommand.findScoreIdentifier(submitArchive), submitArchive.solution)
+                .map { solution ->
+                    Tuples.of(
+                        solution.puzzle,
+                        OmRecord(solution.score, submitArchive.gif, interaction.user.username),
+                        solution
+                    )
+                }
+        }
 }
 
 @ApplicationCommand(description = "Submit and archive a solution", subCommand = true)
