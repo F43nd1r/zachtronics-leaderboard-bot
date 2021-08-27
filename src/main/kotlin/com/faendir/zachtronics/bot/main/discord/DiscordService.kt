@@ -33,9 +33,7 @@ class DiscordService(private val discordClient: GatewayDiscordClient, private va
                 .name(game.commandName)
                 .description(game.displayName)
             for (command in context.commands) {
-                val buildData = command.data
-                if (buildData.name().isNotEmpty())
-                    request.addOption(buildData)
+                if (command.isEnabled) request.addOption(command.data)
             }
             request.build()
         }
