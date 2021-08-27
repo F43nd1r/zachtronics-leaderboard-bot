@@ -11,6 +11,7 @@ import discord4j.discordjson.json.WebhookExecuteRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.MultipartRequest;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,7 @@ public class CommandTest {
     }
 
     @Test
+    @Disabled("Not actually exposed to Discord")
     public void testSubmit() {
         Map<String, String> args = Map.of("puzzle", "Tunnels I",
                                           "score", "1/1/1",
@@ -57,12 +59,22 @@ public class CommandTest {
     }
 
     @Test
-    public void testSubmitViaExport() {
+    public void testSubmitArchive() {
         Map<String, String> args = Map.of("video", "http://example.com",
                                           "export", "https://pastebin.com/19smCuS8", // valid 45/1/14
                                           "author", "testMan");
-        String result = runCommand("submit-via-export", args);
+        String result = runCommand("submit-archive", args);
         assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("45/1/14"));
+    }
+
+    @Test
+    public void testSubmitOnlyScore() {
+        Map<String, String> args = Map.of("puzzle", "Tunnels I",
+                                          "score", "1/1/1",
+                                          "author", "testMan",
+                                          "video", "http://example.com");
+        String result = runCommand("submit-only-score", args);
+        assertTrue(result.contains("Tunnels I") && result.contains("1/1/1"));
     }
 
     @Test
@@ -87,7 +99,7 @@ public class CommandTest {
     }
 
     @NotNull
-    private String runCommand(String commandName, Map<String, String> args) {
+    private String runCommand(String commandName, @NotNull Map<String, String> args) {
         Interaction interaction = Mockito.mock(Interaction.class, Mockito.RETURNS_DEEP_STUBS);
 
         List<ApplicationCommandInteractionOption> options = args.entrySet().stream()

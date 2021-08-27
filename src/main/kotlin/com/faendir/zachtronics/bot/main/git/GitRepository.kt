@@ -71,6 +71,8 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
             git.reset().addPath(file.relativeTo(repo).path).call()
             git.clean().setForce(true).setPaths(setOf(file.relativeTo(repo).path)).call()
         }
+
+        fun originUrl() = git.repository.config.getString("remote", "origin", "url");
     }
 
     @PreDestroy

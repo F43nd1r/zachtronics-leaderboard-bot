@@ -17,13 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 @RequiredArgsConstructor
 @Component
 public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
@@ -34,41 +27,7 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
     @Override
     public Mono<ScSolution> parseSolution(@NotNull Interaction interaction) {
         return ScArchiveCommand$DataParser.parse(interaction)
-                                          .map(data -> makeSolution(data.puzzle, data.score, data.export));
-    }
-
-    public static ScSolution makeSolution(ScPuzzle puzzle, ScScore score, String exportLink) {
-        ScSolution solution;
-        if (exportLink != null) {
-            try (InputStream is = new URL(rawContentURL(exportLink)).openStream()) {
-                String content = new String(is.readAllBytes());
-                solution = new ScSolution(puzzle, score, content);
-            } catch (MalformedURLException e) {
-                throw new IllegalArgumentException("Could not parse your link");
-            } catch (IOException e) {
-                throw new IllegalArgumentException("Couldn't read your solution");
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Could not parse a valid solution");
-            }
-        }
-        else {
-            if (puzzle == null || score == null) {
-                throw new IllegalArgumentException("Need a link or a puzzle-score pair (or both), I found neither");
-            }
-            solution = new ScSolution(puzzle, score);
-        }
-        return solution;
-    }
-
-    private static final Pattern PASTEBIN_PATTERN = Pattern.compile("(?:https?://)?pastebin.com/(?:raw/)?(\\w+)");
-    @NotNull
-    private static String rawContentURL(@NotNull String link) {
-        Matcher m = PASTEBIN_PATTERN.matcher(link);
-        if (m.matches()) { // pastebin has an easy way to get raw text
-            return "https://pastebin.com/raw/" + m.group(1);
-        }
-        else
-            return link;
+                                          .map(data -> ScSolution.makeSolution(data.puzzle, data.score, data.export));
     }
 
     @NotNull

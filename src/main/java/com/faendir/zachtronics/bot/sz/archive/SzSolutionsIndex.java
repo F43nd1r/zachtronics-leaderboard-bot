@@ -46,13 +46,8 @@ class SzSolutionsIndex implements SolutionsIndex<SzSolution> {
 
     }
 
-    /**
-     * @return list of displaced scores
-     */
-    public List<String> add(@NotNull SzSolution solution) throws IOException {
-        List<String> displacedScores = new ArrayList<>();
+    public boolean add(@NotNull SzSolution solution) throws IOException {
         SzScore candidate = solution.getScore();
-        categoryLoop:
         for (Map.Entry<Integer, List<SzSolution>> entry : diskSolutions.entrySet()) {
             List<SzSolution> categorySolutions = entry.getValue();
             ListIterator<SzSolution> it = categorySolutions.listIterator();
@@ -61,10 +56,9 @@ class SzSolutionsIndex implements SolutionsIndex<SzSolution> {
                 SzScore score = solutionDisk.getScore();
                 int r = dominanceCompare(candidate, score);
                 if (r > 0)
-                    break categoryLoop;
+                    return false;
                 else if (r < 0) {
                     // remove beaten score
-                    displacedScores.add(score.toDisplayString());
                     it.remove();
                     assert solutionDisk.getPath() != null;
                     Files.delete(solutionDisk.getPath());
@@ -95,9 +89,7 @@ class SzSolutionsIndex implements SolutionsIndex<SzSolution> {
 
         }
 
-        if (displacedScores.isEmpty()) // solution is in the frontier but doesn't outright beat any, we have to fill a placeholder
-            displacedScores.add("-");
-        return displacedScores;
+        return true;
     }
 
     /** If equal, s1 dominates */

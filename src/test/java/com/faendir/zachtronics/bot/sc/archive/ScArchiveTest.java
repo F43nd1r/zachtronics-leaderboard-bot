@@ -29,30 +29,30 @@ public class ScArchiveTest {
         score.setBugged(false);
         assertEquals(0, doArchiveScore(score).size()); // our score is a P, fail
         score.setPrecognitive(false);
-        assertEquals(1, doArchiveScore(score).size()); // identical score, replace
+        assertEquals(0, doArchiveScore(score).size()); // identical score, fail
         score = new ScScore(10, 100, 1000);
-        assertEquals(1, doArchiveScore(score).size()); // new frontier piece
+        assertEquals(2, doArchiveScore(score).size()); // new frontier piece
         score = new ScScore(1000, 100, 10);
-        assertEquals(1, doArchiveScore(score).size()); // new frontier piece
+        assertEquals(2, doArchiveScore(score).size()); // new frontier piece
         score = new ScScore(10, 10, 10);
         assertEquals(2, doArchiveScore(score).size()); // beats them both
         score = new ScScore(20, 20, 20);
         assertEquals(0, doArchiveScore(score).size()); // fails flat
         score.setBugged(false);
-        assertEquals(1, doArchiveScore(score).size()); // new non bugged record
+        assertEquals(2, doArchiveScore(score).size()); // new non bugged record
     }
 
     @Test
     public void testArchiveAttachment() {
         // we start at 100/100/100
         ScScore score = new ScScore(50, 50, 50);
-        assertEquals(1, doArchiveScore(score).size()); // 50/50/50
+        assertEquals(2, doArchiveScore(score).size()); // 50/50/50
 
         String content = "SOLUTION:Of Pancakes and Spaceships,12345ieee,45-1-14\nbunch of stuff...";
-        assertEquals(1, doArchiveScoreContent(null, content).size()); // 45/1/14/B
+        assertEquals(3, doArchiveScoreContent(null, content).size()); // 45/1/14/B
 
         score = new ScScore(45, 1, 14, false, false);
-        assertEquals(2, doArchiveScoreContent(score, content).size()); // 45/1/14
+        assertEquals(3, doArchiveScoreContent(score, content).size()); // 45/1/14
     }
 
     private List<String> doArchiveScore(ScScore score) {

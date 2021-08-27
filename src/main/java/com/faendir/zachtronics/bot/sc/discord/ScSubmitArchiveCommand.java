@@ -2,10 +2,8 @@ package com.faendir.zachtronics.bot.sc.discord;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.zachtronics.bot.generic.discord.AbstractSubmitCommand;
+import com.faendir.zachtronics.bot.generic.discord.AbstractSubmitArchiveCommand;
 import com.faendir.zachtronics.bot.generic.discord.LinkConverter;
-import com.faendir.zachtronics.bot.model.Leaderboard;
-import com.faendir.zachtronics.bot.sc.archive.ScArchive;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
@@ -18,39 +16,41 @@ import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
+import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
 
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 @RequiredArgsConstructor
-public class ScSubmitViaExportCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
+public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzle, ScRecord, ScSolution> {
     @Getter
-    private final String name = "submit-via-export";
-    private final ScArchive archive;
+    private final ScSubmitCommand submitCommand;
     @Getter
-    private final List<Leaderboard<?, ScPuzzle, ScRecord>> leaderboards;
+    private final ScArchiveCommand archiveCommand;
 
     @NotNull
     @Override
-    public Mono<Tuple2<ScPuzzle, ScRecord>> parseSubmission(@NotNull Interaction interaction) {
-        return ScSubmitViaExportCommand$DataParser.parse(interaction).map(data -> {
-            // we also archive the score here
-            ScSolution solution = ScArchiveCommand.makeSolution(data.puzzle, data.score, data.export);
-            archive.archive(solution).block();
+    public Mono<Tuple3<ScPuzzle, ScRecord, ScSolution>> parseToPRS(@NotNull Interaction interaction) {
+        return ScSubmitArchiveCommand$DataParser.parse(interaction).map(data -> {
+            ScSolution solution = ScSolution.makeSolution(data.puzzle, data.score, data.export);
             ScRecord record = new ScRecord(solution.getScore(), data.author, data.video, false);
-            return Tuples.of(solution.getPuzzle(), record);
+            return Tuples.of(solution.getPuzzle(), record, solution);
         });
     }
 
     @NotNull
     @Override
     public ApplicationCommandOptionData buildData() {
-        return ScSubmitViaExportCommand$DataParser.buildData();
+        return ScSubmitArchiveCommand$DataParser.buildData();
     }
 
-    @ApplicationCommand(name = "submit-via-export", subCommand = true)
+    @ApplicationCommand(name = "submit-archive", subCommand = true)
     @Value
     public static class Data {
         @NotNull String video;

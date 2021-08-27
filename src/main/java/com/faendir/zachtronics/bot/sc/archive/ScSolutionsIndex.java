@@ -1,5 +1,6 @@
 package com.faendir.zachtronics.bot.sc.archive;
 
+import com.faendir.zachtronics.bot.generic.archive.SolutionsIndex;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
@@ -9,7 +10,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,7 +21,7 @@ import java.util.stream.Stream;
  *  We use this to (de)serialize the index that is in each level folder and keep track of the export files.<br>
  *  The index is a list sorted in CRS order of BPScores
  */
-class ScSolutionsIndex {
+class ScSolutionsIndex implements SolutionsIndex<ScSolution> {
     private static final Comparator<ScScore> COMPARATOR = ScCategory.C.getScoreComparator()
                                                                       .thenComparing(ScScore::isBugged)
                                                                       .thenComparing(ScScore::isPrecognitive);
@@ -31,21 +35,16 @@ class ScSolutionsIndex {
         }
     }
 
-    /**
-     * @return list of displaced scores
-     */
-    List<String> add(@NotNull ScSolution solution) throws IOException {
-        List<String> displacedScores = new ArrayList<>();
+    public boolean add(@NotNull ScSolution solution) throws IOException {
         ScScore candidate = solution.getScore();
         ListIterator<ScScore> it = scores.listIterator();
         while (it.hasNext()) {
             ScScore score = it.next();
             int r = dominanceCompare(candidate, score);
             if (r > 0)
-                return Collections.emptyList();
+                return false;
             else if (r < 0) {
                 // remove beaten score
-                displacedScores.add(score.toDisplayString());
                 it.remove();
                 Files.deleteIfExists(puzzlePath.resolve(makeScoreFilename(score)));
             }
@@ -61,13 +60,12 @@ class ScSolutionsIndex {
         Files.write(puzzlePath.resolve("solutions.txt"), lines, StandardOpenOption.TRUNCATE_EXISTING);
 
         if (solution.getContent() != null) {
-            Path solutionPath = puzzlePath.resolve(makeScoreFilename(candidate));
+            String filename = makeScoreFilename(candidate);
+            Path solutionPath = puzzlePath.resolve(filename);
             Files.write(solutionPath, solution.getContent().getBytes(), StandardOpenOption.CREATE_NEW);
         }
+        return true;
 
-        if (displacedScores.isEmpty()) // solution is in the frontier but doesn't outright beat any, we have to fill a placeholder
-            displacedScores.add("-");
-        return displacedScores;
     }
 
     @NotNull
