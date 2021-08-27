@@ -20,17 +20,18 @@ abstract class AbstractArchiveCommand<S : Solution> : Command {
             .map { MultipartRequest.ofRequest(it) }
     }
 
-    fun archive(solution: S): Mono<EmbedData> = archive.archive(solution).map { result -> getResultMessage(result, solution) }
+    fun archive(solution: S): Mono<EmbedData> =
+        archive.archive(solution).map { (title, description) -> getResultMessage(title, description, solution) }
 
-    private fun getResultMessage(result: List<String>, solution: S): EmbedData {
-        return if (result.isNotEmpty()) {
+    private fun getResultMessage(title:String, description:String, solution: S): EmbedData {
+        return if (title.isNotEmpty()) {
             EmbedData.builder()
-                .title("Success: *${solution.puzzle.displayName}* ${result.joinToString()}")
-                .description("`${solution.score.toDisplayString()}` has been archived.")
+                .title("Success: *${solution.puzzle.displayName}* $title")
+                .description("`${solution.score.toDisplayString()}` has been archived.\n\n$description")
                 .build()
         } else {
             EmbedData.builder()
-                .title("Failure: *${solution.puzzle}*")
+                .title("Failure: *${solution.puzzle.displayName}*")
                 .description("`${solution.score.toDisplayString()}` did not qualify for archiving.")
                 .build()
         }

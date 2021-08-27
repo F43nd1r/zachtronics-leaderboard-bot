@@ -6,7 +6,7 @@ import reactor.core.publisher.Mono
 interface Archive<S: Solution> {
 
     /**
-     * @return everything that was updated
+     * @return (title, description)
      */
-    fun archive(solution: S) : Mono<List<String>>
+    fun archive(solution: S) : Mono<Pair<String, String>>
 }

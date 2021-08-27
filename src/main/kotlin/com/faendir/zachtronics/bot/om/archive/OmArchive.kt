@@ -27,7 +27,7 @@ class OmArchive(@Qualifier("omArchiveRepository") private val gitRepo: GitReposi
         }
     }*/
 
-    override fun archive(solution: OmSolution): Mono<List<String>> {
+    override fun archive(solution: OmSolution): Mono<Pair<String,String>> {
         return gitRepo.access {
             val dir = getPuzzleDir(solution.puzzle)
             val changed = OmCategory.values().filter { it.supportsPuzzle(solution.puzzle) && it.supportsScore(solution.score) }.filter { category ->
@@ -61,7 +61,7 @@ class OmArchive(@Qualifier("omArchiveRepository") private val gitRepo: GitReposi
             if (changed.any()) {
                 commitAndPush("${solution.puzzle.displayName} ${solution.score.toDisplayString()} $changed")
             }
-            changed.map { it.displayName }
+            changed.joinToString { it.displayName } to ""
         }
     }
 
