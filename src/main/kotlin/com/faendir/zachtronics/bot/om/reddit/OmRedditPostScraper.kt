@@ -94,10 +94,10 @@ class OmRedditPostScraper(
             .flatMap { lastUpdate ->
                 val comments = redditService.findCommentsOnPost(Subreddit.OPUS_MAGNUM, "official record submission thread")
                 Flux.fromStream(comments.walkTrees().asStream())
-                    .map { comment -> handleComment(lastUpdate, comments, comment) }
+                    .flatMap { comment -> handleComment(lastUpdate, comments, comment) }
                     .collectList()
-                    .map { it.any() }
-                    .flatMap { hasNewComment ->
+                    .flatMap { list ->
+                        val hasNewComment = list.any { it }
                         if (hasNewComment) {
                             gitRepo.access {
                                 val timestamp = File(repo, timestampFile)
@@ -154,7 +154,7 @@ class OmRedditPostScraper(
     }
 
     private fun getNonBotParentComment(forest: Forest<Comment>, commentNode: Comment): Mono<Comment> {
-        return forest.toMono().kMapNotNull { it.parentOf(commentNode) }.map { if (it.author == redditService.myUsername()) forest.parentOf(it) else it }
+        return forest.toMono().kMapNotNull { it.parentOf(commentNode) }.mapNotNull { if (it.author == redditService.myUsername()) forest.parentOf(it) else it }
     }
 
     private fun parseComment(comment: Comment): Mono<Void> {
