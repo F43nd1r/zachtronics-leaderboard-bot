@@ -20,9 +20,11 @@ import com.faendir.zachtronics.bot.utils.filterIsInstance
 import com.faendir.zachtronics.bot.utils.throwIfEmpty
 import com.roxstudio.utils.CUrl
 import discord4j.core.`object`.command.Interaction
+import discord4j.core.event.domain.interaction.SlashCommandEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
-import kotlinx.io.streams.asInput
-import kotlinx.io.streams.asOutput
+import okio.buffer
+import okio.sink
+import okio.source
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.util.ResourceUtils
@@ -41,7 +43,7 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
 
     override fun buildData(): ApplicationCommandOptionData = ArchiveParser.buildData()
 
-    override fun parseSolution(interaction: Interaction): Mono<OmSolution> {
+    override fun parseSolution(interaction: SlashCommandEvent): Mono<OmSolution> {
         return ArchiveParser.parse(interaction)
             .map { Tuples.of(findScoreIdentifier(it), it.solution) }
             .flatMap { (identifier, link) -> parseSolution(identifier, link) }
@@ -49,7 +51,7 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
 
     fun parseSolution(scoreIdentifier: ScoreIdentifier, link: String): Mono<OmSolution> {
         return link.toMono().map {
-            SolutionParser.parse(ByteArrayInputStream(CUrl(it).exec()).asInput())
+            SolutionParser.parse(ByteArrayInputStream(CUrl(it).exec()).source().buffer())
         }.onErrorMap { IllegalArgumentException("I could not parse your solution") }
             .filterIsInstance<SolvedSolution>()
             .throwIfEmpty { "only solved solutions are accepted" }
@@ -138,7 +140,7 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
 
     private fun Solution.getWidthAndHeight(puzzle: OmPuzzle): Pair<Double, Double>? {
         val puzzleFile = puzzle.file?.takeIf { it.exists() } ?: return null
-        val solution = File.createTempFile(puzzle.id, ".solution").also { SolutionParser.write(this, it.outputStream().asOutput()) }
+        val solution = File.createTempFile(puzzle.id, ".solution").also { SolutionParser.write(this, it.outputStream().sink().buffer()) }
         try {
             val width = verifier.getWidth(puzzleFile, solution).takeIf { it != -1 } ?: return null
             return width.toDouble() / 2 to verifier.getHeight(puzzleFile, solution).toDouble()

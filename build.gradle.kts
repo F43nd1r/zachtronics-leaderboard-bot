@@ -1,53 +1,48 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
-plugins {
-    kotlin("jvm") version "1.5.0"
-    kotlin("plugin.serialization") version "1.5.0"
-    id("org.springframework.boot") version "2.4.5"
-    id("io.spring.dependency-management") version "1.0.7.RELEASE"
-    kotlin("plugin.spring") version "1.5.0"
-    id("com.palantir.docker") version "0.26.0"
-    id("io.freefair.lombok") version "5.2.1"
-    id("com.google.devtools.ksp") version "1.5.0-1.0.0-alpha09"
+3plugins {
+    kotlin("jvm") version "1.5.30"
+    kotlin("plugin.serialization") version "1.5.30"
+    id("org.springframework.boot") version "2.5.4"
+    id("io.spring.dependency-management") version "1.0.11.RELEASE"
+    kotlin("plugin.spring") version "1.5.30"
+    id("com.palantir.docker") version "0.28.0"
+    id("io.freefair.lombok") version "6.1.0"
+    id("com.google.devtools.ksp") version "1.5.30-1.0.0-beta08"
     id("com.gorylenko.gradle-git-properties") version "2.3.1"
 }
 
 repositories {
-    jcenter()
     mavenCentral()
     google()
-    maven {
-        name = "m2-dv8tion"
-        setUrl("https://m2.dv8tion.net/releases")
-    }
     mavenLocal()
 }
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("com.discord4j:discord4j-core:3.2.0-M3")
-    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.3")
-    implementation("org.eclipse.jgit:org.eclipse.jgit:5.8.1.202007141445-r")
+    implementation("com.discord4j:discord4j-core:3.2.0-RC3")
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.4")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:5.12.0.202106070339-r")
     implementation("com.github.rockswang:java-curl:1.2.2.2")
     implementation("com.faendir.jraw:JRAW:1.2.0")
     implementation("net.bramp.ffmpeg:ffmpeg:0.6.2")
-    implementation("com.faendir.om:dsl:1.2.0")
-    implementation("com.faendir.om:parser:2.0.3")
-    implementation("com.faendir.discord4j-command-parser:annotations:1.3.2")
-    ksp("com.faendir.discord4j-command-parser:processor:1.3.2")
+    implementation("com.faendir.om:dsl:1.2.6")
+    implementation("com.faendir.om:parser:2.1.8")
+    implementation("com.faendir.discord4j-command-parser:annotations:1.3.6")
+    ksp("com.faendir.discord4j-command-parser:processor:1.3.6")
     implementation(project("native"))
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("net.sf.trove4j:trove4j:3.0.3")
-    testImplementation("com.ninja-squad:springmockk:2.0.3")
-    testImplementation("io.strikt:strikt-core:0.27.0")
+    testImplementation("com.ninja-squad:springmockk:3.0.1")
+    testImplementation("io.strikt:strikt-core:0.31.0")
 }
 
 tasks.withType<Test> {
@@ -101,4 +96,8 @@ sourceSets {
             srcDir(file("$buildDir/generated/ksp/test/kotlin"))
         }
     }
+}
+
+tasks.getByName<Jar>("jar") {
+    enabled = false
 }

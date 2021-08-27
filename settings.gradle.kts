@@ -4,6 +4,6 @@ include("native")
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        google() //required for ksp
+        mavenCentral() //required for ksp
     }
 }

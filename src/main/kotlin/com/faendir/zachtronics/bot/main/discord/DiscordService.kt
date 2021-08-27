@@ -6,7 +6,7 @@ import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.User
 import discord4j.core.`object`.presence.ClientActivity
 import discord4j.core.`object`.presence.ClientPresence
-import discord4j.core.event.domain.InteractionCreateEvent
+import discord4j.core.event.domain.interaction.SlashCommandEvent
 import discord4j.discordjson.json.ApplicationCommandRequest
 import org.slf4j.LoggerFactory
 import org.springframework.boot.info.GitProperties
@@ -33,7 +33,7 @@ class DiscordService(private val discordClient: GatewayDiscordClient, private va
                 .name(game.commandName)
                 .description(game.displayName)
             for (command in context.commands) {
-                val buildData = command.buildData()
+                val buildData = command.data
                 if (buildData.name().isNotEmpty())
                     request.addOption(buildData)
             }
@@ -49,19 +49,19 @@ class DiscordService(private val discordClient: GatewayDiscordClient, private va
                     .onErrorResume { Mono.empty() }
             }
             .subscribe()
-        discordClient.on(InteractionCreateEvent::class.java).flatMap {
+        discordClient.on(SlashCommandEvent::class.java).flatMap {
             it.acknowledge().then(handleCommand(it))
         }.subscribe()
         logger.info("Connected to discord with version ${gitProperties.shortCommitId}")
         discordClient.updatePresence(ClientPresence.online(ClientActivity.playing(gitProperties.shortCommitId))).subscribe()
     }
 
-    private fun handleCommand(event: InteractionCreateEvent): Mono<Void> {
+    private fun handleCommand(event: SlashCommandEvent): Mono<Void> {
         return Mono.defer {
             findGameContext(event)
                 .flatMap { gameContext ->
-                    val option = event.interaction.commandInteraction.options.first()
-                    val command = gameContext.commands.find { it.name == option.name }
+                    val option = event.options.first()
+                    val command = gameContext.commands.find { it.data.name() == option.name }
                         ?: return@flatMap Mono.error(IllegalArgumentException("I did not recognize the command \"${option.name}\"."))
 
                     if (!command.isReadOnly) {
@@ -76,8 +76,8 @@ class DiscordService(private val discordClient: GatewayDiscordClient, private va
                         command.toMono()
                     }
                 }
-                .flatMap { command -> command.handle(event.interaction) }
-                .flatMap { event.interactionResponse.createFollowupMessage(it, true) }
+                .flatMap { command -> command.handle(event) }
+                .flatMap { event.interactionResponse.createFollowupMessage(it) }
                 .onErrorResume {
                     logger.info("User command failed", it)
                     event.interactionResponse.createFollowupMessage("**Failed**: ${it.message ?: "Something went wrong"}")
@@ -86,8 +86,8 @@ class DiscordService(private val discordClient: GatewayDiscordClient, private va
         }
     }
 
-    private fun findGameContext(event: InteractionCreateEvent): Mono<GameContext> {
-        val name = event.interaction.commandInteraction.name
+    private fun findGameContext(event: SlashCommandEvent): Mono<GameContext> {
+        val name = event.commandName
         return Mono.fromCallable<GameContext> { gameContexts.find { it.game.commandName == name } }
             .throwIfEmpty { "I did not recognize the game \"$name\"." }
     }

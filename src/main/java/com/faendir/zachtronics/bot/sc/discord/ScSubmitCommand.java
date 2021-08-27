@@ -8,6 +8,7 @@ import com.faendir.zachtronics.bot.model.Leaderboard;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
+import discord4j.core.event.domain.interaction.SlashCommandEvent;
 import discord4j.core.object.command.Interaction;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
@@ -26,11 +27,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
     @Getter
+    private final boolean isEnabled = false; // purposefully hidden, used only as a component of submit-archive
+
+    @Getter
     private final List<Leaderboard<?, ScPuzzle, ScRecord>> leaderboards;
 
     @NotNull
     @Override
-    public Mono<Tuple2<ScPuzzle, ScRecord>> parseSubmission(@NotNull Interaction interaction) {
+    public Mono<Tuple2<ScPuzzle, ScRecord>> parseSubmission(@NotNull SlashCommandEvent interaction) {
         return ScSubmitCommand$DataParser.parse(interaction).map(data -> {
             ScRecord record = new ScRecord(data.score, data.author, data.video, false);
             return Tuples.of(data.puzzle, record);
@@ -43,7 +47,7 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
         return ScSubmitCommand$DataParser.buildData();
     }
 
-    @ApplicationCommand(name = "", subCommand = true) // purposefully hidden, used only as a component of submit-archive
+    @ApplicationCommand(name = "", subCommand = true)
     @Value
     public static class Data {
         @NonNull ScPuzzle puzzle;

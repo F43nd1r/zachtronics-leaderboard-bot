@@ -8,7 +8,7 @@ import com.faendir.zachtronics.bot.generic.discord.LinkConverter
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmSolution
-import discord4j.core.`object`.command.Interaction
+import discord4j.core.event.domain.interaction.SlashCommandEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import org.springframework.stereotype.Component
 import reactor.util.function.Tuples
@@ -19,13 +19,13 @@ class OmSubmitArchiveCommand(override val archiveCommand: OmArchiveCommand, over
 
     override fun buildData(): ApplicationCommandOptionData = SubmitArchiveParser.buildData()
 
-    override fun parseToPRS(interaction: Interaction) =
+    override fun parseToPRS(interaction: SlashCommandEvent) =
         SubmitArchiveParser.parse(interaction).flatMap { submitArchive ->
             archiveCommand.parseSolution(archiveCommand.findScoreIdentifier(submitArchive), submitArchive.solution)
                 .map { solution ->
                     Tuples.of(
                         solution.puzzle,
-                        OmRecord(solution.score, submitArchive.gif, interaction.user.username),
+                        OmRecord(solution.score, submitArchive.gif, interaction.interaction.user.username),
                         solution
                     )
                 }

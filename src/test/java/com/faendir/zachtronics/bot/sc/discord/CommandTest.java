@@ -4,6 +4,7 @@ import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.generic.discord.Command;
 import com.faendir.zachtronics.bot.sc.SpaceChemMarker;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.event.domain.interaction.SlashCommandEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import discord4j.core.object.command.Interaction;
@@ -100,15 +101,15 @@ public class CommandTest {
 
     @NotNull
     private String runCommand(String commandName, @NotNull Map<String, String> args) {
-        Interaction interaction = Mockito.mock(Interaction.class, Mockito.RETURNS_DEEP_STUBS);
+        SlashCommandEvent slashCommandEvent = Mockito.mock(SlashCommandEvent.class, Mockito.RETURNS_DEEP_STUBS);
 
         List<ApplicationCommandInteractionOption> options = args.entrySet().stream()
                                                                 .map(e -> mockOption(e.getKey(), e.getValue()))
                                                                 .collect(Collectors.toList());
-        Mockito.when(interaction.getCommandInteraction().getOptions()).thenReturn(options);
+        Mockito.when(slashCommandEvent.getOptions()).thenReturn(options);
 
-        MultipartRequest<WebhookExecuteRequest> multipartRequest = commands.stream().filter(c -> c.getName().equals(commandName))
-                .findFirst().orElseThrow().handle(interaction).block();
+        MultipartRequest<WebhookExecuteRequest> multipartRequest = commands.stream().filter(c -> c.getData().name().equals(commandName))
+                .findFirst().orElseThrow().handle(slashCommandEvent).block();
         assert multipartRequest != null;
         WebhookExecuteRequest executeRequest = multipartRequest.getJsonPayload();
         assert executeRequest != null;

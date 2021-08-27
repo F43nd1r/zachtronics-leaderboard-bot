@@ -8,7 +8,8 @@ import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.om.model.OmGroup.*
 import com.faendir.zachtronics.bot.om.model.OmType.*
 import com.faendir.zachtronics.bot.utils.getSingleMatchingPuzzle
-import kotlinx.io.streams.asInput
+import okio.buffer
+import okio.source
 import org.springframework.util.ResourceUtils
 
 internal val SINGLE = setOf(0 to 0)
@@ -171,7 +172,7 @@ enum class OmPuzzle(
     }
 
     val data by lazy {
-        file?.inputStream()?.use { PuzzleParser.parse(it.asInput()) }
+        file?.inputStream()?.use { PuzzleParser.parse(it.source().buffer()) }
     }
 
     fun getReagentShape(io: IO): Set<Position> {

@@ -5,6 +5,7 @@ import com.faendir.zachtronics.bot.model.Leaderboard
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import discord4j.core.`object`.command.Interaction
+import discord4j.core.event.domain.interaction.SlashCommandEvent
 import discord4j.discordjson.json.EmbedData
 import discord4j.discordjson.json.EmbedFieldData
 import discord4j.discordjson.json.WebhookExecuteRequest
@@ -15,12 +16,11 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import reactor.util.function.Tuple2
 
-abstract class AbstractListCommand<C : Category, P : Puzzle, R : Record> : Command {
+abstract class AbstractListCommand<C : Category, P : Puzzle, R : Record> : AbstractCommand() {
     abstract val leaderboards: List<Leaderboard<C, P, R>>
-    override val name: String = "list"
     override val isReadOnly: Boolean = true
 
-    override fun handle(interaction: Interaction): Mono<MultipartRequest<WebhookExecuteRequest>> {
+    override fun handle(interaction: SlashCommandEvent): Mono<MultipartRequest<WebhookExecuteRequest>> {
         return findPuzzleAndCategories(interaction).flatMap { (puzzle, categories) ->
             leaderboards.toFlux().flatMap { it.getAll(puzzle, categories) }.collectList()
                 .map { it.reduce { acc, map -> acc + map } }
@@ -61,5 +61,5 @@ abstract class AbstractListCommand<C : Category, P : Puzzle, R : Record> : Comma
     }
 
     /** @return pair of Puzzle and all the categories that support it */
-    abstract fun findPuzzleAndCategories(interaction: Interaction): Mono<Tuple2<P, List<C>>>
+    abstract fun findPuzzleAndCategories(interaction: SlashCommandEvent): Mono<Tuple2<P, List<C>>>
 }

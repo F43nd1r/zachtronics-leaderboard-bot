@@ -8,6 +8,7 @@ import com.faendir.zachtronics.bot.sc.archive.ScArchive;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
+import discord4j.core.event.domain.interaction.SlashCommandEvent;
 import discord4j.core.object.command.Interaction;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
@@ -25,7 +26,7 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
 
     @NotNull
     @Override
-    public Mono<ScSolution> parseSolution(@NotNull Interaction interaction) {
+    public Mono<ScSolution> parseSolution(@NotNull SlashCommandEvent interaction) {
         return ScArchiveCommand$DataParser.parse(interaction)
                                           .map(data -> ScSolution.makeSolution(data.puzzle, data.score, data.export));
     }
