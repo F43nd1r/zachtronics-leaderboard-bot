@@ -10,23 +10,23 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
 public abstract class AbstractArchive<S extends Solution> implements Archive<S> {
-    public abstract GitRepository getGitRepo();
+    protected abstract GitRepository getGitRepo();
 
     @NotNull
+    @Override
     public Mono<List<String>> archive(@NotNull S solution) {
         return getGitRepo().access(a -> performArchive(a, solution));
     }
 
-    public abstract Path relativePuzzlePath(@NotNull S solution);
+    protected abstract Path relativePuzzlePath(@NotNull S solution);
 
-    public abstract SolutionsIndex<S> makeSolutionIndex(@NotNull Path puzzlePath,
-                                                        @NotNull S solution) throws IOException;
+    protected abstract SolutionsIndex<S> makeSolutionIndex(@NotNull Path puzzlePath,
+                                                           @NotNull S solution) throws IOException;
 
     @NotNull
     private List<String> performArchive(@NotNull GitRepository.AccessScope accessScope, @NotNull S solution) {

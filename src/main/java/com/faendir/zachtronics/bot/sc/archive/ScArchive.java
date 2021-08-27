@@ -6,7 +6,6 @@ import com.faendir.zachtronics.bot.main.git.GitRepository;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -23,13 +22,13 @@ public class ScArchive extends AbstractArchive<ScSolution> {
     private final GitRepository gitRepo;
 
     @Override
-    public Path relativePuzzlePath(@NotNull ScSolution solution) {
+    protected Path relativePuzzlePath(@NotNull ScSolution solution) {
         return Paths.get(solution.getPuzzle().getGroup().name(), solution.getPuzzle().name());
     }
 
     @Override
-    public SolutionsIndex<ScSolution> makeSolutionIndex(@NotNull Path puzzlePath,
-                                                        @NotNull ScSolution solution) throws IOException {
+    protected SolutionsIndex<ScSolution> makeSolutionIndex(@NotNull Path puzzlePath,
+                                                           @NotNull ScSolution solution) throws IOException {
         return new ScSolutionsIndex(puzzlePath);
     }
 }

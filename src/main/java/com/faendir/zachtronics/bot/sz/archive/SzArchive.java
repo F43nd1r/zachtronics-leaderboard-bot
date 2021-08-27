@@ -9,13 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -25,13 +22,13 @@ public class SzArchive extends AbstractArchive<SzSolution> {
     private final GitRepository gitRepo;
 
     @Override
-    public Path relativePuzzlePath(@NotNull SzSolution solution) {
+    protected Path relativePuzzlePath(@NotNull SzSolution solution) {
         return Paths.get(solution.getPuzzle().getGroup().getRepoFolder());
     }
 
     @Override
-    public SolutionsIndex<SzSolution> makeSolutionIndex(@NotNull Path puzzlePath,
-                                                        @NotNull SzSolution solution) throws IOException {
+    protected SolutionsIndex<SzSolution> makeSolutionIndex(@NotNull Path puzzlePath,
+                                                           @NotNull SzSolution solution) throws IOException {
         return new SzSolutionsIndex(puzzlePath, solution.getPuzzle());
     }
 }
