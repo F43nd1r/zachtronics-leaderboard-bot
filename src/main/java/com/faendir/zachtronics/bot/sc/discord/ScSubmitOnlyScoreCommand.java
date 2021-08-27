@@ -25,8 +25,6 @@ import reactor.util.function.Tuples;
 @RequiredArgsConstructor
 public class ScSubmitOnlyScoreCommand extends AbstractSubmitArchiveCommand<ScPuzzle, ScRecord, ScSolution> {
     @Getter
-    private final String name = "submit-only-score";
-    @Getter
     private final ScSubmitCommand submitCommand;
     @Getter
     private final ScArchiveCommand archiveCommand;

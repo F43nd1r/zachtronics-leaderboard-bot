@@ -27,7 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
     @Getter
-    private final boolean isEnabled = false; // purposefully hidden, used only as a component of submit-archive
+    private final boolean enabled = false; // purposefully hidden, used only as a component of submit-archive
 
     @Getter
     private final List<Leaderboard<?, ScPuzzle, ScRecord>> leaderboards;
