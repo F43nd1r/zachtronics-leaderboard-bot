@@ -19,13 +19,10 @@ class DiscordConfiguration {
     }
 
     @Bean
-    fun discordClient(discordProperties: DiscordProperties, gitProperties: GitProperties): GatewayDiscordClient = DiscordClientBuilder.create(discordProperties.token)
+    fun discordClient(discordProperties: DiscordProperties): GatewayDiscordClient = DiscordClientBuilder.create(discordProperties.token)
         .build()
         .gateway()
-        .setInitialPresence {
-            logger.info("Connecting to discord with version ${gitProperties.shortCommitId}")
-            ClientPresence.online(ClientActivity.playing(gitProperties.shortCommitId))
-        }
+        .setInitialPresence { ClientPresence.online() }
         .setEnabledIntents(IntentSet.of(Intent.DIRECT_MESSAGES, Intent.GUILD_MESSAGES))
         .login()
         .block()!!
