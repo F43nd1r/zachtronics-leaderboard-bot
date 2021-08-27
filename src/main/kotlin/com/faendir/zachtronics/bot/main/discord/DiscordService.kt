@@ -16,15 +16,17 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
+import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 
 @Service
-class DiscordService(private val discordClient: GatewayDiscordClient, private val gameContexts: List<GameContext>, gitProperties: GitProperties) {
+class DiscordService(private val discordClient: GatewayDiscordClient, private val gameContexts: List<GameContext>, private val gitProperties: GitProperties) {
     companion object {
         private val logger = LoggerFactory.getLogger(DiscordService::class.java)
     }
 
-    init {
+    @PostConstruct
+    fun init() {
         val requests = gameContexts.map { context ->
             val game = context.game
             val request = ApplicationCommandRequest.builder()
@@ -51,7 +53,7 @@ class DiscordService(private val discordClient: GatewayDiscordClient, private va
             it.acknowledge().then(handleCommand(it))
         }.subscribe()
         logger.info("Connected to discord with version ${gitProperties.shortCommitId}")
-        discordClient.updatePresence(ClientPresence.online(ClientActivity.playing(gitProperties.shortCommitId)))
+        discordClient.updatePresence(ClientPresence.online(ClientActivity.playing(gitProperties.shortCommitId))).subscribe()
     }
 
     private fun handleCommand(event: InteractionCreateEvent): Mono<Void> {
@@ -92,8 +94,8 @@ class DiscordService(private val discordClient: GatewayDiscordClient, private va
 
     @PreDestroy
     fun preDestroy() {
-        discordClient.updatePresence(ClientPresence.doNotDisturb(ClientActivity.playing("Maintenance, please stand by...")))
-        discordClient.logout()
+        discordClient.updatePresence(ClientPresence.doNotDisturb(ClientActivity.playing("Maintenance, please stand by..."))).block()
+        discordClient.logout().block()
     }
 }
 
