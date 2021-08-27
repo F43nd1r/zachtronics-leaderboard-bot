@@ -9,6 +9,6 @@ import reactor.core.publisher.Mono
 import java.util.*
 
 class PuzzleConverter : OptionConverter<OmPuzzle> {
-    override fun fromString(context: InteractionCreateEvent, string: String?): Mono<Optional<OmPuzzle>> =
+    override fun fromString(context: SlashCommandEvent, string: String?): Mono<Optional<OmPuzzle>> =
         Mono.fromCallable { Optional.ofNullable(string?.let { OmPuzzle.parse(it) }) }
 }

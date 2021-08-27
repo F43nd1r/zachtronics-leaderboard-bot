@@ -6,6 +6,7 @@ import discord4j.core.`object`.command.Interaction
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.reaction.ReactionEmoji
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.event.domain.interaction.SlashCommandEvent
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.switchIfEmpty
@@ -16,7 +17,7 @@ import java.time.Instant
 import java.util.*
 
 class LinkConverter : OptionConverter<String> {
-    override fun fromString(context: InteractionCreateEvent, string: String?): Mono<Optional<String>> {
+    override fun fromString(context: SlashCommandEvent, string: String?): Mono<Optional<String>> {
         return string?.trim()?.let { s ->
             findLink(s, context.interaction.channel.flatMapMany { it.getMessagesBefore(it.lastMessageId.orElseGet { Snowflake.of(Instant.now()) }) }
                 .filter { it.author.isPresent && it.author.get() == context.interaction.user }).map { Optional.of(it) }
