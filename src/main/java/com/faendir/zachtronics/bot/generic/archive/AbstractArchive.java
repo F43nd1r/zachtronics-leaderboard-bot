@@ -44,14 +44,16 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
 
         if (frontierChanged && !accessScope.status().isClean()) {
             accessScope.addAll(puzzlePath.toFile());
-            String repoUrl = accessScope.originUrl();
-            String result = Stream.concat(accessScope.status().getChanged().stream(),
-                                          accessScope.status().getAdded().stream())
-                                  .map(f -> "[" + f.replaceFirst(".+/", "") + "](" + repoUrl + "/" + f + ")")
-                                  .collect(Collectors.joining(", "));
+            String repoUrl = accessScope.originUrl().replaceFirst(".git$", "");
+            String rawFilesUrl = repoUrl.replace("github.com/", "raw.githubusercontent.com/") + "/master";
+            String result = "**Data**\n" + Stream.concat(accessScope.status().getChanged().stream(),
+                                                         accessScope.status().getAdded().stream())
+                                                 .map(f -> "[" + f.replaceFirst(".+/", "") + "](" + rawFilesUrl + f +
+                                                           ")").collect(Collectors.joining(", "));
             accessScope.commitAndPush(
                     "Added " + solution.getScore().toDisplayString() + " for " + solution.getPuzzle().getDisplayName());
-            result += "\n[commit](" + repoUrl + "/" + accessScope.currentHash() + ")";
+            result += "\n[commit " + accessScope.currentHash().substring(0, 6) + "](" + repoUrl + "/commit/" +
+                      accessScope.currentHash() + ")";
             return new Pair<>(" ", result);
         }
         else
