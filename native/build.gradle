@@ -64,6 +64,13 @@ java {
     targetCompatibility = JavaVersion.VERSION_11
 }
 
+processResources {
+    dependsOn "zachtronicsjniSharedLibrary"
+    from("$buildDir/libs/zachtronicsjni/") {
+        include 'shared/*.so'
+    }
+}
+
 test {
     useJUnitPlatform()
 }
