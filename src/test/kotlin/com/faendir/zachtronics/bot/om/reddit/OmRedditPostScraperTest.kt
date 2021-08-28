@@ -40,14 +40,14 @@ internal class OmRedditPostScraperTest {
     lateinit var gitRepo: GitRepository
 
     @Test
-    fun oldComment() {
+    suspend fun oldComment() {
         val lastUpdate = Date()
         val comment = Comment("0",
             "${OmPuzzle.STABILIZED_WATER.displayName}: [1/1/1](http://fake.link)",
             "trustedUser1",
             lastUpdate.minus(5, ChronoUnit.MINUTES),
             null)
-        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment).block()).isFalse()
+        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isFalse()
         expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isNotEqualTo(1.0)
         }
@@ -56,14 +56,14 @@ internal class OmRedditPostScraperTest {
     }
 
     @Test
-    fun newComment() {
+    suspend fun newComment() {
         val lastUpdate = Date()
         val comment = Comment("0",
             "${OmPuzzle.STABILIZED_WATER.displayName}: [1/1/1](http://fake.link)",
             "trustedUser1",
             lastUpdate.plus(5, ChronoUnit.MINUTES),
             null)
-        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment).block()).isTrue()
+        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isTrue()
         expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isEqualTo(1.0)
         }
@@ -71,14 +71,14 @@ internal class OmRedditPostScraperTest {
     }
 
     @Test
-    fun updatedComment() {
+    suspend fun updatedComment() {
         val lastUpdate = Date()
         val comment = Comment("0",
             "${OmPuzzle.STABILIZED_WATER.displayName}: [1/1/1](http://fake.link)",
             "trustedUser1",
             lastUpdate.minus(5, ChronoUnit.MINUTES),
             lastUpdate.plus(5, ChronoUnit.MINUTES))
-        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment).block()).isTrue()
+        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isTrue()
         expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isEqualTo(1.0)
         }
@@ -86,14 +86,14 @@ internal class OmRedditPostScraperTest {
     }
 
     @Test
-    fun commentWithOtherText() {
+    suspend fun commentWithOtherText() {
         val lastUpdate = Date()
         val comment = Comment("0",
             "Here's some text.\n${OmPuzzle.STABILIZED_WATER.displayName}: [1/1/1](http://fake.link)\n This is some more text.\nIt should be ignored.",
             "trustedUser1",
             lastUpdate.plus(5, ChronoUnit.MINUTES),
             null)
-        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment).block()).isTrue()
+        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isTrue()
         expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isEqualTo(1.0)
         }
@@ -101,14 +101,14 @@ internal class OmRedditPostScraperTest {
     }
 
     @Test
-    fun multipleSubmissionLine() {
+    suspend fun multipleSubmissionLine() {
         val lastUpdate = Date()
         val comment = Comment("0",
             "${OmPuzzle.STABILIZED_WATER.displayName}: [1/2/3](http://fake.link), [3/2/1](http://fake.link)",
             "trustedUser1",
             lastUpdate.plus(5, ChronoUnit.MINUTES),
             null)
-        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment).block()).isTrue()
+        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isTrue()
         expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isEqualTo(1.0)
             get { score.parts[OmScorePart.AREA] }.isEqualTo(3.0)
@@ -121,14 +121,14 @@ internal class OmRedditPostScraperTest {
     }
 
     @Test
-    fun multiLineSubmission() {
+    suspend fun multiLineSubmission() {
         val lastUpdate = Date()
         val comment = Comment("0",
             "${OmPuzzle.STABILIZED_WATER.displayName}: [1/1/1](http://fake.link)\n${OmPuzzle.ABLATIVE_CRYSTAL.displayName}: [1/1/1](http://fake.link)",
             "trustedUser1",
             lastUpdate.plus(5, ChronoUnit.MINUTES),
             null)
-        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment).block()).isTrue()
+        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isTrue()
         expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isEqualTo(1.0)
         }
@@ -139,14 +139,14 @@ internal class OmRedditPostScraperTest {
     }
 
     @Test
-    fun untrustedUser() {
+    suspend fun untrustedUser() {
         val lastUpdate = Date()
         val comment = Comment("0",
             "${OmPuzzle.STABILIZED_WATER.displayName}: [1/1/1](http://fake.link)",
             "untrustedUser",
             lastUpdate.plus(5, ChronoUnit.MINUTES),
             null)
-        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment).block()).isTrue()
+        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isTrue()
         expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isNotEqualTo(1.0)
         }
@@ -154,14 +154,14 @@ internal class OmRedditPostScraperTest {
     }
 
     @Test
-    fun unrelatedTrustedComment() {
+    suspend fun unrelatedTrustedComment() {
         val lastUpdate = Date()
         val comment = Comment("0",
             "Talking about something",
             "trustedUser1",
             lastUpdate.plus(5, ChronoUnit.MINUTES),
             null)
-        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment).block()).isTrue()
+        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isTrue()
         expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isNotEqualTo(1.0)
         }
@@ -169,14 +169,14 @@ internal class OmRedditPostScraperTest {
     }
 
     @Test
-    fun unrelatedUnTrustedComment() {
+    suspend fun unrelatedUnTrustedComment() {
         val lastUpdate = Date()
         val comment = Comment("0",
             "Talking about something",
             "untrustedUser",
             lastUpdate.plus(5, ChronoUnit.MINUTES),
             null)
-        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment).block()).isTrue()
+        expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isTrue()
         expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isNotEqualTo(1.0)
         }

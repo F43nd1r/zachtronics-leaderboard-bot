@@ -13,26 +13,22 @@ import com.faendir.zachtronics.bot.generic.archive.Archive
 import com.faendir.zachtronics.bot.generic.discord.AbstractArchiveCommand
 import com.faendir.zachtronics.bot.generic.discord.LinkConverter
 import com.faendir.zachtronics.bot.om.JNISolutionVerifier
-import com.faendir.zachtronics.bot.om.imgur.ProductionImgurService
 import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.om.model.OmScorePart.*
-import com.faendir.zachtronics.bot.utils.filterIsInstance
-import com.faendir.zachtronics.bot.utils.throwIfEmpty
 import com.roxstudio.utils.CUrl
-import discord4j.core.`object`.command.Interaction
 import discord4j.core.event.domain.interaction.SlashCommandEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.newFixedThreadPoolContext
+import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.reactor.mono
+import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.sink
 import okio.source
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import org.springframework.util.ResourceUtils
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
-import reactor.kotlin.core.util.function.component1
-import reactor.kotlin.core.util.function.component2
-import reactor.util.function.Tuples
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.util.*
@@ -43,46 +39,45 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
 
     override fun buildData(): ApplicationCommandOptionData = ArchiveParser.buildData()
 
-    override fun parseSolution(interaction: SlashCommandEvent): Mono<OmSolution> {
-        return ArchiveParser.parse(interaction)
-            .map { Tuples.of(findScoreIdentifier(it), it.solution) }
-            .flatMap { (identifier, link) -> parseSolution(identifier, link) }
+    override fun parseSolution(interaction: SlashCommandEvent): Mono<OmSolution> = mono {
+        val command = ArchiveParser.parse(interaction).awaitSingle()
+        parseSolution(findScoreIdentifier(command), command.solution)
     }
 
-    fun parseSolution(scoreIdentifier: ScoreIdentifier, link: String): Mono<OmSolution> {
-        return link.toMono().map {
-            SolutionParser.parse(ByteArrayInputStream(CUrl(it).exec()).source().buffer())
-        }.onErrorMap { IllegalArgumentException("I could not parse your solution") }
-            .filterIsInstance<SolvedSolution>()
-            .throwIfEmpty { "only solved solutions are accepted" }
-            .map { solution ->
-                val puzzle =
-                    OmPuzzle.values().find { it.id == solution.puzzle } ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
-                val parts = linkedMapOf(
-                    COST to solution.cost.toDouble(),
-                    CYCLES to solution.cycles.toDouble(),
-                    AREA to solution.area.toDouble(),
-                    INSTRUCTIONS to solution.instructions.toDouble()
-                )
-                solution.getWidthAndHeight(puzzle)?.let { (width, height) ->
-                    parts[WIDTH] = width
-                    parts[HEIGHT] = height
-                }
-                val score = when (scoreIdentifier) {
-                    is ScoreIdentifier.Part -> {
-                        parts[scoreIdentifier.scorePart] = scoreIdentifier.value
-                        OmScore(parts)
-                    }
-                    is ScoreIdentifier.Normal -> OmScore(
-                        parts, when {
-                            solution.isOverlap(puzzle) -> OmModifier.OVERLAP
-                            solution.isTrackless() -> OmModifier.TRACKLESS
-                            else -> OmModifier.NORMAL
-                        }
-                    )
-                }
-                OmSolution(puzzle, score, DslGenerator.toDsl(solution))
+    suspend fun parseSolution(scoreIdentifier: ScoreIdentifier, link: String): OmSolution {
+        val solution = withContext(Dispatchers.IO) {
+            try {
+                SolutionParser.parse(ByteArrayInputStream(CUrl(link).exec()).source().buffer())
+            } catch (e: Exception) {
+                throw IllegalArgumentException("I could not parse your solution")
             }
+        }
+        if(solution !is SolvedSolution) throw IllegalArgumentException("only solved solutions are accepted")
+        val puzzle = OmPuzzle.values().find { it.id == solution.puzzle } ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
+        val parts = linkedMapOf(
+            COST to solution.cost.toDouble(),
+            CYCLES to solution.cycles.toDouble(),
+            AREA to solution.area.toDouble(),
+            INSTRUCTIONS to solution.instructions.toDouble()
+        )
+        solution.getWidthAndHeight(puzzle)?.let { (width, height) ->
+            parts[WIDTH] = width
+            parts[HEIGHT] = height
+        }
+        val score = when (scoreIdentifier) {
+            is ScoreIdentifier.Part -> {
+                parts[scoreIdentifier.scorePart] = scoreIdentifier.value
+                OmScore(parts)
+            }
+            is ScoreIdentifier.Normal -> OmScore(
+                parts, when {
+                    solution.isOverlap(puzzle) -> OmModifier.OVERLAP
+                    solution.isTrackless() -> OmModifier.TRACKLESS
+                    else -> OmModifier.NORMAL
+                }
+            )
+        }
+        return OmSolution(puzzle, score, DslGenerator.toDsl(solution))
     }
 
     fun findScoreIdentifier(archive: IArchive): ScoreIdentifier {

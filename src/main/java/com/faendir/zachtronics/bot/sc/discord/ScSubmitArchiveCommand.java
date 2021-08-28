@@ -9,7 +9,6 @@ import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
-import discord4j.core.object.command.Interaction;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +18,6 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Component
 @RequiredArgsConstructor
@@ -37,8 +29,8 @@ public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzl
 
     @NotNull
     @Override
-    public Mono<Tuple3<ScPuzzle, ScRecord, ScSolution>> parseToPRS(@NotNull SlashCommandEvent interaction) {
-        return ScSubmitArchiveCommand$DataParser.parse(interaction).map(data -> {
+    public Mono<Tuple3<ScPuzzle, ScRecord, ScSolution>> parseToPRS(@NotNull SlashCommandEvent event) {
+        return ScSubmitArchiveCommand$DataParser.parse(event).map(data -> {
             ScSolution solution = ScSolution.makeSolution(data.puzzle, data.score, data.export);
             ScRecord record = new ScRecord(solution.getScore(), data.author, data.video, false);
             return Tuples.of(solution.getPuzzle(), record, solution);

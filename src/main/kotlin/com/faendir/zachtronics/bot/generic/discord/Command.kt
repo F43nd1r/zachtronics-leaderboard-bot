@@ -12,7 +12,7 @@ interface Command {
 
     val isReadOnly: Boolean
 
-    fun handle(interaction: SlashCommandEvent): Mono<MultipartRequest<WebhookExecuteRequest>>
+    fun handle(event: SlashCommandEvent): Mono<MultipartRequest<WebhookExecuteRequest>>
 
     val data: ApplicationCommandOptionData
 }

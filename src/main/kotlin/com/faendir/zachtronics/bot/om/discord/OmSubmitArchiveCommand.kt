@@ -10,6 +10,8 @@ import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmSolution
 import discord4j.core.event.domain.interaction.SlashCommandEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
+import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.reactor.mono
 import org.springframework.stereotype.Component
 import reactor.util.function.Tuples
 
@@ -19,17 +21,15 @@ class OmSubmitArchiveCommand(override val archiveCommand: OmArchiveCommand, over
 
     override fun buildData(): ApplicationCommandOptionData = SubmitArchiveParser.buildData()
 
-    override fun parseToPRS(interaction: SlashCommandEvent) =
-        SubmitArchiveParser.parse(interaction).flatMap { submitArchive ->
-            archiveCommand.parseSolution(archiveCommand.findScoreIdentifier(submitArchive), submitArchive.solution)
-                .map { solution ->
-                    Tuples.of(
-                        solution.puzzle,
-                        OmRecord(solution.score, submitArchive.gif, interaction.interaction.user.username),
-                        solution
-                    )
-                }
-        }
+    override fun parseToPRS(event: SlashCommandEvent) = mono {
+        val submitArchive = SubmitArchiveParser.parse(event).awaitSingle()
+        val solution = archiveCommand.parseSolution(archiveCommand.findScoreIdentifier(submitArchive), submitArchive.solution)
+        Tuples.of(
+            solution.puzzle,
+            OmRecord(solution.score, submitArchive.gif, event.interaction.user.username),
+            solution
+        )
+    }
 }
 
 @ApplicationCommand(description = "Submit and archive a solution", subCommand = true)

@@ -9,7 +9,6 @@ import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
-import discord4j.core.object.command.Interaction;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
 import lombok.NonNull;
@@ -31,8 +30,8 @@ public class ScSubmitOnlyScoreCommand extends AbstractSubmitArchiveCommand<ScPuz
 
     @NotNull
     @Override
-    public Mono<Tuple3<ScPuzzle, ScRecord, ScSolution>> parseToPRS(@NotNull SlashCommandEvent interaction) {
-        return ScSubmitOnlyScoreCommand$DataParser.parse(interaction).map(data -> {
+    public Mono<Tuple3<ScPuzzle, ScRecord, ScSolution>> parseToPRS(@NotNull SlashCommandEvent event) {
+        return ScSubmitOnlyScoreCommand$DataParser.parse(event).map(data -> {
             ScSolution solution = new ScSolution(data.puzzle, data.score);
             ScRecord record = new ScRecord(solution.getScore(), data.author, data.video, false);
             return Tuples.of(solution.getPuzzle(), record, solution);

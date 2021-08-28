@@ -3,6 +3,7 @@ package com.faendir.zachtronics.bot.om.archive
 import com.faendir.zachtronics.bot.main.git.GitRepository
 import com.faendir.zachtronics.bot.generic.archive.Archive
 import com.faendir.zachtronics.bot.om.model.*
+import kotlinx.coroutines.reactor.mono
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
@@ -27,8 +28,8 @@ class OmArchive(@Qualifier("omArchiveRepository") private val gitRepo: GitReposi
         }
     }*/
 
-    override fun archive(solution: OmSolution): Mono<Pair<String,String>> {
-        return gitRepo.access {
+    override fun archive(solution: OmSolution): Mono<Pair<String,String>>  = mono {
+        gitRepo.kAccess {
             val dir = getPuzzleDir(solution.puzzle)
             val changed = OmCategory.values().filter { it.supportsPuzzle(solution.puzzle) && it.supportsScore(solution.score) }.filter { category ->
                 val oldFile = dir.list()?.find { it.startsWith(category.displayName) }

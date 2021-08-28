@@ -9,6 +9,8 @@ import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.utils.plusIf
+import kotlinx.coroutines.reactor.mono
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import reactor.core.publisher.Mono
@@ -30,21 +32,23 @@ abstract class AbstractOmJsonLeaderboard<J>(
 
     @PostConstruct
     fun onStartUp() {
-        gitRepo.access {
-            directoryCategories.forEach { (dirName, categories) ->
-                val dir = File(repo, dirName)
-                File(dir, scoreFileName).takeIf { it.exists() }?.let { file ->
-                    updatePage(dir, categories, Json.decodeFromString(serializer, file.readText()))
+        runBlocking {
+            gitRepo.kAccess {
+                directoryCategories.forEach { (dirName, categories) ->
+                    val dir = File(repo, dirName)
+                    File(dir, scoreFileName).takeIf { it.exists() }?.let { file ->
+                        updatePage(dir, categories, Json.decodeFromString(serializer, file.readText()))
+                    }
+                }
+                if (status().run { added.isNotEmpty() || changed.isNotEmpty() }) {
+                    commitAndPush("Update page formatting")
                 }
             }
-            if (status().run { added.isNotEmpty() || changed.isNotEmpty() }) {
-                commitAndPush("Update page formatting")
-            }
-        }.block()
+        }
     }
 
-    override fun update(puzzle: OmPuzzle, record: OmRecord): Mono<UpdateResult> {
-        return gitRepo.access {
+    override fun update(puzzle: OmPuzzle, record: OmRecord): Mono<UpdateResult> = mono {
+        gitRepo.kAccess {
             val betterExists = mutableMapOf<OmCategory, OmScore>()
             val success = mutableMapOf<OmCategory, OmScore?>()
             val rehostedLink by lazy { imgurService.tryRehost(record.link) }
@@ -91,14 +95,14 @@ abstract class AbstractOmJsonLeaderboard<J>(
         }
     }
 
-    override fun get(puzzle: OmPuzzle, category: OmCategory): Mono<OmRecord> {
-        return gitRepo.access {
+    override fun get(puzzle: OmPuzzle, category: OmCategory): Mono<OmRecord> = mono {
+        gitRepo.kAccess {
             getRecords(category)?.getRecord(puzzle, category)
         }
     }
 
-    override fun getAll(puzzle: OmPuzzle, categories: Collection<OmCategory>): Mono<Map<OmCategory, OmRecord>> {
-        return gitRepo.access {
+    override fun getAll(puzzle: OmPuzzle, categories: Collection<OmCategory>): Mono<Map<OmCategory, OmRecord>> = mono {
+        gitRepo.kAccess {
             categories.groupBy { category -> directoryCategories.asIterable().find { it.value.contains(category) }?.key }
                 .flatMap { (dirName, categories) ->
                     if (dirName != null) {

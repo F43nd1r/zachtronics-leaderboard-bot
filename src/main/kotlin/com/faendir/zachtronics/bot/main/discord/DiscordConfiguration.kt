@@ -14,16 +14,12 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class DiscordConfiguration {
-    companion object {
-        private val logger = LoggerFactory.getLogger(DiscordService::class.java)
-    }
 
     @Bean
     fun discordClient(discordProperties: DiscordProperties): GatewayDiscordClient = DiscordClientBuilder.create(discordProperties.token)
         .build()
         .gateway()
         .setInitialPresence { ClientPresence.online() }
-        .setEnabledIntents(IntentSet.of(Intent.DIRECT_MESSAGES, Intent.GUILD_MESSAGES))
         .login()
         .block()!!
 }

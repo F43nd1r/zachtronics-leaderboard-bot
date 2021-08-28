@@ -1,6 +1,8 @@
 package com.faendir.zachtronics.bot.utils
 
 import com.faendir.zachtronics.bot.model.Puzzle
+import discord4j.discordjson.json.MessageSendRequestBase
+import discord4j.rest.util.MultipartRequest
 
 inline fun <T, R> Collection<T>.ifNotEmpty(block: (Collection<T>) -> R): R? = takeIf { it.isNotEmpty() }?.let(block)
 
@@ -46,3 +48,5 @@ fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> 
             true
         }
 }
+
+fun <T : MessageSendRequestBase> T.asMultipartRequest() = MultipartRequest.ofRequest(this)

@@ -7,26 +7,22 @@ import com.faendir.zachtronics.bot.main.reddit.Subreddit
 import com.faendir.zachtronics.bot.model.Leaderboard
 import com.faendir.zachtronics.bot.model.UpdateResult
 import com.faendir.zachtronics.bot.om.model.*
-import com.faendir.zachtronics.bot.utils.*
+import com.faendir.zachtronics.bot.utils.DateSerializer
+import com.faendir.zachtronics.bot.utils.Forest
+import com.faendir.zachtronics.bot.utils.filterIsInstance
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.channel.MessageChannel
+import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toFlux
-import reactor.kotlin.core.publisher.toMono
-import reactor.kotlin.core.util.function.component1
-import reactor.kotlin.core.util.function.component2
-import reactor.kotlin.core.util.function.component3
-import reactor.util.function.Tuples
 import java.io.File
 import java.time.Instant
 import java.util.*
-import kotlin.streams.asStream
+import javax.annotation.PostConstruct
 
 @Service
 @EnableScheduling
@@ -46,8 +42,11 @@ class OmRedditPostScraper(
 
     private val moderators by lazy { redditService.getModerators(Subreddit.OPUS_MAGNUM) }
 
-    init {
-        gitRepo.access { trustedUsers = File(repo, trustFile).readLines().filter { it.isNotBlank() }.map { it.trim() } }.block()
+    @PostConstruct
+    fun init() {
+        runBlocking {
+            gitRepo.kAccess { trustedUsers = File(repo, trustFile).readLines().filter { it.isNotBlank() }.map { it.trim() } }
+        }
     }
 
     /*@PostConstruct
@@ -88,104 +87,92 @@ class OmRedditPostScraper(
 
     @Scheduled(fixedRate = 1000L * 60 * 60)
     fun pullFromReddit() {
-        val now = Instant.now() //capture timestamp before processing
-        gitRepo.access { File(repo, timestampFile).takeIf { it.exists() }?.readText() }
-            .map { Json.decodeFromString(DateSerializer, it) }
-            .flatMap { lastUpdate ->
-                val comments = redditService.findCommentsOnPost(Subreddit.OPUS_MAGNUM, "official record submission thread")
-                Flux.fromStream(comments.walkTrees().asStream())
-                    .flatMap { comment -> handleComment(lastUpdate, comments, comment) }
-                    .collectList()
-                    .flatMap { list ->
-                        val hasNewComment = list.any { it }
-                        if (hasNewComment) {
-                            gitRepo.access {
-                                val timestamp = File(repo, timestampFile)
-                                timestamp.writeText(Json.encodeToString(DateSerializer, Date.from(now)))
-                                add(timestamp)
-                                commitAndPush("timestamp update")
-                            }
-                        } else {
-                            Mono.empty()
-                        }
-                    }
+        runBlocking {
+            val now = Instant.now() //capture timestamp before processing
+            val oldTimestamp = gitRepo.kAccess { File(repo, timestampFile).takeIf { it.exists() }?.readText() }
+            val lastUpdate = oldTimestamp?.let { Json.decodeFromString(DateSerializer, it) }
+            val comments = redditService.findCommentsOnPost(Subreddit.OPUS_MAGNUM, "official record submission thread")
+            val hasNewComments = comments.walkTrees().asIterable().map { comment -> handleComment(lastUpdate, comments, comment) }
+            if (hasNewComments.any { it }) {
+                gitRepo.kAccess {
+                    val timestamp = File(repo, timestampFile)
+                    timestamp.writeText(Json.encodeToString(DateSerializer, Date.from(now)))
+                    add(timestamp)
+                    commitAndPush("timestamp update")
+                }
             }
-            .subscribe()
-    }
-
-    internal fun handleComment(lastUpdate: Date?, comments: Forest<Comment>, comment: Comment): Mono<Boolean> {
-        return if (lastUpdate == null || (comment.edited ?: comment.created).after(lastUpdate)) {
-            Mono.fromCallable<String> { comment.body }.flatMap { body ->
-                if (body != "[deleted]") {
-                    Mono.`when`(when {
-                        trustedUsers.contains(comment.author) -> parseComment(comment)
-                        body.lines().any { mainRegex.matches(it) } -> Mono.fromCallable {
-                            redditService.reply(
-                                comment,
-                                "[BOT] sorry, you're not a trusted user. Wait for a moderator to reply with `!trust-score` or `!trust-user`."
-                            )
-                        }
-                        else -> Mono.empty()
-                    }, when {
-                        body.trim() == "!trust-user" && moderators.contains(comment.author) -> getNonBotParentComment(comments, comment).map { trust ->
-                            parseComment(trust).and {
-                                trustedUsers = trustedUsers + trust.author
-                                gitRepo.access {
-                                    val file = File(repo, trustFile)
-                                    file.appendText("\n${trust.author}\n")
-                                    add(file)
-                                    commitAndPush("added trusted user \"${trust.author}\"")
-                                }
-                            }
-                        }
-                        body.trim() == "!trust-score" && moderators.contains(comment.author) -> getNonBotParentComment(
-                            comments,
-                            comment
-                        ).map { parseComment(it) }
-                        else -> Mono.empty()
-                    })
-                } else {
-                    Mono.empty()
-                }.then(true.toMono())
-            }
-        } else {
-            false.toMono()
         }
     }
 
-    private fun getNonBotParentComment(forest: Forest<Comment>, commentNode: Comment): Mono<Comment> {
-        return forest.toMono().kMapNotNull { it.parentOf(commentNode) }.mapNotNull { if (it.author == redditService.myUsername()) forest.parentOf(it) else it }
+    internal suspend fun handleComment(lastUpdate: Date?, comments: Forest<Comment>, comment: Comment): Boolean {
+        val isNewOrUpdated = lastUpdate == null || (comment.edited ?: comment.created).after(lastUpdate)
+        if (isNewOrUpdated) {
+            val body = comment.body
+            if (body != null && body != "[deleted]") {
+                when {
+                    trustedUsers.contains(comment.author) -> parseComment(comment)
+                    body.lines().any { mainRegex.matches(it) } ->
+                        redditService.reply(
+                            comment,
+                            "[BOT] sorry, you're not a trusted user. Wait for a moderator to reply with `!trust-score` or `!trust-user`."
+                        )
+                }
+                when {
+                    body.trim() == "!trust-user" && moderators.contains(comment.author) -> {
+                        val trust = getNonBotParentComment(comments, comment)
+                        if (trust != null) {
+                            parseComment(trust)
+                            trustedUsers = trustedUsers + trust.author
+                            gitRepo.kAccess {
+                                val file = File(repo, trustFile)
+                                file.appendText("\n${trust.author}\n")
+                                add(file)
+                                commitAndPush("added trusted user \"${trust.author}\"")
+                            }
+                        }
+                    }
+                    body.trim() == "!trust-score" && moderators.contains(comment.author) -> getNonBotParentComment(
+                        comments,
+                        comment
+                    )?.let { parseComment(it) }
+                }
+            }
+        }
+        return isNewOrUpdated
     }
 
-    private fun parseComment(comment: Comment): Mono<Void> {
-        return if (comment.body != null) {
-            Flux.fromIterable(comment.body.lines())
-                .kMapNotNull { mainRegex.matchEntire(it) }
-                .map { Tuples.of(OmPuzzle.parse(it.groups["puzzle"]!!.value), it.groups["scores"]!!.value) }
-                .flatMapIterable { (puzzle, scores) -> scoreRegex.findAll(scores).map { Tuples.of(puzzle, it) }.asIterable() }
-                .map { (puzzle, subCommand) ->
-                    Tuples.of(puzzle, OmScore.parse(puzzle, subCommand.groups["score"]!!.value), subCommand.groups["link"]!!.value)
-                }.flatMap { (puzzle, score, link) ->
-                    leaderboards.toFlux().flatMap { it.update(puzzle, OmRecord(score, link, comment.author)) }.collectList()
-                        .map { results: List<UpdateResult> ->
-                            val successes = results.filterIsInstance<UpdateResult.Success>()
-                            if (successes.isNotEmpty()) {
-                                sendDiscordMessage(
-                                    "opus-magnum", "New record by ${comment.author} on reddit: ${puzzle.displayName} ${
-                                    successes.flatMap { it.oldScores.keys }.map { it.displayName }
-                                } ${score.toDisplayString()} (previously ${
-                                    successes.flatMap { it.oldScores.entries }
-                                        .joinToString { "`${it.key.displayName} ${it.value?.toDisplayString() ?: "none"}`" }
-                                }) $link")
-                            }
-                        }.map { true }
-                        .defaultIfEmpty(false)
-                }.collectList()
-                .map { it.any() }
-                .ifTrue { redditService.reply(comment, "[BOT] thanks, your submission(s) have been recorded!") }
-                .then()
-        } else {
-            Mono.empty()
+    private fun getNonBotParentComment(forest: Forest<Comment>, commentNode: Comment): Comment? {
+        return forest.parentOf(commentNode)?.let { if (it.author == redditService.myUsername()) forest.parentOf(it) else it }
+    }
+
+    private suspend fun parseComment(comment: Comment) {
+        if (comment.body != null) {
+            val results = comment.body.lines()
+                .mapNotNull { mainRegex.matchEntire(it) }
+                .flatMap {
+                    val puzzle = OmPuzzle.parse(it.groups["puzzle"]!!.value)
+                    val scores = it.groups["scores"]!!.value
+                    scoreRegex.findAll(scores).map { matchResult -> puzzle to matchResult }
+                }.map { (puzzle, subCommand) ->
+                    val score = OmScore.parse(puzzle, subCommand.groups["score"]!!.value)
+                    val link = subCommand.groups["link"]!!.value
+                    val results = leaderboards.map { it.update(puzzle, OmRecord(score, link, comment.author)).awaitSingle() }
+                    val successes = results.filterIsInstance<UpdateResult.Success>()
+                    val hasSuccess = successes.isNotEmpty()
+                    if (hasSuccess) {
+                        sendDiscordMessage(
+                            "opus-magnum", "New record by ${comment.author} on reddit: ${puzzle.displayName} ${
+                                successes.flatMap { it.oldScores.keys }.map { it.displayName }
+                            } ${score.toDisplayString()} (previously ${
+                                successes.flatMap { it.oldScores.entries }
+                                    .joinToString { "`${it.key.displayName} ${it.value?.toDisplayString() ?: "none"}`" }
+                            }) $link")
+                    }
+                    hasSuccess
+                }
+            if (results.any { it }) {
+                redditService.reply(comment, "[BOT] thanks, your submission(s) have been recorded!")
+            }
         }
     }
 
