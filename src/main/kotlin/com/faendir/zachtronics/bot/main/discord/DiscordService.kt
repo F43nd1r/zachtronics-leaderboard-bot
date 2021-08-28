@@ -56,15 +56,20 @@ class DiscordService(
                     .onErrorResume { Mono.empty() }
             }
             .subscribe()
-        discordClient.on(SlashCommandEvent::class.java).flatMap {
-            logger.info("Acknowledging ${it.commandName} by ${it.interaction.user.username}")
-            it.acknowledge()
+        discordClient.on(SlashCommandEvent::class.java).flatMap { event ->
+            logger.info("Acknowledging ${event.commandName} by ${event.interaction.user.username}")
+            event.acknowledge()
                 .then(Mono.fromCallable {
-                    logger.info("Acknowledged ${it.commandName} by ${it.interaction.user.username}")
+                    logger.info("Acknowledged ${event.commandName} by ${event.interaction.user.username}")
                 })
-                .then(handleCommand(it))
+                .onErrorResume {
+                    Mono.fromCallable {
+                        logger.warn("Acknowledge failed for ${event.commandName} by ${event.interaction.user.username} - processing anyways", it)
+                    }
+                }
+                .then(handleCommand(event))
                 .then(Mono.fromCallable {
-                    logger.info("Handled ${it.commandName} by ${it.interaction.user.username}")
+                    logger.info("Handled ${event.commandName} by ${event.interaction.user.username}")
                 })
         }.onErrorContinue { throwable, _ ->
             logger.error("Fatal error in slash command - shutting down: ", throwable)
