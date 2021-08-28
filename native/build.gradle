@@ -64,16 +64,14 @@ java {
     targetCompatibility = JavaVersion.VERSION_11
 }
 
-processResources {
-    dependsOn "zachtronicsjniSharedLibrary"
-    from("$buildDir/libs/zachtronicsjni/") {
-        include 'shared/*.so'
-    }
-}
-
 test {
     useJUnitPlatform()
 }
 
-test.dependsOn "zachtronicsjniSharedLibrary"
-
+afterEvaluate {
+    def so = tasks.findByName("zachtronicsjniSharedLibrary")
+    if(so) {
+        processResources.dependsOn so
+        test.dependsOn so
+    }
+}
