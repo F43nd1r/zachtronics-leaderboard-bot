@@ -9,7 +9,10 @@ import discord4j.core.`object`.presence.ClientPresence
 import discord4j.core.event.domain.interaction.SlashCommandEvent
 import discord4j.discordjson.json.ApplicationCommandRequest
 import org.slf4j.LoggerFactory
+import org.springframework.boot.ExitCodeGenerator
+import org.springframework.boot.SpringApplication
 import org.springframework.boot.info.GitProperties
+import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -20,7 +23,12 @@ import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 
 @Service
-class DiscordService(private val discordClient: GatewayDiscordClient, private val gameContexts: List<GameContext>, private val gitProperties: GitProperties) {
+class DiscordService(
+    private val discordClient: GatewayDiscordClient,
+    private val gameContexts: List<GameContext>,
+    private val gitProperties: GitProperties,
+    private val applicationContext: ApplicationContext
+) {
     companion object {
         private val logger = LoggerFactory.getLogger(DiscordService::class.java)
     }
@@ -49,6 +57,11 @@ class DiscordService(private val discordClient: GatewayDiscordClient, private va
             .subscribe()
         discordClient.on(SlashCommandEvent::class.java).flatMap {
             it.acknowledge().then(handleCommand(it))
+        }.onErrorContinue { throwable, _ ->
+            logger.error("Fatal error in slash command - shutting down: ", throwable)
+            SpringApplication.exit(applicationContext, object : ExitCodeGenerator {
+                override fun getExitCode(): Int = 1
+            })
         }.subscribe()
         logger.info("Connected to discord with version ${gitProperties.shortCommitId}")
         discordClient.updatePresence(ClientPresence.online(ClientActivity.playing(gitProperties.shortCommitId))).subscribe()
