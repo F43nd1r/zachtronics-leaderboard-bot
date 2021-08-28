@@ -7,6 +7,7 @@ import discord4j.core.`object`.reaction.ReactionEmoji
 import discord4j.core.event.domain.interaction.SlashCommandEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.withContext
 import reactor.core.publisher.Flux
@@ -28,7 +29,7 @@ class LinkConverter : OptionConverter<String> {
         val link = if (Regex("m\\d+").matches(input)) {
             val num = input.removePrefix("m").toInt()
             val message = messages.elementAt(num - 1).awaitSingle()
-            message.attachments.firstOrNull()?.url?.also { message.addReaction(ReactionEmoji.unicode("\uD83D\uDC4D"/* 👍 */)).awaitSingle() }
+            message.attachments.firstOrNull()?.url?.also { message.addReaction(ReactionEmoji.unicode("\uD83D\uDC4D"/* 👍 */)).awaitSingleOrNull() }
                 ?: throw IllegalArgumentException(
                     "https://discord.com/channels/${
                         message.guild.awaitSingle().id.asLong().toString().ifEmpty { "@me" }
