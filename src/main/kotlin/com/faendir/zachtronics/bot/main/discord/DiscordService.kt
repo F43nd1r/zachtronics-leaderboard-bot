@@ -8,6 +8,7 @@ import discord4j.core.`object`.presence.ClientPresence
 import discord4j.core.event.domain.interaction.SlashCommandEvent
 import discord4j.discordjson.json.ApplicationCommandRequest
 import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import org.slf4j.LoggerFactory
 import org.springframework.boot.SpringApplication
@@ -58,9 +59,9 @@ class DiscordService(
         discordClient.on(SlashCommandEvent::class.java).flatMap { event ->
             mono {
                 logger.info("Acknowledging ${event.commandName} by ${event.interaction.user.username}")
-                event.acknowledge().awaitSingle()
+                event.acknowledge().awaitSingleOrNull()
                 logger.info("Acknowledged ${event.commandName} by ${event.interaction.user.username}")
-                handleCommand(event).awaitSingle()
+                handleCommand(event).awaitSingleOrNull()
                 logger.info("Handled ${event.commandName} by ${event.interaction.user.username}")
             }
         }.onErrorContinue { throwable, _ ->
