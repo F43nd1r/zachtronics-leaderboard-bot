@@ -65,20 +65,13 @@ java {
 }
 
 processResources {
-    dependsOn "zachtronicsjniSharedLibrary"
+    dependsOn ":native:zachtronicsjniSharedLibrary"
     from("$buildDir/libs/zachtronicsjni/") {
         include 'shared/*.so'
     }
 }
 
 test {
+    dependsOn "zachtronicsjniSharedLibrary"
     useJUnitPlatform()
-}
-
-afterEvaluate {
-    def so = tasks.findByName("zachtronicsjniSharedLibrary")
-    if(so) {
-        processResources.dependsOn so
-        test.dependsOn so
-    }
 }
