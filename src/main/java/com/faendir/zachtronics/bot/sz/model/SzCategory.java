@@ -26,8 +26,6 @@ public enum SzCategory implements Category {
     @Getter
     private final String displayName;
     @Getter
-    private final String contentDescription = "c/p/l";
-    @Getter
     private final Comparator<SzScore> scoreComparator;
     private final Set<SzType> supportedTypes = Collections.singleton(STANDARD);
     @Getter
