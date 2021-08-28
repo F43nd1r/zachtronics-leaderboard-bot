@@ -21,6 +21,7 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
+import kotlin.system.exitProcess
 
 @Service
 class DiscordService(
@@ -62,6 +63,8 @@ class DiscordService(
             SpringApplication.exit(applicationContext, object : ExitCodeGenerator {
                 override fun getExitCode(): Int = 1
             })
+            Thread.sleep(5000)
+            exitProcess(1)
         }.subscribe()
         logger.info("Connected to discord with version ${gitProperties.shortCommitId}")
         discordClient.updatePresence(ClientPresence.online(ClientActivity.playing(gitProperties.shortCommitId))).subscribe()
