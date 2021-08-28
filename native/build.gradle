@@ -65,6 +65,7 @@ java {
 }
 
 processResources {
+    dependsOn "zachtronicsjniSharedLibrary"
     from("$buildDir/libs/zachtronicsjni/") {
         include 'shared/*.so'
     }
