@@ -7,7 +7,6 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
-import discord4j.core.object.command.Interaction;
 import discord4j.discordjson.json.WebhookExecuteRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.MultipartRequest;
@@ -81,9 +80,8 @@ public class CommandTest {
     @Test
     public void testArchive() {
         // we start at 100/100/100
-        Map<String, String> args = Map.of("puzzle", "Of Pancakes",
-                                          "score", "45/1/14",
-                                          "link", "https://pastebin.com/19smCuS8"); // valid 45/1/14
+        Map<String, String> args = Map.of("score", "45/1/14",
+                                          "export", "https://pastebin.com/19smCuS8"); // valid 45/1/14
         String result = runCommand("archive", args);
         assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14`"));
     }

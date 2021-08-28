@@ -56,6 +56,6 @@ public class ScArchiveTest {
     }
 
     private String doArchiveScoreContent(ScScore score, String content) {
-        return archive.archive(new ScSolution(null, score, content)).block().getSecond();
+        return archive.archive(new ScSolution(score, content)).block().getSecond();
     }
 }

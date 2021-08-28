@@ -19,7 +19,6 @@ import com.roxstudio.utils.CUrl
 import discord4j.core.event.domain.interaction.SlashCommandEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.withContext
@@ -28,7 +27,8 @@ import okio.sink
 import okio.source
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import reactor.core.publisher.Mono
+import reactor.core.publisher.Flux
+import reactor.kotlin.core.publisher.toFlux
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.util.*
@@ -39,10 +39,10 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
 
     override fun buildData(): ApplicationCommandOptionData = ArchiveParser.buildData()
 
-    override fun parseSolution(interaction: SlashCommandEvent): Mono<OmSolution> = mono {
+    override fun parseSolutions(interaction: SlashCommandEvent): Flux<OmSolution> = mono {
         val command = ArchiveParser.parse(interaction).awaitSingle()
         parseSolution(findScoreIdentifier(command), command.solution)
-    }
+    }.toFlux()
 
     suspend fun parseSolution(scoreIdentifier: ScoreIdentifier, link: String): OmSolution {
         val solution = withContext(Dispatchers.IO) {

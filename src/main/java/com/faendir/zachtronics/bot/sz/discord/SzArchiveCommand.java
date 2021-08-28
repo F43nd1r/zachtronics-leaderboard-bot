@@ -5,17 +5,15 @@ import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.zachtronics.bot.generic.discord.AbstractArchiveCommand;
 import com.faendir.zachtronics.bot.generic.discord.LinkConverter;
 import com.faendir.zachtronics.bot.sz.archive.SzArchive;
-import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzSolution;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
-import discord4j.core.object.command.Interaction;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +28,7 @@ public class SzArchiveCommand extends AbstractArchiveCommand<SzSolution> {
 
     @NotNull
     @Override
-    public Mono<SzSolution> parseSolution(@NotNull SlashCommandEvent interaction) {
+    public Flux<SzSolution> parseSolutions(@NotNull SlashCommandEvent interaction) {
         return SzArchiveCommand$DataParser.parse(interaction).map(data -> {
             SzSolution solution;
             try (InputStream is = new URL(data.link).openStream()) {
@@ -44,7 +42,7 @@ public class SzArchiveCommand extends AbstractArchiveCommand<SzSolution> {
                 throw new IllegalArgumentException("Could not parse a valid solution");
             }
             return solution;
-        });
+        }).flux();
     }
 
     @NotNull
@@ -56,11 +54,9 @@ public class SzArchiveCommand extends AbstractArchiveCommand<SzSolution> {
     @ApplicationCommand(name = "archive", subCommand = true)
     @Value
     public static class Data {
-        @NotNull SzPuzzle puzzle;
         @NotNull String link;
 
-        public Data(@Converter(SzPuzzleConverter.class) @NotNull SzPuzzle puzzle, @NotNull @Converter(LinkConverter.class) String link) {
-            this.puzzle = puzzle;
+        public Data(@NotNull @Converter(LinkConverter.class) String link) {
             this.link = link;
         }
     }

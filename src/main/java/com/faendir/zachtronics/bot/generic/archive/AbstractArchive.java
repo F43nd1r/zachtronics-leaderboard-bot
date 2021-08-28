@@ -9,6 +9,8 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -20,6 +22,14 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
     @Override
     public Mono<Pair<String, String>> archive(@NotNull S solution) {
         return getGitRepo().access(a -> performArchive(a, solution));
+    }
+
+    @NotNull
+    @Override
+    public Mono<List<Pair<String, String>>> archiveAll(@NotNull Collection<? extends S> solution) {
+        return getGitRepo().access(a -> solution.stream()
+                                                .map(s -> performArchive(a, s))
+                                                .collect(Collectors.toList()));
     }
 
     protected abstract Path relativePuzzlePath(@NotNull S solution);
