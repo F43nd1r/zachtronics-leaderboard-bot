@@ -57,7 +57,15 @@ class DiscordService(
             }
             .subscribe()
         discordClient.on(SlashCommandEvent::class.java).flatMap {
-            it.acknowledge().then(handleCommand(it))
+            logger.info("Acknowledging ${it.commandName} by ${it.interaction.user.username}")
+            it.acknowledge()
+                .then(Mono.fromCallable {
+                    logger.info("Acknowledged ${it.commandName} by ${it.interaction.user.username}")
+                })
+                .then(handleCommand(it))
+                .then(Mono.fromCallable {
+                    logger.info("Handled ${it.commandName} by ${it.interaction.user.username}")
+                })
         }.onErrorContinue { throwable, _ ->
             logger.error("Fatal error in slash command - shutting down: ", throwable)
             SpringApplication.exit(applicationContext, object : ExitCodeGenerator {
