@@ -173,7 +173,8 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                             row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory));
                         }
                         else {
-                            if (thisCategory.supportsScore(record.getScore()))
+                            if (blockRecords[i] != ScRecord.IMPOSSIBLE_CATEGORY &&
+                                thisCategory.supportsScore(record.getScore()))
                                 relatedScores.put(thisCategory, currentScore);
                             row.append(prevElem);
                         }
