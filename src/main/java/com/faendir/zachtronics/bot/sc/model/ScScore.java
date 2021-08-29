@@ -38,9 +38,10 @@ public class ScScore implements Score {
 
     /** ccc/r/ss */
     public static final Pattern REGEX_SIMPLE_SCORE = Pattern.compile(
-            "\\**(?<cycles>[\\d,]+)\\**(?<oldRNG>\\\\\\*)?/\\**(?<reactors>\\d+)\\**/\\**(?<symbols>\\d+)\\**");
+            "\\**(?<cycles>[\\d,]+)\\**(?<oldRNG>\\\\\\*)?[/-]\\**(?<reactors>\\d+)\\**[/-]\\**(?<symbols>\\d+)\\**");
 
     /** we assume m matches */
+    @NotNull
     public static ScScore parseSimpleScore(@NotNull Matcher m) {
         int cycles = Integer.parseInt(m.group("cycles").replace(",", ""));
         int reactors = Integer.parseInt(m.group("reactors"));
@@ -50,7 +51,7 @@ public class ScScore implements Score {
 
     /** ccc/r/ss[/BP] */
     public static final Pattern REGEX_BP_SCORE = Pattern
-            .compile(REGEX_SIMPLE_SCORE + "(?:/(?<flags>B?P?))?", Pattern.CASE_INSENSITIVE);
+            .compile(REGEX_SIMPLE_SCORE + "(?:[/-](?<flags>B?P?))?", Pattern.CASE_INSENSITIVE);
 
     @Nullable
     public static ScScore parseBPScore(@NotNull String string) {
