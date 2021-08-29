@@ -31,6 +31,7 @@ dependencies {
     implementation("com.github.rockswang:java-curl:1.2.2.2")
     implementation("com.faendir.jraw:JRAW:1.2.0")
     implementation("net.bramp.ffmpeg:ffmpeg:0.6.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.12.5")
     implementation("com.faendir.om:dsl:1.2.6")
     implementation("com.faendir.om:parser:2.1.8")
     implementation("com.faendir.discord4j-command-parser:annotations:1.4.0")
@@ -65,13 +66,9 @@ tasks.withType<Test> {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "16"
         freeCompilerArgs = listOf("-Xjvm-default=all", "-Xjsr305=strict")
     }
-}
-
-tasks.getByName<BootJar>("bootJar") {
-    layered()
 }
 
 docker {
@@ -81,8 +78,8 @@ docker {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
 }
 
 sourceSets {

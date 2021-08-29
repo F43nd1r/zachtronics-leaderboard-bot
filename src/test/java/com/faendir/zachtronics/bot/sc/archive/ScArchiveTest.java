@@ -25,7 +25,7 @@ public class ScArchiveTest {
         score.setBugged(false);
         assertEquals("", doArchiveScore(score)); // our score is a P, fail
         score.setPrecognitive(false);
-        assertEquals("", doArchiveScore(score)); // identical score, fail
+        assertNotEquals("", doArchiveScore(score)); // identical score, different content, accept
         score = new ScScore(10, 100, 1000);
         assertNotEquals("", doArchiveScore(score)); // new frontier piece
         score = new ScScore(1000, 100, 10);
@@ -52,10 +52,10 @@ public class ScArchiveTest {
     }
 
     private String doArchiveScore(ScScore score) {
-        return archive.archive(new ScSolution(ScPuzzle.research_example_1, score)).getSecond();
+        return archive.archive(new ScSolution(ScPuzzle.research_example_1, score, "")).getSecond();
     }
 
     private String doArchiveScoreContent(ScScore score, String content) {
-        return archive.archive(new ScSolution(score, content)).getSecond();
+        return archive.archive(ScSolution.fromContentNoValidation(content, null, score)).getSecond();
     }
 }

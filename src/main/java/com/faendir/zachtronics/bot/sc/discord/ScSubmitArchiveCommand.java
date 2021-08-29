@@ -29,7 +29,7 @@ public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzl
     @Override
     public Triple<ScPuzzle, ScRecord, ScSolution> parseToPRS(@NotNull SlashCommandEvent event) {
         Data data = ScSubmitArchiveCommand$DataParser.parse(event);
-        ScSolution solution = ScSolution.fromExportLink(data.export, data.score).get(0);
+        ScSolution solution = ScSolution.fromExportLink(data.export, data.puzzle, data.score).get(0);
         ScRecord record = new ScRecord(solution.getScore(), data.author, data.video, false);
         return new Triple<>(solution.getPuzzle(), record, solution);
     }
@@ -43,20 +43,20 @@ public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzl
     @ApplicationCommand(name = "submit-archive", subCommand = true)
     @Value
     public static class Data {
-        @NotNull
-        String video;
-        @NotNull
-        String export;
-        @NotNull
-        String author;
+        @NotNull String video;
+        @NotNull String export;
+        @NotNull String author;
+        ScPuzzle puzzle;
         ScScore score;
 
         public Data(@NotNull @Converter(LinkConverter.class) String video,
                     @NotNull @Converter(LinkConverter.class) String export, @NotNull String author,
+                    @Converter(ScPuzzleConverter.class) ScPuzzle puzzle,
                     @Converter(ScBPScoreConverter.class) ScScore score) {
             this.video = video;
             this.export = export;
             this.author = author;
+            this.puzzle = puzzle;
             this.score = score;
         }
     }

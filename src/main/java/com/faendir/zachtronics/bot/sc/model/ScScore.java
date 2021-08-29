@@ -16,6 +16,8 @@ import java.util.regex.Pattern;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class ScScore implements Score {
+    public static final ScScore INVALID_SCORE = new ScScore(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+
     private final int cycles;
     private final int reactors;
     private final int symbols;

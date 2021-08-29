@@ -1,6 +1,7 @@
 package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.Solution;
+import com.faendir.zachtronics.bot.sc.validator.SChem;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
@@ -10,55 +11,50 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /** Levels with a comma in their name aren't supported */
 @Value
 public class ScSolution implements Solution {
     @NotNull ScPuzzle puzzle;
     @NotNull ScScore score;
-    /** null content indicates a score-only solution */
-    @Nullable String content;
+    @NotNull String content;
 
-    public ScSolution(@Nullable ScScore score, @NotNull String content) {
+    @NotNull
+    public static ScSolution fromContentNoValidation(@NotNull String content, @Nullable ScPuzzle puzzle,
+                                                     @Nullable ScScore score) {
         Matcher m = Pattern.compile("^SOLUTION:(?<puzzle>[^,]+),[^,]+," +
-                                    "(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)(?:,.+)?(\r?\n)")
+                                    "(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)(?:,.+)?$", Pattern.MULTILINE)
                            .matcher(content);
         if (!m.find()) {
             throw new IllegalArgumentException("header");
         }
 
-        this.puzzle = ScPuzzle.DISPLAY_NAME_2_PUZZLE.get(m.group("puzzle"));
-        if (this.puzzle == null)
-            throw new IllegalArgumentException("puzzle");
+        ScPuzzle destPuzzle = Objects.requireNonNullElseGet(puzzle, () -> SpaceChem.parsePuzzle(m.group("puzzle")));
 
+        ScScore destScore;
         ScScore contentScore = ScScore.parseSimpleScore(m);
-        contentScore.setPrecognitive(!this.puzzle.isDeterministic());
+        contentScore.setPrecognitive(!destPuzzle.isDeterministic());
         if (score == null ||
             score.getCycles() != contentScore.getCycles() ||
             score.getReactors() != contentScore.getReactors() ||
             score.getSymbols() != contentScore.getSymbols()) {
             // if no given score or it doesn't match the solution metadata, ignore it
-            this.score = contentScore;
+            destScore = contentScore;
         }
         else {
-            this.score = score;
+            destScore = score;
         }
-        this.content = m.replaceFirst("SOLUTION:$1,Archiver,$2-$3-$4,Archived Solution$5");
-    }
+        content = m.replaceFirst("SOLUTION:$1,Archiver,$2-$3-$4,Archived Solution");
 
-    public ScSolution(@NotNull ScPuzzle puzzle, @NotNull ScScore score) {
-        this.puzzle = puzzle;
-        this.score = score;
-        this.content = null;
+        return new ScSolution(destPuzzle, destScore, content);
     }
 
     @NotNull
-    public static List<ScSolution> fromExportLink(@NotNull String exportLink, ScScore score) {
+    public static List<ScSolution> fromExportLink(@NotNull String exportLink, ScPuzzle puzzle, ScScore score) {
         String export;
         try (InputStream is = new URL(Utils.rawContentURL(exportLink)).openStream()) {
             export = new String(is.readAllBytes());
@@ -68,23 +64,6 @@ public class ScSolution implements Solution {
             throw new IllegalArgumentException("Couldn't read your solution");
         }
 
-        List<ScSolution> result = fromMultiContent(export, score);
-        if (result.isEmpty())
-            throw new IllegalArgumentException("Could not parse a valid solution");
-        return result;
-    }
-
-    @NotNull
-    public static List<ScSolution> fromMultiContent(@NotNull String export, ScScore score) {
-        // TODO use Stream#mapMulti in java 16
-        List<ScSolution> result = new ArrayList<>();
-        for (String content : export.split("(?=SOLUTION:)")) {
-            try {
-                result.add(new ScSolution(score, content));
-            } catch (IllegalArgumentException ignored) {
-
-            }
-        }
-        return result;
+        return SChem.validateMultiExport(export, puzzle, score);
     }
 }

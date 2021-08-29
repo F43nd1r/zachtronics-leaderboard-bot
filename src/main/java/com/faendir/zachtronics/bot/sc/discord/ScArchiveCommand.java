@@ -5,6 +5,7 @@ import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.zachtronics.bot.generic.discord.AbstractArchiveCommand;
 import com.faendir.zachtronics.bot.generic.discord.LinkConverter;
 import com.faendir.zachtronics.bot.sc.archive.ScArchive;
+import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
@@ -27,7 +28,7 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
     @Override
     public List<ScSolution> parseSolutions(@NotNull SlashCommandEvent interaction) {
         Data data = ScArchiveCommand$DataParser.parse(interaction);
-        return ScSolution.fromExportLink(data.export, data.score);
+        return ScSolution.fromExportLink(data.export, data.puzzle, data.score);
     }
 
     @NotNull
@@ -40,11 +41,14 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
     @Value
     public static class Data {
         @NotNull String export;
+        ScPuzzle puzzle;
         ScScore score;
 
         public Data(@NotNull @Converter(LinkConverter.class) String export,
+                    @Converter(ScPuzzleConverter.class) ScPuzzle puzzle,
                     @Converter(ScBPScoreConverter.class) ScScore score) {
             this.export = export;
+            this.puzzle = puzzle;
             this.score = score;
         }
     }

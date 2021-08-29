@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Value
 public class ScRecord implements Record {
-    public static final ScRecord IMPOSSIBLE_CATEGORY = new ScRecord(new ScScore(-1, -1, -1), "", "", false);
+    public static final ScRecord IMPOSSIBLE_CATEGORY = new ScRecord(ScScore.INVALID_SCORE, "", "", false);
 
     ScScore score;
     String author;

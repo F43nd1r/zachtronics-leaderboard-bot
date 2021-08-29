@@ -8,6 +8,7 @@ import discord4j.core.event.domain.interaction.SlashCommandEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import discord4j.discordjson.json.WebhookExecuteRequest;
+import discord4j.discordjson.possible.Possible;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.MultipartRequest;
 import org.jetbrains.annotations.NotNull;
@@ -68,16 +69,6 @@ public class CommandTest {
     }
 
     @Test
-    public void testSubmitOnlyScore() {
-        Map<String, String> args = Map.of("puzzle", "Tunnels I",
-                                          "score", "1/1/1",
-                                          "author", "testMan",
-                                          "video", "http://example.com");
-        String result = runCommand("submit-only-score", args);
-        assertTrue(result.contains("Tunnels I") && result.contains("1/1/1"));
-    }
-
-    @Test
     public void testArchiveOne() {
         // we start at 100/100/100
         Map<String, String> args = Map.of("score", "45/1/14",
@@ -91,18 +82,28 @@ public class CommandTest {
         // we start at 100/100/100
         Map<String, String> args = Map.of("export", "https://pastebin.com/kNnfTvMa"); // valid 45/1/14 and 115/1/6
         String result = runCommand("archive", args);
-        assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14/B`") &&
-                   result.contains("`115/1/6/B`"));
+        assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14`") &&
+                   result.contains("`115/1/6`"));
     }
 
     @Test
     public void testArchiveManyAndScore() {
-        // we start at 100/100/100
-        Map<String, String> args = Map.of("score", "45/1/14",
-                                          "export", "https://pastebin.com/kNnfTvMa"); // valid 45/1/14 and 115/1/6
+        // we start at 1000/1/1000
+        Map<String, String> args = Map.of("score", "136/1/27",
+                                          "export", "https://pastebin.com/y7hG42XL"); // valid 136/1/27 and 236/1/11
         String result = runCommand("archive", args);
-        assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14`") &&
-                   result.contains("`115/1/6/B`"));
+        assertTrue(result.contains("An Introduction to Sensing") && result.contains("`136/1/27`") &&
+                   result.contains("`236/1/11/P`"));
+    }
+
+    @Test
+    public void testArchiveBugged() {
+        // we start at 100/100/100
+        Map<String, String> args = Map.of("score", "50/1/50/B",
+                                          "export", "https://pastebin.com/19smCuS8"); // valid 45/1/14
+        String result = runCommand("archive", args);
+        // we "trick" the archive
+        assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14/B`"));
     }
 
     @NotNull
@@ -127,18 +128,22 @@ public class CommandTest {
 
         MultipartRequest<WebhookExecuteRequest> multipartRequest = commands.stream().filter(c -> c.getData().name().equals(commandName))
                 .findFirst().orElseThrow().handle(slashCommandEvent);
-        assert multipartRequest != null;
         WebhookExecuteRequest executeRequest = multipartRequest.getJsonPayload();
         assert executeRequest != null;
-        String result = Stream.concat(executeRequest.content().toOptional().stream(),
-                                      executeRequest.embeds().toOptional().stream().flatMap(l -> l.stream().flatMap(
-                                              e -> Stream.of(e.title().toOptional().stream(),
-                                                             e.description().toOptional().stream(),
+        String result = Stream.concat(stream(executeRequest.content()),
+                                      stream(executeRequest.embeds()).flatMap(l -> l.stream().flatMap(
+                                              e -> Stream.of(stream(e.title()),
+                                                             stream(e.description()),
                                                              e.fields().toOptional().orElse(Collections.emptyList())
-                                                              .stream().map(f -> f.name() + " " + f.value()))
+                                                              .stream().map(f -> f.name() + "\n" + f.value()))
                                                          .flatMap(Function.identity()))))
                               .collect(Collectors.joining("\n"));
         System.out.println(result);
         return result;
+    }
+
+    @NotNull
+    private static <T> Stream<T> stream(@NotNull Possible<T> p) {
+        return p.toOptional().stream();
     }
 }
