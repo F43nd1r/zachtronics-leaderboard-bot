@@ -38,13 +38,13 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
     @ApplicationCommand(name = "archive", subCommand = true)
     @Value
     public static class Data {
+        @NotNull String export;
         ScScore score;
-        String export;
 
-        public Data(@Converter(ScBPScoreConverter.class) ScScore score,
-                    @Converter(LinkConverter.class) String export) {
-            this.score = score;
+        public Data(@NotNull @Converter(LinkConverter.class) String export,
+                    @Converter(ScBPScoreConverter.class) ScScore score) {
             this.export = export;
+            this.score = score;
         }
     }
 }
