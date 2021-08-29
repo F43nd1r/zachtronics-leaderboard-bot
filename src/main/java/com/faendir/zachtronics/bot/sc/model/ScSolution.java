@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,17 +59,32 @@ public class ScSolution implements Solution {
 
     @NotNull
     public static List<ScSolution> fromExportLink(@NotNull String exportLink, ScScore score) {
+        String export;
         try (InputStream is = new URL(Utils.rawContentURL(exportLink)).openStream()) {
-            String export = new String(is.readAllBytes());
-            return Pattern.compile("(?=SOLUTION:)").splitAsStream(export)
-                          .map(content -> new ScSolution(score, content))
-                          .collect(Collectors.toList());
+            export = new String(is.readAllBytes());
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Could not parse your link");
         } catch (IOException e) {
             throw new IllegalArgumentException("Couldn't read your solution");
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Could not parse a valid solution");
         }
+
+        List<ScSolution> result = fromMultiContent(export, score);
+        if (result.isEmpty())
+            throw new IllegalArgumentException("Could not parse a valid solution");
+        return result;
+    }
+
+    @NotNull
+    public static List<ScSolution> fromMultiContent(@NotNull String export, ScScore score) {
+        // TODO use Stream#mapMulti in java 16
+        List<ScSolution> result = new ArrayList<>();
+        for (String content : export.split("(?=SOLUTION:)")) {
+            try {
+                result.add(new ScSolution(score, content));
+            } catch (IllegalArgumentException ignored) {
+
+            }
+        }
+        return result;
     }
 }

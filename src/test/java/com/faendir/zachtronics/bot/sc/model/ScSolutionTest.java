@@ -4,6 +4,8 @@ import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.sc.SpaceChemMarker;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @BotTest(SpaceChemMarker.SpaceChemConfiguration.class)
@@ -38,5 +40,21 @@ class ScSolutionTest {
 
     private static void assertBreaks(ScScore score, String content) {
         assertThrows(IllegalArgumentException.class, () -> new ScSolution(score, content));
+    }
+
+    @Test
+    public void testMultiContent() {
+        String multiContent = "SOLUTION:Fuming Nitric Acid,12345ieee,1026-4-96\n" +
+                              "stuff...\n" +
+                              "SOLUTION:Fuming Nitric Acid,12345ieee,1758-2-108,1758-2-108\n" +
+                              "stuff...\n" +
+                              "SOLUTION:Fuming Nitric Acid,12345ieee,1678-2-110,comment\n" +
+                              "stuff...\n" +
+                              "SOLUTION:Fuming Nitric Acid,12345ieee,1600-2-111,thing (copy) (copy) (copy)\n" +
+                              "stuff...\n" +
+                              "SOLUTION:Fuming Nitric Acid,12345ieee,0-0-0,unscore\n" +
+                              "stuff...";
+        List<ScSolution> solutions = ScSolution.fromMultiContent(multiContent, null);
+        assertEquals(5, solutions.size());
     }
 }
