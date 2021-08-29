@@ -78,12 +78,31 @@ public class CommandTest {
     }
 
     @Test
-    public void testArchive() {
+    public void testArchiveOne() {
         // we start at 100/100/100
         Map<String, String> args = Map.of("score", "45/1/14",
                                           "export", "https://pastebin.com/19smCuS8"); // valid 45/1/14
         String result = runCommand("archive", args);
         assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14`"));
+    }
+
+    @Test
+    public void testArchiveMany() {
+        // we start at 100/100/100
+        Map<String, String> args = Map.of("export", "https://pastebin.com/kNnfTvMa"); // valid 45/1/14 and 115/1/6
+        String result = runCommand("archive", args);
+        assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14/B`") &&
+                   result.contains("`115/1/6/B`"));
+    }
+
+    @Test
+    public void testArchiveManyAndScore() {
+        // we start at 100/100/100
+        Map<String, String> args = Map.of("score", "45/1/14",
+                                          "export", "https://pastebin.com/kNnfTvMa"); // valid 45/1/14 and 115/1/6
+        String result = runCommand("archive", args);
+        assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14`") &&
+                   result.contains("`115/1/6/B`"));
     }
 
     @NotNull

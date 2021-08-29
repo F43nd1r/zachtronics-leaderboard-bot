@@ -25,11 +25,11 @@ abstract class AbstractArchiveCommand<S : Solution> : AbstractCommand() {
     fun archiveAll(solutions: Collection<S>): Mono<EmbedData> = mono {
         val results = archive.archiveAll(solutions).awaitSingle()
         val successes = results.count { it.first.isNotEmpty() }
-        if (successes != 0) {
-            EmbedData.builder()
-                .title("Success: $successes solution(s) archived")
-                .addAllFields(
-                    solutions.zip(results).map {(solution, result) ->
+        EmbedData.builder()
+            .title(if (successes != 0) "Success: $successes solution(s) archived" else "Failure: no solutions archived")
+            .addAllFields(
+                solutions.zip(results).map { (solution, result) ->
+                    if (result.first.isNotEmpty()) {
                         EmbedFieldData.builder()
                             .name("*${solution.puzzle.displayName}* ${result.first}")
                             .value(
@@ -37,21 +37,15 @@ abstract class AbstractArchiveCommand<S : Solution> : AbstractCommand() {
                                         "\n" +
                                         result.second
                             ).build()
-                    }
-                )
-                .build()
-        } else {
-            EmbedData.builder()
-                .title("Failure: no solutions archived")
-                .addAllFields(
-                    solutions.map {
+                    } else {
                         EmbedFieldData.builder()
-                            .name("*${it.puzzle.displayName}*")
-                            .value("`${it.score.toDisplayString()}` did not qualify for archiving.").build()
+                            .name("*${solution.puzzle.displayName}*")
+                            .value("`${solution.score.toDisplayString()}` did not qualify for archiving.")
+                            .build()
                     }
-                )
-                .build()
-        }
+                }
+            )
+            .build()
     }
 
     abstract fun parseSolutions(interaction: SlashCommandEvent): Flux<S>

@@ -37,16 +37,14 @@ public class ScSolution implements Solution {
 
         ScScore contentScore = ScScore.parseSimpleScore(m);
         contentScore.setPrecognitive(!this.puzzle.isDeterministic());
-        if (score == null) {
+        if (score == null ||
+            score.getCycles() != contentScore.getCycles() ||
+            score.getReactors() != contentScore.getReactors() ||
+            score.getSymbols() != contentScore.getSymbols()) {
+            // if no given score or it doesn't match the solution metadata, ignore it
             this.score = contentScore;
         }
         else {
-            if (score.getCycles() != contentScore.getCycles() ||
-                score.getReactors() != contentScore.getReactors() ||
-                score.getSymbols() != contentScore.getSymbols()) {
-                // if the given score doesn't match the solution metadata, refuse it
-                throw new IllegalArgumentException("score");
-            }
             this.score = score;
         }
         this.content = m.replaceFirst("SOLUTION:$1,Archiver,$2-$3-$4,Archived Solution$5");
