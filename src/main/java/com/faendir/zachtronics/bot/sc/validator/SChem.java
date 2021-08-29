@@ -96,7 +96,7 @@ public class SChem {
 
     static SChemResult run(@NotNull String export) throws SChemException {
         ProcessBuilder builder = new ProcessBuilder();
-        builder.command("python", "-m", "schem", "--json");
+        builder.command("python3", "-m", "schem", "--json");
 
         try {
             Process process = builder.start();
