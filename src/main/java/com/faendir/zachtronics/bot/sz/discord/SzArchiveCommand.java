@@ -13,12 +13,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Component
@@ -28,21 +29,20 @@ public class SzArchiveCommand extends AbstractArchiveCommand<SzSolution> {
 
     @NotNull
     @Override
-    public Flux<SzSolution> parseSolutions(@NotNull SlashCommandEvent interaction) {
-        return SzArchiveCommand$DataParser.parse(interaction).map(data -> {
-            SzSolution solution;
-            try (InputStream is = new URL(data.link).openStream()) {
-                String content = new String(is.readAllBytes());
-                solution = new SzSolution(content);
-            } catch (MalformedURLException e) {
-                throw new IllegalArgumentException("Could not parse your link");
-            } catch (IOException e) {
-                throw new IllegalArgumentException("Couldn't read your solution");
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Could not parse a valid solution");
-            }
-            return solution;
-        }).flux();
+    public List<SzSolution> parseSolutions(@NotNull SlashCommandEvent interaction) {
+        Data data = SzArchiveCommand$DataParser.parse(interaction);
+        SzSolution solution;
+        try (InputStream is = new URL(data.link).openStream()) {
+            String content = new String(is.readAllBytes());
+            solution = new SzSolution(content);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Could not parse your link");
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Couldn't read your solution");
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Could not parse a valid solution");
+        }
+        return Collections.singletonList(solution);
     }
 
     @NotNull
@@ -54,7 +54,8 @@ public class SzArchiveCommand extends AbstractArchiveCommand<SzSolution> {
     @ApplicationCommand(name = "archive", subCommand = true)
     @Value
     public static class Data {
-        @NotNull String link;
+        @NotNull
+        String link;
 
         public Data(@NotNull @Converter(LinkConverter.class) String link) {
             this.link = link;

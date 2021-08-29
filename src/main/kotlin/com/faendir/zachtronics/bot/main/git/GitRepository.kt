@@ -3,14 +3,9 @@ package com.faendir.zachtronics.bot.main.git
 import com.faendir.zachtronics.bot.main.config.GitProperties
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Score
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.reactor.mono
-import kotlinx.coroutines.withContext
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.Status
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
-import reactor.core.publisher.Mono
-import reactor.core.scheduler.Schedulers
 import java.io.File
 import java.nio.file.Files
 import javax.annotation.PreDestroy
@@ -24,15 +19,7 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
         }
     }
 
-    fun <T : Any> access(access: AccessScope.() -> T?): Mono<T> = mono {
-        kAccess(access)
-    }
-
-    suspend fun <T> kAccess(access: AccessScope.() -> T): T = withContext(Dispatchers.IO) {
-        doAccess(access)
-    }
-
-    private fun <T> doAccess(access: AccessScope.() -> T) : T{
+    fun <T> access(access: AccessScope.() -> T): T  {
         return synchronized(repo) {
             Git.open(repo).use { git ->
                 git.pull().setTimeout(120).call()

@@ -9,11 +9,8 @@ import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.utils.plusIf
-import kotlinx.coroutines.reactor.mono
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
-import reactor.core.publisher.Mono
 import java.io.File
 import javax.annotation.PostConstruct
 
@@ -32,8 +29,7 @@ abstract class AbstractOmJsonLeaderboard<J>(
 
     @PostConstruct
     fun onStartUp() {
-        runBlocking {
-            gitRepo.kAccess {
+            gitRepo.access {
                 directoryCategories.forEach { (dirName, categories) ->
                     val dir = File(repo, dirName)
                     File(dir, scoreFileName).takeIf { it.exists() }?.let { file ->
@@ -44,75 +40,68 @@ abstract class AbstractOmJsonLeaderboard<J>(
                     commitAndPush("Update page formatting")
                 }
             }
+    }
+
+    override fun update(puzzle: OmPuzzle, record: OmRecord): UpdateResult = gitRepo.access {
+        val betterExists = mutableMapOf<OmCategory, OmScore>()
+        val success = mutableMapOf<OmCategory, OmScore?>()
+        val rehostedLink by lazy { imgurService.tryRehost(record.link) }
+        var paretoUpdate = false
+        directoryCategories.forEach { (dirName, dirCategories) ->
+            val dir = File(repo, dirName)
+            val scoreFile = File(dir, scoreFileName)
+            val records = getRecords(dirName)
+            val categories = dirCategories.filter { it.supportsPuzzle(puzzle) && it.supportsScore(record.score) }
+            var changed = false
+            for (category in categories) {
+                val oldRecord = records.getRecord(puzzle, category)
+                if (oldRecord == null || category.scoreComparator.compare(record.score, oldRecord.score).let {
+                        it < 0 || it == 0 && oldRecord.link != record.link
+                    }) {
+                    records.setRecord(puzzle, category, OmRecord(category.normalizeScore(record.score), rehostedLink))
+                    changed = true
+                    success[category] = oldRecord?.score
+                } else {
+                    betterExists[category] = oldRecord.score
+                }
+            }
+            val localParetoUpdate = paretoUpdate(puzzle, record, records)
+            if (changed || localParetoUpdate) {
+                scoreFile.parentFile.mkdirs()
+                scoreFile.writeText(Json { prettyPrint = true }.encodeToString(serializer, records))
+                add(scoreFile)
+                updatePage(dir, dirCategories, records)
+            }
+            paretoUpdate = paretoUpdate || localParetoUpdate
+        }
+        if (status().run { added.isNotEmpty() || changed.isNotEmpty() }) {
+            commitAndPush(record.author, puzzle, record.score, success.map { it.key.displayName }.plusIf(paretoUpdate, "PARETO"))
+        }
+        when {
+            success.isNotEmpty() -> {
+                success.keys.filter { it.name.startsWith("S") }.forEach { record.score.displaySums.add(it.requiredParts) }
+                UpdateResult.Success(success)
+            }
+            paretoUpdate -> UpdateResult.ParetoUpdate()
+            betterExists.isNotEmpty() -> UpdateResult.BetterExists(betterExists)
+            else -> UpdateResult.NotSupported()
         }
     }
 
-    override fun update(puzzle: OmPuzzle, record: OmRecord): Mono<UpdateResult> = mono {
-        gitRepo.kAccess {
-            val betterExists = mutableMapOf<OmCategory, OmScore>()
-            val success = mutableMapOf<OmCategory, OmScore?>()
-            val rehostedLink by lazy { imgurService.tryRehost(record.link) }
-            var paretoUpdate = false
-            directoryCategories.forEach { (dirName, dirCategories) ->
-                val dir = File(repo, dirName)
-                val scoreFile = File(dir, scoreFileName)
-                val records = getRecords(dirName)
-                val categories = dirCategories.filter { it.supportsPuzzle(puzzle) && it.supportsScore(record.score) }
-                var changed = false
-                for (category in categories) {
-                    val oldRecord = records.getRecord(puzzle, category)
-                    if (oldRecord == null || category.scoreComparator.compare(record.score, oldRecord.score).let {
-                            it < 0 || it == 0 && oldRecord.link != record.link
-                        }) {
-                        records.setRecord(puzzle, category, OmRecord(category.normalizeScore(record.score), rehostedLink))
-                        changed = true
-                        success[category] = oldRecord?.score
-                    } else {
-                        betterExists[category] = oldRecord.score
-                    }
-                }
-                val localParetoUpdate = paretoUpdate(puzzle, record, records)
-                if (changed || localParetoUpdate) {
-                    scoreFile.parentFile.mkdirs()
-                    scoreFile.writeText(Json { prettyPrint = true }.encodeToString(serializer, records))
-                    add(scoreFile)
-                    updatePage(dir, dirCategories, records)
-                }
-                paretoUpdate = paretoUpdate || localParetoUpdate
-            }
-            if (status().run { added.isNotEmpty() || changed.isNotEmpty() }) {
-                commitAndPush(record.author, puzzle, record.score, success.map { it.key.displayName }.plusIf(paretoUpdate, "PARETO"))
-            }
-            when {
-                success.isNotEmpty() -> {
-                    success.keys.filter { it.name.startsWith("S") }.forEach { record.score.displaySums.add(it.requiredParts) }
-                    UpdateResult.Success(success)
-                }
-                paretoUpdate -> UpdateResult.ParetoUpdate()
-                betterExists.isNotEmpty() -> UpdateResult.BetterExists(betterExists)
-                else -> UpdateResult.NotSupported()
-            }
-        }
+    override fun get(puzzle: OmPuzzle, category: OmCategory): OmRecord? = gitRepo.access {
+        getRecords(category)?.getRecord(puzzle, category)
     }
 
-    override fun get(puzzle: OmPuzzle, category: OmCategory): Mono<OmRecord> = mono {
-        gitRepo.kAccess {
-            getRecords(category)?.getRecord(puzzle, category)
-        }
-    }
-
-    override fun getAll(puzzle: OmPuzzle, categories: Collection<OmCategory>): Mono<Map<OmCategory, OmRecord>> = mono {
-        gitRepo.kAccess {
-            categories.groupBy { category -> directoryCategories.asIterable().find { it.value.contains(category) }?.key }
-                .flatMap { (dirName, categories) ->
-                    if (dirName != null) {
-                        val records = getRecords(dirName)
-                        categories.mapNotNull { category -> records.getRecord(puzzle, category)?.let { category to it } }
-                    } else {
-                        emptyList()
-                    }
-                }.toMap()
-        }
+    override fun getAll(puzzle: OmPuzzle, categories: Collection<OmCategory>): Map<OmCategory, OmRecord> = gitRepo.access {
+        categories.groupBy { category -> directoryCategories.asIterable().find { it.value.contains(category) }?.key }
+            .flatMap { (dirName, categories) ->
+                if (dirName != null) {
+                    val records = getRecords(dirName)
+                    categories.mapNotNull { category -> records.getRecord(puzzle, category)?.let { category to it } }
+                } else {
+                    emptyList()
+                }
+            }.toMap()
     }
 
     private var cached: MutableMap<String, J> = mutableMapOf()

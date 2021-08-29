@@ -9,9 +9,9 @@ import com.faendir.zachtronics.bot.sz.model.SzSolution;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,15 +34,15 @@ public class SzGitLeaderboard implements Leaderboard<SzCategory, SzPuzzle, SzRec
     private static final Pattern NAME_REGEX = Pattern
             .compile("top solution (?:cost|power|lines)(?:->(?:cost|power|lines))?(?: - (?<author>.+))?", Pattern.CASE_INSENSITIVE);
 
-    @NotNull
+    @Nullable
     @Override
-    public Mono<SzRecord> get(@NotNull SzPuzzle puzzle, @NotNull SzCategory category) {
+    public SzRecord get(@NotNull SzPuzzle puzzle, @NotNull SzCategory category) {
         return gitRepository.access(a -> readSolutionFile(findPuzzleFile(a, puzzle, category)));
     }
 
     @NotNull
     @Override
-    public Mono<Map<SzCategory, SzRecord>> getAll(@NotNull SzPuzzle puzzle, @NotNull Collection<? extends SzCategory> categories) {
+    public Map<SzCategory, SzRecord> getAll(@NotNull SzPuzzle puzzle, @NotNull Collection<? extends SzCategory> categories) {
         return gitRepository.access(
                 a -> categories.stream().collect(Collectors.toMap(category -> category,
                                                                   category -> readSolutionFile(

@@ -10,12 +10,7 @@ import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import discord4j.core.event.domain.interaction.SlashCommandEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
-import kotlinx.coroutines.reactor.awaitSingle
-import kotlinx.coroutines.reactor.mono
 import org.springframework.stereotype.Component
-import reactor.core.publisher.Mono
-import reactor.util.function.Tuple2
-import reactor.util.function.Tuples
 
 @Component
 class OmShowCommand(override val leaderboards: List<Leaderboard<OmCategory, OmPuzzle, OmRecord>>) :
@@ -23,14 +18,14 @@ class OmShowCommand(override val leaderboards: List<Leaderboard<OmCategory, OmPu
 
     override fun buildData(): ApplicationCommandOptionData = ShowParser.buildData()
 
-    override fun findPuzzleAndCategory(interaction: SlashCommandEvent): Mono<Tuple2<OmPuzzle, OmCategory>> = mono {
-        val show = ShowParser.parse(interaction).awaitSingle()
+    override fun findPuzzleAndCategory(interaction: SlashCommandEvent): Pair<OmPuzzle, OmCategory> {
+        val show = ShowParser.parse(interaction)
         val puzzle = show.puzzle
         val categories = findCategoryCandidates(show)
         if (categories.isEmpty()) throw IllegalArgumentException("${show.category} is not a tracked category.")
         val filtered = categories.filter { it.supportsPuzzle(puzzle) }
         if (filtered.isEmpty()) throw IllegalArgumentException("Category ${categories.first().displayName} does not support ${puzzle.displayName}")
-        Tuples.of(puzzle, filtered.first())
+        return Pair(puzzle, filtered.first())
     }
 
     private fun findCategoryCandidates(show: Show): List<OmCategory> {

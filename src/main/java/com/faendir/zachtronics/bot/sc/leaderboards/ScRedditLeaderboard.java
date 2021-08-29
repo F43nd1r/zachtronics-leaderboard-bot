@@ -8,8 +8,8 @@ import com.faendir.zachtronics.bot.sc.model.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.text.NumberFormat;
 import java.util.*;
@@ -27,9 +27,9 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
     private final List<ScCategory> supportedCategories = Arrays.asList(ScCategory.values());
     private final RedditService redditService;
 
-    @NotNull
+    @Nullable
     @Override
-    public Mono<ScRecord> get(@NotNull ScPuzzle puzzle, @NotNull ScCategory category) {
+    public ScRecord get(@NotNull ScPuzzle puzzle, @NotNull ScCategory category) {
         String[] lines = redditService.getWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
 
         boolean needsReactors = category.name().startsWith("R") && puzzle.getType() != ScType.PRODUCTION_TRIVIAL;
@@ -51,15 +51,15 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                                                                                 .endsWith("NB") ? 1 : 0;
             ScRecord record = records[column];
             if (record != ScRecord.IMPOSSIBLE_CATEGORY)
-                return Mono.just(record);
+                return record;
             break;
         }
-        return Mono.empty();
+        return null;
     }
 
     @NotNull
     @Override
-    public Mono<Map<ScCategory, ScRecord>> getAll(@NotNull final ScPuzzle puzzle, @NotNull Collection<? extends ScCategory> categories) {
+    public Map<ScCategory, ScRecord> getAll(@NotNull final ScPuzzle puzzle, @NotNull Collection<? extends ScCategory> categories) {
         String[] lines = redditService.getWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
         Pattern puzzleRegex = Pattern.compile("^\\s*\\|\\s*" + Pattern.quote(puzzle.getDisplayName()));
         Map<ScCategory, ScRecord> result = new EnumMap<>(ScCategory.class);
@@ -98,12 +98,12 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                 break;
             }
         }
-        return Mono.just(result);
+        return result;
     }
 
     @NotNull
     @Override
-    public Mono<UpdateResult> update(@NotNull ScPuzzle puzzle, @NotNull ScRecord record) {
+    public UpdateResult update(@NotNull ScPuzzle puzzle, @NotNull ScRecord record) {
         String[] lines = redditService.getWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
         Pattern puzzleRegex = Pattern.compile("^\\s*\\|\\s*" + Pattern.quote(puzzle.getDisplayName()));
 
@@ -188,10 +188,10 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
             redditService.updateWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage(), String.join("\r\n", lines),
                                          puzzle.getDisplayName() + " " + record.getScore().toDisplayString() + " by " +
                                          record.getAuthor());
-            return Mono.just(new UpdateResult.Success(beatenScores));
+            return new UpdateResult.Success(beatenScores);
         }
         else {
-            return Mono.just(new UpdateResult.BetterExists(relatedScores));
+            return new UpdateResult.BetterExists(relatedScores);
         }
     }
 

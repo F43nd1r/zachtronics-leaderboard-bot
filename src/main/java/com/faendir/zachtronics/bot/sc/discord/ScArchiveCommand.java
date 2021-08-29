@@ -14,7 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Component
@@ -24,9 +25,9 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
 
     @NotNull
     @Override
-    public Flux<ScSolution> parseSolutions(@NotNull SlashCommandEvent interaction) {
-        return ScArchiveCommand$DataParser.parse(interaction).flatMapIterable(
-                data -> ScSolution.fromExportLink(data.export, data.score));
+    public List<ScSolution> parseSolutions(@NotNull SlashCommandEvent interaction) {
+        Data data = ScArchiveCommand$DataParser.parse(interaction);
+        return ScSolution.fromExportLink(data.export, data.score);
     }
 
     @NotNull

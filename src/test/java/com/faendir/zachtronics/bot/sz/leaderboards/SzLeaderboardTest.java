@@ -28,9 +28,9 @@ public class SzLeaderboardTest {
             List<SzCategory> categories = Arrays.stream(SzCategory.values())
                                                 .filter(c -> c.supportsPuzzle(p))
                                                 .collect(Collectors.toList());
-            Collection<SzRecord> records = new HashSet<>(szLeaderboard.getAll(p, categories).block().values());
+            Collection<SzRecord> records = new HashSet<>(szLeaderboard.getAll(p, categories).values());
             for (SzRecord r : records)
-                szLeaderboard.update(p, r).block();
+                szLeaderboard.update(p, r);
 
             System.out.println("Done " + p.getDisplayName());
         }

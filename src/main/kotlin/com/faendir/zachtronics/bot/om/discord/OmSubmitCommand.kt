@@ -12,9 +12,6 @@ import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
 import discord4j.core.event.domain.interaction.SlashCommandEvent
 import org.springframework.stereotype.Component
-import reactor.core.publisher.Mono
-import reactor.util.function.Tuple2
-import reactor.util.function.Tuples
 
 @Component
 class OmSubmitCommand(override val leaderboards: List<Leaderboard<*, OmPuzzle, OmRecord>>) :
@@ -22,14 +19,12 @@ class OmSubmitCommand(override val leaderboards: List<Leaderboard<*, OmPuzzle, O
 
     override fun buildData() = SubmitParser.buildData()
 
-    override fun parseSubmission(interaction: SlashCommandEvent): Mono<Tuple2<OmPuzzle, OmRecord>> {
-        return SubmitParser.parse(interaction)
-            .map {
-                Tuples.of(
-                    it.puzzle,
-                    OmRecord(OmScore.parse(it.puzzle, it.score).apply { modifier = it.modifier ?: OmModifier.NORMAL }, it.gif, interaction.interaction.user.username)
-                )
-            }
+    override fun parseSubmission(interaction: SlashCommandEvent): Pair<OmPuzzle, OmRecord> {
+        val submit = SubmitParser.parse(interaction)
+        return Pair(
+            submit.puzzle,
+            OmRecord(OmScore.parse(submit.puzzle, submit.score).apply { modifier = submit.modifier ?: OmModifier.NORMAL }, submit.gif, interaction.interaction.user.username)
+        )
     }
 }
 

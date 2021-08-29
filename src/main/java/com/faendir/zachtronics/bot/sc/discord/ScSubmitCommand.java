@@ -9,17 +9,14 @@ import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
-import discord4j.core.object.command.Interaction;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
+import kotlin.Pair;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 import java.util.List;
 
@@ -34,11 +31,10 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
 
     @NotNull
     @Override
-    public Mono<Tuple2<ScPuzzle, ScRecord>> parseSubmission(@NotNull SlashCommandEvent interaction) {
-        return ScSubmitCommand$DataParser.parse(interaction).map(data -> {
-            ScRecord record = new ScRecord(data.score, data.author, data.video, false);
-            return Tuples.of(data.puzzle, record);
-        });
+    public Pair<ScPuzzle, ScRecord> parseSubmission(@NotNull SlashCommandEvent interaction) {
+        Data data = ScSubmitCommand$DataParser.parse(interaction);
+        ScRecord record = new ScRecord(data.score, data.author, data.video, false);
+        return new Pair<>(data.puzzle, record);
     }
 
     @NotNull
@@ -51,9 +47,12 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
     @Value
     public static class Data {
         @NonNull ScPuzzle puzzle;
-        @NotNull ScScore score;
-        @NotNull String author;
-        @NotNull String video;
+        @NotNull
+        ScScore score;
+        @NotNull
+        String author;
+        @NotNull
+        String video;
 
         public Data(@Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle,
                     @Converter(ScBPScoreConverter.class) @NonNull ScScore score,

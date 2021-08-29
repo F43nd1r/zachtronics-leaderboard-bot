@@ -8,18 +8,14 @@ import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
-import discord4j.core.object.command.ApplicationCommandInteractionOption;
-import discord4j.core.object.command.Interaction;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
+import kotlin.Pair;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 import java.util.List;
 
@@ -31,8 +27,9 @@ public class ScShowCommand extends AbstractShowCommand<ScCategory, ScPuzzle, ScR
 
     @NotNull
     @Override
-    public Mono<Tuple2<ScPuzzle, ScCategory>> findPuzzleAndCategory(@NotNull SlashCommandEvent interaction) {
-        return ScShowCommand$DataParser.parse(interaction).map(data -> Tuples.of(data.puzzle, data.category));
+    public Pair<ScPuzzle, ScCategory> findPuzzleAndCategory(@NotNull SlashCommandEvent interaction) {
+        Data data = ScShowCommand$DataParser.parse(interaction);
+        return new Pair<>(data.puzzle, data.category);
     }
 
     @NotNull

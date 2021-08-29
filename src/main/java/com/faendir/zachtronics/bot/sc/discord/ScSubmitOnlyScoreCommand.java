@@ -10,15 +10,13 @@ import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
+import kotlin.Triple;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple3;
-import reactor.util.function.Tuples;
 
 @Component
 @RequiredArgsConstructor
@@ -30,12 +28,11 @@ public class ScSubmitOnlyScoreCommand extends AbstractSubmitArchiveCommand<ScPuz
 
     @NotNull
     @Override
-    public Mono<Tuple3<ScPuzzle, ScRecord, ScSolution>> parseToPRS(@NotNull SlashCommandEvent event) {
-        return ScSubmitOnlyScoreCommand$DataParser.parse(event).map(data -> {
-            ScSolution solution = new ScSolution(data.puzzle, data.score);
-            ScRecord record = new ScRecord(solution.getScore(), data.author, data.video, false);
-            return Tuples.of(solution.getPuzzle(), record, solution);
-        });
+    public Triple<ScPuzzle, ScRecord, ScSolution> parseToPRS(@NotNull SlashCommandEvent event) {
+        Data data = ScSubmitOnlyScoreCommand$DataParser.parse(event);
+        ScSolution solution = new ScSolution(data.puzzle, data.score);
+        ScRecord record = new ScRecord(solution.getScore(), data.author, data.video, false);
+        return new Triple<>(solution.getPuzzle(), record, solution);
     }
 
     @NotNull
@@ -48,9 +45,12 @@ public class ScSubmitOnlyScoreCommand extends AbstractSubmitArchiveCommand<ScPuz
     @Value
     public static class Data {
         @NonNull ScPuzzle puzzle;
-        @NotNull ScScore score;
-        @NotNull String author;
-        @NotNull String video;
+        @NotNull
+        ScScore score;
+        @NotNull
+        String author;
+        @NotNull
+        String video;
 
         public Data(@Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle,
                     @Converter(ScBPScoreConverter.class) @NonNull ScScore score,

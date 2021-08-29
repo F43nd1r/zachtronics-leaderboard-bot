@@ -8,27 +8,39 @@ import com.faendir.om.parser.solution.SolutionParser
 import com.faendir.om.parser.solution.model.Position
 import com.faendir.om.parser.solution.model.Solution
 import com.faendir.om.parser.solution.model.SolvedSolution
-import com.faendir.om.parser.solution.model.part.*
+import com.faendir.om.parser.solution.model.part.Arm
+import com.faendir.om.parser.solution.model.part.ArmType
+import com.faendir.om.parser.solution.model.part.Conduit
+import com.faendir.om.parser.solution.model.part.Glyph
+import com.faendir.om.parser.solution.model.part.IO
+import com.faendir.om.parser.solution.model.part.IOType
+import com.faendir.om.parser.solution.model.part.Part
+import com.faendir.om.parser.solution.model.part.Track
 import com.faendir.zachtronics.bot.generic.archive.Archive
 import com.faendir.zachtronics.bot.generic.discord.AbstractArchiveCommand
 import com.faendir.zachtronics.bot.generic.discord.LinkConverter
 import com.faendir.zachtronics.bot.om.JNISolutionVerifier
-import com.faendir.zachtronics.bot.om.model.*
-import com.faendir.zachtronics.bot.om.model.OmScorePart.*
+import com.faendir.zachtronics.bot.om.model.FULL_CIRCLE
+import com.faendir.zachtronics.bot.om.model.OmModifier
+import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.model.OmScore
+import com.faendir.zachtronics.bot.om.model.OmScorePart
+import com.faendir.zachtronics.bot.om.model.OmScorePart.AREA
+import com.faendir.zachtronics.bot.om.model.OmScorePart.COST
+import com.faendir.zachtronics.bot.om.model.OmScorePart.CYCLES
+import com.faendir.zachtronics.bot.om.model.OmScorePart.HEIGHT
+import com.faendir.zachtronics.bot.om.model.OmScorePart.INSTRUCTIONS
+import com.faendir.zachtronics.bot.om.model.OmScorePart.WIDTH
+import com.faendir.zachtronics.bot.om.model.OmSolution
+import com.faendir.zachtronics.bot.om.model.SINGLE
 import com.roxstudio.utils.CUrl
 import discord4j.core.event.domain.interaction.SlashCommandEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.reactor.awaitSingle
-import kotlinx.coroutines.reactor.mono
-import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.sink
 import okio.source
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import reactor.core.publisher.Flux
-import reactor.kotlin.core.publisher.toFlux
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.util.*
@@ -39,20 +51,18 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
 
     override fun buildData(): ApplicationCommandOptionData = ArchiveParser.buildData()
 
-    override fun parseSolutions(interaction: SlashCommandEvent): Flux<OmSolution> = mono {
-        val command = ArchiveParser.parse(interaction).awaitSingle()
-        parseSolution(findScoreIdentifier(command), command.solution)
-    }.toFlux()
+    override fun parseSolutions(interaction: SlashCommandEvent): List<OmSolution> {
+        val command = ArchiveParser.parse(interaction)
+        return listOf(parseSolution(findScoreIdentifier(command), command.solution))
+    }
 
-    suspend fun parseSolution(scoreIdentifier: ScoreIdentifier, link: String): OmSolution {
-        val solution = withContext(Dispatchers.IO) {
-            try {
-                SolutionParser.parse(ByteArrayInputStream(CUrl(link).exec()).source().buffer())
-            } catch (e: Exception) {
-                throw IllegalArgumentException("I could not parse your solution")
-            }
+    fun parseSolution(scoreIdentifier: ScoreIdentifier, link: String): OmSolution {
+        val solution = try {
+            SolutionParser.parse(ByteArrayInputStream(CUrl(link).exec()).source().buffer())
+        } catch (e: Exception) {
+            throw IllegalArgumentException("I could not parse your solution")
         }
-        if(solution !is SolvedSolution) throw IllegalArgumentException("only solved solutions are accepted")
+        if (solution !is SolvedSolution) throw IllegalArgumentException("only solved solutions are accepted")
         val puzzle = OmPuzzle.values().find { it.id == solution.puzzle } ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
         val parts = linkedMapOf(
             COST to solution.cost.toDouble(),
@@ -139,13 +149,13 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
         try {
             val width = verifier.getWidth(puzzleFile, solution).takeIf { it != -1 } ?: return null
             return width.toDouble() / 2 to verifier.getHeight(puzzleFile, solution).toDouble()
-        } catch (e : Exception) {
+        } catch (e: Exception) {
             logger.info("Verifier threw exception", e)
             return null
         }
     }
 
-    companion object{
+    companion object {
         private val logger = LoggerFactory.getLogger(OmArchiveCommand::class.java)
     }
 }

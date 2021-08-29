@@ -10,21 +10,15 @@ import discord4j.discordjson.json.EmbedData
 import discord4j.discordjson.json.EmbedFieldData
 import discord4j.discordjson.json.WebhookExecuteRequest
 import discord4j.rest.util.MultipartRequest
-import kotlinx.coroutines.reactor.awaitSingle
-import kotlinx.coroutines.reactor.mono
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.util.function.component1
-import reactor.kotlin.core.util.function.component2
-import reactor.util.function.Tuple2
 
 abstract class AbstractListCommand<C : Category, P : Puzzle, R : Record> : AbstractCommand() {
     abstract val leaderboards: List<Leaderboard<C, P, R>>
     override val isReadOnly: Boolean = true
 
-    override fun handle(event: SlashCommandEvent): Mono<MultipartRequest<WebhookExecuteRequest>> = mono {
-        val (puzzle, categories) = findPuzzleAndCategories(event).awaitSingle()
-        val records = leaderboards.map { it.getAll(puzzle, categories).awaitSingle() }.reduce { acc, map -> acc + map }
-        WebhookExecuteRequest.builder()
+    override fun handle(event: SlashCommandEvent): MultipartRequest<WebhookExecuteRequest> {
+        val (puzzle, categories) = findPuzzleAndCategories(event)
+        val records = leaderboards.map { it.getAll(puzzle, categories) }.reduce { acc, map -> acc + map }
+        return WebhookExecuteRequest.builder()
             .addEmbed(EmbedData.builder()
                 .title("*${puzzle.displayName}*")
                 .addAllFields(
@@ -59,5 +53,5 @@ abstract class AbstractListCommand<C : Category, P : Puzzle, R : Record> : Abstr
     }
 
     /** @return pair of Puzzle and all the categories that support it */
-    abstract fun findPuzzleAndCategories(interaction: SlashCommandEvent): Mono<Tuple2<P, List<C>>>
+    abstract fun findPuzzleAndCategories(interaction: SlashCommandEvent): Pair<P, List<C>>
 }

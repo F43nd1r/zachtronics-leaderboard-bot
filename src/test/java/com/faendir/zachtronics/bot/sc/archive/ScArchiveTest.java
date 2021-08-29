@@ -52,10 +52,10 @@ public class ScArchiveTest {
     }
 
     private String doArchiveScore(ScScore score) {
-        return archive.archive(new ScSolution(ScPuzzle.research_example_1, score)).block().getSecond();
+        return archive.archive(new ScSolution(ScPuzzle.research_example_1, score)).getSecond();
     }
 
     private String doArchiveScoreContent(ScScore score, String content) {
-        return archive.archive(new ScSolution(score, content)).block().getSecond();
+        return archive.archive(new ScSolution(score, content)).getSecond();
     }
 }

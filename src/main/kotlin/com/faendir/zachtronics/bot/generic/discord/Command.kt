@@ -4,7 +4,6 @@ import discord4j.core.event.domain.interaction.SlashCommandEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import discord4j.discordjson.json.WebhookExecuteRequest
 import discord4j.rest.util.MultipartRequest
-import reactor.core.publisher.Mono
 
 interface Command {
 
@@ -12,7 +11,7 @@ interface Command {
 
     val isReadOnly: Boolean
 
-    fun handle(event: SlashCommandEvent): Mono<MultipartRequest<WebhookExecuteRequest>>
+    fun handle(event: SlashCommandEvent): MultipartRequest<WebhookExecuteRequest>
 
     val data: ApplicationCommandOptionData
 }

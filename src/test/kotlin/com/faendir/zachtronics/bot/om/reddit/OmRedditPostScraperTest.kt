@@ -2,13 +2,13 @@ package com.faendir.zachtronics.bot.om.reddit
 
 import com.faendir.zachtronics.bot.BotTest
 import com.faendir.zachtronics.bot.main.git.GitRepository
+import com.faendir.zachtronics.bot.main.reddit.Comment
+import com.faendir.zachtronics.bot.main.reddit.RedditService
+import com.faendir.zachtronics.bot.om.OpusMagnumConfiguration
 import com.faendir.zachtronics.bot.om.leaderboards.OmRedditWikiLeaderboard
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmScorePart
-import com.faendir.zachtronics.bot.main.reddit.Comment
-import com.faendir.zachtronics.bot.main.reddit.RedditService
-import com.faendir.zachtronics.bot.om.OpusMagnumConfiguration
 import com.faendir.zachtronics.bot.utils.Forest
 import com.faendir.zachtronics.bot.utils.Tree
 import com.ninjasquad.springmockk.SpykBean
@@ -17,7 +17,11 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import strikt.api.expectThat
-import strikt.assertions.*
+import strikt.assertions.isEqualTo
+import strikt.assertions.isFalse
+import strikt.assertions.isNotEqualTo
+import strikt.assertions.isNotNull
+import strikt.assertions.isTrue
 import java.io.File
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalUnit
@@ -48,11 +52,11 @@ internal class OmRedditPostScraperTest {
             lastUpdate.minus(5, ChronoUnit.MINUTES),
             null)
         expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isFalse()
-        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
+        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC)).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isNotEqualTo(1.0)
         }
         verify(exactly = 0) { redditService.reply(comment, any()) }
-        expectThat(gitRepo.access { File(repo, "om-reddit-scraper/last_update.json").readText() }.block()).isEqualTo("5")
+        expectThat(gitRepo.access { File(repo, "om-reddit-scraper/last_update.json").readText() }).isEqualTo("5")
     }
 
     @Test
@@ -64,7 +68,7 @@ internal class OmRedditPostScraperTest {
             lastUpdate.plus(5, ChronoUnit.MINUTES),
             null)
         expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isTrue()
-        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
+        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC)).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isEqualTo(1.0)
         }
         verify(exactly = 1) { redditService.reply(comment, any()) }
@@ -79,7 +83,7 @@ internal class OmRedditPostScraperTest {
             lastUpdate.minus(5, ChronoUnit.MINUTES),
             lastUpdate.plus(5, ChronoUnit.MINUTES))
         expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isTrue()
-        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
+        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC)).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isEqualTo(1.0)
         }
         verify(exactly = 1) { redditService.reply(comment, any()) }
@@ -94,7 +98,7 @@ internal class OmRedditPostScraperTest {
             lastUpdate.plus(5, ChronoUnit.MINUTES),
             null)
         expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isTrue()
-        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
+        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC)).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isEqualTo(1.0)
         }
         verify(exactly = 1) { redditService.reply(comment, any()) }
@@ -109,11 +113,11 @@ internal class OmRedditPostScraperTest {
             lastUpdate.plus(5, ChronoUnit.MINUTES),
             null)
         expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isTrue()
-        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
+        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC)).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isEqualTo(1.0)
             get { score.parts[OmScorePart.AREA] }.isEqualTo(3.0)
         }
-        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.AG).block()).isNotNull().and {
+        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.AG)).isNotNull().and {
             get { score.parts[OmScorePart.AREA] }.isEqualTo(1.0)
             get { score.parts[OmScorePart.COST] }.isEqualTo(3.0)
         }
@@ -129,10 +133,10 @@ internal class OmRedditPostScraperTest {
             lastUpdate.plus(5, ChronoUnit.MINUTES),
             null)
         expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isTrue()
-        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
+        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC)).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isEqualTo(1.0)
         }
-        expectThat(leaderboard.get(OmPuzzle.ABLATIVE_CRYSTAL, OmCategory.GC).block()).isNotNull().and {
+        expectThat(leaderboard.get(OmPuzzle.ABLATIVE_CRYSTAL, OmCategory.GC)).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isEqualTo(1.0)
         }
         verify(exactly = 1) { redditService.reply(comment, any()) }
@@ -147,7 +151,7 @@ internal class OmRedditPostScraperTest {
             lastUpdate.plus(5, ChronoUnit.MINUTES),
             null)
         expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isTrue()
-        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
+        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC)).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isNotEqualTo(1.0)
         }
         verify(exactly = 1) { redditService.reply(comment, any()) }
@@ -162,7 +166,7 @@ internal class OmRedditPostScraperTest {
             lastUpdate.plus(5, ChronoUnit.MINUTES),
             null)
         expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isTrue()
-        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
+        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC)).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isNotEqualTo(1.0)
         }
         verify(exactly = 0) { redditService.reply(comment, any()) }
@@ -177,7 +181,7 @@ internal class OmRedditPostScraperTest {
             lastUpdate.plus(5, ChronoUnit.MINUTES),
             null)
         expectThat(scraper.handleComment(lastUpdate, singletonForest(comment), comment)).isTrue()
-        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC).block()).isNotNull().and {
+        expectThat(leaderboard.get(OmPuzzle.STABILIZED_WATER, OmCategory.GC)).isNotNull().and {
             get { score.parts[OmScorePart.COST] }.isNotEqualTo(1.0)
         }
         verify(exactly = 0) { redditService.reply(comment, any()) }

@@ -6,14 +6,16 @@ import com.faendir.zachtronics.bot.main.reddit.RedditService
 import com.faendir.zachtronics.bot.main.reddit.Subreddit
 import com.faendir.zachtronics.bot.model.Leaderboard
 import com.faendir.zachtronics.bot.model.UpdateResult
-import com.faendir.zachtronics.bot.om.model.*
+import com.faendir.zachtronics.bot.om.model.OmCategory
+import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.om.model.OmScore
+import com.faendir.zachtronics.bot.om.model.OpusMagnum
 import com.faendir.zachtronics.bot.utils.DateSerializer
 import com.faendir.zachtronics.bot.utils.Forest
 import com.faendir.zachtronics.bot.utils.filterIsInstance
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.channel.MessageChannel
-import kotlinx.coroutines.reactor.awaitSingle
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -44,9 +46,7 @@ class OmRedditPostScraper(
 
     @PostConstruct
     fun init() {
-        runBlocking {
-            gitRepo.kAccess { trustedUsers = File(repo, trustFile).readLines().filter { it.isNotBlank() }.map { it.trim() } }
-        }
+        gitRepo.access { trustedUsers = File(repo, trustFile).readLines().filter { it.isNotBlank() }.map { it.trim() } }
     }
 
     /*@PostConstruct
@@ -87,24 +87,22 @@ class OmRedditPostScraper(
 
     @Scheduled(fixedRate = 1000L * 60 * 60)
     fun pullFromReddit() {
-        runBlocking {
-            val now = Instant.now() //capture timestamp before processing
-            val oldTimestamp = gitRepo.kAccess { File(repo, timestampFile).takeIf { it.exists() }?.readText() }
-            val lastUpdate = oldTimestamp?.let { Json.decodeFromString(DateSerializer, it) }
-            val comments = redditService.findCommentsOnPost(Subreddit.OPUS_MAGNUM, "official record submission thread")
-            val hasNewComments = comments.walkTrees().asIterable().map { comment -> handleComment(lastUpdate, comments, comment) }
-            if (hasNewComments.any { it }) {
-                gitRepo.kAccess {
-                    val timestamp = File(repo, timestampFile)
-                    timestamp.writeText(Json.encodeToString(DateSerializer, Date.from(now)))
-                    add(timestamp)
-                    commitAndPush("timestamp update")
-                }
+        val now = Instant.now() //capture timestamp before processing
+        val oldTimestamp = gitRepo.access { File(repo, timestampFile).takeIf { it.exists() }?.readText() }
+        val lastUpdate = oldTimestamp?.let { Json.decodeFromString(DateSerializer, it) }
+        val comments = redditService.findCommentsOnPost(Subreddit.OPUS_MAGNUM, "official record submission thread")
+        val hasNewComments = comments.walkTrees().asIterable().map { comment -> handleComment(lastUpdate, comments, comment) }
+        if (hasNewComments.any { it }) {
+            gitRepo.access {
+                val timestamp = File(repo, timestampFile)
+                timestamp.writeText(Json.encodeToString(DateSerializer, Date.from(now)))
+                add(timestamp)
+                commitAndPush("timestamp update")
             }
         }
     }
 
-    internal suspend fun handleComment(lastUpdate: Date?, comments: Forest<Comment>, comment: Comment): Boolean {
+    internal fun handleComment(lastUpdate: Date?, comments: Forest<Comment>, comment: Comment): Boolean {
         val isNewOrUpdated = lastUpdate == null || (comment.edited ?: comment.created).after(lastUpdate)
         if (isNewOrUpdated) {
             val body = comment.body
@@ -123,7 +121,7 @@ class OmRedditPostScraper(
                         if (trust != null) {
                             parseComment(trust)
                             trustedUsers = trustedUsers + trust.author
-                            gitRepo.kAccess {
+                            gitRepo.access {
                                 val file = File(repo, trustFile)
                                 file.appendText("\n${trust.author}\n")
                                 add(file)
@@ -145,7 +143,7 @@ class OmRedditPostScraper(
         return forest.parentOf(commentNode)?.let { if (it.author == redditService.myUsername()) forest.parentOf(it) else it }
     }
 
-    private suspend fun parseComment(comment: Comment) {
+    private fun parseComment(comment: Comment) {
         if (comment.body != null) {
             val results = comment.body.lines()
                 .mapNotNull { mainRegex.matchEntire(it) }
@@ -156,7 +154,7 @@ class OmRedditPostScraper(
                 }.map { (puzzle, subCommand) ->
                     val score = OmScore.parse(puzzle, subCommand.groups["score"]!!.value)
                     val link = subCommand.groups["link"]!!.value
-                    val results = leaderboards.map { it.update(puzzle, OmRecord(score, link, comment.author)).awaitSingle() }
+                    val results = leaderboards.map { it.update(puzzle, OmRecord(score, link, comment.author)) }
                     val successes = results.filterIsInstance<UpdateResult.Success>()
                     val hasSuccess = successes.isNotEmpty()
                     if (hasSuccess) {

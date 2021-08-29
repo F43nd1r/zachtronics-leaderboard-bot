@@ -82,7 +82,7 @@ class DiscordService(
             if (!command.isReadOnly && !gameContext.game.hasWritePermission(event.interaction.member.map { it as User }.orElse(event.interaction.user)).awaitSingle()) {
                 throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
             }
-            val result = command.handle(event).awaitSingle()
+            val result = command.handle(event)
             event.interactionResponse.createFollowupMessage(result).awaitSingle()
     }.onErrorResume {
         logger.info("User command failed", it)

@@ -126,7 +126,7 @@ public class CommandTest {
         Mockito.when(slashCommandEvent.getOptions()).thenReturn(options);
 
         MultipartRequest<WebhookExecuteRequest> multipartRequest = commands.stream().filter(c -> c.getData().name().equals(commandName))
-                .findFirst().orElseThrow().handle(slashCommandEvent).block();
+                .findFirst().orElseThrow().handle(slashCommandEvent);
         assert multipartRequest != null;
         WebhookExecuteRequest executeRequest = multipartRequest.getJsonPayload();
         assert executeRequest != null;

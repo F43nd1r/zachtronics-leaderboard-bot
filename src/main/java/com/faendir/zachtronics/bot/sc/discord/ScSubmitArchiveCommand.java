@@ -10,14 +10,12 @@ import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
+import kotlin.Triple;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple3;
-import reactor.util.function.Tuples;
 
 @Component
 @RequiredArgsConstructor
@@ -29,12 +27,11 @@ public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzl
 
     @NotNull
     @Override
-    public Mono<Tuple3<ScPuzzle, ScRecord, ScSolution>> parseToPRS(@NotNull SlashCommandEvent event) {
-        return ScSubmitArchiveCommand$DataParser.parse(event).map(data -> {
-            ScSolution solution = ScSolution.fromExportLink(data.export, data.score).get(0);
-            ScRecord record = new ScRecord(solution.getScore(), data.author, data.video, false);
-            return Tuples.of(solution.getPuzzle(), record, solution);
-        });
+    public Triple<ScPuzzle, ScRecord, ScSolution> parseToPRS(@NotNull SlashCommandEvent event) {
+        Data data = ScSubmitArchiveCommand$DataParser.parse(event);
+        ScSolution solution = ScSolution.fromExportLink(data.export, data.score).get(0);
+        ScRecord record = new ScRecord(solution.getScore(), data.author, data.video, false);
+        return new Triple<>(solution.getPuzzle(), record, solution);
     }
 
     @NotNull
@@ -46,9 +43,12 @@ public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzl
     @ApplicationCommand(name = "submit-archive", subCommand = true)
     @Value
     public static class Data {
-        @NotNull String video;
-        @NotNull String export;
-        @NotNull String author;
+        @NotNull
+        String video;
+        @NotNull
+        String export;
+        @NotNull
+        String author;
         ScScore score;
 
         public Data(@NotNull @Converter(LinkConverter.class) String video,

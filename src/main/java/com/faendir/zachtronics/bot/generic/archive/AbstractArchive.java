@@ -5,7 +5,6 @@ import com.faendir.zachtronics.bot.model.Solution;
 import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -20,13 +19,13 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
 
     @NotNull
     @Override
-    public Mono<Pair<String, String>> archive(@NotNull S solution) {
+    public Pair<String, String> archive(@NotNull S solution) {
         return getGitRepo().access(a -> performArchive(a, solution));
     }
 
     @NotNull
     @Override
-    public Mono<List<Pair<String, String>>> archiveAll(@NotNull Collection<? extends S> solution) {
+    public List<Pair<String, String>> archiveAll(@NotNull Collection<? extends S> solution) {
         return getGitRepo().access(a -> solution.stream()
                                                 .map(s -> performArchive(a, s))
                                                 .collect(Collectors.toList()));
