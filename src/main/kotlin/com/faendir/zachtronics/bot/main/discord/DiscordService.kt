@@ -75,7 +75,6 @@ class DiscordService(
     }
 
     private fun handleCommand(event: SlashCommandEvent): Mono<Void> = mono {
-        try {
             val gameContext = findGameContext(event)
             val option = event.options.first()
             val command = gameContext.commands.find { it.data.name() == option.name }
@@ -85,10 +84,9 @@ class DiscordService(
             }
             val result = command.handle(event).awaitSingle()
             event.interactionResponse.createFollowupMessage(result).awaitSingle()
-        } catch (e: Exception) {
-            logger.info("User command failed", e)
-            event.interactionResponse.createFollowupMessage("**Failed**: ${e.message ?: "Something went wrong"}").awaitSingle()
-        }
+    }.onErrorResume {
+        logger.info("User command failed", it)
+        event.interactionResponse.createFollowupMessage("**Failed**: ${it.message ?: "Something went wrong"}")
     }.then()
 
     private fun findGameContext(event: SlashCommandEvent): GameContext {
