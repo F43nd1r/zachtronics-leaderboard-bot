@@ -4,7 +4,7 @@ import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.zachtronics.bot.discord.LinkConverter;
 import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand;
-import com.faendir.zachtronics.bot.model.Leaderboard;
+import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScScore;

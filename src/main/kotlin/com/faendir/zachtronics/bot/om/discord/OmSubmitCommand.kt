@@ -6,7 +6,7 @@ import com.faendir.discord4j.command.annotation.Description
 import com.faendir.zachtronics.bot.discord.LinkConverter
 import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand
 import com.faendir.zachtronics.bot.discord.command.Secured
-import com.faendir.zachtronics.bot.model.Leaderboard
+import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.OmModifier
 import com.faendir.zachtronics.bot.om.model.OmPuzzle

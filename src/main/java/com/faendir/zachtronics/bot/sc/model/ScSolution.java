@@ -1,6 +1,7 @@
 package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.Solution;
+import com.faendir.zachtronics.bot.sc.discord.ScPuzzleConverter;
 import com.faendir.zachtronics.bot.sc.validator.SChem;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
@@ -33,7 +34,7 @@ public class ScSolution implements Solution {
             throw new IllegalArgumentException("header");
         }
 
-        ScPuzzle destPuzzle = Objects.requireNonNullElseGet(puzzle, () -> SpaceChem.parsePuzzle(m.group("puzzle")));
+        ScPuzzle destPuzzle = Objects.requireNonNullElseGet(puzzle, () -> ScPuzzleConverter.parsePuzzle(m.group("puzzle")));
 
         ScScore destScore;
         ScScore contentScore = ScScore.parseSimpleScore(m);

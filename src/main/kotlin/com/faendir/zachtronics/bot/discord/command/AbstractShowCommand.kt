@@ -1,7 +1,7 @@
 package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.zachtronics.bot.model.Category
-import com.faendir.zachtronics.bot.model.Leaderboard
+import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import discord4j.core.event.domain.interaction.SlashCommandEvent

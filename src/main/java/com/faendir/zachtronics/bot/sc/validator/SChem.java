@@ -1,16 +1,19 @@
 package com.faendir.zachtronics.bot.sc.validator;
 
+import com.faendir.zachtronics.bot.sc.discord.ScPuzzleConverter;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
-import com.faendir.zachtronics.bot.sc.model.SpaceChem;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /** Wrapper for a schem package installed on the system */
@@ -67,10 +70,10 @@ public class SChem {
 
         ScPuzzle puzzle;
         try {
-            puzzle = SpaceChem.parsePuzzle(result.getLevelName());
+            puzzle = ScPuzzleConverter.parsePuzzle(result.getLevelName());
         } catch (IllegalArgumentException e) {
             assert result.getResnetId() != null;
-            puzzle = SpaceChem.parsePuzzle(
+            puzzle = ScPuzzleConverter.parsePuzzle(
                     result.getLevelName() + " (" + result.getResnetId()[0] + "-" + result.getResnetId()[1] + "-" +
                     result.getResnetId()[2] + ")");
         }

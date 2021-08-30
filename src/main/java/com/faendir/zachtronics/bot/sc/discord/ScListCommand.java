@@ -3,7 +3,7 @@ package com.faendir.zachtronics.bot.sc.discord;
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.zachtronics.bot.discord.command.AbstractListCommand;
-import com.faendir.zachtronics.bot.model.Leaderboard;
+import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;

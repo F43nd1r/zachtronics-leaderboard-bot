@@ -1,7 +1,7 @@
 package com.faendir.zachtronics.bot.sc.leaderboards;
 
-import com.faendir.zachtronics.bot.model.Leaderboard;
-import com.faendir.zachtronics.bot.model.UpdateResult;
+import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
+import com.faendir.zachtronics.bot.leaderboards.UpdateResult;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.sc.model.*;

@@ -1,11 +1,11 @@
 package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.zachtronics.bot.model.Category
-import com.faendir.zachtronics.bot.model.Leaderboard
+import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.Score
-import com.faendir.zachtronics.bot.model.UpdateResult
+import com.faendir.zachtronics.bot.leaderboards.UpdateResult
 import com.faendir.zachtronics.bot.utils.asMultipartRequest
 import com.faendir.zachtronics.bot.utils.findInstance
 import com.faendir.zachtronics.bot.utils.ifNotEmpty

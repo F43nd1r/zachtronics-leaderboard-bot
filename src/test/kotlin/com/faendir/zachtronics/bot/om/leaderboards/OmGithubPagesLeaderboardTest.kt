@@ -2,7 +2,7 @@ package com.faendir.zachtronics.bot.om.leaderboards
 
 import com.faendir.zachtronics.bot.Application
 import com.faendir.zachtronics.bot.BotTest
-import com.faendir.zachtronics.bot.model.UpdateResult
+import com.faendir.zachtronics.bot.leaderboards.UpdateResult
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord

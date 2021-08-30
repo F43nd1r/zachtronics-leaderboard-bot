@@ -1,9 +1,5 @@
 package com.faendir.zachtronics.bot.sc.validator;
 
-import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
-import com.faendir.zachtronics.bot.sc.model.ScScore;
-import com.faendir.zachtronics.bot.sc.model.ScSolution;
-import com.faendir.zachtronics.bot.sc.model.SpaceChem;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Value;
