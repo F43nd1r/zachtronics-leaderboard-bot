@@ -57,7 +57,7 @@ public class ScSolution implements Solution {
     public static List<ScSolution> fromExportLink(@NotNull String exportLink, ScPuzzle puzzle, ScScore score) {
         String export;
         try (InputStream is = new URL(Utils.rawContentURL(exportLink)).openStream()) {
-            export = new String(is.readAllBytes());
+            export = new String(is.readAllBytes()).replace("\r\n", "\n");
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Could not parse your link");
         } catch (IOException e) {
