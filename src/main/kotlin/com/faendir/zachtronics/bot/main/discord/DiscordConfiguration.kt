@@ -9,6 +9,7 @@ import discord4j.gateway.intent.Intent
 import discord4j.gateway.intent.IntentSet
 import org.slf4j.LoggerFactory
 import org.springframework.boot.info.GitProperties
+import org.springframework.cloud.context.restart.RestartEndpoint
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -22,4 +23,7 @@ class DiscordConfiguration {
         .setInitialPresence { ClientPresence.online() }
         .login()
         .block()!!
+
+    @Bean
+    fun restartEndpoint() = RestartEndpoint()
 }
