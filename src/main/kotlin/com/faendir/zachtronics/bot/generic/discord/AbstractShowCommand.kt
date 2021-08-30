@@ -14,7 +14,7 @@ abstract class AbstractShowCommand<C : Category, P : Puzzle, R : Record> : Abstr
 
     override fun handle(event: SlashCommandEvent): MultipartRequest<WebhookExecuteRequest> {
         val (puzzle, category) = findPuzzleAndCategory(event)
-        val record = leaderboards.asSequence().map { it.get(puzzle, category) }.firstOrNull()
+        val record = leaderboards.asSequence().mapNotNull { it.get(puzzle, category) }.firstOrNull()
             ?: throw IllegalArgumentException("sorry, there is no score for ${puzzle.displayName} ${category.displayName}.")
         return MultipartRequest.ofRequestAndFiles(
             WebhookExecuteRequest.builder().content("*${puzzle.displayName}* **${category.displayName}**\n${record.toDisplayString()}").build(),
