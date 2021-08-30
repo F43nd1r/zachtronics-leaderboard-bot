@@ -10,5 +10,5 @@ interface Game {
 
     val commandName: String
 
-    fun hasWritePermission(user: User): Mono<Boolean> = false.toMono()
+    fun hasWritePermission(user: User): Boolean = false
 }

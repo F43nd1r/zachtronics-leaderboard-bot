@@ -29,11 +29,10 @@ public class ShenzhenIO implements Game {
     }
 
     private static final long WIKI_ADMIN = 295868901042946048L; // 12345ieee
-    @NotNull
     @Override
-    public Mono<Boolean> hasWritePermission(@Nullable User user) {
+    public boolean hasWritePermission(@Nullable User user) {
         if (user == null)
-            return Mono.just(false);
-        return Mono.just(user.getId().asLong() == WIKI_ADMIN);
+            return false;
+        return user.getId().asLong() == WIKI_ADMIN;
     }
 }

@@ -33,11 +33,10 @@ public class SpaceChem implements Game {
                                                         516462621382410260L, // TT
                                                         185983061190508544L  // Zig
     );
-    @NotNull
     @Override
-    public Mono<Boolean> hasWritePermission(@Nullable User user) {
+    public boolean hasWritePermission(@Nullable User user) {
         if (user == null)
-            return Mono.just(false);
-        return Mono.just(WIKI_ADMINS.contains(user.getId().asLong()));
+            return false;
+        return WIKI_ADMINS.contains(user.getId().asLong());
     }
 }

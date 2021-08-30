@@ -77,7 +77,7 @@ class DiscordService(
             val option = event.options.first()
             val command = gameContext.commands.find { it.data.name() == option.name }
                 ?: throw IllegalArgumentException("I did not recognize the command \"${option.name}\".")
-            if (!command.isReadOnly && !gameContext.game.hasWritePermission(event.interaction.member.map { it as User }.orElse(event.interaction.user)).awaitSingle()) {
+            if (!command.hasExecutionPermission(gameContext.game, event.interaction.member.map { it as User }.orElse(event.interaction.user))) {
                 throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
             }
             val result = command.handle(event)

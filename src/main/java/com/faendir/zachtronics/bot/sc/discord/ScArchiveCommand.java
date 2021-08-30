@@ -4,11 +4,14 @@ import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.zachtronics.bot.generic.discord.AbstractArchiveCommand;
 import com.faendir.zachtronics.bot.generic.discord.LinkConverter;
+import com.faendir.zachtronics.bot.model.Game;
 import com.faendir.zachtronics.bot.sc.archive.ScArchive;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.User;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -51,5 +54,12 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
             this.puzzle = puzzle;
             this.score = score;
         }
+    }
+
+    @Override
+    public boolean hasExecutionPermission(@NotNull Game game, @NotNull User user) {
+        if(user instanceof Member)
+            return ((Member) user).getRoles().any(r -> r.getName().equals("trusted-leaderboard-poster")).block();
+        else return false;
     }
 }
