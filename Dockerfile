@@ -9,7 +9,10 @@ WORKDIR application
 RUN apt-get update && apt-get install -y ffmpeg python3-pip
 RUN pip install schem
 COPY --from=builder application/dependencies/ ./
+RUN true
 COPY --from=builder application/spring-boot-loader/ ./
+RUN true
 COPY --from=builder application/snapshot-dependencies/ ./
+RUN true
 COPY --from=builder application/application/ ./
 ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
