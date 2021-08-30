@@ -1,14 +1,12 @@
 package com.faendir.zachtronics.bot.sc.model;
 
+import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.sc.SpaceChemMarker;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@BotTest(SpaceChemMarker.SpaceChemConfiguration.class)
+@BotTest(Application.class)
 class ScSolutionTest {
     @Test
     public void testCoherentContentScore() {

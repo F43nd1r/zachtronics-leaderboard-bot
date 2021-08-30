@@ -1,8 +1,8 @@
 package com.faendir.zachtronics.bot.sc.leaderboards;
 
+import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.model.UpdateResult;
-import com.faendir.zachtronics.bot.sc.SpaceChemMarker;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@BotTest(SpaceChemMarker.SpaceChemConfiguration.class)
+@BotTest(Application.class)
 public class ScLeaderboardTest {
 
     @Autowired

@@ -1,6 +1,6 @@
 package com.faendir.zachtronics.bot.om.leaderboards
 
-import com.faendir.zachtronics.bot.main.git.GitRepository
+import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.model.Leaderboard
 import com.faendir.zachtronics.bot.model.UpdateResult
 import com.faendir.zachtronics.bot.om.imgur.ImgurService

@@ -1,16 +1,15 @@
 package com.faendir.zachtronics.bot.om.reddit
 
-import com.faendir.zachtronics.bot.main.git.GitRepository
-import com.faendir.zachtronics.bot.main.reddit.Comment
-import com.faendir.zachtronics.bot.main.reddit.RedditService
-import com.faendir.zachtronics.bot.main.reddit.Subreddit
+import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.model.Leaderboard
 import com.faendir.zachtronics.bot.model.UpdateResult
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
-import com.faendir.zachtronics.bot.om.model.OpusMagnum
+import com.faendir.zachtronics.bot.reddit.Comment
+import com.faendir.zachtronics.bot.reddit.RedditService
+import com.faendir.zachtronics.bot.reddit.Subreddit
 import com.faendir.zachtronics.bot.utils.DateSerializer
 import com.faendir.zachtronics.bot.utils.Forest
 import com.faendir.zachtronics.bot.utils.filterIsInstance
@@ -29,7 +28,7 @@ import javax.annotation.PostConstruct
 @Service
 @EnableScheduling
 class OmRedditPostScraper(
-    private val redditService: RedditService, private val discordClient: GatewayDiscordClient, private val opusMagnum: OpusMagnum,
+    private val redditService: RedditService, private val discordClient: GatewayDiscordClient,
     @Qualifier("configRepository") private val gitRepo: GitRepository,
     private val leaderboards: List<Leaderboard<OmCategory, OmPuzzle, OmRecord>>
 ) {

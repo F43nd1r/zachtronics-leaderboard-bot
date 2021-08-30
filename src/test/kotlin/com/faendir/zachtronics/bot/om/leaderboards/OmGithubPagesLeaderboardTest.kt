@@ -1,8 +1,8 @@
 package com.faendir.zachtronics.bot.om.leaderboards
 
+import com.faendir.zachtronics.bot.Application
 import com.faendir.zachtronics.bot.BotTest
 import com.faendir.zachtronics.bot.model.UpdateResult
-import com.faendir.zachtronics.bot.om.OpusMagnumConfiguration
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
@@ -20,7 +20,7 @@ import strikt.assertions.isNotNull
 import strikt.assertions.isNull
 import strikt.assertions.isTrue
 
-@BotTest(OpusMagnumConfiguration::class)
+@BotTest(Application::class)
 internal class OmGithubPagesLeaderboardTest {
 
     @Autowired

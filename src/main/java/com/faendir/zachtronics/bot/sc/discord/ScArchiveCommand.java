@@ -2,9 +2,9 @@ package com.faendir.zachtronics.bot.sc.discord;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.zachtronics.bot.generic.discord.AbstractArchiveCommand;
-import com.faendir.zachtronics.bot.generic.discord.LinkConverter;
-import com.faendir.zachtronics.bot.model.Game;
+import com.faendir.zachtronics.bot.discord.LinkConverter;
+import com.faendir.zachtronics.bot.discord.command.AbstractArchiveCommand;
+import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.archive.ScArchive;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
@@ -23,6 +23,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Component
+@ScQualifier
 public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
     @Getter
     private final ScArchive archive;
@@ -57,9 +58,9 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
     }
 
     @Override
-    public boolean hasExecutionPermission(@NotNull Game game, @NotNull User user) {
-        if(user instanceof Member)
-            return ((Member) user).getRoles().any(r -> r.getName().equals("trusted-leaderboard-poster")).block();
+    public boolean hasExecutionPermission(@NotNull User user) {
+        if (user instanceof Member)
+            return ((Member)user).getRoles().any(r -> r.getName().equals("trusted-leaderboard-poster")).block();
         else return false;
     }
 }

@@ -1,7 +1,5 @@
 package com.faendir.zachtronics.bot
 
-import com.faendir.zachtronics.bot.generic.GenericConfiguration
-import com.faendir.zachtronics.bot.main.Application
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
@@ -21,6 +19,6 @@ annotation class BotTest(@get:AliasFor(annotation = ContextConfiguration::class,
 
 class ContextInitializer : ApplicationContextInitializer<AnnotationConfigApplicationContext> {
     override fun initialize(applicationContext: AnnotationConfigApplicationContext) {
-        applicationContext.register(Application::class.java, GenericConfiguration::class.java, TestConfiguration::class.java)
+        applicationContext.register(Application::class.java, TestConfiguration::class.java)
     }
 }

@@ -3,8 +3,10 @@ package com.faendir.zachtronics.bot.om.discord
 import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
-import com.faendir.zachtronics.bot.generic.discord.AbstractSubmitArchiveCommand
-import com.faendir.zachtronics.bot.generic.discord.LinkConverter
+import com.faendir.zachtronics.bot.discord.LinkConverter
+import com.faendir.zachtronics.bot.discord.command.AbstractSubmitArchiveCommand
+import com.faendir.zachtronics.bot.discord.command.Secured
+import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmSolution
@@ -13,8 +15,9 @@ import discord4j.discordjson.json.ApplicationCommandOptionData
 import org.springframework.stereotype.Component
 
 @Component
+@OmQualifier
 class OmSubmitArchiveCommand(override val archiveCommand: OmArchiveCommand, override val submitCommand: OmSubmitCommand) :
-    AbstractSubmitArchiveCommand<OmPuzzle, OmRecord, OmSolution>() {
+    AbstractSubmitArchiveCommand<OmPuzzle, OmRecord, OmSolution>(), Secured by OmSecured {
 
     override fun buildData(): ApplicationCommandOptionData = SubmitArchiveParser.buildData()
 

@@ -3,8 +3,9 @@ package com.faendir.zachtronics.bot.om.discord
 import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
-import com.faendir.zachtronics.bot.generic.discord.AbstractListCommand
+import com.faendir.zachtronics.bot.discord.command.AbstractListCommand
 import com.faendir.zachtronics.bot.model.Leaderboard
+import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
@@ -13,6 +14,7 @@ import discord4j.discordjson.json.ApplicationCommandOptionData
 import org.springframework.stereotype.Component
 
 @Component
+@OmQualifier
 class OmListCommand(override val leaderboards: List<Leaderboard<OmCategory, OmPuzzle, OmRecord>>) :
     AbstractListCommand<OmCategory, OmPuzzle, OmRecord>() {
 

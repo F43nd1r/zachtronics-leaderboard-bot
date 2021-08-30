@@ -1,6 +1,6 @@
 package com.faendir.zachtronics.bot.sc.archive;
 
-import com.faendir.zachtronics.bot.generic.archive.SolutionsIndex;
+import com.faendir.zachtronics.bot.archive.SolutionsIndex;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;

@@ -2,8 +2,8 @@ package com.faendir.zachtronics.bot.sc.discord;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.zachtronics.bot.generic.discord.AbstractSubmitCommand;
-import com.faendir.zachtronics.bot.generic.discord.LinkConverter;
+import com.faendir.zachtronics.bot.discord.LinkConverter;
+import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand;
 import com.faendir.zachtronics.bot.model.Leaderboard;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
@@ -22,9 +22,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
-    @Getter
-    private final boolean enabled = false; // purposefully hidden, used only as a component of submit-archive
+public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> implements ScSecured {
 
     @Getter
     private final List<Leaderboard<?, ScPuzzle, ScRecord>> leaderboards;
@@ -43,7 +41,7 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> {
         return ScSubmitCommand$DataParser.buildData();
     }
 
-    @ApplicationCommand(name = "", subCommand = true)
+    @ApplicationCommand(subCommand = true)
     @Value
     public static class Data {
         @NonNull ScPuzzle puzzle;

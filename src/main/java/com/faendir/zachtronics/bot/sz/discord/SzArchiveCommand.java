@@ -2,8 +2,9 @@ package com.faendir.zachtronics.bot.sz.discord;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.zachtronics.bot.generic.discord.AbstractArchiveCommand;
-import com.faendir.zachtronics.bot.generic.discord.LinkConverter;
+import com.faendir.zachtronics.bot.discord.LinkConverter;
+import com.faendir.zachtronics.bot.discord.command.AbstractArchiveCommand;
+import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.archive.SzArchive;
 import com.faendir.zachtronics.bot.sz.model.SzSolution;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
@@ -23,7 +24,8 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Component
-public class SzArchiveCommand extends AbstractArchiveCommand<SzSolution> {
+@SzQualifier
+public class SzArchiveCommand extends AbstractArchiveCommand<SzSolution> implements SzSecured {
     @Getter
     private final SzArchive archive;
 

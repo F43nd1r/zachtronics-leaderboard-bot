@@ -1,7 +1,7 @@
 package com.faendir.zachtronics.bot.sc.archive;
 
+import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.sc.SpaceChemMarker;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-@BotTest(SpaceChemMarker.SpaceChemConfiguration.class)
+@BotTest(Application.class)
 public class ScArchiveTest {
 
     @Autowired

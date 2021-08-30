@@ -2,8 +2,9 @@ package com.faendir.zachtronics.bot.sc.discord;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.zachtronics.bot.generic.discord.AbstractSubmitArchiveCommand;
-import com.faendir.zachtronics.bot.generic.discord.LinkConverter;
+import com.faendir.zachtronics.bot.discord.LinkConverter;
+import com.faendir.zachtronics.bot.discord.command.AbstractSubmitArchiveCommand;
+import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
@@ -19,7 +20,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzle, ScRecord, ScSolution> {
+@ScQualifier
+public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzle, ScRecord, ScSolution> implements ScSecured {
     @Getter
     private final ScSubmitCommand submitCommand;
     @Getter

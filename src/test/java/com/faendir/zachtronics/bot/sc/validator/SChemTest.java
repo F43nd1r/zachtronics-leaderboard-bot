@@ -1,13 +1,14 @@
 package com.faendir.zachtronics.bot.sc.validator;
 
+import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.sc.SpaceChemMarker;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@BotTest(SpaceChemMarker.SpaceChemConfiguration.class)
+@BotTest(Application.class)
 @Disabled("Uses SChem")
 class SChemTest {
 

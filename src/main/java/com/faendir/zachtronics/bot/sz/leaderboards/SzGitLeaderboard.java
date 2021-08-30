@@ -1,6 +1,6 @@
 package com.faendir.zachtronics.bot.sz.leaderboards;
 
-import com.faendir.zachtronics.bot.main.git.GitRepository;
+import com.faendir.zachtronics.bot.git.GitRepository;
 import com.faendir.zachtronics.bot.model.Leaderboard;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;

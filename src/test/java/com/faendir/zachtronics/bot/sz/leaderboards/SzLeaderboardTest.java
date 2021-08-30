@@ -1,7 +1,7 @@
 package com.faendir.zachtronics.bot.sz.leaderboards;
 
+import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.sz.ShenzhenIOMarker;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@BotTest(ShenzhenIOMarker.ShenzhenIOConfiguration.class)
+@BotTest(Application.class)
 public class SzLeaderboardTest {
 
     @Autowired

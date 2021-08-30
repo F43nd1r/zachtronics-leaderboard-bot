@@ -3,9 +3,11 @@ package com.faendir.zachtronics.bot.om.discord
 import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
-import com.faendir.zachtronics.bot.generic.discord.AbstractSubmitCommand
-import com.faendir.zachtronics.bot.generic.discord.LinkConverter
+import com.faendir.zachtronics.bot.discord.LinkConverter
+import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand
+import com.faendir.zachtronics.bot.discord.command.Secured
 import com.faendir.zachtronics.bot.model.Leaderboard
+import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.OmModifier
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
@@ -14,8 +16,9 @@ import discord4j.core.event.domain.interaction.SlashCommandEvent
 import org.springframework.stereotype.Component
 
 @Component
+@OmQualifier
 class OmSubmitCommand(override val leaderboards: List<Leaderboard<*, OmPuzzle, OmRecord>>) :
-    AbstractSubmitCommand<OmPuzzle, OmRecord>() {
+    AbstractSubmitCommand<OmPuzzle, OmRecord>(), Secured by OmSecured {
 
     override fun buildData() = SubmitParser.buildData()
 
@@ -23,7 +26,11 @@ class OmSubmitCommand(override val leaderboards: List<Leaderboard<*, OmPuzzle, O
         val submit = SubmitParser.parse(interaction)
         return Pair(
             submit.puzzle,
-            OmRecord(OmScore.parse(submit.puzzle, submit.score).apply { modifier = submit.modifier ?: OmModifier.NORMAL }, submit.gif, interaction.interaction.user.username)
+            OmRecord(
+                OmScore.parse(submit.puzzle, submit.score).apply { modifier = submit.modifier ?: OmModifier.NORMAL },
+                submit.gif,
+                interaction.interaction.user.username
+            )
         )
     }
 }

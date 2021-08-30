@@ -2,8 +2,9 @@ package com.faendir.zachtronics.bot.sz.discord;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.zachtronics.bot.generic.discord.AbstractShowCommand;
+import com.faendir.zachtronics.bot.discord.command.AbstractShowCommand;
 import com.faendir.zachtronics.bot.model.Leaderboard;
+import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Component
+@SzQualifier
 public class SzShowCommand extends AbstractShowCommand<SzCategory, SzPuzzle, SzRecord> {
     @Getter
     private final List<Leaderboard<SzCategory, SzPuzzle, SzRecord>> leaderboards;

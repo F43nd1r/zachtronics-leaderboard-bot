@@ -1,5 +1,8 @@
 package com.faendir.zachtronics.bot.main.reddit
 
+import com.faendir.zachtronics.bot.reddit.Comment
+import com.faendir.zachtronics.bot.reddit.RedditService
+import com.faendir.zachtronics.bot.reddit.Subreddit
 import com.faendir.zachtronics.bot.utils.Forest
 import java.io.File
 import javax.annotation.PreDestroy

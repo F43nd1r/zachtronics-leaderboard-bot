@@ -1,7 +1,7 @@
 package com.faendir.zachtronics.bot.om.archive
 
-import com.faendir.zachtronics.bot.generic.archive.Archive
-import com.faendir.zachtronics.bot.main.git.GitRepository
+import com.faendir.zachtronics.bot.archive.Archive
+import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmScore

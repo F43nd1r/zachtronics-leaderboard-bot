@@ -1,6 +1,6 @@
 package com.faendir.zachtronics.bot.om.imgur
 
-import com.faendir.zachtronics.bot.main.config.ImgurProperties
+import com.faendir.zachtronics.bot.config.ImgurProperties
 import com.roxstudio.utils.CUrl
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString

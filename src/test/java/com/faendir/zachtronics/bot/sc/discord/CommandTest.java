@@ -1,8 +1,8 @@
 package com.faendir.zachtronics.bot.sc.discord;
 
+import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.generic.discord.Command;
-import com.faendir.zachtronics.bot.sc.SpaceChemMarker;
+import com.faendir.zachtronics.bot.discord.command.Command;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@BotTest(SpaceChemMarker.SpaceChemConfiguration.class)
+@BotTest(Application.class)
 public class CommandTest {
 
     @Autowired

@@ -1,6 +1,7 @@
 package com.faendir.zachtronics.bot.main.git
 
-import com.faendir.zachtronics.bot.main.config.GitProperties
+import com.faendir.zachtronics.bot.config.GitProperties
+import com.faendir.zachtronics.bot.git.GitRepository
 import java.io.File
 import javax.annotation.PreDestroy
 

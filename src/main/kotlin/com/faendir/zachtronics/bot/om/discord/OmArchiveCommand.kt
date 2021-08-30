@@ -16,10 +16,12 @@ import com.faendir.om.parser.solution.model.part.IO
 import com.faendir.om.parser.solution.model.part.IOType
 import com.faendir.om.parser.solution.model.part.Part
 import com.faendir.om.parser.solution.model.part.Track
-import com.faendir.zachtronics.bot.generic.archive.Archive
-import com.faendir.zachtronics.bot.generic.discord.AbstractArchiveCommand
-import com.faendir.zachtronics.bot.generic.discord.LinkConverter
+import com.faendir.zachtronics.bot.archive.Archive
+import com.faendir.zachtronics.bot.discord.LinkConverter
+import com.faendir.zachtronics.bot.discord.command.AbstractArchiveCommand
+import com.faendir.zachtronics.bot.discord.command.Secured
 import com.faendir.zachtronics.bot.om.JNISolutionVerifier
+import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.FULL_CIRCLE
 import com.faendir.zachtronics.bot.om.model.OmModifier
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
@@ -46,7 +48,8 @@ import java.io.File
 import java.util.*
 
 @Component
-class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArchiveCommand<OmSolution>() {
+@OmQualifier
+class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArchiveCommand<OmSolution>(), Secured by OmSecured {
     private val verifier = JNISolutionVerifier()
 
     override fun buildData(): ApplicationCommandOptionData = ArchiveParser.buildData()

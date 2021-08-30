@@ -1,8 +1,8 @@
 package com.faendir.zachtronics.bot.sc.archive;
 
-import com.faendir.zachtronics.bot.generic.archive.AbstractArchive;
-import com.faendir.zachtronics.bot.generic.archive.SolutionsIndex;
-import com.faendir.zachtronics.bot.main.git.GitRepository;
+import com.faendir.zachtronics.bot.archive.AbstractArchive;
+import com.faendir.zachtronics.bot.archive.SolutionsIndex;
+import com.faendir.zachtronics.bot.git.GitRepository;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
