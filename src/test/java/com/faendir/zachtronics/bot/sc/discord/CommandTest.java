@@ -60,6 +60,7 @@ public class CommandTest {
     }
 
     @Test
+    @Disabled("Uses SChem")
     public void testSubmitArchive() {
         Map<String, String> args = Map.of("video", "http://example.com",
                                           "export", "https://pastebin.com/19smCuS8", // valid 45/1/14
@@ -69,6 +70,7 @@ public class CommandTest {
     }
 
     @Test
+    @Disabled("Uses SChem")
     public void testArchiveOne() {
         // we start at 100/100/100
         Map<String, String> args = Map.of("score", "45/1/14",
@@ -78,6 +80,7 @@ public class CommandTest {
     }
 
     @Test
+    @Disabled("Uses SChem")
     public void testArchiveMany() {
         // we start at 100/100/100
         Map<String, String> args = Map.of("export", "https://pastebin.com/kNnfTvMa"); // valid 45/1/14 and 115/1/6
@@ -87,6 +90,7 @@ public class CommandTest {
     }
 
     @Test
+    @Disabled("Uses SChem")
     public void testArchiveManyAndScore() {
         // we start at 1000/1/1000
         Map<String, String> args = Map.of("score", "136/1/27",
