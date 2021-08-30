@@ -54,8 +54,8 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
 
         fun commitAndPush(message: String) {
             git.commit()
-                .setAuthor("om-leaderboard-discord-bot", "om-leaderboard-discord-bot@faendir.com")
-                .setCommitter("om-leaderboard-discord-bot", "om-leaderboard-discord-bot@faendir.com")
+                .setAuthor("zachtronics-leaderboard-bot", "zachtronics-leaderboard-bot@faendir.com")
+                .setCommitter("zachtronics-leaderboard-bot", "zachtronics-leaderboard-bot@faendir.com")
                 .setMessage("[BOT] $message")
                 .call()
             git.push().setCredentialsProvider(UsernamePasswordCredentialsProvider(gitProperties.username, gitProperties.accessToken)).setTimeout(120).call()

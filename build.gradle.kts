@@ -72,7 +72,7 @@ tasks.withType<KotlinCompile> {
 }
 
 docker {
-    name = "f43nd1r/om-leaderboard-discord-bot:latest"
+    name = "f43nd1r/om-leaderboard-discord-bot:latest" // TODO change name to zachtronics-leaderboard-bot
     files(tasks.getByName<BootJar>("bootJar").outputs)
     copySpec.into("build/libs")
 }
