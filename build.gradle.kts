@@ -25,6 +25,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.5.1")
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.cloud:spring-cloud-starter:3.0.3")
     implementation("com.discord4j:discord4j-core:3.2.0-RC3")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.4")
     implementation("org.eclipse.jgit:org.eclipse.jgit:5.12.0.202106070339-r")
