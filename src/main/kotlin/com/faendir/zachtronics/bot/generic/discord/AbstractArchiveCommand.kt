@@ -30,7 +30,6 @@ abstract class AbstractArchiveCommand<S : Solution> : AbstractCommand() {
                             .name("*${solution.puzzle.displayName}* ${result.first}")
                             .value(
                                 "`${solution.score.toDisplayString()}` has been archived.\n" +
-                                        "\n" +
                                         result.second
                             ).build()
                     } else {

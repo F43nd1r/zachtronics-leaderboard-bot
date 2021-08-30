@@ -10,9 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /** Wrapper for a schem package installed on the system */
@@ -39,7 +37,7 @@ public class SChem {
             return Collections.singletonList(ScSolution.fromContentNoValidation(export, puzzle, userScore));
         }
 
-        List<ScSolution> result = new ArrayList<>();
+        LinkedHashSet<ScSolution> result = new LinkedHashSet<>();
         StringBuilder exceptions = new StringBuilder();
         int line = 1;
         for (String content : contents) {
@@ -54,7 +52,7 @@ public class SChem {
         if (!exceptions.isEmpty()) {
             throw new IllegalArgumentException(exceptions.toString());
         }
-        return result;
+        return Arrays.asList(result.toArray(new ScSolution[0]));
     }
 
     /**
