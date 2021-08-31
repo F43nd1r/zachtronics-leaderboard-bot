@@ -3,6 +3,7 @@ package com.faendir.zachtronics.bot.sc.discord;
 import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.discord.command.Command;
+import com.faendir.zachtronics.bot.sc.ScQualifier;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
@@ -32,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CommandTest {
 
     @Autowired
+    @ScQualifier
     private List<Command> commands;
 
     @Test
