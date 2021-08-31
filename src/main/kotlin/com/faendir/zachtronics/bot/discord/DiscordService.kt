@@ -36,12 +36,10 @@ class DiscordService(
     @PostConstruct
     fun init() {
         val requests = gameCommands.map { gameCommand ->
-            println(gameCommand.commandName)
             val request = ApplicationCommandRequest.builder()
                 .name(gameCommand.commandName)
                 .description(gameCommand.displayName)
             for (command in gameCommand.commands) {
-                println(command.data.name())
                 request.addOption(command.data)
             }
             request.build()
