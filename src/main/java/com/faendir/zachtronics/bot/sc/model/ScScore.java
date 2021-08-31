@@ -4,8 +4,6 @@ import com.faendir.zachtronics.bot.model.Score;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +14,8 @@ import java.util.regex.Pattern;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class ScScore implements Score {
-    public static final ScScore INVALID_SCORE = new ScScore(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+    /** it's also unbeatable */
+    public static final ScScore INVALID_SCORE = new ScScore(-1, -1, -1);
 
     private final int cycles;
     private final int reactors;
