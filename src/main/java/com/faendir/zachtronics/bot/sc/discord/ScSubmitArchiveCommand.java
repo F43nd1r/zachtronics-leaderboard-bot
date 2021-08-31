@@ -8,7 +8,6 @@ import com.faendir.zachtronics.bot.discord.command.AbstractSubmitArchiveCommand;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
-import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
@@ -53,8 +52,10 @@ public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzl
 
         public Data(@Description("Link to your video of the solution, can be `m1` to scrape it from your last message")
                     @NotNull @Converter(LinkConverter.class) String video,
+                    /* TODO description in 100 chars or less
                     @Description("Link to your export file, can be `m1` to scrape it from your last message\n" +
                                  "If the solution name starts with `/B`, `/P` or `/BP`, the corresponding flags are set in the score")
+                    */
                     @NotNull @Converter(LinkConverter.class) String export,
                     @Description("Name to appear on the Reddit leaderboard")
                     @NotNull String author,
