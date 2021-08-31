@@ -1,7 +1,6 @@
 package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.Record;
-import kotlinx.serialization.Serializable;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,8 +8,8 @@ import org.jetbrains.annotations.NotNull;
 public class ScRecord implements Record {
     public static final ScRecord IMPOSSIBLE_CATEGORY = new ScRecord(ScScore.INVALID_SCORE, "", "", false);
 
-    ScScore score;
-    String author;
-    String link;
+    @NotNull ScScore score;
+    @NotNull String author;
+    @NotNull String link;
     boolean oldVideoRNG;
 }

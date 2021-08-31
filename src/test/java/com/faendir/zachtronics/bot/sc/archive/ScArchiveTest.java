@@ -20,28 +20,28 @@ public class ScArchiveTest {
     @Test
     public void testArchiveScore() {
         // we start with a 100/100/100
-        ScScore score = new ScScore(100, 100, 100);
+        ScScore score = new ScScore(100, 100, 100, true, true);
         assertEquals("", doArchiveScore(score)); // our score is a BP, fail
-        score.setBugged(false);
+        score = new ScScore(100, 100, 100, false, true);
         assertEquals("", doArchiveScore(score)); // our score is a P, fail
-        score.setPrecognitive(false);
+        score = new ScScore(100, 100, 100, false, false);
         assertNotEquals("", doArchiveScore(score)); // identical score, different content, accept
-        score = new ScScore(10, 100, 1000);
+        score = new ScScore(10, 100, 1000, true, true);
         assertNotEquals("", doArchiveScore(score)); // new frontier piece
-        score = new ScScore(1000, 100, 10);
+        score = new ScScore(1000, 100, 10, true, true);
         assertNotEquals("", doArchiveScore(score)); // new frontier piece
-        score = new ScScore(10, 10, 10);
+        score = new ScScore(10, 10, 10, true, true);
         assertNotEquals("", doArchiveScore(score)); // beats them both
-        score = new ScScore(20, 20, 20);
+        score = new ScScore(20, 20, 20, true, true);
         assertEquals("", doArchiveScore(score)); // fails flat
-        score.setBugged(false);
+        score = new ScScore(20, 20, 20, false, true);
         assertNotEquals("", doArchiveScore(score)); // new non bugged record
     }
 
     @Test
     public void testArchiveAttachment() {
         // we start at 100/100/100
-        ScScore score = new ScScore(50, 50, 50);
+        ScScore score = new ScScore(50, 50, 50, false, false);
         assertNotEquals("", doArchiveScore(score)); // 50/50/50
 
         String content = "SOLUTION:Of Pancakes and Spaceships,12345ieee,45-1-14\nbunch of stuff...";

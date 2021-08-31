@@ -72,13 +72,14 @@ public class ScLeaderboardTest {
     public void testUpdate() {
         // (**817**/2/104) | ← | (**819**/2/44)
         ScPuzzle p = ScPuzzle.sensing_4;
-        ScScore s = new ScScore(819, 2, 43);
+        ScScore s = new ScScore(819, 2, 43, false, true);
         ScRecord r = new ScRecord(s, "auth", "lnk", false);
 
         UpdateResult ur = scLeaderboard.update(p, r);
         assertTrue(ur instanceof UpdateResult.BetterExists);
 
-        s.setPrecognitive(false);
+        s = new ScScore(819, 2, 43, false, false);
+        r = new ScRecord(s, "auth", "lnk", false);
         ur = scLeaderboard.update(p, r);
         assertTrue(ur instanceof UpdateResult.Success);
     }

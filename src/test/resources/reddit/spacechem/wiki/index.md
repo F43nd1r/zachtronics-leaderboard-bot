@@ -20,7 +20,7 @@ This archive is moderated by u/12345ieee, u/ToughThought, and u/zig1000.
 
 ####Submitting a new Solution
 Record and upload the solution to YouTube with the game's built-in solution recorder,
-then post the link on the [discussion thread](https://www.reddit.com/r/spacechem/comments/ivhb8m/spacechem_archive_of_top_solutions_thread_8/).  You are strongly encouraged also to export your solution using the [Community Edition of SpaceChem](https://github.com/spacechem-community-developers/SpaceChem-Community-Edition/), post the export/import code to a site of your choice, and link to it in the video description.  
+then post the link on the [discussion thread](https://www.reddit.com/r/spacechem/comments/mmcuzb/spacechem_archive_of_top_solutions_thread_9/).  You are strongly encouraged also to export your solution using the [Community Edition of SpaceChem](https://github.com/spacechem-community-developers/SpaceChem-Community-Edition/), post the export/import code to a site of your choice, and link to it in the video description.  
 
 For complex production levels in which the in-game video is not very clear, either upload a collection of reactor screenshots
 and link it in the video description, or record with an external recorder, showing all the reactors.
@@ -33,33 +33,33 @@ See further [explanations at the bottom of this page](https://www.reddit.com/r/s
 ###Sernimir II
 |Name                         |Min Cycles |Min Cycles - No Bugs |Min Symbols |Min Symbols - No Bugs
 |:-                           |:-      |:-      |:-      |:-
-|Of Pancakes and Spaceships   | [(**45**/1/14) toi333](https://youtu.be/QAGV96A_KY4) | ← | [(115/1/**6**) Sahishar](https://youtu.be/SPdA4K_2RvU) | ←
+|Of Pancakes and Spaceships | [(**45**/1/14) toi333](https://youtu.be/QAGV96A_KY4) | ← | [(115/1/**6**) Sahishar](https://youtu.be/SPdA4K_2RvU) | ←
 |
-|Slightly Different           | [(**45**/1/14) toi333](https://youtu.be/A6D7vh_eAFU) | ← | [(115/1/**6**) Sahishar](https://youtu.be/bwpIMpduOBk) | ←
+|Slightly Different | [(**45**/1/14) toi333](https://youtu.be/A6D7vh_eAFU) | ← | [(115/1/**6**) Sahishar](https://youtu.be/bwpIMpduOBk) | ←
 |
-|Crossover                    | [(**136**/1/36) toi333](https://youtu.be/jFZW0RN77qU) | ← | [(155/1/**16**) Sahishar](https://youtu.be/bISOddxfarA) | ←
+|Crossover | [(**136**/1/36) toi333](https://youtu.be/jFZW0RN77qU) | ← | [(155/1/**16**) Sahishar](https://youtu.be/bISOddxfarA) | ←
 |
-|An Introduction to Bonding   | [(**74**/1/40) Zig](https://youtu.be/c4LK7IZ-PGs) | ← | [(154/1/**10**) Sahishar](https://youtu.be/k2oLGHYKLtQ) | ←
+|An Introduction to Bonding | [(**74**/1/40) Zig](https://youtu.be/c4LK7IZ-PGs) | ← | [(154/1/**10**) Sahishar](https://youtu.be/k2oLGHYKLtQ) | ←
 |
 |A Brief History of SpaceChem | [(**75**/1/20) toi333](https://youtu.be/QmsfMwv7C2I) | ← | [(154/1/**10**) Sahishar](https://youtu.be/DXogI64d9m8) | ←
 |
-|Removing Bonds               | [(**27**/1/13) hailstone](https://youtu.be/CkajOkvfCD8) | ← | [(55/1/**7**) Sahishar](https://youtu.be/Q4FtlgQ-AzU) | ←
+|Removing Bonds | [(**27**/1/13) hailstone](https://youtu.be/CkajOkvfCD8) | ← | [(55/1/**7**) Sahishar](https://youtu.be/Q4FtlgQ-AzU) | ←
 
 
 ###Sernimir IV
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Symbols |Min Symbols - No Bugs
 |:-                    |:-      |:-      |:-      |:-
-|Double Bonds          | [(**56**/1/18) Sahishar](https://youtu.be/rrkyR8F4Ohs) | ← | [(117/1/**7**) prdwong](https://youtu.be/4JyPZdg_nZY) | ←
+|Double Bonds | [(**56**/1/18) Sahishar](https://youtu.be/rrkyR8F4Ohs) | ← | [(117/1/**7**) prdwong](https://youtu.be/4JyPZdg_nZY) | ←
 |
-|Best Left Unanswered  | [(**42**/1/50) Sahishar](https://youtu.be/bEy7c9I4PMc) | ← | [(117/1/**7**) prdwong](https://youtu.be/vf9JPqKGukE) | ←
+|Best Left Unanswered | [(**42**/1/50) Sahishar](https://youtu.be/bEy7c9I4PMc) | ← | [(117/1/**7**) prdwong](https://youtu.be/vf9JPqKGukE) | ←
 |
-|Multiple Outputs      | [(**50**/1/59) harbinger](https://youtu.be/pBtkV94vAUE) | ← | [(155/1/**10**) Jared T.](https://youtu.be/9gqYJari6pU) | ←
+|Multiple Outputs | [(**50**/1/59) harbinger](https://youtu.be/pBtkV94vAUE) | ← | [(155/1/**10**) Jared T.](https://youtu.be/9gqYJari6pU) | ←
 |
-|An Introduction to Pipelines      | [(**407**/0/0) prdwong](https://youtu.be/_S1ndm9lqsU) | ← | [(407/0/**0**) prdwong](https://youtu.be/_S1ndm9lqsU) | ←
+|An Introduction to Pipelines | [(**407**/0/0) prdwong](https://youtu.be/_S1ndm9lqsU) | ← | [(407/0/**0**) prdwong](https://youtu.be/_S1ndm9lqsU) | ←
 |
 |There's Something in the Fishcake | [(**412**/1/14) hailstone](https://youtu.be/HJGvifiTao0) | ← | [(647/1/**10**) Sahishar](https://youtu.be/E8jIE4Kb4Xs) | ←
 |
-|Sleepless on Sernimir IV          | [(**805**/2/48) Sahishar](https://youtu.be/6ebQ_DWPfk0) | ← | [(810/2/**21**) prdwong](https://youtu.be/FKvdtzuwF2s) | ←
+|Sleepless on Sernimir IV | [(**805**/2/48) Sahishar](https://youtu.be/6ebQ_DWPfk0) | ← | [(810/2/**21**) prdwong](https://youtu.be/FKvdtzuwF2s) | ←
 
 
 ###Danopth
@@ -67,49 +67,49 @@ See further [explanations at the bottom of this page](https://www.reddit.com/r/s
 |:-                       |:-      |:-      |:-      |:-      
 |Every Day is the First Day | [(**103**/1/41) Sahishar](https://youtu.be/W3IgEvqkOkg) | ← | [(354/1/**12**) Sahishar](https://youtu.be/qypYprgAyTQ) | ←
 |
-|It Takes Three        | [(**102**/1/34) toi333](https://youtu.be/xekMsh0r1GI) | ← | [(142/1/**14**) Sahishar](https://youtu.be/BagzxqWY7iU) | ←
+|It Takes Three | [(**102**/1/34) toi333](https://youtu.be/xekMsh0r1GI) | ← | [(142/1/**14**) Sahishar](https://youtu.be/BagzxqWY7iU) | ←
 |
-|Split Before Bonding      | [(**73**/1/24) toi333](https://youtu.be/l-_o99COWK0) | ← | [(155/1/**11**) prdwong](https://youtu.be/BkN9ted63Zc) | ←
+|Split Before Bonding | [(**73**/1/24) toi333](https://youtu.be/l-_o99COWK0) | ← | [(155/1/**11**) prdwong](https://youtu.be/BkN9ted63Zc) | ←
 |
-|Settling into the Routine      | [(**820**/3/34) Sahishar](https://youtu.be/oHcDZZ977rQ) | ← | [(1777/3/**25**) Sahishar](https://youtu.be/Z3_VgcEDK-E) | ←
+|Settling into the Routine | [(**820**/3/34) Sahishar](https://youtu.be/oHcDZZ977rQ) | ← | [(1777/3/**25**) Sahishar](https://youtu.be/Z3_VgcEDK-E) | ←
 |
-|Nothing Works      | [(**413**/4/59) hailstone](https://youtu.be/m2KEtV7qkuc) | ← | [(814/3/**28**) ants280](https://youtu.be/zPD8ddbBKTw) | [(808/4/**35**) Sahishar](https://youtu.be/5eGQIiZYRN0)
-|Nothing Works - 3 Reactors | [(**422**/**3**/54) 12345ieee](https://youtu.be/BL9XS7klF0w) | X | [(814/**3**/**28**) ants280](https://youtu.be/zPD8ddbBKTw) | X
+|Nothing Works | [(**413**/4/59) hailstone](https://youtu.be/m2KEtV7qkuc) | ← | [(814/3/**28**/B) ants280](https://youtu.be/zPD8ddbBKTw) | [(808/4/**35**) Sahishar](https://youtu.be/5eGQIiZYRN0)
+|Nothing Works - 3 Reactors | [(**422**/**3**/54/B) 12345ieee](https://youtu.be/BL9XS7klF0w) | X | [(814/**3**/**28**/B) ants280](https://youtu.be/zPD8ddbBKTw) | X
 |
-|Challenge: In-Place Swap      | [(**423**/3/59) Spiff](https://youtu.be/R9aXN2vBujA) | ← | [(1710/1/**25**) Sahishar](https://youtu.be/8IP0Mv6Cx6M) | ←
-|Challenge: In-Place Swap - 1 Reactor   | [(**903**/**1**/31) Spiff](https://youtu.be/gdjGPXHANi0) | ← | [(1710/**1**/**25**) Sahishar](https://youtu.be/8IP0Mv6Cx6M) | ←
+|Challenge: In-Place Swap | [(**423**/3/59) Spiff](https://youtu.be/R9aXN2vBujA) | ← | [(1710/1/**25**) Sahishar](https://youtu.be/8IP0Mv6Cx6M) | ←
+|Challenge: In-Place Swap - 1 Reactor | [(**903**/**1**/31) Spiff](https://youtu.be/gdjGPXHANi0) | ← | [(1710/**1**/**25**) Sahishar](https://youtu.be/8IP0Mv6Cx6M) | ←
 
 
 ###Alkonost
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Cycles - No Precognition |Min Symbols |Min Symbols - No Bugs |Min Symbols - No Precognition
 |:-                       |:-      |:-      |:-      |:-      |:-      |:-
-|An Introduction to Sensing | [(**136**/1/27) serbaldrig](https://youtu.be/B4FEWvbeR0I) | ← | ←← | [(236/1/**11**) pieceofmind](https://www.youtube.com/watch?hd=1&v=8w0gL2IjQcE) | ← | ←← 
+|An Introduction to Sensing | [(**136**/1/27) serbaldrig](https://youtu.be/B4FEWvbeR0I) | ← | ←← | [(236/1/**11**) pieceofmind](https://www.youtube.com/watch?hd=1&v=8w0gL2IjQcE) | ← | ←←
 |
 |Prelude to a Migraine | [(**67**/1/14) hailstone](https://youtu.be/IuyF1TPGbe0) | ← | ←← | [(152/1/**7**) Storm Frog](https://youtu.be/if5VSn2fNAg) | ← | ←←
 |
-|Random Oxides         | [(**176**/1/46) Sahishar](https://youtu.be/1Ayss3sS4hU) | ← | ←← | [(422/1/**15**) Sahishar](https://youtu.be/1uw0l-S08J4) | ← | ←← 
+|Random Oxides | [(**176**/1/46) Sahishar](https://youtu.be/1Ayss3sS4hU) | ← | ←← | [(671/1/**14**) Zig](https://youtu.be/WnotdoU0Udo) | ← | ←←
 |
-|No Ordinary Headache | [(**817**/2/104) ToughThought](https://youtu.be/S3KyURvT8pE) | ← | [(**819**/2/44) Spiff](https://youtu.be/RHbx5NsrjEU) | [(3725/1/**17**) Sahishar](https://youtu.be/AJUkeRZ0E2w) | ← | ←←
+|No Ordinary Headache | [(**817**/2/104/P) ToughThought](https://youtu.be/S3KyURvT8pE) | ← | [(**819**/2/44) Spiff](https://youtu.be/RHbx5NsrjEU) | [(3725/1/**17**) Sahishar](https://youtu.be/AJUkeRZ0E2w) | ← | ←←
 |No Ordinary Headache - 1 Reactor | [(**828**/**1**/69) Billy](https://youtu.be/X9kBj0-jiWE) | ← | ←← | [(3725/**1**/**17**) Sahishar](https://youtu.be/AJUkeRZ0E2w) | ← | ←←
 |
 |No Thanks Necessary | [(**791**/5/131) Spiff](https://youtu.be/wCDd0OuX8_g) | ← | ←← | [(8855\*/2/**41**) 12345ieee](https://youtu.be/AWmdNa4vHe0) | ← | ←←
 |No Thanks Necessary - 2 Reactors | [(**2519**/**2**/168) whoever314](https://youtu.be/-JZ1utfcz-Q) | ← | ←← | [(8855\*/**2**/**41**) 12345ieee](https://youtu.be/AWmdNa4vHe0) | ← | ←←
 |
 |Challenge: Going Green | [(**1219**/3/85) kuroi_neko](https://youtu.be/jdrMC3tJGGA) | ← | ←← | [(2297/2/**35**) 12345ieee](https://youtu.be/zV0Icutzh4k) | ← | ←←
-|Challenge: Going Green - 1 Reactor | [(**3578**/**1**/103) Zig](https://youtu.be/vcY-cyhmpVE) | ← | [(**3579**/**1**/101) Zig](https://youtu.be/BMJqRzr32pQ) | [(4247/**1**/**90**) Zig](https://youtu.be/Ma0KokWt_g0) | ← | ←← 
+|Challenge: Going Green - 1 Reactor | [(**2918**/**1**/99) Zig](https://youtu.be/Mx6WjrT9oT4) | ← | ←← | [(5581/**1**/**76**) Zig](https://youtu.be/U0VSxqZVxKo) | ← | ←←
 
 
 ###Sikutar
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Symbols |Min Symbols - No Bugs 
 |:-                    |:-      |:-      |:-      |:-
-|Ice to Meet You | [(**44**/1/48) Sahishar](https://youtu.be/6aHmycCdxwo) | ← | [(176/1/**10**) Sahishar](https://youtu.be/rVgZ2hUyKks) | ← 
+|Ice to Meet You | [(**44**/1/48) Sahishar](https://youtu.be/6aHmycCdxwo) | ← | [(176/1/**10**) Sahishar](https://youtu.be/rVgZ2hUyKks) | ←
 |
 |Under the Ice | [(**78**/1/39) Sahishar](https://youtu.be/3Qtm5NslaQE) | ← | [(178/1/**14**) toi333](https://youtu.be/459XewxbfKg) | ←
 |
-|Unknown Sender | [(**124**/1/33) 2nodes](https://youtu.be/XURRuXjGOBc) | [(**124**/1/33) Community](https://youtu.be/e4UFc96cRsI) | [(1400/1/**11**) Sahishar](https://youtu.be/OL1GgEo3OZQ) | ← 
+|Unknown Sender | [(**124**/1/33) Community](https://youtu.be/e4UFc96cRsI) | ← | [(1400/1/**11**) Sahishar](https://youtu.be/OL1GgEo3OZQ) | ←
 |
-|Falling       | [(**874**/5/257) whoever314](https://youtu.be/mCq2hGwM3uM) | ← | [(1420/2/**39**) Sahishar](https://youtu.be/mGjidk1RE1g) | ← 
-|Falling - 2 Reactors | [(**1015**/**2**/75) whoever314](https://youtu.be/g7IxvRT_XHQ) | ← | [(1420/**2**/**39**) Sahishar](https://youtu.be/mGjidk1RE1g) | ← 
+|Falling | [(**874**/5/257) whoever314](https://youtu.be/mCq2hGwM3uM) | ← | [(1420/2/**39**) Sahishar](https://youtu.be/mGjidk1RE1g) | ←
+|Falling - 2 Reactors | [(**1015**/**2**/75) whoever314](https://youtu.be/g7IxvRT_XHQ) | ← | [(1420/**2**/**39**) Sahishar](https://youtu.be/mGjidk1RE1g) | ←
 |
 |Challenge: Applied Fusion | [(**2019**/1/60) serbaldrig](https://youtu.be/NB06DGbGKOU) | ← | [(5457/1/**31**) mrcable](https://youtu.be/fSpwlW0P_8I) | ←
 |Challenge: Applied Fusion - 1 Reactor | [(**2019**/**1**/60) serbaldrig](https://youtu.be/NB06DGbGKOU) | ← | [(5457/**1**/**31**) mrcable](https://youtu.be/fSpwlW0P_8I) | ←
@@ -118,9 +118,9 @@ See further [explanations at the bottom of this page](https://www.reddit.com/r/s
 ###Hephaestus IV
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Cycles - No Precognition |Min Symbols |Min Symbols - No Bugs |Min Symbols - No Precognition
 |:-                       |:-      |:-      |:-      |:-      |:-      |:-
-|Like a Boss   | [(**152**/1/52) Sahishar](https://youtu.be/K_MuYPkDlUM) | ← | X | [(450/1/**18**) Sahishar](https://youtu.be/oRQ9r0XXRA0) | ← | X 
+|Like a Boss | [(**152**/1/52) Sahishar](https://youtu.be/K_MuYPkDlUM) | ← | X | [(450/1/**18**) Sahishar](https://youtu.be/oRQ9r0XXRA0) | ← | X
 |
-|Sacré Bleu! | [(**136**/1/23) eFse7en](https://youtu.be/EIgmvpMLF5o) | ← | X | [(147/1/**18**) darkgiggs](https://youtu.be/XBRphiERNRY) | ← | X 
+|Sacré Bleu! | [(**136**/1/23) eFse7en](https://youtu.be/EIgmvpMLF5o) | ← | X | [(147/1/**18**) darkgiggs](https://youtu.be/XBRphiERNRY) | ← | X
 |
 |The Plot Thickens | [(**419**/1/54) eiTTio](https://youtu.be/PFyqNCLn-L4) | ← | X | [(1327/1/**14**) Andy](https://youtu.be/RSmWFCcVGrI) | ← | X
 |
@@ -133,7 +133,7 @@ See further [explanations at the bottom of this page](https://www.reddit.com/r/s
 |Gas Works Park - 1 Reactor | [(**5173**/**1**/78) ShadowTheAge](https://youtube.com/watch?v=YQjXu7uIx0k) | ← | ←← | [(5173/**1**/**78**) ShadowTheAge](https://youtube.com/watch?v=YQjXu7uIx0k) | ← | ←←
 |
 |Challenge: KOHCTPYKTOP | [(**3351**/3/103) Andy](https://youtu.be/Z3gpNdPgreA) | ← | X | [(21633/4/**55**) Ir_Sigma](https://youtu.be/HkuvNWRIO80) | ← | X
-|Challenge: KOHCTPYKTOP - 2 Reactors | [(**85561**/**2**/149) Andy](https://youtu.be/Htyhlg6nBMs) | † [(**3351**/**3**/103) Andy](https://youtu.be/Z3gpNdPgreA) | X | [(85561/**2**/**149**) Andy](https://youtu.be/Htyhlg6nBMs) | † [(3351/**3**/**103**) Andy](https://youtu.be/Z3gpNdPgreA) | X
+|Challenge: KOHCTPYKTOP - 2 Reactors | [(**85561**/**2**/149/B) Andy](https://youtu.be/Htyhlg6nBMs) | † [(**3351**/**3**/103) Andy](https://youtu.be/Z3gpNdPgreA) | X | [(85561/**2**/**149**/B) Andy](https://youtu.be/Htyhlg6nBMs) | † [(3351/**3**/**103**) Andy](https://youtu.be/Z3gpNdPgreA) | X
 
 
 ###Atropos Station
@@ -143,9 +143,9 @@ See further [explanations at the bottom of this page](https://www.reddit.com/r/s
 |
 |No Stomach for Lunch | [(**132**/1/30) serbaldrig](https://youtu.be/jS_lvijAzVc) | ← | X | [(237/1/**17**) Sahishar](https://youtu.be/pbhslbAnJms) | ← | X
 |
-|No Employment Record Found | [(**354**/1/65) Zig](https://youtu.be/0qoJ2vVSsQs) | ← | ←← | [(5762/1/**12**) Sahishar](https://youtu.be/xWURijz_NEI) | ← | ←←
+|No Employment Record Found | [(**344**/1/77) Zig](https://youtu.be/3i_LrukSJ_4) | ← | ←← | [(5762/1/**12**) Sahishar](https://youtu.be/xWURijz_NEI) | ← | ←←
 |
-|Right All Along | [(**672**/1/52) whoever314](https://youtu.be/YvunGBAsJSI) | ← | X | [(2705/1/**15**) Sahishar](https://youtu.be/QYEL_Y2l4f0) | ← | X 
+|Right All Along | [(**672**/1/52) whoever314](https://youtu.be/YvunGBAsJSI) | ← | X | [(2705/1/**15**) Sahishar](https://youtu.be/QYEL_Y2l4f0) | ← | X
 |
 |Accidents Happen | [(**275**/1/88) Zig](https://youtu.be/Qy4h6byyw-s) | ← | ←← | [(1044/1/**24**) CaitSith2](https://youtu.be/uRuSiKDyeQs) | ← | ←←
 
@@ -167,29 +167,29 @@ See further [explanations at the bottom of this page](https://www.reddit.com/r/s
 ##Moustachium
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Symbols |Min Symbols - No Bugs
 |:-                       |:-      |:-      |:-      |:-      
-|Moustachium 602      | [(**37**/1/44) Sahishar](https://youtu.be/0ZFOoNA2bXg) | ← | [(117/1/**7**) erlandodk](https://youtu.be/C5uLuaCa1sA) | ←
+|Moustachium 602 | [(**37**/1/44) Sahishar](https://youtu.be/0ZFOoNA2bXg) | ← | [(117/1/**7**) erlandodk](https://youtu.be/C5uLuaCa1sA) | ←
 |
-|Moustachium 604      | [(**63**/1/41) ToughThought](https://youtu.be/gtClEF1l-rc) | ← | [(713/1/**9**) toi333](https://youtu.be/i4pgU5qe_v8) | ←
+|Moustachium 604 | [(**63**/1/41) ToughThought](https://youtu.be/gtClEF1l-rc) | ← | [(713/1/**9**) toi333](https://youtu.be/i4pgU5qe_v8) | ←
 |
-|Moustachium 608      | [(**172**/1/49) ToughThought](https://youtu.be/cEsbx62XcaU) | ← | [(473/1/**18**) Phoil](https://youtu.be/CrpIaKoYQ5s) | ←
+|Moustachium 608 | [(**172**/1/49) ToughThought](https://youtu.be/cEsbx62XcaU) | ← | [(473/1/**18**) Phoil](https://youtu.be/CrpIaKoYQ5s) | ←
 
 
 ##63 Corvi (DLC)
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Cycles - No Precognition |Min Symbols |Min Symbols - No Bugs |Min Symbols - No Precognition
 |:-                       |:-      |:-      |:-      |:-      |:-      |:-
-|QT-1          | [(**15**/1/14) Andy](https://youtu.be/au4p001aI2g) | ← | X | [(20/1/**5**) Alexander Pas](https://youtu.be/BoT7ob687sg) | ← | X
+|QT-1 | [(**15**/1/14) Andy](https://youtu.be/au4p001aI2g) | ← | X | [(20/1/**5**) Alexander Pas](https://youtu.be/BoT7ob687sg) | ← | X
 |
-|QT-2          | [(**80**/1/13) ToughThought](https://youtu.be/nt2EIw27fvM) | ← | X | [(83/1/**11**) Spiff](https://youtu.be/mC89_tpyv4k)  | ← | X
+|QT-2 | [(**80**/1/13) ToughThought](https://youtu.be/nt2EIw27fvM) | ← | X | [(83/1/**11**) Spiff](https://youtu.be/mC89_tpyv4k) | ← | X
 |
-|Teleporters      | [(**983**/3/48) GuavaMoment](https://youtu.be/yEaLSU2fPv4) | ← | X | [(3859/2/**27**) Sahishar](https://youtu.be/pDsmPbx9jB4) | ← | X
+|Teleporters | [(**983**/3/48) GuavaMoment](https://youtu.be/yEaLSU2fPv4) | ← | X | [(3859/2/**27**) Sahishar](https://youtu.be/pDsmPbx9jB4) | ← | X
 |Teleporters - 2 Reactors | [(**988**/**2**/43) Spiff](https://youtu.be/CALAJTXBvjA) | ← | X | [(3859/**2**/**27**) Sahishar](https://youtu.be/pDsmPbx9jB4) | ← | X
 |
-|QT-3      |[(**109**/1/24) Zig](https://youtu.be/LfprU_v-1Yk) | [(**161**/1/27) Sahishar](https://youtu.be/eRdHjzJyCT4) | X | [(400/1/**13**) mrcable](https://youtu.be/zm4zXWVKlsA) | ← | X
+|QT-3 | [(**109**/1/24/B) Zig](https://youtu.be/LfprU_v-1Yk) | [(**161**/1/27) Sahishar](https://youtu.be/eRdHjzJyCT4) | X | [(400/1/**13**) mrcable](https://youtu.be/zm4zXWVKlsA) | ← | X
 |
-|QT-4      | [(**246**/1/44) eFse7en](https://youtu.be/ujUaOqw_hkc) | ← | X | [(1057/1/**18**) Sahishar](https://youtu.be/DePKulwedGA) | ← | X
+|QT-4 | [(**246**/1/44) eFse7en](https://youtu.be/ujUaOqw_hkc) | ← | X | [(1057/1/**18**) Sahishar](https://youtu.be/DePKulwedGA) | ← | X
 |
 |Precursor Compounds | [(**1050**/4/100) eiTTio](https://youtu.be/trcmtEU0qGk) | ← | ←← | [(12197\*/3/**56**) 12345ieee](https://youtu.be/eCc5LBov9b0) | ← | ←←
-|Precursor Compounds - 1 Reactor | [(**32538**\*/**1**/131) 12345ieee](https://youtu.be/-PfbgY65FsE) | ← | ←← | [(32538\*/**1**/**131**) 12345ieee](https://youtu.be/-PfbgY65FsE) | ← | ←← 
+|Precursor Compounds - 1 Reactor | [(**32538**\*/**1**/131) 12345ieee](https://youtu.be/-PfbgY65FsE) | ← | ←← | [(32538\*/**1**/**131**) 12345ieee](https://youtu.be/-PfbgY65FsE) | ← | ←←
 
 
 ##ResearchNet

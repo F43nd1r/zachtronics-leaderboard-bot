@@ -185,7 +185,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
         }
 
         if (!beatenScores.isEmpty()) {
-            redditService.updateWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage(), String.join("\r\n", lines),
+            redditService.updateWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage(), String.join("\n", lines),
                                          puzzle.getDisplayName() + " " + record.getScore().toDisplayString() + " by " +
                                          record.getAuthor());
             return new UpdateResult.Success(beatenScores);
@@ -211,21 +211,21 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
     @NotNull
     private static String makeScoreCell(@NotNull ScRecord record, @NotNull ScCategory category) {
         ScScore score = record.getScore();
-        String cyclesStr = score.getCycles() >= 100000 ? NumberFormat.getNumberInstance(Locale.ROOT)
-                                                                     .format(score.getCycles()) : Integer
-                .toString(score.getCycles());
-        return String.format("[(" + category.getFormatStringLb() + ") %s](%s)", cyclesStr,
+        String cyclesStr =
+                score.getCycles() >= 100000 ? NumberFormat.getNumberInstance(Locale.ROOT).format(score.getCycles())
+                                            : Integer.toString(score.getCycles());
+        return String.format("[(" + category.getFormatStringLb() + "%s) %s](%s)", cyclesStr,
                              record.isOldVideoRNG() ? "\\*" : "", score.getReactors(), score.getSymbols(),
-                             record.getAuthor(), record.getLink());
+                             score.slashFlags(), record.getAuthor(), record.getLink());
     }
 
     @NotNull
     private static ScRecord parseLeaderboardRecord(String recordCell) {
-        Pattern scoreRegex = Pattern.compile("(?:†\\s*)?\\[?\\((?<score>" + ScScore.REGEX_SIMPLE_SCORE +
-                                             ")\\)\\s+(?<author>[^]]+)(?:]\\((?<link>[^)]+)\\).*?)?");
+        Pattern scoreRegex = Pattern.compile("(?:†\\s*)?\\((?<score>" + ScScore.REGEX_BP_SCORE +
+                                             ")\\)\\s+(?<author>[^]]+)]\\((?<link>[^)]+)\\).*?");
         Matcher m = scoreRegex.matcher(recordCell);
         if (m.matches()) {
-            ScScore score = ScScore.parseSimpleScore(m);
+            ScScore score = ScScore.parseBPScore(m);
             return new ScRecord(score, m.group("author"), m.group("link"), m.group("oldRNG") != null);
         }
         throw new IllegalStateException("Leaderboard record unparseable" + recordCell);
@@ -240,21 +240,14 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
             records[1] = records[0];
         else
             records[1] = parseLeaderboardRecord(halfTable.get(1));
-        records[1].getScore().setBugged(false);
 
-        if (halfTable.size() == 3 && !halfTable.get(2).startsWith("X")) {
-            if (halfTable.get(2).equals("←←"))
-                records[2] = records[0];
-            else if (halfTable.get(2).equals("←"))
-                records[2] = records[1];
-            else
-                records[2] = parseLeaderboardRecord(halfTable.get(2));
-            records[2].getScore().setPrecognitive(false);
-        }
-        else {
-            records[0].getScore().setPrecognitive(false);
-            records[1].getScore().setPrecognitive(false);
+        if (halfTable.size() != 3 || halfTable.get(2).startsWith("X"))
             records[2] = ScRecord.IMPOSSIBLE_CATEGORY;
-        }
+        else if (halfTable.get(2).equals("←←"))
+            records[2] = records[0];
+        else if (halfTable.get(2).equals("←"))
+            records[2] = records[1];
+        else
+            records[2] = parseLeaderboardRecord(halfTable.get(2));
     }
 }
