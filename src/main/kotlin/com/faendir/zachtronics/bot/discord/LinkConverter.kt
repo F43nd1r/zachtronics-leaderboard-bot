@@ -15,7 +15,15 @@ class LinkConverter : OptionConverter<String> {
         return findLink(
             string.trim(),
             context.interaction.channel.flatMapMany { it.getMessagesBefore(it.lastMessageId.orElseGet { Snowflake.of(Instant.now()) }) }
-                .filter { it.author.isPresent && it.author.get() == context.interaction.user })
+                .filter { it.author.isPresent && it.author.get() == context.interaction.user }
+                .onErrorMap {
+                    //TODO remove when threads are supported
+                    if (it is UnsupportedOperationException) {
+                        IllegalArgumentException("mX arguments are not supported in threads.", it)
+                    } else {
+                        it
+                    }
+                })
     }
 
     private fun findLink(input: String, messages: Flux<Message>): String {
