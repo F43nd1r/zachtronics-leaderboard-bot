@@ -31,7 +31,7 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : AbstractCommand()
             return WebhookExecuteRequest.builder().addEmbed(
                 EmbedData.builder()
                     .title("Success: *${puzzle.displayName}* ${successes.flatMap { it.oldScores.keys }.joinToString { it.displayName }}")
-                    .description("`${record.score.toDisplayString()}`\npreviously:")
+                    .description("`${record.score.toDisplayString()}` ${record.author?.let { " by $it" } ?: ""}\npreviously:")
                     .addAllFields(successes.flatMap { it.oldScores.entries }
                         .map { EmbedFieldData.builder().name(it.key.displayName).value("`${it.value?.toDisplayString() ?: "none"}`").inline(true).build() })
                     .link(record.link)
