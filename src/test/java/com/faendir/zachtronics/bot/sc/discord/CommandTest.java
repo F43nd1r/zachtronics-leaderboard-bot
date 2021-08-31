@@ -14,6 +14,7 @@ import discord4j.rest.util.MultipartRequest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -60,7 +61,7 @@ public class CommandTest {
     }
 
     @Test
-    @Disabled("Uses SChem")
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
     public void testSubmitArchive() {
         Map<String, String> args = Map.of("video", "http://example.com",
                                           "export", "https://pastebin.com/19smCuS8", // valid 45/1/14
@@ -70,44 +71,22 @@ public class CommandTest {
     }
 
     @Test
-    @Disabled("Uses SChem")
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
     public void testArchiveOne() {
         // we start at 100/100/100
-        Map<String, String> args = Map.of("score", "45/1/14",
-                                          "export", "https://pastebin.com/19smCuS8"); // valid 45/1/14
+        Map<String, String> args = Map.of("export", "https://pastebin.com/19smCuS8"); // valid 45/1/14
         String result = runCommand("archive", args);
         assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14`"));
     }
 
     @Test
-    @Disabled("Uses SChem")
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
     public void testArchiveMany() {
         // we start at 100/100/100
         Map<String, String> args = Map.of("export", "https://pastebin.com/kNnfTvMa"); // valid 45/1/14 and 115/1/6
         String result = runCommand("archive", args);
         assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14`") &&
                    result.contains("`115/1/6`"));
-    }
-
-    @Test
-    @Disabled("Uses SChem")
-    public void testArchiveManyAndScore() {
-        // we start at 1000/1/1000
-        Map<String, String> args = Map.of("score", "136/1/27",
-                                          "export", "https://pastebin.com/y7hG42XL"); // valid 136/1/27 and 236/1/11
-        String result = runCommand("archive", args);
-        assertTrue(result.contains("An Introduction to Sensing") && result.contains("`136/1/27`") &&
-                   result.contains("`236/1/11/P`"));
-    }
-
-    @Test
-    public void testArchiveBugged() {
-        // we start at 100/100/100
-        Map<String, String> args = Map.of("score", "50/1/50/B",
-                                          "export", "https://pastebin.com/19smCuS8"); // valid 45/1/14
-        String result = runCommand("archive", args);
-        // we "trick" the archive
-        assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14/B`"));
     }
 
     @NotNull

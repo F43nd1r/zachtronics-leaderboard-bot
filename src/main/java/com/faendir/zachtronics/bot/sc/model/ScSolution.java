@@ -24,38 +24,24 @@ public class ScSolution implements Solution {
     @NotNull ScScore score;
     @NotNull String content;
 
+    private static final Pattern SOLUTION_HEADER = Pattern.compile("^SOLUTION:(?<puzzle>[^,]+),[^,]+," +
+            "(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)(?:,'?([/-](?<flags>B?P?))?.*)?'?$", Pattern.MULTILINE);
     @NotNull
-    public static ScSolution fromContentNoValidation(@NotNull String content, @Nullable ScPuzzle puzzle,
-                                                     @Nullable ScScore score) {
-        Matcher m = Pattern.compile("^SOLUTION:(?<puzzle>[^,]+),[^,]+," +
-                                    "(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)(?:,.+)?$", Pattern.MULTILINE)
-                           .matcher(content);
+    public static ScSolution fromContentNoValidation(@NotNull String content, @Nullable ScPuzzle puzzle) {
+        Matcher m = SOLUTION_HEADER.matcher(content);
         if (!m.find()) {
             throw new IllegalArgumentException("header");
         }
 
         ScPuzzle destPuzzle = Objects.requireNonNullElseGet(puzzle, () -> ScPuzzleConverter.parsePuzzle(m.group("puzzle")));
+        ScScore score = ScScore.parseBPScore(m);
+        content = m.replaceFirst("SOLUTION:$1,Archiver,$2-$3-$4,$5 Archived Solution");
 
-        ScScore destScore;
-        ScScore contentScore = ScScore.parseSimpleScore(m);
-        contentScore.setPrecognitive(!destPuzzle.isDeterministic());
-        if (score == null ||
-            score.getCycles() != contentScore.getCycles() ||
-            score.getReactors() != contentScore.getReactors() ||
-            score.getSymbols() != contentScore.getSymbols()) {
-            // if no given score or it doesn't match the solution metadata, ignore it
-            destScore = contentScore;
-        }
-        else {
-            destScore = score;
-        }
-        content = m.replaceFirst("SOLUTION:$1,Archiver,$2-$3-$4,Archived Solution");
-
-        return new ScSolution(destPuzzle, destScore, content);
+        return new ScSolution(destPuzzle, score, content);
     }
 
     @NotNull
-    public static List<ScSolution> fromExportLink(@NotNull String exportLink, ScPuzzle puzzle, ScScore score) {
+    public static List<ScSolution> fromExportLink(@NotNull String exportLink, ScPuzzle puzzle) {
         String export;
         try (InputStream is = new URL(Utils.rawContentURL(exportLink)).openStream()) {
             export = new String(is.readAllBytes()).replace("\r\n", "\n");
@@ -65,6 +51,6 @@ public class ScSolution implements Solution {
             throw new IllegalArgumentException("Couldn't read your solution");
         }
 
-        return SChem.validateMultiExport(export, puzzle, score);
+        return SChem.validateMultiExport(export, puzzle);
     }
 }

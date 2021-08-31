@@ -57,18 +57,19 @@ public class ScScore implements Score {
     @Nullable
     public static ScScore parseBPScore(@NotNull String string) {
         Matcher m = REGEX_BP_SCORE.matcher(string);
-        if (m.matches()) {
-            ScScore score = parseSimpleScore(m);
-            String flags = m.group("flags");
-            if (flags == null)
-                flags = "";
-            score.setBugged(flags.toUpperCase().contains("B"));
-            score.setPrecognitive(flags.toUpperCase().contains("P"));
+        return m.matches() ? parseBPScore(m) : null;
+    }
 
-            return score;
-        }
-        else {
-            return null;
-        }
+    /** we assume m matches */
+    @NotNull
+    public static ScScore parseBPScore(@NotNull Matcher m) {
+        ScScore score = parseSimpleScore(m);
+        String flags = m.group("flags");
+        if (flags == null)
+            flags = "";
+        score.setBugged(flags.toUpperCase().contains("B"));
+        score.setPrecognitive(flags.toUpperCase().contains("P"));
+
+        return score;
     }
 }

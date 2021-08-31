@@ -45,12 +45,9 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> i
     @Value
     public static class Data {
         @NonNull ScPuzzle puzzle;
-        @NotNull
-        ScScore score;
-        @NotNull
-        String author;
-        @NotNull
-        String video;
+        @NotNull ScScore score;
+        @NotNull String author;
+        @NotNull String video;
 
         public Data(@Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle,
                     @Converter(ScBPScoreConverter.class) @NonNull ScScore score,

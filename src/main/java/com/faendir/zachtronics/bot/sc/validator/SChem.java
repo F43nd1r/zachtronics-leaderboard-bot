@@ -7,11 +7,9 @@ import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -25,29 +23,30 @@ public class SChem {
      * validates a possibly multi SpaceChem export
      *
      * @param export multiExport to check
-     * @param userScore score to attach to one of the solutions to specify extra flags
      * @param puzzle to aid in puzzle resolution
      * @return list of solutions, solutions that didn't validate are
      *         <tt>{{@link ScPuzzle#research_example_1}, {@link ScScore#INVALID_SCORE}, "reason SChem is kill"}</tt>
      */
     @NotNull
-    public static List<ScSolution> validateMultiExport(@NotNull String export, ScPuzzle puzzle, @Nullable ScScore userScore) {
+    public static List<ScSolution> validateMultiExport(@NotNull String export, ScPuzzle puzzle) {
         String[] contents = export.split("(?=SOLUTION:)");
-        if (contents.length == 1 && userScore != null && userScore.isBugged()) {
-            /* we won't be able to validate this, because SChem will crash
-             * we trust the user didn't mess with us and pass the score to the non-validating handler
-             */
-            return Collections.singletonList(ScSolution.fromContentNoValidation(export, puzzle, userScore));
-        }
-
         LinkedHashSet<ScSolution> result = new LinkedHashSet<>();
         StringBuilder exceptions = new StringBuilder();
         int line = 1;
         for (String content : contents) {
             try {
-                result.add(validate(content, userScore));
+                result.add(validate(content));
             } catch (SChemException e) {
-                exceptions.append(line).append(": ").append(e.getMessage()).append('\n');
+                ScSolution solution = ScSolution.fromContentNoValidation(content, puzzle);
+                if (solution.getScore().isBugged()) {
+                    /* we won't be able to validate this, because SChem will crash
+                     * we trust the user didn't mess with us and pass the solution up
+                     */
+                    result.add(solution);
+                }
+                else {
+                    exceptions.append(line).append(": ").append(e.getMessage()).append('\n');
+                }
             }
             line++;
         }
@@ -65,7 +64,7 @@ public class SChem {
      * @return solution if validation succeeded
      * @throws SChemException if validation failed, reason is in message
      */
-    static ScSolution validate(@NotNull String export, @Nullable ScScore userScore) throws SChemException {
+    static ScSolution validate(@NotNull String export) throws SChemException {
         SChemResult result = run(export);
 
         ScPuzzle puzzle;
@@ -78,20 +77,16 @@ public class SChem {
                     result.getResnetId()[2] + ")");
         }
 
-        // we know the score isn't bugged because SChem ran it, but we have to assume precognition where possible
+        // we know the score isn't bugged because SChem ran it, we get the precog flag from the title
+        boolean usesPrecog = !puzzle.isDeterministic() && result.getSolutionName() != null &&
+                             result.getSolutionName().matches("^/P .+");
         ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), false,
-                                    !puzzle.isDeterministic());
-        if (userScore != null &&
-            userScore.getCycles() == score.getCycles() &&
-            userScore.getReactors() == score.getReactors() &&
-            userScore.getSymbols() == score.getSymbols()) {
-            // override
-            score = userScore;
-        }
+                                    usesPrecog);
+
 
         String content = Pattern.compile("^SOLUTION:.+$", Pattern.MULTILINE).matcher(export).replaceFirst(
-                String.format("SOLUTION:%s,Archiver,%d-%d-%d,Archived Solution", result.getLevelName(),
-                              result.getCycles(), result.getReactors(), result.getSymbols()));
+                String.format("SOLUTION:%s,Archiver,%d-%d-%d,%sArchived Solution", result.getLevelName(),
+                              result.getCycles(), result.getReactors(), result.getSymbols(), usesPrecog ? "/P " : ""));
         return new ScSolution(puzzle, score, content);
     }
 

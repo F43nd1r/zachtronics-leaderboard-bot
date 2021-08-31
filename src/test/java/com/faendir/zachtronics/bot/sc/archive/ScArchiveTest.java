@@ -45,17 +45,14 @@ public class ScArchiveTest {
         assertNotEquals("", doArchiveScore(score)); // 50/50/50
 
         String content = "SOLUTION:Of Pancakes and Spaceships,12345ieee,45-1-14\nbunch of stuff...";
-        assertNotEquals("", doArchiveScoreContent(null, content)); // 45/1/14/B
-
-        score = new ScScore(45, 1, 14, false, false);
-        assertNotEquals("", doArchiveScoreContent(score, content)); // 45/1/14
+        assertNotEquals("", doArchiveContent(content)); // 45/1/14
     }
 
     private String doArchiveScore(ScScore score) {
         return archive.archive(new ScSolution(ScPuzzle.research_example_1, score, "")).getSecond();
     }
 
-    private String doArchiveScoreContent(ScScore score, String content) {
-        return archive.archive(ScSolution.fromContentNoValidation(content, null, score)).getSecond();
+    private String doArchiveContent(String content) {
+        return archive.archive(ScSolution.fromContentNoValidation(content, null)).getSecond();
     }
 }

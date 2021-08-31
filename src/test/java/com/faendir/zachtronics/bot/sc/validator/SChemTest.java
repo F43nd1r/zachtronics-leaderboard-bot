@@ -2,14 +2,16 @@ package com.faendir.zachtronics.bot.sc.validator;
 
 import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
+import com.faendir.zachtronics.bot.sc.model.ScScore;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @BotTest(Application.class)
-@Disabled("Uses SChem")
+@DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
 class SChemTest {
 
     @Test
@@ -113,6 +115,47 @@ class SChemTest {
                 PIPE:1,4,2
                 """; // we've messed up the cycles count
         assertSChemBreaks(export);
+    }
+
+    @Test
+    public void validatePrecog() {
+        String export = """
+                SOLUTION:An Introduction to Sensing,12345ieee,236-1-11,/P precog, kind of
+                COMPONENT:'drag-advanced-reactor',2,0,''
+                MEMBER:'instr-start',-90,0,128,0,2,0,0
+                MEMBER:'instr-start',-90,0,32,6,5,0,0
+                MEMBER:'feature-bonder',-1,0,1,4,5,0,0
+                MEMBER:'feature-bonder',-1,0,1,5,5,0,0
+                MEMBER:'feature-bonder',-1,0,1,4,6,0,0
+                MEMBER:'feature-bonder',-1,0,1,5,6,0,0
+                MEMBER:'feature-sensor',-1,0,1,5,1,0,0
+                MEMBER:'instr-input',-1,0,128,0,1,0,0
+                MEMBER:'instr-arrow',0,0,64,0,1,0,0
+                MEMBER:'instr-grab',-1,1,128,1,1,0,0
+                MEMBER:'instr-arrow',180,0,64,6,1,0,0
+                MEMBER:'instr-grab',-1,2,128,6,1,0,0
+                MEMBER:'instr-output',-1,0,128,5,1,0,0
+                MEMBER:'instr-sensor',90,0,32,6,0,0,18
+                MEMBER:'instr-grab',-1,1,32,6,1,0,0
+                MEMBER:'instr-grab',-1,2,32,6,4,0,0
+                MEMBER:'instr-arrow',-90,0,16,6,4,0,0
+                MEMBER:'instr-output',-1,1,32,6,3,0,0
+                PIPE:0,4,1
+                PIPE:1,4,2
+                """;
+
+        ScScore expected = new ScScore(236, 1, 11, false, true);
+        ScScore result = SChem.validate(export).getScore();
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testArchiveBugged() {
+        String export = "SOLUTION:QT-3,Zig,109-1-24,/B telekinesys"; // it doesn't have to run at all
+
+        ScScore expected = new ScScore(109, 1, 24, true, false);
+        ScScore result = SChem.validateMultiExport(export, null).get(0).getScore();
+        assertEquals(expected, result);
     }
 
     private static void assertSChemBreaks(String export) {
