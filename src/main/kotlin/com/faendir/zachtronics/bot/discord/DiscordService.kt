@@ -1,7 +1,9 @@
 package com.faendir.zachtronics.bot.discord
 
+import com.faendir.zachtronics.bot.discord.command.Secured
 import com.faendir.zachtronics.bot.discord.command.TopLevelCommand
 import discord4j.core.GatewayDiscordClient
+import discord4j.core.`object`.entity.User
 import discord4j.core.`object`.presence.ClientActivity
 import discord4j.core.`object`.presence.ClientPresence
 import discord4j.core.event.domain.interaction.SlashCommandEvent
@@ -62,7 +64,11 @@ class DiscordService(
     }
 
     private fun handleCommand(event: SlashCommandEvent): Mono<Void> = mono {
-        val result = findCommand(event).handle(event)
+        val command = findCommand(event)
+        if (command is Secured && !command.hasExecutionPermission(event.interaction.member.map { it as User }.orElse(event.interaction.user))) {
+            throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
+        }
+        val result = command.handle(event)
         event.interactionResponse.createFollowupMessage(result).awaitSingle()
     }.onErrorResume {
         logger.info("User command failed", it)
