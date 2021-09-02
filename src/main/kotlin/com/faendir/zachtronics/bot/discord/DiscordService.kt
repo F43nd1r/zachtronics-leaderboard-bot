@@ -1,13 +1,10 @@
 package com.faendir.zachtronics.bot.discord
 
-import com.faendir.zachtronics.bot.discord.command.GameCommand
-import com.faendir.zachtronics.bot.discord.command.Secured
+import com.faendir.zachtronics.bot.discord.command.TopLevelCommand
 import discord4j.core.GatewayDiscordClient
-import discord4j.core.`object`.entity.User
 import discord4j.core.`object`.presence.ClientActivity
 import discord4j.core.`object`.presence.ClientPresence
 import discord4j.core.event.domain.interaction.SlashCommandEvent
-import discord4j.discordjson.json.ApplicationCommandRequest
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
@@ -25,7 +22,7 @@ import javax.annotation.PreDestroy
 @Service
 class DiscordService(
     private val discordClient: GatewayDiscordClient,
-    private val gameCommands: List<GameCommand>,
+    private val commands: List<TopLevelCommand>,
     private val gitProperties: GitProperties,
     private val restartEndpoint: RestartEndpoint
 ) {
@@ -35,15 +32,7 @@ class DiscordService(
 
     @PostConstruct
     fun init() {
-        val requests = gameCommands.map { gameCommand ->
-            val request = ApplicationCommandRequest.builder()
-                .name(gameCommand.commandName)
-                .description(gameCommand.displayName)
-            for (command in gameCommand.commands) {
-                request.addOption(command.data)
-            }
-            request.build()
-        }
+        val requests = commands.map { it.buildRequest() }
         val restClient = discordClient.restClient
         Flux.fromIterable(requests)
             .zipWith(restClient.applicationId.repeat())
@@ -73,23 +62,16 @@ class DiscordService(
     }
 
     private fun handleCommand(event: SlashCommandEvent): Mono<Void> = mono {
-        val gameContext = findGameCommand(event)
-        val option = event.options.first()
-        val command = gameContext.commands.find { it.data.name() == option.name }
-            ?: throw IllegalArgumentException("I did not recognize the command \"${option.name}\".")
-        if (command is Secured && !command.hasExecutionPermission(event.interaction.member.map { it as User }.orElse(event.interaction.user))) {
-            throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
-        }
-        val result = command.handle(event)
+        val result = findCommand(event).handle(event)
         event.interactionResponse.createFollowupMessage(result).awaitSingle()
     }.onErrorResume {
         logger.info("User command failed", it)
         event.interactionResponse.createFollowupMessage("**Failed**: ${it.message ?: "Something went wrong"}")
     }.then()
 
-    private fun findGameCommand(event: SlashCommandEvent): GameCommand {
+    private fun findCommand(event: SlashCommandEvent): TopLevelCommand {
         val name = event.commandName
-        return gameCommands.find { it.commandName == name } ?: throw IllegalArgumentException("I did not recognize the game \"$name\".")
+        return commands.find { it.commandName == name } ?: throw IllegalArgumentException("I did not recognize the game \"$name\".")
     }
 
     @PreDestroy
