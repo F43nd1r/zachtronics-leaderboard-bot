@@ -37,16 +37,21 @@ public class SChem {
             try {
                 result.add(validate(content));
             } catch (SChemException e) {
-                ScSolution solution = ScSolution.fromContentNoValidation(content, puzzle);
-                if (solution.getScore().isBugged()) {
-                    /* we won't be able to validate this, because SChem will crash
-                     * we trust the user didn't mess with us and pass the solution up
-                     */
-                    result.add(solution);
+                try {
+                    ScSolution solution = ScSolution.fromContentNoValidation(content, puzzle);
+                    if (solution.getScore().isBugged()) {
+                        /* we won't be able to validate this, because SChem will crash
+                         * we trust the user didn't mess with us and pass the solution up
+                         */
+                        result.add(solution);
+                        continue;
+                    }
                 }
-                else {
-                    exceptions.append(line).append(": ").append(e.getMessage()).append('\n');
+                catch (IllegalArgumentException ignored) {
+                    // solution import is not readable, we'll show the SChem exception
                 }
+
+                exceptions.append(line).append(": ").append(e.getMessage()).append('\n');
             }
             line++;
         }

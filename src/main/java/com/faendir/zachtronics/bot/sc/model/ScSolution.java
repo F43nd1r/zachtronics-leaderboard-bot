@@ -17,27 +17,35 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Levels with a comma in their name aren't supported */
 @Value
 public class ScSolution implements Solution {
     @NotNull ScPuzzle puzzle;
     @NotNull ScScore score;
     @NotNull String content;
 
-    private static final Pattern SOLUTION_HEADER = Pattern.compile("^SOLUTION:(?<puzzle>[^,]+),[^,]+," +
+    private static final Pattern SOLUTION_HEADER = Pattern.compile("^SOLUTION:(?<puzzle>[^,]+|'(?:[^']|'')+'),[^,]+," +
             "(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)(?:,'?([/-](?<flags>B?P?))?.*)?'?$", Pattern.MULTILINE);
+    /**
+     * @throws IllegalArgumentException if we can't correctly parse metadata
+     */
     @NotNull
-    public static ScSolution fromContentNoValidation(@NotNull String content, @Nullable ScPuzzle puzzle) {
+    public static ScSolution fromContentNoValidation(@NotNull String content, @Nullable ScPuzzle puzzle) throws IllegalArgumentException {
         Matcher m = SOLUTION_HEADER.matcher(content);
         if (!m.find()) {
-            throw new IllegalArgumentException("header");
+            throw new IllegalArgumentException("Invalid header");
         }
 
-        ScPuzzle destPuzzle = Objects.requireNonNullElseGet(puzzle, () -> ScPuzzleConverter.parsePuzzle(m.group("puzzle")));
-        ScScore score = ScScore.parseBPScore(m);
-        content = m.replaceFirst("SOLUTION:$1,Archiver,$2-$3-$4,$5 Archived Solution");
+        if (puzzle == null) {
+            String rawPuzzle = m.group("puzzle");
+            if (rawPuzzle.matches("'.+'"))
+                rawPuzzle = rawPuzzle.replaceAll("^'|'$", "").replace("''", "'");
+            puzzle = ScPuzzleConverter.parsePuzzle(rawPuzzle);
+        }
 
-        return new ScSolution(destPuzzle, score, content);
+        ScScore score = ScScore.parseBPScore(m);
+        content = m.replaceFirst("SOLUTION:$1,Archiver,$2-$3-$4," + (m.group(5) == null ? "" : "$5 ") + "Archived Solution");
+
+        return new ScSolution(puzzle, score, content);
     }
 
     @NotNull
