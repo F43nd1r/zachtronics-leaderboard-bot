@@ -84,7 +84,7 @@ public class SChem {
 
         // we know the score isn't bugged because SChem ran it, we get the precog flag from the title
         boolean usesPrecog = !puzzle.isDeterministic() && result.getSolutionName() != null &&
-                             result.getSolutionName().matches("^/P .+");
+                             result.getSolutionName().matches("^/P(?: .*)?");
         ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), false,
                                     usesPrecog);
 
