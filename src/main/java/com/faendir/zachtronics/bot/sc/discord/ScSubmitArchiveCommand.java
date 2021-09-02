@@ -52,13 +52,12 @@ public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzl
 
         public Data(@Description("Link to your video of the solution, can be `m1` to scrape it from your last message")
                     @NotNull @Converter(LinkConverter.class) String video,
-                    /* TODO description in 100 chars or less
-                    @Description("Link to your export file, can be `m1` to scrape it from your last message\n" +
-                                 "If the solution name starts with `/B`, `/P` or `/BP`, the corresponding flags are set in the score")
-                    */
+                    @Description("Link or `m1` to scrape it from your last message. " +
+                                 "Start the solution name with `/B?P?` to set flags")
                     @NotNull @Converter(LinkConverter.class) String export,
                     @Description("Name to appear on the Reddit leaderboard")
                     @NotNull String author,
+                    @Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
                     @Converter(ScPuzzleConverter.class) ScPuzzle puzzle) {
             this.video = video;
             this.export = export;

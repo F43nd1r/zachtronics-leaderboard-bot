@@ -2,6 +2,7 @@ package com.faendir.zachtronics.bot.sc.discord;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
+import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractListCommand;
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
@@ -44,12 +45,13 @@ public class ScListCommand extends AbstractListCommand<ScCategory, ScPuzzle, ScR
                 .collect(Collectors.toList()));
     }
 
-    @ApplicationCommand(name = "list", subCommand = true)
+    @ApplicationCommand(name = "list", description = "List records", subCommand = true)
     @Value
     public static class Data {
         @NonNull ScPuzzle puzzle;
 
-        public Data(@Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle) {
+        public Data(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
+                    @Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle) {
             this.puzzle = puzzle;
         }
     }

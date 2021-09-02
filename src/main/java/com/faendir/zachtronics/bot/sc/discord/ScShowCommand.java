@@ -2,6 +2,7 @@ package com.faendir.zachtronics.bot.sc.discord;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
+import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractShowCommand;
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
@@ -40,13 +41,16 @@ public class ScShowCommand extends AbstractShowCommand<ScCategory, ScPuzzle, ScR
         return ScShowCommand$DataParser.buildData();
     }
 
-    @ApplicationCommand(name = "show", subCommand = true)
+    @ApplicationCommand(name = "show", description = "Show a record", subCommand = true)
     @Value
     public static class Data {
         @NonNull ScPuzzle puzzle;
         @NonNull ScCategory category;
 
-        public Data(@Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle, @NonNull ScCategory category) {
+        public Data(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
+                    @Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle,
+                    @Description("Category. E.g. `C`, `RSNB`")
+                    @NonNull ScCategory category) {
             this.puzzle = puzzle;
             this.category = category;
         }

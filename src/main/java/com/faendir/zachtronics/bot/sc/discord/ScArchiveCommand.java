@@ -2,6 +2,7 @@ package com.faendir.zachtronics.bot.sc.discord;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
+import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.LinkConverter;
 import com.faendir.zachtronics.bot.discord.command.AbstractArchiveCommand;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
@@ -47,10 +48,10 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
         ScPuzzle puzzle;
 
         public Data(@NotNull
-                    /* TODO description in 100 chars or less
-                    @Description("Link to your export file, can be `m1` to scrape it from your last message\n" +
-                                 "If the solution name starts with `/B`, `/P` or `/BP`, the corresponding flags are set in the score")*/
+                    @Description("Link or `m1` to scrape it from your last message. " +
+                                 "Start the solution name with `/B?P?` to set flags")
                     @Converter(LinkConverter.class) String export,
+                    @Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
                     @Converter(ScPuzzleConverter.class) ScPuzzle puzzle) {
             this.export = export;
             this.puzzle = puzzle;
