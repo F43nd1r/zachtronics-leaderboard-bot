@@ -1,8 +1,12 @@
 package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.Puzzle;
+import com.faendir.zachtronics.bot.utils.UtilsKt;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
@@ -388,4 +392,12 @@ public enum ScPuzzle implements Puzzle {
     private final ScType type;
     private final String displayName;
     private final boolean isDeterministic;
+
+    @NotNull
+    public static ScPuzzle parsePuzzle(@NotNull String name) {
+        return Arrays.stream(ScPuzzle.values())
+                     .filter(p -> p.getDisplayName().equalsIgnoreCase(name))
+                     .findFirst()
+                     .orElseGet(() -> UtilsKt.getSingleMatchingPuzzle(ScPuzzle.values(), name));
+    }
 }

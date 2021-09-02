@@ -1,6 +1,5 @@
 package com.faendir.zachtronics.bot.sc.validator;
 
-import com.faendir.zachtronics.bot.sc.discord.ScPuzzleConverter;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
@@ -74,10 +73,10 @@ public class SChem {
 
         ScPuzzle puzzle;
         try {
-            puzzle = ScPuzzleConverter.parsePuzzle(result.getLevelName());
+            puzzle = ScPuzzle.parsePuzzle(result.getLevelName());
         } catch (IllegalArgumentException e) {
             assert result.getResnetId() != null;
-            puzzle = ScPuzzleConverter.parsePuzzle(
+            puzzle = ScPuzzle.parsePuzzle(
                     result.getLevelName() + " (" + result.getResnetId()[0] + "-" + result.getResnetId()[1] + "-" +
                     result.getResnetId()[2] + ")");
         }

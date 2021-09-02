@@ -1,8 +1,10 @@
 package com.faendir.zachtronics.bot.sz.model;
 
 import com.faendir.zachtronics.bot.model.Puzzle;
+import com.faendir.zachtronics.bot.utils.UtilsKt;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @RequiredArgsConstructor
@@ -59,4 +61,9 @@ public enum SzPuzzle implements Puzzle {
     private final SzGroup group;
     private final SzType type;
     private final String displayName;
+
+    @NotNull
+    public static SzPuzzle parsePuzzle(@NotNull String name) {
+        return UtilsKt.getSingleMatchingPuzzle(SzPuzzle.values(), name);
+    }
 }

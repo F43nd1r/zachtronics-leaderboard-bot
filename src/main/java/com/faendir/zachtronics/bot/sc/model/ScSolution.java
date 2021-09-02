@@ -1,7 +1,6 @@
 package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.Solution;
-import com.faendir.zachtronics.bot.sc.discord.ScPuzzleConverter;
 import com.faendir.zachtronics.bot.sc.validator.SChem;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
@@ -13,7 +12,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,7 +37,7 @@ public class ScSolution implements Solution {
             String rawPuzzle = m.group("puzzle");
             if (rawPuzzle.matches("'.+'"))
                 rawPuzzle = rawPuzzle.replaceAll("^'|'$", "").replace("''", "'");
-            puzzle = ScPuzzleConverter.parsePuzzle(rawPuzzle);
+            puzzle = ScPuzzle.parsePuzzle(rawPuzzle);
         }
 
         ScScore score = ScScore.parseBPScore(m);
