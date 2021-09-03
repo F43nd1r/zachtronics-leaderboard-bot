@@ -91,6 +91,16 @@ public class CommandTest {
                    result.contains("`115/1/6`"));
     }
 
+    @Test
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
+    public void testArchiveTooMany() {
+        // we start at 100/100/100
+        Map<String, String> args = Map.of("export", "https://pastebin.com/yEZKDh7T"); // a lot of GG
+        String result = runCommand("archive", args);
+        assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14`") &&
+                   result.contains("`115/1/6`"));
+    }
+
     @NotNull
     private static ApplicationCommandInteractionOption mockOption(String name, String value) {
         ApplicationCommandInteractionOptionValue optionValue = new ApplicationCommandInteractionOptionValue(

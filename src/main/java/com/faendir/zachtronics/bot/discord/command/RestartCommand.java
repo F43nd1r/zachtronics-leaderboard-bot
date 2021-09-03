@@ -21,9 +21,9 @@ import java.util.Set;
 @Component
 class RestartCommand implements TopLevelCommand, Secured {
     @Getter
-    String commandName = "restart";
+    private final String commandName = "restart";
     @Getter
-    ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
 
     @NotNull
     @Override
