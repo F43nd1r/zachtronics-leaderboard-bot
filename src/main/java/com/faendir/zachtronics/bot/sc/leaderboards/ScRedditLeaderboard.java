@@ -221,7 +221,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
 
     @NotNull
     private static ScRecord parseLeaderboardRecord(String recordCell) {
-        Pattern scoreRegex = Pattern.compile("(?:†\\s*)?" +
+        Pattern scoreRegex = Pattern.compile("(?:† )?" +
                                              "\\[\\((?<score>" + ScScore.REGEX_BP_SCORE + ")\\) (?<author>[^]]+)]" +
                                              "\\((?<link>[^)]+)\\).*?");
         Matcher m = scoreRegex.matcher(recordCell);

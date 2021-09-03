@@ -10,19 +10,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
-@Qualifier
+@Component
 class RestartCommand implements TopLevelCommand, Secured {
     @Getter
     String commandName = "restart";
-    @Getter ApplicationContext applicationContext;
+    @Getter
+    ApplicationContext applicationContext;
 
     @NotNull
     @Override
