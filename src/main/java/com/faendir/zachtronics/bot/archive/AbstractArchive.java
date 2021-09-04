@@ -59,8 +59,8 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
                                   .collect(Collectors.joining(", "));
             accessScope.commitAndPush(
                     "Added " + solution.getScore().toDisplayString() + " for " + solution.getPuzzle().getDisplayName());
-            result += "\n[commit " + accessScope.currentHash().substring(0, 7) + "](" + getGitRepo().getUrl() + "/commit/" +
-                      accessScope.currentHash() + ")";
+            result += "\n[commit " + accessScope.currentHash().substring(0, 7) + "](" +
+                      getGitRepo().getUrl().replaceFirst(".git$", "") + "/commit/" + accessScope.currentHash() + ")";
             return new Pair<>(" ", result);
         }
         else
