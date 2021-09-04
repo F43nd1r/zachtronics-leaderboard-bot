@@ -11,7 +11,7 @@ import java.nio.file.Files
 import javax.annotation.PreDestroy
 
 open class GitRepository(private val gitProperties: GitProperties, name: String, val url: String) {
-    val rawFilesUrl = Regex("github.com/([^/]+)/([^/.]+)(?:.git)?").replaceFirst(url, "raw.githubusercontent.com/$1/$2/master")
+    val rawFilesUrl = Regex("github.com/([^/]+)/([^/.]+)(?:.git)?").replaceFirst(url, "raw.githubusercontent.com/$1/$2/master/")
     private val repo = Files.createTempDirectory(name).toFile()
 
     init {
