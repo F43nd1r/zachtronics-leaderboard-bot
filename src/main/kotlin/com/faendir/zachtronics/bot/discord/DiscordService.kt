@@ -2,11 +2,13 @@ package com.faendir.zachtronics.bot.discord
 
 import com.faendir.zachtronics.bot.discord.command.Secured
 import com.faendir.zachtronics.bot.discord.command.TopLevelCommand
+import com.fasterxml.jackson.databind.ObjectMapper
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.User
 import discord4j.core.`object`.presence.ClientActivity
 import discord4j.core.`object`.presence.ClientPresence
 import discord4j.core.event.domain.interaction.SlashCommandEvent
+import discord4j.rest.http.client.ClientException
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
@@ -26,7 +28,8 @@ class DiscordService(
     private val discordClient: GatewayDiscordClient,
     private val commands: List<TopLevelCommand>,
     private val gitProperties: GitProperties,
-    private val restartEndpoint: RestartEndpoint
+    private val restartEndpoint: RestartEndpoint,
+    private val objectMapper: ObjectMapper,
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(DiscordService::class.java)
@@ -69,7 +72,19 @@ class DiscordService(
             throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
         }
         val result = command.handle(event)
-        event.interactionResponse.createFollowupMessage(result).awaitSingle()
+        try {
+            event.interactionResponse.createFollowupMessage(result).awaitSingle()
+        } catch (e: ClientException) {
+            logger.info("User command response failed", e)
+            throw RuntimeException(
+                "Your command was processed successfully, but the response couldn't be displayed: ${
+                    e.errorResponse.orElse(null)?.fields?.let {
+                        objectMapper.writeValueAsString(
+                            it
+                        )
+                    } ?: e.message
+                }")
+        }
     }.onErrorResume {
         logger.info("User command failed", it)
         event.interactionResponse.createFollowupMessage("**Failed**: ${it.message ?: "Something went wrong"}")
