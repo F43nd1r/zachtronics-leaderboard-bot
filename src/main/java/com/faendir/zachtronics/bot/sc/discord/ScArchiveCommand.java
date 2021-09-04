@@ -10,8 +10,6 @@ import com.faendir.zachtronics.bot.sc.archive.ScArchive;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
-import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.User;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 @ScQualifier
-public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
+public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> implements ScSecured {
     @Getter
     private final ScArchive archive;
 
@@ -56,12 +54,5 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> {
             this.export = export;
             this.puzzle = puzzle;
         }
-    }
-
-    @Override
-    public boolean hasExecutionPermission(@NotNull User user) {
-        if (user instanceof Member)
-            return ((Member)user).getRoles().any(r -> r.getName().equals("trusted-leaderboard-poster")).block();
-        else return false;
     }
 }
