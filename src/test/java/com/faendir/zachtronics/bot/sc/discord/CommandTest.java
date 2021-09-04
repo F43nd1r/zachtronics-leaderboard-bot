@@ -92,13 +92,12 @@ public class CommandTest {
     }
 
     @Test
-    @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
+    @Disabled("Obscenely slow")
     public void testArchiveTooMany() {
         // we start at 100/100/100
-        Map<String, String> args = Map.of("export", "https://pastebin.com/yEZKDh7T"); // a lot of GG
+        Map<String, String> args = Map.of("export", "https://pastebin.com/yEZKDh7T"); // 33x of GG, 23x archivable
         String result = runCommand("archive", args);
-        assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14`") &&
-                   result.contains("`115/1/6`"));
+        assertTrue(result.contains("results hidden"));
     }
 
     @NotNull
@@ -126,13 +125,13 @@ public class CommandTest {
         WebhookExecuteRequest executeRequest = multipartRequest.getJsonPayload();
         assert executeRequest != null;
         String result = Stream.concat(stream(executeRequest.content()),
-                                      stream(executeRequest.embeds()).flatMap(l -> l.stream().flatMap(
-                                              e -> Stream.of(stream(e.title()),
-                                                             stream(e.description()),
-                                                             e.fields().toOptional().orElse(Collections.emptyList())
-                                                              .stream().map(f -> f.name() + "\n" + f.value()))
-                                                         .flatMap(Function.identity()))))
-                              .collect(Collectors.joining("\n"));
+                                      stream(executeRequest.embeds()).flatMap(l -> l.stream().mapMulti((e, d) -> {
+                                          e.title().toOptional().ifPresent(d);
+                                          e.description().toOptional().ifPresent(d);
+                                          e.fields().toOptional().orElse(Collections.emptyList()).stream()
+                                           .map(f -> f.name() + "\n" + f.value()).forEach(d);
+                                          e.footer().toOptional().ifPresent(f -> d.accept(f.text()));
+                                      }))).collect(Collectors.joining("\n"));
         System.out.println(result);
         return result;
     }
