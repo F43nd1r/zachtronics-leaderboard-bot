@@ -33,163 +33,163 @@ See further [explanations at the bottom of this page](https://www.reddit.com/r/s
 ###Sernimir II
 |Name                         |Min Cycles |Min Cycles - No Bugs |Min Symbols |Min Symbols - No Bugs
 |:-                           |:-      |:-      |:-      |:-
-|Of Pancakes and Spaceships | [(**45**/1/14) toi333](https://youtu.be/QAGV96A_KY4) | ← | [(115/1/**6**) Sahishar](https://youtu.be/SPdA4K_2RvU) | ←
+|Of Pancakes and Spaceships | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_example_1/45-1-14.txt) [(**45**/1/14) toi333](https://youtu.be/QAGV96A_KY4) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_example_1/115-1-6.txt) [(115/1/**6**) Sahishar](https://youtu.be/SPdA4K_2RvU) | ←
 |
-|Slightly Different | [(**45**/1/14) toi333](https://youtu.be/A6D7vh_eAFU) | ← | [(115/1/**6**) Sahishar](https://youtu.be/bwpIMpduOBk) | ←
+|Slightly Different | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_tutorial_1/45-1-14.txt) [(**45**/1/14) toi333](https://youtu.be/A6D7vh_eAFU) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_tutorial_1/115-1-6.txt) [(115/1/**6**) Sahishar](https://youtu.be/bwpIMpduOBk) | ←
 |
-|Crossover | [(**136**/1/36) toi333](https://youtu.be/jFZW0RN77qU) | ← | [(155/1/**16**) Sahishar](https://youtu.be/bISOddxfarA) | ←
+|Crossover | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_tutorial_1point5/136-1-36.txt) [(**136**/1/36) toi333](https://youtu.be/jFZW0RN77qU) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_tutorial_1point5/155-1-16.txt) [(155/1/**16**) Sahishar](https://youtu.be/bISOddxfarA) | ←
 |
-|An Introduction to Bonding | [(**74**/1/40) Zig](https://youtu.be/c4LK7IZ-PGs) | ← | [(154/1/**10**) Sahishar](https://youtu.be/k2oLGHYKLtQ) | ←
+|An Introduction to Bonding | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_example_2/74-1-40.txt) [(**74**/1/40) Zig](https://youtu.be/c4LK7IZ-PGs) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_example_2/154-1-10.txt) [(154/1/**10**) Sahishar](https://youtu.be/k2oLGHYKLtQ) | ←
 |
-|A Brief History of SpaceChem | [(**75**/1/20) toi333](https://youtu.be/QmsfMwv7C2I) | ← | [(154/1/**10**) Sahishar](https://youtu.be/DXogI64d9m8) | ←
+|A Brief History of SpaceChem | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_tutorial_2/75-1-20.txt) [(**75**/1/20) toi333](https://youtu.be/QmsfMwv7C2I) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_tutorial_2/154-1-10.txt) [(154/1/**10**) Sahishar](https://youtu.be/DXogI64d9m8) | ←
 |
-|Removing Bonds | [(**27**/1/13) hailstone](https://youtu.be/CkajOkvfCD8) | ← | [(55/1/**7**) Sahishar](https://youtu.be/Q4FtlgQ-AzU) | ←
+|Removing Bonds | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_tutorial_3/27-1-13.txt) [(**27**/1/13) hailstone](https://youtu.be/CkajOkvfCD8) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_tutorial_3/55-1-7.txt) [(55/1/**7**) Sahishar](https://youtu.be/Q4FtlgQ-AzU) | ←
 
 
 ###Sernimir IV
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Symbols |Min Symbols - No Bugs
 |:-                    |:-      |:-      |:-      |:-
-|Double Bonds | [(**56**/1/18) Sahishar](https://youtu.be/rrkyR8F4Ohs) | ← | [(117/1/**7**) prdwong](https://youtu.be/4JyPZdg_nZY) | ←
+|Double Bonds | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_tutorial_4/56-1-18.txt) [(**56**/1/18) Sahishar](https://youtu.be/rrkyR8F4Ohs) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_tutorial_4/117-1-7.txt) [(117/1/**7**) prdwong](https://youtu.be/4JyPZdg_nZY) | ←
 |
-|Best Left Unanswered | [(**42**/1/50) Sahishar](https://youtu.be/bEy7c9I4PMc) | ← | [(117/1/**7**) prdwong](https://youtu.be/vf9JPqKGukE) | ←
+|Best Left Unanswered | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_tutorial_5/42-1-50.txt) [(**42**/1/50) Sahishar](https://youtu.be/bEy7c9I4PMc) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_tutorial_5/117-1-7.txt) [(117/1/**7**) prdwong](https://youtu.be/vf9JPqKGukE) | ←
 |
-|Multiple Outputs | [(**50**/1/59) harbinger](https://youtu.be/pBtkV94vAUE) | ← | [(155/1/**10**) Jared T.](https://youtu.be/9gqYJari6pU) | ←
+|Multiple Outputs | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_tutorial_6/50-1-59.txt) [(**50**/1/59) harbinger](https://youtu.be/pBtkV94vAUE) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_tutorial_6/155-1-10.txt) [(155/1/**10**) Jared T.](https://youtu.be/9gqYJari6pU) | ←
 |
-|An Introduction to Pipelines | [(**407**/0/0) prdwong](https://youtu.be/_S1ndm9lqsU) | ← | [(407/0/**0**) prdwong](https://youtu.be/_S1ndm9lqsU) | ←
+|An Introduction to Pipelines | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/production_tutorial_1/407-0-0.txt) [(**407**/0/0) prdwong](https://youtu.be/_S1ndm9lqsU) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/production_tutorial_1/407-0-0.txt) [(407/0/**0**) prdwong](https://youtu.be/_S1ndm9lqsU) | ←
 |
-|There's Something in the Fishcake | [(**412**/1/14) hailstone](https://youtu.be/HJGvifiTao0) | ← | [(647/1/**10**) Sahishar](https://youtu.be/E8jIE4Kb4Xs) | ←
+|There's Something in the Fishcake | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/production_tutorial_2/412-1-14.txt) [(**412**/1/14) hailstone](https://youtu.be/HJGvifiTao0) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/production_tutorial_2/647-1-10.txt) [(647/1/**10**) Sahishar](https://youtu.be/E8jIE4Kb4Xs) | ←
 |
-|Sleepless on Sernimir IV | [(**805**/2/48) Sahishar](https://youtu.be/6ebQ_DWPfk0) | ← | [(810/2/**21**) prdwong](https://youtu.be/FKvdtzuwF2s) | ←
+|Sleepless on Sernimir IV | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/production_tutorial_3/805-2-48.txt) [(**805**/2/48) Sahishar](https://youtu.be/6ebQ_DWPfk0) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/production_tutorial_3/810-2-21.txt) [(810/2/**21**) prdwong](https://youtu.be/FKvdtzuwF2s) | ←
 
 
 ###Danopth
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Symbols |Min Symbols - No Bugs
 |:-                       |:-      |:-      |:-      |:-      
-|Every Day is the First Day | [(**103**/1/41) Sahishar](https://youtu.be/W3IgEvqkOkg) | ← | [(354/1/**12**) Sahishar](https://youtu.be/qypYprgAyTQ) | ←
+|Every Day is the First Day | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_2/103-1-41.txt) [(**103**/1/41) Sahishar](https://youtu.be/W3IgEvqkOkg) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_2/354-1-12.txt) [(354/1/**12**) Sahishar](https://youtu.be/qypYprgAyTQ) | ←
 |
-|It Takes Three | [(**102**/1/34) toi333](https://youtu.be/xekMsh0r1GI) | ← | [(142/1/**14**) Sahishar](https://youtu.be/BagzxqWY7iU) | ←
+|It Takes Three | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_3/102-1-34.txt) [(**102**/1/34) toi333](https://youtu.be/xekMsh0r1GI) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_3/142-1-14.txt) [(142/1/**14**) Sahishar](https://youtu.be/BagzxqWY7iU) | ←
 |
-|Split Before Bonding | [(**73**/1/24) toi333](https://youtu.be/l-_o99COWK0) | ← | [(155/1/**11**) prdwong](https://youtu.be/BkN9ted63Zc) | ←
+|Split Before Bonding | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_4/73-1-24.txt) [(**73**/1/24) toi333](https://youtu.be/l-_o99COWK0) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_4/155-1-11.txt) [(155/1/**11**) prdwong](https://youtu.be/BkN9ted63Zc) | ←
 |
-|Settling into the Routine | [(**820**/3/34) Sahishar](https://youtu.be/oHcDZZ977rQ) | ← | [(1777/3/**25**) Sahishar](https://youtu.be/Z3_VgcEDK-E) | ←
+|Settling into the Routine | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_6/820-3-34.txt) [(**820**/3/34) Sahishar](https://youtu.be/oHcDZZ977rQ) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_6/1777-3-25.txt) [(1777/3/**25**) Sahishar](https://youtu.be/Z3_VgcEDK-E) | ←
 |
-|Nothing Works | [(**413**/4/59) hailstone](https://youtu.be/m2KEtV7qkuc) | ← | [(814/3/**28**/B) ants280](https://youtu.be/zPD8ddbBKTw) | [(808/4/**35**) Sahishar](https://youtu.be/5eGQIiZYRN0)
-|Nothing Works - 3 Reactors | [(**422**/**3**/54/B) 12345ieee](https://youtu.be/BL9XS7klF0w) | X | [(814/**3**/**28**/B) ants280](https://youtu.be/zPD8ddbBKTw) | X
+|Nothing Works | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_7/413-4-59.txt) [(**413**/4/59) hailstone](https://youtu.be/m2KEtV7qkuc) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_7/814-3-28-B.txt) [(814/3/**28**/B) ants280](https://youtu.be/zPD8ddbBKTw) | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_7/808-4-35.txt) [(808/4/**35**) Sahishar](https://youtu.be/5eGQIiZYRN0)
+|Nothing Works - 3 Reactors | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_7/422-3-54-B.txt) [(**422**/**3**/54/B) 12345ieee](https://youtu.be/BL9XS7klF0w) | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_7/814-3-28-B.txt) [(814/**3**/**28**/B) ants280](https://youtu.be/zPD8ddbBKTw) | X
 |
-|Challenge: In-Place Swap | [(**423**/3/59) Spiff](https://youtu.be/R9aXN2vBujA) | ← | [(1710/1/**25**) Sahishar](https://youtu.be/8IP0Mv6Cx6M) | ←
-|Challenge: In-Place Swap - 1 Reactor | [(**903**/**1**/31) Spiff](https://youtu.be/gdjGPXHANi0) | ← | [(1710/**1**/**25**) Sahishar](https://youtu.be/8IP0Mv6Cx6M) | ←
+|Challenge: In-Place Swap | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_5/423-3-59.txt) [(**423**/3/59) Spiff](https://youtu.be/R9aXN2vBujA) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_5/1710-1-25.txt) [(1710/1/**25**) Sahishar](https://youtu.be/8IP0Mv6Cx6M) | ←
+|Challenge: In-Place Swap - 1 Reactor | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_5/903-1-31.txt) [(**903**/**1**/31) Spiff](https://youtu.be/gdjGPXHANi0) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/bonding_5/1710-1-25.txt) [(1710/**1**/**25**) Sahishar](https://youtu.be/8IP0Mv6Cx6M) | ←
 
 
 ###Alkonost
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Cycles - No Precognition |Min Symbols |Min Symbols - No Bugs |Min Symbols - No Precognition
 |:-                       |:-      |:-      |:-      |:-      |:-      |:-
-|An Introduction to Sensing | [(**136**/1/27) serbaldrig](https://youtu.be/B4FEWvbeR0I) | ← | ←← | [(236/1/**11**) pieceofmind](https://www.youtube.com/watch?hd=1&v=8w0gL2IjQcE) | ← | ←←
+|An Introduction to Sensing | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_1/136-1-27.txt) [(**136**/1/27) serbaldrig](https://youtu.be/B4FEWvbeR0I) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_1/236-1-11.txt) [(236/1/**11**) pieceofmind](https://www.youtube.com/watch?hd=1&v=8w0gL2IjQcE) | ← | ←←
 |
-|Prelude to a Migraine | [(**67**/1/14) hailstone](https://youtu.be/IuyF1TPGbe0) | ← | ←← | [(152/1/**7**) Storm Frog](https://youtu.be/if5VSn2fNAg) | ← | ←←
+|Prelude to a Migraine | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_2/67-1-14.txt) [(**67**/1/14) hailstone](https://youtu.be/IuyF1TPGbe0) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_2/152-1-7.txt) [(152/1/**7**) Storm Frog](https://youtu.be/if5VSn2fNAg) | ← | ←←
 |
-|Random Oxides | [(**176**/1/46) Sahishar](https://youtu.be/1Ayss3sS4hU) | ← | ←← | [(671/1/**14**) Zig](https://youtu.be/WnotdoU0Udo) | ← | ←←
+|Random Oxides | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_3/176-1-46.txt) [(**176**/1/46) Sahishar](https://youtu.be/1Ayss3sS4hU) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_3/671-1-14.txt) [(671/1/**14**) Zig](https://youtu.be/WnotdoU0Udo) | ← | ←←
 |
-|No Ordinary Headache | [(**817**/2/104/P) ToughThought](https://youtu.be/S3KyURvT8pE) | ← | [(**819**/2/44) Spiff](https://youtu.be/RHbx5NsrjEU) | [(3725/1/**17**) Sahishar](https://youtu.be/AJUkeRZ0E2w) | ← | ←←
-|No Ordinary Headache - 1 Reactor | [(**828**/**1**/69) Billy](https://youtu.be/X9kBj0-jiWE) | ← | ←← | [(3725/**1**/**17**) Sahishar](https://youtu.be/AJUkeRZ0E2w) | ← | ←←
+|No Ordinary Headache | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_4/817-2-104-P.txt) [(**817**/2/104/P) ToughThought](https://youtu.be/S3KyURvT8pE) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_4/819-2-44.txt) [(**819**/2/44) Spiff](https://youtu.be/RHbx5NsrjEU) | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_4/3725-1-17.txt) [(3725/1/**17**) Sahishar](https://youtu.be/AJUkeRZ0E2w) | ← | ←←
+|No Ordinary Headache - 1 Reactor | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_4/828-1-69.txt) [(**828**/**1**/69) Billy](https://youtu.be/X9kBj0-jiWE) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_4/3725-1-17.txt) [(3725/**1**/**17**) Sahishar](https://youtu.be/AJUkeRZ0E2w) | ← | ←←
 |
-|No Thanks Necessary | [(**791**/5/131) Spiff](https://youtu.be/wCDd0OuX8_g) | ← | ←← | [(8855\*/2/**41**) 12345ieee](https://youtu.be/AWmdNa4vHe0) | ← | ←←
-|No Thanks Necessary - 2 Reactors | [(**2519**/**2**/168) whoever314](https://youtu.be/-JZ1utfcz-Q) | ← | ←← | [(8855\*/**2**/**41**) 12345ieee](https://youtu.be/AWmdNa4vHe0) | ← | ←←
+|No Thanks Necessary | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_5/791-5-131.txt) [(**791**/5/131) Spiff](https://youtu.be/wCDd0OuX8_g) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_5/8855-2-41.txt) [(8855\*/2/**41**) 12345ieee](https://youtu.be/AWmdNa4vHe0) | ← | ←←
+|No Thanks Necessary - 2 Reactors | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_5/2519-2-168.txt) [(**2519**/**2**/168) whoever314](https://youtu.be/-JZ1utfcz-Q) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_5/8855-2-41.txt) [(8855\*/**2**/**41**) 12345ieee](https://youtu.be/AWmdNa4vHe0) | ← | ←←
 |
-|Challenge: Going Green | [(**1219**/3/85) kuroi_neko](https://youtu.be/jdrMC3tJGGA) | ← | ←← | [(2297/2/**35**) 12345ieee](https://youtu.be/zV0Icutzh4k) | ← | ←←
-|Challenge: Going Green - 1 Reactor | [(**2918**/**1**/99) Zig](https://youtu.be/Mx6WjrT9oT4) | ← | ←← | [(5581/**1**/**76**) Zig](https://youtu.be/U0VSxqZVxKo) | ← | ←←
+|Challenge: Going Green | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_6/1219-3-85.txt) [(**1219**/3/85) kuroi_neko](https://youtu.be/jdrMC3tJGGA) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_6/2297-2-35.txt) [(2297/2/**35**) 12345ieee](https://youtu.be/zV0Icutzh4k) | ← | ←←
+|Challenge: Going Green - 1 Reactor | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_6/2918-1-99.txt) [(**2918**/**1**/99) Zig](https://youtu.be/Mx6WjrT9oT4) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/sensing_6/5581-1-76.txt) [(5581/**1**/**76**) Zig](https://youtu.be/U0VSxqZVxKo) | ← | ←←
 
 
 ###Sikutar
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Symbols |Min Symbols - No Bugs 
 |:-                    |:-      |:-      |:-      |:-
-|Ice to Meet You | [(**44**/1/48) Sahishar](https://youtu.be/6aHmycCdxwo) | ← | [(176/1/**10**) Sahishar](https://youtu.be/rVgZ2hUyKks) | ←
+|Ice to Meet You | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/fusion_1/44-1-48.txt) [(**44**/1/48) Sahishar](https://youtu.be/6aHmycCdxwo) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/fusion_1/176-1-10.txt) [(176/1/**10**) Sahishar](https://youtu.be/rVgZ2hUyKks) | ←
 |
-|Under the Ice | [(**78**/1/39) Sahishar](https://youtu.be/3Qtm5NslaQE) | ← | [(178/1/**14**) toi333](https://youtu.be/459XewxbfKg) | ←
+|Under the Ice | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/fusion_2/78-1-39.txt) [(**78**/1/39) Sahishar](https://youtu.be/3Qtm5NslaQE) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/fusion_2/178-1-14.txt) [(178/1/**14**) toi333](https://youtu.be/459XewxbfKg) | ←
 |
-|Unknown Sender | [(**124**/1/33) Community](https://youtu.be/e4UFc96cRsI) | ← | [(1400/1/**11**) Sahishar](https://youtu.be/OL1GgEo3OZQ) | ←
+|Unknown Sender | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/fusion_3/124-1-33.txt) [(**124**/1/33) Community](https://youtu.be/e4UFc96cRsI) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/fusion_3/1400-1-11.txt) [(1400/1/**11**) Sahishar](https://youtu.be/OL1GgEo3OZQ) | ←
 |
-|Falling | [(**874**/5/257) whoever314](https://youtu.be/mCq2hGwM3uM) | ← | [(1420/2/**39**) Sahishar](https://youtu.be/mGjidk1RE1g) | ←
-|Falling - 2 Reactors | [(**1015**/**2**/75) whoever314](https://youtu.be/g7IxvRT_XHQ) | ← | [(1420/**2**/**39**) Sahishar](https://youtu.be/mGjidk1RE1g) | ←
+|Falling | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/fusion_5/874-5-257.txt) [(**874**/5/257) whoever314](https://youtu.be/mCq2hGwM3uM) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/fusion_5/1420-2-39.txt) [(1420/2/**39**) Sahishar](https://youtu.be/mGjidk1RE1g) | ←
+|Falling - 2 Reactors | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/fusion_5/1015-2-75.txt) [(**1015**/**2**/75) whoever314](https://youtu.be/g7IxvRT_XHQ) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/fusion_5/1420-2-39.txt) [(1420/**2**/**39**) Sahishar](https://youtu.be/mGjidk1RE1g) | ←
 |
-|Challenge: Applied Fusion | [(**2019**/1/60) serbaldrig](https://youtu.be/NB06DGbGKOU) | ← | [(5457/1/**31**) mrcable](https://youtu.be/fSpwlW0P_8I) | ←
-|Challenge: Applied Fusion - 1 Reactor | [(**2019**/**1**/60) serbaldrig](https://youtu.be/NB06DGbGKOU) | ← | [(5457/**1**/**31**) mrcable](https://youtu.be/fSpwlW0P_8I) | ←
+|Challenge: Applied Fusion | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/fusion_6/2019-1-60.txt) [(**2019**/1/60) serbaldrig](https://youtu.be/NB06DGbGKOU) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/fusion_6/5457-1-31.txt) [(5457/1/**31**) mrcable](https://youtu.be/fSpwlW0P_8I) | ←
+|Challenge: Applied Fusion - 1 Reactor | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/fusion_6/2019-1-60.txt) [(**2019**/**1**/60) serbaldrig](https://youtu.be/NB06DGbGKOU) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/fusion_6/5457-1-31.txt) [(5457/**1**/**31**) mrcable](https://youtu.be/fSpwlW0P_8I) | ←
 
 
 ###Hephaestus IV
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Cycles - No Precognition |Min Symbols |Min Symbols - No Bugs |Min Symbols - No Precognition
 |:-                       |:-      |:-      |:-      |:-      |:-      |:-
-|Like a Boss | [(**152**/1/52) Sahishar](https://youtu.be/K_MuYPkDlUM) | ← | X | [(450/1/**18**) Sahishar](https://youtu.be/oRQ9r0XXRA0) | ← | X
+|Like a Boss | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_2/152-1-52.txt) [(**152**/1/52) Sahishar](https://youtu.be/K_MuYPkDlUM) | ← | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_2/450-1-18.txt) [(450/1/**18**) Sahishar](https://youtu.be/oRQ9r0XXRA0) | ← | X
 |
-|Sacré Bleu! | [(**136**/1/23) eFse7en](https://youtu.be/EIgmvpMLF5o) | ← | X | [(147/1/**18**) darkgiggs](https://youtu.be/XBRphiERNRY) | ← | X
+|Sacré Bleu! | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_3/136-1-23.txt) [(**136**/1/23) eFse7en](https://youtu.be/EIgmvpMLF5o) | ← | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_3/147-1-18.txt) [(147/1/**18**) darkgiggs](https://youtu.be/XBRphiERNRY) | ← | X
 |
-|The Plot Thickens | [(**419**/1/54) eiTTio](https://youtu.be/PFyqNCLn-L4) | ← | X | [(1327/1/**14**) Andy](https://youtu.be/RSmWFCcVGrI) | ← | X
+|The Plot Thickens | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_7/419-1-54.txt) [(**419**/1/54) eiTTio](https://youtu.be/PFyqNCLn-L4) | ← | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_7/1327-1-14.txt) [(1327/1/**14**) Andy](https://youtu.be/RSmWFCcVGrI) | ← | X
 |
-|Danger Zone | [(**154**/1/24) Sahishar](https://youtu.be/VJ-VrcQbxpk) | ← | ←← | [(319/1/**10**) Sahishar](https://youtu.be/kDlpbr4kxIw) | ← | ←←
+|Danger Zone | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_1/154-1-24.txt) [(**154**/1/24) Sahishar](https://youtu.be/VJ-VrcQbxpk) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_1/319-1-10.txt) [(319/1/**10**) Sahishar](https://youtu.be/kDlpbr4kxIw) | ← | ←←
 |
-|Molecular Foundry | [(**1618**/3/113) serbaldrig](https://youtu.be/enUqPKMgZlE) | ← | ←← | [(9538/2/**29**) ToughThought](https://youtu.be/Y19gRkN4HvE) | ← | ←←
-|Molecular Foundry - 1 Reactor | [(**3496**/**1**/66) whoever314](https://youtu.be/ownMk0K8cAg) | ← | ←← | [(23,608,270/**1**/**32**) Andy](https://youtu.be/RPSw3jGoPP4) | ← | ←←
+|Molecular Foundry | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_5/1618-3-113.txt) [(**1618**/3/113) serbaldrig](https://youtu.be/enUqPKMgZlE) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_5/9538-2-29.txt) [(9538/2/**29**) ToughThought](https://youtu.be/Y19gRkN4HvE) | ← | ←←
+|Molecular Foundry - 1 Reactor | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_5/3496-1-66.txt) [(**3496**/**1**/66) whoever314](https://youtu.be/ownMk0K8cAg) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_5/23608270-1-32.txt) [(23,608,270/**1**/**32**) Andy](https://youtu.be/RPSw3jGoPP4) | ← | ←←
 |
-|Gas Works Park | [(**820**/4/95) serbaldrig](https://youtu.be/MrGuVX-7qfU) | ← | ←← | [(1954/2/**35**) darkgiggs/Sahishar](https://youtu.be/fX3wOSh1URc) | ← | ←←
-|Gas Works Park - 1 Reactor | [(**5173**/**1**/78) ShadowTheAge](https://youtube.com/watch?v=YQjXu7uIx0k) | ← | ←← | [(5173/**1**/**78**) ShadowTheAge](https://youtube.com/watch?v=YQjXu7uIx0k) | ← | ←←
+|Gas Works Park | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_4/820-4-95.txt) [(**820**/4/95) serbaldrig](https://youtu.be/MrGuVX-7qfU) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_4/1954-2-35.txt) [(1954/2/**35**) darkgiggs/Sahishar](https://youtu.be/fX3wOSh1URc) | ← | ←←
+|Gas Works Park - 1 Reactor | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_4/5173-1-78.txt) [(**5173**/**1**/78) ShadowTheAge](https://youtube.com/watch?v=YQjXu7uIx0k) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_4/5173-1-78.txt) [(5173/**1**/**78**) ShadowTheAge](https://youtube.com/watch?v=YQjXu7uIx0k) | ← | ←←
 |
-|Challenge: KOHCTPYKTOP | [(**3351**/3/103) Andy](https://youtu.be/Z3gpNdPgreA) | ← | X | [(21633/4/**55**) Ir_Sigma](https://youtu.be/HkuvNWRIO80) | ← | X
-|Challenge: KOHCTPYKTOP - 2 Reactors | [(**85561**/**2**/149/B) Andy](https://youtu.be/Htyhlg6nBMs) | † [(**3351**/**3**/103) Andy](https://youtu.be/Z3gpNdPgreA) | X | [(85561/**2**/**149**/B) Andy](https://youtu.be/Htyhlg6nBMs) | † [(3351/**3**/**103**) Andy](https://youtu.be/Z3gpNdPgreA) | X
+|Challenge: KOHCTPYKTOP | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_6/3351-3-103.txt) [(**3351**/3/103) Andy](https://youtu.be/Z3gpNdPgreA) | ← | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_6/21633-4-55.txt) [(21633/4/**55**) Ir_Sigma](https://youtu.be/HkuvNWRIO80) | ← | X
+|Challenge: KOHCTPYKTOP - 2 Reactors | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_6/85561-2-149-B.txt) [(**85561**/**2**/149/B) Andy](https://youtu.be/Htyhlg6nBMs) | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_6/3351-3-103.txt) † [(**3351**/**3**/103) Andy](https://youtu.be/Z3gpNdPgreA) | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_6/85561-2-149-B.txt) [(85561/**2**/**149**/B) Andy](https://youtu.be/Htyhlg6nBMs) | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/mining_6/3351-3-103.txt) † [(3351/**3**/**103**) Andy](https://youtu.be/Z3gpNdPgreA) | X
 
 
 ###Atropos Station
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Cycles - No Precognition |Min Symbols |Min Symbols - No Bugs |Min Symbols - No Precognition
 |:-                       |:-      |:-      |:-      |:-      |:-      |:-
-|The Blue Danube | [(**154**/1/24) Sahishar](https://youtu.be/o0Y2EE07PwQ) | ← | ←← | [(319/1/**10**) Sahishar](https://youtu.be/HVxWRbfehLA) | ← | ←←
+|The Blue Danube | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_1/154-1-24.txt) [(**154**/1/24) Sahishar](https://youtu.be/o0Y2EE07PwQ) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_1/319-1-10.txt) [(319/1/**10**) Sahishar](https://youtu.be/HVxWRbfehLA) | ← | ←←
 |
-|No Stomach for Lunch | [(**132**/1/30) serbaldrig](https://youtu.be/jS_lvijAzVc) | ← | X | [(237/1/**17**) Sahishar](https://youtu.be/pbhslbAnJms) | ← | X
+|No Stomach for Lunch | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_3/132-1-30.txt) [(**132**/1/30) serbaldrig](https://youtu.be/jS_lvijAzVc) | ← | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_3/237-1-17.txt) [(237/1/**17**) Sahishar](https://youtu.be/pbhslbAnJms) | ← | X
 |
-|No Employment Record Found | [(**344**/1/77) Zig](https://youtu.be/3i_LrukSJ_4) | ← | ←← | [(5762/1/**12**) Sahishar](https://youtu.be/xWURijz_NEI) | ← | ←←
+|No Employment Record Found | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_6/344-1-77.txt) [(**344**/1/77) Zig](https://youtu.be/3i_LrukSJ_4) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_6/5762-1-12.txt) [(5762/1/**12**) Sahishar](https://youtu.be/xWURijz_NEI) | ← | ←←
 |
-|Right All Along | [(**672**/1/52) whoever314](https://youtu.be/YvunGBAsJSI) | ← | X | [(2705/1/**15**) Sahishar](https://youtu.be/QYEL_Y2l4f0) | ← | X
+|Right All Along | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_5/672-1-52.txt) [(**672**/1/52) whoever314](https://youtu.be/YvunGBAsJSI) | ← | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_5/2705-1-15.txt) [(2705/1/**15**) Sahishar](https://youtu.be/QYEL_Y2l4f0) | ← | X
 |
-|Accidents Happen | [(**275**/1/88) Zig](https://youtu.be/Qy4h6byyw-s) | ← | ←← | [(1044/1/**24**) CaitSith2](https://youtu.be/uRuSiKDyeQs) | ← | ←←
+|Accidents Happen | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_2/275-1-88.txt) [(**275**/1/88) Zig](https://youtu.be/Qy4h6byyw-s) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/research_2/1044-1-24.txt) [(1044/1/**24**) CaitSith2](https://youtu.be/uRuSiKDyeQs) | ← | ←←
 
 
 ###Flidais
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Cycles - No Precognition |Min Symbols |Min Symbols - No Bugs |Min Symbols - No Precognition
 |:-                       |:-      |:-      |:-      |:-      |:-      |:-
-|Special Assignment | [(**193**/1/39) Sahishar](https://youtu.be/_fRc74KIm7o) | ← | X | [(574/1/**20**) darkgiggs](https://youtu.be/trjajJU9438) | ← | X
+|Special Assignment | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/organic_1/193-1-39.txt) [(**193**/1/39) Sahishar](https://youtu.be/_fRc74KIm7o) | ← | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/organic_1/574-1-20.txt) [(574/1/**20**) darkgiggs](https://youtu.be/trjajJU9438) | ← | X
 |
-|Suspicious Behavior | [(**1101**/1/62) serbaldrig](https://youtu.be/_lkvA_O1dzQ) | ← | X | [(2838/1/**28**) ShadowTheAge/12345ieee](https://youtu.be/9Kp7za98pMQ) | ← | X
+|Suspicious Behavior | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/organic_2/1101-1-62.txt) [(**1101**/1/62) serbaldrig](https://youtu.be/_lkvA_O1dzQ) | ← | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/organic_2/2838-1-28.txt) [(2838/1/**28**) ShadowTheAge/12345ieee](https://youtu.be/9Kp7za98pMQ) | ← | X
 |
-|I Told You So | [(**185**/1/88) Andy](https://youtu.be/qrSKRqhymak) | ← | X | [(1216/1/**17**) Ir_Sigma](https://youtu.be/P0MpYQKOgSg) | ← | X
+|I Told You So | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/organic_3/185-1-88.txt) [(**185**/1/88) Andy](https://youtu.be/qrSKRqhymak) | ← | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/organic_3/1216-1-17.txt) [(1216/1/**17**) Ir_Sigma](https://youtu.be/P0MpYQKOgSg) | ← | X
 |
-|Ω-Pseudoethyne | [(**829**/2/121) Lemonymous](https://youtu.be/hhGOLHHs-PQ) | ← | ←← | [(2977/2/**41**) rezoons/12345ieee](https://youtu.be/Dc-yZaul-p4) | ← | ←←
+|Ω-Pseudoethyne | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/organic_5/829-2-121.txt) [(**829**/2/121) Lemonymous](https://youtu.be/hhGOLHHs-PQ) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/organic_5/2977-2-41.txt) [(2977/2/**41**) rezoons/12345ieee](https://youtu.be/Dc-yZaul-p4) | ← | ←←
 |
-|Σ-Ethylene | [(**2011**/2/91) ToughThought](https://youtu.be/A7N5_tuZLjg) | ← | X | [(4097/2/**47**) Andy](https://youtu.be/PHManTlgf3w) | ← | X
+|Σ-Ethylene | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/organic_6/2011-2-91.txt) [(**2011**/2/91) ToughThought](https://youtu.be/A7N5_tuZLjg) | ← | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/MAIN/organic_6/4097-2-47.txt) [(4097/2/**47**) Andy](https://youtu.be/PHManTlgf3w) | ← | X
 
 
 ##Moustachium
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Symbols |Min Symbols - No Bugs
 |:-                       |:-      |:-      |:-      |:-      
-|Moustachium 602 | [(**37**/1/44) Sahishar](https://youtu.be/0ZFOoNA2bXg) | ← | [(117/1/**7**) erlandodk](https://youtu.be/C5uLuaCa1sA) | ←
+|Moustachium 602 | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/TF2/tf2_1/37-1-44.txt) [(**37**/1/44) Sahishar](https://youtu.be/0ZFOoNA2bXg) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/TF2/tf2_1/117-1-7.txt) [(117/1/**7**) erlandodk](https://youtu.be/C5uLuaCa1sA) | ←
 |
-|Moustachium 604 | [(**63**/1/41) ToughThought](https://youtu.be/gtClEF1l-rc) | ← | [(713/1/**9**) toi333](https://youtu.be/i4pgU5qe_v8) | ←
+|Moustachium 604 | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/TF2/tf2_2/63-1-41.txt) [(**63**/1/41) ToughThought](https://youtu.be/gtClEF1l-rc) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/TF2/tf2_2/713-1-9.txt) [(713/1/**9**) toi333](https://youtu.be/i4pgU5qe_v8) | ←
 |
-|Moustachium 608 | [(**172**/1/49) ToughThought](https://youtu.be/cEsbx62XcaU) | ← | [(473/1/**18**) Phoil](https://youtu.be/CrpIaKoYQ5s) | ←
+|Moustachium 608 | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/TF2/tf2_3/172-1-49.txt) [(**172**/1/49) ToughThought](https://youtu.be/cEsbx62XcaU) | ← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/TF2/tf2_3/473-1-18.txt) [(473/1/**18**) Phoil](https://youtu.be/CrpIaKoYQ5s) | ←
 
 
 ##63 Corvi (DLC)
 |Name                  |Min Cycles |Min Cycles - No Bugs |Min Cycles - No Precognition |Min Symbols |Min Symbols - No Bugs |Min Symbols - No Precognition
 |:-                       |:-      |:-      |:-      |:-      |:-      |:-
-|QT-1 | [(**15**/1/14) Andy](https://youtu.be/au4p001aI2g) | ← | X | [(20/1/**5**) Alexander Pas](https://youtu.be/BoT7ob687sg) | ← | X
+|QT-1 | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_1/15-1-14.txt) [(**15**/1/14) Andy](https://youtu.be/au4p001aI2g) | ← | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_1/20-1-5.txt) [(20/1/**5**) Alexander Pas](https://youtu.be/BoT7ob687sg) | ← | X
 |
-|QT-2 | [(**80**/1/13) ToughThought](https://youtu.be/nt2EIw27fvM) | ← | X | [(83/1/**11**) Spiff](https://youtu.be/mC89_tpyv4k) | ← | X
+|QT-2 | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_2/80-1-13.txt) [(**80**/1/13) ToughThought](https://youtu.be/nt2EIw27fvM) | ← | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_2/83-1-11.txt) [(83/1/**11**) Spiff](https://youtu.be/mC89_tpyv4k) | ← | X
 |
-|Teleporters | [(**983**/3/48) GuavaMoment](https://youtu.be/yEaLSU2fPv4) | ← | X | [(3859/2/**27**) Sahishar](https://youtu.be/pDsmPbx9jB4) | ← | X
-|Teleporters - 2 Reactors | [(**988**/**2**/43) Spiff](https://youtu.be/CALAJTXBvjA) | ← | X | [(3859/**2**/**27**) Sahishar](https://youtu.be/pDsmPbx9jB4) | ← | X
+|Teleporters | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_4/983-3-48.txt) [(**983**/3/48) GuavaMoment](https://youtu.be/yEaLSU2fPv4) | ← | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_4/3859-2-27.txt) [(3859/2/**27**) Sahishar](https://youtu.be/pDsmPbx9jB4) | ← | X
+|Teleporters - 2 Reactors | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_4/988-2-43.txt) [(**988**/**2**/43) Spiff](https://youtu.be/CALAJTXBvjA) | ← | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_4/3859-2-27.txt) [(3859/**2**/**27**) Sahishar](https://youtu.be/pDsmPbx9jB4) | ← | X
 |
-|QT-3 | [(**109**/1/24/B) Zig](https://youtu.be/LfprU_v-1Yk) | [(**161**/1/27) Sahishar](https://youtu.be/eRdHjzJyCT4) | X | [(400/1/**13**) mrcable](https://youtu.be/zm4zXWVKlsA) | ← | X
+|QT-3 | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_3/109-1-24-B.txt) [(**109**/1/24/B) Zig](https://youtu.be/LfprU_v-1Yk) | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_3/161-1-27.txt) [(**161**/1/27) Sahishar](https://youtu.be/eRdHjzJyCT4) | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_3/400-1-13.txt) [(400/1/**13**) mrcable](https://youtu.be/zm4zXWVKlsA) | ← | X
 |
-|QT-4 | [(**246**/1/44) eFse7en](https://youtu.be/ujUaOqw_hkc) | ← | X | [(1057/1/**18**) Sahishar](https://youtu.be/DePKulwedGA) | ← | X
+|QT-4 | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_5/246-1-44.txt) [(**246**/1/44) eFse7en](https://youtu.be/ujUaOqw_hkc) | ← | X | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_5/1057-1-18.txt) [(1057/1/**18**) Sahishar](https://youtu.be/DePKulwedGA) | ← | X
 |
-|Precursor Compounds | [(**1050**/4/100) eiTTio](https://youtu.be/trcmtEU0qGk) | ← | ←← | [(12197\*/3/**56**) 12345ieee](https://youtu.be/eCc5LBov9b0) | ← | ←←
-|Precursor Compounds - 1 Reactor | [(**32538**\*/**1**/131) 12345ieee](https://youtu.be/-PfbgY65FsE) | ← | ←← | [(32538\*/**1**/**131**) 12345ieee](https://youtu.be/-PfbgY65FsE) | ← | ←←
+|Precursor Compounds | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_6/1050-4-100.txt) [(**1050**/4/100) eiTTio](https://youtu.be/trcmtEU0qGk) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_6/12197-3-56.txt) [(12197\*/3/**56**) 12345ieee](https://youtu.be/eCc5LBov9b0) | ← | ←←
+|Precursor Compounds - 1 Reactor | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_6/32538-1-131.txt) [(**32538**\*/**1**/131) 12345ieee](https://youtu.be/-PfbgY65FsE) | ← | ←← | [📄](https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/CORVI63/quantum_6/32538-1-131.txt) [(32538\*/**1**/**131**) 12345ieee](https://youtu.be/-PfbgY65FsE) | ← | ←←
 
 
 ##ResearchNet

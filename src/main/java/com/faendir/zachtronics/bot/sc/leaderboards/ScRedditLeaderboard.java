@@ -164,13 +164,13 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                         beatenScores.put(thisCategory, currentScore);
                         blockRecords[i] = record;
 
-                        row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory));
+                        row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory, puzzle));
                     }
                     else {
                         String prevElem = prevElems[block * halfSize + i + 2];
                         if (beatenScores.containsValue(currentScore) && prevElem.matches("←+")) {
                             // "dangling" reference to beaten score, we need to write the actual score or change the pointer
-                            row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory));
+                            row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory, puzzle));
                         }
                         else {
                             if (blockRecords[i] != ScRecord.IMPOSSIBLE_CATEGORY &&
@@ -196,40 +196,44 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
     }
 
     @NotNull
-    private static String makeLeaderboardCell(ScRecord[] blockRecords, int i, int minReactors,
-                                              ScCategory thisCategory) {
+    private static String makeLeaderboardCell(@NotNull ScRecord[] blockRecords, int i, int minReactors,
+                                              ScCategory thisCategory, ScPuzzle puzzle) {
+        ScRecord record = blockRecords[i];
         for (int prev = 0; prev < i; prev++) {
-            if (blockRecords[i] == blockRecords[prev]) {
+            if (record == blockRecords[prev]) {
                 return "←".repeat(i - prev);
             }
         }
 
-        String reactorPrefix = (blockRecords[i].getScore().getReactors() > minReactors) ? "† " : "";
-        return reactorPrefix + makeScoreCell(blockRecords[i], thisCategory);
-    }
-
-    @NotNull
-    private static String makeScoreCell(@NotNull ScRecord record, @NotNull ScCategory category) {
+        String reactorPrefix = (record.getScore().getReactors() > minReactors) ? "† " : "";
         ScScore score = record.getScore();
         String cyclesStr =
                 score.getCycles() >= 100000 ? NumberFormat.getNumberInstance(Locale.ROOT).format(score.getCycles())
                                             : Integer.toString(score.getCycles());
-        return String.format("[(" + category.getFormatStringLb() + "%s) %s](%s)", cyclesStr,
+        return String.format("[\uD83D\uDCC4](%s) %s[(" + thisCategory.getFormatStringLb() + "%s) %s](%s)", // 📄
+                             makeArchiveLink(puzzle, score), reactorPrefix, cyclesStr,
                              record.isOldVideoRNG() ? "\\*" : "", score.getReactors(), score.getSymbols(),
                              score.slashFlags(), record.getAuthor(), record.getLink());
     }
 
+    private static String makeArchiveLink(@NotNull ScPuzzle puzzle, @NotNull ScScore score) {
+        return String.format("https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/%s/%s/%s.txt",
+                             puzzle.getGroup().name(), puzzle.name(), score.toDisplayString().replace('/', '-'));
+    }
+
+    private static final Pattern REGEX_SCORE_CELL =
+            Pattern.compile("\\[\uD83D\uDCC4]\\(.+\\.txt\\) " +
+                            "(?:† )?" +
+                            "\\[\\((?<score>" + ScScore.REGEX_BP_SCORE + ")\\) (?<author>[^]]+)]" +
+                            "\\((?<link>[^)]+)\\).*?");
     @NotNull
     private static ScRecord parseLeaderboardRecord(String recordCell) {
-        Pattern scoreRegex = Pattern.compile("(?:† )?" +
-                                             "\\[\\((?<score>" + ScScore.REGEX_BP_SCORE + ")\\) (?<author>[^]]+)]" +
-                                             "\\((?<link>[^)]+)\\).*?");
-        Matcher m = scoreRegex.matcher(recordCell);
+        Matcher m = REGEX_SCORE_CELL.matcher(recordCell);
         if (m.matches()) {
             ScScore score = ScScore.parseBPScore(m);
             return new ScRecord(score, m.group("author"), m.group("link"), m.group("oldRNG") != null);
         }
-        throw new IllegalStateException("Leaderboard record unparseable" + recordCell);
+        throw new IllegalStateException("Leaderboard record unparseable: " + recordCell);
     }
 
     private static void parseHalfTable(@NotNull List<String> halfTable, @NotNull ScRecord[] records) {
