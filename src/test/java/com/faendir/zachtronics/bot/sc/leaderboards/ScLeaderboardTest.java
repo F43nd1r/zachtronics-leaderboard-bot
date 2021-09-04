@@ -73,13 +73,13 @@ public class ScLeaderboardTest {
         // (**817**/2/104) | ← | (**819**/2/44)
         ScPuzzle p = ScPuzzle.sensing_4;
         ScScore s = new ScScore(819, 2, 43, false, true);
-        ScRecord r = new ScRecord(s, "auth", "lnk", false);
+        ScRecord r = new ScRecord(s, "auth", "lnk", "alnk", false);
 
         UpdateResult ur = scLeaderboard.update(p, r);
         assertTrue(ur instanceof UpdateResult.BetterExists);
 
         s = new ScScore(819, 2, 43, false, false);
-        r = new ScRecord(s, "auth", "lnk", false);
+        r = new ScRecord(s, "auth", "lnk", "alnk", false);
         ur = scLeaderboard.update(p, r);
         assertTrue(ur instanceof UpdateResult.Success);
     }

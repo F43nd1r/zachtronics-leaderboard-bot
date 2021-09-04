@@ -10,7 +10,8 @@ import java.io.File
 import java.nio.file.Files
 import javax.annotation.PreDestroy
 
-open class GitRepository(private val gitProperties: GitProperties, name: String, url: String) {
+open class GitRepository(private val gitProperties: GitProperties, name: String, val url: String) {
+    val rawFilesUrl = Regex("github.com/([^/]+)/([^/]+)(?:.git)?").replaceFirst(url, "raw.githubusercontent.com/$1/$2/master")
     private val repo = Files.createTempDirectory(name).toFile()
 
     init {
@@ -65,8 +66,6 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
             git.reset().addPath(file.relativeTo(repo).path).call()
             git.clean().setForce(true).setPaths(setOf(file.relativeTo(repo).path)).call()
         }
-
-        fun originUrl(): String = git.repository.config.getString("remote", "origin", "url")
     }
 
     @PreDestroy

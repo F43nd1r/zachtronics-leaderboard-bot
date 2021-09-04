@@ -3,6 +3,7 @@ package com.faendir.zachtronics.bot.sz.archive;
 import com.faendir.zachtronics.bot.archive.AbstractArchive;
 import com.faendir.zachtronics.bot.archive.SolutionsIndex;
 import com.faendir.zachtronics.bot.git.GitRepository;
+import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzSolution;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,5 +31,9 @@ public class SzArchive extends AbstractArchive<SzSolution> {
     protected SolutionsIndex<SzSolution> makeSolutionIndex(@NotNull Path puzzlePath,
                                                            @NotNull SzSolution solution) throws IOException {
         return new SzSolutionsIndex(puzzlePath, solution.getPuzzle());
+    }
+
+    public String makeArchiveLink(@NotNull SzPuzzle puzzle, @NotNull String fileName) {
+        return String.format("%s/%s/%s", getGitRepo().getRawFilesUrl(), puzzle.getGroup().getRepoFolder(), fileName);
     }
 }

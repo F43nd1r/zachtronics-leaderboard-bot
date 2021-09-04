@@ -16,7 +16,8 @@ abstract class AbstractShowCommand<C : Category, P : Puzzle, R : Record> : Abstr
         val record = leaderboards.asSequence().mapNotNull { it.get(puzzle, category) }.firstOrNull()
             ?: throw IllegalArgumentException("sorry, there is no score for ${puzzle.displayName} ${category.displayName}.")
         return MultipartRequest.ofRequestAndFiles(
-            WebhookExecuteRequest.builder().content("*${puzzle.displayName}* **${category.displayName}**\n${record.toDisplayString()}").build(),
+            WebhookExecuteRequest.builder()
+                .content("*${puzzle.displayName}* **${category.displayName}**\n${record.toDisplayString()}").build(),
             record.attachments()
         )
     }

@@ -32,7 +32,8 @@ public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzl
     public Triple<ScPuzzle, ScRecord, ScSolution> parseToPRS(@NotNull SlashCommandEvent event) {
         Data data = ScSubmitArchiveCommand$DataParser.parse(event);
         ScSolution solution = ScSolution.fromExportLink(data.export, data.puzzle).get(0);
-        ScRecord record = new ScRecord(solution.getScore(), data.author, data.video, false);
+        String archiveLink = archiveCommand.getArchive().makeArchiveLink(solution);
+        ScRecord record = new ScRecord(solution.getScore(), data.author, data.video, archiveLink, false);
         return new Triple<>(solution.getPuzzle(), record, solution);
     }
 

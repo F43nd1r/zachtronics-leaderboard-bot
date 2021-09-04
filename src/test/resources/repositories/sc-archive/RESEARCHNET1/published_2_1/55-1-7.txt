@@ -1,0 +1,15 @@
+SOLUTION:Fission I,Archiver,55-1-7,Archived Solution
+COMPONENT:'custom-research-reactor',2,0,''
+MEMBER:'instr-start',-90,0,128,0,2,0,0
+MEMBER:'instr-start',180,0,32,1,7,0,0
+MEMBER:'feature-splitter',-1,0,1,5,1,0,0
+MEMBER:'instr-input',-1,0,128,0,1,0,0
+MEMBER:'instr-arrow',0,0,64,0,1,0,0
+MEMBER:'instr-grab',-1,1,128,1,1,0,0
+MEMBER:'instr-grab',-1,2,128,6,1,0,0
+MEMBER:'instr-arrow',180,0,64,6,1,0,0
+MEMBER:'instr-output',-1,0,32,0,7,0,0
+MEMBER:'instr-split',-1,0,128,5,1,0,0
+PIPE:0,4,1
+PIPE:1,4,2
+

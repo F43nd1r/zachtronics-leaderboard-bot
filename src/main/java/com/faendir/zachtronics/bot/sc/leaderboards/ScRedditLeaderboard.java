@@ -4,6 +4,7 @@ import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
+import com.faendir.zachtronics.bot.sc.archive.ScArchive;
 import com.faendir.zachtronics.bot.sc.model.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
     @Getter
     private final List<ScCategory> supportedCategories = Arrays.asList(ScCategory.values());
     private final RedditService redditService;
+    private final ScArchive archive;
 
     @Nullable
     @Override
@@ -45,7 +47,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
             List<String> halfTable = category.getDisplayName().contains("C") ? tableCols
                     .subList(0, tableCols.size() / 2) : tableCols.subList(tableCols.size() / 2, tableCols.size());
             ScRecord[] records = new ScRecord[3];
-            parseHalfTable(halfTable, records);
+            parseHalfTable(puzzle, halfTable, records);
 
             int column = category.getDisplayName().endsWith("NP") ? 2 : category.getDisplayName()
                                                                                 .endsWith("NB") ? 1 : 0;
@@ -72,7 +74,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                 ScRecord[] records = new ScRecord[3];
 
                 List<String> cyclesHalf = tableCols.subList(0, tableCols.size() / 2);
-                parseHalfTable(cyclesHalf, records);
+                parseHalfTable(puzzle, cyclesHalf, records);
                 for (int j = 0; j < 3; j++) {
                     if (records[j] != ScRecord.IMPOSSIBLE_CATEGORY) {
                         ScCategory category = CATEGORIES[2 * seenRows][j];
@@ -82,7 +84,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                 }
 
                 List<String> symbolsHalf = tableCols.subList(tableCols.size() / 2, tableCols.size());
-                parseHalfTable(symbolsHalf, records);
+                parseHalfTable(puzzle, symbolsHalf, records);
                 for (int j = 0; j < 3; j++) {
                     if (records[j] != ScRecord.IMPOSSIBLE_CATEGORY) {
                         ScCategory category = CATEGORIES[2 * seenRows + 1][j];
@@ -118,9 +120,9 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                 String[] pieces = line.trim().split("\\s*\\|\\s*");
                 List<String> tableCols = Arrays.asList(pieces).subList(2, pieces.length);
                 List<String> cyclesHalf = tableCols.subList(0, tableCols.size() / 2);
-                parseHalfTable(cyclesHalf, records[2 * seenRows]);
+                parseHalfTable(puzzle, cyclesHalf, records[2 * seenRows]);
                 List<String> symbolsHalf = tableCols.subList(tableCols.size() / 2, tableCols.size());
-                parseHalfTable(symbolsHalf, records[2 * seenRows + 1]);
+                parseHalfTable(puzzle, symbolsHalf, records[2 * seenRows + 1]);
 
                 if (seenRows == 0) {
                     startingRow = i;
@@ -164,13 +166,13 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                         beatenScores.put(thisCategory, currentScore);
                         blockRecords[i] = record;
 
-                        row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory, puzzle));
+                        row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory));
                     }
                     else {
                         String prevElem = prevElems[block * halfSize + i + 2];
                         if (beatenScores.containsValue(currentScore) && prevElem.matches("←+")) {
                             // "dangling" reference to beaten score, we need to write the actual score or change the pointer
-                            row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory, puzzle));
+                            row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory));
                         }
                         else {
                             if (blockRecords[i] != ScRecord.IMPOSSIBLE_CATEGORY &&
@@ -197,7 +199,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
 
     @NotNull
     private static String makeLeaderboardCell(@NotNull ScRecord[] blockRecords, int i, int minReactors,
-                                              ScCategory thisCategory, ScPuzzle puzzle) {
+                                              ScCategory thisCategory) {
         ScRecord record = blockRecords[i];
         for (int prev = 0; prev < i; prev++) {
             if (record == blockRecords[prev]) {
@@ -211,14 +213,9 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                 score.getCycles() >= 100000 ? NumberFormat.getNumberInstance(Locale.ROOT).format(score.getCycles())
                                             : Integer.toString(score.getCycles());
         return String.format("[\uD83D\uDCC4](%s) %s[(" + thisCategory.getFormatStringLb() + "%s) %s](%s)", // 📄
-                             makeArchiveLink(puzzle, score), reactorPrefix, cyclesStr,
+                             record.getArchiveLink(), reactorPrefix, cyclesStr,
                              record.isOldVideoRNG() ? "\\*" : "", score.getReactors(), score.getSymbols(),
                              score.slashFlags(), record.getAuthor(), record.getLink());
-    }
-
-    private static String makeArchiveLink(@NotNull ScPuzzle puzzle, @NotNull ScScore score) {
-        return String.format("https://raw.githubusercontent.com/12345ieee/spacechem-archive/master/%s/%s/%s.txt",
-                             puzzle.getGroup().name(), puzzle.name(), score.toDisplayString().replace('/', '-'));
     }
 
     private static final Pattern REGEX_SCORE_CELL =
@@ -227,24 +224,26 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                             "\\[\\((?<score>" + ScScore.REGEX_BP_SCORE + ")\\) (?<author>[^]]+)]" +
                             "\\((?<link>[^)]+)\\).*?");
     @NotNull
-    private static ScRecord parseLeaderboardRecord(String recordCell) {
+    private ScRecord parseLeaderboardRecord(ScPuzzle puzzle, String recordCell) {
         Matcher m = REGEX_SCORE_CELL.matcher(recordCell);
         if (m.matches()) {
             ScScore score = ScScore.parseBPScore(m);
-            return new ScRecord(score, m.group("author"), m.group("link"), m.group("oldRNG") != null);
+            return new ScRecord(score, m.group("author"), m.group("link"),
+                                archive.makeArchiveLink(puzzle, score),
+                                m.group("oldRNG") != null);
         }
         throw new IllegalStateException("Leaderboard record unparseable: " + recordCell);
     }
 
-    private static void parseHalfTable(@NotNull List<String> halfTable, @NotNull ScRecord[] records) {
-        records[0] = parseLeaderboardRecord(halfTable.get(0));
+    private void parseHalfTable(ScPuzzle puzzle, @NotNull List<String> halfTable, @NotNull ScRecord[] records) {
+        records[0] = parseLeaderboardRecord(puzzle, halfTable.get(0));
 
         if (halfTable.get(1).startsWith("X"))
             records[1] = ScRecord.IMPOSSIBLE_CATEGORY;
         else if (halfTable.get(1).equals("←"))
             records[1] = records[0];
         else
-            records[1] = parseLeaderboardRecord(halfTable.get(1));
+            records[1] = parseLeaderboardRecord(puzzle, halfTable.get(1));
 
         if (halfTable.size() != 3 || halfTable.get(2).startsWith("X"))
             records[2] = ScRecord.IMPOSSIBLE_CATEGORY;
@@ -253,6 +252,6 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
         else if (halfTable.get(2).equals("←"))
             records[2] = records[1];
         else
-            records[2] = parseLeaderboardRecord(halfTable.get(2));
+            records[2] = parseLeaderboardRecord(puzzle, halfTable.get(2));
     }
 }

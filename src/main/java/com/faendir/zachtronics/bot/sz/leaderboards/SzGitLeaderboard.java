@@ -2,6 +2,7 @@ package com.faendir.zachtronics.bot.sz.leaderboards;
 
 import com.faendir.zachtronics.bot.git.GitRepository;
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
+import com.faendir.zachtronics.bot.sz.archive.SzArchive;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
@@ -10,7 +11,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
@@ -28,8 +28,7 @@ import java.util.stream.Collectors;
 public class SzGitLeaderboard implements Leaderboard<SzCategory, SzPuzzle, SzRecord> {
     @Getter
     private final List<SzCategory> supportedCategories = Arrays.asList(SzCategory.values());
-    @Qualifier("szRepository")
-    private final GitRepository gitRepository;
+    private final SzArchive archive;
 
     private static final Pattern NAME_REGEX = Pattern
             .compile("top solution (?:cost|power|lines)(?:->(?:cost|power|lines))?(?: - (?<author>.+))?", Pattern.CASE_INSENSITIVE);
@@ -37,27 +36,26 @@ public class SzGitLeaderboard implements Leaderboard<SzCategory, SzPuzzle, SzRec
     @Nullable
     @Override
     public SzRecord get(@NotNull SzPuzzle puzzle, @NotNull SzCategory category) {
-        return gitRepository.access(a -> readSolutionFile(findPuzzleFile(a, puzzle, category)));
+        return archive.getGitRepo().access(a -> readSolutionFile(findPuzzleFile(a, puzzle, category)));
     }
 
     @NotNull
     @Override
     public Map<SzCategory, SzRecord> getAll(@NotNull SzPuzzle puzzle, @NotNull Collection<? extends SzCategory> categories) {
-        return gitRepository.access(
+        return archive.getGitRepo().access(
                 a -> categories.stream().collect(Collectors.toMap(category -> category,
                                                                   category -> readSolutionFile(
                                                                           findPuzzleFile(a, puzzle, category)))));
     }
 
     @NotNull
-    private static SzRecord readSolutionFile(Path solutionFile) {
+    private SzRecord readSolutionFile(Path solutionFile) {
         SzSolution solution = new SzSolution(solutionFile);
         Matcher m = NAME_REGEX.matcher(solution.getTitle());
         if (!m.matches())
             throw new IllegalStateException("Name does not match standard format: " + m.replaceFirst(""));
         String author = m.group("author");
-        String link = "https://raw.githubusercontent.com/12345ieee/shenzhenIO-leaderboard/master/" +
-                      solution.getPuzzle().getGroup().getRepoFolder() + "/" + solutionFile.getFileName();
+        String link = archive.makeArchiveLink(solution.getPuzzle(), solutionFile.getFileName().toString());
         return new SzRecord(solution.getScore(), author, link);
 
     }

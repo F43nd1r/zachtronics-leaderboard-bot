@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.util.function.Tuple2;
 
 import java.util.Collections;
 import java.util.List;
@@ -124,14 +125,16 @@ public class CommandTest {
                 .findFirst().orElseThrow().handle(slashCommandEvent);
         WebhookExecuteRequest executeRequest = multipartRequest.getJsonPayload();
         assert executeRequest != null;
-        String result = Stream.concat(stream(executeRequest.content()),
-                                      stream(executeRequest.embeds()).flatMap(l -> l.stream().mapMulti((e, d) -> {
-                                          e.title().toOptional().ifPresent(d);
-                                          e.description().toOptional().ifPresent(d);
-                                          e.fields().toOptional().orElse(Collections.emptyList()).stream()
-                                           .map(f -> f.name() + "\n" + f.value()).forEach(d);
-                                          e.footer().toOptional().ifPresent(f -> d.accept(f.text()));
-                                      }))).collect(Collectors.joining("\n"));
+        String result = Stream.<Stream<String>>of(stream(executeRequest.content()),
+                                  stream(executeRequest.embeds()).flatMap(l -> l.stream().mapMulti((e, d) -> {
+                                      e.title().toOptional().ifPresent(d);
+                                      e.description().toOptional().ifPresent(d);
+                                      e.fields().toOptional().orElse(Collections.emptyList()).stream()
+                                       .map(f -> f.name() + "\n" + f.value()).forEach(d);
+                                      e.footer().toOptional().ifPresent(f -> d.accept(f.text()));
+                                  })), multipartRequest.getFiles().stream().map(Tuple2::getT1))
+                              .flatMap(Function.identity())
+                              .collect(Collectors.joining("\n"));
         System.out.println(result);
         return result;
     }

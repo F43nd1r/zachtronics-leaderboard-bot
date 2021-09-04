@@ -8,6 +8,7 @@ import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
+import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import kotlin.Pair;
@@ -31,7 +32,7 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> i
     @Override
     public Pair<ScPuzzle, ScRecord> parseSubmission(@NotNull SlashCommandEvent interaction) {
         Data data = ScSubmitCommand$DataParser.parse(interaction);
-        ScRecord record = new ScRecord(data.score, data.author, data.video, false);
+        ScRecord record = new ScRecord(data.score, data.author, data.video, "", false);
         return new Pair<>(data.puzzle, record);
     }
 
