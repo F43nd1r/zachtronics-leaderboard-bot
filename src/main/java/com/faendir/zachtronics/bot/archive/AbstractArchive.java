@@ -20,15 +20,23 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
     @NotNull
     @Override
     public Pair<String, String> archive(@NotNull S solution) {
-        return getGitRepo().access(a -> performArchive(a, solution));
+        return getGitRepo().access(a -> {
+            Pair<String, String> r = performArchive(a, solution);
+            a.push();
+            return r;
+        });
     }
 
     @NotNull
     @Override
     public List<Pair<String, String>> archiveAll(@NotNull Collection<? extends S> solution) {
-        return getGitRepo().access(a -> solution.stream()
-                                                .map(s -> performArchive(a, s))
-                                                .collect(Collectors.toList()));
+        return getGitRepo().access(a -> {
+            List<Pair<String, String>> r = solution.stream()
+                                                   .map(s -> performArchive(a, s))
+                                                   .collect(Collectors.toList());
+            a.push();
+            return r;
+        });
     }
 
     protected abstract Path relativePuzzlePath(@NotNull S solution);
@@ -57,7 +65,7 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
                                           accessScope.status().getAdded().stream())
                                   .map(f -> "[" + f.replaceFirst(".+/", "") + "](" + getGitRepo().getRawFilesUrl() + f + ")")
                                   .collect(Collectors.joining(", "));
-            accessScope.commitAndPush(
+            accessScope.commit(
                     "Added " + solution.getScore().toDisplayString() + " for " + solution.getPuzzle().getDisplayName());
             result += "\n[commit " + accessScope.currentHash().substring(0, 7) + "](" +
                       getGitRepo().getUrl().replaceFirst(".git$", "") + "/commit/" + accessScope.currentHash() + ")";

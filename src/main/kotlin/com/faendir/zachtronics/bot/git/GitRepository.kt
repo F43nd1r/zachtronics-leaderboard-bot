@@ -5,6 +5,7 @@ import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Score
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.Status
+import org.eclipse.jgit.transport.PushResult
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import java.io.File
 import java.nio.file.Files
@@ -54,12 +55,21 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
         }
 
         fun commitAndPush(message: String) {
+            commit(message)
+            push()
+        }
+
+        fun commit(message: String) {
             git.commit()
                 .setAuthor("zachtronics-leaderboard-bot", "zachtronics-leaderboard-bot@faendir.com")
                 .setCommitter("zachtronics-leaderboard-bot", "zachtronics-leaderboard-bot@faendir.com")
                 .setMessage("[BOT] $message")
                 .call()
-            git.push().setCredentialsProvider(UsernamePasswordCredentialsProvider(gitProperties.username, gitProperties.accessToken)).setTimeout(120).call()
+        }
+
+        fun push() {
+            git.push().setCredentialsProvider(UsernamePasswordCredentialsProvider(gitProperties.username, gitProperties.accessToken))
+                .setTimeout(120).call()
         }
 
         fun resetAndClean(file: File) {
