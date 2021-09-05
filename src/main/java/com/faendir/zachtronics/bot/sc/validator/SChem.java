@@ -33,6 +33,7 @@ public class SChem {
         StringBuilder exceptions = new StringBuilder();
         int line = 1;
         for (String content : contents) {
+            content = content.replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
             try {
                 result.add(validate(content));
             } catch (SChemException e) {
@@ -68,6 +69,7 @@ public class SChem {
      * @return solution if validation succeeded
      * @throws SChemException if validation failed, reason is in message
      */
+    @NotNull
     static ScSolution validate(@NotNull String export) throws SChemException {
         SChemResult result = run(export);
 
