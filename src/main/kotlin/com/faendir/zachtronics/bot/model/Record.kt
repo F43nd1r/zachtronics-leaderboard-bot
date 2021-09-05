@@ -8,6 +8,7 @@ interface Record {
     val score: Score
     val link: String
     val author: String?
-    fun toDisplayString(): String = "${score.toDisplayString()}${author?.let { " by $it" } ?: ""} $link"
+    fun toShowDisplayString(): String = "${score.toDisplayString()}${author?.let { " by $it" } ?: ""} $link"
+    fun toListDisplayString(): String = "[${score.toDisplayString()}](${link})"
     fun attachments(): List<Tuple2<String, InputStream>> = emptyList()
 }

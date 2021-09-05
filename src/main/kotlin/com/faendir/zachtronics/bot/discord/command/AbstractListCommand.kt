@@ -28,7 +28,7 @@ abstract class AbstractListCommand<C : Category, P : Puzzle, R : Record> : Abstr
                         .map { (record, categories) ->
                             EmbedFieldData.builder()
                                 .name(categories.joinToString("/") { it.displayName })
-                                .value(record.let { "[${it.score.toDisplayString()}](${it.link})" })
+                                .value(record.toListDisplayString())
                                 .inline(true)
                                 .build()
                         }

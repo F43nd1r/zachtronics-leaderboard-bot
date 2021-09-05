@@ -1,7 +1,6 @@
 package com.faendir.zachtronics.bot.sz.model;
 
 import com.faendir.zachtronics.bot.model.Record;
-import kotlinx.serialization.Serializable;
 import lombok.SneakyThrows;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +20,7 @@ public class SzRecord implements Record {
 
     @NotNull
     @Override
-    public String toDisplayString() {
+    public String toShowDisplayString() {
         return score.toDisplayString() + (author != null ? " by " + author : "");
     }
 

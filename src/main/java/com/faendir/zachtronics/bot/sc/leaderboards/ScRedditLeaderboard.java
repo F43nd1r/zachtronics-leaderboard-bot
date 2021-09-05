@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
-import java.text.NumberFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -208,14 +207,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
         }
 
         String reactorPrefix = (record.getScore().getReactors() > minReactors) ? "† " : "";
-        ScScore score = record.getScore();
-        String cyclesStr =
-                score.getCycles() >= 100000 ? NumberFormat.getNumberInstance(Locale.ROOT).format(score.getCycles())
-                                            : Integer.toString(score.getCycles());
-        return String.format("[\uD83D\uDCC4](%s) %s[(" + thisCategory.getFormatStringLb() + "%s) %s](%s)", // 📄
-                             record.getArchiveLink(), reactorPrefix, cyclesStr,
-                             record.isOldVideoRNG() ? "\\*" : "", score.getReactors(), score.getSymbols(),
-                             score.slashFlags(), record.getAuthor(), record.getLink());
+        return record.toLbDisplayString(thisCategory.getFormatStringLb(), reactorPrefix);
     }
 
     private static final Pattern REGEX_SCORE_CELL =

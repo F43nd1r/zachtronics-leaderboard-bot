@@ -17,7 +17,7 @@ abstract class AbstractShowCommand<C : Category, P : Puzzle, R : Record> : Abstr
             ?: throw IllegalArgumentException("sorry, there is no score for ${puzzle.displayName} ${category.displayName}.")
         return MultipartRequest.ofRequestAndFiles(
             WebhookExecuteRequest.builder()
-                .content("*${puzzle.displayName}* **${category.displayName}**\n${record.toDisplayString()}").build(),
+                .content("*${puzzle.displayName}* **${category.displayName}**\n${record.toShowDisplayString()}").build(),
             record.attachments()
         )
     }
