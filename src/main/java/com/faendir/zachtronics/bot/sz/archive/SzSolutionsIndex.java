@@ -40,12 +40,14 @@ class SzSolutionsIndex implements SolutionsIndex<SzSolution> {
         this.puzzleName = puzzle.name();
         diskSolutions = Files.list(folderPath)
                              .filter(p -> p.getFileName().toString().startsWith(puzzle.name()))
-                             .collect(groupingBy(p -> Integer
-                                                         .valueOf(p.getFileName().toString().replace(puzzle.name(), "").charAt(1)),
+                             .collect(groupingBy(p -> Integer.valueOf(
+                                                         p.getFileName().toString()
+                                                          .replace(puzzle.name(), "").charAt(1)),
                                                  Collectors.mapping(SzSolution::new, toList())));
 
     }
 
+    @Override
     public boolean add(@NotNull SzSolution solution) throws IOException {
         SzScore candidate = solution.getScore();
         for (Map.Entry<Integer, List<SzSolution>> entry : diskSolutions.entrySet()) {

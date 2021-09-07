@@ -35,6 +35,7 @@ class ScSolutionsIndex implements SolutionsIndex<ScSolution> {
         }
     }
 
+    @Override
     public boolean add(@NotNull ScSolution solution) throws IOException {
         ScScore candidate = solution.getScore();
         ListIterator<ScScore> it = scores.listIterator();
@@ -59,11 +60,9 @@ class ScSolutionsIndex implements SolutionsIndex<ScSolution> {
         Iterable<String> lines = scores.stream().map(ScScore::toDisplayString)::iterator;
         Files.write(puzzlePath.resolve("solutions.txt"), lines, StandardOpenOption.TRUNCATE_EXISTING);
 
-        if (solution.getContent() != null) {
-            String filename = makeScoreFilename(candidate);
-            Path solutionPath = puzzlePath.resolve(filename);
-            Files.write(solutionPath, solution.getContent().getBytes(), StandardOpenOption.CREATE_NEW);
-        }
+        String filename = makeScoreFilename(candidate);
+        Path solutionPath = puzzlePath.resolve(filename);
+        Files.write(solutionPath, solution.getContent().getBytes(), StandardOpenOption.CREATE_NEW);
         return true;
 
     }
