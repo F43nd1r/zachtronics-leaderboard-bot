@@ -59,6 +59,13 @@ public class ScScore implements Score {
      * @return <tt>""</tt> or <tt>"/B"</tt> or <tt>"/P"</tt> or <tt>"/BP"</tt>
      */
     public String slashFlags() {
+        return slashFlags(bugged, precognitive);
+    }
+
+    /**
+     * @return <tt>""</tt> or <tt>"/B"</tt> or <tt>"/P"</tt> or <tt>"/BP"</tt>
+     */
+    public static String slashFlags(boolean bugged, boolean precognitive) {
         if (bugged || precognitive) {
             String result = "/";
             if (bugged) result += "B";

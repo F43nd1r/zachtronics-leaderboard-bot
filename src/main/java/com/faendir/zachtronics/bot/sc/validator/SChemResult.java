@@ -14,7 +14,8 @@ import org.jetbrains.annotations.Nullable;
  "reactors": 1,
  "symbols": 6,
  "author": "12345ieee",
- "solution_name": "s"
+ "solution_name": "s",
+ "precog": false
  }</tt>
  */
 @Value
@@ -27,4 +28,5 @@ public class SChemResult {
     int symbols;
     @NotNull String author;
     @Nullable String solutionName;
+    boolean precog;
 }

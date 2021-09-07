@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /** Wrapper for a schem package installed on the system */
 public class SChem {
@@ -78,27 +79,36 @@ public class SChem {
             puzzle = ScPuzzle.parsePuzzle(result.getLevelName());
         } catch (IllegalArgumentException e) {
             assert result.getResnetId() != null;
-            puzzle = ScPuzzle.parsePuzzle(
-                    result.getLevelName() + " (" + result.getResnetId()[0] + "-" + result.getResnetId()[1] + "-" +
-                    result.getResnetId()[2] + ")");
+            puzzle = ScPuzzle.parsePuzzle(result.getLevelName() +
+                                          Arrays.stream(result.getResnetId()).mapToObj(Integer::toString)
+                                                .collect(Collectors.joining("-", "(", ")")));
         }
 
-        // we know the score isn't bugged because SChem ran it, we get the precog flag from the title
-        boolean usesPrecog = !puzzle.isDeterministic() && result.getSolutionName() != null &&
-                             result.getSolutionName().matches("^/P(?: .*)?");
-        ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), false,
-                                    usesPrecog);
+        boolean declaresBugged = result.getSolutionName() != null &&
+                                 result.getSolutionName().matches("^/BP?(?: .*)?");
+        boolean declaresPrecog = result.getSolutionName() != null &&
+                                 result.getSolutionName().matches("^/B?P(?: .*)?");
+        // check if the user is lying:
+        // we know the score isn't bugged because SChem ran it and we can check SChem's precog opinion
+        if (declaresBugged || (declaresPrecog && !result.isPrecog())) {
+            String declaredFlags = ScScore.slashFlags(declaresBugged, declaresPrecog);
+            String schemFlags = result.isPrecog() ? "/P" : "";
+            throw new SChemException("Incoherent solution flags, given `" + declaredFlags +
+                                     "` but SChem wanted `" + schemFlags + "`");
+        }
 
+        ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), false,
+                                    result.isPrecog());
 
         String content = Pattern.compile("^SOLUTION:.+$", Pattern.MULTILINE).matcher(export).replaceFirst(
                 String.format("SOLUTION:%s,Archiver,%d-%d-%d,%sArchived Solution", result.getLevelName(),
-                              result.getCycles(), result.getReactors(), result.getSymbols(), usesPrecog ? "/P " : ""));
+                              result.getCycles(), result.getReactors(), result.getSymbols(), result.isPrecog() ? "/P " : ""));
         return new ScSolution(puzzle, score, content);
     }
 
     static SChemResult run(@NotNull String export) throws SChemException {
         ProcessBuilder builder = new ProcessBuilder();
-        builder.command("python3", "-m", "schem", "--json");
+        builder.command("python3", "-m", "schem", "--json", "--check_precog", "--max_cycles", Integer.toString(100_000));
 
         try {
             Process process = builder.start();
