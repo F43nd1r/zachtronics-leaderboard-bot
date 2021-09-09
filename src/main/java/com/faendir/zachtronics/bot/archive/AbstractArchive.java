@@ -48,30 +48,41 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
     private Pair<String, String> performArchive(@NotNull GitRepository.AccessScope accessScope, @NotNull S solution) {
         Path repoPath = accessScope.getRepo().toPath();
         Path puzzlePath = repoPath.resolve(relativePuzzlePath(solution));
-        boolean frontierChanged;
+        boolean newOrEqual;
         try {
             SolutionsIndex<S> index = makeSolutionIndex(puzzlePath, solution);
-            frontierChanged = index.add(solution);
+            newOrEqual = index.add(solution);
         } catch (IOException e) {
             // failures could happen after we dirtied the repo, so we call reset&clean on the puzzle dir
             accessScope.resetAndClean(puzzlePath.toFile());
             log.warn("Recoverable error during archive: ", e);
-            return new Pair<>("", "");
+            return makeResult(ArchiveResult.FAILURE, "");
         }
 
-        if (frontierChanged && !accessScope.status().isClean()) {
+        if (!newOrEqual) {
+            return makeResult(ArchiveResult.FAILURE, "");
+        }
+
+        if (!accessScope.status().isClean()) {
             accessScope.addAll(puzzlePath.toFile());
             String result = Stream.concat(accessScope.status().getChanged().stream(),
                                           accessScope.status().getAdded().stream())
-                                  .map(f -> "[" + f.replaceFirst(".+/", "") + "](" + getGitRepo().getRawFilesUrl() + f + ")")
-                                  .collect(Collectors.joining(", "));
+                                  .map(f -> "[" + f.replaceFirst(".+/", "") + "](" + getGitRepo().getRawFilesUrl() + f +
+                                            ")").collect(Collectors.joining(", "));
             accessScope.commit(
                     "Added " + solution.getScore().toDisplayString() + " for " + solution.getPuzzle().getDisplayName());
             result += "\n[commit " + accessScope.currentHash().substring(0, 7) + "](" +
                       getGitRepo().getUrl().replaceFirst(".git$", "") + "/commit/" + accessScope.currentHash() + ")";
-            return new Pair<>(" ", result);
+            return makeResult(ArchiveResult.SUCCESS, result);
         }
-        else
-            return new Pair<>("", "");
+        else {
+            // the same exact sol was already archived,
+            return makeResult(ArchiveResult.ALREADY_ARCHIVED, "");
+        }
+    }
+
+    @NotNull
+    private static Pair<String, String> makeResult(@NotNull ArchiveResult archiveResult, String message) {
+        return new Pair<>(archiveResult.getTitleString(), message);
     }
 }

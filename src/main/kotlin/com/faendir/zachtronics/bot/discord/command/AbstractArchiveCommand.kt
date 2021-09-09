@@ -1,6 +1,7 @@
 package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.zachtronics.bot.archive.Archive
+import com.faendir.zachtronics.bot.archive.ArchiveResult
 import com.faendir.zachtronics.bot.model.Solution
 import discord4j.core.event.domain.interaction.SlashCommandEvent
 import discord4j.discordjson.json.EmbedData
@@ -33,12 +34,19 @@ abstract class AbstractArchiveCommand<S : Solution> : AbstractCommand(), Secured
         for ((solution, result) in solutions.zip(results)) {
             val name: String
             val value: String
-            if (result.first.isNotEmpty()) {
-                name = "*${solution.puzzle.displayName}* ${result.first}"
-                value = "`${solution.score.toDisplayString()}` has been archived.\n" + result.second
-            } else {
-                name = "*${solution.puzzle.displayName}*"
-                value = "`${solution.score.toDisplayString()}` did not qualify for archiving."
+            when (result.first) {
+                ArchiveResult.FAILURE.titleString -> {
+                    name = "*${solution.puzzle.displayName}*"
+                    value = "`${solution.score.toDisplayString()}` did not qualify for archiving."
+                }
+                ArchiveResult.ALREADY_ARCHIVED.titleString -> {
+                    name = "*${solution.puzzle.displayName}*"
+                    value = "`${solution.score.toDisplayString()}` was already in the archive."
+                }
+                else -> {
+                    name = "*${solution.puzzle.displayName}* ${result.first}"
+                    value = "`${solution.score.toDisplayString()}` has been archived.\n" + result.second
+                }
             }
 
             totalFields++
