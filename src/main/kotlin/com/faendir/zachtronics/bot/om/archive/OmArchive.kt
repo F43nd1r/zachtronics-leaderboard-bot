@@ -1,6 +1,7 @@
 package com.faendir.zachtronics.bot.om.archive
 
 import com.faendir.zachtronics.bot.archive.Archive
+import com.faendir.zachtronics.bot.archive.ArchiveResult
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
@@ -29,7 +30,7 @@ class OmArchive(@Qualifier("omArchiveRepository") private val gitRepo: GitReposi
         }
     }*/
 
-    override fun archive(solution: OmSolution): Pair<String,String> = gitRepo.access {
+    override fun archive(solution: OmSolution): ArchiveResult = gitRepo.access {
         val dir = getPuzzleDir(solution.puzzle)
         val changed = OmCategory.values().filter { it.supportsPuzzle(solution.puzzle) && it.supportsScore(solution.score) }.filter { category ->
             val oldFile = dir.list()?.find { it.startsWith(category.displayName) }
@@ -60,9 +61,17 @@ class OmArchive(@Qualifier("omArchiveRepository") private val gitRepo: GitReposi
             }
         }
         if (changed.any()) {
-            commitAndPush("${solution.puzzle.displayName} ${solution.score.toDisplayString()} $changed")
+            if (status().isClean) {
+                ArchiveResult.AlreadyArchived()
+            }
+            else {
+                commitAndPush("${solution.puzzle.displayName} ${solution.score.toDisplayString()} $changed")
+                ArchiveResult.Success("**${changed.joinToString { it.displayName }}**")
+            }
         }
-        changed.joinToString { it.displayName } to ""
+        else {
+            ArchiveResult.Failure()
+        }
     }
 
     private fun GitRepository.AccessScope.getPuzzleDir(puzzle: OmPuzzle): File = File(repo, "${puzzle.group.name}/${puzzle.name}")

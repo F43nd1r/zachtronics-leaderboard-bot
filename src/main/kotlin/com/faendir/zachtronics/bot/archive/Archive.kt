@@ -7,10 +7,10 @@ interface Archive<S: Solution> {
     /**
      * @return (title, description)
      */
-    fun archive(solution: S) : Pair<String, String>
+    fun archive(solution: S) : ArchiveResult
 
     /**
      * @return [(title, description), ...]
      */
-    fun archiveAll(solutions: Collection<S>): List<Pair<String, String>> = solutions.map { archive(it) }
+    fun archiveAll(solutions: Collection<S>): List<ArchiveResult> = solutions.map { archive(it) }
 }

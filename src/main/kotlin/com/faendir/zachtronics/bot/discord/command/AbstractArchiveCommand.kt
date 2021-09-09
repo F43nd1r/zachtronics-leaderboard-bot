@@ -22,7 +22,7 @@ abstract class AbstractArchiveCommand<S : Solution> : AbstractCommand(), Secured
     fun archiveAll(solutions: Collection<S>): EmbedData {
         val results = archive.archiveAll(solutions)
 
-        val successes = results.count { it.first.isNotEmpty() }
+        val successes = results.count { it !is ArchiveResult.Failure }
         val title = if (successes != 0) "Success: $successes solution(s) archived" else "Failure: no solutions archived"
 
         // Discord cries if an embed is bigger than 6k or we have more tha 25 embed fields:
@@ -32,20 +32,16 @@ abstract class AbstractArchiveCommand<S : Solution> : AbstractCommand(), Secured
 
         val embed = EmbedData.builder().title(title)
         for ((solution, result) in solutions.zip(results)) {
-            val name: String
-            val value: String
-            when (result.first) {
-                ArchiveResult.FAILURE.titleString -> {
-                    name = "*${solution.puzzle.displayName}*"
-                    value = "`${solution.score.toDisplayString()}` did not qualify for archiving."
+            val name = "*${solution.puzzle.displayName}*"
+            val value = when (result) {
+                is ArchiveResult.Success -> {
+                    "`${solution.score.toDisplayString()}` has been archived.\n" + result.message
                 }
-                ArchiveResult.ALREADY_ARCHIVED.titleString -> {
-                    name = "*${solution.puzzle.displayName}*"
-                    value = "`${solution.score.toDisplayString()}` was already in the archive."
+                is ArchiveResult.AlreadyArchived -> {
+                    "`${solution.score.toDisplayString()}` was already in the archive."
                 }
-                else -> {
-                    name = "*${solution.puzzle.displayName}* ${result.first}"
-                    value = "`${solution.score.toDisplayString()}` has been archived.\n" + result.second
+                is ArchiveResult.Failure -> {
+                    "`${solution.score.toDisplayString()}` did not qualify for archiving."
                 }
             }
 

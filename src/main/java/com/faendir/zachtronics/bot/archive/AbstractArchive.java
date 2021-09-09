@@ -2,7 +2,6 @@ package com.faendir.zachtronics.bot.archive;
 
 import com.faendir.zachtronics.bot.git.GitRepository;
 import com.faendir.zachtronics.bot.model.Solution;
-import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,9 +18,9 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
 
     @NotNull
     @Override
-    public Pair<String, String> archive(@NotNull S solution) {
+    public ArchiveResult archive(@NotNull S solution) {
         return getGitRepo().access(a -> {
-            Pair<String, String> r = performArchive(a, solution);
+            ArchiveResult r = performArchive(a, solution);
             a.push();
             return r;
         });
@@ -29,11 +28,11 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
 
     @NotNull
     @Override
-    public List<Pair<String, String>> archiveAll(@NotNull Collection<? extends S> solution) {
+    public List<ArchiveResult> archiveAll(@NotNull Collection<? extends S> solution) {
         return getGitRepo().access(a -> {
-            List<Pair<String, String>> r = solution.stream()
-                                                   .map(s -> performArchive(a, s))
-                                                   .collect(Collectors.toList());
+            List<ArchiveResult> r = solution.stream()
+                                            .map(s -> performArchive(a, s))
+                                            .collect(Collectors.toList());
             a.push();
             return r;
         });
@@ -45,7 +44,7 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
                                                            @NotNull S solution) throws IOException;
 
     @NotNull
-    private Pair<String, String> performArchive(@NotNull GitRepository.AccessScope accessScope, @NotNull S solution) {
+    private ArchiveResult performArchive(@NotNull GitRepository.AccessScope accessScope, @NotNull S solution) {
         Path repoPath = accessScope.getRepo().toPath();
         Path puzzlePath = repoPath.resolve(relativePuzzlePath(solution));
         boolean newOrEqual;
@@ -56,11 +55,11 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
             // failures could happen after we dirtied the repo, so we call reset&clean on the puzzle dir
             accessScope.resetAndClean(puzzlePath.toFile());
             log.warn("Recoverable error during archive: ", e);
-            return makeResult(ArchiveResult.FAILURE, "");
+            return new ArchiveResult.Failure();
         }
 
         if (!newOrEqual) {
-            return makeResult(ArchiveResult.FAILURE, "");
+            return new ArchiveResult.Failure();
         }
 
         if (!accessScope.status().isClean()) {
@@ -73,16 +72,11 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
                     "Added " + solution.getScore().toDisplayString() + " for " + solution.getPuzzle().getDisplayName());
             result += "\n[commit " + accessScope.currentHash().substring(0, 7) + "](" +
                       getGitRepo().getUrl().replaceFirst(".git$", "") + "/commit/" + accessScope.currentHash() + ")";
-            return makeResult(ArchiveResult.SUCCESS, result);
+            return new ArchiveResult.Success(result);
         }
         else {
             // the same exact sol was already archived,
-            return makeResult(ArchiveResult.ALREADY_ARCHIVED, "");
+            return new ArchiveResult.AlreadyArchived();
         }
-    }
-
-    @NotNull
-    private static Pair<String, String> makeResult(@NotNull ArchiveResult archiveResult, String message) {
-        return new Pair<>(archiveResult.getTitleString(), message);
     }
 }
