@@ -108,7 +108,7 @@ public class SChem {
 
     static SChemResult run(@NotNull String export) throws SChemException {
         ProcessBuilder builder = new ProcessBuilder();
-        builder.command("python3", "-m", "schem", "--json", "--check_precog", "--max_cycles", Integer.toString(100_000));
+        builder.command("python3", "-m", "schem", "--json", "--check_precog", "--max_cycles", Integer.toString(200_000));
 
         try {
             Process process = builder.start();
