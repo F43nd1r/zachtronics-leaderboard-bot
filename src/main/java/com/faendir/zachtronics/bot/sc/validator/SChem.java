@@ -93,8 +93,8 @@ public class SChem {
         if (declaresBugged || (declaresPrecog != result.isPrecog())) {
             String declaredFlags = ScScore.slashFlags(declaresBugged, declaresPrecog);
             String schemFlags = result.isPrecog() ? "/P" : "";
-            throw new SChemException("Incoherent solution flags, given `" + declaredFlags +
-                                     "` but SChem wanted `" + schemFlags + "`");
+            throw new SChemException("Incoherent solution flags, given \"" + declaredFlags +
+                                     "\" but SChem wanted \"" + schemFlags + "\"");
         }
 
         ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), false,
