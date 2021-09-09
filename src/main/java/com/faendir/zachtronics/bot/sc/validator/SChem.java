@@ -90,7 +90,7 @@ public class SChem {
                                  result.getSolutionName().matches("^/B?P(?: .*)?");
         // check if the user is lying:
         // we know the score isn't bugged because SChem ran it and we can check SChem's precog opinion
-        if (declaresBugged || (declaresPrecog && !result.isPrecog())) {
+        if (declaresBugged || (declaresPrecog != result.isPrecog())) {
             String declaredFlags = ScScore.slashFlags(declaresBugged, declaresPrecog);
             String schemFlags = result.isPrecog() ? "/P" : "";
             throw new SChemException("Incoherent solution flags, given `" + declaredFlags +
@@ -108,7 +108,7 @@ public class SChem {
 
     static SChemResult run(@NotNull String export) throws SChemException {
         ProcessBuilder builder = new ProcessBuilder();
-        builder.command("python3", "-m", "schem", "--json", "--check_precog", "--max_cycles", Integer.toString(200_000));
+        builder.command("python3", "-m", "schem", "--json", "--check_precog", "--max_cycles", Integer.toString(400_000));
 
         try {
             Process process = builder.start();
