@@ -30,7 +30,7 @@ class ScSolutionsIndex implements SolutionsIndex<ScSolution> {
 
     ScSolutionsIndex(@NotNull Path puzzlePath) throws IOException {
         this.puzzlePath = puzzlePath;
-        try (Stream<String> lines = Files.lines(puzzlePath.resolve("solutions.txt"))) {
+        try (Stream<String> lines = Files.lines(puzzlePath.resolve("scores.txt"))) {
             scores = lines.map(ScScore::parseBPScore).collect(Collectors.toList());
         }
     }
@@ -58,7 +58,7 @@ class ScSolutionsIndex implements SolutionsIndex<ScSolution> {
         scores.add(index, candidate);
 
         Iterable<String> lines = scores.stream().map(ScScore::toDisplayString)::iterator;
-        Files.write(puzzlePath.resolve("solutions.txt"), lines, StandardOpenOption.TRUNCATE_EXISTING);
+        Files.write(puzzlePath.resolve("scores.txt"), lines, StandardOpenOption.TRUNCATE_EXISTING);
 
         String filename = makeScoreFilename(candidate);
         Path solutionPath = puzzlePath.resolve(filename);
