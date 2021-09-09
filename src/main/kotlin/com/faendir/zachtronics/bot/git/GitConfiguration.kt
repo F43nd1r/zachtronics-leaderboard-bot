@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration
 class GitConfiguration(private val gitProperties: GitProperties) {
 
     @Bean("omGithubPagesLeaderboardRepository")
-    fun omGithubPagesLeaderboardRepository() = GitRepository(gitProperties, "om-leaderboard", "https://github.com/F43nd1r/om-leaderboard.git")
+    fun omGithubPagesLeaderboardRepository() = GitRepository(gitProperties, "om-leaderboard", "https://github.com/F43nd1r/om-leaderboard.git", true)
 
     @Bean("omRedditLeaderboardRepository")
     fun omRedditLeaderboardRepository() = GitRepository(gitProperties, "om-wiki", "https://github.com/F43nd1r/OM-wiki.git")
