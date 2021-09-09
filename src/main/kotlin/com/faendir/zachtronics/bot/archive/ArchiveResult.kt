@@ -7,5 +7,5 @@ package com.faendir.zachtronics.bot.archive
 enum class ArchiveResult(val titleString: String) {
     FAILURE(""),
     ALREADY_ARCHIVED("ALREADY_ARCHIVED"),
-    SUCCESS(".+");
+    SUCCESS(" ");
 }
