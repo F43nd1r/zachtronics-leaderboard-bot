@@ -38,6 +38,7 @@ dependencies {
     implementation("com.faendir.discord4j-command-parser:annotations:1.4.0")
     ksp("com.faendir.discord4j-command-parser:processor:1.4.0")
     implementation(project("native"))
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
