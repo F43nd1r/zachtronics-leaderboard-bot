@@ -52,8 +52,8 @@ internal class OmGithubPagesLeaderboardTest {
     fun update3() {
         val record = OmRecord(OmScore(HEIGHT to 200.0, CYCLES to 200.0, COST to 200.0), "http://fake.link")
         expectThat(leaderboard.update(OmPuzzle.STABILIZED_WATER, record)).isA<UpdateResult.BetterExists>().and {
-            get { scores.containsKey(OmCategory.HEIGHT) }.isTrue()
-            get { scores[OmCategory.HEIGHT] }.isNotNull()
+            get { records.containsKey(OmCategory.HEIGHT) }.isTrue()
+            get { records[OmCategory.HEIGHT] }.isNotNull()
         }
     }
 }

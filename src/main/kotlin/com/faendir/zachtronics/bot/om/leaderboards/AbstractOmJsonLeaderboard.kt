@@ -43,8 +43,8 @@ abstract class AbstractOmJsonLeaderboard<J>(
     }
 
     override fun update(puzzle: OmPuzzle, record: OmRecord): UpdateResult = gitRepo.access {
-        val betterExists = mutableMapOf<OmCategory, OmScore>()
-        val success = mutableMapOf<OmCategory, OmScore?>()
+        val betterExists = mutableMapOf<OmCategory, OmRecord>()
+        val success = mutableMapOf<OmCategory, OmRecord?>()
         val rehostedLink by lazy { imgurService.tryRehost(record.link) }
         var paretoUpdate = false
         directoryCategories.forEach { (dirName, dirCategories) ->
@@ -60,9 +60,9 @@ abstract class AbstractOmJsonLeaderboard<J>(
                     }) {
                     records.setRecord(puzzle, category, OmRecord(category.normalizeScore(record.score), rehostedLink))
                     changed = true
-                    success[category] = oldRecord?.score
+                    success[category] = oldRecord
                 } else {
-                    betterExists[category] = oldRecord.score
+                    betterExists[category] = oldRecord
                 }
             }
             val localParetoUpdate = paretoUpdate(puzzle, record, records)

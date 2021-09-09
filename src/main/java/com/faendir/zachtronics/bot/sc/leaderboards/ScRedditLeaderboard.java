@@ -135,8 +135,8 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
             }
         }
 
-        Map<ScCategory, ScScore> beatenScores = new EnumMap<>(ScCategory.class);
-        Map<ScCategory, ScScore> relatedScores = new EnumMap<>(ScCategory.class);
+        Map<ScCategory, ScRecord> beatenRecords = new EnumMap<>(ScCategory.class);
+        Map<ScCategory, ScRecord> relatedRecords = new EnumMap<>(ScCategory.class);
         // |Puzzle | [(**ccc**/r/ss) author](https://li.nk) | ← | [(ccc/r/**ss**) author](https://li.nk) | ←
         // |Puzzle - 1 Reactor | [(**ccc**/**r**/ss) author](https://li.nk) | ← | [(ccc/**r**/**ss**) author](https://li.nk) | ←
         for (int rowIdx = 0; rowIdx < seenRows; rowIdx++) {
@@ -158,25 +158,24 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
 
                 for (int i = 0; i < halfSize; i++) {
                     ScCategory thisCategory = blockCategories[i];
-                    ScScore currentScore = blockRecords[i].getScore();
                     row.append(" | ");
                     if (thisCategory.supportsScore(record.getScore()) &&
-                        thisCategory.getScoreComparator().compare(record.getScore(), currentScore) <= 0) {
-                        beatenScores.put(thisCategory, currentScore);
+                        thisCategory.getScoreComparator().compare(record.getScore(), blockRecords[i].getScore()) <= 0) {
+                        beatenRecords.put(thisCategory, blockRecords[i]);
                         blockRecords[i] = record;
 
                         row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory));
                     }
                     else {
                         String prevElem = prevElems[block * halfSize + i + 2];
-                        if (beatenScores.containsValue(currentScore) && prevElem.matches("←+")) {
+                        if (beatenRecords.containsValue(blockRecords[i]) && prevElem.matches("←+")) {
                             // "dangling" reference to beaten score, we need to write the actual score or change the pointer
                             row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory));
                         }
                         else {
                             if (blockRecords[i] != ScRecord.IMPOSSIBLE_CATEGORY &&
                                 thisCategory.supportsScore(record.getScore()))
-                                relatedScores.put(thisCategory, currentScore);
+                                relatedRecords.put(thisCategory, blockRecords[i]);
                             row.append(prevElem);
                         }
                     }
@@ -185,14 +184,14 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
             lines[startingRow + rowIdx] = row.toString();
         }
 
-        if (!beatenScores.isEmpty()) {
+        if (!beatenRecords.isEmpty()) {
             redditService.updateWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage(), String.join("\n", lines),
                                          puzzle.getDisplayName() + " " + record.getScore().toDisplayString() + " by " +
                                          record.getAuthor());
-            return new UpdateResult.Success(beatenScores);
+            return new UpdateResult.Success(beatenRecords);
         }
         else {
-            return new UpdateResult.BetterExists(relatedScores);
+            return new UpdateResult.BetterExists(relatedRecords);
         }
     }
 

@@ -159,10 +159,10 @@ class OmRedditPostScraper(
                     if (hasSuccess) {
                         sendDiscordMessage(
                             "opus-magnum", "New record by ${comment.author} on reddit: ${puzzle.displayName} ${
-                                successes.flatMap { it.oldScores.keys }.map { it.displayName }
+                                successes.flatMap { it.oldRecords.keys }.map { it.displayName }
                             } ${score.toDisplayString()} (previously ${
-                                successes.flatMap { it.oldScores.entries }
-                                    .joinToString { "`${it.key.displayName} ${it.value?.toDisplayString() ?: "none"}`" }
+                                successes.flatMap { it.oldRecords.entries }
+                                    .joinToString { "`${it.key.displayName} ${it.value?.score?.toDisplayString() ?: "none"}`" }
                             }) $link")
                     }
                     hasSuccess

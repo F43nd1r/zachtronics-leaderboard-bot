@@ -4,7 +4,6 @@ import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
-import com.faendir.zachtronics.bot.model.Score
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult
 import com.faendir.zachtronics.bot.utils.asMultipartRequest
 import com.faendir.zachtronics.bot.utils.findInstance
@@ -30,10 +29,13 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : AbstractCommand()
         results.filterIsInstance<UpdateResult.Success>().ifNotEmpty { successes ->
             return WebhookExecuteRequest.builder().addEmbed(
                 EmbedData.builder()
-                    .title("Success: *${puzzle.displayName}* ${successes.flatMap { it.oldScores.keys }.joinToString { it.displayName }}")
+                    .title("Success: *${puzzle.displayName}* ${successes.flatMap { it.oldRecords.keys }.joinToString { it.displayName }}")
                     .description("`${record.score.toDisplayString()}` ${record.author?.let { " by $it" } ?: ""}\npreviously:")
-                    .addAllFields(successes.flatMap { it.oldScores.entries }
-                        .map { EmbedFieldData.builder().name(it.key.displayName).value("`${it.value?.toDisplayString() ?: "none"}`").inline(true).build() })
+                    .addAllFields(successes.flatMap { it.oldRecords.entries }
+                        .map {
+                            EmbedFieldData.builder().name(it.key.displayName)
+                                .value(it.value?.toListDisplayString() ?: "`none`").inline(true).build()
+                        })
                     .link(record.link)
                     .build()
             )
@@ -56,9 +58,12 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : AbstractCommand()
                     EmbedData.builder()
                         .title("No Scores beaten by *${puzzle.displayName}* `${record.score.toDisplayString()}`")
                         .description("Existing scores:")
-                        .addAllFields(betterExists.flatMap { it.scores.entries }
-                            .sortedBy<Map.Entry<Category, Score>, Comparable<*>> { it.key as? Comparable<*> }
-                            .map { EmbedFieldData.builder().name(it.key.displayName).value("\n`${it.value.toDisplayString()}`").inline(true).build() })
+                        .addAllFields(betterExists.flatMap { it.records.entries }
+                            .sortedBy<Map.Entry<Category, Record>, Comparable<*>> { it.key as? Comparable<*> }
+                            .map {
+                                EmbedFieldData.builder().name(it.key.displayName)
+                                    .value("\n${it.value.toListDisplayString()}").inline(true).build()
+                            })
                         .build()
                 )
                 .build()
