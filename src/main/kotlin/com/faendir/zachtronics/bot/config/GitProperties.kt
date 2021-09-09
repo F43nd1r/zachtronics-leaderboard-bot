@@ -8,4 +8,5 @@ import org.springframework.context.annotation.Configuration
 class GitProperties {
     lateinit var accessToken: String
     lateinit var username: String
+    var webhookSecret: String = ""
 }

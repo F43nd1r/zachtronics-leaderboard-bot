@@ -5,15 +5,20 @@ import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Score
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.Status
-import org.eclipse.jgit.transport.PushResult
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.nio.file.Files
 import javax.annotation.PreDestroy
 
-open class GitRepository(private val gitProperties: GitProperties, name: String, val url: String) {
+open class GitRepository(private val gitProperties: GitProperties, private val name: String, val url: String, private val hasWebHook: Boolean = false) {
+    companion object {
+        private val logger = LoggerFactory.getLogger(GitRepository::class.java)
+    }
+
     val rawFilesUrl = Regex("github.com/([^/]+)/([^/.]+)(?:.git)?").replaceFirst(url, "raw.githubusercontent.com/$1/$2/master/")
     private val repo = Files.createTempDirectory(name).toFile()
+    private var needsPull = true
 
     init {
         synchronized(repo) {
@@ -24,9 +29,21 @@ open class GitRepository(private val gitProperties: GitProperties, name: String,
     fun <T> access(access: AccessScope.() -> T): T  {
         return synchronized(repo) {
             Git.open(repo).use { git ->
-                git.pull().setTimeout(120).call()
+                if (!hasWebHook || needsPull) {
+                    git.pull().setTimeout(120).call()
+                    needsPull = false
+                    logger.info("pulled $name")
+                } else {
+                    logger.info("$name is up to date, not pulling")
+                }
                 AccessScope(git, repo).access()
             }
+        }
+    }
+
+    fun invalidate() {
+        synchronized(repo) {
+            needsPull = true
         }
     }
 
