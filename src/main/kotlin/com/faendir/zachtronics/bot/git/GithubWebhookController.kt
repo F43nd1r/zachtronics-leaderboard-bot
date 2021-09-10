@@ -25,11 +25,11 @@ class GithubWebhookController(private val repositories: List<GitRepository>, pri
             return
         }
         val payload = objectMapper.readValue<Payload>(payloadString)
-        if (payload.ref == "refs/heads/master" && payload.headCommit.author.email != "zachtronics-leaderboard-bot@faendir.com") {
+        if (payload.ref == "refs/heads/master") {
             val repository = repositories.find { it.url.equals(payload.repository.clone_url, ignoreCase = true) }
             if (repository != null) {
                 logger.info("invalidating ${repository.name}")
-                repository.invalidate()
+                repository.updateRemoteHash(payload.headCommit.id)
             } else {
                 logger.warn("received webhook for unknown repository ${payload.repository.clone_url}")
             }
