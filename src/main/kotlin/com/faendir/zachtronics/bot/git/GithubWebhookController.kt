@@ -20,7 +20,7 @@ class GithubWebhookController(private val repositories: List<GitRepository>, pri
 
     @PostMapping(path = ["/push"], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun reportPush(@RequestBody payloadString: String, @RequestHeader(name = "X-Hub-Signature-256") signature: String) {
-        if (signature != hash(payloadString)) {
+        if (signature.removePrefix("sha256=") != hash(payloadString)) {
             logger.warn("Received webhook call with invalid signature")
             return
         }
