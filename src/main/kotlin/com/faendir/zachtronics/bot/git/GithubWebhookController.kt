@@ -1,6 +1,7 @@
 package com.faendir.zachtronics.bot.git
 
 import com.faendir.zachtronics.bot.config.GitProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.common.hash.Hashing
@@ -45,7 +46,8 @@ data class Payload(
     val ref: String,
     val pusher: User,
     val repository: Repository,
-    val headCommit: Commit
+    @JsonProperty("head_commit")
+    val headCommit: Commit,
 )
 
 data class Commit(
