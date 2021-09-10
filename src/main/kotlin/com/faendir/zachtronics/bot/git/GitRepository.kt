@@ -11,7 +11,7 @@ import java.io.File
 import java.nio.file.Files
 import javax.annotation.PreDestroy
 
-open class GitRepository(private val gitProperties: GitProperties, private val name: String, val url: String, private val hasWebHook: Boolean = false) {
+open class GitRepository(private val gitProperties: GitProperties, val name: String, val url: String, private val hasWebHook: Boolean = false) {
     companion object {
         private val logger = LoggerFactory.getLogger(GitRepository::class.java)
     }
