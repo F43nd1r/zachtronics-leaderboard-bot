@@ -3,15 +3,13 @@ package com.faendir.zachtronics.bot.git
 import com.faendir.zachtronics.bot.config.GitProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.google.common.hash.Hashing
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
-import org.springframework.util.Base64Utils
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
-import javax.crypto.Mac
-import javax.crypto.spec.SecretKeySpec
 
 
 @RestController
@@ -34,9 +32,7 @@ class GithubWebhookController(private val repositories: List<GitRepository>, pri
     }
 
     private fun hash(payload: String): String {
-        val mac = Mac.getInstance("HmacSHA256")
-        mac.init(SecretKeySpec(gitProperties.webhookSecret.toByteArray(Charsets.UTF_8), "HmacSHA256"))
-        return "sha256=" + Base64Utils.encode(mac.doFinal(payload.toByteArray(Charsets.UTF_8)))
+        return Hashing.hmacSha256(gitProperties.webhookSecret.toByteArray(Charsets.UTF_8)).hashString(payload, Charsets.UTF_8).toString()
     }
 }
 
