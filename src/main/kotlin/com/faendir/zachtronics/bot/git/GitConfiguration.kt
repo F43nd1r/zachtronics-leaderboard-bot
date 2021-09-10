@@ -17,10 +17,10 @@ class GitConfiguration(private val gitProperties: GitProperties) {
     fun omArchiveRepository() = GitRepository(gitProperties, "om-archive", "https://github.com/F43nd1r/om-archive.git", true)
 
     @Bean("scArchiveRepository")
-    fun scArchiveRepository() = GitRepository(gitProperties, "sc-archive", "https://github.com/spacechem-community-developers/spacechem-archive.git")
+    fun scArchiveRepository() = GitRepository(gitProperties, "sc-archive", "https://github.com/spacechem-community-developers/spacechem-archive.git", true)
 
     @Bean("szRepository")
-    fun szRepository() = GitRepository(gitProperties, "shenzhenIO-leaderboard", "https://github.com/12345ieee/shenzhenIO-leaderboard.git")
+    fun szRepository() = GitRepository(gitProperties, "shenzhenIO-leaderboard", "https://github.com/12345ieee/shenzhenIO-leaderboard.git", true)
 
     @Bean("configRepository")
     fun configRepository() = GitRepository(gitProperties, "config", "https://github.com/F43nd1r/zachtronics-leaderboard-bot-config.git", true)
