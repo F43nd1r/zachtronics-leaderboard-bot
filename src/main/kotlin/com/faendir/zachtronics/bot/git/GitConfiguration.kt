@@ -11,10 +11,10 @@ class GitConfiguration(private val gitProperties: GitProperties) {
     fun omGithubPagesLeaderboardRepository() = GitRepository(gitProperties, "om-leaderboard", "https://github.com/F43nd1r/om-leaderboard.git", true)
 
     @Bean("omRedditLeaderboardRepository")
-    fun omRedditLeaderboardRepository() = GitRepository(gitProperties, "om-wiki", "https://github.com/F43nd1r/OM-wiki.git")
+    fun omRedditLeaderboardRepository() = GitRepository(gitProperties, "om-wiki", "https://github.com/F43nd1r/OM-wiki.git", true)
 
     @Bean("omArchiveRepository")
-    fun omArchiveRepository() = GitRepository(gitProperties, "om-archive", "https://github.com/F43nd1r/om-archive.git")
+    fun omArchiveRepository() = GitRepository(gitProperties, "om-archive", "https://github.com/F43nd1r/om-archive.git", true)
 
     @Bean("scArchiveRepository")
     fun scArchiveRepository() = GitRepository(gitProperties, "sc-archive", "https://github.com/spacechem-community-developers/spacechem-archive.git")
@@ -23,5 +23,5 @@ class GitConfiguration(private val gitProperties: GitProperties) {
     fun szRepository() = GitRepository(gitProperties, "shenzhenIO-leaderboard", "https://github.com/12345ieee/shenzhenIO-leaderboard.git")
 
     @Bean("configRepository")
-    fun configRepository() = GitRepository(gitProperties, "config", "https://github.com/F43nd1r/zachtronics-leaderboard-bot-config.git")
+    fun configRepository() = GitRepository(gitProperties, "config", "https://github.com/F43nd1r/zachtronics-leaderboard-bot-config.git", true)
 }
