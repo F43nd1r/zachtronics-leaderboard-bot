@@ -1,6 +1,10 @@
 package com.faendir.zachtronics.bot.utils
 
+import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
+import com.faendir.zachtronics.bot.model.Record
+import discord4j.discordjson.json.EmbedFieldData
+import discord4j.discordjson.json.ImmutableEmbedData
 import discord4j.discordjson.json.MessageSendRequestBase
 import discord4j.rest.util.MultipartRequest
 
@@ -50,3 +54,18 @@ fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> 
 }
 
 fun <T : MessageSendRequestBase> T.asMultipartRequest() = MultipartRequest.ofRequest(this)
+
+fun <C : Category, R : Record> ImmutableEmbedData.Builder.embedCategoryRecords(records: Iterable<Map.Entry<C, R?>>):
+        ImmutableEmbedData.Builder {
+    return this.addAllFields(
+        records.groupBy({ it.value?.toEmbedDisplayString() ?: "`none`" }, { it.key })
+            .map { (value, categories) ->
+                val sortedCategories = categories.sortedBy<C, Comparable<*>> { it as Comparable<*> }
+                EmbedFieldData.builder()
+                    .name(sortedCategories.joinToString("/") { it.displayName })
+                    .value(value)
+                    .inline(true)
+                    .build()
+            }
+    )
+}

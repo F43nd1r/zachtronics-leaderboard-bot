@@ -5,6 +5,7 @@ import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.utils.asMultipartRequest
+import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import discord4j.core.event.domain.interaction.SlashCommandEvent
 import discord4j.discordjson.json.EmbedData
 import discord4j.discordjson.json.EmbedFieldData
@@ -20,21 +21,9 @@ abstract class AbstractListCommand<C : Category, P : Puzzle, R : Record> : Abstr
         return WebhookExecuteRequest.builder()
             .addEmbed(EmbedData.builder()
                 .title("*${puzzle.displayName}*")
-                .addAllFields(
-                    records.asIterable()
-                        .groupBy({ it.value }, { it.key })
-                        .map { entry -> entry.key to entry.value.sortedBy<C, Comparable<*>> { it as? Comparable<*> } }
-                        .sortedBy<Pair<R, List<C>>, Comparable<*>> { it.second.first() as? Comparable<*> }
-                        .map { (record, categories) ->
-                            EmbedFieldData.builder()
-                                .name(categories.joinToString("/") { it.displayName })
-                                .value(record.toListDisplayString())
-                                .inline(true)
-                                .build()
-                        }
-                )
+                .embedCategoryRecords(records.asIterable())
                 .apply {
-                    val missing = categories.minus(records.map { it.key })
+                    val missing = categories.minus(records.keys)
                     if (missing.isNotEmpty()) {
                         addField(
                             EmbedFieldData.builder()

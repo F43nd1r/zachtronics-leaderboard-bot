@@ -36,7 +36,7 @@ public class ScRecord implements Record {
 
     @NotNull
     @Override
-    public String toListDisplayString() {
+    public String toEmbedDisplayString() {
         return toLbDisplayString("%s%s/%d/%d", "");
     }
 

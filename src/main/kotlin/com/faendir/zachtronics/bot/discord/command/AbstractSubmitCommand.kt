@@ -1,11 +1,11 @@
 package com.faendir.zachtronics.bot.discord.command
 
-import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult
 import com.faendir.zachtronics.bot.utils.asMultipartRequest
+import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.findInstance
 import com.faendir.zachtronics.bot.utils.ifNotEmpty
 import discord4j.core.event.domain.interaction.SlashCommandEvent
@@ -31,11 +31,7 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : AbstractCommand()
                 EmbedData.builder()
                     .title("Success: *${puzzle.displayName}* ${successes.flatMap { it.oldRecords.keys }.joinToString { it.displayName }}")
                     .description("`${record.score.toDisplayString()}` ${record.author?.let { " by $it" } ?: ""}\npreviously:")
-                    .addAllFields(successes.flatMap { it.oldRecords.entries }
-                        .map {
-                            EmbedFieldData.builder().name(it.key.displayName)
-                                .value(it.value?.toListDisplayString() ?: "`none`").inline(true).build()
-                        })
+                    .embedCategoryRecords(successes.flatMap { it.oldRecords.entries.asIterable() })
                     .link(record.link)
                     .build()
             )
@@ -58,12 +54,7 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : AbstractCommand()
                     EmbedData.builder()
                         .title("No Scores beaten by *${puzzle.displayName}* `${record.score.toDisplayString()}`")
                         .description("Existing scores:")
-                        .addAllFields(betterExists.flatMap { it.records.entries }
-                            .sortedBy<Map.Entry<Category, Record>, Comparable<*>> { it.key as? Comparable<*> }
-                            .map {
-                                EmbedFieldData.builder().name(it.key.displayName)
-                                    .value("\n${it.value.toListDisplayString()}").inline(true).build()
-                            })
+                        .embedCategoryRecords(betterExists.flatMap {it.records.entries})
                         .build()
                 )
                 .build()
