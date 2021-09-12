@@ -21,7 +21,7 @@ abstract class AbstractListCommand<C : Category, P : Puzzle, R : Record> : Abstr
         return WebhookExecuteRequest.builder()
             .addEmbed(EmbedData.builder()
                 .title("*${puzzle.displayName}*")
-                .embedCategoryRecords(records.asIterable())
+                .embedCategoryRecords(records.entries)
                 .apply {
                     val missing = categories.minus(records.keys)
                     if (missing.isNotEmpty()) {
