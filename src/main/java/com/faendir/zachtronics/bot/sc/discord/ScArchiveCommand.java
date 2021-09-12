@@ -63,7 +63,7 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> impleme
 
         public Data(@NotNull
                     @Description("Link or `m1` to scrape it from your last message. " +
-                            "Start the solution name with `/B?P?` to set flags")
+                                 "Start the solution name with `/B?P?` to set flags")
                     @Converter(LinkConverter.class) String export,
                     @Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
                     @Converter(ScPuzzleConverter.class) ScPuzzle puzzle) {

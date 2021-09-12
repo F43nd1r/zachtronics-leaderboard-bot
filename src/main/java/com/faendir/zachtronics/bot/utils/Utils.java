@@ -31,13 +31,13 @@ public final class Utils {
     }
 
     private static final Pattern PASTEBIN_PATTERN = Pattern.compile("(?:https?://)?pastebin.com/(?:raw/)?(\\w+)");
-
     @NotNull
     public static String rawContentURL(@NotNull String link) {
         Matcher m = PASTEBIN_PATTERN.matcher(link);
         if (m.matches()) { // pastebin has an easy way to get raw text
             return "https://pastebin.com/raw/" + m.group(1);
-        } else
+        }
+        else
             return link;
     }
 }

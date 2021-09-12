@@ -64,10 +64,10 @@ public class ScRecord implements Record {
     public String toLbDisplayString(String formatString, String reactorPrefix) {
         String cyclesStr =
                 score.getCycles() >= 100000 ? NumberFormat.getNumberInstance(Locale.ROOT).format(score.getCycles())
-                        : Integer.toString(score.getCycles());
+                                            : Integer.toString(score.getCycles());
         return String.format("[\uD83D\uDCC4](%s) %s[(" + formatString + "%s) %s](%s)", // 📄
-                archiveLink, reactorPrefix, cyclesStr,
-                oldVideoRNG ? "\\*" : "", score.getReactors(), score.getSymbols(),
-                score.slashFlags(), author, link);
+                             archiveLink, reactorPrefix, cyclesStr,
+                             oldVideoRNG ? "\\*" : "", score.getReactors(), score.getSymbols(),
+                             score.slashFlags(), author, link);
     }
 }

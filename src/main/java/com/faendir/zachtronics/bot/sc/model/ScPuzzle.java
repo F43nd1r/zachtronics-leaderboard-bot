@@ -412,8 +412,8 @@ public enum ScPuzzle implements Puzzle {
     @NotNull
     public static ScPuzzle parsePuzzle(@NotNull String name) {
         return Arrays.stream(ScPuzzle.values())
-                .filter(p -> p.getDisplayName().equalsIgnoreCase(name))
-                .findFirst()
-                .orElseGet(() -> UtilsKt.getSingleMatchingPuzzle(ScPuzzle.values(), name));
+                     .filter(p -> p.getDisplayName().equalsIgnoreCase(name))
+                     .findFirst()
+                     .orElseGet(() -> UtilsKt.getSingleMatchingPuzzle(ScPuzzle.values(), name));
     }
 }

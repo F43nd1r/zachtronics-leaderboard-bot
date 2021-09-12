@@ -25,8 +25,8 @@ import java.util.Set;
 
 public interface ScSecured extends Secured {
     Set<Long> WIKI_ADMINS = Set.of(295868901042946048L, // 12345ieee,
-            516462621382410260L, // TT
-            185983061190508544L  // Zig
+                                   516462621382410260L, // TT
+                                   185983061190508544L  // Zig
     );
 
     private static boolean isWikiAdmin(@NotNull User user) {

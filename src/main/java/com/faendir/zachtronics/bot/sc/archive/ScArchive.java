@@ -52,7 +52,7 @@ public class ScArchive extends AbstractArchive<ScSolution> {
 
     public String makeArchiveLink(@NotNull ScPuzzle puzzle, @NotNull ScScore score) {
         return String.format("%s/%s/%s/%s.txt", getGitRepo().getRawFilesUrl(), puzzle.getGroup().name(), puzzle.name(),
-                score.toDisplayString().replace('/', '-'));
+                             score.toDisplayString().replace('/', '-'));
     }
 
     public String makeArchiveLink(@NotNull ScSolution solution) {

@@ -62,7 +62,8 @@ public class SChem {
                         result.add(solution);
                         continue;
                     }
-                } catch (IllegalArgumentException ignored) {
+                }
+                catch (IllegalArgumentException ignored) {
                     // solution import is not readable, we'll show the SChem exception
                 }
 
@@ -94,8 +95,8 @@ public class SChem {
         } catch (IllegalArgumentException e) {
             assert result.getResnetId() != null;
             puzzle = ScPuzzle.parsePuzzle(result.getLevelName() +
-                    Arrays.stream(result.getResnetId()).mapToObj(Integer::toString)
-                            .collect(Collectors.joining("-", "(", ")")));
+                                          Arrays.stream(result.getResnetId()).mapToObj(Integer::toString)
+                                                .collect(Collectors.joining("-", "(", ")")));
         }
 
         String solutionName = result.getSolutionName() != null ? result.getSolutionName() : "";
@@ -111,11 +112,11 @@ public class SChem {
             String declaredFlags = ScScore.slashFlags(declaresBugged, declaresPrecog);
             String schemFlags = result.isPrecog() ? "/P" : "";
             throw new SChemException("Incoherent solution flags, given \"" + declaredFlags +
-                    "\" but SChem wanted \"" + schemFlags + "\"");
+                                     "\" but SChem wanted \"" + schemFlags + "\"");
         }
 
         ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), false,
-                result.isPrecog());
+                                    result.isPrecog());
 
         return new ScSolution(puzzle, score, export);
     }

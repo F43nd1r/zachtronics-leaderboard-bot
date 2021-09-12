@@ -47,8 +47,8 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
     public List<ArchiveResult> archiveAll(@NotNull Collection<? extends S> solution) {
         return getGitRepo().access(a -> {
             List<ArchiveResult> r = solution.stream()
-                    .map(s -> performArchive(a, s))
-                    .collect(Collectors.toList());
+                                            .map(s -> performArchive(a, s))
+                                            .collect(Collectors.toList());
             a.push();
             return r;
         });
@@ -81,15 +81,16 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
         if (!accessScope.status().isClean()) {
             accessScope.addAll(puzzlePath.toFile());
             String result = Stream.concat(accessScope.status().getChanged().stream(),
-                            accessScope.status().getAdded().stream())
-                    .map(f -> "[" + f.replaceFirst(".+/", "") + "](" + getGitRepo().getRawFilesUrl() + f +
-                            ")").collect(Collectors.joining(", "));
+                                          accessScope.status().getAdded().stream())
+                                  .map(f -> "[" + f.replaceFirst(".+/", "") + "](" + getGitRepo().getRawFilesUrl() + f +
+                                            ")").collect(Collectors.joining(", "));
             accessScope.commit(
                     "Added " + solution.getScore().toDisplayString() + " for " + solution.getPuzzle().getDisplayName());
             result += "\n[commit " + accessScope.currentHash().substring(0, 7) + "](" +
-                    getGitRepo().getUrl().replaceFirst(".git$", "") + "/commit/" + accessScope.currentHash() + ")";
+                      getGitRepo().getUrl().replaceFirst(".git$", "") + "/commit/" + accessScope.currentHash() + ")";
             return new ArchiveResult.Success(result);
-        } else {
+        }
+        else {
             // the same exact sol was already archived,
             return new ArchiveResult.AlreadyArchived();
         }

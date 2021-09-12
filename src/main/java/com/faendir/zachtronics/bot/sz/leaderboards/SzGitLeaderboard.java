@@ -60,8 +60,8 @@ public class SzGitLeaderboard implements Leaderboard<SzCategory, SzPuzzle, SzRec
     public Map<SzCategory, SzRecord> getAll(@NotNull SzPuzzle puzzle, @NotNull Collection<? extends SzCategory> categories) {
         return archive.getGitRepo().access(
                 a -> categories.stream().collect(Collectors.toMap(category -> category,
-                        category -> readSolutionFile(
-                                findPuzzleFile(a, puzzle, category)))));
+                                                                  category -> readSolutionFile(
+                                                                          findPuzzleFile(a, puzzle, category)))));
     }
 
     @NotNull

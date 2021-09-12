@@ -20,9 +20,7 @@ import com.faendir.zachtronics.bot.model.Solution;
 
 import java.io.IOException;
 
-/**
- * Interface for classes that handle archival data for a level in the respective repository
- */
+/** Interface for classes that handle archival data for a level in the respective repository */
 public interface SolutionsIndex<T extends Solution> {
 
     /**

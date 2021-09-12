@@ -39,8 +39,8 @@ import java.util.stream.Stream;
  */
 class ScSolutionsIndex implements SolutionsIndex<ScSolution> {
     private static final Comparator<ScScore> COMPARATOR = ScCategory.C.getScoreComparator()
-            .thenComparing(ScScore::isBugged)
-            .thenComparing(ScScore::isPrecognitive);
+                                                                      .thenComparing(ScScore::isBugged)
+                                                                      .thenComparing(ScScore::isPrecognitive);
     private final Path puzzlePath;
     private final List<ScScore> scores;
 
@@ -115,10 +115,12 @@ class ScSolutionsIndex implements SolutionsIndex<ScSolution> {
         if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0 && r5 <= 0) {
             // s1 dominates
             return -1;
-        } else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0 && r5 >= 0) {
+        }
+        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0 && r5 >= 0) {
             // s2 dominates
             return 1;
-        } else {
+        }
+        else {
             // equal is already captured by the 1st check, this is for "not comparable"
             return 0;
         }

@@ -46,9 +46,9 @@ public class ScScore implements Score {
     /** <tt>ccc/r/ss[/BP]</tt>, tolerates extra <tt>*</tt> */
     public static final Pattern REGEX_BP_SCORE = Pattern.compile(
             "\\**(?<cycles>[\\d,]+)\\**(?<oldRNG>\\\\\\*)?[/-]" +
-                    "\\**(?<reactors>\\d+)\\**[/-]" +
-                    "\\**(?<symbols>\\d+)\\**" +
-                    "(?:[/-](?<flags>B?P?))?");
+            "\\**(?<reactors>\\d+)\\**[/-]" +
+            "\\**(?<symbols>\\d+)\\**" +
+            "(?:[/-](?<flags>B?P?))?");
 
     /** <tt>ccc/r/ss[/BP]</tt>, tolerates extra <tt>*</tt> */
     @Nullable
@@ -67,8 +67,8 @@ public class ScScore implements Score {
         String flags = m.group("flags");
 
         return new ScScore(cycles, reactors, symbols,
-                flags != null && flags.contains("B"),
-                flags != null && flags.contains("P"));
+                           flags != null && flags.contains("B"),
+                           flags != null && flags.contains("P"));
     }
 
     /**
@@ -87,6 +87,7 @@ public class ScScore implements Score {
             if (bugged) result += "B";
             if (precognitive) result += "P";
             return result;
-        } else return "";
+        }
+        else return "";
     }
 }

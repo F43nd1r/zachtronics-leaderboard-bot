@@ -45,9 +45,9 @@ class RestartCommand implements TopLevelCommand, Secured {
     @Override
     public ApplicationCommandRequest buildRequest() {
         return ApplicationCommandRequest.builder()
-                .name(commandName)
-                .description("Stops the bot, which will restart with the latest image")
-                .build();
+                                        .name(commandName)
+                                        .description("Stops the bot, which will restart with the latest image")
+                                        .build();
     }
 
     @SneakyThrows
@@ -62,7 +62,7 @@ class RestartCommand implements TopLevelCommand, Secured {
     }
 
     private final Set<Long> BOT_OWNERS = Set.of(295868901042946048L, // 12345ieee,
-            288766560938622976L  // F43nd1r
+                                                288766560938622976L  // F43nd1r
     );
 
     @Override
