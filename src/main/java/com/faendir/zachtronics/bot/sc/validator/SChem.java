@@ -45,6 +45,10 @@ public class SChem {
     @NotNull
     public static List<ScSolution> validateMultiExport(@NotNull String export, ScPuzzle puzzle) {
         String[] contents = export.split("(?=SOLUTION:)");
+        if (contents.length > 50) {
+            throw new IllegalArgumentException(
+                    "You can archive a maximum of 50 solutions at a time, you tried " + contents.length);
+        }
         LinkedHashSet<ScSolution> result = new LinkedHashSet<>();
         StringBuilder exceptions = new StringBuilder();
         int line = 1;
