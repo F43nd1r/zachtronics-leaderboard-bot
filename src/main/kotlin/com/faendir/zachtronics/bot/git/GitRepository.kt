@@ -26,13 +26,18 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
         }
     }
 
-    fun <T> access(access: AccessScope.() -> T): T  {
+    fun <T> access(access: AccessScope.() -> T): T {
         return synchronized(repo) {
             Git.open(repo).use { git ->
                 val accessScope = AccessScope(git, repo)
                 if (!hasWebHook || accessScope.currentHash() != remoteHash) {
                     git.pull().setTimeout(120).call()
-                    logger.info("pulled $name")
+                    if (remoteHash == null) {
+                        remoteHash = accessScope.currentHash()
+                        logger.info("initial pull $name")
+                    } else {
+                        logger.info("pulled $name")
+                    }
                 } else {
                     logger.info("$name is up to date, not pulling")
                 }
@@ -65,7 +70,7 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
 
         fun status(): Status = git.status().call()
 
-        fun currentHash() : String = git.repository.resolve("HEAD").name()
+        fun currentHash(): String = git.repository.resolve("HEAD").name()
 
         fun commitAndPush(user: String?, puzzle: Puzzle, score: Score, updated: Collection<String>) {
             commitAndPush("${puzzle.displayName} ${score.toDisplayString()} $updated by ${user ?: "unknown"}")
