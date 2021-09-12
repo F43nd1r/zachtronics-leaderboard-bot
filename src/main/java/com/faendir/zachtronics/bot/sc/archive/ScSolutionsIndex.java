@@ -38,33 +38,50 @@ class ScSolutionsIndex implements SolutionsIndex<ScSolution> {
     @Override
     public boolean add(@NotNull ScSolution solution) throws IOException {
         ScScore candidate = solution.getScore();
-        ListIterator<ScScore> it = scores.listIterator();
-        while (it.hasNext()) {
-            ScScore score = it.next();
-            int r = dominanceCompare(candidate, score);
-            if (r > 0)
-                return false;
-            else if (r < 0) {
-                // remove beaten score
-                it.remove();
-                Files.deleteIfExists(puzzlePath.resolve(makeScoreFilename(score)));
+
+        if (scores.contains(candidate)) {
+            Path solutionPath = puzzlePath.resolve(makeScoreFilename(candidate));
+            if (Files.exists(solutionPath)) {
+                // we allow file replacement only if the author is the same
+                String diskHeader = Files.newBufferedReader(solutionPath).readLine();
+                String diskAuthor = ScSolution.authorFromSolutionHeader(diskHeader);
+                String candidateAuthor = ScSolution.authorFromSolutionHeader(solution.getContent());
+                if (diskAuthor.equals(candidateAuthor)) {
+                    Files.delete(solutionPath);
+                }
+                else {
+                    return false;
+                }
             }
         }
+        else {
+            ListIterator<ScScore> it = scores.listIterator();
+            while (it.hasNext()) {
+                ScScore score = it.next();
+                int r = dominanceCompare(candidate, score);
+                if (r > 0)
+                    return false;
+                else if (r < 0) {
+                    // remove beaten score
+                    it.remove();
+                    Files.deleteIfExists(puzzlePath.resolve(makeScoreFilename(score)));
+                }
+            }
 
-        int index = Collections.binarySearch(scores, candidate, COMPARATOR);
-        if (index < 0) {
-            index = -index - 1;
+            int index = Collections.binarySearch(scores, candidate, COMPARATOR);
+            if (index < 0) {
+                index = -index - 1;
+            }
+            scores.add(index, candidate);
+
+            Iterable<String> lines = scores.stream().map(ScScore::toDisplayString)::iterator;
+            Files.write(puzzlePath.resolve("scores.txt"), lines, StandardOpenOption.TRUNCATE_EXISTING);
         }
-        scores.add(index, candidate);
-
-        Iterable<String> lines = scores.stream().map(ScScore::toDisplayString)::iterator;
-        Files.write(puzzlePath.resolve("scores.txt"), lines, StandardOpenOption.TRUNCATE_EXISTING);
 
         String filename = makeScoreFilename(candidate);
         Path solutionPath = puzzlePath.resolve(filename);
         Files.write(solutionPath, solution.getContent().getBytes(), StandardOpenOption.CREATE_NEW);
         return true;
-
     }
 
     @NotNull

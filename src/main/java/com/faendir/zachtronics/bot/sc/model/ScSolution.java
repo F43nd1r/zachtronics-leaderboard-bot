@@ -21,8 +21,12 @@ public class ScSolution implements Solution {
     @NotNull ScScore score;
     @NotNull String content;
 
-    private static final Pattern SOLUTION_HEADER = Pattern.compile("^SOLUTION:(?<puzzle>[^,]+|'(?:[^']|'')+'),[^,]+," +
-            "(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)(?:,'?([/-](?<flags>B?P?))?.*)?'?$", Pattern.MULTILINE);
+    /** <tt>SOLUTION:$puzzle,$author,$c-$r-$s[,$description]</tt> */
+    private static final Pattern SOLUTION_HEADER = Pattern.compile(
+            "^SOLUTION:(?<puzzle>[^,]+|'(?:[^']|'')+')," +
+            "(?<author>[^,]+)," +
+            "(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)" +
+            "(?:,'?(?:[/-](?<flags>B?P?)(?:$| ))?.*'?)?$", Pattern.MULTILINE);
     /**
      * @throws IllegalArgumentException if we can't correctly parse metadata
      */
@@ -41,8 +45,6 @@ public class ScSolution implements Solution {
         }
 
         ScScore score = ScScore.parseBPScore(m);
-        content = m.replaceFirst("SOLUTION:$1,Archiver,$2-$3-$4," + (m.group(5) == null ? "" : "$5 ") + "Archived Solution");
-
         return new ScSolution(puzzle, score, content);
     }
 
@@ -58,5 +60,13 @@ public class ScSolution implements Solution {
         }
 
         return SChem.validateMultiExport(export, puzzle);
+    }
+
+    public static String authorFromSolutionHeader(String header) {
+        Matcher m = SOLUTION_HEADER.matcher(header);
+        if (!m.find()) {
+            throw new IllegalArgumentException("Invalid header");
+        }
+        return m.group("author");
     }
 }

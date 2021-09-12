@@ -29,13 +29,13 @@ class ScSolutionTest {
         String content = "SOLUTION:'1,3-Dimetoxibencene',andy,922-1-27,s\nstuff...";
         ScSolution result = ScSolution.fromContentNoValidation(content, null);
         ScSolution expected = new ScSolution(ScPuzzle.published_43_2, new ScScore(922, 1, 27, false, false),
-                                             "SOLUTION:'1,3-Dimetoxibencene',Archiver,922-1-27,Archived Solution\nstuff...");
+                                             "SOLUTION:'1,3-Dimetoxibencene',andy,922-1-27,s\nstuff...");
         assertEquals(expected, result);
 
         content = "SOLUTION:Of Pancakes and Spaceships,12345ieee,50-50-50,'/B with, commmas, :('\nstuff...";
         result = ScSolution.fromContentNoValidation(content, null);
         expected = new ScSolution(ScPuzzle.research_example_1, new ScScore(50, 50, 50, true, false),
-                                  "SOLUTION:Of Pancakes and Spaceships,Archiver,50-50-50,/B Archived Solution\nstuff...");
+                                  "SOLUTION:Of Pancakes and Spaceships,12345ieee,50-50-50,'/B with, commmas, :('\nstuff...");
         assertEquals(expected, result);
     }
 

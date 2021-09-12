@@ -27,7 +27,6 @@ public class ScArchiveTest {
         assertTrue(doArchiveScore(score) instanceof ArchiveResult.Failure); // our score is a P, fail
         score = new ScScore(100, 100, 100, false, false);
         assertTrue(doArchiveScore(score) instanceof ArchiveResult.Success); // identical score, different content, accept
-        assertTrue(doArchiveScore(score) instanceof ArchiveResult.AlreadyArchived); // identical score and content, we have it
         score = new ScScore(10, 100, 1000, true, true);
         assertTrue(doArchiveScore(score) instanceof ArchiveResult.Success); // new frontier piece
         score = new ScScore(1000, 100, 10, true, true);
@@ -48,11 +47,19 @@ public class ScArchiveTest {
 
         String content = "SOLUTION:Of Pancakes and Spaceships,12345ieee,45-1-14\nbunch of stuff...";
         assertTrue(doArchiveContent(content) instanceof ArchiveResult.Success); // 45/1/14
+        assertTrue(doArchiveContent(content) instanceof ArchiveResult.AlreadyArchived); // identical
+
+        content = "SOLUTION:Of Pancakes and Spaceships,12345ieee,45-1-14\ndifferent stuff...";
+        assertTrue(doArchiveContent(content) instanceof ArchiveResult.Success); // changed content, I can
+
+        content = "SOLUTION:Of Pancakes and Spaceships,BadGuy,45-1-14\ndifferent stuff...";
+        assertTrue(doArchiveContent(content) instanceof ArchiveResult.Failure); // stealing is bad
     }
 
     @NotNull
     private ArchiveResult doArchiveScore(ScScore score) {
-        return archive.archive(new ScSolution(ScPuzzle.research_example_1, score, ""));
+        String content = "SOLUTION:Of Pancakes and Spaceships,12345ieee,45-1-14\nbunch of stuff...";
+        return archive.archive(new ScSolution(ScPuzzle.research_example_1, score, content));
     }
 
     @NotNull

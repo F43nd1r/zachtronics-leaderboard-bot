@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /** Wrapper for a schem package installed on the system */
@@ -84,10 +83,13 @@ public class SChem {
                                                 .collect(Collectors.joining("-", "(", ")")));
         }
 
-        boolean declaresBugged = result.getSolutionName() != null &&
-                                 result.getSolutionName().matches("^/BP?(?: .*)?");
-        boolean declaresPrecog = result.getSolutionName() != null &&
-                                 result.getSolutionName().matches("^/B?P(?: .*)?");
+        String solutionName = result.getSolutionName() != null ? result.getSolutionName() : "";
+        if (solutionName.length() > 100) {
+            throw new SChemException("Solution name too long");
+        }
+
+        boolean declaresBugged = solutionName.matches("^/BP?(?: .*)?");
+        boolean declaresPrecog = solutionName.matches("^/B?P(?: .*)?");
         // check if the user is lying:
         // we know the score isn't bugged because SChem ran it and we can check SChem's precog opinion
         if (declaresBugged || (declaresPrecog != result.isPrecog())) {
@@ -100,10 +102,7 @@ public class SChem {
         ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), false,
                                     result.isPrecog());
 
-        String content = Pattern.compile("^SOLUTION:.+$", Pattern.MULTILINE).matcher(export).replaceFirst(
-                String.format("SOLUTION:%s,Archiver,%d-%d-%d,%sArchived Solution", result.getLevelName(),
-                              result.getCycles(), result.getReactors(), result.getSymbols(), result.isPrecog() ? "/P " : ""));
-        return new ScSolution(puzzle, score, content);
+        return new ScSolution(puzzle, score, export);
     }
 
     static SChemResult run(@NotNull String export) throws SChemException {
