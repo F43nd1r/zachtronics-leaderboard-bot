@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.om.parser.puzzle.PuzzleParser
@@ -5,8 +21,27 @@ import com.faendir.om.parser.solution.model.Position
 import com.faendir.om.parser.solution.model.part.IO
 import com.faendir.om.parser.solution.model.to
 import com.faendir.zachtronics.bot.model.Puzzle
-import com.faendir.zachtronics.bot.om.model.OmGroup.*
-import com.faendir.zachtronics.bot.om.model.OmType.*
+import com.faendir.zachtronics.bot.om.model.OmGroup.CHAPTER_1
+import com.faendir.zachtronics.bot.om.model.OmGroup.CHAPTER_2
+import com.faendir.zachtronics.bot.om.model.OmGroup.CHAPTER_3
+import com.faendir.zachtronics.bot.om.model.OmGroup.CHAPTER_4
+import com.faendir.zachtronics.bot.om.model.OmGroup.CHAPTER_5
+import com.faendir.zachtronics.bot.om.model.OmGroup.CHAPTER_PRODUCTION
+import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_I
+import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_II
+import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_III
+import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_IV
+import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_IX
+import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_V
+import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_VI
+import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_VII
+import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_VIII
+import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2019
+import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2020
+import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2021
+import com.faendir.zachtronics.bot.om.model.OmType.INFINITE
+import com.faendir.zachtronics.bot.om.model.OmType.NORMAL
+import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
 import com.faendir.zachtronics.bot.utils.getSingleMatchingPuzzle
 import okio.buffer
 import okio.source

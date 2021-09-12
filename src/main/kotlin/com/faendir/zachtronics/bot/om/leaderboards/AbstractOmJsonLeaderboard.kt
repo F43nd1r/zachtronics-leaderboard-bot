@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.faendir.zachtronics.bot.om.leaderboards
 
 import com.faendir.zachtronics.bot.git.GitRepository
@@ -29,17 +45,17 @@ abstract class AbstractOmJsonLeaderboard<J>(
 
     @PostConstruct
     fun onStartUp() {
-            gitRepo.access {
-                directoryCategories.forEach { (dirName, categories) ->
-                    val dir = File(repo, dirName)
-                    File(dir, scoreFileName).takeIf { it.exists() }?.let { file ->
-                        updatePage(dir, categories, Json.decodeFromString(serializer, file.readText()))
-                    }
-                }
-                if (status().run { added.isNotEmpty() || changed.isNotEmpty() }) {
-                    commitAndPush("Update page formatting")
+        gitRepo.access {
+            directoryCategories.forEach { (dirName, categories) ->
+                val dir = File(repo, dirName)
+                File(dir, scoreFileName).takeIf { it.exists() }?.let { file ->
+                    updatePage(dir, categories, Json.decodeFromString(serializer, file.readText()))
                 }
             }
+            if (status().run { added.isNotEmpty() || changed.isNotEmpty() }) {
+                commitAndPush("Update page formatting")
+            }
+        }
     }
 
     override fun update(puzzle: OmPuzzle, record: OmRecord): UpdateResult = gitRepo.access {

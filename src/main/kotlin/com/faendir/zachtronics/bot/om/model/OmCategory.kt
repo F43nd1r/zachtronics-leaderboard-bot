@@ -1,10 +1,39 @@
+/*
+ * Copyright (c) 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.Category
-import com.faendir.zachtronics.bot.om.model.OmMetric.*
+import com.faendir.zachtronics.bot.om.model.OmMetric.AREA
+import com.faendir.zachtronics.bot.om.model.OmMetric.COST
+import com.faendir.zachtronics.bot.om.model.OmMetric.CYCLES
+import com.faendir.zachtronics.bot.om.model.OmMetric.INSTRUCTIONS
+import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_CA
+import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_CI
+import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_GA
+import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_GC
+import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_GI
+import com.faendir.zachtronics.bot.om.model.OmMetric.SUM3A
+import com.faendir.zachtronics.bot.om.model.OmMetric.SUM3I
+import com.faendir.zachtronics.bot.om.model.OmMetric.SUM4
 import com.faendir.zachtronics.bot.om.model.OmModifier.OVERLAP
 import com.faendir.zachtronics.bot.om.model.OmModifier.TRACKLESS
-import com.faendir.zachtronics.bot.om.model.OmType.*
+import com.faendir.zachtronics.bot.om.model.OmType.INFINITE
+import com.faendir.zachtronics.bot.om.model.OmType.NORMAL
+import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
 
 
 private val NORMAL_TYPES = setOf(NORMAL, INFINITE)

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.faendir.zachtronics.bot.sz.archive;
 
 import com.faendir.zachtronics.bot.archive.SolutionsIndex;
@@ -28,8 +44,8 @@ class SzSolutionsIndex implements SolutionsIndex<SzSolution> {
     private final Map<Integer, List<SzSolution>> diskSolutions;
     private static final Map<Integer, Comparator<SzSolution>> COMPARATOR_MAP = Map
             .of(1, makeComparator(SzCategory.CP),
-                2, makeComparator(SzCategory.PC),
-                3, makeComparator(SzCategory.LC));
+                    2, makeComparator(SzCategory.PC),
+                    3, makeComparator(SzCategory.LC));
 
     private static Comparator<SzSolution> makeComparator(@NotNull SzCategory category) {
         return Comparator.comparing(SzSolution::getScore, category.getScoreComparator());
@@ -39,11 +55,11 @@ class SzSolutionsIndex implements SolutionsIndex<SzSolution> {
         this.folderPath = folderPath;
         this.puzzleName = puzzle.name();
         diskSolutions = Files.list(folderPath)
-                             .filter(p -> p.getFileName().toString().startsWith(puzzle.name()))
-                             .collect(groupingBy(p -> Integer.valueOf(
-                                                         p.getFileName().toString()
-                                                          .replace(puzzle.name(), "").charAt(1)),
-                                                 Collectors.mapping(SzSolution::new, toList())));
+                .filter(p -> p.getFileName().toString().startsWith(puzzle.name()))
+                .collect(groupingBy(p -> Integer.valueOf(
+                                p.getFileName().toString()
+                                        .replace(puzzle.name(), "").charAt(1)),
+                        Collectors.mapping(SzSolution::new, toList())));
 
     }
 
@@ -80,8 +96,7 @@ class SzSolutionsIndex implements SolutionsIndex<SzSolution> {
                 if (!newPath.equals(oldPath)) {
                     if (oldPath != null) { // an old sol
                         Files.move(oldPath, newPath);
-                    }
-                    else { // it's our new sol
+                    } else { // it's our new sol
                         assert solution.getContent() != null;
                         Files.write(newPath, solution.getContent().getBytes(), StandardOpenOption.CREATE_NEW);
                     }
@@ -102,12 +117,10 @@ class SzSolutionsIndex implements SolutionsIndex<SzSolution> {
         if (r1 <= 0 && r2 <= 0 && r3 <= 0) {
             // s1 dominates
             return -1;
-        }
-        else if (r1 >= 0 && r2 >= 0 && r3 >= 0) {
+        } else if (r1 >= 0 && r2 >= 0 && r3 >= 0) {
             // s2 dominates
             return 1;
-        }
-        else {
+        } else {
             // equal is already captured by the 1st check, this is for "not comparable"
             return 0;
         }

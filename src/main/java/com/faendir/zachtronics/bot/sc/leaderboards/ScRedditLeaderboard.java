@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.faendir.zachtronics.bot.sc.leaderboards;
 
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
@@ -22,7 +38,7 @@ import static com.faendir.zachtronics.bot.sc.model.ScCategory.*;
 @RequiredArgsConstructor
 public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, ScRecord> {
     private static final ScCategory[][] CATEGORIES = {{C,  CNB,  CNP},  {S,  SNB,  SNP},
-                                                      {RC, RCNB, RCNP}, {RS, RSNB, RSNP}};
+            {RC, RCNB, RCNP}, {RS, RSNB, RSNP}};
     @Getter
     private final List<ScCategory> supportedCategories = Arrays.asList(ScCategory.values());
     private final RedditService redditService;
@@ -49,7 +65,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
             parseHalfTable(puzzle, halfTable, records);
 
             int column = category.getDisplayName().endsWith("NP") ? 2 : category.getDisplayName()
-                                                                                .endsWith("NB") ? 1 : 0;
+                    .endsWith("NB") ? 1 : 0;
             ScRecord record = records[column];
             if (record != ScRecord.IMPOSSIBLE_CATEGORY)
                 return record;
@@ -93,8 +109,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                 }
 
                 seenRows++;
-            }
-            else if (seenRows != 0) {
+            } else if (seenRows != 0) {
                 // we've already found the point and now we're past it, we're done
                 break;
             }
@@ -128,8 +143,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                     halfSize = tableCols.size() / 2;
                 }
                 seenRows++;
-            }
-            else if (seenRows != 0) {
+            } else if (seenRows != 0) {
                 // we've already found the point and now we're past it, we're done
                 break;
             }
@@ -146,9 +160,8 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
             if (rowIdx == 1) {
                 minReactors = Math.min(record.getScore().getReactors(), records[2][0].getScore().getReactors());
                 row.append(puzzle.getDisplayName()).append(" - ").append(minReactors).append(" Reactor")
-                   .append(minReactors == 1 ? "" : "s");
-            }
-            else {
+                        .append(minReactors == 1 ? "" : "s");
+            } else {
                 row.append(prevElems[1]);
             }
 
@@ -160,21 +173,19 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
                     ScCategory thisCategory = blockCategories[i];
                     row.append(" | ");
                     if (thisCategory.supportsScore(record.getScore()) &&
-                        thisCategory.getScoreComparator().compare(record.getScore(), blockRecords[i].getScore()) <= 0) {
+                            thisCategory.getScoreComparator().compare(record.getScore(), blockRecords[i].getScore()) <= 0) {
                         beatenRecords.put(thisCategory, blockRecords[i]);
                         blockRecords[i] = record;
 
                         row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory));
-                    }
-                    else {
+                    } else {
                         String prevElem = prevElems[block * halfSize + i + 2];
                         if (beatenRecords.containsValue(blockRecords[i]) && prevElem.matches("←+")) {
                             // "dangling" reference to beaten score, we need to write the actual score or change the pointer
                             row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory));
-                        }
-                        else {
+                        } else {
                             if (blockRecords[i] != ScRecord.IMPOSSIBLE_CATEGORY &&
-                                thisCategory.supportsScore(record.getScore()))
+                                    thisCategory.supportsScore(record.getScore()))
                                 relatedRecords.put(thisCategory, blockRecords[i]);
                             row.append(prevElem);
                         }
@@ -186,11 +197,10 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
 
         if (!beatenRecords.isEmpty()) {
             redditService.updateWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage(), String.join("\n", lines),
-                                         puzzle.getDisplayName() + " " + record.getScore().toDisplayString() + " by " +
-                                         record.getAuthor());
+                    puzzle.getDisplayName() + " " + record.getScore().toDisplayString() + " by " +
+                            record.getAuthor());
             return new UpdateResult.Success(beatenRecords);
-        }
-        else {
+        } else {
             return new UpdateResult.BetterExists(relatedRecords);
         }
     }
@@ -211,17 +221,18 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
 
     private static final Pattern REGEX_SCORE_CELL =
             Pattern.compile("\\[\uD83D\uDCC4]\\(.+\\.txt\\) " +
-                            "(?:† )?" +
-                            "\\[\\((?<score>" + ScScore.REGEX_BP_SCORE + ")\\) (?<author>[^]]+)]" +
-                            "\\((?<link>[^)]+)\\).*?");
+                    "(?:† )?" +
+                    "\\[\\((?<score>" + ScScore.REGEX_BP_SCORE + ")\\) (?<author>[^]]+)]" +
+                    "\\((?<link>[^)]+)\\).*?");
+
     @NotNull
     private ScRecord parseLeaderboardRecord(ScPuzzle puzzle, String recordCell) {
         Matcher m = REGEX_SCORE_CELL.matcher(recordCell);
         if (m.matches()) {
             ScScore score = ScScore.parseBPScore(m);
             return new ScRecord(score, m.group("author"), m.group("link"),
-                                archive.makeArchiveLink(puzzle, score),
-                                m.group("oldRNG") != null);
+                    archive.makeArchiveLink(puzzle, score),
+                    m.group("oldRNG") != null);
         }
         throw new IllegalStateException("Leaderboard record unparseable: " + recordCell);
     }

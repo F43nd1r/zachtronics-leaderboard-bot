@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.faendir.zachtronics.bot.sc.discord;
 
 import com.faendir.zachtronics.bot.Application;
@@ -40,7 +56,7 @@ public class CommandTest {
     @Test
     public void testShow() {
         Map<String, String> args = Map.of("puzzle", "fission I",
-                                          "category", "C");
+                "category", "C");
         String result = runCommand("show", args);
         assertTrue(result.contains("Fission I") && result.contains("C"));
     }
@@ -56,9 +72,9 @@ public class CommandTest {
     @Disabled("Not actually exposed to Discord")
     public void testSubmit() {
         Map<String, String> args = Map.of("puzzle", "Tunnels I",
-                                          "score", "1/1/1",
-                                          "author", "testMan",
-                                          "video", "http://example.com");
+                "score", "1/1/1",
+                "author", "testMan",
+                "video", "http://example.com");
         String result = runCommand("submit", args);
         assertTrue(result.contains("Tunnels I") && result.contains("1/1/1"));
     }
@@ -67,8 +83,8 @@ public class CommandTest {
     @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
     public void testSubmitArchive() {
         Map<String, String> args = Map.of("video", "http://example.com",
-                                          "export", "https://pastebin.com/19smCuS8", // valid 45/1/14
-                                          "author", "testMan");
+                "export", "https://pastebin.com/19smCuS8", // valid 45/1/14
+                "author", "testMan");
         String result = runCommand("submit-archive", args);
         assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("45/1/14"));
     }
@@ -89,7 +105,7 @@ public class CommandTest {
         Map<String, String> args = Map.of("export", "https://pastebin.com/kNnfTvMa"); // valid 45/1/14 and 115/1/6
         String result = runCommand("archive", args);
         assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14`") &&
-                   result.contains("`115/1/6`"));
+                result.contains("`115/1/6`"));
     }
 
     @Test
@@ -117,8 +133,8 @@ public class CommandTest {
         SlashCommandEvent slashCommandEvent = Mockito.mock(SlashCommandEvent.class, Mockito.RETURNS_DEEP_STUBS);
 
         List<ApplicationCommandInteractionOption> options = args.entrySet().stream()
-                                                                .map(e -> mockOption(e.getKey(), e.getValue()))
-                                                                .collect(Collectors.toList());
+                .map(e -> mockOption(e.getKey(), e.getValue()))
+                .collect(Collectors.toList());
         Mockito.when(slashCommandEvent.getOptions()).thenReturn(options);
 
         MultipartRequest<WebhookExecuteRequest> multipartRequest = commands.stream().filter(c -> c.getData().name().equals(commandName))
@@ -126,15 +142,15 @@ public class CommandTest {
         WebhookExecuteRequest executeRequest = multipartRequest.getJsonPayload();
         assert executeRequest != null;
         String result = Stream.<Stream<String>>of(stream(executeRequest.content()),
-                                  stream(executeRequest.embeds()).flatMap(l -> l.stream().mapMulti((e, d) -> {
-                                      e.title().toOptional().ifPresent(d);
-                                      e.description().toOptional().ifPresent(d);
-                                      e.fields().toOptional().orElse(Collections.emptyList()).stream()
-                                       .map(f -> f.name() + "\n" + f.value()).forEach(d);
-                                      e.footer().toOptional().ifPresent(f -> d.accept(f.text()));
-                                  })), multipartRequest.getFiles().stream().map(Tuple2::getT1))
-                              .flatMap(Function.identity())
-                              .collect(Collectors.joining("\n"));
+                        stream(executeRequest.embeds()).flatMap(l -> l.stream().mapMulti((e, d) -> {
+                            e.title().toOptional().ifPresent(d);
+                            e.description().toOptional().ifPresent(d);
+                            e.fields().toOptional().orElse(Collections.emptyList()).stream()
+                                    .map(f -> f.name() + "\n" + f.value()).forEach(d);
+                            e.footer().toOptional().ifPresent(f -> d.accept(f.text()));
+                        })), multipartRequest.getFiles().stream().map(Tuple2::getT1))
+                .flatMap(Function.identity())
+                .collect(Collectors.joining("\n"));
         System.out.println(result);
         return result;
     }

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2021
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.faendir.zachtronics.bot.archive;
 
 import com.faendir.zachtronics.bot.git.GitRepository;
@@ -31,8 +47,8 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
     public List<ArchiveResult> archiveAll(@NotNull Collection<? extends S> solution) {
         return getGitRepo().access(a -> {
             List<ArchiveResult> r = solution.stream()
-                                            .map(s -> performArchive(a, s))
-                                            .collect(Collectors.toList());
+                    .map(s -> performArchive(a, s))
+                    .collect(Collectors.toList());
             a.push();
             return r;
         });
@@ -65,16 +81,15 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
         if (!accessScope.status().isClean()) {
             accessScope.addAll(puzzlePath.toFile());
             String result = Stream.concat(accessScope.status().getChanged().stream(),
-                                          accessScope.status().getAdded().stream())
-                                  .map(f -> "[" + f.replaceFirst(".+/", "") + "](" + getGitRepo().getRawFilesUrl() + f +
-                                            ")").collect(Collectors.joining(", "));
+                            accessScope.status().getAdded().stream())
+                    .map(f -> "[" + f.replaceFirst(".+/", "") + "](" + getGitRepo().getRawFilesUrl() + f +
+                            ")").collect(Collectors.joining(", "));
             accessScope.commit(
                     "Added " + solution.getScore().toDisplayString() + " for " + solution.getPuzzle().getDisplayName());
             result += "\n[commit " + accessScope.currentHash().substring(0, 7) + "](" +
-                      getGitRepo().getUrl().replaceFirst(".git$", "") + "/commit/" + accessScope.currentHash() + ")";
+                    getGitRepo().getUrl().replaceFirst(".git$", "") + "/commit/" + accessScope.currentHash() + ")";
             return new ArchiveResult.Success(result);
-        }
-        else {
+        } else {
             // the same exact sol was already archived,
             return new ArchiveResult.AlreadyArchived();
         }
