@@ -96,12 +96,12 @@ public class SChem {
             assert result.getResnetId() != null;
             puzzle = ScPuzzle.parsePuzzle(result.getLevelName() +
                                           Arrays.stream(result.getResnetId()).mapToObj(Integer::toString)
-                                                .collect(Collectors.joining("-", "(", ")")));
+                                                .collect(Collectors.joining("-", " (", ")")));
         }
 
         String solutionName = result.getSolutionName() != null ? result.getSolutionName() : "";
         if (solutionName.length() > 100) {
-            throw new SChemException("Solution name too long");
+            solutionName = solutionName.substring(0, 100) + "...";
         }
 
         boolean declaresBugged = solutionName.matches("^/BP?(?: .*)?");

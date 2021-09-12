@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.sc.validator;
 
 import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.sc.model.ScScore;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
@@ -27,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @BotTest(Application.class)
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
-class SChemTest {
+class SChemRunTest {
 
     @Test
     void runGood() {
@@ -133,7 +132,7 @@ class SChemTest {
     }
 
     @Test
-    public void validatePrecog() {
+    public void runPrecog() {
         String export = """
                 SOLUTION:Freon,Archiver,112-1-63,/P Archived Solution
                 COMPONENT:'custom-research-reactor',2,0,''
@@ -213,66 +212,6 @@ class SChemTest {
         SChemResult expected = new SChemResult("Freon", new int[]{1, 10, 2}, 112, 1, 63, "Archiver",
                                                "/P Archived Solution", true);
         SChemResult result = SChem.run(export);
-        assertEquals(expected, result);
-    }
-
-    @Test
-    public void incoherentPrecog() {
-        String export = """
-                SOLUTION:An Introduction to Sensing,12345ieee,236-1-11,/P precog, but not really
-                COMPONENT:'drag-advanced-reactor',2,0,''
-                MEMBER:'instr-start',-90,0,128,0,2,0,0
-                MEMBER:'instr-start',-90,0,32,6,5,0,0
-                MEMBER:'feature-bonder',-1,0,1,4,5,0,0
-                MEMBER:'feature-bonder',-1,0,1,5,5,0,0
-                MEMBER:'feature-bonder',-1,0,1,4,6,0,0
-                MEMBER:'feature-bonder',-1,0,1,5,6,0,0
-                MEMBER:'feature-sensor',-1,0,1,5,1,0,0
-                MEMBER:'instr-input',-1,0,128,0,1,0,0
-                MEMBER:'instr-arrow',0,0,64,0,1,0,0
-                MEMBER:'instr-grab',-1,1,128,1,1,0,0
-                MEMBER:'instr-arrow',180,0,64,6,1,0,0
-                MEMBER:'instr-grab',-1,2,128,6,1,0,0
-                MEMBER:'instr-output',-1,0,128,5,1,0,0
-                MEMBER:'instr-sensor',90,0,32,6,0,0,18
-                MEMBER:'instr-grab',-1,1,32,6,1,0,0
-                MEMBER:'instr-grab',-1,2,32,6,4,0,0
-                MEMBER:'instr-arrow',-90,0,16,6,4,0,0
-                MEMBER:'instr-output',-1,1,32,6,3,0,0
-                PIPE:0,4,1
-                PIPE:1,4,2
-                """;
-
-        assertThrows(SChemException.class, () -> SChem.validate(export));
-    }
-
-    @Test
-    void incoherentBugged() {
-        String export = """
-                SOLUTION:QT-1,12345ieee,20-1-5,/B bugged, but not really
-                COMPONENT:'drag-quantum-reactor-x',2,0,''
-                MEMBER:'instr-start',180,0,128,4,1,0,0
-                MEMBER:'instr-start',180,0,32,1,7,0,0
-                MEMBER:'feature-tunnel',-1,0,1,1,1,0,0
-                MEMBER:'feature-tunnel',-1,0,1,7,5,0,0
-                MEMBER:'instr-input',-1,0,128,3,1,0,0
-                MEMBER:'instr-swap',-1,0,128,2,1,0,0
-                MEMBER:'instr-arrow',0,0,64,2,1,0,0
-                MEMBER:'instr-arrow',180,0,64,3,1,0,0
-                MEMBER:'instr-output',-1,1,32,0,7,0,0
-                PIPE:0,4,1
-                PIPE:1,4,2
-                """;
-
-        assertThrows(SChemException.class, () -> SChem.validate(export));
-    }
-
-    @Test
-    public void testArchiveBugged() {
-        String export = "SOLUTION:QT-3,Zig,109-1-24,/B telekinesys"; // it doesn't have to run at all
-
-        ScScore expected = new ScScore(109, 1, 24, true, false);
-        ScScore result = SChem.validateMultiExport(export, null).get(0).getScore();
         assertEquals(expected, result);
     }
 }
