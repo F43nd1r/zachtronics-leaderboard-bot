@@ -61,8 +61,8 @@ public class ScLeaderboardTest {
 
     @Test
     public void testAllRecords() {
-        Map<ScCategory, ScRecord> allRecords = scLeaderboard
-                .getAll(ScPuzzle.research_example_1, Arrays.asList(ScCategory.values()));
+        Map<ScCategory, ScRecord> allRecords = scLeaderboard.getAll(ScPuzzle.research_example_1,
+                                                                    Arrays.asList(ScCategory.values()));
         assertNotNull(allRecords);
         System.out.println(allRecords);
         assertEquals(4, allRecords.size());
@@ -73,8 +73,8 @@ public class ScLeaderboardTest {
     public void testFullIO() {
         for (ScPuzzle p : ScPuzzle.values()) {
             List<ScCategory> categories = Arrays.stream(ScCategory.values())
-                    .filter(c -> c.supportsPuzzle(p))
-                    .collect(Collectors.toList());
+                                                .filter(c -> c.supportsPuzzle(p))
+                                                .collect(Collectors.toList());
             Collection<ScRecord> records = new HashSet<>(scLeaderboard.getAll(p, categories).values());
             for (ScRecord r : records)
                 scLeaderboard.update(p, r);

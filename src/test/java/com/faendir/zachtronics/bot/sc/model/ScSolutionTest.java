@@ -58,12 +58,12 @@ class ScSolutionTest {
     @Test
     public void testFlags() {
         List<ScScore> scores = Stream.of("", "/B", "/P", "/BP")
-                .map("SOLUTION:Of Pancakes and Spaceships,12345ieee,50-50-50,"::concat)
-                .map(e -> ScSolution.fromContentNoValidation(e, null).getScore())
-                .collect(Collectors.toList());
+                                     .map("SOLUTION:Of Pancakes and Spaceships,12345ieee,50-50-50,"::concat)
+                                     .map(e -> ScSolution.fromContentNoValidation(e, null).getScore())
+                                     .collect(Collectors.toList());
         boolean[] bugged = {false, true, false, true};
         boolean[] precog = {false, false, true, true};
-        for (int i =0; i < scores.size(); i++) {
+        for (int i = 0; i < scores.size(); i++) {
             assertEquals(bugged[i], scores.get(i).isBugged());
             assertEquals(precog[i], scores.get(i).isPrecognitive());
         }

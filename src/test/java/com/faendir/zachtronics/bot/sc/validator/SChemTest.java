@@ -211,7 +211,7 @@ class SChemTest {
                 """;
 
         SChemResult expected = new SChemResult("Freon", new int[]{1, 10, 2}, 112, 1, 63, "Archiver",
-                "/P Archived Solution", true);
+                                               "/P Archived Solution", true);
         SChemResult result = SChem.run(export);
         assertEquals(expected, result);
     }
