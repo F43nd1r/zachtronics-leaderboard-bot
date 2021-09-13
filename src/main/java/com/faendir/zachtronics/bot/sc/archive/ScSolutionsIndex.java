@@ -66,7 +66,8 @@ class ScSolutionsIndex implements SolutionsIndex<ScSolution> {
                     Files.delete(solutionPath);
                 }
                 else {
-                    return false;
+                    // we won't change the files, but return true so that we'll realize we already had it
+                    return true;
                 }
             }
         }

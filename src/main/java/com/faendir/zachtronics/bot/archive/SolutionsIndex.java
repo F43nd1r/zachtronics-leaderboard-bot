@@ -24,7 +24,7 @@ import java.io.IOException;
 public interface SolutionsIndex<T extends Solution> {
 
     /**
-     * @return whether the frontier changed at all
+     * @return whether the new solution sits on the frontier
      */
     boolean add(T solution) throws IOException;
 }

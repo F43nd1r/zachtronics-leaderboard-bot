@@ -69,7 +69,10 @@ public class ScArchiveTest {
         assertTrue(doArchiveContent(content) instanceof ArchiveResult.Success); // changed content, I can
 
         content = "SOLUTION:Of Pancakes and Spaceships,BadGuy,45-1-14\ndifferent stuff...";
-        assertTrue(doArchiveContent(content) instanceof ArchiveResult.Failure); // stealing is bad
+        assertTrue(doArchiveContent(content) instanceof ArchiveResult.AlreadyArchived); // stealing is bad
+
+        content = "SOLUTION:Of Pancakes and Spaceships,BadGuy,50-1-50\nsome more stuff...";
+        assertTrue(doArchiveContent(content) instanceof ArchiveResult.Failure); // just give up, man
     }
 
     @NotNull
