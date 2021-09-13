@@ -37,12 +37,14 @@ public class ScSolution implements Solution {
     @NotNull ScScore score;
     @NotNull String content;
 
+    public static final Pattern SOLUTION_NAME_REGEX = Pattern.compile("'?(?:[/-](?<Bflag>B)?(?<Pflag>P)?(?:$| ))?.*'?");
+
     /** <tt>SOLUTION:$puzzle,$author,$c-$r-$s[,$description]</tt> */
-    private static final Pattern SOLUTION_HEADER = Pattern.compile(
+    public static final Pattern SOLUTION_HEADER = Pattern.compile(
             "^SOLUTION:(?<puzzle>[^,]+|'(?:[^']|'')+')," +
             "(?<author>[^,]+)," +
             "(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)" +
-            "(?:,'?(?:[/-](?<flags>B?P?)(?:$| ))?.*'?)?$", Pattern.MULTILINE);
+            "(?:," + SOLUTION_NAME_REGEX + ")?$", Pattern.MULTILINE);
     /**
      * @throws IllegalArgumentException if we can't correctly parse metadata
      */

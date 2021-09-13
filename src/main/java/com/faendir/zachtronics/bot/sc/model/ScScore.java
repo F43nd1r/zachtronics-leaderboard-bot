@@ -48,7 +48,7 @@ public class ScScore implements Score {
             "\\**(?<cycles>[\\d,]+)\\**(?<oldRNG>\\\\\\*)?[/-]" +
             "\\**(?<reactors>\\d+)\\**[/-]" +
             "\\**(?<symbols>\\d+)\\**" +
-            "(?:[/-](?<flags>B?P?))?");
+            "(?:[/-](?<Bflag>B)?(?<Pflag>P)?)?");
 
     /** <tt>ccc/r/ss[/BP]</tt>, tolerates extra <tt>*</tt> */
     @Nullable
@@ -64,11 +64,8 @@ public class ScScore implements Score {
         int reactors = Integer.parseInt(m.group("reactors"));
         int symbols = Integer.parseInt(m.group("symbols"));
 
-        String flags = m.group("flags");
-
         return new ScScore(cycles, reactors, symbols,
-                           flags != null && flags.contains("B"),
-                           flags != null && flags.contains("P"));
+                           m.group("Bflag") != null, m.group("Pflag") != null);
     }
 
     /**

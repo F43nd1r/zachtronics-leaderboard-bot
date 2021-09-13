@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 /** Wrapper for a schem package installed on the system */
@@ -44,7 +45,7 @@ public class SChem {
      */
     @NotNull
     public static List<ScSolution> validateMultiExport(@NotNull String export, ScPuzzle puzzle) {
-        String[] contents = export.split("(?=SOLUTION:)");
+        String[] contents = export.trim().split("(?=SOLUTION:)");
         if (contents.length > 50) {
             throw new IllegalArgumentException(
                     "You can archive a maximum of 50 solutions at a time, you tried " + contents.length);
@@ -103,31 +104,30 @@ public class SChem {
                                                 .collect(Collectors.joining("-", " (", ")")));
         }
 
-        String solutionName = result.getSolutionName() != null ? result.getSolutionName() : "";
-        if (solutionName.length() > 100) {
-            solutionName = solutionName.substring(0, 100) + "...";
+        Matcher m = ScSolution.SOLUTION_HEADER.matcher(export);
+        if (!m.find())
+            throw new SChemException("Invalid header");
+
+        String commaSolName = "";
+        if (result.getSolutionName() != null) {
+            commaSolName = "," + result.getSolutionName();
+            if (commaSolName.length() > 100) {
+                commaSolName = commaSolName.substring(0, 100) + "..." + (commaSolName.startsWith("'") ? "'" : "");
+            }
         }
 
-        boolean declaresBugged = solutionName.matches("^/BP?(?: .*)?");
-        boolean declaresPrecog = solutionName.matches("^/B?P(?: .*)?");
-        // check if the user is lying:
-        // we know the score isn't bugged because SChem ran it and we can check SChem's precog opinion
-        if (declaresBugged || (declaresPrecog != result.isPrecog())) {
-            String declaredFlags = ScScore.slashFlags(declaresBugged, declaresPrecog);
-            String schemFlags = result.isPrecog() ? "/P" : "";
-            throw new SChemException("Incoherent solution flags, given \"" + declaredFlags +
-                                     "\" but SChem wanted \"" + schemFlags + "\"");
-        }
+        String content = m.replaceFirst("SOLUTION:${puzzle},${author},${cycles}-${reactors}-${symbols}" + commaSolName);
 
         ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), false,
-                                    result.isPrecog());
+                                    m.group("Pflag") != null);
 
-        return new ScSolution(puzzle, score, export);
+        return new ScSolution(puzzle, score, content);
     }
 
+    @NotNull
     static SChemResult run(@NotNull String export) throws SChemException {
         ProcessBuilder builder = new ProcessBuilder();
-        builder.command("python3", "-m", "schem", "--json", "--check_precog", "--max_cycles", Integer.toString(400_000));
+        builder.command("python3", "-m", "schem", "--json", "--check-precog", "--verbose");
 
         try {
             Process process = builder.start();
@@ -139,7 +139,31 @@ public class SChem {
                 throw new SChemException(new String(process.getErrorStream().readAllBytes()));
             }
 
-            return objectMapper.readValue(process.getInputStream(), SChemResult.class);
+            SChemResult result = objectMapper.readValue(process.getInputStream(), SChemResult.class);
+
+            boolean declaresBugged = false;
+            boolean declaresPrecog = false;
+            if (result.getSolutionName() != null) {
+                Matcher m = ScSolution.SOLUTION_NAME_REGEX.matcher(result.getSolutionName());
+                if (!m.matches()) {
+                    throw new SChemException("Invalid solution name: \"" + result.getSolutionName() + "\"");
+                }
+                declaresBugged = m.group("Bflag") != null;
+                declaresPrecog = m.group("Pflag") != null;
+            }
+
+            // check if the user is lying:
+            // we know the score isn't bugged because SChem ran it and we can check SChem's precog opinion
+            if (declaresBugged || (result.getPrecog() != null && declaresPrecog != result.getPrecog())) {
+                String declaredFlags = ScScore.slashFlags(declaresBugged, declaresPrecog);
+                String schemFlags = Boolean.TRUE.equals(result.getPrecog()) ? "/P" : "";
+                throw new SChemException("Incoherent solution flags, given \"" + declaredFlags +
+                                         "\" but SChem wanted \"" + schemFlags + "\"\n" +
+                                         "SChem reports the following precognition analysis:\n" +
+                                         new String(process.getErrorStream().readAllBytes()));
+            }
+
+            return result;
 
         } catch (JsonProcessingException e) {
             throw new SChemException("Error in reading back results", e);

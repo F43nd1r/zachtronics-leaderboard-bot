@@ -44,5 +44,5 @@ public class SChemResult {
     int symbols;
     @NotNull String author;
     @Nullable String solutionName;
-    boolean precog;
+    @Nullable Boolean precog;
 }
