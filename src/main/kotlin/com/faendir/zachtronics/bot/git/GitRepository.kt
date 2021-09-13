@@ -34,11 +34,12 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
 
     val rawFilesUrl = Regex("github.com/([^/]+)/([^/.]+)(?:.git)?").replaceFirst(url, "raw.githubusercontent.com/$1/$2/master/")
     private val repo = Files.createTempDirectory(name).toFile()
-    private var remoteHash: String? = null
+    private var remoteHash: String
 
     init {
         synchronized(repo) {
-            Git.cloneRepository().setURI(url).setDirectory(repo).call()
+            val r = Git.cloneRepository().setURI(url).setDirectory(repo).call()
+            remoteHash = r.repository.resolve("HEAD").name()
         }
     }
 
@@ -48,12 +49,7 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
                 val accessScope = AccessScope(git, repo)
                 if (!hasWebHook || accessScope.currentHash() != remoteHash) {
                     git.pull().setTimeout(120).call()
-                    if (remoteHash == null) {
-                        remoteHash = accessScope.currentHash()
-                        logger.info("initial pull $name")
-                    } else {
-                        logger.info("pulled $name")
-                    }
+                    logger.info("pulled $name")
                 } else {
                     logger.info("$name is up to date, not pulling")
                 }
