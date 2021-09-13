@@ -38,7 +38,7 @@ abstract class AbstractArchiveCommand<S : Solution> : AbstractCommand(), Secured
     fun archiveAll(solutions: Collection<S>): EmbedData {
         val results = archive.archiveAll(solutions)
 
-        val successes = results.count { it !is ArchiveResult.Failure }
+        val successes = results.count { it is ArchiveResult.Success }
         val title = if (successes != 0) "Success: $successes solution(s) archived" else "Failure: no solutions archived"
 
         // Discord cries if an embed is bigger than 6k or we have more tha 25 embed fields:
@@ -64,7 +64,7 @@ abstract class AbstractArchiveCommand<S : Solution> : AbstractCommand(), Secured
             totalFields++
             totalSize += name.length + value.length
             if (totalFields > 25 || totalSize > 5900) {
-                embed.footer(EmbedFooterData.builder().text("${results.size - totalFields - 1} more results hidden").build())
+                embed.footer(EmbedFooterData.builder().text("${results.size - totalFields + 1} more results hidden").build())
                 break
             }
 
