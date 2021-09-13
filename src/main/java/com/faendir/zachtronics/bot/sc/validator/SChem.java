@@ -155,12 +155,14 @@ public class SChem {
             // check if the user is lying:
             // we know the score isn't bugged because SChem ran it and we can check SChem's precog opinion
             if (declaresBugged || (result.getPrecog() != null && declaresPrecog != result.getPrecog())) {
-                String declaredFlags = ScScore.slashFlags(declaresBugged, declaresPrecog);
-                String schemFlags = Boolean.TRUE.equals(result.getPrecog()) ? "/P" : "";
-                throw new SChemException("Incoherent solution flags, given \"" + declaredFlags +
-                                         "\" but SChem wanted \"" + schemFlags + "\"\n" +
+                String declaredScore = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(),
+                                                   declaresBugged, declaresPrecog).toDisplayString();
+                String schemScore = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(),
+                                                false, Boolean.TRUE.equals(result.getPrecog())).toDisplayString();
+                throw new SChemException("Incoherent solution flags, given " + declaredScore +
+                                         " but SChem wanted " + schemScore + "\n" +
                                          "SChem reports the following precognition analysis:\n" +
-                                         new String(process.getErrorStream().readAllBytes()));
+                                         new String(process.getErrorStream().readAllBytes()).trim());
             }
 
             return result;
