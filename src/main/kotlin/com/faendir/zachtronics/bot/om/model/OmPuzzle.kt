@@ -17,8 +17,10 @@
 package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.om.parser.puzzle.PuzzleParser
+import com.faendir.om.parser.puzzle.model.Atom
 import com.faendir.om.parser.solution.model.Position
 import com.faendir.om.parser.solution.model.part.IO
+import com.faendir.om.parser.solution.model.part.IOType
 import com.faendir.om.parser.solution.model.to
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.om.model.OmGroup.CHAPTER_1
@@ -215,7 +217,15 @@ enum class OmPuzzle(
     }
 
     fun getProductShape(io: IO): Set<Position> {
-        return data?.outputs?.get(io.index)?.atoms?.map { it.second }?.map { it.x.toInt() to it.y.toInt() }?.toSet() ?: SINGLE
+        return if(io.type != IOType.INFINITE) {
+            data?.outputs?.get(io.index)?.atoms?.map { it.second }?.map { it.x.toInt() to it.y.toInt() }?.toSet()
+        } else {
+            data?.outputs?.get(io.index)?.atoms?.let {atoms ->
+                val repeatPosition = atoms.first { it.first == Atom.REPEAT }.second
+                val atomPositions = atoms.map { it.second }
+                (0 until 6).flatMap { i -> atomPositions.map { Position(it.x + i * repeatPosition.x, it.y + i * repeatPosition.y) } }.toSet()
+            }
+        } ?: SINGLE
     }
 
     companion object {
