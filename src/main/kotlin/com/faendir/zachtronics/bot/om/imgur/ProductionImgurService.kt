@@ -29,9 +29,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.File
 import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URI
-import java.net.URL
 
 @Service
 class ProductionImgurService(private val imgurProperties: ImgurProperties) : ImgurService {
@@ -44,6 +41,8 @@ class ProductionImgurService(private val imgurProperties: ImgurProperties) : Img
     private val ffmpeg = FFmpegExecutor(FFmpeg("/usr/bin/ffmpeg"), FFprobe("/usr/bin/ffprobe"))
 
     override fun tryRehost(link: String): String {
+        return link
+        /* TODO fix this
         val host = URI(link).host
         if (whitelistedHosts.any { host.contains(it, ignoreCase = true) }) return link
         return try {
@@ -65,7 +64,7 @@ class ProductionImgurService(private val imgurProperties: ImgurProperties) : Img
         } catch (e: Throwable) {
             logger.info("Rehosting failed for $link", e)
             link
-        }
+        }*/
     }
 
     private fun upload(file: File): String {
