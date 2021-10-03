@@ -75,11 +75,12 @@ fun <C : Category, R : Record> ImmutableEmbedData.Builder.embedCategoryRecords(r
         ImmutableEmbedData.Builder {
     return this.addAllFields(
         records.groupBy({ it.value?.toEmbedDisplayString() ?: "`none`" }, { it.key })
-            .map { (value, categories) ->
-                val sortedCategories = categories.sortedBy<C, Comparable<*>> { it as Comparable<*> }
+            .map { (record, categories) -> record to categories.sortedBy<C, Comparable<*>> { it as Comparable<*> } }
+            .sortedBy<Pair<String, List<C>>, Comparable<*>> { it.second.first() as Comparable<*> }
+            .map { (record, categories) ->
                 EmbedFieldData.builder()
-                    .name(sortedCategories.joinToString("/") { it.displayName })
-                    .value(value)
+                    .name(categories.joinToString("/") { it.displayName })
+                    .value(record)
                     .inline(true)
                     .build()
             }
