@@ -84,7 +84,7 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : AbstractCommand()
         if (allowedImageTypes.contains(link.substringAfterLast(".", ""))) {
             image(EmbedImageData.builder().url(link).build())
         } else if (allowedVideoHosts.any { link.startsWith(it) }) {
-            video(EmbedVideoData.builder().url(link).build())
+            video(EmbedVideoData.builder().url(link).proxyUrl(link).height(100).width(100).build())
         } else {
             addField(EmbedFieldData.builder().name("Link").value("[$link]($link)").inline(false).build())
         }
