@@ -25,7 +25,11 @@ import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.findInstance
 import com.faendir.zachtronics.bot.utils.ifNotEmpty
 import discord4j.core.event.domain.interaction.SlashCommandEvent
-import discord4j.discordjson.json.*
+import discord4j.discordjson.json.EmbedData
+import discord4j.discordjson.json.EmbedFieldData
+import discord4j.discordjson.json.EmbedImageData
+import discord4j.discordjson.json.ImmutableEmbedData
+import discord4j.discordjson.json.WebhookExecuteRequest
 import discord4j.rest.util.MultipartRequest
 
 abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : AbstractCommand(), SecuredCommand {
@@ -78,13 +82,10 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : AbstractCommand()
     }
 
     private val allowedImageTypes = setOf("gif", "png", "jpg")
-    private val allowedVideoHosts = setOf("https://www.youtube.com/", "https://youtu.be/")
 
     private fun ImmutableEmbedData.Builder.link(link: String) = apply {
         if (allowedImageTypes.contains(link.substringAfterLast(".", ""))) {
             image(EmbedImageData.builder().url(link).build())
-        } else if (allowedVideoHosts.any { link.startsWith(it) }) {
-            video(EmbedVideoData.builder().url(link).proxyUrl(link).height(100).width(100).build())
         } else {
             addField(EmbedFieldData.builder().name("Link").value("[$link]($link)").inline(false).build())
         }
