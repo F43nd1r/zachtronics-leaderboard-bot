@@ -110,10 +110,11 @@ public class SChem {
 
         String commaSolName = "";
         if (result.getSolutionName() != null) {
-            commaSolName = "," + result.getSolutionName();
-            if (commaSolName.length() > 100) {
-                commaSolName = commaSolName.substring(0, 100) + "..." + (commaSolName.startsWith("'") ? "'" : "");
+            String solName = result.getSolutionName().replace(" (copy)", ""); // try to cut down on duplicate churn
+            if (solName.length() > 100) {
+                solName = solName.substring(0, 100) + "..." + (solName.startsWith("'") ? "'" : "");
             }
+            commaSolName = "," + solName;
         }
 
         String content = m.replaceFirst("SOLUTION:${puzzle},${author},${cycles}-${reactors}-${symbols}" + commaSolName);
