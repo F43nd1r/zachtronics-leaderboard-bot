@@ -47,6 +47,8 @@ public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzl
     @Override
     public Triple<ScPuzzle, ScRecord, ScSolution> parseToPRS(@NotNull SlashCommandEvent event) {
         Data data = ScSubmitArchiveCommand$DataParser.parse(event);
+        if (data.export.equals(data.video))
+            throw new IllegalArgumentException("Export link and video link cannot be the same link");
         ScSolution solution = ScSolution.fromExportLink(data.export, data.puzzle).get(0);
         String archiveLink = archiveCommand.getArchive().makeArchiveLink(solution);
         ScRecord record = new ScRecord(solution.getScore(), data.author, data.video, archiveLink, false);
