@@ -19,6 +19,8 @@ package com.faendir.zachtronics.bot.utils
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
+import discord4j.core.`object`.entity.User
+import discord4j.core.event.domain.interaction.SlashCommandEvent
 import discord4j.discordjson.json.EmbedFieldData
 import discord4j.discordjson.json.ImmutableEmbedData
 import discord4j.discordjson.json.MessageSendRequestBase
@@ -86,3 +88,6 @@ fun <C : Category, R : Record> ImmutableEmbedData.Builder.embedCategoryRecords(r
             }
     )
 }
+
+fun SlashCommandEvent.user(): User =
+    this.interaction.member.map { it as User }.orElse(this.interaction.user)

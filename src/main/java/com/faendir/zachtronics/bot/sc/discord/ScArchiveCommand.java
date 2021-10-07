@@ -25,6 +25,7 @@ import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.archive.ScArchive;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
+import com.faendir.zachtronics.bot.utils.UtilsKt;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
@@ -46,7 +47,11 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> impleme
     @Override
     public List<ScSolution> parseSolutions(@NotNull SlashCommandEvent interaction) {
         Data data = ScArchiveCommand$DataParser.parse(interaction);
-        return ScSolution.fromExportLink(data.export, data.puzzle);
+        boolean bypassValidation = data.bypassValidation != null;
+        if (bypassValidation && !ScSecured.isWikiAdmin(UtilsKt.user(interaction))) {
+            throw new IllegalArgumentException("Only a wiki admin can bypass the validation");
+        }
+        return ScSolution.fromExportLink(data.export, data.puzzle, bypassValidation);
     }
 
     @NotNull
@@ -60,15 +65,19 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> impleme
     public static class Data {
         @NotNull String export;
         ScPuzzle puzzle;
+        String bypassValidation;
 
         public Data(@NotNull
                     @Description("Link or `m1` to scrape it from your last message. " +
                                  "Start the solution name with `/B?P?` to set flags")
                     @Converter(LinkConverter.class) String export,
                     @Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
-                    @Converter(ScPuzzleConverter.class) ScPuzzle puzzle) {
+                    @Converter(ScPuzzleConverter.class) ScPuzzle puzzle,
+                    @Description("Skips running SChem on the solutions if not empty. Admin-only")
+                            String bypassValidation) {
             this.export = export;
             this.puzzle = puzzle;
+            this.bypassValidation = bypassValidation;
         }
     }
 }

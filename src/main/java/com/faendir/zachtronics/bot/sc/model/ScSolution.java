@@ -67,7 +67,7 @@ public class ScSolution implements Solution {
     }
 
     @NotNull
-    public static List<ScSolution> fromExportLink(@NotNull String exportLink, ScPuzzle puzzle) {
+    public static List<ScSolution> fromExportLink(@NotNull String exportLink, ScPuzzle puzzle, boolean bypassValidation) {
         String export;
         try (InputStream is = new URL(Utils.rawContentURL(exportLink)).openStream()) {
             export = new String(is.readAllBytes()).replace("\r\n", "\n");
@@ -77,7 +77,7 @@ public class ScSolution implements Solution {
             throw new IllegalArgumentException("Couldn't read your solution");
         }
 
-        return SChem.validateMultiExport(export, puzzle);
+        return SChem.validateMultiExport(export, puzzle, bypassValidation);
     }
 
     public static String authorFromSolutionHeader(String header) {

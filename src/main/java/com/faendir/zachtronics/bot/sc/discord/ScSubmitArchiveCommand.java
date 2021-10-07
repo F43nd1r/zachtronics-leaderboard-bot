@@ -49,7 +49,7 @@ public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzl
         Data data = ScSubmitArchiveCommand$DataParser.parse(event);
         if (data.export.equals(data.video))
             throw new IllegalArgumentException("Export link and video link cannot be the same link");
-        ScSolution solution = ScSolution.fromExportLink(data.export, data.puzzle).get(0);
+        ScSolution solution = archiveCommand.parseSolutions(event).get(0);
         String archiveLink = archiveCommand.getArchive().makeArchiveLink(solution);
         ScRecord record = new ScRecord(solution.getScore(), data.author, data.video, archiveLink, false);
         return new Triple<>(solution.getPuzzle(), record, solution);
@@ -68,6 +68,7 @@ public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzl
         @NotNull String export;
         @NotNull String author;
         ScPuzzle puzzle;
+        String bypassValidation;
 
         public Data(@Description("Link to your video of the solution, can be `m1` to scrape it from your last message")
                     @NotNull @Converter(LinkConverter.class) String video,
@@ -77,11 +78,14 @@ public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzl
                     @Description("Name to appear on the Reddit leaderboard")
                     @NotNull String author,
                     @Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
-                    @Converter(ScPuzzleConverter.class) ScPuzzle puzzle) {
+                    @Converter(ScPuzzleConverter.class) ScPuzzle puzzle,
+                    @Description("Skips running SChem on the solutions if not empty. Admin-only")
+                            String bypassValidation) {
             this.video = video;
             this.export = export;
             this.author = author;
             this.puzzle = puzzle;
+            this.bypassValidation = bypassValidation;
         }
     }
 }

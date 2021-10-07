@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.discord.command
 
+import com.faendir.zachtronics.bot.utils.user
 import discord4j.core.`object`.entity.User
 import discord4j.core.event.domain.interaction.SlashCommandEvent
 import discord4j.discordjson.json.ApplicationCommandRequest
@@ -41,7 +42,7 @@ interface GameCommand : TopLevelCommand {
         val option = event.options.first()
         val command = commands.find { it.data.name() == option.name }
             ?: throw IllegalArgumentException("I did not recognize the command \"${option.name}\".")
-        if (command is Secured && !command.hasExecutionPermission(event.interaction.member.map { it as User }.orElse(event.interaction.user))) {
+        if (command is Secured && !command.hasExecutionPermission(event.user())) {
             throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
         }
         return command.handle(event)

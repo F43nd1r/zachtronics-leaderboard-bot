@@ -40,13 +40,14 @@ public class SChem {
      *
      * @param export multiExport to check
      * @param puzzle to aid in puzzle resolution
+     * @param bypassValidation skip validation and checks entirely, just parse everything
      * @return list of solutions, solutions that didn't validate are
      *         <tt>{{@link ScPuzzle#research_example_1}, {@link ScScore#INVALID_SCORE}, "reason SChem is kill"}</tt>
      */
     @NotNull
-    public static List<ScSolution> validateMultiExport(@NotNull String export, ScPuzzle puzzle) {
+    public static List<ScSolution> validateMultiExport(@NotNull String export, ScPuzzle puzzle, boolean bypassValidation) {
         String[] contents = export.trim().split("(?=SOLUTION:)");
-        if (contents.length > 50) {
+        if (contents.length > 50 && !bypassValidation) {
             throw new IllegalArgumentException(
                     "You can archive a maximum of 50 solutions at a time, you tried " + contents.length);
         }
@@ -56,23 +57,18 @@ public class SChem {
         for (String content : contents) {
             content = content.replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
             try {
-                result.add(validate(content));
-            } catch (SChemException e) {
-                try {
-                    ScSolution solution = ScSolution.fromContentNoValidation(content, puzzle);
-                    if (solution.getScore().isBugged()) {
-                        /* we won't be able to validate this, because SChem will crash
-                         * we trust the user didn't mess with us and pass the solution up
-                         */
-                        result.add(solution);
-                        continue;
-                    }
+                ScSolution solution;
+                if (bypassValidation) {
+                    solution = ScSolution.fromContentNoValidation(content, puzzle);
                 }
-                catch (IllegalArgumentException ignored) {
-                    // solution import is not readable, we'll show the SChem exception
+                else {
+                    solution = validate(content);
                 }
-
-                exceptions.append(line).append(": ").append(e.getMessage()).append('\n');
+                result.add(solution);
+            } catch (IllegalArgumentException | SChemException e) {
+                if (contents.length != 1)
+                    exceptions.append(line).append(": ");
+                exceptions.append(e.getMessage()).append('\n');
             }
             line++;
         }
@@ -112,8 +108,10 @@ public class SChem {
         if (result.getSolutionName() != null) {
             String solName = result.getSolutionName().replace(" (copy)", ""); // try to cut down on duplicate churn
             if (solName.length() > 100) {
-                solName = solName.substring(0, 100) + "..." + (solName.startsWith("'") ? "'" : "");
+                solName = solName.substring(0, 100) + "...";
             }
+            if (solName.contains(","))
+                solName = "'" + solName.replace("'", "''") + "'";
             commaSolName = "," + solName;
         }
 

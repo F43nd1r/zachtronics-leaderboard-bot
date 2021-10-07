@@ -29,7 +29,7 @@ public interface ScSecured extends Secured {
                                    185983061190508544L  // Zig
     );
 
-    private static boolean isWikiAdmin(@NotNull User user) {
+    static boolean isWikiAdmin(@NotNull User user) {
         return WIKI_ADMINS.contains(user.getId().asLong());
     }
 

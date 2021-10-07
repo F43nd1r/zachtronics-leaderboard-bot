@@ -138,7 +138,7 @@ class SChemValidateTest {
         String export = "SOLUTION:QT-3,Zig,109-1-24,/B telekinesys"; // it doesn't have to run at all
 
         ScScore expected = new ScScore(109, 1, 24, true, false);
-        ScScore result = SChem.validateMultiExport(export, null).get(0).getScore();
+        ScScore result = SChem.validateMultiExport(export, null, true).get(0).getScore();
         assertEquals(expected, result);
     }
 }
