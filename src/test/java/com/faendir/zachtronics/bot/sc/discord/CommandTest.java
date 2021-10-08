@@ -24,6 +24,8 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.SlashCommandEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
+import discord4j.core.object.entity.User;
+import discord4j.discordjson.json.UserData;
 import discord4j.discordjson.json.WebhookExecuteRequest;
 import discord4j.discordjson.possible.Possible;
 import discord4j.rest.util.ApplicationCommandOptionType;
@@ -44,6 +46,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @BotTest(Application.class)
@@ -117,6 +120,19 @@ public class CommandTest {
         assertTrue(result.contains("results hidden"));
     }
 
+    @Test
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
+    public void testArchiveSudo() {
+        String exportLink = "https://raw.githubusercontent.com/spacechem-community-developers/spacechem-archive/" +
+                            "master/RESEARCHNET3/published_26_3/156-1-45-B.txt";
+        Map<String, String> args1 = Map.of("export", exportLink);
+        assertThrows(IllegalArgumentException.class, () -> runCommand("archive", args1));
+
+        Map<String, String> args2 = Map.of("export", exportLink, "bypass-validation", "indeed");
+        String result = runCommand("archive", args2);
+        assertTrue(result.contains("Passivation") && result.contains("`156/1/45/B`"));
+    }
+
     @NotNull
     private static ApplicationCommandInteractionOption mockOption(String name, String value) {
         ApplicationCommandInteractionOptionValue optionValue = new ApplicationCommandInteractionOptionValue(
@@ -136,6 +152,10 @@ public class CommandTest {
                                                                 .map(e -> mockOption(e.getKey(), e.getValue()))
                                                                 .collect(Collectors.toList());
         Mockito.when(slashCommandEvent.getOptions()).thenReturn(options);
+
+        User ieee = new User(Mockito.mock(GatewayDiscordClient.class), Mockito.mock(UserData.class, Mockito.RETURNS_DEEP_STUBS));
+        Mockito.when(ieee.getId().asLong()).thenReturn(295868901042946048L);
+        Mockito.when(slashCommandEvent.getInteraction().getUser()).thenReturn(ieee);
 
         MultipartRequest<WebhookExecuteRequest> multipartRequest = commands.stream().filter(c -> c.getData().name()
                                                                                                   .equals(commandName))
