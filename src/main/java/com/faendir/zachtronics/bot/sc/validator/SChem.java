@@ -115,7 +115,9 @@ public class SChem {
             commaSolName = "," + solName;
         }
 
-        String content = m.replaceFirst("SOLUTION:${puzzle},${author},${cycles}-${reactors}-${symbols}" + commaSolName);
+        String newHeader = String.format("SOLUTION:${puzzle},${author},%d-%d-%d%s", result.getCycles(),
+                                         result.getReactors(), result.getSymbols(), commaSolName);
+        String content = m.replaceFirst(newHeader);
 
         ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), false,
                                     m.group("Pflag") != null);
