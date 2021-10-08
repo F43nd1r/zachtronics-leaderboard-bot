@@ -16,7 +16,7 @@
 
 package com.faendir.zachtronics.bot.discord.command;
 
-import discord4j.core.event.domain.interaction.SlashCommandEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.object.entity.User;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.discordjson.json.WebhookExecuteRequest;
@@ -53,7 +53,7 @@ class RestartCommand implements TopLevelCommand, Secured {
     @SneakyThrows
     @NotNull
     @Override
-    public MultipartRequest<WebhookExecuteRequest> handle(@NotNull SlashCommandEvent event) {
+    public MultipartRequest<WebhookExecuteRequest> handle(@NotNull ChatInputInteractionEvent event) {
         log.error("Requested shut down, see you soon");
         SpringApplication.exit(applicationContext);
         Thread.sleep(5000);

@@ -25,7 +25,7 @@ import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
-import discord4j.core.event.domain.interaction.SlashCommandEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import kotlin.Pair;
 import lombok.Getter;
@@ -46,7 +46,7 @@ public class ScShowCommand extends AbstractShowCommand<ScCategory, ScPuzzle, ScR
 
     @NotNull
     @Override
-    public Pair<ScPuzzle, ScCategory> findPuzzleAndCategory(@NotNull SlashCommandEvent interaction) {
+    public Pair<ScPuzzle, ScCategory> findPuzzleAndCategory(@NotNull ChatInputInteractionEvent interaction) {
         Data data = ScShowCommand$DataParser.parse(interaction);
         return new Pair<>(data.puzzle, data.category);
     }

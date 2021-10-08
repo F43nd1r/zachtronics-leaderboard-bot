@@ -23,7 +23,7 @@ import com.faendir.zachtronics.bot.discord.command.AbstractArchiveCommand;
 import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.archive.SzArchive;
 import com.faendir.zachtronics.bot.sz.model.SzSolution;
-import discord4j.core.event.domain.interaction.SlashCommandEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +47,7 @@ public class SzArchiveCommand extends AbstractArchiveCommand<SzSolution> impleme
 
     @NotNull
     @Override
-    public List<SzSolution> parseSolutions(@NotNull SlashCommandEvent interaction) {
+    public List<SzSolution> parseSolutions(@NotNull ChatInputInteractionEvent interaction) {
         Data data = SzArchiveCommand$DataParser.parse(interaction);
         SzSolution solution;
         try (InputStream is = new URL(data.link).openStream()) {

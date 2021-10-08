@@ -28,7 +28,7 @@ import com.faendir.zachtronics.bot.om.model.OmModifier
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
-import discord4j.core.event.domain.interaction.SlashCommandEvent
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import org.springframework.stereotype.Component
 
 @Component
@@ -38,7 +38,7 @@ class OmSubmitCommand(override val leaderboards: List<Leaderboard<*, OmPuzzle, O
 
     override fun buildData() = SubmitParser.buildData()
 
-    override fun parseSubmission(interaction: SlashCommandEvent): Pair<OmPuzzle, OmRecord> {
+    override fun parseSubmission(interaction: ChatInputInteractionEvent): Pair<OmPuzzle, OmRecord> {
         val submit = SubmitParser.parse(interaction)
         return Pair(
             submit.puzzle,

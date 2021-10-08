@@ -19,7 +19,7 @@ package com.faendir.zachtronics.bot.discord.command
 import com.faendir.zachtronics.bot.archive.Archive
 import com.faendir.zachtronics.bot.archive.ArchiveResult
 import com.faendir.zachtronics.bot.model.Solution
-import discord4j.core.event.domain.interaction.SlashCommandEvent
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.discordjson.json.EmbedData
 import discord4j.discordjson.json.EmbedFieldData
 import discord4j.discordjson.json.EmbedFooterData
@@ -29,7 +29,7 @@ import discord4j.rest.util.MultipartRequest
 abstract class AbstractArchiveCommand<S : Solution> : AbstractCommand(), SecuredCommand {
     protected abstract val archive: Archive<S>
 
-    override fun handle(event: SlashCommandEvent): MultipartRequest<WebhookExecuteRequest> {
+    override fun handle(event: ChatInputInteractionEvent): MultipartRequest<WebhookExecuteRequest> {
         val solutions = parseSolutions(event)
         val embed = archiveAll(solutions)
         return MultipartRequest.ofRequest(WebhookExecuteRequest.builder().addEmbed(embed).build())
@@ -79,5 +79,5 @@ abstract class AbstractArchiveCommand<S : Solution> : AbstractCommand(), Secured
         return embed.build()
     }
 
-    abstract fun parseSolutions(interaction: SlashCommandEvent): List<S>
+    abstract fun parseSolutions(interaction: ChatInputInteractionEvent): List<S>
 }

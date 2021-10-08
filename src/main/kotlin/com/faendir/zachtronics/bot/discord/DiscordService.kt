@@ -23,7 +23,7 @@ import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.User
 import discord4j.core.`object`.presence.ClientActivity
 import discord4j.core.`object`.presence.ClientPresence
-import discord4j.core.event.domain.interaction.SlashCommandEvent
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.rest.http.client.ClientException
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -64,10 +64,10 @@ class DiscordService(
                     .onErrorResume { Mono.empty() }
             }
             .subscribe()
-        discordClient.on(SlashCommandEvent::class.java).flatMap { event ->
+        discordClient.on(ChatInputInteractionEvent::class.java).flatMap { event ->
             mono {
                 logger.info("Acknowledging ${event.commandName} by ${event.interaction.user.username}")
-                event.acknowledge().awaitSingleOrNull()
+                event.deferReply().awaitSingleOrNull()
                 logger.info("Acknowledged ${event.commandName} by ${event.interaction.user.username}")
                 handleCommand(event).awaitSingleOrNull()
                 logger.info("Handled ${event.commandName} by ${event.interaction.user.username}")
@@ -82,7 +82,7 @@ class DiscordService(
         discordClient.updatePresence(ClientPresence.online(ClientActivity.playing(gitProperties.shortCommitId))).subscribe()
     }
 
-    private fun handleCommand(event: SlashCommandEvent): Mono<Void> = mono {
+    private fun handleCommand(event: ChatInputInteractionEvent): Mono<Void> = mono {
         val command = findCommand(event)
         if (command is Secured && !command.hasExecutionPermission(event.interaction.member.map { it as User }.orElse(event.interaction.user))) {
             throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
@@ -106,7 +106,7 @@ class DiscordService(
         event.interactionResponse.createFollowupMessage("**Failed**: ${it.message ?: "Something went wrong"}")
     }.then()
 
-    private fun findCommand(event: SlashCommandEvent): TopLevelCommand {
+    private fun findCommand(event: ChatInputInteractionEvent): TopLevelCommand {
         val name = event.commandName
         return commands.find { it.commandName == name } ?: throw IllegalArgumentException("I did not recognize the game \"$name\".")
     }

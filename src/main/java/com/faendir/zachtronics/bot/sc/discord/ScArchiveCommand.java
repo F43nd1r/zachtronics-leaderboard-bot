@@ -26,7 +26,7 @@ import com.faendir.zachtronics.bot.sc.archive.ScArchive;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
-import discord4j.core.event.domain.interaction.SlashCommandEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,7 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> impleme
 
     @NotNull
     @Override
-    public List<ScSolution> parseSolutions(@NotNull SlashCommandEvent interaction) {
+    public List<ScSolution> parseSolutions(@NotNull ChatInputInteractionEvent interaction) {
         Data data = ScArchiveCommand$DataParser.parse(interaction);
         boolean bypassValidation = data.bypassValidation != null;
         if (bypassValidation && !ScSecured.isWikiAdmin(UtilsKt.user(interaction))) {

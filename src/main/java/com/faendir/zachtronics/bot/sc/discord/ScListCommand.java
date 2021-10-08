@@ -25,7 +25,7 @@ import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
-import discord4j.core.event.domain.interaction.SlashCommandEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import kotlin.Pair;
 import lombok.Getter;
@@ -54,7 +54,7 @@ public class ScListCommand extends AbstractListCommand<ScCategory, ScPuzzle, ScR
 
     @NotNull
     @Override
-    public Pair<ScPuzzle, List<ScCategory>> findPuzzleAndCategories(@NotNull SlashCommandEvent interaction) {
+    public Pair<ScPuzzle, List<ScCategory>> findPuzzleAndCategories(@NotNull ChatInputInteractionEvent interaction) {
         Data data = ScListCommand$DataParser.parse(interaction);
         return new Pair<>(data.puzzle, Arrays.stream(ScCategory.values())
                 .filter(c -> c.supportsPuzzle(data.puzzle))

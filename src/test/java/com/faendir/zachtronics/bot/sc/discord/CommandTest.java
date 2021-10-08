@@ -21,14 +21,14 @@ import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.discord.command.Command;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
 import discord4j.core.GatewayDiscordClient;
-import discord4j.core.event.domain.interaction.SlashCommandEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
+import discord4j.core.object.command.ApplicationCommandOption;
 import discord4j.core.object.entity.User;
 import discord4j.discordjson.json.UserData;
 import discord4j.discordjson.json.WebhookExecuteRequest;
 import discord4j.discordjson.possible.Possible;
-import discord4j.rest.util.ApplicationCommandOptionType;
 import discord4j.rest.util.MultipartRequest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Disabled;
@@ -136,7 +136,7 @@ public class CommandTest {
     @NotNull
     private static ApplicationCommandInteractionOption mockOption(String name, String value) {
         ApplicationCommandInteractionOptionValue optionValue = new ApplicationCommandInteractionOptionValue(
-                Mockito.mock(GatewayDiscordClient.class), null, ApplicationCommandOptionType.STRING.getValue(), value);
+                Mockito.mock(GatewayDiscordClient.class), null, ApplicationCommandOption.Type.STRING.getValue(), value);
 
         ApplicationCommandInteractionOption option = Mockito.mock(ApplicationCommandInteractionOption.class);
         Mockito.when(option.getName()).thenReturn(name);
@@ -146,21 +146,21 @@ public class CommandTest {
 
     @NotNull
     private String runCommand(String commandName, @NotNull Map<String, String> args) {
-        SlashCommandEvent slashCommandEvent = Mockito.mock(SlashCommandEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        ChatInputInteractionEvent ChatInputInteractionEvent = Mockito.mock(ChatInputInteractionEvent.class, Mockito.RETURNS_DEEP_STUBS);
 
         List<ApplicationCommandInteractionOption> options = args.entrySet().stream()
                                                                 .map(e -> mockOption(e.getKey(), e.getValue()))
                                                                 .collect(Collectors.toList());
-        Mockito.when(slashCommandEvent.getOptions()).thenReturn(options);
+        Mockito.when(ChatInputInteractionEvent.getOptions()).thenReturn(options);
 
         User ieee = new User(Mockito.mock(GatewayDiscordClient.class), Mockito.mock(UserData.class, Mockito.RETURNS_DEEP_STUBS));
         Mockito.when(ieee.getId().asLong()).thenReturn(295868901042946048L);
-        Mockito.when(slashCommandEvent.getInteraction().getUser()).thenReturn(ieee);
+        Mockito.when(ChatInputInteractionEvent.getInteraction().getUser()).thenReturn(ieee);
 
         MultipartRequest<WebhookExecuteRequest> multipartRequest = commands.stream().filter(c -> c.getData().name()
                                                                                                   .equals(commandName))
                                                                            .findFirst().orElseThrow()
-                                                                           .handle(slashCommandEvent);
+                                                                           .handle(ChatInputInteractionEvent);
         WebhookExecuteRequest executeRequest = multipartRequest.getJsonPayload();
         assert executeRequest != null;
         String result = Stream.<Stream<String>>of(stream(executeRequest.content()),

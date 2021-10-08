@@ -20,14 +20,14 @@ import com.faendir.discord4j.command.annotation.OptionConverter
 import discord4j.common.util.Snowflake
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.reaction.ReactionEmoji
-import discord4j.core.event.domain.interaction.SlashCommandEvent
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import reactor.core.publisher.Flux
 import java.net.HttpURLConnection
 import java.net.URL
 import java.time.Instant
 
 class LinkConverter : OptionConverter<String> {
-    override fun fromString(context: SlashCommandEvent, string: String): String {
+    override fun fromString(context: ChatInputInteractionEvent, string: String): String {
         return findLink(
             string.trim(),
             context.interaction.channel.flatMapMany { it.getMessagesBefore(it.lastMessageId.orElseGet { Snowflake.of(Instant.now()) }) }

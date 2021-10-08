@@ -22,7 +22,7 @@ import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.utils.asMultipartRequest
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
-import discord4j.core.event.domain.interaction.SlashCommandEvent
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.discordjson.json.EmbedData
 import discord4j.discordjson.json.EmbedFieldData
 import discord4j.discordjson.json.WebhookExecuteRequest
@@ -31,7 +31,7 @@ import discord4j.rest.util.MultipartRequest
 abstract class AbstractListCommand<C : Category, P : Puzzle, R : Record> : AbstractCommand() {
     abstract val leaderboards: List<Leaderboard<C, P, R>>
 
-    override fun handle(event: SlashCommandEvent): MultipartRequest<WebhookExecuteRequest> {
+    override fun handle(event: ChatInputInteractionEvent): MultipartRequest<WebhookExecuteRequest> {
         val (puzzle, categories) = findPuzzleAndCategories(event)
         val records = leaderboards.map { it.getAll(puzzle, categories) }.reduce { acc, map -> acc + map }
         return WebhookExecuteRequest.builder()
@@ -57,5 +57,5 @@ abstract class AbstractListCommand<C : Category, P : Puzzle, R : Record> : Abstr
     }
 
     /** @return pair of Puzzle and all the categories that support it */
-    abstract fun findPuzzleAndCategories(interaction: SlashCommandEvent): Pair<P, List<C>>
+    abstract fun findPuzzleAndCategories(interaction: ChatInputInteractionEvent): Pair<P, List<C>>
 }

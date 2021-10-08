@@ -25,7 +25,7 @@ import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
-import discord4j.core.event.domain.interaction.SlashCommandEvent
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import org.springframework.stereotype.Component
 
@@ -36,7 +36,7 @@ class OmListCommand(override val leaderboards: List<Leaderboard<OmCategory, OmPu
 
     override fun buildData(): ApplicationCommandOptionData = ListCommandParser.buildData()
 
-    override fun findPuzzleAndCategories(interaction: SlashCommandEvent): Pair<OmPuzzle, List<OmCategory>> {
+    override fun findPuzzleAndCategories(interaction: ChatInputInteractionEvent): Pair<OmPuzzle, List<OmCategory>> {
         val show = ListCommandParser.parse(interaction)
         return Pair(show.puzzle, OmCategory.values().filter { it.supportsPuzzle(show.puzzle) })
     }

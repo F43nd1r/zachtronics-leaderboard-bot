@@ -18,14 +18,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
-    kotlin("jvm") version "1.5.30"
-    kotlin("plugin.serialization") version "1.5.30"
-    id("org.springframework.boot") version "2.5.4"
+    kotlin("jvm") version "1.5.31"
+    kotlin("plugin.serialization") version "1.5.31"
+    id("org.springframework.boot") version "2.5.5"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    kotlin("plugin.spring") version "1.5.30"
+    kotlin("plugin.spring") version "1.5.31"
     id("com.palantir.docker") version "0.28.0"
     id("io.freefair.lombok") version "6.1.0"
-    id("com.google.devtools.ksp") version "1.5.30-1.0.0-beta08"
+    id("com.google.devtools.ksp") version "1.5.31-1.0.0"
     id("com.gorylenko.gradle-git-properties") version "2.3.1"
 }
 
@@ -37,22 +37,22 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.5.2")
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.cloud:spring-cloud-starter:3.0.3")
-    implementation("com.discord4j:discord4j-core:3.2.0-RC3")
+    implementation("org.springframework.cloud:spring-cloud-starter:3.0.4")
+    implementation("com.discord4j:discord4j-core:3.2.0")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.4")
-    implementation("org.eclipse.jgit:org.eclipse.jgit:5.12.0.202106070339-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r")
     implementation("com.github.rockswang:java-curl:1.2.2.2")
     implementation("com.faendir.jraw:JRAW:1.2.0")
     implementation("net.bramp.ffmpeg:ffmpeg:0.6.2")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.12.5")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.0")
     implementation("com.faendir.om:dsl:1.2.6")
     implementation("com.faendir.om:parser:2.1.8")
-    implementation("com.faendir.discord4j-command-parser:annotations:1.4.0")
-    ksp("com.faendir.discord4j-command-parser:processor:1.4.0")
+    implementation("com.faendir.discord4j-command-parser:annotations:1.4.1")
+    ksp("com.faendir.discord4j-command-parser:processor:1.4.1")
     implementation(project("native"))
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
@@ -61,7 +61,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("net.sf.trove4j:trove4j:3.0.3")
     testImplementation("com.ninja-squad:springmockk:3.0.1")
-    testImplementation("io.strikt:strikt-core:0.31.0")
+    testImplementation("io.strikt:strikt-core:0.32.0")
 }
 
 tasks.withType<Test> {
@@ -115,4 +115,11 @@ sourceSets {
 
 tasks.getByName<Jar>("jar") {
     enabled = false
+}
+
+afterEvaluate {
+    // shut up gradle
+    tasks.named("generateMainEffectiveLombokConfig2") {
+        dependsOn(tasks.named("kspKotlin"))
+    }
 }

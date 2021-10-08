@@ -17,8 +17,7 @@
 package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.zachtronics.bot.utils.user
-import discord4j.core.`object`.entity.User
-import discord4j.core.event.domain.interaction.SlashCommandEvent
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.discordjson.json.ApplicationCommandRequest
 import discord4j.discordjson.json.WebhookExecuteRequest
 import discord4j.rest.util.MultipartRequest
@@ -38,7 +37,7 @@ interface GameCommand : TopLevelCommand {
         return request.build()
     }
 
-    override fun handle(event: SlashCommandEvent): MultipartRequest<WebhookExecuteRequest> {
+    override fun handle(event: ChatInputInteractionEvent): MultipartRequest<WebhookExecuteRequest> {
         val option = event.options.first()
         val command = commands.find { it.data.name() == option.name }
             ?: throw IllegalArgumentException("I did not recognize the command \"${option.name}\".")

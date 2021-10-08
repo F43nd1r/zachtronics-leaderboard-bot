@@ -20,7 +20,7 @@ import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.Solution
 import com.faendir.zachtronics.bot.utils.asMultipartRequest
-import discord4j.core.event.domain.interaction.SlashCommandEvent
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.discordjson.json.WebhookExecuteRequest
 import discord4j.rest.util.MultipartRequest
 import org.springframework.stereotype.Component
@@ -31,7 +31,7 @@ abstract class AbstractSubmitArchiveCommand<P : Puzzle, R : Record, S : Solution
     protected abstract val submitCommand: AbstractSubmitCommand<P, R>
     protected abstract val archiveCommand: AbstractArchiveCommand<S>
 
-    override fun handle(event: SlashCommandEvent): MultipartRequest<WebhookExecuteRequest> {
+    override fun handle(event: ChatInputInteractionEvent): MultipartRequest<WebhookExecuteRequest> {
         val (puzzle, record, solution) = parseToPRS(event)
         val submitOut = submitCommand.submitToLeaderboards(puzzle, record)
         val archiveOut = archiveCommand.archiveAll(Collections.singleton(solution))
@@ -42,5 +42,5 @@ abstract class AbstractSubmitArchiveCommand<P : Puzzle, R : Record, S : Solution
             .asMultipartRequest()
     }
 
-    abstract fun parseToPRS(event: SlashCommandEvent): Triple<P, R, S>
+    abstract fun parseToPRS(event: ChatInputInteractionEvent): Triple<P, R, S>
 }

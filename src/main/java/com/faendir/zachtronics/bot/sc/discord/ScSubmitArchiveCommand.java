@@ -25,7 +25,7 @@ import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
-import discord4j.core.event.domain.interaction.SlashCommandEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import kotlin.Triple;
 import lombok.Getter;
@@ -45,7 +45,7 @@ public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzl
 
     @NotNull
     @Override
-    public Triple<ScPuzzle, ScRecord, ScSolution> parseToPRS(@NotNull SlashCommandEvent event) {
+    public Triple<ScPuzzle, ScRecord, ScSolution> parseToPRS(@NotNull ChatInputInteractionEvent event) {
         Data data = ScSubmitArchiveCommand$DataParser.parse(event);
         if (data.export.equals(data.video))
             throw new IllegalArgumentException("Export link and video link cannot be the same link");

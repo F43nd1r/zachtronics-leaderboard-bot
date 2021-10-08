@@ -18,8 +18,8 @@ package com.faendir.zachtronics.bot.om.discord
 
 import com.faendir.discord4j.command.annotation.OptionConverter
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
-import discord4j.core.event.domain.interaction.SlashCommandEvent
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 
 class PuzzleConverter : OptionConverter<OmPuzzle> {
-    override fun fromString(context: SlashCommandEvent, string: String): OmPuzzle = OmPuzzle.parse(string)
+    override fun fromString(context: ChatInputInteractionEvent, string: String): OmPuzzle = OmPuzzle.parse(string)
 }

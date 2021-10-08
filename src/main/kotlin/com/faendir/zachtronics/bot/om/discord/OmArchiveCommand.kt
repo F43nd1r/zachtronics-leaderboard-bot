@@ -52,7 +52,7 @@ import com.faendir.zachtronics.bot.om.model.OmScorePart.WIDTH
 import com.faendir.zachtronics.bot.om.model.OmSolution
 import com.faendir.zachtronics.bot.om.model.SINGLE
 import com.roxstudio.utils.CUrl
-import discord4j.core.event.domain.interaction.SlashCommandEvent
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import okio.buffer
 import okio.sink
@@ -70,7 +70,7 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
 
     override fun buildData(): ApplicationCommandOptionData = ArchiveParser.buildData()
 
-    override fun parseSolutions(interaction: SlashCommandEvent): List<OmSolution> {
+    override fun parseSolutions(interaction: ChatInputInteractionEvent): List<OmSolution> {
         val command = ArchiveParser.parse(interaction)
         return listOf(parseSolution(findScoreIdentifier(command), command.solution))
     }

@@ -65,6 +65,8 @@ class ProductionRedditService(redditProperties: RedditProperties) : RedditServic
             ?.map { it.toTree() } ?: emptyList())
     }
 
+    private val json = Json { ignoreUnknownKeys = true }
+
     override fun getModerators(subreddit: Subreddit): List<String> {
         var text: String? = null
         while (text == null) {
@@ -77,7 +79,7 @@ class ProductionRedditService(redditProperties: RedditProperties) : RedditServic
                 } else throw e
             }
         }
-        val response: Response = Json { ignoreUnknownKeys = true }.decodeFromString(text)
+        val response: Response = json.decodeFromString(text)
         check(response.kind == "UserList")
         return response.data.children.map { it.name }
     }

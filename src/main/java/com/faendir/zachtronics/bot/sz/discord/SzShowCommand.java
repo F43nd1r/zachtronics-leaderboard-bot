@@ -24,7 +24,7 @@ import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
-import discord4j.core.event.domain.interaction.SlashCommandEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import kotlin.Pair;
 import lombok.Getter;
@@ -45,7 +45,7 @@ public class SzShowCommand extends AbstractShowCommand<SzCategory, SzPuzzle, SzR
 
     @NotNull
     @Override
-    public Pair<SzPuzzle, SzCategory> findPuzzleAndCategory(@NotNull SlashCommandEvent interaction) {
+    public Pair<SzPuzzle, SzCategory> findPuzzleAndCategory(@NotNull ChatInputInteractionEvent interaction) {
         Data data = SzShowCommand$DataParser.parse(interaction);
         return new Pair<>(data.puzzle, data.category);
     }

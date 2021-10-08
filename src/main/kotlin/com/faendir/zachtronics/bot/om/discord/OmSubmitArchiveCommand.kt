@@ -26,7 +26,7 @@ import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmSolution
-import discord4j.core.event.domain.interaction.SlashCommandEvent
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import org.springframework.stereotype.Component
 
@@ -37,7 +37,7 @@ class OmSubmitArchiveCommand(override val archiveCommand: OmArchiveCommand, over
 
     override fun buildData(): ApplicationCommandOptionData = SubmitArchiveParser.buildData()
 
-    override fun parseToPRS(event: SlashCommandEvent): Triple<OmPuzzle, OmRecord, OmSolution> {
+    override fun parseToPRS(event: ChatInputInteractionEvent): Triple<OmPuzzle, OmRecord, OmSolution> {
         val submitArchive = SubmitArchiveParser.parse(event)
         val solution = archiveCommand.parseSolution(archiveCommand.findScoreIdentifier(submitArchive), submitArchive.solution)
         return Triple(

@@ -24,7 +24,7 @@ import com.faendir.zachtronics.bot.utils.asMultipartRequest
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.findInstance
 import com.faendir.zachtronics.bot.utils.ifNotEmpty
-import discord4j.core.event.domain.interaction.SlashCommandEvent
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.discordjson.json.EmbedData
 import discord4j.discordjson.json.EmbedFieldData
 import discord4j.discordjson.json.EmbedImageData
@@ -35,7 +35,7 @@ import discord4j.rest.util.MultipartRequest
 abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : AbstractCommand(), SecuredCommand {
     protected abstract val leaderboards: List<Leaderboard<*, P, R>>
 
-    override fun handle(event: SlashCommandEvent): MultipartRequest<WebhookExecuteRequest> {
+    override fun handle(event: ChatInputInteractionEvent): MultipartRequest<WebhookExecuteRequest> {
         val (puzzle, record) = parseSubmission(event)
         return submitToLeaderboards(puzzle, record).asMultipartRequest()
     }
@@ -91,5 +91,5 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : AbstractCommand()
         }
     }
 
-    abstract fun parseSubmission(interaction: SlashCommandEvent): Pair<P, R>
+    abstract fun parseSubmission(interaction: ChatInputInteractionEvent): Pair<P, R>
 }
