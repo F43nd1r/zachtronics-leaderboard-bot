@@ -146,21 +146,21 @@ public class CommandTest {
 
     @NotNull
     private String runCommand(String commandName, @NotNull Map<String, String> args) {
-        ChatInputInteractionEvent ChatInputInteractionEvent = Mockito.mock(ChatInputInteractionEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        ChatInputInteractionEvent interactionEvent = Mockito.mock(ChatInputInteractionEvent.class, Mockito.RETURNS_DEEP_STUBS);
 
         List<ApplicationCommandInteractionOption> options = args.entrySet().stream()
                                                                 .map(e -> mockOption(e.getKey(), e.getValue()))
                                                                 .collect(Collectors.toList());
-        Mockito.when(ChatInputInteractionEvent.getOptions()).thenReturn(options);
+        Mockito.when(interactionEvent.getOptions()).thenReturn(options);
 
         User ieee = new User(Mockito.mock(GatewayDiscordClient.class), Mockito.mock(UserData.class, Mockito.RETURNS_DEEP_STUBS));
         Mockito.when(ieee.getId().asLong()).thenReturn(295868901042946048L);
-        Mockito.when(ChatInputInteractionEvent.getInteraction().getUser()).thenReturn(ieee);
+        Mockito.when(interactionEvent.getInteraction().getUser()).thenReturn(ieee);
 
         MultipartRequest<WebhookExecuteRequest> multipartRequest = commands.stream().filter(c -> c.getData().name()
                                                                                                   .equals(commandName))
                                                                            .findFirst().orElseThrow()
-                                                                           .handle(ChatInputInteractionEvent);
+                                                                           .handle(interactionEvent);
         WebhookExecuteRequest executeRequest = multipartRequest.getJsonPayload();
         assert executeRequest != null;
         String result = Stream.<Stream<String>>of(stream(executeRequest.content()),
