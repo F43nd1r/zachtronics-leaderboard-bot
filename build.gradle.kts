@@ -48,7 +48,7 @@ dependencies {
     implementation("com.github.rockswang:java-curl:1.2.2.2")
     implementation("com.faendir.jraw:JRAW:1.2.0")
     implementation("net.bramp.ffmpeg:ffmpeg:0.6.2")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.faendir.om:dsl:1.2.6")
     implementation("com.faendir.om:parser:2.1.8")
     implementation("com.faendir.discord4j-command-parser:annotations:1.4.1")
