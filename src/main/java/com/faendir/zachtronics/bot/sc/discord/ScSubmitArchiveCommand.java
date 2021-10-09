@@ -68,7 +68,7 @@ public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzl
         @NotNull String export;
         @NotNull String author;
         ScPuzzle puzzle;
-        String bypassValidation;
+        Boolean bypassValidation;
 
         public Data(@Description("Link to your video of the solution, can be `m1` to scrape it from your last message")
                     @NotNull @Converter(LinkConverter.class) String video,
@@ -79,8 +79,8 @@ public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzl
                     @NotNull String author,
                     @Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
                     @Converter(ScPuzzleConverter.class) ScPuzzle puzzle,
-                    @Description("Skips running SChem on the solutions if not empty. Admin-only")
-                            String bypassValidation) {
+                    @Description("Skips running SChem on the solutions. Admin-only")
+                            Boolean bypassValidation) {
             this.video = video;
             this.export = export;
             this.author = author;

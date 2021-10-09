@@ -125,18 +125,20 @@ public class CommandTest {
     public void testArchiveSudo() {
         String exportLink = "https://raw.githubusercontent.com/spacechem-community-developers/spacechem-archive/" +
                             "master/RESEARCHNET3/published_26_3/156-1-45-B.txt";
-        Map<String, String> args1 = Map.of("export", exportLink);
+        Map<String, ?> args1 = Map.of("export", exportLink);
         assertThrows(IllegalArgumentException.class, () -> runCommand("archive", args1));
 
-        Map<String, String> args2 = Map.of("export", exportLink, "bypass-validation", "indeed");
+        Map<String, ?> args2 = Map.of("export", exportLink, "bypass-validation", true);
         String result = runCommand("archive", args2);
         assertTrue(result.contains("Passivation") && result.contains("`156/1/45/B`"));
     }
 
     @NotNull
-    private static ApplicationCommandInteractionOption mockOption(String name, String value) {
+    private static ApplicationCommandInteractionOption mockOption(String name, @NotNull Object value) {
+        ApplicationCommandOption.Type type = value instanceof Boolean ? ApplicationCommandOption.Type.BOOLEAN :
+                                                                        ApplicationCommandOption.Type.STRING;
         ApplicationCommandInteractionOptionValue optionValue = new ApplicationCommandInteractionOptionValue(
-                Mockito.mock(GatewayDiscordClient.class), null, ApplicationCommandOption.Type.STRING.getValue(), value);
+                Mockito.mock(GatewayDiscordClient.class), null, type.getValue(), value.toString());
 
         ApplicationCommandInteractionOption option = Mockito.mock(ApplicationCommandInteractionOption.class);
         Mockito.when(option.getName()).thenReturn(name);
@@ -145,7 +147,7 @@ public class CommandTest {
     }
 
     @NotNull
-    private String runCommand(String commandName, @NotNull Map<String, String> args) {
+    private String runCommand(String commandName, @NotNull Map<String, ?> args) {
         ChatInputInteractionEvent interactionEvent = Mockito.mock(ChatInputInteractionEvent.class, Mockito.RETURNS_DEEP_STUBS);
 
         List<ApplicationCommandInteractionOption> options = args.entrySet().stream()

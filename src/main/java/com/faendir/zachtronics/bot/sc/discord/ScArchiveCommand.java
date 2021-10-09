@@ -65,7 +65,7 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> impleme
     public static class Data {
         @NotNull String export;
         ScPuzzle puzzle;
-        String bypassValidation;
+        Boolean bypassValidation;
 
         public Data(@NotNull
                     @Description("Link or `m1` to scrape it from your last message. " +
@@ -73,8 +73,8 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> impleme
                     @Converter(LinkConverter.class) String export,
                     @Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
                     @Converter(ScPuzzleConverter.class) ScPuzzle puzzle,
-                    @Description("Skips running SChem on the solutions if not empty. Admin-only")
-                            String bypassValidation) {
+                    @Description("Skips running SChem on the solutions. Admin-only")
+                            Boolean bypassValidation) {
             this.export = export;
             this.puzzle = puzzle;
             this.bypassValidation = bypassValidation;
