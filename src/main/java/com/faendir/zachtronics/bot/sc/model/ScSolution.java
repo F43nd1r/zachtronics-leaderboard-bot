@@ -63,6 +63,13 @@ public class ScSolution implements Solution {
         }
 
         ScScore score = ScScore.parseBPScore(m);
+        if (score.getCycles() == 0) {
+            throw new IllegalArgumentException("Invalid score");
+        }
+
+        String newHeader = m.group().replace(" (copy)", ""); // try to cut down on duplicate churn
+        content = m.replaceFirst(newHeader);
+
         return new ScSolution(puzzle, score, content);
     }
 

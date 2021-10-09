@@ -41,7 +41,7 @@ class ScSolutionTest {
     }
 
     @Test
-    public void TestCommas() {
+    public void testCommas() {
         String content = "SOLUTION:'1,3-Dimetoxibencene',andy,922-1-27,s\nstuff...";
         ScSolution result = ScSolution.fromContentNoValidation(content, null);
         ScSolution expected = new ScSolution(ScPuzzle.published_43_2, new ScScore(922, 1, 27, false, false), content);
@@ -51,6 +51,17 @@ class ScSolutionTest {
         result = ScSolution.fromContentNoValidation(content, null);
         expected = new ScSolution(ScPuzzle.research_example_1, new ScScore(50, 50, 50, true, false), content);
         assertEquals(expected, result);
+    }
+
+    @Test
+    public void testCopyBad() {
+        for (String name: new String[]{"name (copy)", "'comma, comma (copy)'"}) {
+            String content = "SOLUTION:Of Pancakes and Spaceships,12345ieee,50-50-50," + name + "\nstuff...";
+            ScSolution result = ScSolution.fromContentNoValidation(content, null);
+            ScSolution expected = new ScSolution(ScPuzzle.research_example_1, new ScScore(50, 50, 50, false, false),
+                                                 content.replace(" (copy)", ""));
+            assertEquals(expected, result);
+        }
     }
 
     @Test
@@ -72,6 +83,7 @@ class ScSolutionTest {
         assertBreaks("No SOL block in sight\nstuff...");
         assertBreaks("SOLUTION:No puzzle that exists,12345ieee,50-50-50\nstuff...");
         assertBreaks("stuff...SOLUTION:Of Pancakes and Spaceships,12345ieee,50-50-50\nstuff...");
+        assertBreaks("SOLUTION:Of Pancakes and Spaceships,12345ieee,0-0-0,way too fast\nstuff...");
     }
 
     private static void assertBreaks(String content) {
