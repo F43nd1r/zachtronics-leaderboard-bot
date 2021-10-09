@@ -47,7 +47,7 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> impleme
     @Override
     public List<ScSolution> parseSolutions(@NotNull ChatInputInteractionEvent interaction) {
         Data data = ScArchiveCommand$DataParser.parse(interaction);
-        boolean bypassValidation = data.bypassValidation != null;
+        boolean bypassValidation = data.bypassValidation != null && data.bypassValidation;
         if (bypassValidation && !ScSecured.isWikiAdmin(UtilsKt.user(interaction))) {
             throw new IllegalArgumentException("Only a wiki admin can bypass the validation");
         }
