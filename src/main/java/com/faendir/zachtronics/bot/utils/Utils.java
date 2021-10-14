@@ -31,13 +31,19 @@ public final class Utils {
     }
 
     private static final Pattern PASTEBIN_PATTERN = Pattern.compile("(?:https?://)?pastebin.com/(?:raw/)?(\\w+)");
+    private static final Pattern GDOCS_PATTERN = Pattern.compile("(?:https?://)?docs.google.com/document/d/(\\w+)(?:/.*)?");
     @NotNull
     public static String rawContentURL(@NotNull String link) {
         Matcher m = PASTEBIN_PATTERN.matcher(link);
         if (m.matches()) { // pastebin has an easy way to get raw text
             return "https://pastebin.com/raw/" + m.group(1);
         }
-        else
-            return link;
+
+        m = GDOCS_PATTERN.matcher(link);
+        if (m.matches()) { // gdocs can export to text from url
+            return "https://docs.google.com/document/d/" + m.group(1) + "/export?format=txt";
+        }
+
+        return link;
     }
 }

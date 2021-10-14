@@ -78,6 +78,8 @@ public class ScSolution implements Solution {
         String export;
         try (InputStream is = new URL(Utils.rawContentURL(exportLink)).openStream()) {
             export = new String(is.readAllBytes()).replace("\r\n", "\n");
+            if (export.charAt(0) == '\uFEFF') // remove BOM
+                export = export.substring(1);
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Could not parse your link");
         } catch (IOException e) {
