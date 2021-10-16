@@ -23,11 +23,10 @@ import com.faendir.zachtronics.bot.discord.command.AbstractArchiveCommand;
 import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.archive.SzArchive;
 import com.faendir.zachtronics.bot.sz.model.SzSolution;
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -41,16 +40,17 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 @SzQualifier
-public class SzArchiveCommand extends AbstractArchiveCommand<SzSolution> implements SzSecured {
+public class SzArchiveCommand extends AbstractArchiveCommand<SzArchiveCommand.ArchiveData, SzSolution> implements SzSecured {
+    @Delegate
+    private final SzArchiveCommand_ArchiveDataParser parser = SzArchiveCommand_ArchiveDataParser.INSTANCE;
     @Getter
     private final SzArchive archive;
 
     @NotNull
     @Override
-    public List<SzSolution> parseSolutions(@NotNull ChatInputInteractionEvent interaction) {
-        Data data = SzArchiveCommand$DataParser.parse(interaction);
+    public List<SzSolution> parseSolutions(@NotNull ArchiveData parameters) {
         SzSolution solution;
-        try (InputStream is = new URL(data.link).openStream()) {
+        try (InputStream is = new URL(parameters.link).openStream()) {
             String content = new String(is.readAllBytes());
             solution = new SzSolution(content);
         } catch (MalformedURLException e) {
@@ -63,19 +63,13 @@ public class SzArchiveCommand extends AbstractArchiveCommand<SzSolution> impleme
         return Collections.singletonList(solution);
     }
 
-    @NotNull
-    @Override
-    public ApplicationCommandOptionData buildData() {
-        return SzArchiveCommand$DataParser.buildData();
-    }
-
     @ApplicationCommand(name = "archive", subCommand = true)
     @Value
-    public static class Data {
+    public static class ArchiveData {
         @NotNull
         String link;
 
-        public Data(@NotNull @Converter(LinkConverter.class) String link) {
+        public ArchiveData(@NotNull @Converter(LinkConverter.class) String link) {
             this.link = link;
         }
     }

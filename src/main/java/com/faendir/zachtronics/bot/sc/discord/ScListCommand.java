@@ -25,13 +25,12 @@ import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -42,32 +41,28 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Component
 @ScQualifier
-public class ScListCommand extends AbstractListCommand<ScCategory, ScPuzzle, ScRecord> {
+public class ScListCommand extends AbstractListCommand<ScListCommand.ListData, ScCategory, ScPuzzle, ScRecord> {
+    @Delegate
+    private final ScListCommand_ListDataParser parser = ScListCommand_ListDataParser.INSTANCE;
     @Getter
     private final List<Leaderboard<ScCategory, ScPuzzle, ScRecord>> leaderboards;
 
     @NotNull
     @Override
-    public ApplicationCommandOptionData buildData() {
-        return ScListCommand$DataParser.buildData();
-    }
-
-    @NotNull
-    @Override
-    public Pair<ScPuzzle, List<ScCategory>> findPuzzleAndCategories(@NotNull ChatInputInteractionEvent interaction) {
-        Data data = ScListCommand$DataParser.parse(interaction);
-        return new Pair<>(data.puzzle, Arrays.stream(ScCategory.values())
-                .filter(c -> c.supportsPuzzle(data.puzzle))
-                .collect(Collectors.toList()));
+    public Pair<ScPuzzle, List<ScCategory>> findPuzzleAndCategories(@NotNull ListData parameters) {
+        return new Pair<>(parameters.puzzle,
+                          Arrays.stream(ScCategory.values())
+                                .filter(c -> c.supportsPuzzle(parameters.puzzle))
+                                .collect(Collectors.toList()));
     }
 
     @ApplicationCommand(name = "list", description = "List records", subCommand = true)
     @Value
-    public static class Data {
+    public static class ListData {
         @NonNull ScPuzzle puzzle;
 
-        public Data(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
-                    @Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle) {
+        public ListData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
+                        @Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle) {
             this.puzzle = puzzle;
         }
     }

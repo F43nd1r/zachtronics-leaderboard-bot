@@ -24,13 +24,12 @@ import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -38,36 +37,31 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class ScSubmitCommand extends AbstractSubmitCommand<ScPuzzle, ScRecord> implements ScSecured {
-
+public class ScSubmitCommand extends AbstractSubmitCommand<ScSubmitCommand.SubmitData, ScPuzzle, ScRecord> implements ScSecured {
+    @Delegate
+    private final ScSubmitCommand_SubmitDataParser parser = ScSubmitCommand_SubmitDataParser.INSTANCE;
     @Getter
     private final List<Leaderboard<?, ScPuzzle, ScRecord>> leaderboards;
 
     @NotNull
     @Override
-    public Pair<ScPuzzle, ScRecord> parseSubmission(@NotNull ChatInputInteractionEvent interaction) {
-        Data data = ScSubmitCommand$DataParser.parse(interaction);
-        ScRecord record = new ScRecord(data.score, data.author, data.video, "", false);
-        return new Pair<>(data.puzzle, record);
-    }
-
-    @NotNull
-    @Override
-    public ApplicationCommandOptionData buildData() {
-        return ScSubmitCommand$DataParser.buildData();
+    public Pair<ScPuzzle, ScRecord> parseSubmission(@NotNull SubmitData parameters) {
+        ScRecord record = new ScRecord(parameters.score, parameters.author, parameters.video, "", false);
+        return new Pair<>(parameters.puzzle, record);
     }
 
     @ApplicationCommand(subCommand = true)
     @Value
-    public static class Data {
+    public static class SubmitData {
         @NonNull ScPuzzle puzzle;
         @NotNull ScScore score;
         @NotNull String author;
         @NotNull String video;
 
-        public Data(@Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle,
-                    @Converter(ScBPScoreConverter.class) @NonNull ScScore score,
-                    @NotNull String author, @NotNull @Converter(LinkConverter.class) String video) {
+        public SubmitData(@Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle,
+                          @Converter(ScBPScoreConverter.class) @NonNull ScScore score,
+                          @NotNull String author,
+                          @NotNull @Converter(LinkConverter.class) String video) {
             this.puzzle = puzzle;
             this.score = score;
             this.video = video;

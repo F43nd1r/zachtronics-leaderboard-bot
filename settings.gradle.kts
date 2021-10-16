@@ -16,6 +16,8 @@
 
 rootProject.name = "zachtronics-leaderboard-bot"
 include("native")
+include("common")
+include("processor")
 
 pluginManagement {
     repositories {

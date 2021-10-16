@@ -24,13 +24,12 @@ import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -39,30 +38,25 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 @SzQualifier
-public class SzShowCommand extends AbstractShowCommand<SzCategory, SzPuzzle, SzRecord> {
+public class SzShowCommand extends AbstractShowCommand<SzShowCommand.ShowData, SzCategory, SzPuzzle, SzRecord> {
+    @Delegate
+    private final SzShowCommand_ShowDataParser parser = SzShowCommand_ShowDataParser.INSTANCE;
     @Getter
     private final List<Leaderboard<SzCategory, SzPuzzle, SzRecord>> leaderboards;
 
     @NotNull
     @Override
-    public Pair<SzPuzzle, SzCategory> findPuzzleAndCategory(@NotNull ChatInputInteractionEvent interaction) {
-        Data data = SzShowCommand$DataParser.parse(interaction);
-        return new Pair<>(data.puzzle, data.category);
-    }
-
-    @NotNull
-    @Override
-    public ApplicationCommandOptionData buildData() {
-        return SzShowCommand$DataParser.buildData();
+    public Pair<SzPuzzle, SzCategory> findPuzzleAndCategory(@NotNull ShowData parameters) {
+        return new Pair<>(parameters.puzzle, parameters.category);
     }
 
     @ApplicationCommand(name = "show", subCommand = true)
     @Value
-    public static class Data {
+    public static class ShowData {
         @NonNull SzPuzzle puzzle;
         @NonNull SzCategory category;
 
-        public Data(@Converter(SzPuzzleConverter.class) @NonNull SzPuzzle puzzle, @NonNull SzCategory category) {
+        public ShowData(@Converter(SzPuzzleConverter.class) @NonNull SzPuzzle puzzle, @NonNull SzCategory category) {
             this.puzzle = puzzle;
             this.category = category;
         }

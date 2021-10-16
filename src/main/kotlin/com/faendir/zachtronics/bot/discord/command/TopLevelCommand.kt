@@ -16,15 +16,20 @@
 
 package com.faendir.zachtronics.bot.discord.command
 
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
+import com.faendir.discord4j.command.parse.ApplicationCommandParser
+import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.discordjson.json.ApplicationCommandRequest
-import discord4j.discordjson.json.WebhookExecuteRequest
-import discord4j.rest.util.MultipartRequest
+import reactor.core.publisher.Mono
 
-interface TopLevelCommand {
+/**
+ * @param T dataclass holding the parsed command parameters
+ */
+interface TopLevelCommand<T> : ApplicationCommandParser<T, ApplicationCommandRequest> {
     val commandName: String
+        get() = request.name()
 
-    fun buildRequest(): ApplicationCommandRequest
+    val request: ApplicationCommandRequest
+        get() = buildData()
 
-    fun handle(event: ChatInputInteractionEvent): MultipartRequest<WebhookExecuteRequest>
+    fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void>
 }

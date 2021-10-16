@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.discord.command
+package com.faendir.discord4j.command.annotation
 
-import discord4j.discordjson.json.ApplicationCommandOptionData
+import com.faendir.discord4j.command.parse.OptionConverter
+import kotlin.reflect.KClass
 
-abstract class AbstractCommand : Command {
-    override val data by lazy {
-        buildData()
-    }
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.VALUE_PARAMETER)
+annotation class Converter(val value: KClass<out OptionConverter<*>>)
 
-    abstract fun buildData(): ApplicationCommandOptionData
-}

@@ -19,26 +19,23 @@ package com.faendir.zachtronics.bot.om.discord
 import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
+import com.faendir.discord4j.command.parse.ApplicationCommandParser
 import com.faendir.zachtronics.bot.discord.command.AbstractListCommand
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import org.springframework.stereotype.Component
 
 @Component
 @OmQualifier
 class OmListCommand(override val leaderboards: List<Leaderboard<OmCategory, OmPuzzle, OmRecord>>) :
-    AbstractListCommand<OmCategory, OmPuzzle, OmRecord>() {
-
-    override fun buildData(): ApplicationCommandOptionData = ListCommandParser.buildData()
-
-    override fun findPuzzleAndCategories(interaction: ChatInputInteractionEvent): Pair<OmPuzzle, List<OmCategory>> {
-        val show = ListCommandParser.parse(interaction)
-        return Pair(show.puzzle, OmCategory.values().filter { it.supportsPuzzle(show.puzzle) })
+    AbstractListCommand<ListCommand, OmCategory, OmPuzzle, OmRecord>(),
+    ApplicationCommandParser<ListCommand, ApplicationCommandOptionData> by ListCommandParser {
+    override fun findPuzzleAndCategories(parameters: ListCommand): Pair<OmPuzzle, List<OmCategory>> {
+        return Pair(parameters.puzzle, OmCategory.values().filter { it.supportsPuzzle(parameters.puzzle) })
     }
 }
 

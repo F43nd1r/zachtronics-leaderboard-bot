@@ -17,16 +17,9 @@
 package com.faendir.zachtronics.bot.sz.model;
 
 import com.faendir.zachtronics.bot.model.Solution;
-import lombok.Getter;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Iterator;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 @Value

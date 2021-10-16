@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.om.discord
 import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
+import com.faendir.discord4j.command.parse.ApplicationCommandParser
 import com.faendir.zachtronics.bot.discord.LinkConverter
 import com.faendir.zachtronics.bot.discord.command.AbstractSubmitArchiveCommand
 import com.faendir.zachtronics.bot.discord.command.Secured
@@ -26,23 +27,21 @@ import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmSolution
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import org.springframework.stereotype.Component
 
 @Component
 @OmQualifier
 class OmSubmitArchiveCommand(override val archiveCommand: OmArchiveCommand, override val submitCommand: OmSubmitCommand) :
-    AbstractSubmitArchiveCommand<OmPuzzle, OmRecord, OmSolution>(), Secured by OmSecured {
+    AbstractSubmitArchiveCommand<SubmitArchive, OmPuzzle, OmRecord, OmSolution>(),
+    Secured by OmSecured,
+ApplicationCommandParser<SubmitArchive, ApplicationCommandOptionData> by SubmitArchiveParser {
 
-    override fun buildData(): ApplicationCommandOptionData = SubmitArchiveParser.buildData()
-
-    override fun parseToPRS(event: ChatInputInteractionEvent): Triple<OmPuzzle, OmRecord, OmSolution> {
-        val submitArchive = SubmitArchiveParser.parse(event)
-        val solution = archiveCommand.parseSolution(archiveCommand.findScoreIdentifier(submitArchive), submitArchive.solution)
+    override fun parseToPRS(parameters: SubmitArchive): Triple<OmPuzzle, OmRecord, OmSolution> {
+        val solution = archiveCommand.parseSolution(archiveCommand.findScoreIdentifier(parameters), parameters.solution)
         return Triple(
             solution.puzzle,
-            OmRecord(solution.score, submitArchive.gif, event.interaction.user.username),
+            OmRecord(solution.score, parameters.gif),
             solution
         )
     }

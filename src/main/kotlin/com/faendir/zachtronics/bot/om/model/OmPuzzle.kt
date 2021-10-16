@@ -44,7 +44,6 @@ import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2021
 import com.faendir.zachtronics.bot.om.model.OmType.INFINITE
 import com.faendir.zachtronics.bot.om.model.OmType.NORMAL
 import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
-import com.faendir.zachtronics.bot.utils.getSingleMatchingPuzzle
 import okio.buffer
 import okio.source
 import org.springframework.util.ResourceUtils
@@ -228,7 +227,4 @@ enum class OmPuzzle(
         } ?: SINGLE
     }
 
-    companion object {
-        fun parse(name: String): OmPuzzle = values().getSingleMatchingPuzzle(name)
-    }
 }

@@ -20,42 +20,33 @@ import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
-import com.faendir.zachtronics.bot.utils.asMultipartRequest
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.discordjson.json.EmbedData
-import discord4j.discordjson.json.EmbedFieldData
-import discord4j.discordjson.json.WebhookExecuteRequest
-import discord4j.rest.util.MultipartRequest
+import com.faendir.zachtronics.bot.utils.interactionReplyReplaceSpecBuilder
+import discord4j.core.spec.EmbedCreateFields
+import discord4j.core.spec.EmbedCreateSpec
+import discord4j.core.spec.InteractionReplyEditSpec
 
-abstract class AbstractListCommand<C : Category, P : Puzzle, R : Record> : AbstractCommand() {
+abstract class AbstractListCommand<T, C : Category, P : Puzzle, R : Record> : AbstractSubCommand<T>() {
     abstract val leaderboards: List<Leaderboard<C, P, R>>
 
-    override fun handle(event: ChatInputInteractionEvent): MultipartRequest<WebhookExecuteRequest> {
-        val (puzzle, categories) = findPuzzleAndCategories(event)
+    override fun handle(parameters: T): InteractionReplyEditSpec {
+        val (puzzle, categories) = findPuzzleAndCategories(parameters)
         val records = leaderboards.map { it.getAll(puzzle, categories) }.reduce { acc, map -> acc + map }
-        return WebhookExecuteRequest.builder()
-            .addEmbed(EmbedData.builder()
+        return interactionReplyReplaceSpecBuilder()
+            .addEmbed(EmbedCreateSpec.builder()
                 .title("*${puzzle.displayName}*")
                 .embedCategoryRecords(records.entries)
                 .apply {
                     val missing = categories.minus(records.keys)
                     if (missing.isNotEmpty()) {
-                        addField(
-                            EmbedFieldData.builder()
-                                .name(missing.joinToString("/") { it.displayName })
-                                .value("None")
-                                .inline(false)
-                                .build()
-                        )
+                        addField(EmbedCreateFields.Field.of(missing.joinToString("/") { it.displayName }, "None", false))
                     }
                 }
                 .build()
             )
             .build()
-            .asMultipartRequest()
     }
 
     /** @return pair of Puzzle and all the categories that support it */
-    abstract fun findPuzzleAndCategories(interaction: ChatInputInteractionEvent): Pair<P, List<C>>
+    abstract fun findPuzzleAndCategories(parameters: T): Pair<P, List<C>>
 }

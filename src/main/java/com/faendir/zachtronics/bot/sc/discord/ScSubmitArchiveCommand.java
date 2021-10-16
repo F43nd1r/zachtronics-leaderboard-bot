@@ -25,19 +25,23 @@ import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
 import kotlin.Triple;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 @ScQualifier
-public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzle, ScRecord, ScSolution> implements ScSecured {
+public class ScSubmitArchiveCommand
+        extends AbstractSubmitArchiveCommand<ScSubmitArchiveCommand.SubmitArchiveData, ScPuzzle, ScRecord, ScSolution>
+        implements ScSecured {
+    @Delegate
+    private final ScSubmitArchiveCommand_SubmitArchiveDataParser parser = ScSubmitArchiveCommand_SubmitArchiveDataParser.INSTANCE;
     @Getter
     private final ScSubmitCommand submitCommand;
     @Getter
@@ -45,47 +49,36 @@ public class ScSubmitArchiveCommand extends AbstractSubmitArchiveCommand<ScPuzzl
 
     @NotNull
     @Override
-    public Triple<ScPuzzle, ScRecord, ScSolution> parseToPRS(@NotNull ChatInputInteractionEvent event) {
-        Data data = ScSubmitArchiveCommand$DataParser.parse(event);
-        if (data.export.equals(data.video))
+    public Triple<ScPuzzle, ScRecord, ScSolution> parseToPRS(@NotNull SubmitArchiveData parameters) {
+        if (parameters.getExport().equals(parameters.video))
             throw new IllegalArgumentException("Export link and video link cannot be the same link");
-        ScSolution solution = archiveCommand.parseSolutions(event).get(0);
+        ScSolution solution = archiveCommand.parseSolutions(parameters).get(0);
         String archiveLink = archiveCommand.getArchive().makeArchiveLink(solution);
-        ScRecord record = new ScRecord(solution.getScore(), data.author, data.video, archiveLink, false);
+        ScRecord record = new ScRecord(solution.getScore(), parameters.author, parameters.video, archiveLink, false);
         return new Triple<>(solution.getPuzzle(), record, solution);
-    }
-
-    @NotNull
-    @Override
-    public ApplicationCommandOptionData buildData() {
-        return ScSubmitArchiveCommand$DataParser.buildData();
     }
 
     @ApplicationCommand(name = "submit-archive", description = "Submit and archive a solution", subCommand = true)
     @Value
-    public static class Data {
+    @EqualsAndHashCode(callSuper = true)
+    public static class SubmitArchiveData extends ScArchiveCommand.ArchiveData {
         @NotNull String video;
-        @NotNull String export;
         @NotNull String author;
-        ScPuzzle puzzle;
-        Boolean bypassValidation;
 
-        public Data(@Description("Link to your video of the solution, can be `m1` to scrape it from your last message")
-                    @NotNull @Converter(LinkConverter.class) String video,
-                    @Description("Link or `m1` to scrape it from your last message. " +
-                                 "Start the solution name with `/B?P?` to set flags")
-                    @NotNull @Converter(LinkConverter.class) String export,
-                    @Description("Name to appear on the Reddit leaderboard")
-                    @NotNull String author,
-                    @Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
-                    @Converter(ScPuzzleConverter.class) ScPuzzle puzzle,
-                    @Description("Skips running SChem on the solutions. Admin-only")
-                            Boolean bypassValidation) {
+        public SubmitArchiveData(@Description("Link to your video of the solution, can be `m1` to scrape it from your last message")
+                                 @NotNull @Converter(LinkConverter.class) String video,
+                                 @Description("Link or `m1` to scrape it from your last message. " +
+                                 "Start the solution name with `/B?P?` to set flags") @NotNull
+                                 @Converter(LinkConverter.class) String export,
+                                 @Description("Name to appear on the Reddit leaderboard")
+                                 @NotNull String author,
+                                 @Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
+                                 @Converter(ScPuzzleConverter.class) ScPuzzle puzzle,
+                                 @Description("Skips running SChem on the solutions. Admin-only")
+                                 @Converter(ScAdminOnlyBooleanConverter.class) Boolean bypassValidation) {
+            super(export, puzzle, bypassValidation);
             this.video = video;
-            this.export = export;
             this.author = author;
-            this.puzzle = puzzle;
-            this.bypassValidation = bypassValidation;
         }
     }
 }

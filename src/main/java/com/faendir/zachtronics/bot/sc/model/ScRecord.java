@@ -17,12 +17,11 @@
 package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.Record;
+import kotlin.Pair;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -45,9 +44,9 @@ public class ScRecord implements Record {
     @SneakyThrows
     @NotNull
     @Override
-    public List<Tuple2<String, InputStream>> attachments() {
+    public List<Pair<String, InputStream>> attachments() {
         String name = archiveLink.replaceFirst(".+/", "");
-        return Collections.singletonList(Tuples.of(name, new URL(archiveLink).openStream()));
+        return Collections.singletonList(new Pair<>(name, new URL(archiveLink).openStream()));
     }
 
     @NotNull

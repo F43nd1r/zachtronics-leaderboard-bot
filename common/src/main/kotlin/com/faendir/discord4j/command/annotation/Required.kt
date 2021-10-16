@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.discord.command
+package com.faendir.discord4j.command.annotation
 
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.discordjson.json.ApplicationCommandOptionData
-import discord4j.discordjson.json.WebhookExecuteRequest
-import discord4j.rest.util.MultipartRequest
-
-interface Command {
-    fun handle(event: ChatInputInteractionEvent): MultipartRequest<WebhookExecuteRequest>
-
-    val data: ApplicationCommandOptionData
-}
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.VALUE_PARAMETER)
+annotation class Required

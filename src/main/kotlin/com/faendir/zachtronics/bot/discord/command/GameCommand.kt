@@ -16,34 +16,69 @@
 
 package com.faendir.zachtronics.bot.discord.command
 
+import com.faendir.discord4j.command.parse.CombinedParseResult
 import com.faendir.zachtronics.bot.utils.user
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
+import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.discordjson.json.ApplicationCommandRequest
-import discord4j.discordjson.json.WebhookExecuteRequest
-import discord4j.rest.util.MultipartRequest
+import reactor.core.publisher.Mono
 
-interface GameCommand : TopLevelCommand {
+private const val COMMAND_KEY = "command"
+
+interface GameCommand : TopLevelCommand<GameCommand.SubCommandWithParameters<*>> {
     val displayName: String
 
-    val commands: List<Command>
+    val subCommands: List<SubCommand<*>>
 
-    override fun buildRequest(): ApplicationCommandRequest {
+    override fun buildData(): ApplicationCommandRequest {
         val request = ApplicationCommandRequest.builder()
             .name(commandName)
             .description(displayName)
-        for (command in commands) {
+        for (command in subCommands) {
             request.addOption(command.data)
         }
         return request.build()
     }
 
-    override fun handle(event: ChatInputInteractionEvent): MultipartRequest<WebhookExecuteRequest> {
-        val option = event.options.first()
-        val command = commands.find { it.data.name() == option.name }
-            ?: throw IllegalArgumentException("I did not recognize the command \"${option.name}\".")
-        if (command is Secured && !command.hasExecutionPermission(event.user())) {
-            throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
-        }
-        return command.handle(event)
+    override fun map(parameters: Map<String, Any?>): SubCommandWithParameters<*>? {
+        val command = subCommands.first { parameters.getValue(COMMAND_KEY) == it.data.name() }
+        return command.mapImpl(parameters - COMMAND_KEY)
     }
+
+    private fun <T> SubCommand<T>.mapImpl(parameters: Map<String, Any?>): SubCommandWithParameters<T>? {
+        val param = map(parameters - COMMAND_KEY)
+        return param?.let { SubCommandWithParameters(this, param) }
+    }
+
+    override fun parse(event: ChatInputInteractionEvent): CombinedParseResult<SubCommandWithParameters<*>> {
+        val option = event.options.first()
+        val subCommand = subCommands.find { it.data.name() == option.name }
+            ?: return CombinedParseResult.Failure(listOf("I did not recognize the command \"${option.name}\"."))
+        if (subCommand is Secured && !subCommand.hasExecutionPermission(event.user())) {
+            return CombinedParseResult.Failure(listOf("sorry, you do not have the permission to use this command."))
+        }
+        return parseSubCommand(subCommand, event)
+    }
+
+    fun <T> parseSubCommand(
+        subCommand: SubCommand<T>,
+        event: ChatInputInteractionEvent
+    ): CombinedParseResult<SubCommandWithParameters<*>> {
+        return when (val result = subCommand.parse(event)) {
+            is CombinedParseResult.Failure -> CombinedParseResult.Failure(result.messages)
+            is CombinedParseResult.Ambiguous -> CombinedParseResult.Ambiguous(
+                result.options,
+                result.partialResult + (COMMAND_KEY to subCommand.data.name())
+            )
+            is CombinedParseResult.Success -> CombinedParseResult.Success(SubCommandWithParameters(subCommand, result.value))
+        }
+    }
+
+    override fun handle(event: InteractionCreateEvent, parameters: SubCommandWithParameters<*>): Mono<Void> = handleImpl(event, parameters)
+
+    private fun <T> handleImpl(event: InteractionCreateEvent, command: SubCommandWithParameters<T>): Mono<Void> {
+        return command.subCommand.handle(event, command.parameters)
+    }
+
+    class SubCommandWithParameters<T>(val subCommand: SubCommand<T>, val parameters: T)
 }

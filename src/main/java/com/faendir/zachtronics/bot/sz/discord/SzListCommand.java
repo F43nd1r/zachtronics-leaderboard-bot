@@ -24,13 +24,12 @@ import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -41,31 +40,27 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Component
 @SzQualifier
-public class SzListCommand extends AbstractListCommand<SzCategory, SzPuzzle, SzRecord> {
+public class SzListCommand extends AbstractListCommand<SzListCommand.ListData, SzCategory, SzPuzzle, SzRecord> {
+    @Delegate
+    private final SzListCommand_ListDataParser parser = SzListCommand_ListDataParser.INSTANCE;
     @Getter
     private final List<Leaderboard<SzCategory, SzPuzzle, SzRecord>> leaderboards;
 
     @NotNull
     @Override
-    public ApplicationCommandOptionData buildData() {
-        return SzListCommand$DataParser.buildData();
-    }
-
-    @NotNull
-    @Override
-    public Pair<SzPuzzle, List<SzCategory>> findPuzzleAndCategories(@NotNull ChatInputInteractionEvent interaction) {
-        Data data = SzListCommand$DataParser.parse(interaction);
-        return new Pair<>(data.puzzle, Arrays.stream(SzCategory.values())
-                .filter(c -> c.supportsPuzzle(data.puzzle))
-                .collect(Collectors.toList()));
+    public Pair<SzPuzzle, List<SzCategory>> findPuzzleAndCategories(@NotNull ListData parameters) {
+        return new Pair<>(parameters.puzzle,
+                          Arrays.stream(SzCategory.values())
+                                .filter(c -> c.supportsPuzzle(parameters.puzzle))
+                                .collect(Collectors.toList()));
     }
 
     @ApplicationCommand(name = "list", subCommand = true)
     @Value
-    public static class Data {
+    public static class ListData {
         @NonNull SzPuzzle puzzle;
 
-        public Data(@Converter(SzPuzzleConverter.class) @NonNull SzPuzzle puzzle) {
+        public ListData(@Converter(SzPuzzleConverter.class) @NonNull SzPuzzle puzzle) {
             this.puzzle = puzzle;
         }
     }

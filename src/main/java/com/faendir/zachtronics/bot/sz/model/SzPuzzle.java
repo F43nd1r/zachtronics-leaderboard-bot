@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.sz.model;
 
+import com.faendir.discord4j.command.parse.SingleParseResult;
 import com.faendir.zachtronics.bot.model.Puzzle;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
 import lombok.Getter;
@@ -79,7 +80,7 @@ public enum SzPuzzle implements Puzzle {
     private final String displayName;
 
     @NotNull
-    public static SzPuzzle parsePuzzle(@NotNull String name) {
+    public static SingleParseResult<SzPuzzle> parsePuzzle(@NotNull String name) {
         return UtilsKt.getSingleMatchingPuzzle(SzPuzzle.values(), name);
     }
 }

@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.sc.model;
 
+import com.faendir.discord4j.command.parse.SingleParseResult;
 import com.faendir.zachtronics.bot.model.Puzzle;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
 import lombok.Getter;
@@ -410,10 +411,11 @@ public enum ScPuzzle implements Puzzle {
     private final boolean isDeterministic;
 
     @NotNull
-    public static ScPuzzle parsePuzzle(@NotNull String name) {
+    public static SingleParseResult<ScPuzzle> parsePuzzle(@NotNull String name) {
         return Arrays.stream(ScPuzzle.values())
                      .filter(p -> p.getDisplayName().equalsIgnoreCase(name))
                      .findFirst()
+                     .<SingleParseResult<ScPuzzle>>map(SingleParseResult.Success::new)
                      .orElseGet(() -> UtilsKt.getSingleMatchingPuzzle(ScPuzzle.values(), name));
     }
 }

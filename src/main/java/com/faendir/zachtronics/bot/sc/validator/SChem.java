@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.sc.validator;
 
+import com.faendir.discord4j.command.parse.SingleParseResult;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
@@ -90,15 +91,13 @@ public class SChem {
     static ScSolution validate(@NotNull String export) throws SChemException {
         SChemResult result = run(export);
 
-        ScPuzzle puzzle;
-        try {
-            puzzle = ScPuzzle.parsePuzzle(result.getLevelName());
-        } catch (IllegalArgumentException e) {
-            assert result.getResnetId() != null;
-            puzzle = ScPuzzle.parsePuzzle(result.getLevelName() +
-                                          Arrays.stream(result.getResnetId()).mapToObj(Integer::toString)
-                                                .collect(Collectors.joining("-", " (", ")")));
+        SingleParseResult<ScPuzzle> puzzleParseResult = ScPuzzle.parsePuzzle(result.getLevelName());
+        if (!(puzzleParseResult instanceof SingleParseResult.Success) && result.getResnetId() != null) {
+            puzzleParseResult = ScPuzzle.parsePuzzle(result.getLevelName() +
+                                                     Arrays.stream(result.getResnetId()).mapToObj(Integer::toString)
+                                                           .collect(Collectors.joining("-", " (", ")")));
         }
+        ScPuzzle puzzle = puzzleParseResult.orElseThrow();
 
         Matcher m = ScSolution.SOLUTION_HEADER.matcher(export);
         if (!m.find())

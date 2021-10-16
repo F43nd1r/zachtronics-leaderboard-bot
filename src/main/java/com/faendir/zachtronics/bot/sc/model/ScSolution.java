@@ -59,7 +59,7 @@ public class ScSolution implements Solution {
             String rawPuzzle = m.group("puzzle");
             if (rawPuzzle.matches("'.+'"))
                 rawPuzzle = rawPuzzle.replaceAll("^'|'$", "").replace("''", "'");
-            puzzle = ScPuzzle.parsePuzzle(rawPuzzle);
+            puzzle = ScPuzzle.parsePuzzle(rawPuzzle).orElseThrow();
         }
 
         ScScore score = ScScore.parseBPScore(m);

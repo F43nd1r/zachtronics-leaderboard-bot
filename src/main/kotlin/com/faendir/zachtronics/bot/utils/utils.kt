@@ -16,15 +16,15 @@
 
 package com.faendir.zachtronics.bot.utils
 
+import com.faendir.discord4j.command.parse.SingleParseResult
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import discord4j.core.`object`.entity.User
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.discordjson.json.EmbedFieldData
-import discord4j.discordjson.json.ImmutableEmbedData
-import discord4j.discordjson.json.MessageSendRequestBase
-import discord4j.rest.util.MultipartRequest
+import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.spec.EmbedCreateFields
+import discord4j.core.spec.EmbedCreateSpec
+import discord4j.core.spec.InteractionReplyEditSpec
 
 inline fun <T, R> Collection<T>.ifNotEmpty(block: (Collection<T>) -> R): R? = takeIf { it.isNotEmpty() }?.let(block)
 
@@ -38,13 +38,13 @@ fun <T> Iterable<T>.plusIf(condition: Boolean, element: T): List<T> = if (condit
 
 private val wordSeparator = Regex("[\\s-/,:]+")
 
-fun <P : Puzzle> Array<P>.getSingleMatchingPuzzle(name: String): P {
+fun <P : Puzzle> Array<P>.getSingleMatchingPuzzle(name: String): SingleParseResult<P> {
     val matches = toList().fuzzyMatch(name.trim()) { displayName }
     return when (val size = matches.size) {
-        0 -> throw IllegalArgumentException("I did not recognize the puzzle \"$name\".")
-        1 -> matches.first()
-        in 2..5 -> throw IllegalArgumentException("your request for \"$name\" was not precise enough. Use one of:\n${matches.joinToString("\n") { "- *${it.displayName}*" }}")
-        else -> throw IllegalArgumentException("your request for \"$name\" was not precise enough. $size matches.")
+        0 -> SingleParseResult.Failure("I did not recognize the puzzle \"$name\".")
+        1 -> SingleParseResult.Success(matches.first())
+        in 2..25 -> SingleParseResult.Ambiguous(matches) { it.displayName }
+        else -> SingleParseResult.Failure("your request for \"$name\" was not precise enough. $size matches.")
     }
 }
 
@@ -71,23 +71,22 @@ fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> 
         }
 }
 
-fun <T : MessageSendRequestBase> T.asMultipartRequest() = MultipartRequest.ofRequest(this)
-
-fun <C : Category, R : Record> ImmutableEmbedData.Builder.embedCategoryRecords(records: Iterable<Map.Entry<C, R?>>):
-        ImmutableEmbedData.Builder {
+fun <C : Category, R : Record> EmbedCreateSpec.Builder.embedCategoryRecords(records: Iterable<Map.Entry<C, R?>>):
+        EmbedCreateSpec.Builder {
     return this.addAllFields(
         records.groupBy({ it.value?.toEmbedDisplayString() ?: "`none`" }, { it.key })
             .map { (record, categories) -> record to categories.sortedBy<C, Comparable<*>> { it as Comparable<*> } }
             .sortedBy<Pair<String, List<C>>, Comparable<*>> { it.second.first() as Comparable<*> }
             .map { (record, categories) ->
-                EmbedFieldData.builder()
-                    .name(categories.joinToString("/") { it.displayName })
-                    .value(record)
-                    .inline(true)
-                    .build()
+                EmbedCreateFields.Field.of(categories.joinToString("/") { it.displayName }, record, true)
             }
     )
 }
 
-fun ChatInputInteractionEvent.user(): User =
+fun InteractionCreateEvent.user(): User =
     this.interaction.member.map { it as User }.orElse(this.interaction.user)
+
+fun interactionReplyReplaceSpecBuilder() = InteractionReplyEditSpec.builder()
+    .contentOrNull(null)
+    .componentsOrNull(null)
+    .embedsOrNull(null)

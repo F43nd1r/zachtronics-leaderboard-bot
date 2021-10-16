@@ -19,28 +19,25 @@ package com.faendir.zachtronics.bot.discord.command
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.Solution
-import com.faendir.zachtronics.bot.utils.asMultipartRequest
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.discordjson.json.WebhookExecuteRequest
-import discord4j.rest.util.MultipartRequest
+import com.faendir.zachtronics.bot.utils.interactionReplyReplaceSpecBuilder
+import discord4j.core.spec.InteractionReplyEditSpec
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-abstract class AbstractSubmitArchiveCommand<P : Puzzle, R : Record, S : Solution> : AbstractCommand(), SecuredCommand {
-    protected abstract val submitCommand: AbstractSubmitCommand<P, R>
-    protected abstract val archiveCommand: AbstractArchiveCommand<S>
+abstract class AbstractSubmitArchiveCommand<T, P : Puzzle, R : Record, S : Solution> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
+    protected abstract val submitCommand: AbstractSubmitCommand<*, P, R>
+    protected abstract val archiveCommand: AbstractArchiveCommand<*, S>
 
-    override fun handle(event: ChatInputInteractionEvent): MultipartRequest<WebhookExecuteRequest> {
-        val (puzzle, record, solution) = parseToPRS(event)
+    override fun handle(parameters: T): InteractionReplyEditSpec {
+        val (puzzle, record, solution) = parseToPRS(parameters)
         val submitOut = submitCommand.submitToLeaderboards(puzzle, record)
         val archiveOut = archiveCommand.archiveAll(Collections.singleton(solution))
-        return WebhookExecuteRequest.builder()
-            .from(submitOut)
+        return interactionReplyReplaceSpecBuilder()
+            .embeds(submitOut.embeds())
             .addEmbed(archiveOut)
             .build()
-            .asMultipartRequest()
     }
 
-    abstract fun parseToPRS(event: ChatInputInteractionEvent): Triple<P, R, S>
+    abstract fun parseToPRS(parameters: T): Triple<P, R, S>
 }

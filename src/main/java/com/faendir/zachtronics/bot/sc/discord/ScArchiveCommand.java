@@ -25,12 +25,11 @@ import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.archive.ScArchive;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
-import com.faendir.zachtronics.bot.utils.UtilsKt;
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import lombok.experimental.Delegate;
+import lombok.experimental.NonFinal;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -39,42 +38,35 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 @ScQualifier
-public class ScArchiveCommand extends AbstractArchiveCommand<ScSolution> implements ScSecured {
+public class ScArchiveCommand extends AbstractArchiveCommand<ScArchiveCommand.ArchiveData, ScSolution> implements ScSecured {
+    @Delegate
+    private final ScArchiveCommand_ArchiveDataParser parser = ScArchiveCommand_ArchiveDataParser.INSTANCE;
     @Getter
     private final ScArchive archive;
 
     @NotNull
     @Override
-    public List<ScSolution> parseSolutions(@NotNull ChatInputInteractionEvent interaction) {
-        Data data = ScArchiveCommand$DataParser.parse(interaction);
-        boolean bypassValidation = data.bypassValidation != null && data.bypassValidation;
-        if (bypassValidation && !ScSecured.isWikiAdmin(UtilsKt.user(interaction))) {
-            throw new IllegalArgumentException("Only a wiki admin can bypass the validation");
-        }
-        return ScSolution.fromExportLink(data.export, data.puzzle, bypassValidation);
-    }
-
-    @NotNull
-    @Override
-    public ApplicationCommandOptionData buildData() {
-        return ScArchiveCommand$DataParser.buildData();
+    public List<ScSolution> parseSolutions(@NotNull ArchiveData parameters) {
+        boolean bypassValidation = parameters.bypassValidation != null && parameters.bypassValidation;
+        return ScSolution.fromExportLink(parameters.export, parameters.puzzle, bypassValidation);
     }
 
     @ApplicationCommand(name = "archive", description = "Archive any number of solutions in an export file", subCommand = true)
     @Value
-    public static class Data {
+    @NonFinal
+    public static class ArchiveData {
         @NotNull String export;
         ScPuzzle puzzle;
         Boolean bypassValidation;
 
-        public Data(@NotNull
-                    @Description("Link or `m1` to scrape it from your last message. " +
-                                 "Start the solution name with `/B?P?` to set flags")
-                    @Converter(LinkConverter.class) String export,
-                    @Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
-                    @Converter(ScPuzzleConverter.class) ScPuzzle puzzle,
-                    @Description("Skips running SChem on the solutions. Admin-only")
-                            Boolean bypassValidation) {
+        public ArchiveData(@NotNull
+                           @Description("Link or `m1` to scrape it from your last message. " +
+                                        "Start the solution name with `/B?P?` to set flags")
+                           @Converter(LinkConverter.class) String export,
+                           @Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
+                           @Converter(ScPuzzleConverter.class) ScPuzzle puzzle,
+                           @Description("Skips running SChem on the solutions. Admin-only")
+                           @Converter(ScAdminOnlyBooleanConverter.class) Boolean bypassValidation) {
             this.export = export;
             this.puzzle = puzzle;
             this.bypassValidation = bypassValidation;

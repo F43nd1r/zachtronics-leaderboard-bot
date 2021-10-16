@@ -29,14 +29,22 @@ plugins {
     id("com.gorylenko.gradle-git-properties") version "2.3.1"
 }
 
-repositories {
-    mavenCentral()
-    google()
-    mavenLocal()
+allprojects {
+    repositories {
+        mavenCentral()
+        google()
+        mavenLocal()
+    }
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = "16"
+            freeCompilerArgs = listOf("-Xjvm-default=all", "-Xjsr305=strict")
+        }
+    }
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.5.2")
     implementation("org.springframework.boot:spring-boot-starter")
@@ -51,8 +59,8 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.faendir.om:dsl:1.2.6")
     implementation("com.faendir.om:parser:2.1.8")
-    implementation("com.faendir.discord4j-command-parser:annotations:1.4.1")
-    ksp("com.faendir.discord4j-command-parser:processor:1.4.1")
+    implementation(project("common"))
+    ksp(project("processor"))
     implementation(project("native"))
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
@@ -80,13 +88,6 @@ tasks.withType<Test> {
             }
         }
     })
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "16"
-        freeCompilerArgs = listOf("-Xjvm-default=all", "-Xjsr305=strict")
-    }
 }
 
 docker {

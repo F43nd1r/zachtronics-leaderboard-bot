@@ -16,8 +16,8 @@
 
 package com.faendir.zachtronics.bot.sz.discord;
 
-import com.faendir.zachtronics.bot.discord.command.Command;
 import com.faendir.zachtronics.bot.discord.command.GameCommand;
+import com.faendir.zachtronics.bot.discord.command.SubCommand;
 import com.faendir.zachtronics.bot.sz.SzQualifier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -34,5 +34,5 @@ public class SzCommand implements GameCommand {
     private final String commandName = "sz";
     @Getter
     @SzQualifier
-    private final List<Command> commands;
+    private final List<SubCommand<?>> subCommands;
 }

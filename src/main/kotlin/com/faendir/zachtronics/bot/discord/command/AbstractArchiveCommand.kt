@@ -19,23 +19,21 @@ package com.faendir.zachtronics.bot.discord.command
 import com.faendir.zachtronics.bot.archive.Archive
 import com.faendir.zachtronics.bot.archive.ArchiveResult
 import com.faendir.zachtronics.bot.model.Solution
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.discordjson.json.EmbedData
-import discord4j.discordjson.json.EmbedFieldData
-import discord4j.discordjson.json.EmbedFooterData
-import discord4j.discordjson.json.WebhookExecuteRequest
-import discord4j.rest.util.MultipartRequest
+import com.faendir.zachtronics.bot.utils.interactionReplyReplaceSpecBuilder
+import discord4j.core.spec.EmbedCreateFields
+import discord4j.core.spec.EmbedCreateSpec
+import discord4j.core.spec.InteractionReplyEditSpec
 
-abstract class AbstractArchiveCommand<S : Solution> : AbstractCommand(), SecuredCommand {
+abstract class AbstractArchiveCommand<T, S : Solution> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
     protected abstract val archive: Archive<S>
 
-    override fun handle(event: ChatInputInteractionEvent): MultipartRequest<WebhookExecuteRequest> {
-        val solutions = parseSolutions(event)
+    override fun handle(parameters: T): InteractionReplyEditSpec {
+        val solutions = parseSolutions(parameters)
         val embed = archiveAll(solutions)
-        return MultipartRequest.ofRequest(WebhookExecuteRequest.builder().addEmbed(embed).build())
+        return interactionReplyReplaceSpecBuilder().addEmbed(embed).build()
     }
 
-    fun archiveAll(solutions: Collection<S>): EmbedData {
+    fun archiveAll(solutions: Collection<S>): EmbedCreateSpec {
         val results = archive.archiveAll(solutions)
 
         val successes = results.count { it is ArchiveResult.Success }
@@ -46,7 +44,7 @@ abstract class AbstractArchiveCommand<S : Solution> : AbstractCommand(), Secured
         var totalSize = title.length
         var totalFields = 0
 
-        val embed = EmbedData.builder().title(title)
+        val embed = EmbedCreateSpec.builder().title(title)
         for ((solution, result) in solutions.zip(results)) {
             val name = "*${solution.puzzle.displayName}*"
             val value = when (result) {
@@ -64,20 +62,14 @@ abstract class AbstractArchiveCommand<S : Solution> : AbstractCommand(), Secured
             totalFields++
             totalSize += name.length + value.length
             if (totalFields > 25 || totalSize > 5900) {
-                embed.footer(EmbedFooterData.builder().text("${results.size - totalFields + 1} more results hidden").build())
+                embed.footer(EmbedCreateFields.Footer.of("${results.size - totalFields + 1} more results hidden", null))
                 break
             }
 
-            embed.addField(
-                EmbedFieldData.builder()
-                    .name(name)
-                    .value(value)
-                    .inline(true)
-                    .build()
-            )
+            embed.addField(EmbedCreateFields.Field.of(name, value, true))
         }
         return embed.build()
     }
 
-    abstract fun parseSolutions(interaction: ChatInputInteractionEvent): List<S>
+    abstract fun parseSolutions(parameters: T): List<S>
 }

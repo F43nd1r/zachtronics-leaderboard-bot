@@ -20,23 +20,22 @@ import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.discordjson.json.WebhookExecuteRequest
-import discord4j.rest.util.MultipartRequest
+import com.faendir.zachtronics.bot.utils.interactionReplyReplaceSpecBuilder
+import discord4j.core.spec.InteractionReplyEditSpec
+import discord4j.core.spec.MessageCreateFields
 
-abstract class AbstractShowCommand<C : Category, P : Puzzle, R : Record> : AbstractCommand() {
+abstract class AbstractShowCommand<T, C : Category, P : Puzzle, R : Record> : AbstractSubCommand<T>() {
     abstract val leaderboards: List<Leaderboard<C, P, R>>
 
-    override fun handle(event: ChatInputInteractionEvent): MultipartRequest<WebhookExecuteRequest> {
-        val (puzzle, category) = findPuzzleAndCategory(event)
+    override fun handle(parameters: T): InteractionReplyEditSpec {
+        val (puzzle, category) = findPuzzleAndCategory(parameters)
         val record = leaderboards.asSequence().mapNotNull { it.get(puzzle, category) }.firstOrNull()
             ?: throw IllegalArgumentException("sorry, there is no score for ${puzzle.displayName} ${category.displayName}.")
-        return MultipartRequest.ofRequestAndFiles(
-            WebhookExecuteRequest.builder()
-                .content("*${puzzle.displayName}* **${category.displayName}**\n${record.toShowDisplayString()}").build(),
-            record.attachments()
-        )
+        return interactionReplyReplaceSpecBuilder()
+            .contentOrNull("*${puzzle.displayName}* **${category.displayName}**\n${record.toShowDisplayString()}")
+            .files(record.attachments().map { (name, data) -> MessageCreateFields.File.of(name, data) })
+            .build()
     }
 
-    abstract fun findPuzzleAndCategory(interaction: ChatInputInteractionEvent): Pair<P, C>
+    abstract fun findPuzzleAndCategory(parameters: T): Pair<P, C>
 }

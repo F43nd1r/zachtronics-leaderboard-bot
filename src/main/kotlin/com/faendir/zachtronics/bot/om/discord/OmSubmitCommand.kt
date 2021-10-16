@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.om.discord
 import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
+import com.faendir.discord4j.command.parse.ApplicationCommandParser
 import com.faendir.zachtronics.bot.discord.LinkConverter
 import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand
 import com.faendir.zachtronics.bot.discord.command.Secured
@@ -28,24 +29,21 @@ import com.faendir.zachtronics.bot.om.model.OmModifier
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
+import discord4j.discordjson.json.ApplicationCommandOptionData
 import org.springframework.stereotype.Component
 
 @Component
 @OmQualifier
 class OmSubmitCommand(override val leaderboards: List<Leaderboard<*, OmPuzzle, OmRecord>>) :
-    AbstractSubmitCommand<OmPuzzle, OmRecord>(), Secured by OmSecured {
-
-    override fun buildData() = SubmitParser.buildData()
-
-    override fun parseSubmission(interaction: ChatInputInteractionEvent): Pair<OmPuzzle, OmRecord> {
-        val submit = SubmitParser.parse(interaction)
+    AbstractSubmitCommand<Submit, OmPuzzle, OmRecord>(),
+    Secured by OmSecured,
+    ApplicationCommandParser<Submit, ApplicationCommandOptionData> by SubmitParser {
+    override fun parseSubmission(parameters: Submit): Pair<OmPuzzle, OmRecord> {
         return Pair(
-            submit.puzzle,
+            parameters.puzzle,
             OmRecord(
-                OmScore.parse(submit.puzzle, submit.score).apply { modifier = submit.modifier ?: OmModifier.NORMAL },
-                submit.gif,
-                interaction.interaction.user.username
+                OmScore.parse(parameters.puzzle, parameters.score).apply { modifier = parameters.modifier ?: OmModifier.NORMAL },
+                parameters.gif
             )
         )
     }

@@ -16,44 +16,37 @@
 
 package com.faendir.zachtronics.bot.discord.command;
 
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
+import com.faendir.discord4j.command.annotation.ApplicationCommand;
+import discord4j.core.event.domain.interaction.InteractionCreateEvent;
 import discord4j.core.object.entity.User;
-import discord4j.discordjson.json.ApplicationCommandRequest;
-import discord4j.discordjson.json.WebhookExecuteRequest;
-import discord4j.rest.util.MultipartRequest;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
-class RestartCommand implements TopLevelCommand, Secured {
+public class RestartCommand implements TopLevelCommand<RestartCommand.RestartData>, Secured {
+    @Delegate
+    RestartCommand_RestartDataParser parser;
     @Getter
     private final String commandName = "restart";
     @Getter
     private final ApplicationContext applicationContext;
 
-    @NotNull
-    @Override
-    public ApplicationCommandRequest buildRequest() {
-        return ApplicationCommandRequest.builder()
-                                        .name(commandName)
-                                        .description("Stops the bot, which will restart with the latest image")
-                                        .build();
-    }
-
     @SneakyThrows
     @NotNull
     @Override
-    public MultipartRequest<WebhookExecuteRequest> handle(@NotNull ChatInputInteractionEvent event) {
+    public Mono<Void> handle(@NotNull InteractionCreateEvent event, RestartData parameters) {
         log.error("Requested shut down, see you soon");
         SpringApplication.exit(applicationContext);
         Thread.sleep(5000);
@@ -69,4 +62,7 @@ class RestartCommand implements TopLevelCommand, Secured {
     public boolean hasExecutionPermission(@NotNull User user) {
         return BOT_OWNERS.contains(user.getId().asLong());
     }
+
+    @ApplicationCommand(name = "restart", description = "Stops the bot, which will restart with the latest image")
+    public static class RestartData {}
 }

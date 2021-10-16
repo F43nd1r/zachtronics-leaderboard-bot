@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.om.discord
 import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
+import com.faendir.discord4j.command.parse.ApplicationCommandParser
 import com.faendir.om.dsl.DslGenerator
 import com.faendir.om.parser.solution.SolutionParser
 import com.faendir.om.parser.solution.model.Position
@@ -52,7 +53,6 @@ import com.faendir.zachtronics.bot.om.model.OmScorePart.WIDTH
 import com.faendir.zachtronics.bot.om.model.OmSolution
 import com.faendir.zachtronics.bot.om.model.SINGLE
 import com.roxstudio.utils.CUrl
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import okio.buffer
 import okio.sink
@@ -65,14 +65,13 @@ import java.util.*
 
 @Component
 @OmQualifier
-class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArchiveCommand<OmSolution>(), Secured by OmSecured {
+class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArchiveCommand<ArchiveParams, OmSolution>(),
+    Secured by OmSecured,
+    ApplicationCommandParser<ArchiveParams, ApplicationCommandOptionData> by ArchiveParamsParser {
     private val verifier = JNISolutionVerifier()
 
-    override fun buildData(): ApplicationCommandOptionData = ArchiveParser.buildData()
-
-    override fun parseSolutions(interaction: ChatInputInteractionEvent): List<OmSolution> {
-        val command = ArchiveParser.parse(interaction)
-        return listOf(parseSolution(findScoreIdentifier(command), command.solution))
+    override fun parseSolutions(parameters: ArchiveParams): List<OmSolution> {
+        return listOf(parseSolution(findScoreIdentifier(parameters), parameters.solution))
     }
 
     fun parseSolution(scoreIdentifier: ScoreIdentifier, link: String): OmSolution {
@@ -189,8 +188,8 @@ interface IArchive {
     val score: String?
 }
 
-@ApplicationCommand(description = "Archive a solution", subCommand = true)
-data class Archive(
+@ApplicationCommand(name= "archive", description = "Archive a solution", subCommand = true)
+data class ArchiveParams(
     @Converter(LinkConverter::class)
     @Description("Link to your solution file, can be `m1` to scrape it from your last message")
     override val solution: String,

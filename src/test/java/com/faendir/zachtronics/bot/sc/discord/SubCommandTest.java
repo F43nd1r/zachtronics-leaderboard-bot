@@ -16,27 +16,28 @@
 
 package com.faendir.zachtronics.bot.sc.discord;
 
+import com.faendir.discord4j.command.parse.CombinedParseResult;
 import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.discord.command.Command;
-import com.faendir.zachtronics.bot.sc.ScQualifier;
+import com.faendir.zachtronics.bot.discord.command.AbstractSubCommand;
+import com.faendir.zachtronics.bot.discord.command.GameCommand;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import discord4j.core.object.command.ApplicationCommandOption;
 import discord4j.core.object.entity.User;
+import discord4j.core.spec.EmbedCreateFields;
+import discord4j.core.spec.InteractionReplyEditSpec;
+import discord4j.core.spec.MessageCreateFields;
 import discord4j.discordjson.json.UserData;
-import discord4j.discordjson.json.WebhookExecuteRequest;
 import discord4j.discordjson.possible.Possible;
-import discord4j.rest.util.MultipartRequest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import reactor.util.function.Tuple2;
 
 import java.util.Collections;
 import java.util.List;
@@ -50,11 +51,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @BotTest(Application.class)
-public class CommandTest {
+public class SubCommandTest {
 
     @Autowired
-    @ScQualifier
-    private List<Command> commands;
+    private ScCommand scCommand;
 
     @Test
     public void testShow() {
@@ -147,42 +147,54 @@ public class CommandTest {
     }
 
     @NotNull
-    private String runCommand(String commandName, @NotNull Map<String, ?> args) {
-        ChatInputInteractionEvent interactionEvent = Mockito.mock(ChatInputInteractionEvent.class, Mockito.RETURNS_DEEP_STUBS);
+    private <T> String runCommand(String commandName, @NotNull Map<String, ?> args) {
+        ApplicationCommandInteractionOption subCommandOption = Mockito.mock(ApplicationCommandInteractionOption.class);
+        Mockito.when(subCommandOption.getName()).thenReturn(commandName);
+        Mockito.when(subCommandOption.getType()).thenReturn(ApplicationCommandOption.Type.SUB_COMMAND);
 
         List<ApplicationCommandInteractionOption> options = args.entrySet().stream()
                                                                 .map(e -> mockOption(e.getKey(), e.getValue()))
                                                                 .collect(Collectors.toList());
-        Mockito.when(interactionEvent.getOptions()).thenReturn(options);
+        Mockito.when(subCommandOption.getOptions()).thenReturn(options);
+
+        ChatInputInteractionEvent interactionEvent = Mockito.mock(ChatInputInteractionEvent.class, Mockito.RETURNS_DEEP_STUBS);
+        Mockito.when(interactionEvent.getOptions()).thenReturn(Collections.singletonList(subCommandOption));
 
         User ieee = new User(Mockito.mock(GatewayDiscordClient.class), Mockito.mock(UserData.class, Mockito.RETURNS_DEEP_STUBS));
         Mockito.when(ieee.getId().asLong()).thenReturn(295868901042946048L);
         Mockito.when(interactionEvent.getInteraction().getUser()).thenReturn(ieee);
 
-        MultipartRequest<WebhookExecuteRequest> multipartRequest = commands.stream().filter(c -> c.getData().name()
-                                                                                                  .equals(commandName))
-                                                                           .findFirst().orElseThrow()
-                                                                           .handle(interactionEvent);
-        WebhookExecuteRequest executeRequest = multipartRequest.getJsonPayload();
-        assert executeRequest != null;
-        String result = Stream.<Stream<String>>of(stream(executeRequest.content()),
-                                                  stream(executeRequest.embeds()).flatMap(
+        CombinedParseResult<GameCommand.SubCommandWithParameters<?>> parseResult = scCommand.parse(interactionEvent);
+        if (!(parseResult instanceof CombinedParseResult.Success))
+            return parseResult.toString();
+
+        @SuppressWarnings("unchecked")
+        GameCommand.SubCommandWithParameters<T> subCommandWithParameters = (GameCommand.SubCommandWithParameters<T>)(
+                (CombinedParseResult.Success<GameCommand.SubCommandWithParameters<?>>) parseResult).getValue();
+        AbstractSubCommand<T> subCommand = (AbstractSubCommand<T>) subCommandWithParameters.getSubCommand();
+        InteractionReplyEditSpec editSpec = subCommand.handle(subCommandWithParameters.getParameters());
+
+        String result = Stream.<Stream<String>>of(flatStream(editSpec.content()),
+                                                  flatStream(editSpec.embeds()).flatMap(
                                                           l -> l.stream().mapMulti((e, d) -> {
                                                               e.title().toOptional().ifPresent(d);
                                                               e.description().toOptional().ifPresent(d);
-                                                              e.fields().toOptional().orElse(Collections.emptyList())
-                                                               .stream().map(f -> f.name() + "\n" + f.value())
+                                                              e.fields().stream()
+                                                               .map(f -> f.name() + "\n" + f.value())
                                                                .forEach(d);
-                                                              e.footer().toOptional()
-                                                               .ifPresent(f -> d.accept(f.text()));
-                                                          })), multipartRequest.getFiles().stream().map(Tuple2::getT1))
+                                                              EmbedCreateFields.Footer footer = e.footer();
+                                                              if (footer != null)
+                                                                  d.accept(footer.text());
+                                                          })),
+                                                  editSpec.files().stream().map(MessageCreateFields.File::name))
                               .flatMap(Function.identity()).collect(Collectors.joining("\n"));
         System.out.println(result);
         return result;
     }
 
     @NotNull
-    private static <T> Stream<T> stream(@NotNull Possible<T> p) {
-        return p.toOptional().stream();
+    private static <T> Stream<T> flatStream(@NotNull Possible<Optional<T>> p) {
+        return Possible.flatOpt(p).stream();
     }
+
 }

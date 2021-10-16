@@ -16,7 +16,8 @@
 
 package com.faendir.zachtronics.bot.discord
 
-import com.faendir.discord4j.command.annotation.OptionConverter
+import com.faendir.discord4j.command.parse.SingleParseResult
+import com.faendir.discord4j.command.parse.StringOptionConverter
 import discord4j.common.util.Snowflake
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.reaction.ReactionEmoji
@@ -26,8 +27,8 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.time.Instant
 
-class LinkConverter : OptionConverter<String> {
-    override fun fromString(context: ChatInputInteractionEvent, string: String): String {
+class LinkConverter : StringOptionConverter<String> {
+    override fun fromString(context: ChatInputInteractionEvent, string: String): SingleParseResult<String> {
         return findLink(
             string.trim(),
             context.interaction.channel.flatMapMany { it.getMessagesBefore(it.lastMessageId.orElseGet { Snowflake.of(Instant.now()) }) }
@@ -42,12 +43,12 @@ class LinkConverter : OptionConverter<String> {
                 })
     }
 
-    private fun findLink(input: String, messages: Flux<Message>): String {
+    private fun findLink(input: String, messages: Flux<Message>): SingleParseResult<String> {
         val link = if (Regex("m\\d+").matches(input)) {
             val num = input.removePrefix("m").toInt()
             val message = messages.elementAt(num - 1).block()!!
             message.attachments.firstOrNull()?.url?.also { message.addReaction(ReactionEmoji.unicode("\uD83D\uDC4D"/* 👍 */)).block() }
-                ?: throw IllegalArgumentException(
+                ?: return SingleParseResult.Failure(
                     "https://discord.com/channels/${
                         message.guild.block()!!.id.asLong().toString().ifEmpty { "@me" }
                     }/${message.channelId.asLong()}/${message.id.asLong()} had no attachments"
@@ -55,21 +56,20 @@ class LinkConverter : OptionConverter<String> {
         } else {
             input
         }
-        checkLink(link)
-        return link
+        if(!isValid(link) ){
+            return SingleParseResult.Failure("\"$link\" is not a valid link")
+        }
+        return SingleParseResult.Success(link)
     }
 
-    private fun checkLink(string: String) {
-        val valid = try {
+    private fun isValid(string: String): Boolean {
+        return try {
             val connection = URL(string).openConnection() as HttpURLConnection
             connection.requestMethod = "HEAD"
             connection.setRequestProperty("Accept", "*/*")
             connection.responseCode in (200 until 400) // accept all redirects as well
         } catch (e: Exception) {
             false
-        }
-        if (!valid) {
-            throw IllegalArgumentException("\"$string\" is not a valid link")
         }
     }
 }

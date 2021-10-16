@@ -25,13 +25,12 @@ import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
-import discord4j.discordjson.json.ApplicationCommandOptionData;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -40,33 +39,28 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 @ScQualifier
-public class ScShowCommand extends AbstractShowCommand<ScCategory, ScPuzzle, ScRecord> {
+public class ScShowCommand extends AbstractShowCommand<ScShowCommand.ShowData, ScCategory, ScPuzzle, ScRecord> {
+    @Delegate
+    private final ScShowCommand_ShowDataParser parser = ScShowCommand_ShowDataParser.INSTANCE;
     @Getter
     private final List<Leaderboard<ScCategory, ScPuzzle, ScRecord>> leaderboards;
 
     @NotNull
     @Override
-    public Pair<ScPuzzle, ScCategory> findPuzzleAndCategory(@NotNull ChatInputInteractionEvent interaction) {
-        Data data = ScShowCommand$DataParser.parse(interaction);
-        return new Pair<>(data.puzzle, data.category);
-    }
-
-    @NotNull
-    @Override
-    public ApplicationCommandOptionData buildData() {
-        return ScShowCommand$DataParser.buildData();
+    public Pair<ScPuzzle, ScCategory> findPuzzleAndCategory(@NotNull ShowData parameters) {
+        return new Pair<>(parameters.puzzle, parameters.category);
     }
 
     @ApplicationCommand(name = "show", description = "Show a record", subCommand = true)
     @Value
-    public static class Data {
+    public static class ShowData {
         @NonNull ScPuzzle puzzle;
         @NonNull ScCategory category;
 
-        public Data(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
-                    @Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle,
-                    @Description("Category. E.g. `C`, `RSNB`")
-                    @NonNull ScCategory category) {
+        public ShowData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
+                        @Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle,
+                        @Description("Category. E.g. `C`, `RSNB`")
+                        @NonNull ScCategory category) {
             this.puzzle = puzzle;
             this.category = category;
         }

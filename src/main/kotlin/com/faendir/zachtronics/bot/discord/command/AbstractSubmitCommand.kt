@@ -20,31 +20,28 @@ import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
-import com.faendir.zachtronics.bot.utils.asMultipartRequest
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.findInstance
 import com.faendir.zachtronics.bot.utils.ifNotEmpty
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.discordjson.json.EmbedData
-import discord4j.discordjson.json.EmbedFieldData
-import discord4j.discordjson.json.EmbedImageData
-import discord4j.discordjson.json.ImmutableEmbedData
-import discord4j.discordjson.json.WebhookExecuteRequest
-import discord4j.rest.util.MultipartRequest
+import com.faendir.zachtronics.bot.utils.interactionReplyReplaceSpecBuilder
+import discord4j.core.spec.EmbedCreateFields
+import discord4j.core.spec.EmbedCreateSpec
+import discord4j.core.spec.InteractionReplyEditSpec
 
-abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : AbstractCommand(), SecuredCommand {
+abstract class AbstractSubmitCommand<T, P : Puzzle, R : Record> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
     protected abstract val leaderboards: List<Leaderboard<*, P, R>>
 
-    override fun handle(event: ChatInputInteractionEvent): MultipartRequest<WebhookExecuteRequest> {
-        val (puzzle, record) = parseSubmission(event)
-        return submitToLeaderboards(puzzle, record).asMultipartRequest()
+    override fun handle(parameters: T): InteractionReplyEditSpec {
+        val (puzzle, record) = parseSubmission(parameters)
+        return submitToLeaderboards(puzzle, record)
     }
 
-    fun submitToLeaderboards(puzzle: P, record: R): WebhookExecuteRequest {
+    fun submitToLeaderboards(puzzle: P, record: R): InteractionReplyEditSpec {
         val results = leaderboards.map { it.update(puzzle, record) }
         results.filterIsInstance<UpdateResult.Success>().ifNotEmpty { successes ->
-            return WebhookExecuteRequest.builder().addEmbed(
-                EmbedData.builder()
+            return interactionReplyReplaceSpecBuilder()
+                .addEmbed(
+                EmbedCreateSpec.builder()
                     .title("Success: *${puzzle.displayName}* ${successes.flatMap { it.oldRecords.keys }.joinToString { it.displayName }}")
                     .description("`${record.score.toDisplayString()}` ${record.author?.let { " by $it" } ?: ""}\npreviously:")
                     .embedCategoryRecords(successes.flatMap { it.oldRecords.entries })
@@ -54,9 +51,9 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : AbstractCommand()
                 .build()
         }
         results.findInstance<UpdateResult.ParetoUpdate> {
-            return WebhookExecuteRequest.builder()
+            return interactionReplyReplaceSpecBuilder()
                 .addEmbed(
-                    EmbedData.builder()
+                    EmbedCreateSpec.builder()
                         .title("Pareto *${puzzle.displayName}*")
                         .description("${record.score.toDisplayString()} was included in the pareto frontier.")
                         .link(record.link)
@@ -65,9 +62,9 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : AbstractCommand()
                 .build()
         }
         results.filterIsInstance<UpdateResult.BetterExists>().ifNotEmpty { betterExists ->
-            return WebhookExecuteRequest.builder()
+            return interactionReplyReplaceSpecBuilder()
                 .addEmbed(
-                    EmbedData.builder()
+                    EmbedCreateSpec.builder()
                         .title("No Scores beaten by *${puzzle.displayName}* `${record.score.toDisplayString()}`")
                         .description("Existing scores:")
                         .embedCategoryRecords(betterExists.flatMap {it.records.entries})
@@ -83,13 +80,13 @@ abstract class AbstractSubmitCommand<P : Puzzle, R : Record> : AbstractCommand()
 
     private val allowedImageTypes = setOf("gif", "png", "jpg")
 
-    private fun ImmutableEmbedData.Builder.link(link: String) = apply {
+    private fun EmbedCreateSpec.Builder.link(link: String) = apply {
         if (allowedImageTypes.contains(link.substringAfterLast(".", ""))) {
-            image(EmbedImageData.builder().url(link).build())
+            image(link)
         } else {
-            addField(EmbedFieldData.builder().name("Link").value("[$link]($link)").inline(false).build())
+            addField(EmbedCreateFields.Field.of("Link", "[$link]($link)", false))
         }
     }
 
-    abstract fun parseSubmission(interaction: ChatInputInteractionEvent): Pair<P, R>
+    abstract fun parseSubmission(parameters: T): Pair<P, R>
 }

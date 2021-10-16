@@ -21,12 +21,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Set;
 
 import static com.faendir.zachtronics.bot.sz.model.SzCategory.SzScoreFormatStrings.*;
 import static com.faendir.zachtronics.bot.sz.model.SzType.STANDARD;
 import static com.faendir.zachtronics.bot.utils.Utils.makeComparator3;
-import static java.util.stream.Collectors.toMap;
 
 @RequiredArgsConstructor
 public enum SzCategory implements Category {
