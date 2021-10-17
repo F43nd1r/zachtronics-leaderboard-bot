@@ -19,34 +19,58 @@ package com.faendir.zachtronics.bot.om.discord
 import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
-import com.faendir.discord4j.command.parse.ApplicationCommandParser
+import com.faendir.discord4j.command.parse.CombinedParseResult
 import com.faendir.zachtronics.bot.discord.command.AbstractShowCommand
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
-import discord4j.discordjson.json.ApplicationCommandOptionData
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import org.springframework.stereotype.Component
 
 @Component
 @OmQualifier
 class OmShowCommand(override val leaderboards: List<Leaderboard<OmCategory, OmPuzzle, OmRecord>>) :
-    AbstractShowCommand<Show, OmCategory, OmPuzzle, OmRecord>(),
-    ApplicationCommandParser<Show, ApplicationCommandOptionData> by ShowParser {
+    AbstractShowCommand<Pair<OmPuzzle, OmCategory>, OmCategory, OmPuzzle, OmRecord>() {
 
-    override fun findPuzzleAndCategory(parameters: Show): Pair<OmPuzzle, OmCategory> {
-        val puzzle = parameters.puzzle
-        val categories = findCategoryCandidates(parameters)
-        if (categories.isEmpty()) throw IllegalArgumentException("${parameters.category} is not a tracked category.")
-        val filtered = categories.filter { it.supportsPuzzle(puzzle) }
-        if (filtered.isEmpty()) throw IllegalArgumentException("Category ${categories.first().displayName} does not support ${puzzle.displayName}")
-        return Pair(puzzle, filtered.first())
+    private fun findCategoryCandidates(category: String): List<OmCategory> {
+        return OmCategory.values().filter { it.displayName.startsWith(category, ignoreCase = true) }.takeIf { it.isNotEmpty() }
+            ?: throw IllegalArgumentException("$category is not a tracked category.")
     }
 
-    private fun findCategoryCandidates(show: Show): List<OmCategory> {
-        return OmCategory.values().filter { it.displayName.startsWith(show.category, ignoreCase = true) }
+    override fun buildData() = ShowParser.buildData()
+
+    override fun map(parameters: Map<String, Any?>): Pair<OmPuzzle, OmCategory>? {
+        return ShowParser.map(parameters)?.toPuzzleCategoryPair()
     }
+
+    override fun parse(event: ChatInputInteractionEvent): CombinedParseResult<Pair<OmPuzzle, OmCategory>> {
+        return when (val parseResult = ShowParser.parse(event)) {
+            is CombinedParseResult.Failure -> parseResult.typed()
+            is CombinedParseResult.Ambiguous -> try {
+                parseResult.partialResult["category"]?.let { findCategoryCandidates(it.toString()) }
+                parseResult.typed()
+            } catch (e: IllegalArgumentException) {
+                CombinedParseResult.Failure(listOf(e.message!!))
+            }
+            is CombinedParseResult.Success -> try {
+                CombinedParseResult.Success(parseResult.value.toPuzzleCategoryPair())
+            } catch (e: IllegalArgumentException) {
+                CombinedParseResult.Failure(listOf(e.message!!))
+            }
+        }
+    }
+
+    private fun Show.toPuzzleCategoryPair(): Pair<OmPuzzle, OmCategory> {
+        val puzzle = puzzle
+        val categories = findCategoryCandidates(category)
+        val filtered = categories.filter { it.supportsPuzzle(puzzle) }.takeIf { it.isNotEmpty() }
+            ?: throw IllegalArgumentException("Category ${categories.first().displayName} does not support ${puzzle.displayName}")
+        return puzzle to filtered.first()
+    }
+
+    override fun findPuzzleAndCategory(parameters: Pair<OmPuzzle, OmCategory>) = parameters
 }
 
 @ApplicationCommand(description = "Show a record", subCommand = true)

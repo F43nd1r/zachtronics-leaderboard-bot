@@ -18,8 +18,15 @@ package com.faendir.discord4j.command.parse
 
 sealed class CombinedParseResult<T> {
     class Success<T>(val value: T) : CombinedParseResult<T>()
-    class Ambiguous<T>(val options: Map<String, SingleParseResult.Ambiguous<*>>, val partialResult: Map<String, Any?>) : CombinedParseResult<T>()
-    class Failure<T>(val messages: List<String>) : CombinedParseResult<T>()
+
+    class Ambiguous<T>(val options: Map<String, SingleParseResult.Ambiguous<*>>, val partialResult: Map<String, Any?>) : CombinedParseResult<T>() {
+        @Suppress("UNCHECKED_CAST")
+        fun <U> typed() =  this as Ambiguous<U>
+    }
+    class Failure<T>(val messages: List<String>) : CombinedParseResult<T>() {
+        @Suppress("UNCHECKED_CAST")
+        fun <U> typed() =  this as Failure<U>
+    }
 
     companion object {
         fun <T> combine(results: Map<String, SingleParseResult<*>>, constructor: (Map<String, Any?>) -> T): CombinedParseResult<T> {
