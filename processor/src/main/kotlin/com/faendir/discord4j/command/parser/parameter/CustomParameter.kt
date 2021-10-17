@@ -18,17 +18,24 @@ package com.faendir.discord4j.command.parser.parameter
 
 import com.faendir.discord4j.command.parse.SingleParseResult
 import com.faendir.discord4j.command.parser.asTypeName
+import com.faendir.discord4j.command.parser.simpleName
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.squareup.kotlinpoet.CodeBlock
 import discord4j.core.`object`.command.ApplicationCommandOption
 import io.github.enjoydambience.kotlinbard.codeBlock
 
-class CustomParameter(parameter: KSValueParameter, index: Int, private val converter: KSType) : Parameter(parameter, index) {
-    override val optionType: ApplicationCommandOption.Type = ApplicationCommandOption.Type.STRING
+class CustomParameter(
+    parameter: KSValueParameter,
+    index: Int,
+    private val converter: KSType,
+    private val inputType: KSType
+) : Parameter(parameter, index) {
+    override val optionType: ApplicationCommandOption.Type =
+        if (inputType == Boolean::class) ApplicationCommandOption.Type.BOOLEAN else ApplicationCommandOption.Type.STRING
     override fun convertValue(): CodeBlock =
         codeBlock {
-            add("let·{·value·-> %T().fromValue(event, value) }", converter.asTypeName())
+            add("let·{·value·-> %T().fromValue(event, value.as%L()) }", converter.asTypeName(), inputType.simpleName)
             if (!isRequired)
                 add(" ?: %T(null)", SingleParseResult.Success::class)
         }

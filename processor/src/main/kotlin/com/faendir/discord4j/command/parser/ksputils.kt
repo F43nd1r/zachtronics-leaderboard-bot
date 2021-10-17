@@ -70,3 +70,6 @@ fun Resolver.getClassesWithAnnotation(name: String) = getSymbolsWithAnnotation(n
 
 val KSDeclaration.normalizedPackageName
     get() = packageName.asString().takeIf { it != "<root>" } ?: ""
+
+val KSType.simpleName
+    get() = declaration.simpleName.asString()

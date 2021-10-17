@@ -16,8 +16,8 @@
 
 package com.faendir.zachtronics.bot.discord
 
+import com.faendir.discord4j.command.parse.OptionConverter
 import com.faendir.discord4j.command.parse.SingleParseResult
-import com.faendir.discord4j.command.parse.StringOptionConverter
 import discord4j.common.util.Snowflake
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.reaction.ReactionEmoji
@@ -25,10 +25,10 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import reactor.core.publisher.Flux
 import java.time.Instant
 
-class LinkConverter : StringOptionConverter<String> {
-    override fun fromString(context: ChatInputInteractionEvent, string: String): SingleParseResult<String> {
+class LinkConverter : OptionConverter<String, String> {
+    override fun fromValue(context: ChatInputInteractionEvent, value: String): SingleParseResult<String> {
         return findLink(
-            string.trim(),
+            value.trim(),
             context.interaction.channel.flatMapMany { it.getMessagesBefore(it.lastMessageId.orElseGet { Snowflake.of(Instant.now()) }) }
                 .filter { it.author.isPresent && it.author.get() == context.interaction.user }
                 .onErrorMap {

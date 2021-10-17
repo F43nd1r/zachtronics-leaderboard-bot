@@ -16,13 +16,13 @@
 
 package com.faendir.zachtronics.bot.om.discord
 
+import com.faendir.discord4j.command.parse.OptionConverter
 import com.faendir.discord4j.command.parse.SingleParseResult
-import com.faendir.discord4j.command.parse.StringOptionConverter
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.utils.getSingleMatchingPuzzle
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 
-class PuzzleConverter : StringOptionConverter<OmPuzzle> {
-    override fun fromString(context: ChatInputInteractionEvent, string: String): SingleParseResult<OmPuzzle> =
-        OmPuzzle.values().getSingleMatchingPuzzle(string)
+class PuzzleConverter : OptionConverter<String, OmPuzzle> {
+    override fun fromValue(context: ChatInputInteractionEvent, value: String): SingleParseResult<OmPuzzle> =
+        OmPuzzle.values().getSingleMatchingPuzzle(value)
 }

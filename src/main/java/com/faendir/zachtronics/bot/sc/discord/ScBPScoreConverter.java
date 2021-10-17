@@ -16,19 +16,19 @@
 
 package com.faendir.zachtronics.bot.sc.discord;
 
+import com.faendir.discord4j.command.parse.OptionConverter;
 import com.faendir.discord4j.command.parse.SingleParseResult;
-import com.faendir.discord4j.command.parse.StringOptionConverter;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class ScBPScoreConverter implements StringOptionConverter<ScScore> {
+public class ScBPScoreConverter implements OptionConverter<String, ScScore> {
     @NotNull
     @Override
-    public SingleParseResult<ScScore> fromString(@NotNull ChatInputInteractionEvent context, @NotNull String s) {
-        ScScore score = ScScore.parseBPScore(s);
+    public SingleParseResult<ScScore> fromValue(@NotNull ChatInputInteractionEvent context, @NotNull String value) {
+        ScScore score = ScScore.parseBPScore(value);
         if (score == null)
-            return new SingleParseResult.Failure<>("Invalid score: " + s);
+            return new SingleParseResult.Failure<>("Invalid score: " + value);
         else
             return new SingleParseResult.Success<>(score);
     }

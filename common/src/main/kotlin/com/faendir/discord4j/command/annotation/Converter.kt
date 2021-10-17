@@ -17,9 +17,13 @@
 package com.faendir.discord4j.command.annotation
 
 import com.faendir.discord4j.command.parse.OptionConverter
+import java.io.Serializable
 import kotlin.reflect.KClass
 
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.VALUE_PARAMETER)
-annotation class Converter(val value: KClass<out OptionConverter<*>>)
+annotation class Converter(
+    val value: KClass<out OptionConverter<out Serializable, *>>,
+    val input: KClass<out Serializable> = String::class
+)
 

@@ -35,7 +35,10 @@ object ParameterFactory {
             val type = parameter.type.resolve()
             val converter = parameter.findAnnotationTypeProperty(Converter::value)
             when {
-                converter != null -> CustomParameter(parameter, index, converter)
+                converter != null -> {
+                    val inputType = parameter.findAnnotationTypeProperty(Converter::input)!!
+                    CustomParameter(parameter, index, converter, inputType)
+                }
                 (type.declaration as KSClassDeclaration).classKind == ClassKind.ENUM_CLASS -> EnumParameter(parameter, index)
                 else -> when(type.asTypeName().nonnull) {
                     INT -> IntParameter(parameter, index)

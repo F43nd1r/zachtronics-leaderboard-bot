@@ -16,9 +16,8 @@
 
 package com.faendir.discord4j.command.parse
 
-import discord4j.core.`object`.command.ApplicationCommandInteractionOptionValue
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 
-interface OptionConverter<T> {
-    fun fromValue(context: ChatInputInteractionEvent, value: ApplicationCommandInteractionOptionValue): SingleParseResult<T>
+interface OptionConverter<In: Any, Out> {
+    fun fromValue(context: ChatInputInteractionEvent, value: In): SingleParseResult<Out>
 }

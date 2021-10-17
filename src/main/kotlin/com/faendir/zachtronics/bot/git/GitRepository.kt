@@ -34,27 +34,26 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
 
     val rawFilesUrl = Regex("github.com/([^/]+)/([^/.]+)(?:.git)?").replaceFirst(url, "raw.githubusercontent.com/$1/$2/master/")
     private val repo = Files.createTempDirectory(name).toFile()
+    private val git: Git
     private var remoteHash: String
 
     init {
         synchronized(repo) {
-            val r = Git.cloneRepository().setURI(url).setDirectory(repo).call()
-            remoteHash = r.repository.resolve("HEAD").name()
+            git = Git.cloneRepository().setURI(url).setDirectory(repo).call()
+            remoteHash = git.repository.resolve("HEAD").name()
         }
     }
 
     fun <T> access(access: AccessScope.() -> T): T {
         return synchronized(repo) {
-            Git.open(repo).use { git ->
-                val accessScope = AccessScope(git, repo)
-                if (!hasWebHook || accessScope.currentHash() != remoteHash) {
-                    git.pull().setTimeout(120).call()
-                    logger.info("pulled $name")
-                } else {
-                    logger.info("$name is up to date, not pulling")
-                }
-                accessScope.access()
+            val accessScope = AccessScope(git, repo)
+            if (!hasWebHook || accessScope.currentHash() != remoteHash) {
+                git.pull().setTimeout(120).call()
+                logger.info("pulled $name")
+            } else {
+                logger.info("$name is up to date, not pulling")
             }
+            accessScope.access()
         }
     }
 
@@ -114,6 +113,7 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
 
     @PreDestroy
     fun cleanup() {
+        git.close()
         repo.deleteRecursively()
     }
 }

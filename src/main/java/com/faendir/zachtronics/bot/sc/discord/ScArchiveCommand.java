@@ -66,7 +66,7 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScArchiveCommand.Ar
                            @Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
                            @Converter(ScPuzzleConverter.class) ScPuzzle puzzle,
                            @Description("Skips running SChem on the solutions. Admin-only")
-                           @Converter(ScAdminOnlyBooleanConverter.class) Boolean bypassValidation) {
+                           @Converter(value=ScAdminOnlyBooleanConverter.class, input=Boolean.class) Boolean bypassValidation) {
             this.export = export;
             this.puzzle = puzzle;
             this.bypassValidation = bypassValidation;

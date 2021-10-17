@@ -23,15 +23,14 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import org.jetbrains.annotations.NotNull;
 
-public class ScAdminOnlyBooleanConverter implements OptionConverter<Boolean> {
+public class ScAdminOnlyBooleanConverter implements OptionConverter<Boolean, Boolean> {
     @NotNull
     @Override
     public SingleParseResult<Boolean> fromValue(@NotNull ChatInputInteractionEvent context,
-                                                @NotNull ApplicationCommandInteractionOptionValue value) {
-        boolean val = value.asBoolean();
-        if (val && !ScSecured.isWikiAdmin(UtilsKt.user(context)))
+                                                @NotNull Boolean value) {
+        if (value && !ScSecured.isWikiAdmin(UtilsKt.user(context)))
             return new SingleParseResult.Failure<>("Only a wiki admin can use this parameter");
         else
-            return new SingleParseResult.Success<>(val);
+            return new SingleParseResult.Success<>(value);
     }
 }

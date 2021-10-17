@@ -16,17 +16,17 @@
 
 package com.faendir.zachtronics.bot.sz.discord;
 
+import com.faendir.discord4j.command.parse.OptionConverter;
 import com.faendir.discord4j.command.parse.SingleParseResult;
-import com.faendir.discord4j.command.parse.StringOptionConverter;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class SzPuzzleConverter implements StringOptionConverter<SzPuzzle> {
+public class SzPuzzleConverter implements OptionConverter<String, SzPuzzle> {
     @NotNull
     @Override
-    public SingleParseResult<SzPuzzle> fromString(@NotNull ChatInputInteractionEvent context, @NotNull String s) {
-        return SzPuzzle.parsePuzzle(s);
+    public SingleParseResult<SzPuzzle> fromValue(@NotNull ChatInputInteractionEvent context, @NotNull String value) {
+        return SzPuzzle.parsePuzzle(value);
     }
 
 }
