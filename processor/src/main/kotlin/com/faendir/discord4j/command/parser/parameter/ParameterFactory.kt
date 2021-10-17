@@ -37,6 +37,7 @@ object ParameterFactory {
             when {
                 converter != null -> {
                     val inputType = parameter.findAnnotationTypeProperty(Converter::input)!!
+                    logger.warn(inputType.asTypeName().nonnull.toString())
                     CustomParameter(parameter, index, converter, inputType)
                 }
                 (type.declaration as KSClassDeclaration).classKind == ClassKind.ENUM_CLASS -> EnumParameter(parameter, index)

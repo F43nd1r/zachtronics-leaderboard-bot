@@ -25,6 +25,7 @@ dependencies {
     implementation("com.faendir:kotlinbard:0.4.0")
     implementation("com.discord4j:discord4j-core:${properties["discord4jVersion"]}")
     implementation("net.pearx.kasechange:kasechange-jvm:1.3.0")
+    implementation(kotlin("compiler-embeddable"))
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.2")
     testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.4.5")
