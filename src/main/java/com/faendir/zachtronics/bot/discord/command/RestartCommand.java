@@ -37,7 +37,7 @@ import java.util.Set;
 @Component
 public class RestartCommand implements TopLevelCommand<RestartCommand.RestartData>, Secured {
     @Delegate
-    RestartCommand_RestartDataParser parser;
+    private final RestartCommand_RestartDataParser parser = RestartCommand_RestartDataParser.INSTANCE;
     @Getter
     private final String commandName = "restart";
     @Getter
@@ -47,11 +47,13 @@ public class RestartCommand implements TopLevelCommand<RestartCommand.RestartDat
     @NotNull
     @Override
     public Mono<Void> handle(@NotNull InteractionCreateEvent event, RestartData parameters) {
-        log.error("Requested shut down, see you soon");
-        SpringApplication.exit(applicationContext);
-        Thread.sleep(5000);
-        System.exit(0);
-        return null;
+        return event.editReply("shutting down, see you soon!").then(Mono.fromCallable(() -> {
+            log.error("Requested shut down, see you soon");
+            SpringApplication.exit(applicationContext);
+            Thread.sleep(5000);
+            System.exit(0);
+            return null;
+        }));
     }
 
     private final Set<Long> BOT_OWNERS = Set.of(295868901042946048L, // 12345ieee,
