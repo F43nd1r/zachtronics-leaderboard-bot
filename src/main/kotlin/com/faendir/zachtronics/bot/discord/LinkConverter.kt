@@ -23,8 +23,6 @@ import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.reaction.ReactionEmoji
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import reactor.core.publisher.Flux
-import java.net.HttpURLConnection
-import java.net.URL
 import java.time.Instant
 
 class LinkConverter : StringOptionConverter<String> {
@@ -56,20 +54,6 @@ class LinkConverter : StringOptionConverter<String> {
         } else {
             input
         }
-        if(!isValid(link) ){
-            return SingleParseResult.Failure("\"$link\" is not a valid link")
-        }
         return SingleParseResult.Success(link)
-    }
-
-    private fun isValid(string: String): Boolean {
-        return try {
-            val connection = URL(string).openConnection() as HttpURLConnection
-            connection.requestMethod = "HEAD"
-            connection.setRequestProperty("Accept", "*/*")
-            connection.responseCode in (200 until 400) // accept all redirects as well
-        } catch (e: Exception) {
-            false
-        }
     }
 }
