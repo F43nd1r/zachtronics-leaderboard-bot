@@ -122,7 +122,7 @@ class Generator(
                             add("return %T(\n", type)
                             indent()
                             for (parameter in parameters) {
-                                add("parameters[%S] as %T,\n", parameter.name, parameter.typeName.copy(!parameter.isRequired))
+                                add("parameters[%S] as %T,\n", parameter.name, parameter.typeName)
                             }
                             unindent()
                             add(")\n")

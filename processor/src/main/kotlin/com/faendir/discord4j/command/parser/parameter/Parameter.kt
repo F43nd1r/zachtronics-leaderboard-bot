@@ -35,9 +35,8 @@ import net.pearx.kasechange.toKebabCase
 
 abstract class Parameter(private val parameter: KSValueParameter, private val index: Int) {
     val type = parameter.type.resolve()
-    val typeName = type.asTypeName()
     val isRequired: Boolean = when (parameter.origin) {
-        Origin.KOTLIN, Origin.KOTLIN_LIB, Origin.SYNTHETIC -> !typeName.isNullable || parameter.hasAnnotation<Required>()
+        Origin.KOTLIN, Origin.KOTLIN_LIB, Origin.SYNTHETIC -> !type.isMarkedNullable || parameter.hasAnnotation<Required>()
         Origin.JAVA, Origin.JAVA_LIB -> type.nullability == Nullability.NOT_NULL || parameter.hasAnnotationWithName(
             "Nonnull",
             "NonNull",
@@ -46,6 +45,7 @@ abstract class Parameter(private val parameter: KSValueParameter, private val in
         ) && !parameter.hasAnnotationWithName("Nullable")
         else -> true
     }
+    val typeName = type.asTypeName().copy(nullable = !isRequired)
     val name = parameter.findAnnotationProperty(Name::value) ?: (parameter.name?.asString() ?: "var$index").toKebabCase()
 
     abstract val optionType: ApplicationCommandOption.Type
