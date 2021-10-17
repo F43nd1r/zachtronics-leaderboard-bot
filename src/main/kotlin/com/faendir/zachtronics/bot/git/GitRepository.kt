@@ -21,6 +21,7 @@ import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Score
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.Status
+import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -92,13 +93,12 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
             push()
         }
 
-        fun commit(message: String) {
+        fun commit(message: String): RevCommit =
             git.commit()
                 .setAuthor("zachtronics-leaderboard-bot", "zachtronics-leaderboard-bot@faendir.com")
                 .setCommitter("zachtronics-leaderboard-bot", "zachtronics-leaderboard-bot@faendir.com")
                 .setMessage("[BOT] $message")
                 .call()
-        }
 
         fun push() {
             git.push().setCredentialsProvider(UsernamePasswordCredentialsProvider(gitProperties.username, gitProperties.accessToken))

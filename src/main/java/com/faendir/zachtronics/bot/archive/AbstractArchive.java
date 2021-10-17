@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.archive;
 import com.faendir.zachtronics.bot.git.GitRepository;
 import com.faendir.zachtronics.bot.model.Solution;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -48,7 +49,7 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
         return getGitRepo().access(a -> {
             List<ArchiveResult> r = solution.stream()
                                             .map(s -> performArchive(a, s))
-                                            .collect(Collectors.toList());
+                                            .toList();
             a.push();
             return r;
         });
@@ -82,12 +83,13 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
             accessScope.addAll(puzzlePath.toFile());
             String result = Stream.concat(accessScope.status().getChanged().stream(),
                                           accessScope.status().getAdded().stream())
-                                  .map(f -> "[" + f.replaceFirst(".+/", "") + "](" + getGitRepo().getRawFilesUrl() + f +
-                                            ")").collect(Collectors.joining(", "));
-            accessScope.commit(
+                                  .map(f -> "[" + f.replaceFirst(".+/", "") + "]" +
+                                            "(" + getGitRepo().getRawFilesUrl() + f + ")")
+                                  .collect(Collectors.joining(", "));
+            RevCommit rev = accessScope.commit(
                     "Added " + solution.getScore().toDisplayString() + " for " + solution.getPuzzle().getDisplayName());
-            result += "\n[commit " + accessScope.currentHash().substring(0, 7) + "](" +
-                      getGitRepo().getUrl().replaceFirst(".git$", "") + "/commit/" + accessScope.currentHash() + ")";
+            result += "\n[commit " + rev.name().substring(0, 7) + "]" +
+                      "(" + getGitRepo().getUrl().replaceFirst(".git$", "") + "/commit/" + rev.name() + ")";
             return new ArchiveResult.Success(result);
         }
         else {

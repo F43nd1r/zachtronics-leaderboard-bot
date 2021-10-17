@@ -36,7 +36,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -53,7 +52,7 @@ public class ScListCommand extends AbstractListCommand<ScListCommand.ListData, S
         return new Pair<>(parameters.puzzle,
                           Arrays.stream(ScCategory.values())
                                 .filter(c -> c.supportsPuzzle(parameters.puzzle))
-                                .collect(Collectors.toList()));
+                                .toList());
     }
 
     @ApplicationCommand(name = "list", description = "List records", subCommand = true)

@@ -21,7 +21,6 @@ import com.faendir.zachtronics.bot.BotTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -69,7 +68,7 @@ class ScSolutionTest {
         List<ScScore> scores = Stream.of("", "/B", "/P", "/BP")
                                      .map("SOLUTION:Of Pancakes and Spaceships,12345ieee,50-50-50,"::concat)
                                      .map(e -> ScSolution.fromContentNoValidation(e, null).getScore())
-                                     .collect(Collectors.toList());
+                                     .toList();
         boolean[] bugged = {false, true, false, true};
         boolean[] precog = {false, false, true, true};
         for (int i = 0; i < scores.size(); i++) {

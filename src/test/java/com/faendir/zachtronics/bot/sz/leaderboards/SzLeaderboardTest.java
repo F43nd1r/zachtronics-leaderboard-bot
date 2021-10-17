@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @BotTest(Application.class)
 public class SzLeaderboardTest {
@@ -43,7 +42,7 @@ public class SzLeaderboardTest {
         for (SzPuzzle p : SzPuzzle.values()) {
             List<SzCategory> categories = Arrays.stream(SzCategory.values())
                     .filter(c -> c.supportsPuzzle(p))
-                    .collect(Collectors.toList());
+                    .toList();
             Collection<SzRecord> records = new HashSet<>(szLeaderboard.getAll(p, categories).values());
             for (SzRecord r : records)
                 szLeaderboard.update(p, r);

@@ -35,7 +35,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -52,7 +51,7 @@ public class SzListCommand extends AbstractListCommand<SzListCommand.ListData, S
         return new Pair<>(parameters.puzzle,
                           Arrays.stream(SzCategory.values())
                                 .filter(c -> c.supportsPuzzle(parameters.puzzle))
-                                .collect(Collectors.toList()));
+                                .toList());
     }
 
     @ApplicationCommand(name = "list", subCommand = true)

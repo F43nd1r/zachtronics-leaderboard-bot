@@ -39,6 +39,7 @@ import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -125,16 +126,16 @@ public class SubCommandTest {
     public void testArchiveSudo() {
         String exportLink = "https://raw.githubusercontent.com/spacechem-community-developers/spacechem-archive/" +
                             "master/RESEARCHNET3/published_26_3/156-1-45-B.txt";
-        Map<String, ?> args1 = Map.of("export", exportLink);
+        Map<String, String> args1 = Map.of("export", exportLink);
         assertThrows(IllegalArgumentException.class, () -> runCommand("archive", args1));
 
-        Map<String, ?> args2 = Map.of("export", exportLink, "bypass-validation", true);
+        Map<String, ? extends Serializable> args2 = Map.of("export", exportLink, "bypass-validation", true);
         String result = runCommand("archive", args2);
         assertTrue(result.contains("Passivation") && result.contains("`156/1/45/B`"));
     }
 
     @NotNull
-    private static ApplicationCommandInteractionOption mockOption(String name, @NotNull Object value) {
+    private static ApplicationCommandInteractionOption mockOption(String name, @NotNull Serializable value) {
         ApplicationCommandOption.Type type = value instanceof Boolean ? ApplicationCommandOption.Type.BOOLEAN :
                                                                         ApplicationCommandOption.Type.STRING;
         ApplicationCommandInteractionOptionValue optionValue = new ApplicationCommandInteractionOptionValue(
@@ -147,14 +148,14 @@ public class SubCommandTest {
     }
 
     @NotNull
-    private <T> String runCommand(String commandName, @NotNull Map<String, ?> args) {
+    private <T> String runCommand(String commandName, @NotNull Map<String, ? extends Serializable> args) {
         ApplicationCommandInteractionOption subCommandOption = Mockito.mock(ApplicationCommandInteractionOption.class);
         Mockito.when(subCommandOption.getName()).thenReturn(commandName);
         Mockito.when(subCommandOption.getType()).thenReturn(ApplicationCommandOption.Type.SUB_COMMAND);
 
         List<ApplicationCommandInteractionOption> options = args.entrySet().stream()
                                                                 .map(e -> mockOption(e.getKey(), e.getValue()))
-                                                                .collect(Collectors.toList());
+                                                                .toList();
         Mockito.when(subCommandOption.getOptions()).thenReturn(options);
 
         ChatInputInteractionEvent interactionEvent = Mockito.mock(ChatInputInteractionEvent.class, Mockito.RETURNS_DEEP_STUBS);

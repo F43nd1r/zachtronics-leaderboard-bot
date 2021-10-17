@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -74,7 +73,7 @@ public class ScLeaderboardTest {
         for (ScPuzzle p : ScPuzzle.values()) {
             List<ScCategory> categories = Arrays.stream(ScCategory.values())
                                                 .filter(c -> c.supportsPuzzle(p))
-                                                .collect(Collectors.toList());
+                                                .toList();
             Collection<ScRecord> records = new HashSet<>(scLeaderboard.getAll(p, categories).values());
             for (ScRecord r : records)
                 scLeaderboard.update(p, r);
