@@ -134,7 +134,7 @@ class DiscordService(
         }
     }.onErrorResume {
         logger.info("User command failed", it)
-        event.interactionResponse.createFollowupMessage("**Failed**: ${it.message ?: "Something went wrong"}").then()
+        event.reply("**Failed**: ${it.message ?: "Something went wrong"}")
     }.then()
 
     private fun <T> TopLevelCommand<T>.handle(event: ChatInputInteractionEvent): Mono<Void> {
