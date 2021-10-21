@@ -44,7 +44,7 @@ class LinkConverter : OptionConverter<String, String> {
     }
 
     private fun findLink(input: String, messages: Flux<Message>): SingleParseResult<String> {
-        val link = if (Regex("m\\d+").matches(input)) {
+        val link = if (Regex("m\\d{1,2}").matches(input)) {
             val num = input.removePrefix("m").toInt()
             val message = messages.elementAt(num - 1).block()!!
             message.attachments.firstOrNull()?.url?.also { message.addReaction(ReactionEmoji.unicode("\uD83D\uDC4D"/* 👍 */)).block() }
