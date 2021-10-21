@@ -78,6 +78,7 @@ class DiscordService(
             .subscribe()
         discordClient.on(ChatInputInteractionEvent::class.java).flatMap { event ->
             mono {
+                event.deferReply().awaitSingleOrNull()
                 handleCommand(event).awaitSingleOrNull()
                 logger.info("Handled ${event.commandName} by ${event.interaction.user.username}")
             }
@@ -139,14 +140,15 @@ class DiscordService(
 
     private fun <T> TopLevelCommand<T>.handle(event: ChatInputInteractionEvent): Mono<Void> {
         return when (val parseResult = parse(event)) {
-            is CombinedParseResult.Failure -> event.reply("**Failed**:\n${parseResult.messages.joinToString("\n")}").withEphemeral(true)
+            is CombinedParseResult.Failure -> event.editReply("**Failed**:\n${parseResult.messages.joinToString("\n")}").then()
             is CombinedParseResult.Ambiguous -> {
                 val id = commandName + event.commandId.asString()
                 defferedProcessingCache[id] = CommandCacheEntry(this, event, parseResult.partialResult)
-                event.reply("Your command was ambiguous. Please select from the options below:")
-                    .withComponents(parseResult.options.map { (name, ambiguous) -> createSelectFor(name, ambiguous, id) })
+                event.editReply("Your command was ambiguous. Please select from the options below:")
+                    .withComponentsOrNull(parseResult.options.map { (name, ambiguous) -> createSelectFor(name, ambiguous, id) })
+                    .then()
             }
-            is CombinedParseResult.Success -> event.deferReply().then(handle(event, parseResult.value))
+            is CombinedParseResult.Success -> handle(event, parseResult.value)
         }
     }
 
