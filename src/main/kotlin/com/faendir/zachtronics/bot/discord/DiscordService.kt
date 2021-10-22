@@ -20,6 +20,7 @@ import com.faendir.discord4j.command.parse.CombinedParseResult
 import com.faendir.discord4j.command.parse.SingleParseResult
 import com.faendir.zachtronics.bot.discord.command.Secured
 import com.faendir.zachtronics.bot.discord.command.TopLevelCommand
+import com.faendir.zachtronics.bot.utils.editReplyWithFailure
 import com.faendir.zachtronics.bot.utils.user
 import com.fasterxml.jackson.databind.ObjectMapper
 import discord4j.core.GatewayDiscordClient
@@ -28,6 +29,7 @@ import discord4j.core.`object`.component.SelectMenu
 import discord4j.core.`object`.presence.ClientActivity
 import discord4j.core.`object`.presence.ClientPresence
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
+import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.core.event.domain.interaction.SelectMenuInteractionEvent
 import discord4j.rest.http.client.ClientException
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -56,12 +58,14 @@ class DiscordService(
     }
 
     private val defferedProcessingCache = mutableMapOf<String, CommandCacheEntry>()
+
     data class CommandCacheEntry(
         val command: TopLevelCommand<*>,
         val event: ChatInputInteractionEvent,
         var partial: Map<String, Any?>
     )
-    private val optionNameCache = mutableMapOf<String, Any>()
+
+    private val optionNameCache = mutableMapOf<String, Any?>()
 
     @PostConstruct
     fun init() {
@@ -76,100 +80,89 @@ class DiscordService(
                     .onErrorResume { Mono.empty() }
             }
             .subscribe()
-        discordClient.on(ChatInputInteractionEvent::class.java).flatMap { event ->
-            mono {
-                event.deferReply().awaitSingleOrNull()
-                handleCommand(event).awaitSingleOrNull()
-                logger.info("Handled ${event.commandName} by ${event.interaction.user.username}")
+        discordClient.subscribeEvent<ChatInputInteractionEvent> { event ->
+            event.deferReply().awaitSingleOrNull()
+            val command = findCommand(event)
+            if (command is Secured && !command.hasExecutionPermission(event.user())) {
+                throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
             }
-        }.onErrorContinue { throwable, _ ->
-            logger.error("Fatal error in slash command - restarting: ", throwable)
-            val restartThread = Thread { restartEndpoint.restart() }
-            restartThread.isDaemon = false
-            restartThread.start()
-        }.subscribe()
-        discordClient.on(SelectMenuInteractionEvent::class.java).flatMap { event ->
-            mono {
-                val (id, name) = event.customId.split(":")
-                if (defferedProcessingCache.containsKey(id)) {
-                    val (command, originalEvent, partial) = defferedProcessingCache.getValue(id)
-                    if(originalEvent.user() == event.user()) {
-                        event.deferEdit().awaitSingleOrNull()
-                        command.handle(originalEvent, id, partial + (name to optionNameCache.getValue(event.values.first())))
-                        logger.info("Handled select on ${originalEvent.commandName} by ${event.interaction.user.username}")
-                    } else {
-                        event.reply("You can't interact with other persons slash commands.").withEphemeral(true).awaitSingleOrNull()
-                    }
+            command.handleChatInput(event)
+            logger.info("Handled ${event.commandName} by ${event.interaction.user.username}")
+        }
+        discordClient.subscribeEvent<SelectMenuInteractionEvent> { event ->
+            val (id, name) = event.customId.split(":")
+            if (defferedProcessingCache.containsKey(id)) {
+                val (command, originalEvent, partial) = defferedProcessingCache.getValue(id)
+                if (originalEvent.user() == event.user()) {
+                    event.deferEdit().awaitSingleOrNull()
+                    command.handleSelect(originalEvent, id, partial + (name to optionNameCache.getValue(event.values.first())))
+                    logger.info("Handled select on ${originalEvent.commandName} by ${event.interaction.user.username}")
                 } else {
-                    event.reply("**Failed**: Unknown interaction. Please resend your original command.").withEphemeral(true).awaitSingleOrNull()
+                    event.reply("You can't interact with other persons slash commands.").withEphemeral(true).awaitSingleOrNull()
                 }
-            }.onErrorResume {
-                logger.info("User select failed", it)
-                event.interactionResponse.createFollowupMessage("**Failed**: ${it.message ?: "Something went wrong"}").then()
+            } else {
+                event.reply("**Failed**: Unknown interaction. Please resend your original command.").withEphemeral(true).awaitSingleOrNull()
             }
-        }.onErrorContinue { throwable, _ ->
-            logger.error("Fatal error in select menu - restarting: ", throwable)
-            val restartThread = Thread { restartEndpoint.restart() }
-            restartThread.isDaemon = false
-            restartThread.start()
-        }.subscribe()
+        }
         logger.info("Connected to discord with version ${gitProperties.shortCommitId}")
         discordClient.updatePresence(ClientPresence.online(ClientActivity.playing(gitProperties.shortCommitId))).subscribe()
     }
 
-    private fun handleCommand(event: ChatInputInteractionEvent): Mono<Void> = mono {
-        val command = findCommand(event)
-        if (command is Secured && !command.hasExecutionPermission(event.user())) {
-            throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
-        }
-        try {
-            command.handle(event).awaitSingleOrNull()
-        } catch (e: ClientException) {
-            logger.info("User command response failed", e)
-            throw RuntimeException(
-                "Your command was processed successfully, but the response couldn't be displayed: ${
-                    e.errorResponse.orElse(null)?.fields?.let {
-                        objectMapper.writeValueAsString(it)
-                    } ?: e.message
-                }")
-        }
-    }.onErrorResume {
-        logger.info("User command failed", it)
-        event.editReply("**Failed**: ${it.message ?: "Something went wrong"}").then()
-    }.then()
+    private inline fun <reified T : InteractionCreateEvent> GatewayDiscordClient.subscribeEvent(noinline handle: suspend (T) -> Unit) {
+        val name = T::class.java.simpleName.removeSuffix("InteractionEvent")
+        on(T::class.java).flatMap { event ->
+            mono {
+                try {
+                    handle(event)
+                } catch (e: ClientException) {
+                    logger.info("$name response failed", e)
+                    throw RuntimeException(
+                        "Your command was processed successfully, but the response couldn't be displayed: ${
+                            e.errorResponse.orElse(null)?.fields?.let {
+                                @Suppress("BlockingMethodInNonBlockingContext")
+                                objectMapper.writeValueAsString(it)
+                            } ?: e.message
+                        }")
+                }
+            }.then().onErrorResume {
+                logger.info("$name failed", it)
+                event.editReplyWithFailure(it.message)
+            }
+        }.onErrorContinue { throwable, _ ->
+            logger.error("Fatal error in $name - restarting: ", throwable)
+            val restartThread = Thread { restartEndpoint.restart() }
+            restartThread.isDaemon = false
+            restartThread.start()
+        }.subscribe()
+    }
 
-    private fun <T> TopLevelCommand<T>.handle(event: ChatInputInteractionEvent): Mono<Void> {
-        return when (val parseResult = parse(event)) {
-            is CombinedParseResult.Failure -> event.editReply("**Failed**:\n${parseResult.messages.joinToString("\n")}").then()
+    private suspend fun <T> TopLevelCommand<T>.handleChatInput(event: ChatInputInteractionEvent) {
+        when (val parseResult = parse(event)) {
+            is CombinedParseResult.Failure -> event.editReplyWithFailure(parseResult.messages.joinToString("\n"))
             is CombinedParseResult.Ambiguous -> {
                 val id = commandName + event.commandId.asString()
                 defferedProcessingCache[id] = CommandCacheEntry(this, event, parseResult.partialResult)
                 event.editReply("Your command was ambiguous. Please select from the options below:")
-                    .withComponentsOrNull(parseResult.options.map { (name, ambiguous) -> createSelectFor(name, ambiguous, id) })
-                    .then()
+                    .withComponentsOrNull(parseResult.options.map { (name, ambiguous) -> ambiguous.createSelect(name, id) })
             }
             is CombinedParseResult.Success -> handle(event, parseResult.value)
-        }
+        }.awaitSingleOrNull()
     }
 
-    private suspend fun <T> TopLevelCommand<T>.handle(event: ChatInputInteractionEvent, id: String, parameters: Map<String, Any?>) {
+    private suspend fun <T> TopLevelCommand<T>.handleSelect(event: ChatInputInteractionEvent, id: String, parameters: Map<String, Any?>) {
         val params = map(parameters)
         if (params != null) {
-            params.let { handle(event, it).awaitSingleOrNull() }
+            handle(event, params).awaitSingleOrNull()
             defferedProcessingCache.remove(id)
         } else {
             defferedProcessingCache.getValue(id).partial = parameters
         }
     }
 
-    private fun <T> createSelectFor(
-        name: String,
-        ambiguous: SingleParseResult.Ambiguous<T>,
-        id: String
-    ): ActionRow {
-        return ActionRow.of(SelectMenu.of("$id:$name", ambiguous.options.map {
-            val s = ambiguous.stringify(it)
-            optionNameCache[s] = it!!
+    private fun <T> SingleParseResult.Ambiguous<T>.createSelect(name: String, id: String): ActionRow {
+        return ActionRow.of(SelectMenu.of("$id:$name", options.map {
+            val s = stringify(it)
+            optionNameCache[s] = it
             SelectMenu.Option.of(s, s)
         }))
     }

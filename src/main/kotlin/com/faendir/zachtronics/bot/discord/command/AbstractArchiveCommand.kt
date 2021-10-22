@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.zachtronics.bot.archive.Archive
 import com.faendir.zachtronics.bot.archive.ArchiveResult
+import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.model.Solution
 import com.faendir.zachtronics.bot.utils.interactionReplyReplaceSpecBuilder
 import discord4j.core.spec.EmbedCreateFields
@@ -44,7 +45,7 @@ abstract class AbstractArchiveCommand<T, S : Solution> : AbstractSubCommand<T>()
         var totalSize = title.length
         var totalFields = 0
 
-        val embed = EmbedCreateSpec.builder().title(title)
+        val embed = EmbedCreateSpec.builder().title(title).color(if(successes != 0) Colors.SUCCESS else Colors.UNCHANGED)
         for ((solution, result) in solutions.zip(results)) {
             val name = "*${solution.puzzle.displayName}*"
             val value = when (result) {

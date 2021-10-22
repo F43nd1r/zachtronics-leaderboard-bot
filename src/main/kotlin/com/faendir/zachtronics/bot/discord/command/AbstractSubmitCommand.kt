@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.discord.command
 
+import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.leaderboards.UpdateResult
 import com.faendir.zachtronics.bot.model.Puzzle
@@ -43,6 +44,7 @@ abstract class AbstractSubmitCommand<T, P : Puzzle, R : Record> : AbstractSubCom
                 .addEmbed(
                 EmbedCreateSpec.builder()
                     .title("Success: *${puzzle.displayName}* ${successes.flatMap { it.oldRecords.keys }.joinToString { it.displayName }}")
+                    .color(Colors.SUCCESS)
                     .description("`${record.score.toDisplayString()}` ${record.author?.let { " by $it" } ?: ""}\npreviously:")
                     .embedCategoryRecords(successes.flatMap { it.oldRecords.entries })
                     .link(record.link)
@@ -55,6 +57,7 @@ abstract class AbstractSubmitCommand<T, P : Puzzle, R : Record> : AbstractSubCom
                 .addEmbed(
                     EmbedCreateSpec.builder()
                         .title("Pareto *${puzzle.displayName}*")
+                        .color(Colors.SUCCESS)
                         .description("${record.score.toDisplayString()} was included in the pareto frontier.")
                         .link(record.link)
                         .build()
@@ -66,6 +69,7 @@ abstract class AbstractSubmitCommand<T, P : Puzzle, R : Record> : AbstractSubCom
                 .addEmbed(
                     EmbedCreateSpec.builder()
                         .title("No Scores beaten by *${puzzle.displayName}* `${record.score.toDisplayString()}`")
+                        .color(Colors.UNCHANGED)
                         .description("Existing scores:")
                         .embedCategoryRecords(betterExists.flatMap {it.records.entries})
                         .build()

@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.discord.command
 
+import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
@@ -35,6 +36,7 @@ abstract class AbstractListCommand<T, C : Category, P : Puzzle, R : Record> : Ab
         return interactionReplyReplaceSpecBuilder()
             .addEmbed(EmbedCreateSpec.builder()
                 .title("*${puzzle.displayName}*")
+                .color(Colors.READ)
                 .embedCategoryRecords(records.entries)
                 .apply {
                     val missing = categories.minus(records.keys)

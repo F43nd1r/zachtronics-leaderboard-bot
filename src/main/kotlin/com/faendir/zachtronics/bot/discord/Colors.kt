@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.model
+package com.faendir.zachtronics.bot.discord
 
-import java.io.InputStream
+import discord4j.rest.util.Color
 
-
-interface Record {
-    val score: Score
-    val link: String
-    val author: String?
-    fun toShowDisplayString(): String = "${score.toDisplayString()}${author?.let { " by $it" } ?: ""} $link"
-    fun toEmbedDisplayString(): String = "[${score.toDisplayString()}](${link})"
-    fun attachments(): List<Pair<String, InputStream>> = emptyList()
+object Colors {
+    val SUCCESS = Color.of(0x388e3c)
+    val FAILURE = Color.of(0xd32f2f)
+    val UNCHANGED = Color.of(0xfbc02d)
+    val READ = Color.of(0x1976d2)
 }

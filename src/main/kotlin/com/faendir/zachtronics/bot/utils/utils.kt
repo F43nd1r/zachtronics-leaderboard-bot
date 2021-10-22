@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.utils
 
 import com.faendir.discord4j.command.parse.SingleParseResult
+import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
@@ -90,3 +91,12 @@ fun interactionReplyReplaceSpecBuilder() = InteractionReplyEditSpec.builder()
     .contentOrNull(null)
     .componentsOrNull(null)
     .embedsOrNull(null)
+
+fun InteractionCreateEvent.editReplyWithFailure(message: String?) =
+    editReply().withEmbeds(
+        EmbedCreateSpec.builder()
+            .title("Failed")
+            .color(Colors.FAILURE)
+            .description(message?.let { if (it.length > 4096) it.substring(0, 4095) + "…" else it } ?: "Something went wrong")
+            .build()
+    ).then()
