@@ -21,32 +21,27 @@ import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
+import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
-import com.faendir.zachtronics.bot.utils.interactionReplyReplaceSpecBuilder
-import discord4j.core.spec.EmbedCreateFields
-import discord4j.core.spec.EmbedCreateSpec
-import discord4j.core.spec.InteractionReplyEditSpec
+import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import reactor.core.publisher.Mono
 
 abstract class AbstractListCommand<T, C : Category, P : Puzzle, R : Record> : AbstractSubCommand<T>() {
     abstract val leaderboards: List<Leaderboard<C, P, R>>
 
-    override fun handle(parameters: T): InteractionReplyEditSpec {
+    override fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void> {
         val (puzzle, categories) = findPuzzleAndCategories(parameters)
         val records = leaderboards.map { it.getAll(puzzle, categories) }.reduce { acc, map -> acc + map }
-        return interactionReplyReplaceSpecBuilder()
-            .addEmbed(EmbedCreateSpec.builder()
-                .title("*${puzzle.displayName}*")
-                .color(Colors.READ)
-                .embedCategoryRecords(records.entries)
-                .apply {
-                    val missing = categories.minus(records.keys)
-                    if (missing.isNotEmpty()) {
-                        addField(EmbedCreateFields.Field.of(missing.joinToString("/") { it.displayName }, "None", false))
-                    }
+        return SafeEmbedMessageBuilder()
+            .title("*${puzzle.displayName}*")
+            .color(Colors.READ)
+            .embedCategoryRecords(records.entries)
+            .apply {
+                val missing = categories.minus(records.keys)
+                if (missing.isNotEmpty()) {
+                    addField(missing.joinToString("/") { it.displayName }, "None")
                 }
-                .build()
-            )
-            .build()
+            }.send(event)
     }
 
     /** @return pair of Puzzle and all the categories that support it */

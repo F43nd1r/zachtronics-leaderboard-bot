@@ -19,9 +19,9 @@ package com.faendir.zachtronics.bot.discord.command
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.Solution
-import com.faendir.zachtronics.bot.utils.interactionReplyReplaceSpecBuilder
-import discord4j.core.spec.InteractionReplyEditSpec
+import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import org.springframework.stereotype.Component
+import reactor.core.publisher.Mono
 import java.util.*
 
 @Component
@@ -29,14 +29,11 @@ abstract class AbstractSubmitArchiveCommand<T, P : Puzzle, R : Record, S : Solut
     protected abstract val submitCommand: AbstractSubmitCommand<*, P, R>
     protected abstract val archiveCommand: AbstractArchiveCommand<*, S>
 
-    override fun handle(parameters: T): InteractionReplyEditSpec {
+    override fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void> {
         val (puzzle, record, solution) = parseToPRS(parameters)
         val submitOut = submitCommand.submitToLeaderboards(puzzle, record)
         val archiveOut = archiveCommand.archiveAll(Collections.singleton(solution))
-        return interactionReplyReplaceSpecBuilder()
-            .embeds(submitOut.embeds())
-            .addEmbed(archiveOut)
-            .build()
+        return (submitOut + archiveOut).send(event)
     }
 
     abstract fun parseToPRS(parameters: T): Triple<P, R, S>

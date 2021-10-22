@@ -72,9 +72,9 @@ fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> 
         }
 }
 
-fun <C : Category, R : Record> EmbedCreateSpec.Builder.embedCategoryRecords(records: Iterable<Map.Entry<C, R?>>):
-        EmbedCreateSpec.Builder {
-    return this.addAllFields(
+fun <C : Category, R : Record> SafeEmbedMessageBuilder.embedCategoryRecords(records: Iterable<Map.Entry<C, R?>>):
+        SafeEmbedMessageBuilder {
+    return this.addFields(
         records.groupBy({ it.value?.toEmbedDisplayString() ?: "`none`" }, { it.key })
             .map { (record, categories) -> record to categories.sortedBy<C, Comparable<*>> { it as Comparable<*> } }
             .sortedBy<Pair<String, List<C>>, Comparable<*>> { it.second.first() as Comparable<*> }
@@ -97,6 +97,8 @@ fun InteractionCreateEvent.editReplyWithFailure(message: String?) =
         EmbedCreateSpec.builder()
             .title("Failed")
             .color(Colors.FAILURE)
-            .description(message?.let { if (it.length > 4096) it.substring(0, 4095) + "…" else it } ?: "Something went wrong")
+            .description(message?.truncateWithEllipsis(Limits.DESCRIPTION) ?: "Something went wrong")
             .build()
     ).then()
+
+fun String.truncateWithEllipsis(maxLength: Int) = if (length > maxLength) substring(0, 4095) + "…" else this

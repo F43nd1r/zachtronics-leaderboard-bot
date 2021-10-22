@@ -20,32 +20,25 @@ import com.faendir.zachtronics.bot.archive.Archive
 import com.faendir.zachtronics.bot.archive.ArchiveResult
 import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.model.Solution
-import com.faendir.zachtronics.bot.utils.interactionReplyReplaceSpecBuilder
-import discord4j.core.spec.EmbedCreateFields
-import discord4j.core.spec.EmbedCreateSpec
-import discord4j.core.spec.InteractionReplyEditSpec
+import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import reactor.core.publisher.Mono
 
 abstract class AbstractArchiveCommand<T, S : Solution> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
     protected abstract val archive: Archive<S>
 
-    override fun handle(parameters: T): InteractionReplyEditSpec {
+    override fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void> {
         val solutions = parseSolutions(parameters)
-        val embed = archiveAll(solutions)
-        return interactionReplyReplaceSpecBuilder().addEmbed(embed).build()
+        return archiveAll(solutions).send(event)
     }
 
-    fun archiveAll(solutions: Collection<S>): EmbedCreateSpec {
+    fun archiveAll(solutions: Collection<S>): SafeEmbedMessageBuilder {
         val results = archive.archiveAll(solutions)
 
         val successes = results.count { it is ArchiveResult.Success }
         val title = if (successes != 0) "Success: $successes solution(s) archived" else "Failure: no solutions archived"
 
-        // Discord cries if an embed is bigger than 6k or we have more tha 25 embed fields:
-        // https://discord.com/developers/docs/resources/channel#embed-limits
-        var totalSize = title.length
-        var totalFields = 0
-
-        val embed = EmbedCreateSpec.builder().title(title).color(if(successes != 0) Colors.SUCCESS else Colors.UNCHANGED)
+        val embed = SafeEmbedMessageBuilder().title(title).color(if(successes != 0) Colors.SUCCESS else Colors.UNCHANGED)
         for ((solution, result) in solutions.zip(results)) {
             val name = "*${solution.puzzle.displayName}*"
             val value = when (result) {
@@ -59,17 +52,9 @@ abstract class AbstractArchiveCommand<T, S : Solution> : AbstractSubCommand<T>()
                     "`${solution.score.toDisplayString()}` did not qualify for archiving."
                 }
             }
-
-            totalFields++
-            totalSize += name.length + value.length
-            if (totalFields > 25 || totalSize > 5900) {
-                embed.footer(EmbedCreateFields.Footer.of("${results.size - totalFields + 1} more results hidden", null))
-                break
-            }
-
-            embed.addField(EmbedCreateFields.Field.of(name, value, true))
+            embed.addField(name, value, true)
         }
-        return embed.build()
+        return embed
     }
 
     abstract fun parseSolutions(parameters: T): List<S>
