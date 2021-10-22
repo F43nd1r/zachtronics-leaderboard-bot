@@ -106,7 +106,7 @@ class SafeEmbedMessageBuilder {
 
     fun send(event: InteractionCreateEvent) : Mono<Void> = mono {
         result.add(current.build())
-        event.editReply().withComponentsOrNull(null).withContentOrNull(null).withEmbeds(result.removeFirst()).awaitSingleOrNull()
+        event.editReply().clear().withEmbeds(result.removeFirst()).awaitSingleOrNull()
         for(embed in result) {
             event.createFollowup().withEmbeds(embed).awaitSingleOrNull()
         }

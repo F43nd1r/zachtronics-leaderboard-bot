@@ -16,20 +16,8 @@
 
 package com.faendir.zachtronics.bot.discord.command
 
-import discord4j.core.event.domain.interaction.InteractionCreateEvent
-import discord4j.core.spec.InteractionReplyEditSpec
-import reactor.core.publisher.Mono
-
 abstract class AbstractSubCommand<T> : SubCommand<T> {
     override val data by lazy {
         buildData()
-    }
-
-    override fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void> {
-        return event.editReply(handle(parameters)).then()
-    }
-
-    open fun handle(parameters: T): InteractionReplyEditSpec {
-        return InteractionReplyEditSpec.builder().contentOrNull("Not yet implemented").build()
     }
 }

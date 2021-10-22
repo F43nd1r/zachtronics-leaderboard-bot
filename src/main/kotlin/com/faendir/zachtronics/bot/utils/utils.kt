@@ -25,7 +25,7 @@ import discord4j.core.`object`.entity.User
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.core.spec.EmbedCreateFields
 import discord4j.core.spec.EmbedCreateSpec
-import discord4j.core.spec.InteractionReplyEditSpec
+import discord4j.core.spec.InteractionReplyEditMono
 
 inline fun <T, R> Collection<T>.ifNotEmpty(block: (Collection<T>) -> R): R? = takeIf { it.isNotEmpty() }?.let(block)
 
@@ -87,10 +87,7 @@ fun <C : Category, R : Record> SafeEmbedMessageBuilder.embedCategoryRecords(reco
 fun InteractionCreateEvent.user(): User =
     this.interaction.member.map { it as User }.orElse(this.interaction.user)
 
-fun interactionReplyReplaceSpecBuilder() = InteractionReplyEditSpec.builder()
-    .contentOrNull(null)
-    .componentsOrNull(null)
-    .embedsOrNull(null)
+fun InteractionReplyEditMono.clear() = withContentOrNull(null).withComponentsOrNull(null).withEmbedsOrNull(null)
 
 fun InteractionCreateEvent.editReplyWithFailure(message: String?) =
     editReply().withEmbeds(
