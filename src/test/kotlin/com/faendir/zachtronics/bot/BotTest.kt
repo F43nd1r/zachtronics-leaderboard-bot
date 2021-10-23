@@ -36,5 +36,6 @@ annotation class BotTest(@get:AliasFor(annotation = ContextConfiguration::class,
 class ContextInitializer : ApplicationContextInitializer<AnnotationConfigApplicationContext> {
     override fun initialize(applicationContext: AnnotationConfigApplicationContext) {
         applicationContext.register(Application::class.java, TestConfiguration::class.java)
+        applicationContext.addBeanFactoryPostProcessor { factory -> factory.beanDefinitionNames.map(factory::getBeanDefinition).forEach { it.isLazyInit = true } }
     }
 }
