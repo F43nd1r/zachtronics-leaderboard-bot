@@ -36,8 +36,10 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -173,8 +175,20 @@ public class SubCommandTest {
         GameCommand.SubCommandWithParameters<T> subCommandWithParameters = (GameCommand.SubCommandWithParameters<T>)(
                 (CombinedParseResult.Success<GameCommand.SubCommandWithParameters<?>>) parseResult).getValue();
         AbstractSubCommand<T> subCommand = (AbstractSubCommand<T>) subCommandWithParameters.getSubCommand();
-        InteractionReplyEditSpec editSpec = subCommand.handle(subCommandWithParameters.getParameters());
 
+        Mockito.when(interactionEvent.editReply()).thenCallRealMethod();
+        Mockito.when(interactionEvent.createFollowup()).thenCallRealMethod();
+        var editSpecWrapper = new Object() {
+            InteractionReplyEditSpec editSpec = null;
+        };
+        Mockito.when(interactionEvent.editReply(ArgumentMatchers.<InteractionReplyEditSpec>any())).then(invocation -> {
+            editSpecWrapper.editSpec = invocation.getArgument(0, InteractionReplyEditSpec.class);
+            return Mono.empty();
+        });
+
+        subCommand.handle(interactionEvent, subCommandWithParameters.getParameters()).block();
+
+        var editSpec = editSpecWrapper.editSpec;
         String result = Stream.<Stream<String>>of(flatStream(editSpec.content()),
                                                   flatStream(editSpec.embeds()).flatMap(
                                                           l -> l.stream().mapMulti((e, d) -> {

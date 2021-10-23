@@ -25,7 +25,7 @@ import kotlinx.coroutines.reactor.mono
 import reactor.core.publisher.Mono
 
 class SafeEmbedMessageBuilder {
-    private val result = mutableListOf<EmbedCreateSpec>()
+    private val result = mutableListOf<Pair<EmbedCreateSpec, Int>>()
     private var current = EmbedCreateSpec.builder()
     private var total = 0
     private var fields = 0
@@ -87,27 +87,37 @@ class SafeEmbedMessageBuilder {
     }
 
     private fun nextBuilder() {
-        result.add(current.build())
+        result.add(buildCurrent())
         current = EmbedCreateSpec.builder()
         color?.let { current.color(it) }
         total = 0
         fields = 0
     }
 
-    operator fun plus(other: SafeEmbedMessageBuilder) : SafeEmbedMessageBuilder {
+    private fun buildCurrent() = current.build() to total
+
+    operator fun plus(other: SafeEmbedMessageBuilder): SafeEmbedMessageBuilder {
         return SafeEmbedMessageBuilder().also {
-            it.result += result + current.build() + other.result + other.current.build()
+            it.result += result + buildCurrent() + other.result
+            it.current = other.current
+            it.total = other.total
+            it.fields = other.fields
         }
     }
 
-    fun addAll(other: SafeEmbedMessageBuilder) {
-        result.addAll(other.result + other.current.build())
-    }
-
-    fun send(event: InteractionCreateEvent) : Mono<Void> = mono {
-        result.add(current.build())
-        event.editReply().clear().withEmbeds(result.removeFirst()).awaitSingleOrNull()
-        for(embed in result) {
+    fun send(event: InteractionCreateEvent): Mono<Void> = mono {
+        result.add(buildCurrent())
+        val r = result.fold(listOf(Pair(emptyList<EmbedCreateSpec>(), 0))) { acc, (spec, total) ->
+            val last = acc.last()
+            val (list, lastTotal) = last
+            if (lastTotal + total <= Limits.TOTAL) {
+                acc - last + ((list + spec) to (lastTotal + total))
+            } else {
+                acc + (listOf(spec) to total)
+            }
+        }.map { it.first }.toMutableList()
+        event.editReply().clear().withEmbedsOrNull(r.removeFirst()).awaitSingleOrNull()
+        for (embed in r) {
             event.createFollowup().withEmbeds(embed).awaitSingleOrNull()
         }
     }.then()
