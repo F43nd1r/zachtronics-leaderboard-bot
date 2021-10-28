@@ -19,8 +19,8 @@ package com.faendir.zachtronics.bot.sc.discord;
 import com.faendir.discord4j.command.parse.CombinedParseResult;
 import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.discord.command.AbstractSubCommand;
 import com.faendir.zachtronics.bot.discord.command.GameCommand;
+import com.faendir.zachtronics.bot.discord.command.SubCommand;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
@@ -174,7 +174,7 @@ public class SubCommandTest {
         @SuppressWarnings("unchecked")
         GameCommand.SubCommandWithParameters<T> subCommandWithParameters = (GameCommand.SubCommandWithParameters<T>)(
                 (CombinedParseResult.Success<GameCommand.SubCommandWithParameters<?>>) parseResult).getValue();
-        AbstractSubCommand<T> subCommand = (AbstractSubCommand<T>) subCommandWithParameters.getSubCommand();
+        SubCommand<T> subCommand = subCommandWithParameters.getSubCommand();
 
         Mockito.when(interactionEvent.editReply()).thenCallRealMethod();
         Mockito.when(interactionEvent.createFollowup()).thenCallRealMethod();

@@ -31,7 +31,7 @@ public final class Utils {
     }
 
     private static final Pattern PASTEBIN_PATTERN = Pattern.compile("(?:https?://)?pastebin.com/(?:raw/)?(\\w+)");
-    private static final Pattern GDOCS_PATTERN = Pattern.compile("(?:https?://)?docs.google.com/document/d/(\\w+)(?:/.*)?");
+    private static final Pattern GDOCS_PATTERN = Pattern.compile("(?:https?://)?docs.google.com/document/d/([\\w-]+)(?:/.*)?");
     @NotNull
     public static String rawContentURL(@NotNull String link) {
         Matcher m = PASTEBIN_PATTERN.matcher(link);
