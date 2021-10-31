@@ -56,7 +56,7 @@ public class SzArchiveCommand extends AbstractArchiveCommand<SzArchiveCommand.Ar
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Could not parse your link");
         } catch (IOException e) {
-            throw new IllegalArgumentException("Couldn't read your solution");
+            throw new IllegalArgumentException("Could not read your solution");
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Could not parse a valid solution");
         }

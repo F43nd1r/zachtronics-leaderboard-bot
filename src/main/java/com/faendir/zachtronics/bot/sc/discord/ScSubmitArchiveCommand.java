@@ -68,7 +68,7 @@ public class ScSubmitArchiveCommand
         public SubmitArchiveData(@Description("Link to your video of the solution, can be `m1` to scrape it from your last message")
                                  @NotNull @Converter(LinkConverter.class) String video,
                                  @Description("Link or `m1` to scrape it from your last message. " +
-                                 "Start the solution name with `/B?P?` to set flags") @NotNull
+                                              "Start the solution name with `/B?P?` to set flags") @NotNull
                                  @Converter(LinkConverter.class) String export,
                                  @Description("Name to appear on the Reddit leaderboard")
                                  @NotNull String author,

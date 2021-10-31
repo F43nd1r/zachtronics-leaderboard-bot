@@ -78,12 +78,12 @@ public class ScSolution implements Solution {
         String export;
         try (InputStream is = new URL(Utils.rawContentURL(exportLink)).openStream()) {
             export = new String(is.readAllBytes()).replace("\r\n", "\n");
-            if (export.charAt(0) == '\uFEFF') // remove BOM
+            if (export.length() > 0 && export.charAt(0) == '\uFEFF') // remove BOM
                 export = export.substring(1);
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Could not parse your link");
         } catch (IOException e) {
-            throw new IllegalArgumentException("Couldn't read your solution");
+            throw new IllegalArgumentException("Could not read your solution");
         }
 
         return SChem.validateMultiExport(export, puzzle, bypassValidation);

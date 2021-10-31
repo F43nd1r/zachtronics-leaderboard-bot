@@ -99,4 +99,4 @@ fun InteractionCreateEvent.editReplyWithFailure(message: String?) =
             .build()
     ).then()
 
-fun String.truncateWithEllipsis(maxLength: Int) = if (length > maxLength) substring(0, 4095) + "…" else this
+fun String.truncateWithEllipsis(maxLength: Int) = if (length > maxLength) substring(0, maxLength - 1) + "…" else this
