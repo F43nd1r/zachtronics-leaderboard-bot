@@ -20,7 +20,6 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 @Suppress("DSL_SCOPE_VIOLATION") // TODO remove when https://youtrack.jetbrains.com/issue/KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.plugin.serialization)
     alias(libs.plugins.kotlin.plugin.lombok)
@@ -66,8 +65,6 @@ dependencies {
     implementation(libs.jackson.kotlin)
 
     ksp(projects.processor)
-
-    kapt(libs.spring.boot.configurationProcessor)
 
     testImplementation(libs.spring.boot.test)
     testImplementation(libs.trove4j)
@@ -123,10 +120,6 @@ tasks.getByName<Jar>("jar") {
 
 kotlinLombok {
     lombokConfigurationFile(file("lombok.config"))
-}
-
-kapt {
-    keepJavacAnnotationProcessors = true
 }
 
 afterEvaluate {
