@@ -20,45 +20,66 @@ import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
 import com.faendir.discord4j.command.parse.ApplicationCommandParser
+import com.faendir.om.parser.solution.model.Position
 import com.faendir.zachtronics.bot.discord.LinkConverter
 import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand
 import com.faendir.zachtronics.bot.discord.command.Secured
-import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.om.OmQualifier
-import com.faendir.zachtronics.bot.om.model.OmModifier
-import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.createSubmission
+import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmRecord
-import com.faendir.zachtronics.bot.om.model.OmScore
+import com.faendir.zachtronics.bot.om.model.OmSubmission
+import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
+import com.faendir.zachtronics.bot.utils.user
+import com.roxstudio.utils.CUrl
+import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 @OmQualifier
-class OmSubmitCommand(override val leaderboards: List<Leaderboard<*, OmPuzzle, OmRecord>>) :
-    AbstractSubmitCommand<Submit, OmPuzzle, OmRecord>(),
+class OmSubmitCommand(override val repository: OmSolutionRepository) : AbstractSubmitCommand<SubmitParams, OmCategory, OmSubmission, OmRecord>(),
     Secured by OmSecured,
-    ApplicationCommandParser<Submit, ApplicationCommandOptionData> by SubmitParser {
-    override fun parseSubmission(parameters: Submit): Pair<OmPuzzle, OmRecord> {
-        return Pair(
-            parameters.puzzle,
-            OmRecord(
-                OmScore.parse(parameters.puzzle, parameters.score).apply { modifier = parameters.modifier ?: OmModifier.NORMAL },
-                parameters.gif
-            )
-        )
+    ApplicationCommandParser<SubmitParams, ApplicationCommandOptionData> by SubmitParamsParser {
+
+    override fun parseSubmission(event: InteractionCreateEvent, parameters: SubmitParams): OmSubmission {
+        val bytes = try {
+            CUrl(parameters.solution).exec()
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Could not load your solution file")
+        }
+        return createSubmission(parameters.gif, event.user().username, bytes)
     }
 }
 
-@ApplicationCommand(description = "Submit a solution", subCommand = true)
-data class Submit(
-    @Description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")
-    @Converter(PuzzleConverter::class)
-    val puzzle: OmPuzzle,
-    @Description("Puzzle score. E.g. `100/32/14/22`, `3.5w/32c/100g`")
-    val score: String,
+@ApplicationCommand(name = "submit", description = "Submit a solution", subCommand = true)
+data class SubmitParams(
+    @Converter(LinkConverter::class)
+    @Description("Link to your solution file, can be `m1` to scrape it from your last message")
+    val solution: String,
     @Converter(LinkConverter::class)
     @Description("Link to your solution gif/mp4, can be `m1` to scrape it from your last message")
     val gif: String,
-    @Description("Metric Modifier")
-    val modifier: OmModifier?
 )
+
+infix operator fun Position.plus(other: Position) = Position(this.x + other.x, this.y + other.y)
+
+data class CubicPosition(val x: Int, val y: Int, val z: Int) {
+
+    fun rotate(times: Int): CubicPosition {
+        val t = Math.floorMod(times, 6)
+        val coords = mutableListOf(x, y, z)
+        if (t % 2 != 0) {
+            coords.replaceAll { -it }
+        }
+        Collections.rotate(coords, t % 3)
+        return CubicPosition(coords[0], coords[1], coords[2])
+    }
+
+    fun toAxial(): Position = Position(x, z)
+}
+
+fun Position.toCubic(): CubicPosition = CubicPosition(x, -x - y, y)
+
+fun Position.rotate(times: Int) = this.toCubic().rotate(times).toAxial()

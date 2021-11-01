@@ -22,9 +22,10 @@ import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.LinkConverter;
 import com.faendir.zachtronics.bot.discord.command.AbstractArchiveCommand;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
-import com.faendir.zachtronics.bot.sc.archive.ScArchive;
+import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
-import com.faendir.zachtronics.bot.sc.model.ScSolution;
+import com.faendir.zachtronics.bot.sc.model.ScSubmission;
+import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -38,17 +39,17 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 @ScQualifier
-public class ScArchiveCommand extends AbstractArchiveCommand<ScArchiveCommand.ArchiveData, ScSolution> implements ScSecured {
+public class ScArchiveCommand extends AbstractArchiveCommand<ScArchiveCommand.ArchiveData, ScCategory, ScSubmission> implements ScSecured {
     @Delegate
     private final ScArchiveCommand_ArchiveDataParser parser = ScArchiveCommand_ArchiveDataParser.INSTANCE;
     @Getter
-    private final ScArchive archive;
+    private final ScSolutionRepository repository;
 
     @NotNull
     @Override
-    public List<ScSolution> parseSolutions(@NotNull ArchiveData parameters) {
+    public List<ScSubmission> parseSubmissions(@NotNull ArchiveData parameters) {
         boolean bypassValidation = parameters.bypassValidation != null && parameters.bypassValidation;
-        return ScSolution.fromExportLink(parameters.export, parameters.puzzle, bypassValidation);
+        return ScSubmission.fromExportLink(parameters.export, parameters.puzzle, bypassValidation);
     }
 
     @ApplicationCommand(name = "archive", description = "Archive any number of solutions in an export file", subCommand = true)

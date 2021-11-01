@@ -16,20 +16,35 @@
 
 package com.faendir.zachtronics.bot.sz.model;
 
-import com.faendir.zachtronics.bot.model.Solution;
 import lombok.Value;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
 @Value
-class SzSolutionMetadata implements Solution<SzPuzzle> {
+class SzSolutionMetadata {
     String title;
     SzPuzzle puzzle;
     SzScore score;
 
+    @NotNull
+    @Contract("_ -> new")
+    public static SzSolutionMetadata fromPath(@NotNull Path path) {
+        try (Stream<String> lines = Files.lines(path)) {
+            return new SzSolutionMetadata(lines);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     /** Closing the stream (if needed) is the caller's issue */
-    SzSolutionMetadata(Stream<String> lines) {
+    SzSolutionMetadata(@NotNull Stream<String> lines) {
         Iterator<String> it = lines.iterator();
         /*
         [name] Top solution Cost->Power - andersk

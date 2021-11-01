@@ -16,6 +16,8 @@
 
 package com.faendir.zachtronics.bot.model
 
-interface Score {
-    fun toDisplayString(): String
+interface Score<C: Category> {
+    fun toDisplayString() = toDisplayString(DisplayContext.plainText())
+
+    fun toDisplayString(context: DisplayContext<C>): String
 }

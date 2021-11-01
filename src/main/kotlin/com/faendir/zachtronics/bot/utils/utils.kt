@@ -19,13 +19,19 @@ package com.faendir.zachtronics.bot.utils
 import com.faendir.discord4j.command.parse.SingleParseResult
 import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.model.Category
+import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
+import com.faendir.zachtronics.bot.model.StringFormat
+import com.faendir.zachtronics.bot.repository.CategoryRecord
 import discord4j.core.`object`.entity.User
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.core.spec.EmbedCreateFields
 import discord4j.core.spec.EmbedCreateSpec
 import discord4j.core.spec.InteractionReplyEditMono
+import java.io.Closeable
+import java.net.HttpURLConnection
+import java.net.URL
 
 inline fun <T, R> Collection<T>.ifNotEmpty(block: (Collection<T>) -> R): R? = takeIf { it.isNotEmpty() }?.let(block)
 
@@ -73,15 +79,31 @@ fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> 
 }
 
 @Suppress("UNCHECKED_CAST")
-fun <C : Category, R : Record> SafeEmbedMessageBuilder.embedCategoryRecords(records: Iterable<Map.Entry<C, R?>>):
+fun <R : Record<C>?, C : Category> SafeEmbedMessageBuilder.embedCategoryRecords(records: Iterable<CategoryRecord<R, C>>):
+        SafeEmbedMessageBuilder {
+    return addFields(
+        records.map { cr -> cr.copy(categories = cr.categories.sortedBy { it as? Comparable<Any> }.toCollection(LinkedHashSet())) }
+            .sortedBy { it.categories.first() as? Comparable<Any> }
+            .map { (record, categories) ->
+                EmbedCreateFields.Field.of(
+                    categories.joinToString(", ") { it.displayName },
+                    record?.toDisplayString(DisplayContext(StringFormat.MARKDOWN, categories.toList())) ?: "none",
+                    true
+                )
+            }
+    )
+}
+
+fun <R : Record<C>, C : Category> SafeEmbedMessageBuilder.embedRecords(records: Iterable<CategoryRecord<R, C>>):
         SafeEmbedMessageBuilder {
     return this.addFields(
-        records.groupBy({ it.value?.toEmbedDisplayString() ?: "`none`" }, { it.key })
-            .map { (record, categories) -> record to categories.sortedBy { it as? Comparable<Any> } }
-            .sortedBy { it.second.first() as? Comparable<Any> }
-            .map { (record, categories) ->
-                EmbedCreateFields.Field.of(categories.joinToString("/") { it.displayName }, record, true)
-            }
+        records.map { (record, categories) ->
+            EmbedCreateFields.Field.of(
+                if (categories.isNotEmpty()) categories.joinToString(", ") { it.displayName } else "\u200B", // NBSP
+                record.toDisplayString(DisplayContext.markdown()),
+                true
+            )
+        }
     )
 }
 
@@ -100,3 +122,43 @@ fun InteractionCreateEvent.editReplyWithFailure(message: String?) =
     ).then()
 
 fun String.truncateWithEllipsis(maxLength: Int) = if (length > maxLength) substring(0, maxLength - 1) + "…" else this
+
+fun <K, V, C : MutableCollection<V>> MutableMap<K, C>.add(key: K, values: C) {
+    if (containsKey(key)) {
+        getValue(key) += values
+    } else {
+        put(key, values)
+    }
+}
+
+inline fun <T : Closeable?, U : Closeable?, R> Pair<T, U>.use(block: (T, U) -> R): R {
+    try {
+        return block(first, second)
+    } finally {
+        try {
+            first?.close()
+        } catch (closeException: Throwable) {
+        }
+        try {
+            second?.close()
+        } catch (closeException: Throwable) {
+        }
+    }
+}
+
+fun String?.orEmpty(prefix: String = "", suffix: String = "") = this?.let { prefix + it + suffix } ?: ""
+
+fun String.ensurePrefix(prefix: String) = if (startsWith(prefix)) this else prefix + this
+
+fun <T> Iterable<T>.productOf(selector: (T) -> Int) = fold(1) {acc, t -> acc * selector(t) }
+
+fun isValidLink(string: String): Boolean {
+    return try {
+        val connection = URL(string).openConnection() as HttpURLConnection
+        connection.requestMethod = "HEAD"
+        connection.setRequestProperty("Accept", "*/*")
+        connection.responseCode in (200 until 400) // accept all redirects as well
+    } catch (e: Exception) {
+        false
+    }
+}

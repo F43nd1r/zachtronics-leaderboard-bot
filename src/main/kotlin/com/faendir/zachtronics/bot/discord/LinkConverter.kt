@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.discord
 
 import com.faendir.discord4j.command.parse.OptionConverter
 import com.faendir.discord4j.command.parse.SingleParseResult
+import com.faendir.zachtronics.bot.utils.isValidLink
 import discord4j.common.util.Snowflake
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.reaction.ReactionEmoji
@@ -56,20 +57,9 @@ class LinkConverter : OptionConverter<String, String> {
         } else {
             input
         }
-        if(!isValid(link) ){
+        if(!isValidLink(link) ){
             return SingleParseResult.Failure("\"$link\" is not a valid link")
         }
         return SingleParseResult.Success(link)
-    }
-
-    private fun isValid(string: String): Boolean {
-        return try {
-            val connection = URL(string).openConnection() as HttpURLConnection
-            connection.requestMethod = "HEAD"
-            connection.setRequestProperty("Accept", "*/*")
-            connection.responseCode in (200 until 400) // accept all redirects as well
-        } catch (e: Exception) {
-            false
-        }
     }
 }

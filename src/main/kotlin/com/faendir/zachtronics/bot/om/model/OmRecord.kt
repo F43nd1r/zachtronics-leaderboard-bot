@@ -17,8 +17,19 @@
 package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.Record
+import com.faendir.zachtronics.bot.utils.PathSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import java.nio.file.Path
 
 @Serializable
-data class OmRecord(override val score: OmScore, override val link: String, @Transient override val author: String? = null) : Record
+data class OmRecord(
+    override val puzzle: OmPuzzle,
+    override val score: OmScore,
+    override val displayLink: String?,
+    @Transient
+    override val dataLink: String? = null,
+    @Serializable(with = PathSerializer::class)
+    override val dataPath: Path?,
+    override val author: String? = null,
+) : Record<OmCategory>

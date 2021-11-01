@@ -21,8 +21,9 @@ import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.zachtronics.bot.discord.LinkConverter;
 import com.faendir.zachtronics.bot.discord.command.AbstractArchiveCommand;
 import com.faendir.zachtronics.bot.sz.SzQualifier;
-import com.faendir.zachtronics.bot.sz.archive.SzArchive;
-import com.faendir.zachtronics.bot.sz.model.SzSolution;
+import com.faendir.zachtronics.bot.sz.model.SzCategory;
+import com.faendir.zachtronics.bot.sz.model.SzSubmission;
+import com.faendir.zachtronics.bot.sz.repository.SzSolutionRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -40,19 +41,19 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 @SzQualifier
-public class SzArchiveCommand extends AbstractArchiveCommand<SzArchiveCommand.ArchiveData, SzSolution> implements SzSecured {
+public class SzArchiveCommand extends AbstractArchiveCommand<SzArchiveCommand.ArchiveData, SzCategory, SzSubmission> implements SzSecured {
     @Delegate
     private final SzArchiveCommand_ArchiveDataParser parser = SzArchiveCommand_ArchiveDataParser.INSTANCE;
     @Getter
-    private final SzArchive archive;
+    private final SzSolutionRepository repository;
 
     @NotNull
     @Override
-    public List<SzSolution> parseSolutions(@NotNull ArchiveData parameters) {
-        SzSolution solution;
+    public List<SzSubmission> parseSubmissions(@NotNull ArchiveData parameters) {
+        SzSubmission solution;
         try (InputStream is = new URL(parameters.link).openStream()) {
             String content = new String(is.readAllBytes());
-            solution = new SzSolution(content);
+            solution = new SzSubmission(content);
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Could not parse your link");
         } catch (IOException e) {

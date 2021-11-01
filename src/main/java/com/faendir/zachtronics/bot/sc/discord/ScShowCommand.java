@@ -20,11 +20,11 @@ import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractShowCommand;
-import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
+import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.NonNull;
@@ -34,8 +34,6 @@ import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @Component
 @ScQualifier
@@ -43,7 +41,7 @@ public class ScShowCommand extends AbstractShowCommand<ScShowCommand.ShowData, S
     @Delegate
     private final ScShowCommand_ShowDataParser parser = ScShowCommand_ShowDataParser.INSTANCE;
     @Getter
-    private final List<Leaderboard<ScCategory, ScPuzzle, ScRecord>> leaderboards;
+    private final ScSolutionRepository repository;
 
     @NotNull
     @Override

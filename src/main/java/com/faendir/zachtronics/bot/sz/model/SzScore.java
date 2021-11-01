@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.sz.model;
 
+import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Score;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Value
-public class SzScore implements Score {
+public class SzScore implements Score<SzCategory> {
     int cost;
     int power;
     int lines;
@@ -32,8 +33,8 @@ public class SzScore implements Score {
     /** ccc/r/ss */
     @NotNull
     @Override
-    public String toDisplayString() {
-        return cost + "/" + power + "/" + lines;
+    public String toDisplayString(@NotNull DisplayContext<SzCategory> context) {
+        return String.valueOf(cost) + context.getSeparator() + power + context.getSeparator() + lines;
     }
 
     /** cc/ppp/ll */
@@ -41,6 +42,7 @@ public class SzScore implements Score {
             "\\**(?<cost>\\d+)\\**/\\**(?<power>\\d+)\\**/\\**(?<lines>\\d+)\\**");
 
     /** we assume m matches */
+    @NotNull
     public static SzScore parseSimpleScore(@NotNull Matcher m) {
         int cost = Integer.parseInt(m.group("cost"));
         int power = Integer.parseInt(m.group("power"));

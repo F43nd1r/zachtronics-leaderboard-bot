@@ -16,23 +16,38 @@
 
 package com.faendir.zachtronics.bot.om.model
 
+import com.faendir.zachtronics.bot.utils.productOf
+
 private const val NOT_FOUND_PLACEHOLDER = 1_000_000_000.0
 
 @Suppress("ClassName")
 sealed class OmMetric(val displayName: String, val scoreParts: List<OmScorePart>) {
     abstract val comparator: Comparator<OmScore>
+    abstract val description: String
+
+    abstract fun describe(score: OmScore): String?
 
     abstract class Basic(identifier: String, scorePart: OmScorePart) : OmMetric(identifier, listOf(scorePart)) {
-        override val comparator: Comparator<OmScore> = Comparator.comparing { it.parts[scorePart] ?: NOT_FOUND_PLACEHOLDER }
+        override val comparator: Comparator<OmScore> = Comparator.comparing { scorePart.getValue(it)?.toDouble() ?: NOT_FOUND_PLACEHOLDER }
+        override val description: String = scorePart.key.toString()
+
+        override fun describe(score: OmScore): String? = null
     }
 
     abstract class Sum(identifier: String, vararg scoreParts: OmScorePart) : OmMetric(identifier, scoreParts.toList()) {
-        override val comparator: Comparator<OmScore> = Comparator.comparing { score -> scoreParts.sumOf { score.parts[it] ?: NOT_FOUND_PLACEHOLDER } }
+        override val comparator: Comparator<OmScore> =
+            Comparator.comparing { score -> scoreParts.sumOf { it.getValue(score)?.toDouble() ?: NOT_FOUND_PLACEHOLDER } }
+        override val description: String = scoreParts.joinToString("+") { it.key.toString() }
+        override fun describe(score: OmScore): String? =
+            if (scoreParts.all { it.getValue(score) != null }) "$description=${scoreParts.sumOf { it.getValue(score)!!.toInt() }}" else null
     }
 
     abstract class Product(vararg scoreParts: OmScorePart) : OmMetric("X", scoreParts.toList()) {
         override val comparator: Comparator<OmScore> =
-            Comparator.comparing { score -> scoreParts.map { score.parts[it] ?: NOT_FOUND_PLACEHOLDER }.reduce { a, b -> a * b } }
+            Comparator.comparing { score -> scoreParts.map { it.getValue(score)?.toDouble() ?: NOT_FOUND_PLACEHOLDER }.reduce { a, b -> a * b } }
+        override val description: String = scoreParts.joinToString("·") { it.key.toString() }
+        override fun describe(score: OmScore): String? =
+            if (scoreParts.all { it.getValue(score) != null }) "$description=${scoreParts.productOf { it.getValue(score)!!.toInt() }}" else null
     }
 
     object COST : Basic("G", OmScorePart.COST)

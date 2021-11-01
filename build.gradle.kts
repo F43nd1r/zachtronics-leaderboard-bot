@@ -40,8 +40,8 @@ allprojects {
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
-            jvmTarget = "16"
-            freeCompilerArgs = listOf("-Xjvm-default=all", "-Xjsr305=strict")
+            jvmTarget = "17"
+            freeCompilerArgs = listOf("-Xjvm-default=all", "-Xjsr305=strict", "-Xopt-in=kotlin.RequiresOptIn")
         }
     }
 }
@@ -63,6 +63,7 @@ dependencies {
     implementation(projects.native)
     implementation(libs.jackson.databind)
     implementation(libs.jackson.kotlin)
+    implementation(libs.springdoc)
 
     ksp(projects.processor)
 
@@ -83,7 +84,7 @@ tasks.withType<Test> {
 
         override fun afterSuite(suite: TestDescriptor, result: TestResult) {
             if(suite.parent == null) {
-                println("Test results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} " +
+                println("Test results: ${result.resultType} (${result.testCount} tests,${result.successfulTestCount} successes, ${result.failedTestCount} " +
                         "failures, ${result.skippedTestCount} skipped)")
             }
         }
@@ -97,8 +98,8 @@ docker {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_16
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 sourceSets {

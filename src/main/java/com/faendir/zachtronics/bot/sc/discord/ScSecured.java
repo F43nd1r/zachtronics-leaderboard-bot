@@ -35,8 +35,8 @@ public interface ScSecured extends Secured {
     }
 
     private static boolean isTrustedPoster(@NotNull User user) {
-        if (user instanceof Member)
-            return ((Member) user).getRoles().any(r -> r.getName().equals("trusted-leaderboard-poster")).block();
+        if (user instanceof Member member)
+            return member.getRoles().any(r -> r.getName().equals("trusted-leaderboard-poster")).block();
         else
             return false;
     }

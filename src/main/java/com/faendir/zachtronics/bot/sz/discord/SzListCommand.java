@@ -19,10 +19,11 @@ package com.faendir.zachtronics.bot.sz.discord;
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.zachtronics.bot.discord.command.AbstractListCommand;
-import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
 import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
+import com.faendir.zachtronics.bot.sz.model.SzRecord;
+import com.faendir.zachtronics.bot.sz.repository.SzSolutionRepository;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.NonNull;
@@ -38,11 +39,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 @SzQualifier
-public class SzListCommand extends AbstractListCommand<SzListCommand.ListData, SzCategory, SzPuzzle> {
+public class SzListCommand extends AbstractListCommand<SzListCommand.ListData, SzCategory, SzPuzzle, SzRecord> {
     @Delegate
     private final SzListCommand_ListDataParser parser = SzListCommand_ListDataParser.INSTANCE;
     @Getter
-    private final List<Leaderboard<SzCategory, SzPuzzle, ?>> leaderboards;
+    private final SzSolutionRepository repository;
 
     @NotNull
     @Override

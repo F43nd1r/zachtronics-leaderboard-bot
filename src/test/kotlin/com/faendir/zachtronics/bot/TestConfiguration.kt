@@ -83,17 +83,7 @@ class TestConfiguration(private val gitProperties: GitProperties) {
         return client
     }
 
-    private fun createTestGitRepository(dir: String): GitRepository {
-        val target = extractResourceDirectory(dir)
-        val git = Git.init().setDirectory(target).call()
-        git.add().addFilepattern(".").call()
-        git.commit()
-            .setAuthor("zachtronics-bot-test", "zachtronics-bot-test@faendir.com")
-            .setCommitter("zachtronics-bot-test", "zachtronics-bot-test@faendir.com")
-            .setMessage("[BOT] initial commit")
-            .call()
-        return TestGitRepository(gitProperties, target)
-    }
+    private fun createTestGitRepository(dir: String): GitRepository = createGitRepositoryFrom(extractResourceDirectory(dir), gitProperties)
 
     private fun extractResourceDirectory(dir: String): File {
         val resourceDir = ResourceUtils.getFile("classpath:$dir")
@@ -101,4 +91,15 @@ class TestConfiguration(private val gitProperties: GitProperties) {
         resourceDir.copyRecursively(target)
         return target
     }
+}
+
+fun createGitRepositoryFrom(dir: File, gitProperties: GitProperties): GitRepository {
+    val git = Git.init().setDirectory(dir).call()
+    git.add().addFilepattern(".").call()
+    git.commit()
+        .setAuthor("zachtronics-bot-test", "zachtronics-bot-test@faendir.com")
+        .setCommitter("zachtronics-bot-test", "zachtronics-bot-test@faendir.com")
+        .setMessage("[BOT] initial commit")
+        .call()
+    return TestGitRepository(gitProperties, dir)
 }

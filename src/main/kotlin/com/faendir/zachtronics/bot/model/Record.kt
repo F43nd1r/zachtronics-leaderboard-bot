@@ -16,14 +16,33 @@
 
 package com.faendir.zachtronics.bot.model
 
-import java.io.InputStream
+import com.faendir.zachtronics.bot.utils.orEmpty
+import lombok.SneakyThrows
+import java.nio.file.Path
+import kotlin.io.path.inputStream
 
-
-interface Record {
-    val score: Score
-    val link: String
+/** Read interface, used to store data from the repositories that needs to be displayed */
+interface Record<C: Category> {
+    val puzzle: Puzzle
+    val score: Score<C>
     val author: String?
-    fun toShowDisplayString(): String = "${score.toDisplayString()}${author?.let { " by $it" } ?: ""} $link"
-    fun toEmbedDisplayString(): String = "[${score.toDisplayString()}](${link})"
-    fun attachments(): List<Pair<String, InputStream>> = emptyList()
+    /** Human-readable solution representation */
+    val displayLink: String?
+    /** Machine-readable solution representation */
+    val dataLink: String?
+    /** Machine-readable solution representation */
+    val dataPath: Path?
+
+    fun toDisplayString(context: DisplayContext<C>): String {
+        return when(context.format) {
+            StringFormat.MARKDOWN ->
+                dataLink.orEmpty(prefix = "[\uD83D\uDCC4](", suffix = ") ") + "[${score.toDisplayString(context) + author.orEmpty(prefix = " ")}](${displayLink.orEmpty()})"
+            else -> score.toDisplayString(context) + author.orEmpty(prefix = " by ") + displayLink.orEmpty(prefix = " ")
+        }
+    }
+
+    @SneakyThrows
+    fun attachments() = dataPath?.let {
+        listOf(it.fileName.toString() to it.inputStream())
+    } ?: emptyList()
 }

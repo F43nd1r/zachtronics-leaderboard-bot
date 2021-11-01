@@ -16,26 +16,36 @@
 
 package com.faendir.zachtronics.bot.discord.command
 
-import com.faendir.zachtronics.bot.leaderboards.Leaderboard
+import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.model.Category
+import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
+import com.faendir.zachtronics.bot.repository.SolutionRepository
+import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.clear
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.core.spec.MessageCreateFields
 import reactor.core.publisher.Mono
 
-abstract class AbstractShowCommand<T, C : Category, P : Puzzle, R : Record> : AbstractSubCommand<T>() {
-    abstract val leaderboards: List<Leaderboard<C, P, R>>
+abstract class AbstractShowCommand<T, C : Category, P : Puzzle, R : Record<C>> : AbstractSubCommand<T>() {
+    abstract val repository: SolutionRepository<C, P, *, R>
 
     override fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void> {
         val (puzzle, category) = findPuzzleAndCategory(parameters)
-        val record = leaderboards.asSequence().mapNotNull { it.get(puzzle, category) }.firstOrNull()
-            ?: throw IllegalArgumentException("sorry, there is no score for ${puzzle.displayName} ${category.displayName}.")
-        return event.editReply().clear()
-            .withContentOrNull("*${puzzle.displayName}* **${category.displayName}**\n${record.toShowDisplayString()}")
-            .withFiles(record.attachments().map { (name, data) -> MessageCreateFields.File.of(name, data) })
-            .then()
+        val record = repository.find(puzzle, category)
+        return if (record != null) {
+            event.editReply().clear()
+                .withContentOrNull("*${puzzle.displayName}* **${category.displayName}**\n${record.toDisplayString(DisplayContext.plainText())}")
+                .withFiles(record.attachments().map { (name, data) -> MessageCreateFields.File.of(name, data) })
+                .then()
+        } else {
+            SafeEmbedMessageBuilder()
+                .title("No score")
+                .description("sorry, there is no score for ${puzzle.displayName} ${category.displayName}.")
+                .color(Colors.UNCHANGED)
+                .send(event)
+        }
     }
 
     abstract fun findPuzzleAndCategory(parameters: T): Pair<P, C>

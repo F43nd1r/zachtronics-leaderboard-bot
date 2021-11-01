@@ -16,36 +16,42 @@
 
 package com.faendir.zachtronics.bot.sz.model;
 
+import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Record;
-import kotlin.Pair;
-import lombok.SneakyThrows;
+import com.faendir.zachtronics.bot.model.StringFormat;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
 
 @Value
-public class SzRecord implements Record {
+public class SzRecord implements Record<SzCategory> {
+    @NotNull SzPuzzle puzzle;
     @NotNull SzScore score;
     String author;
-    @NotNull String link;
-    transient Path archivePath;
+    String link;
+    Path dataPath;
 
-    @NotNull
+    @Nullable
     @Override
-    public String toShowDisplayString() {
-        return score.toDisplayString() + (author != null ? " by " + author : "");
+    public String getDisplayLink() {
+        return link;
     }
 
-    @SneakyThrows
+    @Nullable
+    @Override
+    public String getDataLink() {
+        return link;
+    }
+
     @NotNull
     @Override
-    public List<Pair<String, InputStream>> attachments() {
-        String name = archivePath.getFileName().toString();
-        return Collections.singletonList(new Pair<>(name, Files.newInputStream(archivePath)));
+    public String toDisplayString(@NotNull DisplayContext<SzCategory> context) {
+        //TODO: could also set archiveLink to null and use super instead?
+        if(context.getFormat() == StringFormat.MARKDOWN) {
+            return "[" + score.toDisplayString() + "](" + link + ")";
+        }
+        return Record.super.toDisplayString(context);
     }
 }

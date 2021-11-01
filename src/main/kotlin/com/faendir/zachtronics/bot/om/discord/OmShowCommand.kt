@@ -21,8 +21,8 @@ import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
 import com.faendir.discord4j.command.parse.CombinedParseResult
 import com.faendir.zachtronics.bot.discord.command.AbstractShowCommand
-import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.om.OmQualifier
+import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component
 
 @Component
 @OmQualifier
-class OmShowCommand(override val leaderboards: List<Leaderboard<OmCategory, OmPuzzle, OmRecord>>) :
+class OmShowCommand(override val repository: OmSolutionRepository) :
     AbstractShowCommand<Pair<OmPuzzle, OmCategory>, OmCategory, OmPuzzle, OmRecord>() {
 
     private fun findCategoryCandidates(category: String): List<OmCategory> {

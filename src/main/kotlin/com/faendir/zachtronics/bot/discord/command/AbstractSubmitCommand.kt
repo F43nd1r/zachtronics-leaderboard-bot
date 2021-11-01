@@ -17,64 +17,51 @@
 package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.zachtronics.bot.discord.Colors
-import com.faendir.zachtronics.bot.leaderboards.Leaderboard
-import com.faendir.zachtronics.bot.leaderboards.UpdateResult
-import com.faendir.zachtronics.bot.model.Puzzle
+import com.faendir.zachtronics.bot.model.Category
+import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.Record
+import com.faendir.zachtronics.bot.model.StringFormat
+import com.faendir.zachtronics.bot.model.Submission
+import com.faendir.zachtronics.bot.repository.SolutionRepository
+import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
-import com.faendir.zachtronics.bot.utils.findInstance
-import com.faendir.zachtronics.bot.utils.ifNotEmpty
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import reactor.core.publisher.Mono
 
-abstract class AbstractSubmitCommand<T, P : Puzzle, R : Record> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
-    protected abstract val leaderboards: List<Leaderboard<*, P, R>>
+abstract class AbstractSubmitCommand<T, C: Category, S : Submission<C, *>, R: Record<C>> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
+    protected abstract val repository: SolutionRepository<C, *, S, R>
 
     override fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void> {
-        val (puzzle, record) = parseSubmission(parameters)
-        return submitToLeaderboards(puzzle, record).send(event)
+        val submission = parseSubmission(event, parameters)
+        return submitToLeaderboards(submission).send(event)
     }
 
-    fun submitToLeaderboards(puzzle: P, record: R): SafeEmbedMessageBuilder {
-        val results = leaderboards.map { it.update(puzzle, record) }
-        results.filterIsInstance<UpdateResult.Success>().ifNotEmpty { successes ->
-            return SafeEmbedMessageBuilder()
-                    .title("Success: *${puzzle.displayName}* ${successes.flatMap { it.oldRecords.keys }.joinToString { it.displayName }}")
+    private fun submitToLeaderboards(submission: S): SafeEmbedMessageBuilder {
+        when (val result = repository.submit(submission)) {
+            is SubmitResult.Success -> {
+                val beatenCategories: List<C> = result.beatenRecords.flatMap { it.categories }
+                return SafeEmbedMessageBuilder()
+                    .title("Success: *${submission.puzzle.displayName}* ${beatenCategories.takeIf { it.isNotEmpty() }?.joinToString { it.displayName } ?: "Pareto"}")
                     .color(Colors.SUCCESS)
-                    .description("`${record.score.toDisplayString()}` ${record.author?.let { " by $it" } ?: ""}\npreviously:")
-                    .embedCategoryRecords(successes.flatMap { it.oldRecords.entries })
-                    .link(record.link)
-        }
-        results.findInstance<UpdateResult.ParetoUpdate> {
-            return SafeEmbedMessageBuilder()
-                        .title("Pareto *${puzzle.displayName}*")
-                        .color(Colors.SUCCESS)
-                        .description("${record.score.toDisplayString()} was included in the pareto frontier.")
-                        .link(record.link)
-        }
-        results.filterIsInstance<UpdateResult.BetterExists>().ifNotEmpty { betterExists ->
-            return SafeEmbedMessageBuilder()
-                        .title("No Scores beaten by *${puzzle.displayName}* `${record.score.toDisplayString()}`")
-                        .color(Colors.UNCHANGED)
-                        .description("Existing scores:")
-                        .embedCategoryRecords(betterExists.flatMap {it.records.entries})
-        }
-        results.findInstance<UpdateResult.NotSupported> {
-            throw IllegalArgumentException("No leaderboard supporting your submission found")
-        }
-        throw IllegalArgumentException("sorry, something went wrong")
-    }
-
-    private val allowedImageTypes = setOf("gif", "png", "jpg")
-
-    private fun SafeEmbedMessageBuilder.link(link: String) = apply {
-        if (allowedImageTypes.contains(link.substringAfterLast(".", ""))) {
-            image(link)
-        } else {
-            addField("Link", "[$link]($link)")
+                    .description("`${submission.score.toDisplayString(DisplayContext(StringFormat.MARKDOWN, beatenCategories))}` ${submission.author?.let { " by $it" } ?: ""}${if (beatenCategories.isNotEmpty()) "\npreviously:" else " was included in the pareto frontier"}")
+                    .embedCategoryRecords(result.beatenRecords)
+                    .link(submission.displayLink)
+            }
+            is SubmitResult.AlreadyPresent ->
+                return SafeEmbedMessageBuilder()
+                    .title("Already present: *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.markdown())}`")
+                    .color(Colors.UNCHANGED)
+                    .description("No action was taken.")
+            is SubmitResult.NothingBeaten ->
+                return SafeEmbedMessageBuilder()
+                    .title("No Scores beaten by *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.markdown())}`")
+                    .color(Colors.UNCHANGED)
+                    .description("Existing scores:")
+                    .embedCategoryRecords(result.records)
+            is SubmitResult.Failure -> throw IllegalArgumentException(result.message)
         }
     }
 
-    abstract fun parseSubmission(parameters: T): Pair<P, R>
+    abstract fun parseSubmission(event: InteractionCreateEvent, parameters: T): S
 }

@@ -19,7 +19,8 @@ package com.faendir.zachtronics.bot.sc.validator;
 import com.faendir.discord4j.command.parse.SingleParseResult;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
-import com.faendir.zachtronics.bot.sc.model.ScSolution;
+import com.faendir.zachtronics.bot.sc.model.ScSolutionMetadata;
+import com.faendir.zachtronics.bot.sc.model.ScSubmission;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
@@ -42,53 +43,44 @@ public class SChem {
      * @param export multiExport to check
      * @param puzzle to aid in puzzle resolution
      * @param bypassValidation skip validation and checks entirely, just parse everything
-     * @return list of solutions, solutions that didn't validate are
-     *         <tt>{{@link ScPuzzle#research_example_1}, {@link ScScore#INVALID_SCORE}, "reason SChem is kill"}</tt>
+     * @return list of solutions, possibly invalid
      */
     @NotNull
-    public static List<ScSolution> validateMultiExport(@NotNull String export, ScPuzzle puzzle, boolean bypassValidation) {
-        String[] contents = export.trim().split("(?=SOLUTION:)");
-        if (contents.length > 50 && !bypassValidation) {
+    public static List<ScSubmission> validateMultiExport(@NotNull String export, ScPuzzle puzzle, boolean bypassValidation) {
+        String[] solutions = export.trim().split("(?=SOLUTION:)");
+        if (solutions.length > 50 && !bypassValidation) {
             throw new IllegalArgumentException(
-                    "You can archive a maximum of 50 solutions at a time, you tried " + contents.length);
+                    "You can archive a maximum of 50 solutions at a time, you tried " + solutions.length);
         }
-        LinkedHashSet<ScSolution> result = new LinkedHashSet<>();
-        StringBuilder exceptions = new StringBuilder();
-        int line = 1;
-        for (String content : contents) {
-            content = content.replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
+        LinkedHashSet<ScSubmission> result = new LinkedHashSet<>();
+        for (String data : solutions) {
+            data = data.replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
             try {
-                ScSolution solution;
+                ScSubmission submission;
                 if (bypassValidation) {
-                    solution = ScSolution.fromContentNoValidation(content, puzzle);
+                    submission = ScSubmission.fromDataNoValidation(data, puzzle);
                 }
                 else {
-                    solution = validate(content);
+                    submission = validate(data).extendToSubmission(null, data);
                 }
-                result.add(solution);
+                result.add(submission);
             } catch (IllegalArgumentException | SChemException e) {
-                if (contents.length != 1)
-                    exceptions.append(line).append(": ");
-                exceptions.append(e.getMessage()).append('\n');
+                result.add(ScSubmission.invalidSubmission(e.getMessage()));
             }
-            line++;
         }
 
-        if (!exceptions.isEmpty()) {
-            throw new IllegalArgumentException(exceptions.toString());
-        }
-        return Arrays.asList(result.toArray(new ScSolution[0]));
+        return Arrays.asList(result.toArray(new ScSubmission[0]));
     }
 
     /**
      * validates a single SpaceChem export
      *
      * @param export **single** export to check
-     * @return solution if validation succeeded
+     * @return metadata if validation succeeded
      * @throws SChemException if validation failed, reason is in message
      */
     @NotNull
-    static ScSolution validate(@NotNull String export) throws SChemException {
+    static ScSolutionMetadata validate(@NotNull String export) throws SChemException {
         SChemResult result = run(export);
 
         SingleParseResult<ScPuzzle> puzzleParseResult = ScPuzzle.parsePuzzle(result.getLevelName());
@@ -99,29 +91,10 @@ public class SChem {
         }
         ScPuzzle puzzle = puzzleParseResult.orElseThrow();
 
-        Matcher m = ScSolution.SOLUTION_HEADER.matcher(export);
-        if (!m.find())
-            throw new SChemException("Invalid header");
-
-        String commaSolName = "";
-        if (result.getSolutionName() != null) {
-            String solName = result.getSolutionName().replace(" (copy)", ""); // try to cut down on duplicate churn
-            if (solName.length() > 100) {
-                solName = solName.substring(0, 100) + "...";
-            }
-            if (solName.contains(","))
-                solName = "'" + solName.replace("'", "''") + "'";
-            commaSolName = "," + solName;
-        }
-
-        String newHeader = String.format("SOLUTION:${puzzle},${author},%d-%d-%d%s", result.getCycles(),
-                                         result.getReactors(), result.getSymbols(), commaSolName);
-        String content = m.replaceFirst(newHeader);
-
         ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), false,
-                                    m.group("Pflag") != null);
+                                    result.getPrecog() != null && result.getPrecog());
 
-        return new ScSolution(puzzle, score, content);
+        return new ScSolutionMetadata(puzzle, result.getAuthor(), score, result.getSolutionName());
     }
 
     @NotNull
@@ -147,7 +120,7 @@ public class SChem {
             boolean declaresBugged = false;
             boolean declaresPrecog = false;
             if (result.getSolutionName() != null) {
-                Matcher m = ScSolution.SOLUTION_NAME_REGEX.matcher(result.getSolutionName());
+                Matcher m = ScSolutionMetadata.SOLUTION_NAME_REGEX.matcher(result.getSolutionName());
                 if (!m.matches()) {
                     throw new SChemException("Invalid solution name: \"" + result.getSolutionName() + "\"");
                 }

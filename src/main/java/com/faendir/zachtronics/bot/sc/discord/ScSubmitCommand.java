@@ -18,52 +18,66 @@ package com.faendir.zachtronics.bot.sc.discord;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
+import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.LinkConverter;
 import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand;
-import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
+import com.faendir.zachtronics.bot.sc.ScQualifier;
+import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
-import com.faendir.zachtronics.bot.sc.model.ScScore;
-import kotlin.Pair;
+import com.faendir.zachtronics.bot.sc.model.ScSubmission;
+import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
+import discord4j.core.event.domain.interaction.InteractionCreateEvent;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 @RequiredArgsConstructor
-public class ScSubmitCommand extends AbstractSubmitCommand<ScSubmitCommand.SubmitData, ScPuzzle, ScRecord> implements ScSecured {
+@ScQualifier
+public class ScSubmitCommand extends AbstractSubmitCommand<ScSubmitCommand.SubmitData, ScCategory, ScSubmission, ScRecord>
+        implements ScSecured {
     @Delegate
     private final ScSubmitCommand_SubmitDataParser parser = ScSubmitCommand_SubmitDataParser.INSTANCE;
     @Getter
-    private final List<Leaderboard<?, ScPuzzle, ScRecord>> leaderboards;
+    private final ScSolutionRepository repository;
+    @Getter
+    private final ScArchiveCommand archiveCommand;
 
     @NotNull
     @Override
-    public Pair<ScPuzzle, ScRecord> parseSubmission(@NotNull SubmitData parameters) {
-        ScRecord record = new ScRecord(parameters.score, parameters.author, parameters.video, false, null, null);
-        return new Pair<>(parameters.puzzle, record);
+    public ScSubmission parseSubmission(@NotNull InteractionCreateEvent event, SubmitData parameters) {
+        if (parameters.getExport().equals(parameters.video))
+            throw new IllegalArgumentException("Export link and video link cannot be the same link");
+        ScSubmission submission = archiveCommand.parseSubmissions(parameters).get(0);
+        return new ScSubmission(submission.getPuzzle(), submission.getScore(), parameters.author, parameters.video,
+                                submission.getData());
     }
 
-    @ApplicationCommand(subCommand = true)
+    @ApplicationCommand(name = "submit", description = "Submit and archive a solution", subCommand = true)
     @Value
-    public static class SubmitData {
-        @NonNull ScPuzzle puzzle;
-        @NotNull ScScore score;
-        @NotNull String author;
+    @EqualsAndHashCode(callSuper = true)
+    public static class SubmitData extends ScArchiveCommand.ArchiveData {
         @NotNull String video;
+        @NotNull String author;
 
-        public SubmitData(@Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle,
-                          @Converter(ScBPScoreConverter.class) @NonNull ScScore score,
+        public SubmitData(@Description("Link to your video of the solution, can be `m1` to scrape it from your last message")
+                          @NotNull @Converter(LinkConverter.class) String video,
+                          @Description("Link or `m1` to scrape it from your last message. " +
+                                       "Start the solution name with `/B?P?` to set flags")
+                          @NotNull @Converter(LinkConverter.class) String export,
+                          @Description("Name to appear on the Reddit leaderboard")
                           @NotNull String author,
-                          @NotNull @Converter(LinkConverter.class) String video) {
-            this.puzzle = puzzle;
-            this.score = score;
+                          @Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
+                          @Converter(ScPuzzleConverter.class) ScPuzzle puzzle,
+                          @Description("Skips running SChem on the solutions. Admin-only")
+                          @Converter(value = ScAdminOnlyBooleanConverter.class, input = Boolean.class)
+                                  Boolean bypassValidation) {
+            super(export, puzzle, bypassValidation);
             this.video = video;
             this.author = author;
         }

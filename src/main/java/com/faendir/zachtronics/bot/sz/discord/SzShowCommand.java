@@ -19,11 +19,11 @@ package com.faendir.zachtronics.bot.sz.discord;
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.zachtronics.bot.discord.command.AbstractShowCommand;
-import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
 import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
+import com.faendir.zachtronics.bot.sz.repository.SzSolutionRepository;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.NonNull;
@@ -33,8 +33,6 @@ import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @Component
 @SzQualifier
@@ -42,7 +40,7 @@ public class SzShowCommand extends AbstractShowCommand<SzShowCommand.ShowData, S
     @Delegate
     private final SzShowCommand_ShowDataParser parser = SzShowCommand_ShowDataParser.INSTANCE;
     @Getter
-    private final List<Leaderboard<SzCategory, SzPuzzle, SzRecord>> leaderboards;
+    private final SzSolutionRepository repository;
 
     @NotNull
     @Override

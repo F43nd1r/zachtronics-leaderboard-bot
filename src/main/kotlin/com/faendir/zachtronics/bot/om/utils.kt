@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.om
 import com.faendir.om.parser.solution.SolutionParser
 import com.faendir.om.parser.solution.model.Position
 import com.faendir.om.parser.solution.model.Solution
+import com.faendir.om.parser.solution.model.SolvedSolution
 import com.faendir.om.parser.solution.model.part.Arm
 import com.faendir.om.parser.solution.model.part.ArmType
 import com.faendir.om.parser.solution.model.part.Conduit
@@ -31,11 +32,15 @@ import com.faendir.zachtronics.bot.om.discord.plus
 import com.faendir.zachtronics.bot.om.discord.rotate
 import com.faendir.zachtronics.bot.om.model.FULL_CIRCLE
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmScorePart
+import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.model.SINGLE
 import okio.buffer
 import okio.sink
+import okio.source
 import org.slf4j.LoggerFactory
+import java.io.ByteArrayInputStream
 import java.io.File
 
 
@@ -111,4 +116,26 @@ private fun OmPuzzle.shape(part: Part): List<Position> {
         is Track -> part.positions
         else -> throw IllegalArgumentException("Unknown part type ${part.name}")
     }.map { it.rotate(part.rotation) }.map { it + part.position }
+}
+
+fun createSubmission(gif: String, author: String, bytes: ByteArray): OmSubmission {
+    val solution = try {
+        SolutionParser.parse(ByteArrayInputStream(bytes).source().buffer())
+    } catch (e: Exception) {
+        throw IllegalArgumentException("I could not parse your solution")
+    }
+    if (solution !is SolvedSolution) throw IllegalArgumentException("only solved solutions are accepted")
+    val puzzle = OmPuzzle.values().find { it.id == solution.puzzle } ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
+    val (width, height) = solution.getWidthAndHeight(puzzle) ?: (null to null)
+    val score = OmScore(
+        cost = solution.cost,
+        cycles = solution.cycles,
+        area = solution.area,
+        instructions = solution.instructions,
+        height = height?.toInt(),
+        width = width,
+        trackless = solution.isTrackless(),
+        overlap = solution.isOverlap(puzzle),
+    )
+    return OmSubmission(puzzle, score, author, gif, bytes)
 }

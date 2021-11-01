@@ -16,46 +16,47 @@
 
 package com.faendir.zachtronics.bot.discord.command
 
-import com.faendir.zachtronics.bot.archive.Archive
-import com.faendir.zachtronics.bot.archive.ArchiveResult
 import com.faendir.zachtronics.bot.discord.Colors
-import com.faendir.zachtronics.bot.model.Solution
+import com.faendir.zachtronics.bot.model.Category
+import com.faendir.zachtronics.bot.model.DisplayContext
+import com.faendir.zachtronics.bot.model.Submission
+import com.faendir.zachtronics.bot.repository.SolutionRepository
+import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import reactor.core.publisher.Mono
 
-abstract class AbstractArchiveCommand<T, S : Solution<*>> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
-    protected abstract val archive: Archive<*, S>
+abstract class AbstractArchiveCommand<T, C: Category, S : Submission<C, *>> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
+    protected abstract val repository: SolutionRepository<*, *, S, *>
 
     override fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void> {
-        val solutions = parseSolutions(parameters)
+        val solutions = parseSubmissions(parameters)
         return archiveAll(solutions).send(event)
     }
 
-    fun archiveAll(solutions: Collection<S>): SafeEmbedMessageBuilder {
-        val results = archive.archiveAll(solutions)
+    private fun archiveAll(solutions: Collection<S>): SafeEmbedMessageBuilder {
+        val results = repository.submitAll(solutions)
 
-        val successes = results.count { it is ArchiveResult.Success }
-        val title = if (successes != 0) "Success: $successes solution(s) archived" else "Failure: no solutions archived"
+        val successes = results.count { it is SubmitResult.Success<*,*> }
+        val (title, color) = when {
+            successes != 0 -> "Success: $successes solution(s) archived" to Colors.SUCCESS
+            results.any { it is SubmitResult.NothingBeaten<*,*> || it is SubmitResult.AlreadyPresent } -> "No solutions archived" to Colors.UNCHANGED
+            else -> "Failure: no solutions archived" to Colors.FAILURE
+        }
 
-        val embed = SafeEmbedMessageBuilder().title(title).color(if(successes != 0) Colors.SUCCESS else Colors.UNCHANGED)
+        val embed = SafeEmbedMessageBuilder().title(title).color(color)
         for ((solution, result) in solutions.zip(results)) {
-            val name = "*${solution.puzzle.displayName}*"
+            val name = if (result is SubmitResult.Failure) "*Failed*" else "*${solution.puzzle.displayName}*"
             val value = when (result) {
-                is ArchiveResult.Success -> {
-                    "`${solution.score.toDisplayString()}` has been archived.\n" + result.message
-                }
-                is ArchiveResult.AlreadyArchived -> {
-                    "`${solution.score.toDisplayString()}` was already in the archive."
-                }
-                is ArchiveResult.Failure -> {
-                    "`${solution.score.toDisplayString()}` did not qualify for archiving."
-                }
+                is SubmitResult.Success -> "`${solution.score.toDisplayString(DisplayContext.markdown())}` has been archived.\n${result.message}"
+                is SubmitResult.AlreadyPresent -> "`${solution.score.toDisplayString(DisplayContext.markdown())}` was already present."
+                is SubmitResult.NothingBeaten -> "`${solution.score.toDisplayString(DisplayContext.markdown())}` did not beat anything."
+                is SubmitResult.Failure -> result.message
             }
             embed.addField(name, value, true)
         }
         return embed
     }
 
-    abstract fun parseSolutions(parameters: T): List<S>
+    abstract fun parseSubmissions(parameters: T): List<S>
 }

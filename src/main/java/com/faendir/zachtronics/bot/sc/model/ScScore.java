@@ -16,16 +16,19 @@
 
 package com.faendir.zachtronics.bot.sc.model;
 
+import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Score;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Value
-public class ScScore implements Score {
+public class ScScore implements Score<ScCategory> {
     /** it's also unbeatable */
     public static final ScScore INVALID_SCORE = new ScScore(-1, -1, -1, false, false);
 
@@ -39,8 +42,20 @@ public class ScScore implements Score {
     /** ccc/r/ss[/BP] */
     @NotNull
     @Override
-    public String toDisplayString() {
-        return cycles + "/" + reactors + "/" + symbols + slashFlags();
+    public String toDisplayString(@NotNull DisplayContext<ScCategory> context) {
+        return toDisplayString(context, "");
+    }
+
+    /** ccc{}/r/ss[/BP] */
+    @NotNull
+    public String toDisplayString(@NotNull DisplayContext<ScCategory> context, String oldRNGMarker) {
+        char separator = context.getSeparator();
+        String cyclesStr = cycles >= 100000 ? NumberFormat.getNumberInstance(Locale.ROOT).format(cycles)
+                                            : Integer.toString(cycles);
+        String formatString = context.getCategories() != null && !context.getCategories().isEmpty() ? context.getCategories().get(0).getScoreFormatString()
+                                                            :"%s%s%c%d%c%d%s";
+        return String.format(formatString,
+                             cyclesStr, oldRNGMarker, separator, reactors, separator, symbols, sepFlags(separator));
     }
 
     /** <tt>ccc/r/ss[/BP]</tt>, tolerates extra <tt>*</tt> */
@@ -68,19 +83,16 @@ public class ScScore implements Score {
                            m.group("Bflag") != null, m.group("Pflag") != null);
     }
 
-    /**
-     * @return <tt>""</tt> or <tt>"/B"</tt> or <tt>"/P"</tt> or <tt>"/BP"</tt>
-     */
-    public String slashFlags() {
-        return slashFlags(bugged, precognitive);
+    public String sepFlags(char separator) {
+        return sepFlags(separator, bugged, precognitive);
     }
 
     /**
      * @return <tt>""</tt> or <tt>"/B"</tt> or <tt>"/P"</tt> or <tt>"/BP"</tt>
      */
-    public static String slashFlags(boolean bugged, boolean precognitive) {
+    public static String sepFlags(char separator, boolean bugged, boolean precognitive) {
         if (bugged || precognitive) {
-            String result = "/";
+            String result = String.valueOf(separator);
             if (bugged) result += "B";
             if (precognitive) result += "P";
             return result;

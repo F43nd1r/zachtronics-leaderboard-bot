@@ -17,26 +17,27 @@
 package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.zachtronics.bot.discord.Colors
-import com.faendir.zachtronics.bot.leaderboards.Leaderboard
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
+import com.faendir.zachtronics.bot.model.Record
+import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import reactor.core.publisher.Mono
 
-abstract class AbstractListCommand<T, C : Category, P : Puzzle> : AbstractSubCommand<T>() {
-    abstract val leaderboards: List<Leaderboard<C, P, *>>
+abstract class AbstractListCommand<T, C : Category, P : Puzzle, R : Record<C>> : AbstractSubCommand<T>() {
+    abstract val repository: SolutionRepository<C, P, *, R>
 
     override fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void> {
         val (puzzle, categories) = findPuzzleAndCategories(parameters)
-        val records = leaderboards.map { it.getAll(puzzle, categories) }.reduce { acc, map -> acc + map }
+        val records = repository.findCategoryHolders(puzzle, includeFrontier = false)
         return SafeEmbedMessageBuilder()
             .title("*${puzzle.displayName}*")
             .color(Colors.READ)
-            .embedCategoryRecords(records.entries)
+            .embedCategoryRecords(records)
             .apply {
-                val missing = categories.minus(records.keys)
+                val missing = categories - records.flatMap { it.categories }
                 if (missing.isNotEmpty()) {
                     addField(missing.joinToString("/") { it.displayName }, "None")
                 }

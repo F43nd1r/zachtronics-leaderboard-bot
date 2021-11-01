@@ -54,10 +54,13 @@ public enum ScCategory implements Category {
     @Getter
     private final Comparator<ScScore> scoreComparator;
     private final Set<ScType> supportedTypes;
-    private final boolean bugFree;
-    private final boolean precogFree;
     @Getter
-    private final String formatStringLb;
+    private final boolean bugFree;
+    @Getter
+    private final boolean precogFree;
+    /** contains <tt>%s%s%c%d%c%d%s</tt> plus a bunch of <tt>*</tt> most likely */
+    @Getter
+    private final String scoreFormatString;
 
     public boolean supportsPuzzle(@NotNull ScPuzzle puzzle) {
         return supportedTypes.contains(puzzle.getType()) && !(puzzle.isDeterministic() && precogFree);
@@ -75,9 +78,9 @@ public enum ScCategory implements Category {
     }
 
     static class ScScoreFormatStrings {
-        static final String F100 = "**%s**%s/%d/%d";
-        static final String F001 = "%s%s/%d/**%d**";
-        static final String F110 = "**%s**%s/**%d**/%d";
-        static final String F011 = "%s%s/**%d**/**%d**";
+        static final String F100 = "**%s**%s%c%d%c%d%s";
+        static final String F001 = "%s%s%c%d%c**%d**%s";
+        static final String F110 = "**%s**%s%c**%d**%c%d%s";
+        static final String F011 = "%s%s%c**%d**%c**%d**%s";
     }
 }

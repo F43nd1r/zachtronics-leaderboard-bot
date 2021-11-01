@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.utils
 
+import discord4j.core.`object`.entity.channel.MessageChannel
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.core.spec.EmbedCreateFields
 import discord4j.core.spec.EmbedCreateSpec
@@ -79,6 +80,18 @@ class SafeEmbedMessageBuilder {
         current.image(image)
     }
 
+    private val allowedImageTypes = setOf("gif", "png", "jpg")
+
+    fun link(link: String?) = apply {
+        if (link != null) {
+            if (allowedImageTypes.contains(link.substringAfterLast(".", ""))) {
+                image(link)
+            } else {
+                addField("Link", "[$link]($link)")
+            }
+        }
+    }
+
     private fun increaseTotal(by: Int) {
         if (total + by > Limits.TOTAL) {
             nextBuilder()
@@ -106,8 +119,24 @@ class SafeEmbedMessageBuilder {
     }
 
     fun send(event: InteractionCreateEvent): Mono<Void> = mono {
-        result.add(buildCurrent())
-        val r = result.fold(listOf(Pair(emptyList<EmbedCreateSpec>(), 0))) { acc, (spec, total) ->
+        val embeds = getEmbeds().toMutableList()
+        event.editReply().clear().withEmbedsOrNull(embeds.removeFirst()).awaitSingleOrNull()
+        for (embed in embeds) {
+            event.createFollowup().withEmbeds(embed).awaitSingleOrNull()
+        }
+    }.then()
+
+    fun send(channel: MessageChannel): Mono<Void> = mono {
+        for (embed in getEmbeds()) {
+            channel.createMessage().withEmbeds(embed).awaitSingleOrNull()
+        }
+    }.then()
+
+    private fun getEmbeds(): List<List<EmbedCreateSpec>> {
+        if (total > 0) {
+            nextBuilder()
+        }
+        return result.fold(listOf(Pair(emptyList<EmbedCreateSpec>(), 0))) { acc, (spec, total) ->
             val last = acc.last()
             val (list, lastTotal) = last
             if (lastTotal + total <= Limits.TOTAL) {
@@ -115,12 +144,8 @@ class SafeEmbedMessageBuilder {
             } else {
                 acc + (listOf(spec) to total)
             }
-        }.map { it.first }.toMutableList()
-        event.editReply().clear().withEmbedsOrNull(r.removeFirst()).awaitSingleOrNull()
-        for (embed in r) {
-            event.createFollowup().withEmbeds(embed).awaitSingleOrNull()
-        }
-    }.then()
+        }.map { it.first }
+    }
 }
 
 object Limits {

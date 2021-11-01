@@ -20,10 +20,11 @@ import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractListCommand;
-import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
+import com.faendir.zachtronics.bot.sc.model.ScRecord;
+import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.NonNull;
@@ -39,11 +40,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 @ScQualifier
-public class ScListCommand extends AbstractListCommand<ScListCommand.ListData, ScCategory, ScPuzzle> {
+public class ScListCommand extends AbstractListCommand<ScListCommand.ListData, ScCategory, ScPuzzle, ScRecord> {
     @Delegate
     private final ScListCommand_ListDataParser parser = ScListCommand_ListDataParser.INSTANCE;
     @Getter
-    private final List<Leaderboard<ScCategory, ScPuzzle, ?>> leaderboards;
+    private final ScSolutionRepository repository;
 
     @NotNull
     @Override

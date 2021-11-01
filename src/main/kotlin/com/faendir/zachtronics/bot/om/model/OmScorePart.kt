@@ -16,16 +16,23 @@
 
 package com.faendir.zachtronics.bot.om.model
 
-enum class OmScorePart(val key: Char, val displayName: String?) {
-    HEIGHT('h', "Height"),
-    WIDTH('w', "Width"),
-    COST('g', "Cost"),
-    CYCLES('c', "Cycles"),
-    AREA('a', "Area"),
-    INSTRUCTIONS('i', "Instructions"),
+import java.text.DecimalFormat
+
+enum class OmScorePart(val key: Char, val displayName: String?, val getValue: (OmScore) -> Number?) {
+    COST('g', "Cost", OmScore::cost),
+    CYCLES('c', "Cycles", OmScore::cycles),
+    AREA('a', "Area", OmScore::area),
+    INSTRUCTIONS('i', "Instructions", OmScore::instructions),
+    HEIGHT('h', "Height", OmScore::height),
+    WIDTH('w', "Width", OmScore::width),
     ;
 
+    fun format(score: OmScore) = getValue(score)?.let { numberFormat.format(it) }?.plus(key)
+
     companion object {
+        private val numberFormat = DecimalFormat("0.#")
+
+
         fun parse(string: String): Pair<OmScorePart, Double>? {
             if (string.isEmpty()) return null
             val part = string.last().let { key -> values().find { key.equals(it.key, ignoreCase = true) } } ?: return null

@@ -32,8 +32,8 @@ import discord4j.core.spec.InteractionReplyEditSpec;
 import discord4j.core.spec.MessageCreateFields;
 import discord4j.discordjson.json.UserData;
 import discord4j.discordjson.possible.Possible;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.mockito.ArgumentMatchers;
@@ -50,8 +50,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @BotTest(Application.class)
 public class SubCommandTest {
@@ -71,39 +70,30 @@ public class SubCommandTest {
     public void testList() {
         Map<String, String> args = Map.of("puzzle", "OPAS");
         String result = runCommand("list", args);
-        assertTrue(result.contains("Pancakes") && result.contains("C"));
+        assertTrue(result.contains("Pancakes"));
+        assertEquals(2, StringUtils.countMatches(result, "](http"));
     }
 
     @Test
-    public void testRetrieve() {
+    public void testFrontier() {
         Map<String, String> args = Map.of("puzzle", "OPAS");
-        String result = runCommand("retrieve", args); // 100/100/100 no files
-        assertTrue(result.contains("Pancakes") && !result.contains("]("));
+        String result = runCommand("frontier", args); // 9 frontier scores, 2 holding categories
+        assertTrue(result.contains("Pancakes"));
+        assertEquals(9, StringUtils.countMatches(result, "](")); // 📄
 
         args = Map.of("puzzle", "Fission I");
-        result = runCommand("retrieve", args); // 2 valid files
-        assertTrue(result.contains("Fission I") && result.contains("]("));
-    }
-
-
-    @Test
-    @Disabled("Not actually exposed to Discord")
-    public void testSubmit() {
-        Map<String, String> args = Map.of("puzzle", "Tunnels I",
-                                          "score", "1/1/1",
-                                          "author", "testMan",
-                                          "video", "http://example.com");
-        String result = runCommand("submit", args);
-        assertTrue(result.contains("Tunnels I") && result.contains("1/1/1"));
+        result = runCommand("frontier", args); // 2 valid files
+        assertTrue(result.contains("Fission I"));
+        assertEquals(2, StringUtils.countMatches(result, "[\uD83D\uDCC4](file:/"));
     }
 
     @Test
     @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
-    public void testSubmitArchive() {
+    public void testSubmit() {
         Map<String, String> args = Map.of("video", "http://example.com",
                                           "export", "https://pastebin.com/19smCuS8", // valid 45/1/14
                                           "author", "testMan");
-        String result = runCommand("submit-archive", args);
+        String result = runCommand("submit", args);
         assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("45/1/14"));
     }
 
@@ -127,12 +117,9 @@ public class SubCommandTest {
     }
 
     @Test
-    @Disabled("Obscenely slow")
     public void testArchiveTooMany() {
-        // we start at 100/100/100
-        Map<String, String> args = Map.of("export", "https://pastebin.com/yEZKDh7T"); // 33x of GG, 23x archivable
-        String result = runCommand("archive", args);
-        assertTrue(result.contains("results hidden"));
+        Map<String, String> args = Map.of("export", "https://pastebin.com/Tf9nZ55Z"); // 60x OPAS headers
+        assertThrows(IllegalArgumentException.class, () -> runCommand("archive", args));
     }
 
     @Test
@@ -140,11 +127,12 @@ public class SubCommandTest {
     public void testArchiveSudo() {
         String exportLink = "https://raw.githubusercontent.com/spacechem-community-developers/spacechem-archive/" +
                             "master/RESEARCHNET3/published_26_3/156-1-45-B.txt";
-        Map<String, String> args1 = Map.of("export", exportLink);
-        assertThrows(IllegalArgumentException.class, () -> runCommand("archive", args1));
+        Map<String, ? extends Serializable> args = Map.of("export", exportLink);
+        String result = runCommand("archive", args);
+        assertTrue(result.contains("Failed") && result.contains("Collision"));
 
-        Map<String, ? extends Serializable> args2 = Map.of("export", exportLink, "bypass-validation", true);
-        String result = runCommand("archive", args2);
+        args = Map.of("export", exportLink, "bypass-validation", true);
+        result = runCommand("archive", args);
         assertTrue(result.contains("Passivation") && result.contains("`156/1/45/B`"));
     }
 
