@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 @Getter
-public class SzSolution implements Solution {
+public class SzSolution implements Solution<SzPuzzle> {
     @Delegate
     private final SzSolutionMetadata solutionMetadata;
 

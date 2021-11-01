@@ -24,7 +24,8 @@ import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
-import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.List;
@@ -33,20 +34,21 @@ import java.util.Locale;
 @Value
 @AllArgsConstructor
 public class ScRecord implements Record {
-    public static final ScRecord IMPOSSIBLE_CATEGORY = new ScRecord(ScScore.INVALID_SCORE, "", "", "", false);
+    public static final ScRecord IMPOSSIBLE_CATEGORY = new ScRecord(ScScore.INVALID_SCORE, "", "", false, null, null);
 
     @NotNull ScScore score;
     @NotNull String author;
     @NotNull String link;
-    @NotNull String archiveLink;
     boolean oldVideoRNG;
+    transient Path archivePath;
+    transient String archiveLink;
 
     @SneakyThrows
     @NotNull
     @Override
     public List<Pair<String, InputStream>> attachments() {
-        String name = archiveLink.replaceFirst(".+/", "");
-        return Collections.singletonList(new Pair<>(name, new URL(archiveLink).openStream()));
+        String name = archivePath.getFileName().toString();
+        return Collections.singletonList(new Pair<>(name, Files.newInputStream(archivePath)));
     }
 
     @NotNull

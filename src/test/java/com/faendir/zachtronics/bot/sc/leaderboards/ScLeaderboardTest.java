@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.nio.file.Path;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -88,13 +89,13 @@ public class ScLeaderboardTest {
         // (**817**/2/104) | ← | (**819**/2/44)
         ScPuzzle p = ScPuzzle.sensing_4;
         ScScore s = new ScScore(819, 2, 43, false, true);
-        ScRecord r = new ScRecord(s, "auth", "lnk", "alnk", false);
+        ScRecord r = new ScRecord(s, "auth", "lnk", false, Path.of("alnk"), "alnk");
 
         UpdateResult ur = scLeaderboard.update(p, r);
         assertTrue(ur instanceof UpdateResult.BetterExists);
 
         s = new ScScore(819, 2, 43, false, false);
-        r = new ScRecord(s, "auth", "lnk", "alnk", false);
+        r = new ScRecord(s, "auth", "lnk", false, Path.of("alnk"), "alnk");
         ur = scLeaderboard.update(p, r);
         assertTrue(ur instanceof UpdateResult.Success);
     }

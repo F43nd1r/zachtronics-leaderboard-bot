@@ -226,7 +226,7 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
     }
 
     private static final Pattern REGEX_SCORE_CELL =
-            Pattern.compile("\\[\uD83D\uDCC4]\\(.+\\.txt\\) " +
+            Pattern.compile("\\[\uD83D\uDCC4]\\((?<archiveLink>.+\\.txt)\\) " +
                             "(?:† )?" +
                             "\\[\\((?<score>" + ScScore.REGEX_BP_SCORE + ")\\) (?<author>[^]]+)]" +
                             "\\((?<link>[^)]+)\\).*?");
@@ -235,9 +235,8 @@ public class ScRedditLeaderboard implements Leaderboard<ScCategory, ScPuzzle, Sc
         Matcher m = REGEX_SCORE_CELL.matcher(recordCell);
         if (m.matches()) {
             ScScore score = ScScore.parseBPScore(m);
-            return new ScRecord(score, m.group("author"), m.group("link"),
-                                archive.makeArchiveLink(puzzle, score),
-                                m.group("oldRNG") != null);
+            return new ScRecord(score, m.group("author"), m.group("link"), m.group("oldRNG") != null,
+                                archive.makeArchivePath(puzzle, score), m.group("archiveLink"));
         }
         throw new IllegalStateException("Leaderboard record unparseable: " + recordCell);
     }

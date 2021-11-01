@@ -25,7 +25,7 @@ import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
-import kotlin.Triple;
+import kotlin.Pair;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -49,13 +49,14 @@ public class ScSubmitArchiveCommand
 
     @NotNull
     @Override
-    public Triple<ScPuzzle, ScRecord, ScSolution> parseToPRS(@NotNull SubmitArchiveData parameters) {
+    public Pair<ScRecord, ScSolution> parseToRS(@NotNull SubmitArchiveData parameters) {
         if (parameters.getExport().equals(parameters.video))
             throw new IllegalArgumentException("Export link and video link cannot be the same link");
         ScSolution solution = archiveCommand.parseSolutions(parameters).get(0);
-        String archiveLink = archiveCommand.getArchive().makeArchiveLink(solution);
-        ScRecord record = new ScRecord(solution.getScore(), parameters.author, parameters.video, archiveLink, false);
-        return new Triple<>(solution.getPuzzle(), record, solution);
+        String archiveLink = archiveCommand.getArchive().makeArchiveLink(solution.getPuzzle(), solution.getScore());
+        ScRecord record = new ScRecord(solution.getScore(), parameters.author, parameters.video, false,
+                                       null, archiveLink);
+        return new Pair<>(record, solution);
     }
 
     @ApplicationCommand(name = "submit-archive", description = "Submit and archive a solution", subCommand = true)

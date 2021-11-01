@@ -25,16 +25,17 @@ import reactor.core.publisher.Mono
 import java.util.*
 
 @Component
-abstract class AbstractSubmitArchiveCommand<T, P : Puzzle, R : Record, S : Solution> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
+abstract class AbstractSubmitArchiveCommand<T, P : Puzzle, R : Record, S : Solution<P>> : AbstractSubCommand<T>(),
+    SecuredSubCommand<T> {
     protected abstract val submitCommand: AbstractSubmitCommand<*, P, R>
     protected abstract val archiveCommand: AbstractArchiveCommand<*, S>
 
     override fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void> {
-        val (puzzle, record, solution) = parseToPRS(parameters)
-        val submitOut = submitCommand.submitToLeaderboards(puzzle, record)
+        val (record, solution) = parseToRS(parameters)
+        val submitOut = submitCommand.submitToLeaderboards(solution.puzzle, record)
         val archiveOut = archiveCommand.archiveAll(Collections.singleton(solution))
         return (submitOut + archiveOut).send(event)
     }
 
-    abstract fun parseToPRS(parameters: T): Triple<P, R, S>
+    abstract fun parseToRS(parameters: T): Pair<R, S>
 }

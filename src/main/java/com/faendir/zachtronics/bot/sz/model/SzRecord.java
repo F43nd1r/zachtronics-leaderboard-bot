@@ -23,15 +23,17 @@ import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
-import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
 @Value
 public class SzRecord implements Record {
-    SzScore score;
+    @NotNull SzScore score;
     String author;
-    String link;
+    @NotNull String link;
+    transient Path archivePath;
 
     @NotNull
     @Override
@@ -43,6 +45,7 @@ public class SzRecord implements Record {
     @NotNull
     @Override
     public List<Pair<String, InputStream>> attachments() {
-        return Collections.singletonList(new Pair<>(link.substring(link.lastIndexOf('/')), new URL(link).openStream()));
+        String name = archivePath.getFileName().toString();
+        return Collections.singletonList(new Pair<>(name, Files.newInputStream(archivePath)));
     }
 }

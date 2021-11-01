@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.archive;
 
 import com.faendir.zachtronics.bot.git.GitRepository;
+import com.faendir.zachtronics.bot.model.Puzzle;
 import com.faendir.zachtronics.bot.model.Solution;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
-public abstract class AbstractArchive<S extends Solution> implements Archive<S> {
+public abstract class AbstractArchive<P extends Puzzle, S extends Solution<P>> implements Archive<S> {
     protected abstract GitRepository getGitRepo();
 
     @NotNull
@@ -55,18 +56,18 @@ public abstract class AbstractArchive<S extends Solution> implements Archive<S> 
         });
     }
 
-    protected abstract Path relativePuzzlePath(@NotNull S solution);
+    protected abstract Path relativePuzzlePath(@NotNull P puzzle);
 
     protected abstract SolutionsIndex<S> makeSolutionIndex(@NotNull Path puzzlePath,
-                                                           @NotNull S solution) throws IOException;
+                                                           @NotNull P puzzle) throws IOException;
 
     @NotNull
     private ArchiveResult performArchive(@NotNull GitRepository.AccessScope accessScope, @NotNull S solution) {
         Path repoPath = accessScope.getRepo().toPath();
-        Path puzzlePath = repoPath.resolve(relativePuzzlePath(solution));
+        Path puzzlePath = repoPath.resolve(relativePuzzlePath(solution.getPuzzle()));
         boolean newOrEqual;
         try {
-            SolutionsIndex<S> index = makeSolutionIndex(puzzlePath, solution);
+            SolutionsIndex<S> index = makeSolutionIndex(puzzlePath, solution.getPuzzle());
             newOrEqual = index.add(solution);
         } catch (IOException e) {
             // failures could happen after we dirtied the repo, so we call reset&clean on the puzzle dir

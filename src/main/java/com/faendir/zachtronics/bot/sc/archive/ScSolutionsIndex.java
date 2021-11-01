@@ -102,7 +102,7 @@ class ScSolutionsIndex implements SolutionsIndex<ScSolution> {
     }
 
     @NotNull
-    private static String makeScoreFilename(@NotNull ScScore score) {
+    static String makeScoreFilename(@NotNull ScScore score) {
         return score.toDisplayString().replace('/', '-') + ".txt";
     }
 

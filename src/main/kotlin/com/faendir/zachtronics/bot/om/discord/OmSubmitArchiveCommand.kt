@@ -37,13 +37,9 @@ class OmSubmitArchiveCommand(override val archiveCommand: OmArchiveCommand, over
     Secured by OmSecured,
 ApplicationCommandParser<SubmitArchive, ApplicationCommandOptionData> by SubmitArchiveParser {
 
-    override fun parseToPRS(parameters: SubmitArchive): Triple<OmPuzzle, OmRecord, OmSolution> {
+    override fun parseToRS(parameters: SubmitArchive): Pair<OmRecord, OmSolution> {
         val solution = archiveCommand.parseSolution(archiveCommand.findScoreIdentifier(parameters), parameters.solution)
-        return Triple(
-            solution.puzzle,
-            OmRecord(solution.score, parameters.gif),
-            solution
-        )
+        return OmRecord(solution.score, parameters.gif) to solution
     }
 }
 

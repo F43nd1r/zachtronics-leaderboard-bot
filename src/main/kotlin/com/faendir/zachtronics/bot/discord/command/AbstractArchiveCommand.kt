@@ -24,7 +24,7 @@ import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import reactor.core.publisher.Mono
 
-abstract class AbstractArchiveCommand<T, S : Solution> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
+abstract class AbstractArchiveCommand<T, S : Solution<*>> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
     protected abstract val archive: Archive<S>
 
     override fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void> {

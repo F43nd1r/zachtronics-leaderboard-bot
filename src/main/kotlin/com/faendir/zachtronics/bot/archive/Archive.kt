@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.archive
 
 import com.faendir.zachtronics.bot.model.Solution
 
-interface Archive<S : Solution> {
+interface Archive<S : Solution<*>> {
 
     /**
      * @return (title, description)

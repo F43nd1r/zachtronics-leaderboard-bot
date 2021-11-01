@@ -32,7 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Value
-public class ScSolution implements Solution {
+public class ScSolution implements Solution<ScPuzzle> {
     @NotNull ScPuzzle puzzle;
     @NotNull ScScore score;
     @NotNull String content;

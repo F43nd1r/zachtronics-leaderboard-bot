@@ -46,7 +46,7 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScSubmitCommand.Submi
     @NotNull
     @Override
     public Pair<ScPuzzle, ScRecord> parseSubmission(@NotNull SubmitData parameters) {
-        ScRecord record = new ScRecord(parameters.score, parameters.author, parameters.video, "", false);
+        ScRecord record = new ScRecord(parameters.score, parameters.author, parameters.video, false, null, null);
         return new Pair<>(parameters.puzzle, record);
     }
 

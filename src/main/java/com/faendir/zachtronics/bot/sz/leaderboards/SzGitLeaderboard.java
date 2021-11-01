@@ -72,8 +72,7 @@ public class SzGitLeaderboard implements Leaderboard<SzCategory, SzPuzzle, SzRec
             throw new IllegalStateException("Name does not match standard format: " + m.replaceFirst(""));
         String author = m.group("author");
         String link = archive.makeArchiveLink(solution.getPuzzle(), solutionFile.getFileName().toString());
-        return new SzRecord(solution.getScore(), author, link);
-
+        return new SzRecord(solution.getScore(), author, link, solutionFile);
     }
 
     private static Path findPuzzleFile(@NotNull GitRepository.AccessScope accessScope, @NotNull SzPuzzle puzzle,

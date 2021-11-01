@@ -16,7 +16,7 @@
 
 package com.faendir.zachtronics.bot.model
 
-interface Solution {
+interface Solution<P: Puzzle> {
     val score: Score
-    val puzzle: Puzzle
+    val puzzle: P
 }

@@ -33,20 +33,21 @@ import java.nio.file.Paths;
 
 @Component
 @RequiredArgsConstructor
-public class SzArchive extends AbstractArchive<SzSolution> {
+public class SzArchive extends AbstractArchive<SzPuzzle, SzSolution> {
     @Getter
     @Qualifier("szRepository")
     private final GitRepository gitRepo;
 
+    @NotNull
     @Override
-    protected Path relativePuzzlePath(@NotNull SzSolution solution) {
-        return Paths.get(solution.getPuzzle().getGroup().getRepoFolder());
+    protected Path relativePuzzlePath(@NotNull SzPuzzle puzzle) {
+        return Paths.get(puzzle.getGroup().getRepoFolder());
     }
 
     @Override
     protected SolutionsIndex<SzSolution> makeSolutionIndex(@NotNull Path puzzlePath,
-                                                           @NotNull SzSolution solution) throws IOException {
-        return new SzSolutionsIndex(puzzlePath, solution.getPuzzle());
+                                                           @NotNull SzPuzzle puzzle) throws IOException {
+        return new SzSolutionsIndex(puzzlePath, puzzle);
     }
 
     public String makeArchiveLink(@NotNull SzPuzzle puzzle, @NotNull String fileName) {

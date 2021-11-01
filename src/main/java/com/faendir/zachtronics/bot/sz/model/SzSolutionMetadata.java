@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.stream.Stream;
 
 @Value
-class SzSolutionMetadata implements Solution {
+class SzSolutionMetadata implements Solution<SzPuzzle> {
     String title;
     SzPuzzle puzzle;
     SzScore score;

@@ -34,28 +34,31 @@ import java.nio.file.Paths;
 
 @Component
 @RequiredArgsConstructor
-public class ScArchive extends AbstractArchive<ScSolution> {
+public class ScArchive extends AbstractArchive<ScPuzzle, ScSolution> {
     @Getter
     @Qualifier("scArchiveRepository")
     private final GitRepository gitRepo;
 
     @Override
-    protected Path relativePuzzlePath(@NotNull ScSolution solution) {
-        return Paths.get(solution.getPuzzle().getGroup().name(), solution.getPuzzle().name());
+    protected Path relativePuzzlePath(@NotNull ScPuzzle puzzle) {
+        return Paths.get(puzzle.getGroup().name(), puzzle.name());
     }
 
     @Override
     protected SolutionsIndex<ScSolution> makeSolutionIndex(@NotNull Path puzzlePath,
-                                                           @NotNull ScSolution solution) throws IOException {
+                                                           @NotNull ScPuzzle puzzle) throws IOException {
         return new ScSolutionsIndex(puzzlePath);
     }
 
     public String makeArchiveLink(@NotNull ScPuzzle puzzle, @NotNull ScScore score) {
-        return String.format("%s/%s/%s/%s.txt", getGitRepo().getRawFilesUrl(), puzzle.getGroup().name(), puzzle.name(),
-                             score.toDisplayString().replace('/', '-'));
+        return String.format("%s/%s/%s/%s", getGitRepo().getRawFilesUrl(), puzzle.getGroup().name(), puzzle.name(),
+                             ScSolutionsIndex.makeScoreFilename(score));
     }
 
-    public String makeArchiveLink(@NotNull ScSolution solution) {
-        return makeArchiveLink(solution.getPuzzle(), solution.getScore());
+    @NotNull
+    public Path makeArchivePath(@NotNull ScPuzzle puzzle, @NotNull ScScore score) {
+        return getGitRepo().access(a -> a.getRepo().toPath()
+                                         .resolve(relativePuzzlePath(puzzle))
+                                         .resolve(ScSolutionsIndex.makeScoreFilename(score)));
     }
 }
