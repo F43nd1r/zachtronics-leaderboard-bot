@@ -51,4 +51,28 @@ public class JNISolutionVerifier {
     }
 
     native int getWidth(String puzzleFile, String solutionFile);
+
+    public int getCost(File puzzle, File solution) {
+        return getCost(puzzle.getAbsolutePath(), solution.getAbsolutePath());
+    }
+
+    native int getCost(String puzzleFile, String solutionFile);
+
+    public int getCycles(File puzzle, File solution) {
+        return getCycles(puzzle.getAbsolutePath(), solution.getAbsolutePath());
+    }
+
+    native int getCycles(String puzzleFile, String solutionFile);
+
+    public int getArea(File puzzle, File solution) {
+        return getArea(puzzle.getAbsolutePath(), solution.getAbsolutePath());
+    }
+
+    native int getArea(String puzzleFile, String solutionFile);
+
+    public int getInstructions(File puzzle, File solution) {
+        return getInstructions(puzzle.getAbsolutePath(), solution.getAbsolutePath());
+    }
+
+    native int getInstructions(String puzzleFile, String solutionFile);
 }

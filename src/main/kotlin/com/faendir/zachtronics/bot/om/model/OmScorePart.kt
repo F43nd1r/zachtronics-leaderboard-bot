@@ -23,7 +23,7 @@ enum class OmScorePart(val key: Char, val displayName: String?) {
     CYCLES('c', "Cycles"),
     AREA('a', "Area"),
     INSTRUCTIONS('i', "Instructions"),
-    COMPUTED('#', null);
+    ;
 
     companion object {
         fun parse(string: String): Pair<OmScorePart, Double>? {

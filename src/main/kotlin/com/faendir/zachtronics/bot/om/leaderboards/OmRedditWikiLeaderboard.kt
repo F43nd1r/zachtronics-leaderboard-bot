@@ -157,6 +157,8 @@ class OmRedditWikiLeaderboard(
         }
         return false
     }
+
+    override fun MutableMap<OmPuzzle, PuzzleEntry>.getPareto(puzzle: OmPuzzle): List<OmScore> = this[puzzle]?.pareto ?: emptyList()
 }
 
 @Serializable

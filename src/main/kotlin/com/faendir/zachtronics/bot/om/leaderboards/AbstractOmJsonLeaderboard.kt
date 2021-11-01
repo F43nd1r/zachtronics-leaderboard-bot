@@ -145,6 +145,10 @@ abstract class AbstractOmJsonLeaderboard<J>(
 
     protected open fun paretoUpdate(puzzle: OmPuzzle, record: OmRecord, records: J): Boolean = false
 
+    fun getPareto(puzzle: OmPuzzle): List<OmScore> = gitRepo.access { directoryCategories.keys.map { getRecords(it) }.flatMap { it.getPareto(puzzle) } }
+
+    protected open fun J.getPareto(puzzle: OmPuzzle): List<OmScore> = emptyList()
+
     protected abstract fun J.getRecord(puzzle: OmPuzzle, category: OmCategory): OmRecord?
 
     protected abstract fun J.setRecord(puzzle: OmPuzzle, category: OmCategory, record: OmRecord)

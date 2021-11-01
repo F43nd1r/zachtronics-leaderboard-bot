@@ -1,0 +1,78 @@
+[versions]
+kotlin = "1.6.0-RC"
+ksp = "1.6.0-RC-1.0.0"
+spring-boot = "2.5.6"
+spring-dependencyManagement = "1.0.11.RELEASE"
+spring-cloud = "3.0.4"
+gradle-docker = "0.28.0"
+gradle-lombok = "6.1.0"
+gradle-gitProperties = "2.3.1"
+kotlinx-json = "1.3.0"
+kotlinx-coroutines = "1.5.2"
+discord4j = "3.2.0"
+reactor-kotlin = "1.1.4"
+jgit = "5.13.0.202109080827-r"
+java-curl = "1.2.2.2"
+java-ffmpeg = "0.6.2"
+jraw = "1.2.0"
+om-dsl = "1.2.7"
+querydsl = "5.0.0"
+trove4j = "3.0.3"
+springmockk = "3.0.1"
+strikt = "0.32.0"
+kotlinPoet = "1.10.2"
+kotlinBard = "0.4.0"
+kaseChange = "1.3.0"
+kotlinCompileTesting = "1.4.5"
+junit = "5.7.2"
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-plugin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+kotlin-plugin-lombok = { id = "org.jetbrains.kotlin.plugin.lombok", version.ref = "kotlin" }
+kotlin-plugin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependencyManagement = { id = "io.spring.dependency-management", version.ref = "spring-dependencyManagement" }
+gradle-docker = { id = "com.palantir.docker", version.ref = "gradle-docker" }
+gradle-lombok = { id = "io.freefair.lombok", version.ref = "gradle-lombok" }
+gradle-gitProperties = { id = "com.gorylenko.gradle-git-properties", version.ref = "gradle-gitProperties" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+[libraries]
+kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-json" }
+kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "kotlinx-coroutines" }
+kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
+kotlin-scriptingCompiler = { module = "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable", version.ref = "kotlin" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
+spring-boot-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-boot-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+mysqlConnector = { module = "mysql:mysql-connector-java" }
+spring-cloud = { module = "org.springframework.cloud:spring-cloud-starter", version.ref = "spring-cloud" }
+discord4j = { module = "com.discord4j:discord4j-core", version.ref = "discord4j" }
+reactor-kotlin = { module = "io.projectreactor.kotlin:reactor-kotlin-extensions", version.ref = "reactor-kotlin" }
+jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
+java-curl = { module = "com.github.rockswang:java-curl", version.ref = "java-curl" }
+jraw = { module = "com.faendir.jraw:JRAW", version.ref = "jraw" }
+java-ffmpeg = { module = "net.bramp.ffmpeg:ffmpeg", version.ref = "java-ffmpeg" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
+jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin" }
+om-dsl = { module = "com.faendir.om:dsl", version.ref = "om-dsl" }
+querydsl-jpa = { module = "com.querydsl:querydsl-jpa", version.ref = "querydsl" }
+querydsl-core = { module = "com.querydsl:querydsl-core", version.ref = "querydsl" }
+querydsl-apt = { module = "com.querydsl:querydsl-apt", version.ref = "querydsl" }
+querydsl-kotlinCodegen = { module = "com.querydsl:querydsl-kotlin-codegen", version.ref = "querydsl" }
+spring-boot-configurationProcessor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
+spring-boot-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+trove4j = { module = "net.sf.trove4j:trove4j", version.ref = "trove4j" }
+springmockk = { module = "com.ninja-squad:springmockk", version.ref = "springmockk" }
+strikt = { module = "io.strikt:strikt-core", version.ref = "strikt" }
+ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
+kotlinPoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
+kotlinBard = { module = "com.faendir:kotlinbard", version.ref = "kotlinBard" }
+kotlinCompileTesting = { module = "com.github.tschuchortdev:kotlin-compile-testing-ksp", version.ref = "kotlinCompileTesting" }
+kaseChange = {module = "net.pearx.kasechange:kasechange-jvm", version.ref = "kaseChange"}
+junit = {module="org.junit.jupiter:junit-jupiter-engine", version.ref = "junit"}
+

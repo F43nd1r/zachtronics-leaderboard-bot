@@ -19,5 +19,5 @@ plugins {
 }
 
 dependencies {
-    implementation("com.discord4j:discord4j-core:${properties["discord4jVersion"]}")
+    implementation(libs.discord4j)
 }

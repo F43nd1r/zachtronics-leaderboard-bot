@@ -23,23 +23,15 @@ import com.faendir.discord4j.command.parse.ApplicationCommandParser
 import com.faendir.om.dsl.DslGenerator
 import com.faendir.om.parser.solution.SolutionParser
 import com.faendir.om.parser.solution.model.Position
-import com.faendir.om.parser.solution.model.Solution
 import com.faendir.om.parser.solution.model.SolvedSolution
-import com.faendir.om.parser.solution.model.part.Arm
-import com.faendir.om.parser.solution.model.part.ArmType
-import com.faendir.om.parser.solution.model.part.Conduit
-import com.faendir.om.parser.solution.model.part.Glyph
-import com.faendir.om.parser.solution.model.part.IO
-import com.faendir.om.parser.solution.model.part.IOType
-import com.faendir.om.parser.solution.model.part.Part
-import com.faendir.om.parser.solution.model.part.Track
 import com.faendir.zachtronics.bot.archive.Archive
 import com.faendir.zachtronics.bot.discord.LinkConverter
 import com.faendir.zachtronics.bot.discord.command.AbstractArchiveCommand
 import com.faendir.zachtronics.bot.discord.command.Secured
-import com.faendir.zachtronics.bot.om.JNISolutionVerifier
 import com.faendir.zachtronics.bot.om.OmQualifier
-import com.faendir.zachtronics.bot.om.model.FULL_CIRCLE
+import com.faendir.zachtronics.bot.om.getWidthAndHeight
+import com.faendir.zachtronics.bot.om.isOverlap
+import com.faendir.zachtronics.bot.om.isTrackless
 import com.faendir.zachtronics.bot.om.model.OmModifier
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmScore
@@ -51,16 +43,12 @@ import com.faendir.zachtronics.bot.om.model.OmScorePart.HEIGHT
 import com.faendir.zachtronics.bot.om.model.OmScorePart.INSTRUCTIONS
 import com.faendir.zachtronics.bot.om.model.OmScorePart.WIDTH
 import com.faendir.zachtronics.bot.om.model.OmSolution
-import com.faendir.zachtronics.bot.om.model.SINGLE
 import com.roxstudio.utils.CUrl
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import okio.buffer
-import okio.sink
 import okio.source
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import java.io.ByteArrayInputStream
-import java.io.File
 import java.util.*
 
 @Component
@@ -68,7 +56,6 @@ import java.util.*
 class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArchiveCommand<ArchiveParams, OmSolution>(),
     Secured by OmSecured,
     ApplicationCommandParser<ArchiveParams, ApplicationCommandOptionData> by ArchiveParamsParser {
-    private val verifier = JNISolutionVerifier()
 
     override fun parseSolutions(parameters: ArchiveParams): List<OmSolution> {
         return listOf(parseSolution(findScoreIdentifier(parameters), parameters.solution))
@@ -89,8 +76,8 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
             INSTRUCTIONS to solution.instructions.toDouble()
         )
         solution.getWidthAndHeight(puzzle)?.let { (width, height) ->
-            parts[WIDTH] = width
-            parts[HEIGHT] = height
+            width?.let { parts[WIDTH] = it }
+            height?.let { parts[HEIGHT] = it }
         }
         val score = when (scoreIdentifier) {
             is ScoreIdentifier.Part -> {
@@ -119,63 +106,6 @@ class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArch
             }
         }
     }
-
-    private fun Solution.isTrackless(): Boolean = parts.none { it is Track }
-
-    private fun Solution.isOverlap(puzzle: OmPuzzle): Boolean =
-        parts.flatMapIndexed { index, part -> parts.subList(0, index).map { it to part } }.any { (p1, p2) -> puzzle.overlap(p1, p2) }
-
-
-    private fun OmPuzzle.overlap(p1: Part, p2: Part): Boolean {
-        return when {
-            p1 is Arm && p2 is Arm -> {
-                val s1 = shape(p1)
-                shape(p2).any { s1.contains(it) }
-            }
-            p1 is Arm && p2 is Track || p2 is Arm && p1 is Track -> false
-            p1 is Arm -> shape(p2).contains(p1.position)
-            p2 is Arm -> shape(p1).contains(p2.position)
-            else -> {
-                val s1 = shape(p1)
-                shape(p2).any { s1.contains(it) }
-            }
-        }
-    }
-
-    private fun OmPuzzle.shape(part: Part): List<Position> {
-        return when (part) {
-            is Arm -> if (part.type == ArmType.VAN_BERLOS_WHEEL) {
-                FULL_CIRCLE
-            } else {
-                SINGLE
-            }
-            is Conduit -> part.positions
-            is Glyph -> part.type.shape
-            is IO -> if (part.type == IOType.INPUT) {
-                this.getReagentShape(part)
-            } else {
-                this.getProductShape(part)
-            }
-            is Track -> part.positions
-            else -> throw IllegalArgumentException("Unknown part type ${part.name}")
-        }.map { it.rotate(part.rotation) }.map { it + part.position }
-    }
-
-    private fun Solution.getWidthAndHeight(puzzle: OmPuzzle): Pair<Double, Double>? {
-        val puzzleFile = puzzle.file?.takeIf { it.exists() } ?: return null
-        val solution = File.createTempFile(puzzle.id, ".solution").also { SolutionParser.write(this, it.outputStream().sink().buffer()) }
-        try {
-            val width = verifier.getWidth(puzzleFile, solution).takeIf { it != -1 } ?: return null
-            return width.toDouble() / 2 to verifier.getHeight(puzzleFile, solution).toDouble()
-        } catch (e: Exception) {
-            logger.info("Verifier threw exception", e)
-            return null
-        }
-    }
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(OmArchiveCommand::class.java)
-    }
 }
 
 sealed class ScoreIdentifier {
@@ -188,7 +118,7 @@ interface IArchive {
     val score: String?
 }
 
-@ApplicationCommand(name= "archive", description = "Archive a solution", subCommand = true)
+@ApplicationCommand(name = "archive", description = "Archive a solution", subCommand = true)
 data class ArchiveParams(
     @Converter(LinkConverter::class)
     @Description("Link to your solution file, can be `m1` to scrape it from your last message")

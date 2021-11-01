@@ -88,6 +88,13 @@ class OmArchive(@Qualifier("omArchiveRepository") private val gitRepo: GitReposi
         }
     }
 
+    fun getAll(puzzle: OmPuzzle): List<OmSolution> = gitRepo.access {
+        getPuzzleDir(puzzle).listFiles()?.map {
+            val score = OmScore.parse(puzzle, it.name.split("_")[1])
+            OmSolution(puzzle, score, it.readText())
+        } ?: emptyList()
+    }
+
     private fun GitRepository.AccessScope.getPuzzleDir(puzzle: OmPuzzle): File = File(repo, "${puzzle.group.name}/${puzzle.name}")
 
     private fun OmScore.toFileString(category: OmCategory) =

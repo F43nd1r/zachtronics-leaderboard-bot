@@ -72,12 +72,13 @@ fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> 
         }
 }
 
+@Suppress("UNCHECKED_CAST")
 fun <C : Category, R : Record> SafeEmbedMessageBuilder.embedCategoryRecords(records: Iterable<Map.Entry<C, R?>>):
         SafeEmbedMessageBuilder {
     return this.addFields(
         records.groupBy({ it.value?.toEmbedDisplayString() ?: "`none`" }, { it.key })
-            .map { (record, categories) -> record to categories.sortedBy<C, Comparable<*>> { it as Comparable<*> } }
-            .sortedBy<Pair<String, List<C>>, Comparable<*>> { it.second.first() as Comparable<*> }
+            .map { (record, categories) -> record to categories.sortedBy { it as? Comparable<Any> } }
+            .sortedBy { it.second.first() as? Comparable<Any> }
             .map { (record, categories) ->
                 EmbedCreateFields.Field.of(categories.joinToString("/") { it.displayName }, record, true)
             }

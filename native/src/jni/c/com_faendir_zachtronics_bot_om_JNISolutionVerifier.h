@@ -23,6 +23,38 @@ JNIEXPORT jint JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_g
 JNIEXPORT jint JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_getWidth
   (JNIEnv *, jobject, jstring, jstring);
 
+/*
+ * Class:     com_faendir_zachtronics_bot_om_JNISolutionVerifier
+ * Method:    getCost
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_getCost
+  (JNIEnv *, jobject, jstring, jstring);
+
+/*
+ * Class:     com_faendir_zachtronics_bot_om_JNISolutionVerifier
+ * Method:    getCycles
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_getCycles
+  (JNIEnv *, jobject, jstring, jstring);
+
+/*
+ * Class:     com_faendir_zachtronics_bot_om_JNISolutionVerifier
+ * Method:    getArea
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_getArea
+  (JNIEnv *, jobject, jstring, jstring);
+
+/*
+ * Class:     com_faendir_zachtronics_bot_om_JNISolutionVerifier
+ * Method:    getInstructions
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_getInstructions
+  (JNIEnv *, jobject, jstring, jstring);
+
 #ifdef __cplusplus
 }
 #endif

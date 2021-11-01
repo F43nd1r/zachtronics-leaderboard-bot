@@ -45,7 +45,7 @@ interface GameCommand : TopLevelCommand<GameCommand.SubCommandWithParameters<*>>
         return command.mapImpl(parameters - COMMAND_KEY)
     }
 
-    private fun <T> SubCommand<T>.mapImpl(parameters: Map<String, Any?>): SubCommandWithParameters<T>? {
+    fun <T> SubCommand<T>.mapImpl(parameters: Map<String, Any?>): SubCommandWithParameters<T>? {
         val param = map(parameters - COMMAND_KEY)
         return param?.let { SubCommandWithParameters(this, param) }
     }
@@ -74,11 +74,9 @@ interface GameCommand : TopLevelCommand<GameCommand.SubCommandWithParameters<*>>
         }
     }
 
-    override fun handle(event: InteractionCreateEvent, parameters: SubCommandWithParameters<*>): Mono<Void> = handleImpl(event, parameters)
+    override fun handle(event: InteractionCreateEvent, parameters: SubCommandWithParameters<*>): Mono<Void> = parameters.handle(event)
 
-    private fun <T> handleImpl(event: InteractionCreateEvent, command: SubCommandWithParameters<T>): Mono<Void> {
-        return command.subCommand.handle(event, command.parameters)
+    data class SubCommandWithParameters<T>(val subCommand: SubCommand<T>, val parameters: T) {
+        fun handle(event: InteractionCreateEvent) = subCommand.handle(event, parameters)
     }
-
-    class SubCommandWithParameters<T>(val subCommand: SubCommand<T>, val parameters: T)
 }

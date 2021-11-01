@@ -17,23 +17,27 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
+@Suppress("DSL_SCOPE_VIOLATION") // TODO remove when https://youtrack.jetbrains.com/issue/KTIJ-19369 is fixed
 plugins {
-    kotlin("jvm") version "1.5.31"
-    kotlin("plugin.serialization") version "1.5.31"
-    id("org.springframework.boot") version "2.5.5"
-    id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    kotlin("plugin.spring") version "1.5.31"
-    id("com.palantir.docker") version "0.28.0"
-    id("io.freefair.lombok") version "6.1.0"
-    id("com.google.devtools.ksp") version "1.5.31-1.0.0"
-    id("com.gorylenko.gradle-git-properties") version "2.3.1"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.plugin.serialization)
+    alias(libs.plugins.kotlin.plugin.jpa)
+    alias(libs.plugins.kotlin.plugin.lombok)
+    alias(libs.plugins.kotlin.plugin.spring)
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependencyManagement)
+    alias(libs.plugins.gradle.docker)
+    alias(libs.plugins.gradle.lombok)
+    alias(libs.plugins.gradle.gitProperties)
 }
 
 allprojects {
     repositories {
+        mavenLocal()
         mavenCentral()
         google()
-        mavenLocal()
     }
 
     tasks.withType<KotlinCompile> {
@@ -45,31 +49,36 @@ allprojects {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.5.2")
-    implementation("org.springframework.boot:spring-boot-starter")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.cloud:spring-cloud-starter:3.0.4")
-    implementation("com.discord4j:discord4j-core:3.2.0")
-    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.1.4")
-    implementation("org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r")
-    implementation("com.github.rockswang:java-curl:1.2.2.2")
-    implementation("com.faendir.jraw:JRAW:1.2.0")
-    implementation("net.bramp.ffmpeg:ffmpeg:0.6.2")
-    implementation("com.fasterxml.jackson.core:jackson-databind")
-    implementation("com.faendir.om:dsl:1.2.6")
-    implementation("com.faendir.om:parser:2.1.8")
-    implementation(project("common"))
-    ksp(project("processor"))
-    implementation(project("native"))
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation(libs.kotlinx.json)
+    implementation(libs.kotlinx.coroutines.reactor)
+    implementation(libs.spring.boot.web)
+    implementation(libs.spring.boot.jpa)
+    implementation(libs.mysqlConnector)
+    implementation(libs.spring.cloud)
+    implementation(libs.discord4j)
+    implementation(libs.reactor.kotlin)
+    implementation(libs.jgit)
+    implementation(libs.java.curl)
+    implementation(libs.jraw)
+    implementation(libs.java.ffmpeg)
+    implementation(libs.om.dsl)
+    implementation(projects.common)
+    implementation(projects.native)
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.kotlin)
+    implementation(libs.querydsl.jpa)
+    implementation(libs.querydsl.core)
 
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    ksp(projects.processor)
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("net.sf.trove4j:trove4j:3.0.3")
-    testImplementation("com.ninja-squad:springmockk:3.0.1")
-    testImplementation("io.strikt:strikt-core:0.32.0")
+    kapt(libs.querydsl.apt) { artifact { classifier = "jpa" } }
+    kapt(libs.querydsl.kotlinCodegen)
+    kapt(libs.spring.boot.configurationProcessor)
+
+    testImplementation(libs.spring.boot.test)
+    testImplementation(libs.trove4j)
+    testImplementation(libs.springmockk)
+    testImplementation(libs.strikt)
 }
 
 tasks.withType<Test> {
@@ -116,6 +125,14 @@ sourceSets {
 
 tasks.getByName<Jar>("jar") {
     enabled = false
+}
+
+kotlinLombok {
+    lombokConfigurationFile(file("lombok.config"))
+}
+
+kapt {
+    keepJavacAnnotationProcessors = true
 }
 
 afterEvaluate {
