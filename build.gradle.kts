@@ -23,7 +23,6 @@ plugins {
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.plugin.serialization)
-    alias(libs.plugins.kotlin.plugin.jpa)
     alias(libs.plugins.kotlin.plugin.lombok)
     alias(libs.plugins.kotlin.plugin.spring)
     alias(libs.plugins.spring.boot)
@@ -52,7 +51,6 @@ dependencies {
     implementation(libs.kotlinx.json)
     implementation(libs.kotlinx.coroutines.reactor)
     implementation(libs.spring.boot.web)
-    implementation(libs.spring.boot.jpa)
     implementation(libs.mysqlConnector)
     implementation(libs.spring.cloud)
     implementation(libs.discord4j)
@@ -66,13 +64,9 @@ dependencies {
     implementation(projects.native)
     implementation(libs.jackson.databind)
     implementation(libs.jackson.kotlin)
-    implementation(libs.querydsl.jpa)
-    implementation(libs.querydsl.core)
 
     ksp(projects.processor)
 
-    kapt(libs.querydsl.apt) { artifact { classifier = "jpa" } }
-    kapt(libs.querydsl.kotlinCodegen)
     kapt(libs.spring.boot.configurationProcessor)
 
     testImplementation(libs.spring.boot.test)
