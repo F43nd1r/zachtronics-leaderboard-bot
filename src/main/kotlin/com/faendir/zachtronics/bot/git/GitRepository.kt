@@ -33,7 +33,7 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
         private val logger = LoggerFactory.getLogger(GitRepository::class.java)
     }
 
-    val rawFilesUrl = Regex("github.com/([^/]+)/([^/.]+)(?:.git)?").replaceFirst(url, "raw.githubusercontent.com/$1/$2/master/")
+    val rawFilesUrl = Regex("github.com/([^/]+)/([^/.]+)(?:.git)?").replaceFirst(url, "raw.githubusercontent.com/$1/$2/master")
     private val repo = Files.createTempDirectory(name).toFile()
     private val git: Git
     private var remoteHash: String

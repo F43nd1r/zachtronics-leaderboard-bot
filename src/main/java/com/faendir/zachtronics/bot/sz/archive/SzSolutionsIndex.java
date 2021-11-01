@@ -55,19 +55,21 @@ class SzSolutionsIndex implements SolutionsIndex<SzSolution> {
 
     SzSolutionsIndex(Path folderPath, @NotNull SzPuzzle puzzle) throws IOException {
         this.folderPath = folderPath;
-        this.puzzleName = puzzle.name();
+        this.puzzleName = puzzle.getId();
         diskSolutions = Files.list(folderPath)
-                             .filter(p -> p.getFileName().toString().startsWith(puzzle.name()))
-                             .collect(groupingBy(p -> Integer.valueOf(
+                             .filter(p -> p.getFileName().toString().startsWith(puzzleName))
+                             .collect(groupingBy(p -> Character.getNumericValue(
                                                          p.getFileName().toString()
-                                                          .replace(puzzle.name(), "").charAt(1)),
+                                                          .charAt(puzzleName.length() + 1)),
                                                  Collectors.mapping(SzSolution::new, toList())));
 
     }
 
     @Override
     public boolean add(@NotNull SzSolution solution) throws IOException {
+        boolean updated = false;
         SzScore candidate = solution.getScore();
+        categoryLoop:
         for (Map.Entry<Integer, List<SzSolution>> entry : diskSolutions.entrySet()) {
             List<SzSolution> categorySolutions = entry.getValue();
             ListIterator<SzSolution> it = categorySolutions.listIterator();
@@ -76,12 +78,13 @@ class SzSolutionsIndex implements SolutionsIndex<SzSolution> {
                 SzScore score = solutionDisk.getScore();
                 int r = dominanceCompare(candidate, score);
                 if (r > 0)
-                    return false;
+                    continue categoryLoop;
                 else if (r < 0) {
                     // remove beaten score
                     it.remove();
                     assert solutionDisk.getPath() != null;
                     Files.delete(solutionDisk.getPath());
+                    updated = true;
                 }
             }
 
@@ -109,7 +112,7 @@ class SzSolutionsIndex implements SolutionsIndex<SzSolution> {
 
         }
 
-        return true;
+        return updated;
     }
 
     @Override

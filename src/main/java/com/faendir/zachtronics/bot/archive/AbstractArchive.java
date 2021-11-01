@@ -49,11 +49,11 @@ public abstract class AbstractArchive<P extends Puzzle, S extends Solution<P>> i
 
     @NotNull
     @Override
-    public List<ArchiveResult> archiveAll(@NotNull Collection<? extends S> solution) {
+    public List<ArchiveResult> archiveAll(@NotNull Collection<? extends S> solutions) {
         return getGitRepo().access(a -> {
-            List<ArchiveResult> r = solution.stream()
-                                            .map(s -> performArchive(a, s))
-                                            .toList();
+            List<ArchiveResult> r = solutions.stream()
+                                             .map(s -> performArchive(a, s))
+                                             .toList();
             a.push();
             return r;
         });
@@ -88,7 +88,7 @@ public abstract class AbstractArchive<P extends Puzzle, S extends Solution<P>> i
             String result = Stream.concat(accessScope.status().getChanged().stream(),
                                           accessScope.status().getAdded().stream())
                                   .map(f -> "[" + f.replaceFirst(".+/", "") + "]" +
-                                            "(" + getGitRepo().getRawFilesUrl() + f + ")")
+                                            "(" + getGitRepo().getRawFilesUrl() + "/" + f + ")")
                                   .collect(Collectors.joining(", "));
             RevCommit rev = accessScope.commit(
                     "Added " + solution.getScore().toDisplayString() + " for " + solution.getPuzzle().getDisplayName());
