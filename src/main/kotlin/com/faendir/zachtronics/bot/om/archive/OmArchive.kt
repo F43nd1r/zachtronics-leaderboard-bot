@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.om.archive
 import com.faendir.zachtronics.bot.archive.Archive
 import com.faendir.zachtronics.bot.archive.ArchiveResult
 import com.faendir.zachtronics.bot.git.GitRepository
+import com.faendir.zachtronics.bot.model.Score
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmScore
@@ -29,7 +30,7 @@ import java.io.File
 
 @Component
 class OmArchive(@Qualifier("omArchiveRepository") private val gitRepo: GitRepository) :
-    Archive<OmSolution> {
+    Archive<OmPuzzle, OmSolution> {
 
     /*@PostConstruct
     fun importOldStuff() {
@@ -99,4 +100,8 @@ class OmArchive(@Qualifier("omArchiveRepository") private val gitRepo: GitReposi
 
     private fun OmScore.toFileString(category: OmCategory) =
         toDisplayString({ category.sortScoreParts(this) }, "-", { part, value -> "${format(value)}${part.key}" })
+
+    override fun retrieve(puzzle: OmPuzzle): Collection<Pair<Score, String?>> {
+        TODO("Not yet implemented")
+    }
 }

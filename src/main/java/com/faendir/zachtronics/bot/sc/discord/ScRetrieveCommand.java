@@ -19,12 +19,11 @@ package com.faendir.zachtronics.bot.sc.discord;
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.discord4j.command.annotation.Description;
-import com.faendir.zachtronics.bot.discord.command.AbstractListCommand;
-import com.faendir.zachtronics.bot.leaderboards.Leaderboard;
+import com.faendir.zachtronics.bot.archive.Archive;
+import com.faendir.zachtronics.bot.discord.command.AbstractRetrieveCommand;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
-import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
-import kotlin.Pair;
+import com.faendir.zachtronics.bot.sc.model.ScSolution;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -33,33 +32,27 @@ import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.List;
-
 @RequiredArgsConstructor
 @Component
 @ScQualifier
-public class ScListCommand extends AbstractListCommand<ScListCommand.ListData, ScCategory, ScPuzzle> {
+public class ScRetrieveCommand extends AbstractRetrieveCommand<ScRetrieveCommand.RetrieveData, ScPuzzle, ScSolution> {
     @Delegate
-    private final ScListCommand_ListDataParser parser = ScListCommand_ListDataParser.INSTANCE;
+    private final ScRetrieveCommand_RetrieveDataParser parser = ScRetrieveCommand_RetrieveDataParser.INSTANCE;
     @Getter
-    private final List<Leaderboard<ScCategory, ScPuzzle, ?>> leaderboards;
+    private final Archive<ScPuzzle, ScSolution> archive;
 
     @NotNull
     @Override
-    public Pair<ScPuzzle, List<ScCategory>> findPuzzleAndCategories(@NotNull ListData parameters) {
-        return new Pair<>(parameters.puzzle,
-                          Arrays.stream(ScCategory.values())
-                                .filter(c -> c.supportsPuzzle(parameters.puzzle))
-                                .toList());
+    public ScPuzzle findPuzzle(@NotNull RetrieveData parameters) {
+        return parameters.puzzle;
     }
 
-    @ApplicationCommand(name = "list", description = "List records", subCommand = true)
+    @ApplicationCommand(name = "retrieve", description = "Retrieve archived solutions", subCommand = true)
     @Value
-    public static class ListData {
+    public static class RetrieveData {
         @NonNull ScPuzzle puzzle;
 
-        public ListData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
+        public RetrieveData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
                         @Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle) {
             this.puzzle = puzzle;
         }

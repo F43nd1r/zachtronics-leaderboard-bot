@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component
 @Component
 @OmQualifier
 class OmListCommand(override val leaderboards: List<Leaderboard<OmCategory, OmPuzzle, OmRecord>>) :
-    AbstractListCommand<ListCommand, OmCategory, OmPuzzle, OmRecord>(),
+    AbstractListCommand<ListCommand, OmCategory, OmPuzzle>(),
     ApplicationCommandParser<ListCommand, ApplicationCommandOptionData> by ListCommandParser {
     override fun findPuzzleAndCategories(parameters: ListCommand): Pair<OmPuzzle, List<OmCategory>> {
         return Pair(parameters.puzzle, OmCategory.values().filter { it.supportsPuzzle(parameters.puzzle) })

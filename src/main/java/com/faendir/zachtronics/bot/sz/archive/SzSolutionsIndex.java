@@ -17,10 +17,12 @@
 package com.faendir.zachtronics.bot.sz.archive;
 
 import com.faendir.zachtronics.bot.archive.SolutionsIndex;
+import com.faendir.zachtronics.bot.model.Score;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzScore;
 import com.faendir.zachtronics.bot.sz.model.SzSolution;
+import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -108,6 +110,15 @@ class SzSolutionsIndex implements SolutionsIndex<SzSolution> {
         }
 
         return true;
+    }
+
+    @Override
+    public Collection<Pair<Score, String>> getAll() {
+        return diskSolutions.values()
+                            .stream()
+                            .flatMap(List::stream)
+                            .map(s -> new Pair<Score, String>(s.getScore(), s.getPath().getFileName().toString()))
+                            .toList();
     }
 
     /** If equal, s1 dominates */

@@ -50,9 +50,14 @@ public class ScArchive extends AbstractArchive<ScPuzzle, ScSolution> {
         return new ScSolutionsIndex(puzzlePath);
     }
 
-    public String makeArchiveLink(@NotNull ScPuzzle puzzle, @NotNull ScScore score) {
+    @Override
+    public String makeArchiveLink(@NotNull ScPuzzle puzzle, @NotNull String filename) {
         return String.format("%s/%s/%s/%s", getGitRepo().getRawFilesUrl(), puzzle.getGroup().name(), puzzle.name(),
-                             ScSolutionsIndex.makeScoreFilename(score));
+                             filename);
+    }
+
+    public String makeArchiveLink(@NotNull ScPuzzle puzzle, @NotNull ScScore score) {
+        return makeArchiveLink(puzzle, ScSolutionsIndex.makeScoreFilename(score));
     }
 
     @NotNull

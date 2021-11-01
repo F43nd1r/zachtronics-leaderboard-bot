@@ -16,17 +16,18 @@
 
 package com.faendir.zachtronics.bot.archive
 
+import com.faendir.zachtronics.bot.model.Puzzle
+import com.faendir.zachtronics.bot.model.Score
 import com.faendir.zachtronics.bot.model.Solution
 
-interface Archive<S : Solution<*>> {
+interface Archive<P: Puzzle, S : Solution<P>> {
 
-    /**
-     * @return (title, description)
-     */
     fun archive(solution: S) : ArchiveResult
 
-    /**
-     * @return [(title, description), ...]
-     */
     fun archiveAll(solutions: Collection<S>): List<ArchiveResult> = solutions.map { archive(it) }
+
+    /**
+     * @return `[(score, link), ...]`, if there's no associated file `link` is null
+     */
+    fun retrieve(puzzle: P): Collection<Pair<Score, String?>>
 }

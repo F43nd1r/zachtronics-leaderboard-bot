@@ -32,17 +32,8 @@ import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.getWidthAndHeight
 import com.faendir.zachtronics.bot.om.isOverlap
 import com.faendir.zachtronics.bot.om.isTrackless
-import com.faendir.zachtronics.bot.om.model.OmModifier
-import com.faendir.zachtronics.bot.om.model.OmPuzzle
-import com.faendir.zachtronics.bot.om.model.OmScore
-import com.faendir.zachtronics.bot.om.model.OmScorePart
-import com.faendir.zachtronics.bot.om.model.OmScorePart.AREA
-import com.faendir.zachtronics.bot.om.model.OmScorePart.COST
-import com.faendir.zachtronics.bot.om.model.OmScorePart.CYCLES
-import com.faendir.zachtronics.bot.om.model.OmScorePart.HEIGHT
-import com.faendir.zachtronics.bot.om.model.OmScorePart.INSTRUCTIONS
-import com.faendir.zachtronics.bot.om.model.OmScorePart.WIDTH
-import com.faendir.zachtronics.bot.om.model.OmSolution
+import com.faendir.zachtronics.bot.om.model.*
+import com.faendir.zachtronics.bot.om.model.OmScorePart.*
 import com.roxstudio.utils.CUrl
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import okio.buffer
@@ -53,7 +44,7 @@ import java.util.*
 
 @Component
 @OmQualifier
-class OmArchiveCommand(override val archive: Archive<OmSolution>) : AbstractArchiveCommand<ArchiveParams, OmSolution>(),
+class OmArchiveCommand(override val archive: Archive<*, OmSolution>) : AbstractArchiveCommand<ArchiveParams, OmSolution>(),
     Secured by OmSecured,
     ApplicationCommandParser<ArchiveParams, ApplicationCommandOptionData> by ArchiveParamsParser {
 

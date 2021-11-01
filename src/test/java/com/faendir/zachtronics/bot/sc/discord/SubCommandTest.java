@@ -75,6 +75,18 @@ public class SubCommandTest {
     }
 
     @Test
+    public void testRetrieve() {
+        Map<String, String> args = Map.of("puzzle", "OPAS");
+        String result = runCommand("retrieve", args); // 100/100/100 no files
+        assertTrue(result.contains("Pancakes") && !result.contains("]("));
+
+        args = Map.of("puzzle", "Fission I");
+        result = runCommand("retrieve", args); // 2 valid files
+        assertTrue(result.contains("Fission I") && result.contains("]("));
+    }
+
+
+    @Test
     @Disabled("Not actually exposed to Discord")
     public void testSubmit() {
         Map<String, String> args = Map.of("puzzle", "Tunnels I",

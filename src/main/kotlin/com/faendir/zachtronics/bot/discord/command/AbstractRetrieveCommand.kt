@@ -16,33 +16,30 @@
 
 package com.faendir.zachtronics.bot.discord.command
 
+import com.faendir.zachtronics.bot.archive.Archive
 import com.faendir.zachtronics.bot.discord.Colors
-import com.faendir.zachtronics.bot.leaderboards.Leaderboard
-import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
+import com.faendir.zachtronics.bot.model.Solution
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
-import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.spec.EmbedCreateFields
 import reactor.core.publisher.Mono
 
-abstract class AbstractListCommand<T, C : Category, P : Puzzle> : AbstractSubCommand<T>() {
-    abstract val leaderboards: List<Leaderboard<C, P, *>>
+abstract class AbstractRetrieveCommand<T, P : Puzzle, S: Solution<P>> : AbstractSubCommand<T>() {
+    abstract val archive: Archive<P, S>
 
     override fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void> {
-        val (puzzle, categories) = findPuzzleAndCategories(parameters)
-        val records = leaderboards.map { it.getAll(puzzle, categories) }.reduce { acc, map -> acc + map }
+        val puzzle = findPuzzle(parameters)
+        val solutions = archive.retrieve(puzzle)
         return SafeEmbedMessageBuilder()
             .title("*${puzzle.displayName}*")
             .color(Colors.READ)
-            .embedCategoryRecords(records.entries)
-            .apply {
-                val missing = categories.minus(records.keys)
-                if (missing.isNotEmpty()) {
-                    addField(missing.joinToString("/") { it.displayName }, "None")
-                }
-            }.send(event)
+            .addFields(solutions.map { (score, link) ->
+                val value = if (link == null) score.toDisplayString() else "[${score.toDisplayString()}]($link)"
+                EmbedCreateFields.Field.of("\u200b", value, true)
+            })
+            .send(event)
     }
 
-    /** @return pair of Puzzle and all the categories that support it */
-    abstract fun findPuzzleAndCategories(parameters: T): Pair<P, List<C>>
+    abstract fun findPuzzle(parameters: T): P
 }

@@ -18,12 +18,15 @@ package com.faendir.zachtronics.bot.archive;
 
 import com.faendir.zachtronics.bot.git.GitRepository;
 import com.faendir.zachtronics.bot.model.Puzzle;
+import com.faendir.zachtronics.bot.model.Score;
 import com.faendir.zachtronics.bot.model.Solution;
+import kotlin.Pair;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -31,7 +34,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
-public abstract class AbstractArchive<P extends Puzzle, S extends Solution<P>> implements Archive<S> {
+public abstract class AbstractArchive<P extends Puzzle, S extends Solution<P>> implements Archive<P, S> {
     protected abstract GitRepository getGitRepo();
 
     @NotNull
@@ -97,5 +100,28 @@ public abstract class AbstractArchive<P extends Puzzle, S extends Solution<P>> i
             // the same exact sol was already archived,
             return new ArchiveResult.AlreadyArchived();
         }
+    }
+
+    public abstract String makeArchiveLink(@NotNull P puzzle, @NotNull String fileName);
+
+    @NotNull
+    @Override
+    public Collection<Pair<Score, String>> retrieve(@NotNull P puzzle) {
+        return getGitRepo().access(accessScope -> {
+            Path repoPath = accessScope.getRepo().toPath();
+            Path puzzlePath = repoPath.resolve(relativePuzzlePath(puzzle));
+            SolutionsIndex<S> solutionsIndex;
+            try {
+                solutionsIndex = makeSolutionIndex(puzzlePath, puzzle);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+            return solutionsIndex.getAll()
+                                 .stream()
+                                 .map(p -> new Pair<>(p.getFirst(),
+                                                      p.getSecond() == null ? null :
+                                                      makeArchiveLink(puzzle, p.getSecond())))
+                                 .toList();
+        });
     }
 }

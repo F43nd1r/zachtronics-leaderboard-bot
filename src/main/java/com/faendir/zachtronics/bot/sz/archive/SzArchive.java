@@ -50,6 +50,7 @@ public class SzArchive extends AbstractArchive<SzPuzzle, SzSolution> {
         return new SzSolutionsIndex(puzzlePath, puzzle);
     }
 
+    @Override
     public String makeArchiveLink(@NotNull SzPuzzle puzzle, @NotNull String fileName) {
         return String.format("%s/%s/%s", getGitRepo().getRawFilesUrl(), puzzle.getGroup().getRepoFolder(), fileName);
     }

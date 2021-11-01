@@ -17,19 +17,18 @@
 package com.faendir.zachtronics.bot.sc.archive;
 
 import com.faendir.zachtronics.bot.archive.SolutionsIndex;
+import com.faendir.zachtronics.bot.model.Score;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolution;
+import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -99,6 +98,18 @@ class ScSolutionsIndex implements SolutionsIndex<ScSolution> {
         Path solutionPath = puzzlePath.resolve(filename);
         Files.write(solutionPath, solution.getContent().getBytes(), StandardOpenOption.CREATE_NEW);
         return true;
+    }
+
+    @Override
+    public Collection<Pair<Score, String>> getAll() {
+        return scores.stream()
+                     .map(score -> {
+                         String filename = makeScoreFilename(score);
+                         if (!Files.exists(puzzlePath.resolve(filename)))
+                             filename = null;
+                         return new Pair<Score, String>(score, filename);
+                     })
+                     .toList();
     }
 
     @NotNull

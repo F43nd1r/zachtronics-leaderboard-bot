@@ -16,15 +16,23 @@
 
 package com.faendir.zachtronics.bot.archive;
 
+import com.faendir.zachtronics.bot.model.Score;
 import com.faendir.zachtronics.bot.model.Solution;
+import kotlin.Pair;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /** Interface for classes that handle archival data for a level in the respective repository */
-public interface SolutionsIndex<T extends Solution<?>> {
+public interface SolutionsIndex<S extends Solution<?>> {
 
     /**
      * @return whether the new solution sits on the frontier
      */
-    boolean add(T solution) throws IOException;
+    boolean add(S solution) throws IOException;
+
+    /**
+     * @return <tt>[(score, filename), ...]</tt>, if there's no associated file <tt>filename</tt> is null
+     */
+    Collection<Pair<Score, String>> getAll();
 }
