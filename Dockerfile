@@ -1,7 +1,7 @@
 FROM openjdk:16-jdk-bullseye as builder
 RUN apt-get update && apt-get install -y python3-pip
 RUN pip install --prefix=/python -r https://raw.githubusercontent.com/spacechem-community-developers/SChem/main/schem/minimal-requirements.txt
-RUN pip install --prefix=/python --no-dependencies schem==0.15.*
+RUN pip install --prefix=/python --no-dependencies schem==0.19.*
 WORKDIR application
 ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} application.jar
