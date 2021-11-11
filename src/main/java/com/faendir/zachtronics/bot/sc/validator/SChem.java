@@ -141,6 +141,9 @@ public class SChem {
 
             SChemResult result = objectMapper.readValue(process.getInputStream(), SChemResult.class);
 
+            if (result.getCycles() == 0)
+                throw new SChemException(new String(process.getErrorStream().readAllBytes()));
+
             boolean declaresBugged = false;
             boolean declaresPrecog = false;
             if (result.getSolutionName() != null) {
