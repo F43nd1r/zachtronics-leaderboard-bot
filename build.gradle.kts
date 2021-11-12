@@ -92,7 +92,7 @@ tasks.withType<Test> {
 }
 
 docker {
-    name = "f43nd1r/om-leaderboard-discord-bot:latest" // TODO change name to zachtronics-leaderboard-bot
+    name = "f43nd1r/zachtronics-leaderboard-bot:latest"
     files(tasks.getByName<BootJar>("bootJar").outputs)
     copySpec.into("build/libs")
 }
