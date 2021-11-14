@@ -22,6 +22,7 @@ import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzSubmission;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,6 +36,7 @@ public class SzArchiveTest {
     @Autowired
     private SzSolutionRepository repository;
 
+    @Disabled
     @Test
     public void testArchive() {
         String content = """
