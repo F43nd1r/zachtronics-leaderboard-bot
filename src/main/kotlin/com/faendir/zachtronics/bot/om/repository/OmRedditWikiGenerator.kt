@@ -156,7 +156,7 @@ class OmRedditWikiGenerator(private val reddit: RedditService) : AbstractOmPageG
     private fun Pair<OmRecord, List<OmCategory>>?.toMarkdown(): String {
         if (this == null) return ""
         val score = first.score.toDisplayString(DisplayContext(StringFormat.MARKDOWN, second))
-        return "${first.displayLink ?.let { "[$score](it)" } ?: score}${if (second.any { it.name.contains("X") }) "*" else ""}"
+        return "${first.displayLink ?.let { "[$score]($it)" } ?: score}${if (second.any { it.name.contains("X") }) "*" else ""}"
     }
 
     override fun GitRepository.ReadWriteAccess.updatePage(dir: File, categories: List<OmCategory>, data: Map<Puzzle, Map<OmRecord, Set<OmCategory>>>) {
