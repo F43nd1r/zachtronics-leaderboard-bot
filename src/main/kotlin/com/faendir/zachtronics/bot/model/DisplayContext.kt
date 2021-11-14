@@ -17,8 +17,8 @@
 package com.faendir.zachtronics.bot.model
 
 enum class StringFormat(val separator: Char) {
-    PLAIN_TEXT('|'),
-    MARKDOWN('|'),
+    PLAIN_TEXT('/'),
+    MARKDOWN('/'),
     FILE_NAME('-')
 }
 
