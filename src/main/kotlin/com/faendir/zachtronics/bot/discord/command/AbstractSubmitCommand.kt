@@ -26,10 +26,11 @@ import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
+import com.faendir.zachtronics.bot.utils.orEmpty
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import reactor.core.publisher.Mono
 
-abstract class AbstractSubmitCommand<T, C: Category, S : Submission<C, *>, R: Record<C>> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
+abstract class AbstractSubmitCommand<T, C : Category, S : Submission<C, *>, R : Record<C>> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
     protected abstract val repository: SolutionRepository<C, *, S, R>
 
     override fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void> {
@@ -42,9 +43,17 @@ abstract class AbstractSubmitCommand<T, C: Category, S : Submission<C, *>, R: Re
             is SubmitResult.Success -> {
                 val beatenCategories: List<C> = result.beatenRecords.flatMap { it.categories }
                 return SafeEmbedMessageBuilder()
-                    .title("Success: *${submission.puzzle.displayName}* ${beatenCategories.takeIf { it.isNotEmpty() }?.joinToString { it.displayName } ?: "Pareto"}")
+                    .title(
+                        "Success: *${submission.puzzle.displayName}* ${
+                            beatenCategories.takeIf { it.isNotEmpty() }?.joinToString { it.displayName } ?: "Pareto"
+                        }")
                     .color(Colors.SUCCESS)
-                    .description("`${submission.score.toDisplayString(DisplayContext(StringFormat.MARKDOWN, beatenCategories))}` ${submission.author?.let { " by $it" } ?: ""}${if (beatenCategories.isNotEmpty()) "\npreviously:" else " was included in the pareto frontier"}")
+                    .description(
+                        "`${submission.score.toDisplayString(DisplayContext(StringFormat.MARKDOWN, beatenCategories))}`"
+                                + submission.author?.orEmpty(prefix = " by ")
+                                + (if (beatenCategories.isEmpty()) " was included in the pareto frontier." else "")
+                                + (if (result.beatenRecords.isNotEmpty()) "\npreviously:" else "")
+                    )
                     .embedCategoryRecords(result.beatenRecords)
                     .link(submission.displayLink)
             }

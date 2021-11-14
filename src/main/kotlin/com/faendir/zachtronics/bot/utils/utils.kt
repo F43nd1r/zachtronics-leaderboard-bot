@@ -99,7 +99,7 @@ fun <R : Record<C>, C : Category> SafeEmbedMessageBuilder.embedRecords(records: 
     return this.addFields(
         records.map { (record, categories) ->
             EmbedCreateFields.Field.of(
-                if (categories.isNotEmpty()) categories.joinToString(", ") { it.displayName } else "\u200B", // NBSP
+                categories.joinToString(", ") { it.displayName }.nbspIfEmpty(),
                 record.toDisplayString(DisplayContext.markdown()),
                 true
             )
@@ -122,6 +122,8 @@ fun InteractionCreateEvent.editReplyWithFailure(message: String?) =
     ).then()
 
 fun String.truncateWithEllipsis(maxLength: Int) = if (length > maxLength) substring(0, maxLength - 1) + "…" else this
+
+fun String.nbspIfEmpty() = ifEmpty { "\u200B" }
 
 fun <K, V, C : MutableCollection<V>> MutableMap<K, C>.add(key: K, values: C) {
     if (containsKey(key)) {

@@ -33,13 +33,13 @@ class SafeEmbedMessageBuilder {
     private var color: Color? = null
 
     fun title(title: String) = apply {
-        val safeTitle = title.truncateWithEllipsis(Limits.TITLE)
+        val safeTitle = title.truncateWithEllipsis(Limits.TITLE).nbspIfEmpty()
         increaseTotal(safeTitle.length)
         current.title(safeTitle)
     }
 
     fun description(description: String) = apply {
-        val safeDescription = description.truncateWithEllipsis(Limits.DESCRIPTION)
+        val safeDescription = description.truncateWithEllipsis(Limits.DESCRIPTION).nbspIfEmpty()
         increaseTotal(safeDescription.length)
         current.description(safeDescription)
     }
@@ -48,8 +48,8 @@ class SafeEmbedMessageBuilder {
         if (fields >= Limits.FIELDS) {
             nextBuilder()
         }
-        val safeName = name.truncateWithEllipsis(Limits.FIELD_NAME)
-        val safeValue = value.truncateWithEllipsis(Limits.FIELD_VALUE)
+        val safeName = name.truncateWithEllipsis(Limits.FIELD_NAME).nbspIfEmpty()
+        val safeValue = value.truncateWithEllipsis(Limits.FIELD_VALUE).nbspIfEmpty()
         increaseTotal(safeName.length + safeValue.length)
         current.addField(EmbedCreateFields.Field.of(safeName, safeValue, inline))
         fields++
@@ -60,13 +60,13 @@ class SafeEmbedMessageBuilder {
     }
 
     fun footer(footer: String, iconUrl: String? = null) = apply {
-        val safeFooter = footer.truncateWithEllipsis(Limits.FOOTER)
+        val safeFooter = footer.truncateWithEllipsis(Limits.FOOTER).nbspIfEmpty()
         increaseTotal(safeFooter.length)
         current.footer(safeFooter, iconUrl)
     }
 
     fun author(author: String, url: String? = null, iconUrl: String? = null) = apply {
-        val safeAuthor = author.truncateWithEllipsis(Limits.AUTHOR)
+        val safeAuthor = author.truncateWithEllipsis(Limits.AUTHOR).nbspIfEmpty()
         increaseTotal(safeAuthor.length)
         current.author(safeAuthor, url, iconUrl)
     }
