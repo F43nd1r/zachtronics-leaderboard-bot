@@ -69,7 +69,7 @@ class OmSolutionRepository(
                 ?.listFiles()
                 ?.map { file -> file.inputStream().buffered().use { json.decodeFromStream<OmRecord>(it) } }
                 ?.forEach { record -> records.add(record.copy(
-                    dataLink = record.dataPath?.let { archive.rawFilesUrl + it },
+                    dataLink = record.dataPath?.let { archive.rawFilesUrl + it.toString().ensurePrefix("/") },
                     dataPath = record.dataPath?.let { archiveScope.repo.toPath().resolve(it) }
                 ), mutableSetOf()) }
             if (records.isNotEmpty()) {
