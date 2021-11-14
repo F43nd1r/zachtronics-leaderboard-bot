@@ -61,7 +61,8 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     @NotNull
     @Override
     public SubmitResult<ScRecord, ScCategory> submit(@NotNull ScSubmission submission) {
-        try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
+        throw new UnsupportedOperationException("This command is temporarily unavailable.");
+        /*try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
             // get the map before we change it by archiving
             Map<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> oldRbcMap =
                     getRbcMap(submission.getPuzzle(), access.getRepo().toPath());
@@ -84,17 +85,18 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
             }
             else
                 return archiveResult;
-        }
+        }*/
     }
 
     @NotNull
     @Override
     public List<SubmitResult<ScRecord, ScCategory>> submitAll(@NotNull Collection<? extends ScSubmission> submissions) {
-        try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
+        throw new UnsupportedOperationException("This command is temporarily unavailable.");
+        /*try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
             List<SubmitResult<ScRecord, ScCategory>> r = submissions.stream().map(s -> performArchive(access, s)).toList();
             access.push();
             return r;
-        }
+        }*/
     }
 
     @Nullable

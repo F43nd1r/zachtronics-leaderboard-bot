@@ -57,11 +57,12 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
     @NotNull
     @Override
     public SubmitResult<SzRecord, SzCategory> submit(@NotNull SzSubmission submission) {
-        try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
+        throw new UnsupportedOperationException("This command is temporarily unavailable.");
+        /*try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
             SubmitResult<SzRecord, SzCategory> r = performArchive(access, submission);
             access.push();
             return r;
-        }
+        }*/
     }
 
     @Nullable
