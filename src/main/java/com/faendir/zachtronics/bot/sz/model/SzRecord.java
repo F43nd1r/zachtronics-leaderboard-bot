@@ -49,9 +49,9 @@ public class SzRecord implements Record<SzCategory> {
     @Override
     public String toDisplayString(@NotNull DisplayContext<SzCategory> context) {
         //TODO: could also set archiveLink to null and use super instead?
-        if(context.getFormat() == StringFormat.MARKDOWN) {
-            return "[" + score.toDisplayString() + "](" + link + ")";
-        }
-        return Record.super.toDisplayString(context);
+        return switch (context.getFormat()) {
+            case DISCORD, REDDIT -> "[" + score.toDisplayString() + "](" + link + ")";
+            default -> Record.super.toDisplayString(context);
+        };
     }
 }

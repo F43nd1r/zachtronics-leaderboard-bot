@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Disabled
 @BotTest(Application.class)
 public class SolRepoSubmitTest {
 

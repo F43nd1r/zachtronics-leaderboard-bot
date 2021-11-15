@@ -48,9 +48,9 @@ abstract class AbstractArchiveCommand<T, C: Category, S : Submission<C, *>> : Ab
         for ((solution, result) in solutions.zip(results)) {
             val name = if (result is SubmitResult.Failure) "*Failed*" else "*${solution.puzzle.displayName}*"
             val value = when (result) {
-                is SubmitResult.Success -> "`${solution.score.toDisplayString(DisplayContext.markdown())}` has been archived.\n${result.message}"
-                is SubmitResult.AlreadyPresent -> "`${solution.score.toDisplayString(DisplayContext.markdown())}` was already present."
-                is SubmitResult.NothingBeaten -> "`${solution.score.toDisplayString(DisplayContext.markdown())}` did not beat anything."
+                is SubmitResult.Success -> "`${solution.score.toDisplayString(DisplayContext.discord())}` has been archived.\n${result.message}"
+                is SubmitResult.AlreadyPresent -> "`${solution.score.toDisplayString(DisplayContext.discord())}` was already present."
+                is SubmitResult.NothingBeaten -> "`${solution.score.toDisplayString(DisplayContext.discord())}` did not beat anything."
                 is SubmitResult.Failure -> result.message
             }
             embed.addField(name, value, true)

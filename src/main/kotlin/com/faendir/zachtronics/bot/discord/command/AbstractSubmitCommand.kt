@@ -49,7 +49,7 @@ abstract class AbstractSubmitCommand<T, C : Category, S : Submission<C, *>, R : 
                         }")
                     .color(Colors.SUCCESS)
                     .description(
-                        "`${submission.score.toDisplayString(DisplayContext(StringFormat.MARKDOWN, beatenCategories))}`"
+                        "`${submission.score.toDisplayString(DisplayContext(StringFormat.DISCORD, beatenCategories))}`"
                                 + submission.author?.orEmpty(prefix = " by ")
                                 + (if (beatenCategories.isEmpty()) " was included in the pareto frontier." else "")
                                 + (if (result.beatenRecords.isNotEmpty()) "\npreviously:" else "")
@@ -59,12 +59,12 @@ abstract class AbstractSubmitCommand<T, C : Category, S : Submission<C, *>, R : 
             }
             is SubmitResult.AlreadyPresent ->
                 return SafeEmbedMessageBuilder()
-                    .title("Already present: *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.markdown())}`")
+                    .title("Already present: *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.discord())}`")
                     .color(Colors.UNCHANGED)
                     .description("No action was taken.")
             is SubmitResult.NothingBeaten ->
                 return SafeEmbedMessageBuilder()
-                    .title("No Scores beaten by *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.markdown())}`")
+                    .title("No Scores beaten by *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.discord())}`")
                     .color(Colors.UNCHANGED)
                     .description("Existing scores:")
                     .embedCategoryRecords(result.records)

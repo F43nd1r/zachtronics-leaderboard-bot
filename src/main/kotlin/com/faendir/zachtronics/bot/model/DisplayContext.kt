@@ -16,10 +16,11 @@
 
 package com.faendir.zachtronics.bot.model
 
-enum class StringFormat(val separator: Char) {
-    PLAIN_TEXT('/'),
-    MARKDOWN('/'),
-    FILE_NAME('-')
+enum class StringFormat(val separator: String) {
+    PLAIN_TEXT("/"),
+    REDDIT("/"),
+    DISCORD("/\u200B"), // ZWS for line breaking
+    FILE_NAME("-")
 }
 
 data class DisplayContext<C : Category>(val format: StringFormat, val categories: List<C>? = null) {
@@ -30,7 +31,9 @@ data class DisplayContext<C : Category>(val format: StringFormat, val categories
         @JvmStatic
         fun <C : Category> plainText() = DisplayContext<C>(StringFormat.PLAIN_TEXT)
         @JvmStatic
-        fun <C : Category> markdown() = DisplayContext<C>(StringFormat.MARKDOWN)
+        fun <C : Category> discord() = DisplayContext<C>(StringFormat.DISCORD)
+        @JvmStatic
+        fun <C : Category> reddit() = DisplayContext<C>(StringFormat.REDDIT)
         @JvmStatic
         fun <C : Category> fileName() = DisplayContext<C>(StringFormat.FILE_NAME)
     }

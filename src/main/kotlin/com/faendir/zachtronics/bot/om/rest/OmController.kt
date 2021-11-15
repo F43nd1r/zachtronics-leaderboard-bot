@@ -78,7 +78,7 @@ class OmController(private val repository: OmSolutionRepository, private val dis
             is SubmitResult.Success -> {
                 val beatenCategories: List<OmCategory> = result.beatenRecords.flatMap { it.categories }
                 val categoryString = beatenCategories.takeIf { it.isNotEmpty() }?.joinToString { it.displayName } ?: "Pareto"
-                val score = submission.score.toDisplayString(DisplayContext(StringFormat.MARKDOWN, beatenCategories))
+                val score = submission.score.toDisplayString(DisplayContext(StringFormat.DISCORD, beatenCategories))
                 sendDiscordMessage(
                     SafeEmbedMessageBuilder()
                         .title("API submission: *${submission.puzzle.displayName}* $categoryString")

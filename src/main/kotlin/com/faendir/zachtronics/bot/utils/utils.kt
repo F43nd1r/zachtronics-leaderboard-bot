@@ -87,7 +87,7 @@ fun <R : Record<C>?, C : Category> SafeEmbedMessageBuilder.embedCategoryRecords(
             .map { (record, categories) ->
                 EmbedCreateFields.Field.of(
                     categories.joinToString(", ") { it.displayName }.ifEmptyZeroWidthSpace(),
-                    record?.toDisplayString(DisplayContext(StringFormat.MARKDOWN, categories.toList())) ?: "none",
+                    record?.toDisplayString(DisplayContext(StringFormat.DISCORD, categories.toList())) ?: "none",
                     true
                 )
             }
@@ -100,7 +100,7 @@ fun <R : Record<C>, C : Category> SafeEmbedMessageBuilder.embedRecords(records: 
         records.map { (record, categories) ->
             EmbedCreateFields.Field.of(
                 categories.joinToString(", ") { it.displayName }.ifEmptyZeroWidthSpace(),
-                record.toDisplayString(DisplayContext.markdown()),
+                record.toDisplayString(DisplayContext.discord()),
                 true
             )
         }

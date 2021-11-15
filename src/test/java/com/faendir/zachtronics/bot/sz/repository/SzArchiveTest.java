@@ -19,7 +19,9 @@ package com.faendir.zachtronics.bot.sz.repository;
 import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
+import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
+import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.sz.model.SzSubmission;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Disabled;
@@ -36,7 +38,6 @@ public class SzArchiveTest {
     @Autowired
     private SzSolutionRepository repository;
 
-    @Disabled
     @Test
     public void testArchive() {
         String content = """
@@ -68,7 +69,7 @@ public class SzArchiveTest {
     }
 
     @NotNull
-    private SubmitResult doArchive(String content) {
+    private SubmitResult<SzRecord, SzCategory> doArchive(String content) {
         return repository.submit(new SzSubmission(content));
     }
 }

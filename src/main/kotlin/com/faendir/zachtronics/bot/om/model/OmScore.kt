@@ -39,7 +39,7 @@ data class OmScore(
             overlap -> "O"
             trackless -> "T"
             else -> null
-        }).filterNotNull().joinToString(context.omSeparator) + (
+        }).filterNotNull().joinToString(context.separator) + (
                 context.categories
                     ?.flatMap { it.metrics.toList() }
                     ?.distinct()
@@ -56,9 +56,3 @@ data class OmScore(
         return compares.none { it == null } && compares.none { it!! > 0 } && compares.any { it!! < 0 }
     }
 }
-
-private val DisplayContext<*>.omSeparator
-    get() = when (format) {
-        StringFormat.PLAIN_TEXT, StringFormat.MARKDOWN -> "/\u200B"
-        StringFormat.FILE_NAME -> "-"
-    }

@@ -61,8 +61,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     @NotNull
     @Override
     public SubmitResult<ScRecord, ScCategory> submit(@NotNull ScSubmission submission) {
-        throw new UnsupportedOperationException("This command is temporarily unavailable.");
-        /*try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
+        try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
             // get the map before we change it by archiving
             Map<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> oldRbcMap =
                     getRbcMap(submission.getPuzzle(), access.getRepo().toPath());
@@ -85,18 +84,17 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
             }
             else
                 return archiveResult;
-        }*/
+        }
     }
 
     @NotNull
     @Override
     public List<SubmitResult<ScRecord, ScCategory>> submitAll(@NotNull Collection<? extends ScSubmission> submissions) {
-        throw new UnsupportedOperationException("This command is temporarily unavailable.");
-        /*try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
+        try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
             List<SubmitResult<ScRecord, ScCategory>> r = submissions.stream().map(s -> performArchive(access, s)).toList();
             access.push();
             return r;
-        }*/
+        }
     }
 
     @Nullable
@@ -298,7 +296,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         }
 
         String reactorPrefix = (record.getScore().getReactors() > minReactors) ? "† " : "";
-        return record.toDisplayString(new DisplayContext<>(StringFormat.MARKDOWN, thisCategory), reactorPrefix);
+        return record.toDisplayString(new DisplayContext<>(StringFormat.REDDIT, thisCategory), reactorPrefix);
     }
 
     private static final Pattern REGEX_SCORE_CELL =

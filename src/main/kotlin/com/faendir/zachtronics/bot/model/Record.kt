@@ -38,7 +38,7 @@ interface Record<C : Category> {
 
     fun toDisplayString(context: DisplayContext<C>): String {
         return when (context.format) {
-            StringFormat.MARKDOWN -> {
+            StringFormat.DISCORD, StringFormat.REDDIT -> {
                 val scoreAndAuthor = score.toDisplayString(context) + author.orEmpty(prefix = " ")
                 dataLink.orEmpty(prefix = "[\uD83D\uDCC4](", suffix = ") ") + (displayLink?.let { "[$scoreAndAuthor]($it)" } ?: scoreAndAuthor)
             }

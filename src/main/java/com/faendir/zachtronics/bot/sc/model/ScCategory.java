@@ -78,9 +78,9 @@ public enum ScCategory implements Category {
     }
 
     static class ScScoreFormatStrings {
-        static final String F100 = "**%s**%s%c%d%c%d%s";
-        static final String F001 = "%s%s%c%d%c**%d**%s";
-        static final String F110 = "**%s**%s%c**%d**%c%d%s";
-        static final String F011 = "%s%s%c**%d**%c**%d**%s";
+        static final String F100 = "**%s**%s%s%d%s%d%s";
+        static final String F001 = "%s%s%s%d%s**%d**%s";
+        static final String F110 = "**%s**%s%s**%d**%s%d%s";
+        static final String F011 = "%s%s%s**%d**%s**%d**%s";
     }
 }

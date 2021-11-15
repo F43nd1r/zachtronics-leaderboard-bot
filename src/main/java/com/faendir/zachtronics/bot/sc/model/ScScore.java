@@ -49,11 +49,12 @@ public class ScScore implements Score<ScCategory> {
     /** ccc{}/r/ss[/BP] */
     @NotNull
     public String toDisplayString(@NotNull DisplayContext<ScCategory> context, String oldRNGMarker) {
-        char separator = context.getSeparator();
+        String separator = context.getSeparator();
         String cyclesStr = cycles >= 100000 ? NumberFormat.getNumberInstance(Locale.ROOT).format(cycles)
                                             : Integer.toString(cycles);
-        String formatString = context.getCategories() != null && !context.getCategories().isEmpty() ? context.getCategories().get(0).getScoreFormatString()
-                                                            :"%s%s%c%d%c%d%s";
+        String formatString = context.getCategories() != null &&
+                              !context.getCategories().isEmpty() ? context.getCategories().get(0).getScoreFormatString()
+                                                                 :"%s%s%s%d%s%d%s";
         return String.format(formatString,
                              cyclesStr, oldRNGMarker, separator, reactors, separator, symbols, sepFlags(separator));
     }
@@ -83,14 +84,14 @@ public class ScScore implements Score<ScCategory> {
                            m.group("Bflag") != null, m.group("Pflag") != null);
     }
 
-    public String sepFlags(char separator) {
+    public String sepFlags(String separator) {
         return sepFlags(separator, bugged, precognitive);
     }
 
     /**
      * @return <tt>""</tt> or <tt>"/B"</tt> or <tt>"/P"</tt> or <tt>"/BP"</tt>
      */
-    public static String sepFlags(char separator, boolean bugged, boolean precognitive) {
+    public static String sepFlags(String separator, boolean bugged, boolean precognitive) {
         if (bugged || precognitive) {
             String result = String.valueOf(separator);
             if (bugged) result += "B";

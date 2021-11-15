@@ -80,7 +80,7 @@ class OmRedditWikiGenerator(private val reddit: RedditService) : AbstractOmPageG
 
     private fun Pair<OmRecord, List<OmCategory>>?.toMarkdown(): String {
         if (this == null) return ""
-        val score = first.score.toDisplayString(DisplayContext(StringFormat.MARKDOWN, second))
+        val score = first.score.toDisplayString(DisplayContext(StringFormat.REDDIT, second))
         return "${first.displayLink ?.let { "[$score]($it)" } ?: score}${if (second.any { it.name.contains("X") }) "*" else ""}"
     }
 
