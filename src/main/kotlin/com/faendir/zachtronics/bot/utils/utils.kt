@@ -83,10 +83,10 @@ fun <R : Record<C>?, C : Category> SafeEmbedMessageBuilder.embedCategoryRecords(
         SafeEmbedMessageBuilder {
     return addFields(
         records.map { cr -> cr.copy(categories = cr.categories.sortedBy { it as? Comparable<Any> }.toCollection(LinkedHashSet())) }
-            .sortedBy { it.categories.first() as? Comparable<Any> }
+            .sortedBy { it.categories.firstOrNull() as? Comparable<Any> }
             .map { (record, categories) ->
                 EmbedCreateFields.Field.of(
-                    categories.joinToString(", ") { it.displayName },
+                    categories.joinToString(", ") { it.displayName }.nbspIfEmpty(),
                     record?.toDisplayString(DisplayContext(StringFormat.MARKDOWN, categories.toList())) ?: "none",
                     true
                 )

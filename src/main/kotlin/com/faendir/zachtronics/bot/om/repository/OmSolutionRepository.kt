@@ -102,8 +102,9 @@ class OmSolutionRepository(
                     if (submission.displayLink != record.displayLink || record.dataLink == null) {
                         record.remove(archiveScope, leaderboardScope)
                         records.add(newRecord, categories)
+                        unclaimedCategories -= categories
                         result.add(CategoryRecord(record, categories.toSet()))
-                        break
+                        continue
                     } else {
                         return@use SubmitResult.AlreadyPresent()
                     }
@@ -168,7 +169,7 @@ class OmSolutionRepository(
         leaderboardFile.outputStream().buffered().use { json.encodeToStream(record, it) }
         leaderboardScope.add(leaderboardFile)
 
-        return record.copy(dataPath = archiveFile.toPath(), author = author)
+        return record.copy(dataPath = archiveFile.toPath())
     }
 
     private fun OmRecord.remove(archiveScope: GitRepository.ReadWriteAccess, leaderboardScope: GitRepository.ReadWriteAccess) {
