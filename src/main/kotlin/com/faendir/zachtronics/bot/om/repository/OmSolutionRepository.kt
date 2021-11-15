@@ -164,12 +164,11 @@ class OmSolutionRepository(
             displayLink = displayLink,
             dataLink = archive.rawFilesUrl + path.toString().ensurePrefix("/"),
             dataPath = path,
-            author = author,
         )
         leaderboardFile.outputStream().buffered().use { json.encodeToStream(record, it) }
         leaderboardScope.add(leaderboardFile)
 
-        return record.copy(dataPath = archiveFile.toPath())
+        return record.copy(dataPath = archiveFile.toPath(), author = author)
     }
 
     private fun OmRecord.remove(archiveScope: GitRepository.ReadWriteAccess, leaderboardScope: GitRepository.ReadWriteAccess) {
