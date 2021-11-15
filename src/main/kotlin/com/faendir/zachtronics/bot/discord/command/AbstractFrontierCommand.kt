@@ -23,13 +23,13 @@ import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedRecords
-import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import reactor.core.publisher.Mono
 
 abstract class AbstractFrontierCommand<T, C: Category, P : Puzzle, R: Record<C>> : AbstractSubCommand<T>() {
     abstract val repository: SolutionRepository<C, P, *, R>
 
-    override fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void> {
+    override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
         val puzzle = findPuzzle(parameters)
         val records = repository.findCategoryHolders(puzzle, includeFrontier = true)
         return SafeEmbedMessageBuilder()

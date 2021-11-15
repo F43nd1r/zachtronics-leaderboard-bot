@@ -23,13 +23,13 @@ import com.faendir.zachtronics.bot.model.Submission
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
-import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import reactor.core.publisher.Mono
 
 abstract class AbstractArchiveCommand<T, C: Category, S : Submission<C, *>> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
     protected abstract val repository: SolutionRepository<*, *, S, *>
 
-    override fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void> {
+    override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
         val solutions = parseSubmissions(parameters)
         return archiveAll(solutions).send(event)
     }

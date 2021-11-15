@@ -27,7 +27,7 @@ import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScSubmission;
 import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
-import discord4j.core.event.domain.interaction.InteractionCreateEvent;
+import discord4j.core.event.domain.interaction.DeferrableInteractionEvent;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +50,7 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScSubmitCommand.Submi
 
     @NotNull
     @Override
-    public ScSubmission parseSubmission(@NotNull InteractionCreateEvent event, SubmitData parameters) {
+    public ScSubmission parseSubmission(@NotNull DeferrableInteractionEvent event, SubmitData parameters) {
         if (parameters.getExport().equals(parameters.video))
             throw new IllegalArgumentException("Export link and video link cannot be the same link");
         ScSubmission submission = archiveCommand.parseSubmissions(parameters).get(0);

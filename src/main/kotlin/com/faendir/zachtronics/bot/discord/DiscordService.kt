@@ -29,7 +29,7 @@ import discord4j.core.`object`.component.SelectMenu
 import discord4j.core.`object`.presence.ClientActivity
 import discord4j.core.`object`.presence.ClientPresence
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.event.domain.interaction.SelectMenuInteractionEvent
 import discord4j.rest.http.client.ClientException
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -108,7 +108,7 @@ class DiscordService(
         discordClient.updatePresence(ClientPresence.online(ClientActivity.playing(gitProperties.shortCommitId))).subscribe()
     }
 
-    private inline fun <reified T : InteractionCreateEvent> GatewayDiscordClient.subscribeEvent(noinline handle: suspend (T) -> Unit) {
+    private inline fun <reified T : DeferrableInteractionEvent> GatewayDiscordClient.subscribeEvent(noinline handle: suspend (T) -> Unit) {
         val name = T::class.java.simpleName.removeSuffix("InteractionEvent")
         on(T::class.java).flatMap { event ->
             mono {

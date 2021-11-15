@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.discord.command;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
-import discord4j.core.event.domain.interaction.InteractionCreateEvent;
+import discord4j.core.event.domain.interaction.DeferrableInteractionEvent;
 import discord4j.core.object.entity.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +46,7 @@ public class RestartCommand implements TopLevelCommand<RestartCommand.RestartDat
     @SneakyThrows
     @NotNull
     @Override
-    public Mono<Void> handle(@NotNull InteractionCreateEvent event, RestartData parameters) {
+    public Mono<Void> handle(@NotNull DeferrableInteractionEvent event, RestartData parameters) {
         return event.editReply("shutting down, see you soon!").then(Mono.fromCallable(() -> {
             log.error("Requested shut down, see you soon");
             SpringApplication.exit(applicationContext);

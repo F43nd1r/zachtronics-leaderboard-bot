@@ -32,7 +32,7 @@ import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.utils.user
 import com.roxstudio.utils.CUrl
-import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import org.springframework.stereotype.Component
 import java.util.*
@@ -43,7 +43,7 @@ class OmSubmitCommand(override val repository: OmSolutionRepository) : AbstractS
     Secured by OmSecured,
     ApplicationCommandParser<SubmitParams, ApplicationCommandOptionData> by SubmitParamsParser {
 
-    override fun parseSubmission(event: InteractionCreateEvent, parameters: SubmitParams): OmSubmission {
+    override fun parseSubmission(event: DeferrableInteractionEvent, parameters: SubmitParams): OmSubmission {
         val bytes = try {
             CUrl(parameters.solution).exec()
         } catch (e: Exception) {

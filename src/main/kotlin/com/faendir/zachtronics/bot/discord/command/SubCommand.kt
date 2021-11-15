@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.discord4j.command.parse.ApplicationCommandParser
-import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import reactor.core.publisher.Mono
 
@@ -25,7 +25,7 @@ import reactor.core.publisher.Mono
  * @param T dataclass holding the parsed command parameters
  */
 interface SubCommand<T>  : ApplicationCommandParser<T, ApplicationCommandOptionData> {
-    fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void>
+    fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void>
 
     val data: ApplicationCommandOptionData
         get() = buildData()

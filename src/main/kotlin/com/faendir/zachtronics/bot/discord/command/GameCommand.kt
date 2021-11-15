@@ -19,7 +19,7 @@ package com.faendir.zachtronics.bot.discord.command
 import com.faendir.discord4j.command.parse.CombinedParseResult
 import com.faendir.zachtronics.bot.utils.user
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.discordjson.json.ApplicationCommandRequest
 import reactor.core.publisher.Mono
 
@@ -74,9 +74,9 @@ interface GameCommand : TopLevelCommand<GameCommand.SubCommandWithParameters<*>>
         }
     }
 
-    override fun handle(event: InteractionCreateEvent, parameters: SubCommandWithParameters<*>): Mono<Void> = parameters.handle(event)
+    override fun handle(event: DeferrableInteractionEvent, parameters: SubCommandWithParameters<*>): Mono<Void> = parameters.handle(event)
 
     data class SubCommandWithParameters<T>(val subCommand: SubCommand<T>, val parameters: T) {
-        fun handle(event: InteractionCreateEvent) = subCommand.handle(event, parameters)
+        fun handle(event: DeferrableInteractionEvent) = subCommand.handle(event, parameters)
     }
 }

@@ -36,6 +36,7 @@ allprojects {
         mavenLocal()
         mavenCentral()
         google()
+        maven { setUrl("https://oss.sonatype.org/content/repositories/snapshots") }
     }
 
     tasks.withType<KotlinCompile> {

@@ -27,13 +27,13 @@ import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.orEmpty
-import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import reactor.core.publisher.Mono
 
 abstract class AbstractSubmitCommand<T, C : Category, S : Submission<C, *>, R : Record<C>> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
     protected abstract val repository: SolutionRepository<C, *, S, R>
 
-    override fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void> {
+    override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
         val submission = parseSubmission(event, parameters)
         return submitToLeaderboards(submission).send(event)
     }
@@ -72,5 +72,5 @@ abstract class AbstractSubmitCommand<T, C : Category, S : Submission<C, *>, R : 
         }
     }
 
-    abstract fun parseSubmission(event: InteractionCreateEvent, parameters: T): S
+    abstract fun parseSubmission(event: DeferrableInteractionEvent, parameters: T): S
 }

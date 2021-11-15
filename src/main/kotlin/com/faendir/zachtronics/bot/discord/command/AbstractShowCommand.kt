@@ -24,14 +24,14 @@ import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.clear
-import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.spec.MessageCreateFields
 import reactor.core.publisher.Mono
 
 abstract class AbstractShowCommand<T, C : Category, P : Puzzle, R : Record<C>> : AbstractSubCommand<T>() {
     abstract val repository: SolutionRepository<C, P, *, R>
 
-    override fun handle(event: InteractionCreateEvent, parameters: T): Mono<Void> {
+    override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
         val (puzzle, category) = findPuzzleAndCategory(parameters)
         val record = repository.find(puzzle, category)
         return if (record != null) {

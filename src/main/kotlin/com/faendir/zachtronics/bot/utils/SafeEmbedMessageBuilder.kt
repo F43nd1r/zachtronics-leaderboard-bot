@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.utils
 
 import discord4j.core.`object`.entity.channel.MessageChannel
-import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.spec.EmbedCreateFields
 import discord4j.core.spec.EmbedCreateSpec
 import discord4j.rest.util.Color
@@ -118,7 +118,7 @@ class SafeEmbedMessageBuilder {
         }
     }
 
-    fun send(event: InteractionCreateEvent): Mono<Void> = mono {
+    fun send(event: DeferrableInteractionEvent): Mono<Void> = mono {
         val embeds = getEmbeds().toMutableList()
         event.editReply().clear().withEmbedsOrNull(embeds.removeFirst()).awaitSingleOrNull()
         for (embed in embeds) {
