@@ -33,13 +33,13 @@ class SafeEmbedMessageBuilder {
     private var color: Color? = null
 
     fun title(title: String) = apply {
-        val safeTitle = title.truncateWithEllipsis(Limits.TITLE).nbspIfEmpty()
+        val safeTitle = title.truncateWithEllipsis(Limits.TITLE).ifEmptyZeroWidthSpace()
         increaseTotal(safeTitle.length)
         current.title(safeTitle)
     }
 
     fun description(description: String) = apply {
-        val safeDescription = description.truncateWithEllipsis(Limits.DESCRIPTION).nbspIfEmpty()
+        val safeDescription = description.truncateWithEllipsis(Limits.DESCRIPTION).ifEmptyZeroWidthSpace()
         increaseTotal(safeDescription.length)
         current.description(safeDescription)
     }
@@ -48,8 +48,8 @@ class SafeEmbedMessageBuilder {
         if (fields >= Limits.FIELDS) {
             nextBuilder()
         }
-        val safeName = name.truncateWithEllipsis(Limits.FIELD_NAME).nbspIfEmpty()
-        val safeValue = value.truncateWithEllipsis(Limits.FIELD_VALUE).nbspIfEmpty()
+        val safeName = name.truncateWithEllipsis(Limits.FIELD_NAME).ifEmptyZeroWidthSpace()
+        val safeValue = value.truncateWithEllipsis(Limits.FIELD_VALUE).ifEmptyZeroWidthSpace()
         increaseTotal(safeName.length + safeValue.length)
         current.addField(EmbedCreateFields.Field.of(safeName, safeValue, inline))
         fields++
@@ -60,13 +60,13 @@ class SafeEmbedMessageBuilder {
     }
 
     fun footer(footer: String, iconUrl: String? = null) = apply {
-        val safeFooter = footer.truncateWithEllipsis(Limits.FOOTER).nbspIfEmpty()
+        val safeFooter = footer.truncateWithEllipsis(Limits.FOOTER).ifEmptyZeroWidthSpace()
         increaseTotal(safeFooter.length)
         current.footer(safeFooter, iconUrl)
     }
 
     fun author(author: String, url: String? = null, iconUrl: String? = null) = apply {
-        val safeAuthor = author.truncateWithEllipsis(Limits.AUTHOR).nbspIfEmpty()
+        val safeAuthor = author.truncateWithEllipsis(Limits.AUTHOR).ifEmptyZeroWidthSpace()
         increaseTotal(safeAuthor.length)
         current.author(safeAuthor, url, iconUrl)
     }

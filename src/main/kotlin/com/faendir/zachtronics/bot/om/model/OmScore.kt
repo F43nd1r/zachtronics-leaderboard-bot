@@ -34,11 +34,12 @@ data class OmScore(
 ) : Score<OmCategory> {
 
     override fun toDisplayString(context: DisplayContext<OmCategory>): String =
-        ((context.categories?.takeIf { it.isNotEmpty() }?.flatMap { it.requiredParts }?.distinct() ?: OmScorePart.values().toList()).map { it.format(this) } + when {
+        ((context.categories?.takeIf { it.isNotEmpty() }?.flatMap { it.requiredParts }?.distinct() ?: OmScorePart.values()
+            .toList()).map { it.format(this) } + when {
             overlap -> "O"
             trackless -> "T"
             else -> null
-        }).filterNotNull().joinToString(context.separator.toString()) + (
+        }).filterNotNull().joinToString(context.omSeparator) + (
                 context.categories
                     ?.flatMap { it.metrics.toList() }
                     ?.distinct()
@@ -55,3 +56,9 @@ data class OmScore(
         return compares.none { it == null } && compares.none { it!! > 0 } && compares.any { it!! < 0 }
     }
 }
+
+private val DisplayContext<*>.omSeparator
+    get() = when (format) {
+        StringFormat.PLAIN_TEXT, StringFormat.MARKDOWN -> "/\u200B"
+        StringFormat.FILE_NAME -> "-"
+    }
