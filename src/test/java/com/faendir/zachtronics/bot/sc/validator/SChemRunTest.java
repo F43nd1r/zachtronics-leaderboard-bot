@@ -45,8 +45,9 @@ class SChemRunTest {
                 PIPE:1,4,2
                 """;
 
-        SChemResult expected = new SChemResult("QT-1", null, 20, 1, 5, "12345ieee", "s", false, null, null);
         SChemResult result = SChem.run(export);
+        SChemResult expected = new SChemResult("QT-1", null, 20, 1, 5, "12345ieee", "s", false,
+                                               result.getPrecogExplanation(), null);
         assertEquals(expected, result);
 
         export = """
@@ -66,8 +67,9 @@ class SChemRunTest {
                 PIPE:1,4,2
                 """;
 
-        expected = new SChemResult("Tunnels I", new int[]{1, 1, 1}, 20, 1, 6, "12345ieee", null, false, null, null);
         result = SChem.run(export);
+        expected = new SChemResult("Tunnels I", new int[]{1, 1, 1}, 20, 1, 6, "12345ieee", null, false,
+                                   result.getPrecogExplanation(), null);
         assertEquals(expected, result);
     }
 
