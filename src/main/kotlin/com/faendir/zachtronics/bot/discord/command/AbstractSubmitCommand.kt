@@ -50,8 +50,8 @@ abstract class AbstractSubmitCommand<T, C : Category, S : Submission<C, *>, R : 
                     .color(Colors.SUCCESS)
                     .description(
                         "`${submission.score.toDisplayString(DisplayContext(StringFormat.DISCORD, beatenCategories))}`"
-                                + submission.author?.orEmpty(prefix = " by ")
-                                + (result.message?.orEmpty(prefix = "\n"))
+                                + submission.author.orEmpty(prefix = " by ")
+                                + (result.message.orEmpty(prefix = "\n"))
                                 + (if (beatenCategories.isEmpty()) " was included in the pareto frontier." else "")
                                 + (if (result.beatenRecords.isNotEmpty()) "\npreviously:" else "")
                     )
