@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.sc.model;
 
-import com.faendir.zachtronics.bot.model.DisplayContext;
 import lombok.SneakyThrows;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
@@ -109,11 +108,19 @@ public class ScSolutionMetadata {
 
     private String toHeader() {
         String commaDescr = "";
-        if (description != null) {
-            commaDescr = "," + encode(normalizeDescription(description));
+        if (score.isBugged() || score.isPrecognitive()) {
+            commaDescr += score.sepFlags("/");
         }
-        return String.format("SOLUTION:%s,%s,%s%s", encode(puzzle.getDisplayName()), author,
-                             score.toDisplayString(DisplayContext.fileName()), commaDescr);
+        if (description != null) {
+            if (!commaDescr.isEmpty())
+                commaDescr += " ";
+            commaDescr += encode(normalizeDescription(description));
+        }
+        if (!commaDescr.isEmpty()) {
+            commaDescr = "," + commaDescr;
+        }
+        return String.format("SOLUTION:%s,%s,%d-%d-%d%s", encode(puzzle.getDisplayName()), author,
+                             score.getCycles(), score.getReactors(), score.getSymbols(), commaDescr);
     }
 
     public ScSubmission extendToSubmission(String displayLink, String data) {
