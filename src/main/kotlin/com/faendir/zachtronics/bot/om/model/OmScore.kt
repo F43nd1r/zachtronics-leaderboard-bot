@@ -18,8 +18,8 @@ package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.Score
-import com.faendir.zachtronics.bot.model.StringFormat
 import kotlinx.serialization.Serializable
+import kotlin.reflect.full.memberProperties
 
 @Serializable
 data class OmScore(
@@ -48,7 +48,23 @@ data class OmScore(
                     ?.joinToString(separator = ", ", prefix = " (", postfix = ")") ?: ""
                 )
 
-    fun isStrictlyBetter(other: OmScore): Boolean {
+    fun isSupersetOf(other: OmScore): Boolean {
+        var hasMoreData = false
+        for (property in OmScore::class.memberProperties) {
+            val thisValue = property(this)
+            val otherValue = property(other)
+            if (thisValue != otherValue) {
+                if (otherValue == null) {
+                    hasMoreData = true
+                } else {
+                    return false
+                }
+            }
+        }
+        return hasMoreData
+    }
+
+    fun isStrictlyBetterThan(other: OmScore): Boolean {
         if ((overlap && !other.overlap) || (!trackless && other.trackless)) return false
         val compares = OmScorePart.values().map { it.getValue }
             .filter { it(other) != null }

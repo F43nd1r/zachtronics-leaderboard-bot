@@ -37,6 +37,7 @@ import kotlinx.serialization.json.encodeToStream
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import java.io.File
+import java.util.*
 import javax.annotation.PostConstruct
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -47,7 +48,21 @@ class OmSolutionRepository(
     private val pageGenerators: List<AbstractOmPageGenerator>
 ) : SolutionRepository<OmCategory, OmPuzzle, OmSubmission, OmRecord> {
     private val json = Json { prettyPrint = true }
-    private lateinit var data: Map<Puzzle, MutableMap<OmRecord, MutableSet<OmCategory>>>
+    private val recordOrder = Comparator
+        .comparing<OmRecord, Int> {
+            when {
+                it.score.overlap -> 1
+                it.score.trackless -> 0
+                else -> 0
+            }
+        }
+        .thenComparingInt { it.score.cost ?: Int.MAX_VALUE }
+        .thenComparingInt { it.score.cycles ?: Int.MAX_VALUE }
+        .thenComparingInt { it.score.area ?: Int.MAX_VALUE }
+        .thenComparingInt { it.score.instructions ?: Int.MAX_VALUE }
+        .thenComparingInt { it.score.height ?: Int.MAX_VALUE }
+        .thenComparingDouble { it.score.width ?: Double.MAX_VALUE }
+    private lateinit var data: Map<Puzzle, SortedMap<OmRecord, MutableSet<OmCategory>>>
     private var hash: String? = null
 
     @PostConstruct
@@ -62,16 +77,18 @@ class OmSolutionRepository(
     }
 
     private fun loadData(leaderboardScope: GitRepository.ReadAccess, archiveScope: GitRepository.ReadAccess) {
-        data = OmPuzzle.values().associateWith { mutableMapOf() }
+        data = OmPuzzle.values().associateWith { sortedMapOf(recordOrder) }
         for (puzzle in OmPuzzle.values()) {
             val records = data.getValue(puzzle)
             leaderboardScope.getPuzzleDir(puzzle).takeIf { it.exists() }
                 ?.listFiles()
                 ?.map { file -> file.inputStream().buffered().use { json.decodeFromStream<OmRecord>(it) } }
-                ?.forEach { record -> records.add(record.copy(
-                    dataLink = record.dataPath?.let { archive.rawFilesUrl + it.toString().ensurePrefix("/") },
-                    dataPath = record.dataPath?.let { archiveScope.repo.toPath().resolve(it) }
-                ), mutableSetOf()) }
+                ?.forEach { record ->
+                    records.add(record.copy(
+                        dataLink = record.dataPath?.let { archive.rawFilesUrl + it.toString().ensurePrefix("/") },
+                        dataPath = record.dataPath?.let { archiveScope.repo.toPath().resolve(it) }
+                    ), mutableSetOf())
+                }
             if (records.isNotEmpty()) {
                 for (category in OmCategory.values().filter { it.supportsPuzzle(puzzle) }.toMutableSet()) {
                     records.entries.filter { category.supportsScore(it.key.score) }
@@ -98,8 +115,8 @@ class OmSolutionRepository(
             val unclaimedCategories = OmCategory.values().filter { it.supportsPuzzle(submission.puzzle) && it.supportsScore(submission.score) }.toMutableSet()
             val result = mutableListOf<CategoryRecord<OmRecord?, OmCategory>>()
             for ((record, categories) in records.toMap()) {
-                if (submission.score == record.score) {
-                    if (submission.displayLink != record.displayLink || record.dataLink == null) {
+                if (submission.score == record.score || submission.score.isSupersetOf(record.score)) {
+                    if (submission.score.isSupersetOf(record.score) || submission.displayLink != record.displayLink || record.dataLink == null) {
                         record.remove(archiveScope, leaderboardScope)
                         records.add(newRecord, categories)
                         unclaimedCategories -= categories
@@ -109,11 +126,11 @@ class OmSolutionRepository(
                         return@use SubmitResult.AlreadyPresent()
                     }
                 }
-                if (record.score.isStrictlyBetter(submission.score)) {
+                if (record.score.isStrictlyBetterThan(submission.score)) {
                     return@use SubmitResult.NothingBeaten(findCategoryHolders(submission.puzzle, includeFrontier = false))
                 }
                 if (categories.isEmpty()) {
-                    if (submission.score.isStrictlyBetter(record.score)) {
+                    if (submission.score.isStrictlyBetterThan(record.score)) {
                         record.remove(archiveScope, leaderboardScope)
                         records.add(newRecord, mutableSetOf())
                         result.add(CategoryRecord(record, emptySet()))
@@ -127,7 +144,7 @@ class OmSolutionRepository(
                     }.toSet()
                     if (beatenCategories.isNotEmpty()) {
                         categories -= beatenCategories
-                        if (categories.isEmpty() && submission.score.isStrictlyBetter(record.score)) {
+                        if (categories.isEmpty() && submission.score.isStrictlyBetterThan(record.score)) {
                             record.remove(archiveScope, leaderboardScope)
                         }
                         records.add(newRecord, beatenCategories.toMutableSet())

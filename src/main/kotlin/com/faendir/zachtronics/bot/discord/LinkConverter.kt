@@ -24,8 +24,6 @@ import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.reaction.ReactionEmoji
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import reactor.core.publisher.Flux
-import java.net.HttpURLConnection
-import java.net.URL
 import java.time.Instant
 
 class LinkConverter : OptionConverter<String, String> {
@@ -33,15 +31,7 @@ class LinkConverter : OptionConverter<String, String> {
         return findLink(
             value.trim(),
             context.interaction.channel.flatMapMany { it.getMessagesBefore(it.lastMessageId.orElseGet { Snowflake.of(Instant.now()) }) }
-                .filter { it.author.isPresent && it.author.get() == context.interaction.user }
-                .onErrorMap {
-                    //TODO remove when threads are supported
-                    if (it is UnsupportedOperationException) {
-                        IllegalArgumentException("mX arguments are not supported in threads.", it)
-                    } else {
-                        it
-                    }
-                })
+                .filter { it.author.isPresent && it.author.get() == context.interaction.user })
     }
 
     private fun findLink(input: String, messages: Flux<Message>): SingleParseResult<String> {
@@ -57,7 +47,7 @@ class LinkConverter : OptionConverter<String, String> {
         } else {
             input
         }
-        if(!isValidLink(link) ){
+        if (!isValidLink(link)) {
             return SingleParseResult.Failure("\"$link\" is not a valid link")
         }
         return SingleParseResult.Success(link)
