@@ -50,7 +50,7 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScSubmitCommand.Submi
 
     @NotNull
     @Override
-    public ScSubmission parseSubmission(@NotNull DeferrableInteractionEvent event, SubmitData parameters) {
+    public ScSubmission parseSubmission(@NotNull DeferrableInteractionEvent event, @NotNull SubmitData parameters) {
         if (parameters.getExport().equals(parameters.video))
             throw new IllegalArgumentException("Export link and video link cannot be the same link");
         ScSubmission submission = archiveCommand.parseSubmissions(parameters).get(0);

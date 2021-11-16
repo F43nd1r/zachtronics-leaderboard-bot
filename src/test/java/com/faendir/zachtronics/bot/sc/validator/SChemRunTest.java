@@ -21,8 +21,7 @@ import com.faendir.zachtronics.bot.BotTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @BotTest(Application.class)
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
@@ -46,7 +45,7 @@ class SChemRunTest {
                 PIPE:1,4,2
                 """;
 
-        SChemResult expected = new SChemResult("QT-1", null, 20, 1, 5, "12345ieee", "s", false);
+        SChemResult expected = new SChemResult("QT-1", null, 20, 1, 5, "12345ieee", "s", false, null, null);
         SChemResult result = SChem.run(export);
         assertEquals(expected, result);
 
@@ -67,7 +66,7 @@ class SChemRunTest {
                 PIPE:1,4,2
                 """;
 
-        expected = new SChemResult("Tunnels I", new int[]{1, 1, 1}, 20, 1, 6, "12345ieee", null, false);
+        expected = new SChemResult("Tunnels I", new int[]{1, 1, 1}, 20, 1, 6, "12345ieee", null, false, null, null);
         result = SChem.run(export);
         assertEquals(expected, result);
     }
@@ -101,7 +100,8 @@ class SChemRunTest {
                 PIPE:0,4,1
                 PIPE:1,4,2
                 """; // we're missing: MEMBER:'instr-grab',-1,1,32,2,1,0,0
-        assertThrows(SChemException.class, () -> SChem.run(export));
+        SChemResult result = SChem.run(export);
+        assertNotNull(result.getError());
     }
 
     @Test
@@ -128,7 +128,8 @@ class SChemRunTest {
                 PIPE:0,4,1
                 PIPE:1,4,2
                 """; // we've messed up the cycles count
-        assertThrows(SChemException.class, () -> SChem.run(export));
+        SChemResult result = SChem.run(export);
+        assertNotNull(result.getError());
     }
 
     @Test
@@ -209,9 +210,11 @@ class SChemRunTest {
                 PIPE:1,4,2
                 """;
 
-        SChemResult expected = new SChemResult("Freon", new int[]{1, 10, 2}, 112, 1, 63, "Archiver",
-                                               "/P Archived Solution", true);
         SChemResult result = SChem.run(export);
+        SChemResult expected = new SChemResult("Freon", new int[]{1, 10, 2}, 112, 1, 63, "Archiver",
+                                               "/P Archived Solution",
+                                               // no need to care about the specific precog details
+                                               true, result.getPrecogExplanation(), null);
         assertEquals(expected, result);
     }
 }

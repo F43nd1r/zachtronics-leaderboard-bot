@@ -75,12 +75,17 @@ public enum ScCategory implements Category {
         static final Comparator<ScScore> comparatorSRC = makeComparator3(ScScore::getSymbols, ScScore::getReactors, ScScore::getCycles);
         static final Comparator<ScScore> comparatorRCS = makeComparator3(ScScore::getReactors, ScScore::getCycles, ScScore::getSymbols);
         static final Comparator<ScScore> comparatorRSC = makeComparator3(ScScore::getReactors, ScScore::getSymbols, ScScore::getCycles);
+
+        private ScScoreComparators() {}
     }
 
     static class ScScoreFormatStrings {
+        static final String F000 = "%s%s%s%d%s%d%s";
         static final String F100 = "**%s**%s%s%d%s%d%s";
         static final String F001 = "%s%s%s%d%s**%d**%s";
         static final String F110 = "**%s**%s%s**%d**%s%d%s";
         static final String F011 = "%s%s%s**%d**%s**%d**%s";
+
+        private ScScoreFormatStrings() {}
     }
 }

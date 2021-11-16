@@ -40,7 +40,8 @@ interface Record<C : Category> {
         return when (context.format) {
             StringFormat.DISCORD, StringFormat.REDDIT -> {
                 val scoreAndAuthor = score.toDisplayString(context) + author.orEmpty(prefix = " ")
-                dataLink.orEmpty(prefix = "[\uD83D\uDCC4](", suffix = ") ") + (displayLink?.let { "[$scoreAndAuthor]($it)" } ?: scoreAndAuthor)
+                dataLink.orEmpty(prefix = "[\uD83D\uDCC4](", suffix = ") ") +  // 📄
+                        (displayLink?.let { "[$scoreAndAuthor]($it)" } ?: scoreAndAuthor)
             }
             else -> score.toDisplayString(context) + author.orEmpty(prefix = " by ") + displayLink.orEmpty(prefix = " ")
         }

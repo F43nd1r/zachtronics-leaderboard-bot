@@ -18,14 +18,17 @@ package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Score;
+import com.faendir.zachtronics.bot.model.StringFormat;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Value
 public class ScScore implements Score<ScCategory> {
@@ -52,9 +55,15 @@ public class ScScore implements Score<ScCategory> {
         String separator = context.getSeparator();
         String cyclesStr = cycles >= 100000 ? NumberFormat.getNumberInstance(Locale.ROOT).format(cycles)
                                             : Integer.toString(cycles);
-        String formatString = context.getCategories() != null &&
-                              !context.getCategories().isEmpty() ? context.getCategories().get(0).getScoreFormatString()
-                                                                 :"%s%s%s%d%s%d%s";
+        String formatString = ScCategory.ScScoreFormatStrings.F000;
+        if (context.getFormat() == StringFormat.REDDIT && context.getCategories() != null) {
+            Set<String> formatStrings = context.getCategories().stream()
+                                               .map(ScCategory::getScoreFormatString)
+                                               .collect(Collectors.toSet());
+            if (formatStrings.size() == 1)
+                formatString = formatStrings.iterator().next();
+        }
+
         return String.format(formatString,
                              cyclesStr, oldRNGMarker, separator, reactors, separator, symbols, sepFlags(separator));
     }

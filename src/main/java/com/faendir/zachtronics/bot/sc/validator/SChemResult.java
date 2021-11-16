@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- <tt>{
+ <pre>{
  "level_name": "Fuming Nitric Acid",
  "resnet_id": [3, 7, 2], # null for main game
  "cycles": 115,
@@ -31,8 +31,10 @@ import org.jetbrains.annotations.Nullable;
  "symbols": 6,
  "author": "12345ieee",
  "solution_name": "s",
- "precog": false
- }</tt>
+ "precog": false,
+ "precogExplanation": "PrecogError(\"Solution is precognitive;...",
+ "error": "ReactionError(\"Cycle 209: Reactor 1: Collision between molecules.\")"
+ }</pre>
  */
 @Value
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
@@ -45,4 +47,6 @@ public class SChemResult {
     @NotNull String author;
     @Nullable String solutionName;
     @Nullable Boolean precog;
+    @Nullable String precogExplanation;
+    @Nullable String error;
 }

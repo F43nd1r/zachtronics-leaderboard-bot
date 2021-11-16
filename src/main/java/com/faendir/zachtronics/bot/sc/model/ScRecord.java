@@ -50,9 +50,8 @@ public class ScRecord implements Record<ScCategory> {
      */
     @NotNull
     public String toDisplayString(@NotNull DisplayContext<ScCategory> context, String reactorPrefix) {
+        String scoreAuthor = String.format("(%s) %s", score.toDisplayString(context, oldVideoRNG ? "\\*" : ""), author);
         return (dataLink != null ? "[\uD83D\uDCC4](" + dataLink + ") " : "") +  // 📄
-               String.format("%s[(%s) %s](%s)", reactorPrefix,
-                             score.toDisplayString(context, oldVideoRNG ? "\\*" : ""),
-                             author, displayLink != null ? displayLink : "");
+               reactorPrefix + (displayLink != null ? "[" + scoreAuthor + "](" + displayLink + ")" : scoreAuthor);
     }
 }

@@ -21,6 +21,7 @@ import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.discord.command.GameCommand;
 import com.faendir.zachtronics.bot.discord.command.SubCommand;
+import com.faendir.zachtronics.bot.model.StringFormat;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
@@ -79,7 +80,9 @@ public class SubCommandTest {
         Map<String, String> args = Map.of("puzzle", "OPAS");
         String result = runCommand("frontier", args); // 9 frontier scores, 2 holding categories
         assertTrue(result.contains("Pancakes"));
-        assertEquals(9, StringUtils.countMatches(result, "](")); // 📄
+        assertEquals(9, StringUtils.countMatches(result, "/1/"));
+        assertEquals(2, StringUtils.countMatches(result, "]("));
+        assertEquals(0, StringUtils.countMatches(result, "[\uD83D\uDCC4]"));
 
         args = Map.of("puzzle", "Fission I");
         result = runCommand("frontier", args); // 2 valid files
@@ -202,7 +205,9 @@ public class SubCommandTest {
                                                                   d.accept(footer.text());
                                                           })),
                                                   editSpec.files().stream().map(MessageCreateFields.File::name))
-                              .flatMap(Function.identity()).collect(Collectors.joining("\n"));
+                              .flatMap(Function.identity())
+                              .map(s -> s.replace(StringFormat.DISCORD.getSeparator(), "/"))
+                              .collect(Collectors.joining("\n"));
         System.out.println(result);
         return result;
     }

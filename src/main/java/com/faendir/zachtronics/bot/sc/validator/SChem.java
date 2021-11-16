@@ -83,6 +83,34 @@ public class SChem {
     static ScSolutionMetadata validate(@NotNull String export) throws SChemException {
         SChemResult result = run(export);
 
+        // TODO make multisol work
+        if (result.getError() != null)
+            throw new SChemException(result.getError());
+
+        ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), false,
+                                    result.getPrecog() != null && result.getPrecog());
+
+        boolean declaresBugged = false;
+        boolean declaresPrecog = false;
+        if (result.getSolutionName() != null) {
+            Matcher m = ScSolutionMetadata.SOLUTION_NAME_REGEX.matcher(result.getSolutionName());
+            if (!m.matches()) {
+                throw new SChemException("Invalid solution name: \"" + result.getSolutionName() + "\"");
+            }
+            declaresBugged = m.group("Bflag") != null;
+            declaresPrecog = m.group("Pflag") != null;
+        }
+
+        // check if the user is lying:
+        // we know the score isn't bugged because SChem ran it and we can check SChem's precog opinion
+        if (declaresBugged || (result.getPrecog() != null && declaresPrecog != result.getPrecog())) {
+            throw new SChemException("Incoherent solution flags, given " +
+                                     "\"" + ScScore.sepFlags("/", declaresBugged, declaresPrecog) + "\"" +
+                                     " but SChem wanted \"" + score.sepFlags("/") + "\"\n" +
+                                     "SChem reports the following precognition analysis:\n" +
+                                     result.getPrecogExplanation());
+        }
+
         SingleParseResult<ScPuzzle> puzzleParseResult = ScPuzzle.parsePuzzle(result.getLevelName());
         if (!(puzzleParseResult instanceof SingleParseResult.Success) && result.getResnetId() != null) {
             puzzleParseResult = ScPuzzle.parsePuzzle(result.getLevelName() +
@@ -91,16 +119,13 @@ public class SChem {
         }
         ScPuzzle puzzle = puzzleParseResult.orElseThrow();
 
-        ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), false,
-                                    result.getPrecog() != null && result.getPrecog());
-
         return new ScSolutionMetadata(puzzle, result.getAuthor(), score, result.getSolutionName());
     }
 
     @NotNull
     static SChemResult run(@NotNull String export) throws SChemException {
         ProcessBuilder builder = new ProcessBuilder();
-        builder.command("python3", "-m", "schem", "--json", "--check-precog", "--verbose");
+        builder.command("python3", "-m", "schem", "--json", "--check-precog");
 
         try {
             Process process = builder.start();
@@ -112,36 +137,7 @@ public class SChem {
                 throw new SChemException(new String(process.getErrorStream().readAllBytes()));
             }
 
-            SChemResult result = objectMapper.readValue(process.getInputStream(), SChemResult.class);
-
-            if (result.getCycles() == 0)
-                throw new SChemException(new String(process.getErrorStream().readAllBytes()));
-
-            boolean declaresBugged = false;
-            boolean declaresPrecog = false;
-            if (result.getSolutionName() != null) {
-                Matcher m = ScSolutionMetadata.SOLUTION_NAME_REGEX.matcher(result.getSolutionName());
-                if (!m.matches()) {
-                    throw new SChemException("Invalid solution name: \"" + result.getSolutionName() + "\"");
-                }
-                declaresBugged = m.group("Bflag") != null;
-                declaresPrecog = m.group("Pflag") != null;
-            }
-
-            // check if the user is lying:
-            // we know the score isn't bugged because SChem ran it and we can check SChem's precog opinion
-            if (declaresBugged || (result.getPrecog() != null && declaresPrecog != result.getPrecog())) {
-                String declaredScore = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(),
-                                                   declaresBugged, declaresPrecog).toDisplayString();
-                String schemScore = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(),
-                                                false, Boolean.TRUE.equals(result.getPrecog())).toDisplayString();
-                throw new SChemException("Incoherent solution flags, given " + declaredScore +
-                                         " but SChem wanted " + schemScore + "\n" +
-                                         "SChem reports the following precognition analysis:\n" +
-                                         new String(process.getErrorStream().readAllBytes()).trim());
-            }
-
-            return result;
+            return objectMapper.readValue(process.getInputStream(), SChemResult.class);
 
         } catch (JsonProcessingException e) {
             throw new SChemException("Error in reading back results", e);
