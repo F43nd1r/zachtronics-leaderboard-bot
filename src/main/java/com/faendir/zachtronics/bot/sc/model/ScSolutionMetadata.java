@@ -33,6 +33,7 @@ public class ScSolutionMetadata {
     @NotNull ScPuzzle puzzle;
     @NotNull String author;
     @NotNull ScScore score;
+    /** Contains flags at start if any */
     String description;
 
     public static final Pattern SOLUTION_NAME_REGEX = Pattern.compile("'?(?:[/-](?<Bflag>B)?(?<Pflag>P)?(?:$| ))?.*'?");
@@ -108,16 +109,8 @@ public class ScSolutionMetadata {
 
     private String toHeader() {
         String commaDescr = "";
-        if (score.isBugged() || score.isPrecognitive()) {
-            commaDescr += score.sepFlags("/");
-        }
         if (description != null) {
-            if (!commaDescr.isEmpty())
-                commaDescr += " ";
-            commaDescr += encode(normalizeDescription(description));
-        }
-        if (!commaDescr.isEmpty()) {
-            commaDescr = "," + commaDescr;
+            commaDescr = "," + encode(normalizeDescription(description));
         }
         return String.format("SOLUTION:%s,%s,%d-%d-%d%s", encode(puzzle.getDisplayName()), author,
                              score.getCycles(), score.getReactors(), score.getSymbols(), commaDescr);

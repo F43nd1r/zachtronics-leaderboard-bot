@@ -76,6 +76,14 @@ class ScSolutionMetadataTest {
         assertBreaks("SOLUTION:Of Pancakes and Spaceships,12345ieee,0-0-0,way too fast\nstuff...");
     }
 
+    @Test
+    public void testExtendToSubmission() {
+        String data = "SOLUTION:Yellowcake,whoever314,10288-1-97,/P\nstuff...";
+        ScSolutionMetadata solutionMetadata = ScSolutionMetadata.fromHeader(data, null);
+        ScSubmission submission = solutionMetadata.extendToSubmission(null, data);
+        assertEquals(data, submission.getData());
+    }
+
     private static void assertBreaks(String content) {
         assertThrows(IllegalArgumentException.class, () -> ScSolutionMetadata.fromHeader(content, null));
     }
