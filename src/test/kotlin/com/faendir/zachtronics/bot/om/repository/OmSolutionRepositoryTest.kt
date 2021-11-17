@@ -183,7 +183,7 @@ class OmSolutionRepositoryTest {
     @Test
     fun `data survives reload`() {
         repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, OmScore(cost = 10, cycles = 20, area =30), displayLink = "https://some.gif"))
-        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, OmScore(cost = 30, cycles = 20, area =10)))
+        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, OmScore(cost = 30, cycles = 22, area =10)))
         repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, OmScore(cost = 25, cycles = 25, area =25)))
         repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, OmScore(cost = 5, cycles = 5, area =5, overlap = true)))
         repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, OmScore(cost = 50, cycles = 50, area =15, trackless = true)))
