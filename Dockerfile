@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-bullseye as builder
+FROM openjdk:18-jdk-bullseye as builder
 RUN apt-get update && apt-get install -y python3-pip
 RUN pip install --prefix=/python -r https://raw.githubusercontent.com/spacechem-community-developers/SChem/main/schem/minimal-requirements.txt
 RUN pip install --prefix=/python --no-dependencies schem==0.21.*
@@ -7,7 +7,7 @@ ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
 
-FROM openjdk:17-jdk-bullseye
+FROM openjdk:18-jdk-bullseye
 WORKDIR application
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg
 COPY --from=builder /python /root/.local
