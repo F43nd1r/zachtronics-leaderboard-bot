@@ -4,5 +4,6 @@
   "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
   "onboarding": false,
   "platform": "github",
-  "dependencyDashboard": false
+  "dependencyDashboard": false,
+  "repositories": ["F43nd1r/zachtronics-leaderboard-bot"]
 }
