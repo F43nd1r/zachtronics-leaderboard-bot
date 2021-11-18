@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.om.discord
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand
+import com.faendir.discord4j.command.annotation.AutoComplete
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
 import com.faendir.discord4j.command.parse.CombinedParseResult
@@ -26,6 +27,7 @@ import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
+import discord4j.core.event.domain.interaction.ChatInputAutoCompleteEvent
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import org.springframework.stereotype.Component
 
@@ -40,6 +42,8 @@ class OmShowCommand(override val repository: OmSolutionRepository) :
     }
 
     override fun buildData() = ShowParser.buildData()
+
+    override fun autoComplete(event: ChatInputAutoCompleteEvent) = ShowParser.autoComplete(event)
 
     override fun map(parameters: Map<String, Any?>): Pair<OmPuzzle, OmCategory>? {
         return ShowParser.map(parameters)?.toPuzzleCategoryPair()
@@ -77,8 +81,10 @@ class OmShowCommand(override val repository: OmSolutionRepository) :
 data class Show(
     @Description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")
     @Converter(PuzzleConverter::class)
+    @AutoComplete(PuzzleAutoCompletionProvider::class)
     val puzzle: OmPuzzle,
     @Description("Category. E.g. `GC`, `sum`")
+    @AutoComplete(CategoryAutoCompletionProvider::class)
     val category: String
 )
 

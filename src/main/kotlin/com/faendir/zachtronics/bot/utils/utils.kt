@@ -27,6 +27,7 @@ import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import discord4j.core.`object`.entity.User
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
+import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.core.spec.EmbedCreateFields
 import discord4j.core.spec.EmbedCreateSpec
 import discord4j.core.spec.InteractionReplyEditMono
@@ -114,7 +115,7 @@ fun <R : Record<C>?, C : Category> SafeEmbedMessageBuilder.embedRecords(
     )
 }
 
-fun DeferrableInteractionEvent.user(): User =
+fun InteractionCreateEvent.user(): User =
     this.interaction.member.map { it as User }.orElse(this.interaction.user)
 
 fun InteractionReplyEditMono.clear() = withContentOrNull(null).withComponentsOrNull(null).withEmbedsOrNull(null)

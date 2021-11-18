@@ -16,11 +16,13 @@
 
 package com.faendir.discord4j.command.parser.parameter
 
+import com.faendir.discord4j.command.annotation.AutoComplete
 import com.faendir.discord4j.command.annotation.Description
 import com.faendir.discord4j.command.annotation.Name
 import com.faendir.discord4j.command.annotation.Required
 import com.faendir.discord4j.command.parser.asTypeName
 import com.faendir.discord4j.command.parser.findAnnotationProperty
+import com.faendir.discord4j.command.parser.findAnnotationTypeProperty
 import com.faendir.discord4j.command.parser.hasAnnotation
 import com.faendir.discord4j.command.parser.hasAnnotationWithName
 import com.google.devtools.ksp.symbol.KSValueParameter
@@ -47,6 +49,7 @@ abstract class Parameter(private val parameter: KSValueParameter, private val in
     }
     val typeName = type.asTypeName().copy(nullable = !isRequired)
     val name = parameter.findAnnotationProperty(Name::value) ?: (parameter.name?.asString() ?: "var$index").toKebabCase()
+    val autoCompletionProvider = parameter.findAnnotationTypeProperty(AutoComplete::value)
 
     abstract val optionType: ApplicationCommandOption.Type
 
@@ -57,6 +60,9 @@ abstract class Parameter(private val parameter: KSValueParameter, private val in
         add(".description(%S)\n", parameter.findAnnotationProperty(Description::value) ?: name)
         if (isRequired) {
             add(".required(true)\n")
+        }
+        if(autoCompletionProvider != null) {
+            add(".autocomplete(true)\n")
         }
         add(".type(%T.Type.%L.value)\n", ApplicationCommandOption::class, optionType.name)
         modifyDataBuilder()

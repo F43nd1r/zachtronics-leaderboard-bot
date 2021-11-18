@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package com.faendir.discord4j.command.parse
+package com.faendir.discord4j.command.annotation
 
-import discord4j.core.event.domain.interaction.ChatInputAutoCompleteEvent
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.discordjson.json.ApplicationCommandOptionChoiceData
+import com.faendir.discord4j.command.parse.AutoCompletionProvider
+import kotlin.reflect.KClass
 
-interface ApplicationCommandParser<T, D> {
-    fun buildData(): D
-    fun map(parameters: Map<String, Any?>): T?
-    fun parse(event: ChatInputInteractionEvent): CombinedParseResult<T>
-    fun autoComplete(event: ChatInputAutoCompleteEvent) : List<ApplicationCommandOptionChoiceData>?
-}
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.VALUE_PARAMETER)
+annotation class AutoComplete(val value: KClass<out AutoCompletionProvider>)

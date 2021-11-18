@@ -18,8 +18,10 @@ package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.discord4j.command.parse.CombinedParseResult
 import com.faendir.zachtronics.bot.utils.user
+import discord4j.core.event.domain.interaction.ChatInputAutoCompleteEvent
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
+import discord4j.discordjson.json.ApplicationCommandOptionChoiceData
 import discord4j.discordjson.json.ApplicationCommandRequest
 import reactor.core.publisher.Mono
 
@@ -38,6 +40,12 @@ interface GameCommand : TopLevelCommand<GameCommand.SubCommandWithParameters<*>>
             request.addOption(command.data)
         }
         return request.build()
+    }
+
+    override fun autoComplete(event: ChatInputAutoCompleteEvent): List<ApplicationCommandOptionChoiceData>? {
+        val option = event.options.first()
+        val subCommand = subCommands.find { it.data.name() == option.name } ?: return null
+        return subCommand.autoComplete(event)
     }
 
     override fun map(parameters: Map<String, Any?>): SubCommandWithParameters<*>? {

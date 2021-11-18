@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.faendir.discord4j.command.parse
+package com.faendir.zachtronics.bot.om.discord
 
-import discord4j.core.event.domain.interaction.ChatInputAutoCompleteEvent
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.discordjson.json.ApplicationCommandOptionChoiceData
+import com.faendir.discord4j.command.parse.AutoCompletionProvider
+import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.utils.fuzzyMatch
 
-interface ApplicationCommandParser<T, D> {
-    fun buildData(): D
-    fun map(parameters: Map<String, Any?>): T?
-    fun parse(event: ChatInputInteractionEvent): CombinedParseResult<T>
-    fun autoComplete(event: ChatInputAutoCompleteEvent) : List<ApplicationCommandOptionChoiceData>?
+class PuzzleAutoCompletionProvider : AutoCompletionProvider {
+    private val list = OmPuzzle.values().toList()
+    override fun autoComplete(partial: String): List<String> {
+        return list.fuzzyMatch(partial) { displayName }.map { it.displayName }
+    }
 }

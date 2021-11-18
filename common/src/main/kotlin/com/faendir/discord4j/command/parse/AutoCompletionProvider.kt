@@ -16,13 +16,6 @@
 
 package com.faendir.discord4j.command.parse
 
-import discord4j.core.event.domain.interaction.ChatInputAutoCompleteEvent
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.discordjson.json.ApplicationCommandOptionChoiceData
-
-interface ApplicationCommandParser<T, D> {
-    fun buildData(): D
-    fun map(parameters: Map<String, Any?>): T?
-    fun parse(event: ChatInputInteractionEvent): CombinedParseResult<T>
-    fun autoComplete(event: ChatInputAutoCompleteEvent) : List<ApplicationCommandOptionChoiceData>?
+interface AutoCompletionProvider {
+    fun autoComplete(partial: String) : List<String>
 }

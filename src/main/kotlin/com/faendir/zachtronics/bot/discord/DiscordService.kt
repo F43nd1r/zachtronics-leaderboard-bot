@@ -28,6 +28,7 @@ import discord4j.core.`object`.component.ActionRow
 import discord4j.core.`object`.component.SelectMenu
 import discord4j.core.`object`.presence.ClientActivity
 import discord4j.core.`object`.presence.ClientPresence
+import discord4j.core.event.domain.interaction.ChatInputAutoCompleteEvent
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.event.domain.interaction.SelectMenuInteractionEvent
@@ -82,7 +83,7 @@ class DiscordService(
             .subscribe()
         discordClient.subscribeEvent<ChatInputInteractionEvent> { event ->
             event.deferReply().awaitSingleOrNull()
-            val command = findCommand(event)
+            val command = findCommand(event.commandName)
             if (command is Secured && !command.hasExecutionPermission(event.user())) {
                 throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
             }
@@ -104,6 +105,16 @@ class DiscordService(
                 event.reply("**Failed**: Unknown interaction. Please resend your original command.").withEphemeral(true).awaitSingleOrNull()
             }
         }
+        discordClient.on(ChatInputAutoCompleteEvent::class.java) { event ->
+            mono {
+                val command = findCommand(event.commandName)
+                if (command is Secured && !command.hasExecutionPermission(event.user())) {
+                    throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
+                }
+                event.respondWithSuggestions(command.autoComplete(event)?.takeIf { it.size <= 25 } ?: emptyList()).awaitSingleOrNull()
+                logger.info("Autocompleted ${event.commandName} by ${event.interaction.user.username}")
+            }
+        }.subscribe()
         logger.info("Connected to discord with version ${gitProperties.shortCommitId}")
         discordClient.updatePresence(ClientPresence.online(ClientActivity.playing(gitProperties.shortCommitId))).subscribe()
     }
@@ -167,8 +178,7 @@ class DiscordService(
         }))
     }
 
-    private fun findCommand(event: ChatInputInteractionEvent): TopLevelCommand<*> {
-        val name = event.commandName
+    private fun findCommand(name: String): TopLevelCommand<*> {
         return commands.find { it.commandName == name } ?: throw IllegalArgumentException("I did not recognize the game \"$name\".")
     }
 

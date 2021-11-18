@@ -40,7 +40,9 @@ import com.squareup.kotlinpoet.STAR
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.asClassName
 import discord4j.core.`object`.command.ApplicationCommandOption
+import discord4j.core.event.domain.interaction.ChatInputAutoCompleteEvent
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
+import discord4j.discordjson.json.ApplicationCommandOptionChoiceData
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import discord4j.discordjson.json.ApplicationCommandRequest
 import io.github.enjoydambience.kotlinbard.`if`
@@ -151,6 +153,23 @@ class Generator(
                             }
                             add("return %T.combine(results)·{ map(it)!! }", CombinedParseResult::class)
                         }
+                    }
+                }
+                addFunction("autoComplete") {
+                    addModifiers(KModifier.OVERRIDE)
+                    returns(List::class.parameterizedBy(ApplicationCommandOptionChoiceData::class).nullable)
+                    addParameter("event", ChatInputAutoCompleteEvent::class)
+                    addCode {
+                        addStatement("val option = event.focusedOption")
+                        for(parameter in parameters) {
+                            parameter.autoCompletionProvider?.let {
+                               `if`("option.name == %S", parameter.name) {
+                                   addStatement("return %T().autoComplete(option.value.orElse(null)?.asString() ?: \"\").map·{ %T.builder().name(it).value(it).build() }",
+                                   it.asClassName(), ApplicationCommandOptionChoiceData::class)
+                               }
+                            }
+                        }
+                        addStatement("return null")
                     }
                 }
             }

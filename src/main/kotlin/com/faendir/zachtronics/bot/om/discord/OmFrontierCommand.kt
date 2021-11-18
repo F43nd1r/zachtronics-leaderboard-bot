@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.om.discord
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand
+import com.faendir.discord4j.command.annotation.AutoComplete
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
 import com.faendir.discord4j.command.parse.ApplicationCommandParser
@@ -41,5 +42,6 @@ class OmFrontierCommand(override val repository: SolutionRepository<OmCategory, 
 data class FrontierCommand(
     @Description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")
     @Converter(PuzzleConverter::class)
+    @AutoComplete(PuzzleAutoCompletionProvider::class)
     val puzzle: OmPuzzle
 )
