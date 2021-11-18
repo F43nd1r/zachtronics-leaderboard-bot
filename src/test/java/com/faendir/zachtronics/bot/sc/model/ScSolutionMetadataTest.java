@@ -78,10 +78,15 @@ class ScSolutionMetadataTest {
 
     @Test
     public void testExtendToSubmission() {
-        String data = "SOLUTION:Yellowcake,whoever314,10288-1-97,/P\nstuff...";
-        ScSolutionMetadata solutionMetadata = ScSolutionMetadata.fromHeader(data, null);
-        ScSubmission submission = solutionMetadata.extendToSubmission(null, data);
-        assertEquals(data, submission.getData());
+        String[] headers = {"SOLUTION:Yellowcake,whoever314,10288-1-97,/P\nstuff...",
+                            "SOLUTION:Vitamin B3,Andy,2174-5-222\nstuff..."};
+        ScPuzzle[] puzzles = {null, ScPuzzle.published_42_3};
+        for (int i = 0; i < headers.length; i++) {
+            String header = headers[i];
+            ScSolutionMetadata solutionMetadata = ScSolutionMetadata.fromHeader(header, puzzles[i]);
+            ScSubmission submission = solutionMetadata.extendToSubmission(null, header);
+            assertEquals(header, submission.getData());
+        }
     }
 
     private static void assertBreaks(String content) {

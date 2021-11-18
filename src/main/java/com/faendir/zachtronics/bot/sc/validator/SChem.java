@@ -112,7 +112,7 @@ public class SChem {
         }
 
         SingleParseResult<ScPuzzle> puzzleParseResult = ScPuzzle.parsePuzzle(result.getLevelName());
-        if (!(puzzleParseResult instanceof SingleParseResult.Success) && result.getResnetId() != null) {
+        if (puzzleParseResult instanceof SingleParseResult.Ambiguous && result.getResnetId() != null) {
             puzzleParseResult = ScPuzzle.parsePuzzle(result.getLevelName() +
                                                      Arrays.stream(result.getResnetId()).mapToObj(Integer::toString)
                                                            .collect(Collectors.joining("-", " (", ")")));

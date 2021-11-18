@@ -112,7 +112,8 @@ public class ScSolutionMetadata {
         if (description != null) {
             commaDescr = "," + encode(normalizeDescription(description));
         }
-        return String.format("SOLUTION:%s,%s,%d-%d-%d%s", encode(puzzle.getDisplayName()), author,
+        return String.format("SOLUTION:%s,%s,%d-%d-%d%s",
+                             encode(puzzle.getDisplayName().replaceFirst(" \\(.-.-.\\)", "")), author,
                              score.getCycles(), score.getReactors(), score.getSymbols(), commaDescr);
     }
 
