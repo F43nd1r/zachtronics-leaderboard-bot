@@ -147,7 +147,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     }
 
     @NotNull
-    private Map<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> getRbcMap(
+    private SortedMap<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> getRbcMap(
             @NotNull ScPuzzle puzzle, @NotNull Path repoPath) {
         Path puzzlePath = repoPath.resolve(relativePuzzlePath(puzzle));
         ScSolutionsIndex solutionsIndex;
@@ -158,9 +158,10 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         }
 
         // TODO put categories in archive, so we can filter sooner and do the author right
-        Map<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> rbcMap = new LinkedHashMap<>();
+        SortedMap<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> rbcMap = new TreeMap<>(
+                ScSolutionsIndex.COMPARATOR);
         for (ScScore score : solutionsIndex.getScores()) {
-            ScRecord.ScRecordBuilder builder = ScRecord.builder().puzzle(puzzle).score(score).author("");
+            ScRecord.ScRecordBuilder builder = ScRecord.builder().puzzle(puzzle).score(score);
             String filename = makeScoreFilename(score);
             Path path = puzzlePath.resolve(filename);
             if (Files.exists(path)) {
@@ -174,7 +175,9 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     @NotNull
     private SubmitResult<ScRecord, ScCategory> submitToRedditLeaderboard(@NotNull ScRecord submissionRecord,
                                                    Map<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> oldRbcMap) {
+        assert submissionRecord.getAuthor() != null;
         assert submissionRecord.getDisplayLink() != null;
+
         ScPuzzle puzzle = submissionRecord.getPuzzle();
         String[] lines = redditService.getWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
         Pattern puzzleRegex = Pattern.compile("^\\s*\\|\\s*" + Pattern.quote(puzzle.getDisplayName()));

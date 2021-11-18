@@ -28,11 +28,11 @@ import java.nio.file.Path;
 @Builder
 public class ScRecord implements Record<ScCategory> {
     public static final ScRecord IMPOSSIBLE_CATEGORY = new ScRecord(ScPuzzle.bonding_boss, ScScore.INVALID_SCORE,
-                                                                    "nobody", null, false, null, null);
+                                                                    null, null, false, null, null);
 
     @NotNull ScPuzzle puzzle;
     @NotNull ScScore score;
-    @NotNull String author;
+    String author;
     /** not-<tt>null</tt> IFF the solution holds a category */
     String displayLink;
     boolean oldVideoRNG;
@@ -50,7 +50,8 @@ public class ScRecord implements Record<ScCategory> {
      */
     @NotNull
     public String toDisplayString(@NotNull DisplayContext<ScCategory> context, String reactorPrefix) {
-        String scoreAuthor = String.format("(%s) %s", score.toDisplayString(context, oldVideoRNG ? "\\*" : ""), author);
+        String scoreAuthor = "(" + score.toDisplayString(context, oldVideoRNG ? "\\*" : "") + ")" +
+                             (author != null ? " " + author : "");
         return (dataLink != null ? "[\uD83D\uDCC4](" + dataLink + ") " : "") +  // 📄
                reactorPrefix + (displayLink != null ? "[" + scoreAuthor + "](" + displayLink + ")" : scoreAuthor);
     }
