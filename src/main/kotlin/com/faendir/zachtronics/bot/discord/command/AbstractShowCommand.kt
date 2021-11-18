@@ -28,7 +28,7 @@ import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.spec.MessageCreateFields
 import reactor.core.publisher.Mono
 
-abstract class AbstractShowCommand<T, C : Category, P : Puzzle, R : Record<C>> : AbstractSubCommand<T>() {
+abstract class AbstractShowCommand<T, C : Category, P : Puzzle<C>, R : Record<C>> : AbstractSubCommand<T>() {
     abstract val repository: SolutionRepository<C, P, *, R>
 
     override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {

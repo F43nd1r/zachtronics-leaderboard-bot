@@ -26,24 +26,23 @@ import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import reactor.core.publisher.Mono
 
-abstract class AbstractListCommand<T, C : Category, P : Puzzle, R : Record<C>> : AbstractSubCommand<T>() {
+abstract class AbstractListCommand<T, C : Category, P : Puzzle<C>, R : Record<C>> : AbstractSubCommand<T>() {
     abstract val repository: SolutionRepository<C, P, *, R>
 
     override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
-        val (puzzle, categories) = findPuzzleAndCategories(parameters)
+        val puzzle = findPuzzle(parameters)
         val records = repository.findCategoryHolders(puzzle, includeFrontier = false)
         return SafeEmbedMessageBuilder()
             .title("*${puzzle.displayName}*")
             .color(Colors.READ)
-            .embedCategoryRecords(records)
+            .embedCategoryRecords(records, puzzle.supportedCategories)
             .apply {
-                val missing = categories - records.flatMap { it.categories }
+                val missing = puzzle.supportedCategories - records.flatMap { it.categories }
                 if (missing.isNotEmpty()) {
-                    addField(missing.joinToString("/") { it.displayName }, "None")
+                    addField(missing.joinToString(", ") { it.displayName }, "None")
                 }
             }.send(event)
     }
 
-    /** @return pair of Puzzle and all the categories that support it */
-    abstract fun findPuzzleAndCategories(parameters: T): Pair<P, List<C>>
+    abstract fun findPuzzle(parameters: T): P
 }

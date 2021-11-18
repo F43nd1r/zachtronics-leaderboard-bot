@@ -23,7 +23,7 @@ import kotlin.io.path.inputStream
 
 /** Read interface, used to store data from the repositories that needs to be displayed */
 interface Record<C : Category> {
-    val puzzle: Puzzle
+    val puzzle: Puzzle<C>
     val score: Score<C>
     val author: String?
 

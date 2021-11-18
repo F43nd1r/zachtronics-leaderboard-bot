@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.om.repository
 
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmCategory.CINP
@@ -91,7 +90,7 @@ class OmGithubPagesGenerator :
         CINP to "Cycles/Instructions",
     )
 
-    override fun GitRepository.ReadWriteAccess.updatePage(dir: File, categories: List<OmCategory>, data: Map<Puzzle, Map<OmRecord, Set<OmCategory>>>) {
+    override fun GitRepository.ReadWriteAccess.updatePage(dir: File, categories: List<OmCategory>, data: Map<OmPuzzle, Map<OmRecord, Set<OmCategory>>>) {
         val templates = File(repo, "templates")
         val mainTemplate = File(templates, "main.html").readText()
         val groupTemplate = File(templates, "group.html").readText()

@@ -84,7 +84,7 @@ class OmController(private val repository: OmSolutionRepository, private val dis
                         .title("API submission: *${submission.puzzle.displayName}* $categoryString")
                         .color(Colors.SUCCESS)
                         .description("`$score`${submission.author.orEmpty(prefix = " by ")}${if (beatenCategories.isNotEmpty()) "\npreviously:" else " was included in the pareto frontier"}")
-                        .embedCategoryRecords(result.beatenRecords)
+                        .embedCategoryRecords(result.beatenRecords, submission.puzzle.supportedCategories)
                         .link(submission.displayLink)
                 )
                 SubmitResultType.SUCCESS

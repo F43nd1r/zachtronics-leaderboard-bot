@@ -34,7 +34,7 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class AbstractSolutionRepository<C extends Category, P extends Puzzle, S extends Submission<C, P>, R extends Record<C>>
+public abstract class AbstractSolutionRepository<C extends Category, P extends Puzzle<C>, S extends Submission<C, P>, R extends Record<C>>
         implements SolutionRepository<C, P, S, R> {
 
     protected abstract GitRepository getGitRepo();

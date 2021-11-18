@@ -27,6 +27,7 @@ import com.faendir.zachtronics.bot.discord.command.Secured
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.createSubmission
 import com.faendir.zachtronics.bot.om.model.OmCategory
+import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
@@ -39,7 +40,7 @@ import java.util.*
 
 @Component
 @OmQualifier
-class OmSubmitCommand(override val repository: OmSolutionRepository) : AbstractSubmitCommand<SubmitParams, OmCategory, OmSubmission, OmRecord>(),
+class OmSubmitCommand(override val repository: OmSolutionRepository) : AbstractSubmitCommand<SubmitParams, OmCategory, OmPuzzle, OmSubmission, OmRecord>(),
     Secured by OmSecured,
     ApplicationCommandParser<SubmitParams, ApplicationCommandOptionData> by SubmitParamsParser {
 

@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.om.repository
 
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmCategory.AC
@@ -84,7 +83,7 @@ class OmRedditWikiGenerator(private val reddit: RedditService) : AbstractOmPageG
         return "${first.displayLink ?.let { "[$score]($it)" } ?: score}${if (second.any { it.name.contains("X") }) "*" else ""}"
     }
 
-    override fun GitRepository.ReadWriteAccess.updatePage(dir: File, categories: List<OmCategory>, data: Map<Puzzle, Map<OmRecord, Set<OmCategory>>>) {
+    override fun GitRepository.ReadWriteAccess.updatePage(dir: File, categories: List<OmCategory>, data: Map<OmPuzzle, Map<OmRecord, Set<OmCategory>>>) {
         val prefix = File(repo, "reddit/prefix.md").readText()
         val suffix = File(repo, "reddit/suffix.md").readText()
         var table = ""

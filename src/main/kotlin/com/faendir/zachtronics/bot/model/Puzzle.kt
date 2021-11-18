@@ -16,8 +16,10 @@
 
 package com.faendir.zachtronics.bot.model
 
-interface Puzzle {
+interface Puzzle<C : Category> {
     val group: Group
     val type: Type
     val displayName: String
+
+    val supportedCategories: List<C>
 }

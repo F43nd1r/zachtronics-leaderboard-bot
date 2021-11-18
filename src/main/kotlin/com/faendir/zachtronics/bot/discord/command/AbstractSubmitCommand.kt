@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.discord.command
 import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.DisplayContext
+import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.model.Submission
@@ -30,8 +31,8 @@ import com.faendir.zachtronics.bot.utils.orEmpty
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import reactor.core.publisher.Mono
 
-abstract class AbstractSubmitCommand<T, C : Category, S : Submission<C, *>, R : Record<C>> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
-    protected abstract val repository: SolutionRepository<C, *, S, R>
+abstract class AbstractSubmitCommand<T, C : Category, P: Puzzle<C>, S : Submission<C, P>, R : Record<C>> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
+    protected abstract val repository: SolutionRepository<C, P, S, R>
 
     override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
         val submission = parseSubmission(event, parameters)
@@ -55,7 +56,7 @@ abstract class AbstractSubmitCommand<T, C : Category, S : Submission<C, *>, R : 
                                 + (if (beatenCategories.isEmpty()) " was included in the pareto frontier." else "")
                                 + (if (result.beatenRecords.isNotEmpty()) "\npreviously:" else "")
                     )
-                    .embedCategoryRecords(result.beatenRecords)
+                    .embedCategoryRecords(result.beatenRecords, submission.puzzle.supportedCategories)
                     .link(submission.displayLink)
             }
             is SubmitResult.AlreadyPresent ->
@@ -68,7 +69,7 @@ abstract class AbstractSubmitCommand<T, C : Category, S : Submission<C, *>, R : 
                     .title("No Scores beaten by *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.discord())}`")
                     .color(Colors.UNCHANGED)
                     .description("Existing scores:")
-                    .embedCategoryRecords(result.records)
+                    .embedCategoryRecords(result.records, submission.puzzle.supportedCategories)
             is SubmitResult.Failure -> throw IllegalArgumentException(result.message)
         }
     }

@@ -131,7 +131,7 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
             git.rm().addFilepattern(file.relativeTo(repo).path).call()
         }
 
-        fun commitAndPush(user: String?, puzzle: Puzzle, score: Score<*>, updated: Collection<String>) {
+        fun commitAndPush(user: String?, puzzle: Puzzle<*>, score: Score<*>, updated: Collection<String>) {
             commitAndPush("${puzzle.displayName} ${score.toDisplayString()} $updated by ${user ?: "unknown"}")
         }
 

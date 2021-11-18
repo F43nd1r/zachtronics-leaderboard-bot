@@ -17,14 +17,14 @@
 package com.faendir.zachtronics.bot.om.repository
 
 import com.faendir.zachtronics.bot.git.GitRepository
-import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.om.model.OmCategory
+import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import java.io.File
 
 abstract class AbstractOmPageGenerator(private val directoryCategories: Map<String, List<OmCategory>>, ) {
 
-    fun update(readWriteAccess: GitRepository.ReadWriteAccess, categories: List<OmCategory>, data: Map<Puzzle, Map<OmRecord, Set<OmCategory>>>) {
+    fun update(readWriteAccess: GitRepository.ReadWriteAccess, categories: List<OmCategory>, data: Map<OmPuzzle, Map<OmRecord, Set<OmCategory>>>) {
         directoryCategories.forEach { (dirName, directoryCategories) ->
             val updateCategories = categories.filter { directoryCategories.contains(it) }
             if(updateCategories.isNotEmpty()) {
@@ -33,5 +33,5 @@ abstract class AbstractOmPageGenerator(private val directoryCategories: Map<Stri
         }
     }
 
-    protected abstract fun GitRepository.ReadWriteAccess.updatePage(dir: File, categories: List<OmCategory>, data: Map<Puzzle, Map<OmRecord, Set<OmCategory>>>)
+    protected abstract fun GitRepository.ReadWriteAccess.updatePage(dir: File, categories: List<OmCategory>, data: Map<OmPuzzle, Map<OmRecord, Set<OmCategory>>>)
 }

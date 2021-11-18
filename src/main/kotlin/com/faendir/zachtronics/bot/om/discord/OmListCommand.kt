@@ -34,9 +34,7 @@ import org.springframework.stereotype.Component
 class OmListCommand(override val repository: OmSolutionRepository) :
     AbstractListCommand<ListCommand, OmCategory, OmPuzzle, OmRecord>(),
     ApplicationCommandParser<ListCommand, ApplicationCommandOptionData> by ListCommandParser {
-    override fun findPuzzleAndCategories(parameters: ListCommand): Pair<OmPuzzle, List<OmCategory>> {
-        return Pair(parameters.puzzle, OmCategory.values().filter { it.supportsPuzzle(parameters.puzzle) })
-    }
+    override fun findPuzzle(parameters: ListCommand): OmPuzzle = parameters.puzzle
 }
 
 @ApplicationCommand(name = "list", description = "List records", subCommand = true)

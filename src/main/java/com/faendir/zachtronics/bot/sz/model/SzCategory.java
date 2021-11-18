@@ -17,12 +17,14 @@
 package com.faendir.zachtronics.bot.sz.model;
 
 import com.faendir.zachtronics.bot.model.Category;
+import com.faendir.zachtronics.bot.model.Metric;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 
 import static com.faendir.zachtronics.bot.sz.model.SzCategory.SzScoreFormatStrings.*;
@@ -49,6 +51,8 @@ public enum SzCategory implements Category {
     private final String formatStringLb;
     @Getter
     private final int repoSuffix;
+    @Getter
+    private final List<Metric> metrics = Collections.emptyList();
 
     public boolean supportsPuzzle(@NotNull SzPuzzle puzzle) {
         return supportedTypes.contains(puzzle.getType());

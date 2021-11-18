@@ -58,7 +58,7 @@ enum class OmPuzzle(
     override val type: OmType,
     override val displayName: String,
     val id: String
-) : Puzzle {
+) : Puzzle<OmCategory> {
     STABILIZED_WATER(CHAPTER_1, NORMAL, "Stabilized Water", "P007"),
     REFINED_GOLD(CHAPTER_1, NORMAL, "Refined Gold", "P010"),
     FACE_POWDER(CHAPTER_1, NORMAL, "Face Powder", "P009"),
@@ -198,6 +198,8 @@ enum class OmPuzzle(
     QUINTESSENTIAL_STABILIZER(TOURNAMENT_2021, NORMAL, "Quintessential Stabilizer", "w2450512626"),
     ELEMENTAL_JEWEL_SETTING(TOURNAMENT_2021, NORMAL, "Elemental Jewel Setting", "w2450512809"),
     ;
+
+    override val supportedCategories: List<OmCategory> = OmCategory.values().filter { it.supportsPuzzle(this) }
 
     val file by lazy {
         try {

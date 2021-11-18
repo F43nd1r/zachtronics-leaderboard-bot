@@ -47,11 +47,8 @@ public class SzListCommand extends AbstractListCommand<SzListCommand.ListData, S
 
     @NotNull
     @Override
-    public Pair<SzPuzzle, List<SzCategory>> findPuzzleAndCategories(@NotNull ListData parameters) {
-        return new Pair<>(parameters.puzzle,
-                          Arrays.stream(SzCategory.values())
-                                .filter(c -> c.supportsPuzzle(parameters.puzzle))
-                                .toList());
+    public SzPuzzle findPuzzle(@NotNull ListData parameters) {
+        return parameters.puzzle;
     }
 
     @ApplicationCommand(name = "list", subCommand = true)

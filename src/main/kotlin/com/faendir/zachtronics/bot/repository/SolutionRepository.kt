@@ -21,7 +21,7 @@ import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.Submission
 
-interface SolutionRepository<C : Category, P : Puzzle, S : Submission<C, P>, R: Record<C>> {
+interface SolutionRepository<C : Category, P : Puzzle<C>, S : Submission<C, P>, R: Record<C>> {
     fun submit(submission: S) : SubmitResult<R, C>
 
     fun submitAll(submissions: Collection<S>): List<SubmitResult<R, C>> = submissions.map { submit(it) }

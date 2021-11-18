@@ -17,14 +17,12 @@
 package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.Category;
+import com.faendir.zachtronics.bot.model.Metric;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.Set;
+import java.util.*;
 
 import static com.faendir.zachtronics.bot.sc.model.ScCategory.ScScoreComparators.*;
 import static com.faendir.zachtronics.bot.sc.model.ScCategory.ScScoreFormatStrings.*;
@@ -61,6 +59,8 @@ public enum ScCategory implements Category {
     /** contains <tt>%s%s%c%d%c%d%s</tt> plus a bunch of <tt>*</tt> most likely */
     @Getter
     private final String scoreFormatString;
+    @Getter
+    private final List<Metric> metrics = Collections.emptyList();
 
     public boolean supportsPuzzle(@NotNull ScPuzzle puzzle) {
         return supportedTypes.contains(puzzle.getType()) && !(puzzle.isDeterministic() && precogFree);

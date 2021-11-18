@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.model
 
-interface Category {
+interface Metric {
     val displayName: String
-    val metrics: List<Metric>
 }

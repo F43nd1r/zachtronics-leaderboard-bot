@@ -16,16 +16,39 @@
 
 package com.faendir.zachtronics.bot.utils
 
-class Tree<T>(val data: T, val children: List<Tree<T>>) {
+abstract class Node<T> {
+    protected val children: MutableList<DataNode<T>> = mutableListOf()
 
-    fun parentOf(child: T): T? = if (children.any { it.data == child }) data else children.asSequence().mapNotNull { it.parentOf(child) }.firstOrNull()
+    fun addPath(path: List<T>) {
+        if (path.isEmpty()) return
+        val data = path.first()
+        (children.find { it.data == data } ?: DataNode(data).also { children.add(it) }).addPath(path.drop(1))
+    }
 
-    fun walkTree(): Sequence<T> = listOf(data).asSequence() + children.asSequence().flatMap { it.walkTree() }
+    fun collapseFullyPresentNodes(reference: Node<T>) {
+        for (referenceChild in reference.children) {
+            val child = children.find { it.data == referenceChild.data } ?: continue
+            if (child == referenceChild) {
+                child.children.clear()
+            } else {
+                child.collapseFullyPresentNodes(referenceChild)
+            }
+        }
+    }
 }
 
-class Forest<T>(val trees: List<Tree<T>>) {
+class DataNode<T>(val data: T) : Node<T>() {
+    override fun equals(other: Any?): Boolean {
+        val otherNode = other as? DataNode<*> ?: return false
+        return data == otherNode.data && children.toSet() == otherNode.children.toSet()
+    }
 
-    fun walkTrees(): Sequence<T> = trees.asSequence().flatMap { it.walkTree() }
+    override fun hashCode(): Int = data.hashCode() + 31 * children.toSet().hashCode()
 
-    fun parentOf(child: T): T? = trees.asSequence().mapNotNull { it.parentOf(child) }.firstOrNull()
+    fun getAllPaths(): Set<List<T>> =
+        if (children.isEmpty()) setOf(listOf(data)) else children.flatMap { node -> node.getAllPaths().map { listOf(data) + it } }.toSet()
+}
+
+class TreeRoot<T> : Node<T>() {
+    fun getAllPaths() = children.flatMap { it.getAllPaths() }
 }

@@ -21,6 +21,7 @@ import com.faendir.zachtronics.bot.om.model.OmMetric.AREA
 import com.faendir.zachtronics.bot.om.model.OmMetric.COST
 import com.faendir.zachtronics.bot.om.model.OmMetric.CYCLES
 import com.faendir.zachtronics.bot.om.model.OmMetric.INSTRUCTIONS
+import com.faendir.zachtronics.bot.om.model.OmMetric.OVERLAP
 import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_CA
 import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_CI
 import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_GA
@@ -29,6 +30,7 @@ import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_GI
 import com.faendir.zachtronics.bot.om.model.OmMetric.SUM3A
 import com.faendir.zachtronics.bot.om.model.OmMetric.SUM3I
 import com.faendir.zachtronics.bot.om.model.OmMetric.SUM4
+import com.faendir.zachtronics.bot.om.model.OmMetric.TRACKLESS_INSTRUCTION
 import com.faendir.zachtronics.bot.om.model.OmType.INFINITE
 import com.faendir.zachtronics.bot.om.model.OmType.NORMAL
 import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
@@ -39,14 +41,8 @@ private val PRODUCTION_TYPES = setOf(PRODUCTION)
 
 enum class OmCategory(
     private val supportedTypes: Set<OmType> = OmType.values().toSet(),
-    vararg val metrics: OmMetric,
-    private val trackless: Boolean = false,
-    private val overlap: Boolean = false,
-    override val displayName: String = when {
-        overlap -> "O"
-        trackless -> "T"
-        else -> ""
-    } + metrics.take(2).joinToString("") { it.displayName }
+    vararg metricsVararg: OmMetric,
+    override val displayName: String = metricsVararg.take(if (metricsVararg.first() is OmMetric.Modifier) 3 else 2).joinToString("") { it.displayName }
 ) : Category {
     GC(NORMAL_TYPES, COST, CYCLES, AREA),
     GCP(PRODUCTION_TYPES, COST, CYCLES, INSTRUCTIONS),
@@ -76,19 +72,19 @@ enum class OmCategory(
     HEIGHT(NORMAL_TYPES, OmMetric.HEIGHT, CYCLES, COST, displayName = "Height"),
     WIDTH(setOf(NORMAL), OmMetric.WIDTH, CYCLES, COST, displayName = "Width"),
 
-    OGC(NORMAL_TYPES, COST, CYCLES, AREA, overlap = true),
-    OGA(NORMAL_TYPES, COST, AREA, CYCLES, overlap = true),
-    OGX(NORMAL_TYPES, COST, PRODUCT_CA, overlap = true),
-    OCG(NORMAL_TYPES, CYCLES, COST, AREA, overlap = true),
-    OCA(NORMAL_TYPES, CYCLES, AREA, COST, overlap = true),
-    OCX(NORMAL_TYPES, CYCLES, PRODUCT_GA, overlap = true),
-    OAG(NORMAL_TYPES, AREA, COST, CYCLES, overlap = true),
-    OAC(NORMAL_TYPES, AREA, CYCLES, COST, overlap = true),
-    OAX(NORMAL_TYPES, AREA, PRODUCT_GC, overlap = true),
+    OGC(NORMAL_TYPES, OVERLAP, COST, CYCLES, AREA),
+    OGA(NORMAL_TYPES, OVERLAP, COST, AREA, CYCLES),
+    OGX(NORMAL_TYPES, OVERLAP, COST, PRODUCT_CA),
+    OCG(NORMAL_TYPES, OVERLAP, CYCLES, COST, AREA),
+    OCA(NORMAL_TYPES, OVERLAP, CYCLES, AREA, COST),
+    OCX(NORMAL_TYPES, OVERLAP, CYCLES, PRODUCT_GA),
+    OAG(NORMAL_TYPES, OVERLAP, AREA, COST, CYCLES),
+    OAC(NORMAL_TYPES, OVERLAP, AREA, CYCLES, COST),
+    OAX(NORMAL_TYPES, OVERLAP, AREA, PRODUCT_GC),
 
-    TIG(NORMAL_TYPES, INSTRUCTIONS, COST, PRODUCT_CA, trackless = true),
-    TIC(NORMAL_TYPES, INSTRUCTIONS, CYCLES, PRODUCT_GA, trackless = true),
-    TIA(NORMAL_TYPES, INSTRUCTIONS, AREA, PRODUCT_GC, trackless = true),
+    TIG(NORMAL_TYPES, TRACKLESS_INSTRUCTION, COST, PRODUCT_CA),
+    TIC(NORMAL_TYPES, TRACKLESS_INSTRUCTION, CYCLES, PRODUCT_GA),
+    TIA(NORMAL_TYPES, TRACKLESS_INSTRUCTION, AREA, PRODUCT_GC),
 
     IGNP(NORMAL_TYPES, INSTRUCTIONS, COST, PRODUCT_CA),
     ICNP(NORMAL_TYPES, INSTRUCTIONS, CYCLES, PRODUCT_GA),
@@ -102,10 +98,12 @@ enum class OmCategory(
     S4I(NORMAL_TYPES, SUM4, INSTRUCTIONS),
     ;
 
+    override val metrics: List<OmMetric> = metricsVararg.toList()
     val requiredParts: List<OmScorePart> = metrics.flatMap { it.scoreParts }.distinct()
     val scoreComparator: Comparator<OmScore> = metrics.map { it.comparator }.reduce { acc, comparator -> acc.thenComparing(comparator) }
 
     fun supportsPuzzle(puzzle: OmPuzzle) = supportedTypes.contains(puzzle.type)
 
-    fun supportsScore(score: OmScore) = requiredParts.all { it.getValue(score) != null } && (overlap || !score.overlap) && (!trackless || score.trackless)
+    fun supportsScore(score: OmScore) =
+        requiredParts.all { it.getValue(score) != null } && (metrics.contains(OVERLAP) || !score.overlap) && (!metrics.contains(TRACKLESS_INSTRUCTION) || score.trackless)
 }

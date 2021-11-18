@@ -23,9 +23,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Getter
 @RequiredArgsConstructor
-public enum SzPuzzle implements Puzzle {
+public enum SzPuzzle implements Puzzle<SzCategory> {
     Sz000("fake-surveillance-camera", SzGroup.FIRST_CAMPAIGN, SzType.STANDARD, "Fake Surveillance Camera"),
     Sz030("control-signal-amplifier", SzGroup.FIRST_CAMPAIGN, SzType.STANDARD, "Control Signal Amplifier"),
     Sz002("diagnostic-pulse-generator", SzGroup.FIRST_CAMPAIGN, SzType.STANDARD, "Diagnostic Pulse Generator"),
@@ -78,6 +81,8 @@ public enum SzPuzzle implements Puzzle {
     private final SzGroup group;
     private final SzType type;
     private final String displayName;
+
+    private final List<SzCategory> supportedCategories = Arrays.stream(SzCategory.values()).toList();
 
     @NotNull
     public static SingleParseResult<SzPuzzle> parsePuzzle(@NotNull String name) {

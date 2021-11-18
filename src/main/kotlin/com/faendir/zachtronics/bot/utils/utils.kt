@@ -20,6 +20,7 @@ import com.faendir.discord4j.command.parse.SingleParseResult
 import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.DisplayContext
+import com.faendir.zachtronics.bot.model.Metric
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.StringFormat
@@ -45,7 +46,7 @@ fun <T> Iterable<T>.plusIf(condition: Boolean, element: T): List<T> = if (condit
 
 private val wordSeparator = Regex("[\\s-/,:]+")
 
-fun <P : Puzzle> Array<P>.getSingleMatchingPuzzle(name: String): SingleParseResult<P> {
+fun <P : Puzzle<*>> Array<P>.getSingleMatchingPuzzle(name: String): SingleParseResult<P> {
     val matches = toList().fuzzyMatch(name.trim()) { displayName }
     return when (val size = matches.size) {
         0 -> SingleParseResult.Failure("I did not recognize the puzzle \"$name\".")
@@ -78,29 +79,35 @@ fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> 
         }
 }
 
+fun Collection<Category>.toMetricsTree(): TreeRoot<Metric> = TreeRoot<Metric>().also { tree -> forEach { tree.addPath(it.metrics) } }
+
 @Suppress("UNCHECKED_CAST")
-fun <R : Record<C>?, C : Category> SafeEmbedMessageBuilder.embedCategoryRecords(records: Iterable<CategoryRecord<R, C>>):
-        SafeEmbedMessageBuilder {
-    return addFields(
-        records.map { cr -> cr.copy(categories = cr.categories.sortedBy { it as? Comparable<Any> }.toCollection(LinkedHashSet())) }
-            .sortedBy { it.categories.firstOrNull() as? Comparable<Any> }
-            .map { (record, categories) ->
-                EmbedCreateFields.Field.of(
-                    categories.joinToString(", ") { it.displayName }.ifEmptyZeroWidthSpace(),
-                    record?.toDisplayString(DisplayContext(StringFormat.DISCORD, categories.toList())) ?: "none",
-                    true
-                )
-            }
+fun <R : Record<C>?, C : Category> SafeEmbedMessageBuilder.embedCategoryRecords(
+    records: Iterable<CategoryRecord<R, C>>,
+    supportedCategories: List<C> = emptyList()
+): SafeEmbedMessageBuilder {
+    return embedRecords(
+        records = records.map { cr -> cr.copy(categories = cr.categories.sortedBy { it as? Comparable<Any> }.toCollection(LinkedHashSet())) }
+            .sortedBy { it.categories.firstOrNull() as? Comparable<Any> },
+        supportedCategories = supportedCategories,
+        formatCategorySpecific = true
     )
 }
 
-fun <R : Record<C>, C : Category> SafeEmbedMessageBuilder.embedRecords(records: Iterable<CategoryRecord<R, C>>):
-        SafeEmbedMessageBuilder {
+fun <R : Record<C>?, C : Category> SafeEmbedMessageBuilder.embedRecords(
+    records: Iterable<CategoryRecord<R, C>>,
+    supportedCategories: List<C> = emptyList(),
+    formatCategorySpecific: Boolean = false
+): SafeEmbedMessageBuilder {
+    val reference = supportedCategories.toMetricsTree()
     return this.addFields(
         records.map { (record, categories) ->
+            val metricsTree = categories.toMetricsTree()
+            metricsTree.collapseFullyPresentNodes(reference)
+            val shortenedCategories = metricsTree.getAllPaths().map { metrics -> metrics.joinToString("") { it.displayName } }
             EmbedCreateFields.Field.of(
-                categories.joinToString(", ") { it.displayName }.ifEmptyZeroWidthSpace(),
-                record.toDisplayString(DisplayContext.discord()),
+                shortenedCategories.joinToString(", ").ifEmptyZeroWidthSpace(),
+                record?.toDisplayString(DisplayContext(StringFormat.DISCORD, categories.takeIf { formatCategorySpecific }?.toList())) ?: "none",
                 true
             )
         }
@@ -152,7 +159,7 @@ fun String?.orEmpty(prefix: String = "", suffix: String = "") = this?.let { pref
 
 fun String.ensurePrefix(prefix: String) = if (startsWith(prefix)) this else prefix + this
 
-fun <T> Iterable<T>.productOf(selector: (T) -> Int) = fold(1) {acc, t -> acc * selector(t) }
+fun <T> Iterable<T>.productOf(selector: (T) -> Int) = fold(1) { acc, t -> acc * selector(t) }
 
 fun isValidLink(string: String): Boolean {
     return try {

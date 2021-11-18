@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @ScQualifier
-public class ScSubmitCommand extends AbstractSubmitCommand<ScSubmitCommand.SubmitData, ScCategory, ScSubmission, ScRecord>
+public class ScSubmitCommand extends AbstractSubmitCommand<ScSubmitCommand.SubmitData, ScCategory, ScPuzzle, ScSubmission, ScRecord>
         implements ScSecured {
     @Delegate
     private final ScSubmitCommand_SubmitDataParser parser = ScSubmitCommand_SubmitDataParser.INSTANCE;

@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.model
 
 /** Write interface, used to store data from the user that needs to be stored */
-interface Submission<C : Category, P: Puzzle> {
+interface Submission<C : Category, P: Puzzle<C>> {
     val puzzle: P
     val score: Score<C>
     val author: String?

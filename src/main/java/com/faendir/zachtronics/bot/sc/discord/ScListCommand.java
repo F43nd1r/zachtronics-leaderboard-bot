@@ -48,11 +48,8 @@ public class ScListCommand extends AbstractListCommand<ScListCommand.ListData, S
 
     @NotNull
     @Override
-    public Pair<ScPuzzle, List<ScCategory>> findPuzzleAndCategories(@NotNull ListData parameters) {
-        return new Pair<>(parameters.puzzle,
-                          Arrays.stream(ScCategory.values())
-                                .filter(c -> c.supportsPuzzle(parameters.puzzle))
-                                .toList());
+    public ScPuzzle findPuzzle(@NotNull ListData parameters) {
+        return parameters.puzzle;
     }
 
     @ApplicationCommand(name = "list", description = "List records", subCommand = true)

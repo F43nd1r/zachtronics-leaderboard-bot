@@ -26,7 +26,7 @@ import com.faendir.zachtronics.bot.utils.embedRecords
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import reactor.core.publisher.Mono
 
-abstract class AbstractFrontierCommand<T, C: Category, P : Puzzle, R: Record<C>> : AbstractSubCommand<T>() {
+abstract class AbstractFrontierCommand<T, C: Category, P : Puzzle<C>, R: Record<C>> : AbstractSubCommand<T>() {
     abstract val repository: SolutionRepository<C, P, *, R>
 
     override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
@@ -35,7 +35,7 @@ abstract class AbstractFrontierCommand<T, C: Category, P : Puzzle, R: Record<C>>
         return SafeEmbedMessageBuilder()
             .title("*${puzzle.displayName}*")
             .color(Colors.READ)
-            .embedRecords(records)
+            .embedRecords(records, puzzle.supportedCategories)
             .send(event)
     }
 

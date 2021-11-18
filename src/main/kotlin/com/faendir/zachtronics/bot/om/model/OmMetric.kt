@@ -16,12 +16,13 @@
 
 package com.faendir.zachtronics.bot.om.model
 
+import com.faendir.zachtronics.bot.model.Metric
 import com.faendir.zachtronics.bot.utils.productOf
 
 private const val NOT_FOUND_PLACEHOLDER = 1_000_000_000.0
 
 @Suppress("ClassName")
-sealed class OmMetric(val displayName: String, val scoreParts: List<OmScorePart>) {
+sealed class OmMetric(override val displayName: String, val scoreParts: List<OmScorePart>) : Metric {
     abstract val comparator: Comparator<OmScore>
     abstract val description: String
 
@@ -50,6 +51,13 @@ sealed class OmMetric(val displayName: String, val scoreParts: List<OmScorePart>
             if (scoreParts.all { it.getValue(score) != null }) "$description=${scoreParts.productOf { it.getValue(score)!!.toInt() }}" else null
     }
 
+    abstract class Modifier(identifier: String): OmMetric(identifier, emptyList()) {
+        override val comparator: Comparator<OmScore> = Comparator { _, _ -> 0 }
+        override val description: String = identifier
+
+        override fun describe(score: OmScore): String? = null
+    }
+
     object COST : Basic("G", OmScorePart.COST)
     object CYCLES : Basic("C", OmScorePart.CYCLES)
     object AREA : Basic("A", OmScorePart.AREA)
@@ -57,9 +65,9 @@ sealed class OmMetric(val displayName: String, val scoreParts: List<OmScorePart>
     object HEIGHT : Basic("Height", OmScorePart.HEIGHT)
     object WIDTH : Basic("Width", OmScorePart.WIDTH)
 
-    object SUM3A : Sum("SUM-", OmScorePart.COST, OmScorePart.CYCLES, OmScorePart.AREA)
-    object SUM3I : Sum("SUM-", OmScorePart.COST, OmScorePart.CYCLES, OmScorePart.INSTRUCTIONS)
-    object SUM4 : Sum("SUM4-", OmScorePart.COST, OmScorePart.CYCLES, OmScorePart.AREA, OmScorePart.INSTRUCTIONS)
+    object SUM3A : Sum("Sum", OmScorePart.COST, OmScorePart.CYCLES, OmScorePart.AREA)
+    object SUM3I : Sum("Sum", OmScorePart.COST, OmScorePart.CYCLES, OmScorePart.INSTRUCTIONS)
+    object SUM4 : Sum("Sum4", OmScorePart.COST, OmScorePart.CYCLES, OmScorePart.AREA, OmScorePart.INSTRUCTIONS)
 
     object PRODUCT_GC : Product(OmScorePart.COST, OmScorePart.CYCLES)
     object PRODUCT_GA : Product(OmScorePart.COST, OmScorePart.AREA)
@@ -67,4 +75,8 @@ sealed class OmMetric(val displayName: String, val scoreParts: List<OmScorePart>
     object PRODUCT_CA : Product(OmScorePart.CYCLES, OmScorePart.AREA)
     object PRODUCT_CI : Product(OmScorePart.CYCLES, OmScorePart.INSTRUCTIONS)
     object PRODUCT_AI : Product(OmScorePart.AREA, OmScorePart.INSTRUCTIONS)
+
+    // hack: don't want to show just "T", so need two-in-one
+    object TRACKLESS_INSTRUCTION : Basic("TI", OmScorePart.INSTRUCTIONS)
+    object OVERLAP : Modifier("O")
 }

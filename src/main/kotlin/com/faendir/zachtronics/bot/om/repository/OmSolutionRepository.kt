@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.om.repository
 
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
@@ -62,7 +61,7 @@ class OmSolutionRepository(
         .thenComparingInt { it.score.instructions ?: Int.MAX_VALUE }
         .thenComparingInt { it.score.height ?: Int.MAX_VALUE }
         .thenComparingDouble { it.score.width ?: Double.MAX_VALUE }
-    private lateinit var data: Map<Puzzle, SortedMap<OmRecord, MutableSet<OmCategory>>>
+    private lateinit var data: Map<OmPuzzle, SortedMap<OmRecord, MutableSet<OmCategory>>>
     private var hash: String? = null
 
     @PostConstruct

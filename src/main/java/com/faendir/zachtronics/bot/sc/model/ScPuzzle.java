@@ -24,10 +24,11 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
-public enum ScPuzzle implements Puzzle {
+public enum ScPuzzle implements Puzzle<ScCategory> {
     research_example_1(ScGroup.MAIN, ScType.RESEARCH, "Of Pancakes and Spaceships", true),
     research_tutorial_1(ScGroup.MAIN, ScType.RESEARCH, "Slightly Different", true),
     research_tutorial_1point5(ScGroup.MAIN, ScType.RESEARCH, "Crossover", true),
@@ -409,6 +410,8 @@ public enum ScPuzzle implements Puzzle {
     private final ScType type;
     private final String displayName;
     private final boolean isDeterministic;
+
+    private final List<ScCategory> supportedCategories = Arrays.stream(ScCategory.values()).toList();
 
     @NotNull
     public static SingleParseResult<ScPuzzle> parsePuzzle(@NotNull String name) {
