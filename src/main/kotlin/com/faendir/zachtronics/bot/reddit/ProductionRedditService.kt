@@ -37,6 +37,7 @@ class ProductionRedditService(redditProperties: RedditProperties) : RedditServic
     override fun getWikiPage(subreddit: Subreddit, page: String): String = subreddit(subreddit).wiki().page(page).content
 
     override fun updateWikiPage(subreddit: Subreddit, page: String, content: String, reason: String) {
-        subreddit(subreddit).wiki().update(page, content, reason)
+        val latinReason = reason.replace("\\P{InBasic_Latin}".toRegex(), "?") // reddit cries if the reason has strange chars
+        subreddit(subreddit).wiki().update(page, content, latinReason)
     }
 }
