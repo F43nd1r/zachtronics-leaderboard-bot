@@ -47,10 +47,6 @@ import java.io.File
 private val verifier = JNISolutionVerifier()
 private val logger = LoggerFactory.getLogger("OM Utils")
 
-fun Solution.getWidthAndHeight(puzzle: OmPuzzle): Pair<Double?, Double?>? {
-    return getMetrics(puzzle, OmScorePart.WIDTH, OmScorePart.HEIGHT)?.let { it[OmScorePart.WIDTH] to it[OmScorePart.HEIGHT] }
-}
-
 fun Solution.getMetrics(puzzle: OmPuzzle, vararg metrics: OmScorePart): Map<OmScorePart, Double?>? {
     val puzzleFile = puzzle.file?.takeIf { it.exists() } ?: return null
     val solution = File.createTempFile(puzzle.id, ".solution").also { SolutionParser.write(this, it.outputStream().sink().buffer()) }
@@ -127,14 +123,15 @@ fun createSubmission(gif: String, author: String, bytes: ByteArray): OmSubmissio
     }
     if (solution !is SolvedSolution) throw IllegalArgumentException("only solved solutions are accepted")
     val puzzle = OmPuzzle.values().find { it.id == solution.puzzle } ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
-    val (width, height) = solution.getWidthAndHeight(puzzle) ?: (null to null)
+    val computed = solution.getMetrics(puzzle, OmScorePart.WIDTH, OmScorePart.HEIGHT, OmScorePart.RATE)
     val score = OmScore(
         cost = solution.cost,
         cycles = solution.cycles,
         area = solution.area,
         instructions = solution.instructions,
-        height = height?.toInt(),
-        width = width,
+        height = computed?.get(OmScorePart.HEIGHT)?.toInt(),
+        width = computed?.get(OmScorePart.WIDTH),
+        rate = computed?.get(OmScorePart.RATE),
         trackless = solution.isTrackless(),
         overlap = solution.isOverlap(puzzle),
     )
