@@ -120,11 +120,22 @@ data class OmScoreDTO(
     val instructions: Int? = null,
     val height: Int? = null,
     val width: Double? = null,
+    val rate: Double? = null,
     val trackless: Boolean = false,
     val overlap: Boolean = false,
 )
 
-fun OmScore.toDTO() = OmScoreDTO(cost, cycles, area, instructions, height, width, trackless, overlap)
+fun OmScore.toDTO() = OmScoreDTO(
+    cost = cost,
+    cycles = cycles,
+    area = area,
+    instructions = instructions,
+    height = height,
+    width = width,
+    rate = rate,
+    trackless = trackless,
+    overlap = overlap
+)
 
 data class OmRecordDTO(val puzzleId: String, val score: OmScoreDTO, val gif: String?, val solution: String?, val categoryIds: List<String>? = null)
 
