@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service
 import java.io.File
 import java.io.IOException
 
-@Service
+//@Service
 class ProductionImgurService(private val imgurProperties: ImgurProperties) : ImgurService {
     companion object {
         private const val TEN_MB = 10 * 1000 * 1000
