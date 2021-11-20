@@ -25,7 +25,6 @@ import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -73,11 +72,7 @@ public class SolRepoFindTest {
                                                             .flatMap(Set::stream)
                                                             .sorted()
                                                             .toList();
-        List<ScCategory> supportedCategories = Arrays.stream(ScCategory.values())
-                                                     .filter(c -> c.supportsPuzzle(puzzle))
-                                                     .sorted()
-                                                     .toList();
-        assertEquals(supportedCategories, coveredCategories);
+        assertEquals(puzzle.getSupportedCategories(), coveredCategories);
     }
 
     @Test

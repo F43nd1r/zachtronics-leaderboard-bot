@@ -20,14 +20,12 @@ import com.faendir.discord4j.command.parse.SingleParseResult;
 import com.faendir.zachtronics.bot.model.Puzzle;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Getter
-@RequiredArgsConstructor
 public enum SzPuzzle implements Puzzle<SzCategory> {
     Sz000("fake-surveillance-camera", SzGroup.FIRST_CAMPAIGN, SzType.STANDARD, "Fake Surveillance Camera"),
     Sz030("control-signal-amplifier", SzGroup.FIRST_CAMPAIGN, SzType.STANDARD, "Control Signal Amplifier"),
@@ -81,8 +79,17 @@ public enum SzPuzzle implements Puzzle<SzCategory> {
     private final SzGroup group;
     private final SzType type;
     private final String displayName;
+    private final List<SzCategory> supportedCategories;
 
-    private final List<SzCategory> supportedCategories = Arrays.stream(SzCategory.values()).toList();
+    SzPuzzle(String id, SzGroup group, SzType type, String displayName) {
+        this.id = id;
+        this.group = group;
+        this.type = type;
+        this.displayName = displayName;
+        this.supportedCategories = Arrays.stream(SzCategory.values())
+                                         .filter(c -> c.getSupportedTypes().contains(type))
+                                         .toList();
+    }
 
     @NotNull
     public static SingleParseResult<SzPuzzle> parsePuzzle(@NotNull String name) {

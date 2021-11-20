@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.model
+package com.faendir.zachtronics.bot.sz.model;
 
-/** Represents a statistic either natively tracked or computed about solutions */
-interface Metric {
-    val displayName: String
+import com.faendir.zachtronics.bot.model.Metric;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+import java.util.function.ToIntFunction;
+
+@Getter
+@RequiredArgsConstructor
+public enum SzMetric implements Metric {
+    COST("C", SzScore::getCost),
+    POWER("P", SzScore::getPower),
+    LINES("L", SzScore::getLines);
+
+    private final String displayName;
+    private final ToIntFunction<SzScore> extract;
 }

@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.sz.model;
 import com.faendir.zachtronics.bot.model.Category;
 import com.faendir.zachtronics.bot.model.Metric;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -28,34 +27,38 @@ import java.util.List;
 import java.util.Set;
 
 import static com.faendir.zachtronics.bot.sz.model.SzCategory.SzScoreFormatStrings.*;
+import static com.faendir.zachtronics.bot.sz.model.SzMetric.*;
 import static com.faendir.zachtronics.bot.sz.model.SzType.STANDARD;
-import static com.faendir.zachtronics.bot.utils.Utils.makeComparator3;
 
-@RequiredArgsConstructor
+@Getter
 public enum SzCategory implements Category {
-    CP("CP", makeComparator3(SzScore::getCost, SzScore::getPower, SzScore::getLines), F100, 101),
-    CL("CL", makeComparator3(SzScore::getCost, SzScore::getLines, SzScore::getPower), F100, 102),
+    CP("CP", List.of(COST, POWER, LINES), F100, 101),
+    CL("CL", List.of(COST, LINES, POWER), F100, 102),
 
-    PC("PC", makeComparator3(SzScore::getPower, SzScore::getCost, SzScore::getLines), F010, 201),
-    PL("PL", makeComparator3(SzScore::getPower, SzScore::getLines, SzScore::getCost), F010, 202),
+    PC("PC", List.of(POWER, COST, LINES), F010, 201),
+    PL("PL", List.of(POWER, LINES, COST), F010, 202),
 
-    LC("LC", makeComparator3(SzScore::getLines, SzScore::getCost, SzScore::getPower), F001, 301),
-    LP("LP", makeComparator3(SzScore::getLines, SzScore::getPower, SzScore::getCost), F001, 302);
+    LC("LC", List.of(LINES, COST, POWER), F001, 301),
+    LP("LP", List.of(LINES, POWER, COST), F001, 302);
 
-    @Getter
     private final String displayName;
-    @Getter
+    private final List<Metric> metrics;
     private final Comparator<SzScore> scoreComparator;
     private final Set<SzType> supportedTypes = Collections.singleton(STANDARD);
-    @Getter
     private final String formatStringLb;
-    @Getter
     private final int repoSuffix;
-    @Getter
-    private final List<Metric> metrics = Collections.emptyList();
 
-    public boolean supportsPuzzle(@NotNull SzPuzzle puzzle) {
-        return supportedTypes.contains(puzzle.getType());
+    @SuppressWarnings("unchecked")
+    SzCategory(String displayName, @NotNull List<SzMetric> metrics, String formatStringLb, int repoSuffix) {
+        this.displayName = displayName;
+        this.metrics = (List<Metric>)(List<?>) metrics;
+        this.scoreComparator = metrics.stream()
+                                      .map(SzMetric::getExtract)
+                                      .map(Comparator::comparingInt)
+                                      .reduce(Comparator::thenComparing)
+                                      .orElseThrow();
+        this.formatStringLb = formatStringLb;
+        this.repoSuffix = repoSuffix;
     }
 
     public boolean supportsScore(@NotNull SzScore score) {

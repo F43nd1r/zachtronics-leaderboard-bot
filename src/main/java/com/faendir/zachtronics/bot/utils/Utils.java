@@ -18,17 +18,11 @@ package com.faendir.zachtronics.bot.utils;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Comparator;
-import java.util.function.ToIntFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class Utils {
     private Utils() {}
-
-    public static <T> Comparator<T> makeComparator3(ToIntFunction<T> c1, ToIntFunction<T> c2, ToIntFunction<T> c3) {
-        return Comparator.comparingInt(c1).thenComparingInt(c2).thenComparingInt(c3);
-    }
 
     private static final Pattern PASTEBIN_PATTERN = Pattern.compile("(?:https?://)?pastebin.com/(?:raw/)?(\\w+)");
     private static final Pattern GDOCS_PATTERN = Pattern.compile("(?:https?://)?docs.google.com/document/d/([\\w-]+)(?:/.*)?");

@@ -20,14 +20,12 @@ import com.faendir.discord4j.command.parse.SingleParseResult;
 import com.faendir.zachtronics.bot.model.Puzzle;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Getter
-@RequiredArgsConstructor
 public enum ScPuzzle implements Puzzle<ScCategory> {
     research_example_1(ScGroup.MAIN, ScType.RESEARCH, "Of Pancakes and Spaceships", true),
     research_tutorial_1(ScGroup.MAIN, ScType.RESEARCH, "Slightly Different", true),
@@ -410,8 +408,18 @@ public enum ScPuzzle implements Puzzle<ScCategory> {
     private final ScType type;
     private final String displayName;
     private final boolean isDeterministic;
+    private final List<ScCategory> supportedCategories;
 
-    private final List<ScCategory> supportedCategories = Arrays.stream(ScCategory.values()).toList();
+    ScPuzzle(ScGroup group, ScType type, String displayName, boolean isDeterministic) {
+        this.group = group;
+        this.type = type;
+        this.displayName = displayName;
+        this.isDeterministic = isDeterministic;
+        this.supportedCategories  = Arrays.stream(ScCategory.values())
+                                          .filter(c -> c.getSupportedTypes().contains(type) &&
+                                                       !(isDeterministic && c.isPrecogFree()))
+                                          .toList();
+    }
 
     @NotNull
     public static SingleParseResult<ScPuzzle> parsePuzzle(@NotNull String name) {
