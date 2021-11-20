@@ -88,6 +88,10 @@ public class SubCommandTest {
         result = runCommand("frontier", args); // 2 valid files
         assertTrue(result.contains("Fission I"));
         assertEquals(2, StringUtils.countMatches(result, "[\uD83D\uDCC4](file:/"));
+
+        args = Map.of("puzzle", "Dessication Station");
+        result = runCommand("frontier", args); // all 3 C categories
+        assertTrue(result.contains("CRS\n") && result.contains("CRSNB\n") && result.contains("CRSNP\n"));
     }
 
     @Test

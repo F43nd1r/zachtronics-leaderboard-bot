@@ -35,10 +35,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -126,10 +123,10 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                     List<String> tableCols = Arrays.asList(pieces1).subList(2, pieces1.length);
 
                     List<String> cyclesHalf1 = tableCols.subList(0, tableCols.size() / 2);
-                    parseHalfTable(rbcMap, cyclesHalf1, CATEGORIES[2 * seenRows]);
+                    parseHalfTable(puzzle, rbcMap, cyclesHalf1, CATEGORIES[2 * seenRows]);
 
                     List<String> symbolsHalf = tableCols.subList(tableCols.size() / 2, tableCols.size());
-                    parseHalfTable(rbcMap, symbolsHalf, CATEGORIES[2 * seenRows + 1]);
+                    parseHalfTable(puzzle, rbcMap, symbolsHalf, CATEGORIES[2 * seenRows + 1]);
                     seenRows++;
                 }
                 else if (seenRows != 0) {
@@ -193,9 +190,9 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                 List<String> tableCols = Arrays.asList(pieces).subList(2, pieces.length);
 
                 List<String> cyclesHalf = tableCols.subList(0, tableCols.size() / 2);
-                parseHalfTable(oldRbcMap, cyclesHalf, CATEGORIES[2 * seenRows]);
+                parseHalfTable(puzzle, oldRbcMap, cyclesHalf, CATEGORIES[2 * seenRows]);
                 List<String> symbolsHalf = tableCols.subList(tableCols.size() / 2, tableCols.size());
-                parseHalfTable(oldRbcMap, symbolsHalf, CATEGORIES[2 * seenRows + 1]);
+                parseHalfTable(puzzle, oldRbcMap, symbolsHalf, CATEGORIES[2 * seenRows + 1]);
 
                 if (seenRows == 0) {
                     startingRow = i;
@@ -312,15 +309,15 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
      * @return set of categories held for updating
      */
     @NotNull
-    private static Set<ScCategory> parseLeaderboardRecord(
-            Map<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> rbcMap, String recordCell) {
+    private static Set<ScCategory> parseLeaderboardRecord(ScPuzzle puzzle,
+                                                          Map<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> rbcMap,
+                                                          String recordCell) {
         Matcher m = REGEX_SCORE_CELL.matcher(recordCell);
         if (m.matches()) {
             ScScore score = ScScore.parseBPScore(m);
             Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>> entry = rbcMap.get(score);
             if (entry == null) {
                 // we don't have this sol in the archive, which means it has been out-pareto'd but still not submitted
-                ScPuzzle puzzle = rbcMap.values().iterator().next().getKey().build().getPuzzle();
                 ScRecord.ScRecordBuilder builder = ScRecord.builder().puzzle(puzzle).score(score);
                 entry = Map.entry(builder, EnumSet.noneOf(ScCategory.class));
                 rbcMap.put(score, entry);
@@ -332,12 +329,13 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         throw new IllegalStateException("Leaderboard record unparseable: " + recordCell);
     }
 
-    private static void parseHalfTable(Map<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> rbcMap,
+    private static void parseHalfTable(ScPuzzle puzzle,
+                                       Map<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> rbcMap,
                                        @NotNull List<String> halfTable, @NotNull ScCategory[] categories) {
 
         @SuppressWarnings("unchecked")
         Set<ScCategory>[] heldCategories = (Set<ScCategory>[]) new Set[3];
-        heldCategories[0] = parseLeaderboardRecord(rbcMap, halfTable.get(0));
+        heldCategories[0] = parseLeaderboardRecord(puzzle, rbcMap, halfTable.get(0));
         heldCategories[0].add(categories[0]);
 
         if (halfTable.get(1).startsWith("X"))
@@ -345,7 +343,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         else if (halfTable.get(1).equals("←"))
             heldCategories[1] = heldCategories[0];
         else
-            heldCategories[1] = parseLeaderboardRecord(rbcMap, halfTable.get(1));
+            heldCategories[1] = parseLeaderboardRecord(puzzle, rbcMap, halfTable.get(1));
         heldCategories[1].add(categories[1]);
 
         if (halfTable.size() != 3 || halfTable.get(2).startsWith("X"))
@@ -355,7 +353,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         else if (halfTable.get(2).equals("←"))
             heldCategories[2] = heldCategories[1];
         else
-            heldCategories[2] = parseLeaderboardRecord(rbcMap, halfTable.get(2));
+            heldCategories[2] = parseLeaderboardRecord(puzzle, rbcMap, halfTable.get(2));
         heldCategories[2].add(categories[2]);
     }
 
@@ -410,9 +408,16 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         ScSolutionsIndex(@NotNull Path puzzlePath, @NotNull ScPuzzle puzzle) throws IOException {
             this.puzzlePath = puzzlePath;
             this.puzzle = puzzle;
+            List<ScScore> scores;
             try (Stream<String> lines = Files.lines(puzzlePath.resolve("scores.txt"))) {
                 scores = lines.map(ScScore::parseBPScore).collect(Collectors.toList());
             }
+            catch (NoSuchFileException e) {
+                Files.createDirectories(puzzlePath);
+                Files.createFile(puzzlePath.resolve("scores.txt"));
+                scores = new ArrayList<>();
+            }
+            this.scores = scores;
         }
 
         @Override
