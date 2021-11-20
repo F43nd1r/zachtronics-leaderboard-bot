@@ -14,29 +14,17 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.discord
+package com.faendir.zachtronics.bot.reddit
 
-import com.faendir.zachtronics.bot.config.DiscordProperties
-import discord4j.core.DiscordClientBuilder
-import discord4j.core.GatewayDiscordClient
-import discord4j.core.`object`.presence.ClientPresence
-import org.springframework.cloud.context.restart.RestartEndpoint
+import com.faendir.zachtronics.bot.config.RedditProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 
 @Configuration
 @Profile("!test")
-class DiscordConfiguration {
+class RedditConfiguration {
 
     @Bean
-    fun discordClient(discordProperties: DiscordProperties): GatewayDiscordClient = DiscordClientBuilder.create(discordProperties.token)
-        .build()
-        .gateway()
-        .setInitialPresence { ClientPresence.online() }
-        .login()
-        .block()!!
-
-    @Bean
-    fun restartEndpoint() = RestartEndpoint()
+    fun redditService(redditProperties: RedditProperties): RedditService = ProductionRedditService(redditProperties)
 }
