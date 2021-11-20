@@ -34,10 +34,10 @@ import com.faendir.zachtronics.bot.om.model.OmCategory.OCX
 import com.faendir.zachtronics.bot.om.model.OmCategory.OGA
 import com.faendir.zachtronics.bot.om.model.OmCategory.OGC
 import com.faendir.zachtronics.bot.om.model.OmCategory.OGX
-import com.faendir.zachtronics.bot.om.model.OmCategory.S4A
-import com.faendir.zachtronics.bot.om.model.OmCategory.S4C
-import com.faendir.zachtronics.bot.om.model.OmCategory.S4G
-import com.faendir.zachtronics.bot.om.model.OmCategory.S4I
+import com.faendir.zachtronics.bot.om.model.OmCategory.SUM4_A
+import com.faendir.zachtronics.bot.om.model.OmCategory.SUM4_C
+import com.faendir.zachtronics.bot.om.model.OmCategory.SUM4_G
+import com.faendir.zachtronics.bot.om.model.OmCategory.SUM4_I
 import com.faendir.zachtronics.bot.om.model.OmCategory.TIA
 import com.faendir.zachtronics.bot.om.model.OmCategory.TIC
 import com.faendir.zachtronics.bot.om.model.OmCategory.TIG
@@ -59,7 +59,7 @@ class OmGithubPagesGenerator :
             "og" to listOf(OGC, OGA, OGX),
             "oc" to listOf(OCG, OCA, OCX),
             "oa" to listOf(OAG, OAC, OAX),
-            "s4" to listOf(S4G, S4C, S4A, S4I),
+            "s4" to listOf(SUM4_G, SUM4_C, SUM4_A, SUM4_I),
             "ti" to listOf(TIG, TIC, TIA),
             "i" to listOf(IGNP, ICNP, IANP, CINP)
         )
@@ -77,10 +77,10 @@ class OmGithubPagesGenerator :
         OAG to "Area/Cost",
         OAC to "Area/Cycles",
         OAX to "Area/Cost*Cycles",
-        S4G to "Sum 4/Cost",
-        S4C to "Sum 4/Cycles",
-        S4A to "Sum 4/Area",
-        S4I to "Sum 4/Instructions",
+        SUM4_G to "Sum 4/Cost",
+        SUM4_C to "Sum 4/Cycles",
+        SUM4_A to "Sum 4/Area",
+        SUM4_I to "Sum 4/Instructions",
         TIG to "Instructions/Cost",
         TIC to "Instructions/Cycles",
         TIA to "Instructions/Area",

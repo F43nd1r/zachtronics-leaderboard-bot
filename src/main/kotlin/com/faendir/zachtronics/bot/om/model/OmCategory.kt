@@ -22,11 +22,13 @@ import com.faendir.zachtronics.bot.om.model.OmMetric.COST
 import com.faendir.zachtronics.bot.om.model.OmMetric.CYCLES
 import com.faendir.zachtronics.bot.om.model.OmMetric.INSTRUCTIONS
 import com.faendir.zachtronics.bot.om.model.OmMetric.OVERLAP
+import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_AI
 import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_CA
 import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_CI
 import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_GA
 import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_GC
 import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_GI
+import com.faendir.zachtronics.bot.om.model.OmMetric.RATE
 import com.faendir.zachtronics.bot.om.model.OmMetric.SUM3A
 import com.faendir.zachtronics.bot.om.model.OmMetric.SUM3I
 import com.faendir.zachtronics.bot.om.model.OmMetric.SUM4
@@ -62,12 +64,12 @@ enum class OmCategory(
     IG(PRODUCTION_TYPES, INSTRUCTIONS, COST, CYCLES),
     IC(PRODUCTION_TYPES, INSTRUCTIONS, CYCLES, COST),
     IX(PRODUCTION_TYPES, INSTRUCTIONS, PRODUCT_GC),
-    SG(NORMAL_TYPES, SUM3A, COST),
-    SGP(PRODUCTION_TYPES, SUM3I, COST),
-    SC(NORMAL_TYPES, SUM3A, CYCLES),
-    SCP(PRODUCTION_TYPES, SUM3I, CYCLES),
-    SA(NORMAL_TYPES, SUM3A, AREA),
-    SI(PRODUCTION_TYPES, SUM3I, INSTRUCTIONS),
+    SUM_G(NORMAL_TYPES, SUM3A, COST),
+    SUM_GP(PRODUCTION_TYPES, SUM3I, COST),
+    SUM_C(NORMAL_TYPES, SUM3A, CYCLES),
+    SUM_CP(PRODUCTION_TYPES, SUM3I, CYCLES),
+    SUM_A(NORMAL_TYPES, SUM3A, AREA),
+    SUM_I(PRODUCTION_TYPES, SUM3I, INSTRUCTIONS),
 
     HEIGHT(NORMAL_TYPES, OmMetric.HEIGHT, CYCLES, COST, displayName = "Height"),
     WIDTH(setOf(NORMAL), OmMetric.WIDTH, CYCLES, COST, displayName = "Width"),
@@ -92,10 +94,14 @@ enum class OmCategory(
 
     CINP(NORMAL_TYPES, CYCLES, INSTRUCTIONS, PRODUCT_GA),
 
-    S4G(NORMAL_TYPES, SUM4, COST),
-    S4C(NORMAL_TYPES, SUM4, CYCLES),
-    S4A(NORMAL_TYPES, SUM4, AREA),
-    S4I(NORMAL_TYPES, SUM4, INSTRUCTIONS),
+    SUM4_G(NORMAL_TYPES, SUM4, COST),
+    SUM4_C(NORMAL_TYPES, SUM4, CYCLES),
+    SUM4_A(NORMAL_TYPES, SUM4, AREA),
+    SUM4_I(NORMAL_TYPES, SUM4, INSTRUCTIONS),
+
+    RG(setOf(NORMAL), RATE, COST, PRODUCT_AI),
+    RA(setOf(NORMAL), RATE, AREA, PRODUCT_GI),
+    RI(setOf(NORMAL), RATE, INSTRUCTIONS, PRODUCT_GA),
     ;
 
     override val metrics: List<OmMetric> = metricsVararg.toList()

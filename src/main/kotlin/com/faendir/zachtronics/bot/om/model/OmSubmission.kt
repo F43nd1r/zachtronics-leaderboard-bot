@@ -22,6 +22,6 @@ class OmSubmission(
     override val puzzle: OmPuzzle,
     override val score: OmScore,
     override val author: String?,
-    override val displayLink: String,
+    override val displayLink: String?,
     override val data: ByteArray
 ) : Submission<OmCategory, OmPuzzle>

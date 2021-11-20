@@ -64,6 +64,7 @@ sealed class OmMetric(override val displayName: String, val scoreParts: List<OmS
     object INSTRUCTIONS : Basic("I", OmScorePart.INSTRUCTIONS)
     object HEIGHT : Basic("Height", OmScorePart.HEIGHT)
     object WIDTH : Basic("Width", OmScorePart.WIDTH)
+    object RATE : Basic("R", OmScorePart.RATE)
 
     object SUM3A : Sum("Sum", OmScorePart.COST, OmScorePart.CYCLES, OmScorePart.AREA)
     object SUM3I : Sum("Sum", OmScorePart.COST, OmScorePart.CYCLES, OmScorePart.INSTRUCTIONS)

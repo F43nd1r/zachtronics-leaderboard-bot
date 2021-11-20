@@ -69,6 +69,7 @@ fun Solution.getMetrics(puzzle: OmPuzzle, vararg metrics: OmScorePart): Map<OmSc
                 OmScorePart.CYCLES -> verifier.getCycles(puzzleFile, solution).takeIf { it != -1 }?.toDouble()
                 OmScorePart.AREA -> verifier.getArea(puzzleFile, solution).takeIf { it != -1 }?.toDouble()
                 OmScorePart.INSTRUCTIONS -> verifier.getInstructions(puzzleFile, solution).takeIf { it != -1 }?.toDouble()
+                OmScorePart.RATE -> verifier.getRate(puzzleFile, solution)
             }
         } catch (e: Exception) {
             logger.info("Verifier threw exception", e)

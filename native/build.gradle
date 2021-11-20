@@ -47,18 +47,26 @@ model {
                     cCompiler.args '-I', "${Jvm.current().javaHome}/include"
                     cCompiler.args '-I', "${Jvm.current().javaHome}/include/darwin"
                     cCompiler.args '-mmacosx-version-min=10.4'
+                    cCompiler.args '-O2'
+                    cCompiler.args '-g'
                     linker.args '-mmacosx-version-min=10.4'
                 } else if (targetPlatform.operatingSystem.linux) {
                     cCompiler.args '-I', "${Jvm.current().javaHome}/include"
                     cCompiler.args '-I', "${Jvm.current().javaHome}/include/linux"
                     cCompiler.args '-D_FILE_OFFSET_BITS=64'
+                    cCompiler.args '-O2'
+                    cCompiler.args '-g'
                 } else if (targetPlatform.operatingSystem.windows) {
                     cCompiler.args "-I${Jvm.current().javaHome}/include"
                     cCompiler.args "-I${Jvm.current().javaHome}/include/win32"
+                    cCompiler.args '-O2'
+                    cCompiler.args '-g'
                     linker.args "Shlwapi.lib", "Advapi32.lib"
                 } else if (targetPlatform.operatingSystem.freeBSD) {
                     cCompiler.args '-I', "${Jvm.current().javaHome}/include"
                     cCompiler.args '-I', "${Jvm.current().javaHome}/include/freebsd"
+                    cCompiler.args '-O2'
+                    cCompiler.args '-g'
                 }
             }
         }

@@ -46,7 +46,10 @@ class OmSolutionRepository(
     @Qualifier("omGithubPagesLeaderboardRepository") private val leaderboard: GitRepository,
     private val pageGenerators: List<AbstractOmPageGenerator>
 ) : SolutionRepository<OmCategory, OmPuzzle, OmSubmission, OmRecord> {
-    private val json = Json { prettyPrint = true }
+    private val json = Json {
+        prettyPrint = true
+        allowSpecialFloatingPointValues = true
+    }
     private val recordOrder = Comparator
         .comparing<OmRecord, Int> {
             when {

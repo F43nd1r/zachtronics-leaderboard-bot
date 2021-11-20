@@ -55,6 +55,14 @@ JNIEXPORT jint JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_g
 JNIEXPORT jint JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_getInstructions
   (JNIEnv *, jobject, jstring, jstring);
 
+/*
+ * Class:     com_faendir_zachtronics_bot_om_JNISolutionVerifier
+ * Method:    getRate
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)I
+ */
+JNIEXPORT jdouble JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_getRate
+  (JNIEnv *, jobject, jstring, jstring);
+
 #ifdef __cplusplus
 }
 #endif

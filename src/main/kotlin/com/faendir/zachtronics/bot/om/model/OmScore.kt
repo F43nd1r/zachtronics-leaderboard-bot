@@ -29,6 +29,7 @@ data class OmScore(
     val instructions: Int? = null,
     val height: Int? = null,
     val width: Double? = null,
+    val rate: Double? = null,
     val trackless: Boolean = false,
     val overlap: Boolean = false,
 ) : Score<OmCategory> {
