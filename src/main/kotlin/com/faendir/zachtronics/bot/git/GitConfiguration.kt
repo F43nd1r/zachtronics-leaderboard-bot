@@ -23,11 +23,8 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class GitConfiguration(private val gitProperties: GitProperties) {
 
-    @Bean("omGithubPagesLeaderboardRepository")
+    @Bean("omLeaderboardRepository")
     fun omGithubPagesLeaderboardRepository() = GitRepository(gitProperties, "om-leaderboard", "https://github.com/F43nd1r/om-leaderboard.git")
-
-    @Bean("omArchiveRepository")
-    fun omArchiveRepository() = GitRepository(gitProperties, "om-archive", "https://github.com/F43nd1r/om-archive.git")
 
     @Bean("scArchiveRepository")
     fun scArchiveRepository() = GitRepository(gitProperties, "sc-archive", "https://github.com/spacechem-community-developers/spacechem-archive.git")

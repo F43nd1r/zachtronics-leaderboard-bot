@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.Score
+import com.faendir.zachtronics.bot.model.StringFormat
 import kotlinx.serialization.Serializable
 import kotlin.reflect.full.memberProperties
 
@@ -36,7 +37,7 @@ data class OmScore(
 
     override fun toDisplayString(context: DisplayContext<OmCategory>): String =
         ((context.categories?.takeIf { it.isNotEmpty() }?.flatMap { it.requiredParts }?.distinct() ?: OmScorePart.values()
-            .toList()).map { it.format(this) } + when {
+            .toList()).map { part -> part.format(this)?.let { if(context.format == StringFormat.FILE_NAME) it.replace("∞", "INF") else it } } + when {
             overlap -> "O"
             trackless -> "T"
             else -> null
