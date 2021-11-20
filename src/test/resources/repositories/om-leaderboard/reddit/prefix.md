@@ -16,37 +16,15 @@ On 24 March 2018, /u/12345ieee helped tremendously with revamping the update bot
 
 Winter 2019 featured [the first Opus Magnum tournament](https://www.reddit.com/r/opus_magnum/comments/abpxj8/opus_magnum_tourney/), hosted by /u/RandomPanda0.  These puzzles exist [on the steam workshop here](https://steamcommunity.com/sharedfiles/filedetails/?id=1700218647).  Scores for these puzzles are now on the leaderboard as well, for all 10 accepted categories.  Note the Week 6 puzzle requires a template file as a starting point, which can be found [here](https://www.dropbox.com/s/n5iuf7rroapr1za/miraculous-autosalt-week6-TEMPLATE.solution?dl=0).
 
+Tournament Puzzles for 2020 and 2021 are included in the same manner.
+
 ## Looping vs nonlooping, waste chain vs clean, etc.
 
 A solution need only bring up the completion screen to count.
-If there are many requests, I can open separate entries for some puzzles.
 
 ## How to add your solution
 
-Post your score as a comment to [this post](https://www.reddit.com/r/opus_magnum/comments/i411ul/official_record_submission_thread/).
-
-Comments should have the puzzle name, any scores associated with the puzzle, and any gifs associated with the scores all on the same line.
-Gifs are expected to be boxed links, use the format
-
-    name : [scoreA](linkA), [scoreB](linkB),...
-    name2: [score2A](link2A)
-    ...etc.
-
-if uncertain.  Links will be added automatically if posted by trusted users, if you want to be added as a trusted user join the discord and message me.
-
-Scores may be triplets or quadruplets.  u/GltyBystndr made [a script](https://www.reddit.com/r/opus_magnum/comments/7scj7i/official_record_submission_thread/dve413n/) that scrapes your solution folder and generates quadruplets in the form
-
-    <cost>/<cycles>/<area>/<instructions>
-
-Triplets should be
-
-    <cost>/<cycles>/<area>
-
-for free space puzzles, and
-
-    <cost>/<cycles>/<instructions>
-
-for production puzzles.
+Submit your score to the [discord](https://discord.gg/98QNzdJ) bot.
 
 ## Attribution
 

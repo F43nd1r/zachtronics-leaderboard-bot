@@ -130,6 +130,7 @@ class OmGithubPagesGenerator :
         val file = File(dir, "index.html")
         val old = file.takeIf { it.exists() }?.readText() ?: ""
         if (old.lines().filter { !it.contains("last updated on") } != text.lines().filter { !it.contains("last updated on") }) {
+            file.parentFile.mkdirs()
             file.writeText(text)
             add(file)
         }

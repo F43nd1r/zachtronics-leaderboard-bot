@@ -1,2 +1,0 @@
-trustedUser1
-trustedUser2
