@@ -99,7 +99,7 @@ class OmRedditWikiGenerator(private val reddit: RedditService) : AbstractOmPageG
             table += "Name|Cost|Cycles|${thirdCategory}|Sum\n:-|:-|:-|:-|:-\n"
             for (puzzle in puzzles) {
                 val entry = data[puzzle] ?: emptyMap()
-                table += "[**${puzzle.displayName}**](##Frontier: ${entry.keys.joinToString(" ") { it.score.toDisplayString() }}##)"
+                table += "[**${puzzle.displayName}**](##Frontier: ${entry.keys.joinToString(" ") { it.score.toDisplayString(DisplayContext.reddit()) }}##)"
 
                 val costScores = filterRecords(entry, costCategories)
                 val cycleScores = filterRecords(entry, cycleCategories)

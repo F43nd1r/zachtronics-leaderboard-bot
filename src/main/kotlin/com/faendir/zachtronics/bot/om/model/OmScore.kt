@@ -41,14 +41,17 @@ data class OmScore(
             overlap -> "O"
             trackless -> "T"
             else -> null
-        }).filterNotNull().joinToString(context.separator) + (
-                context.categories
-                    ?.flatMap { it.metrics.toList() }
-                    ?.distinct()
-                    ?.mapNotNull { metric -> metric.describe(this) }
-                    ?.takeIf { it.isNotEmpty() }
-                    ?.joinToString(separator = ", ", prefix = " (", postfix = ")") ?: ""
-                )
+        }).filterNotNull().joinToString(context.separator) + when (context.format) {
+            StringFormat.DISCORD, StringFormat.PLAIN_TEXT -> (
+                    context.categories
+                        ?.flatMap { it.metrics.toList() }
+                        ?.distinct()
+                        ?.mapNotNull { metric -> metric.describe(this) }
+                        ?.takeIf { it.isNotEmpty() }
+                        ?.joinToString(separator = ", ", prefix = " (", postfix = ")") ?: ""
+                    )
+            else -> ""
+        }
 
     fun isSupersetOf(other: OmScore): Boolean {
         var hasMoreData = false
