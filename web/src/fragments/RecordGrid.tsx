@@ -30,7 +30,7 @@ export default function RecordGrid(props: RecordGridProps) {
             {props.records.map((record) => (
                 <Grid item xs>
                     <Card>
-                        <CardActionArea href={record.gif ?? ""}>
+                        <CardActionArea href={record.gif ?? window.location.href}>
                             <CardHeader title={props.getTitle(record)} />
                             {record.gif ? (
                                 <CardMedia

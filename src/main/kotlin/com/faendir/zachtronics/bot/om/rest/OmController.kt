@@ -78,10 +78,7 @@ class OmController(private val repository: OmSolutionRepository, private val dis
     fun listRecords(@PathVariable categoryId: String): List<OmRecordDTO> {
         val category =
             OmCategory.values().find { it.name == categoryId } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Category $categoryId not found.")
-        return OmPuzzle.values()
-            .filter { category.supportsPuzzle(it) }
-            .map { it to repository.find(it, category) }
-            .map { (puzzle, record) -> record?.withCategory(category)?.toDTO() ?: emptyRecord(puzzle) }
+        return repository.findAll(category).entries.sortedBy { it.key }.map { it.value?.withCategory(category)?.toDTO() ?: emptyRecord(it.key) }
     }
 
     @GetMapping(path = ["/puzzle/{puzzleId}/category/{categoryId}/record"], produces = [MediaType.APPLICATION_JSON_VALUE])

@@ -30,7 +30,7 @@ export default function PuzzleView() {
     const [state, setState] = useState(ComponentState.LOADING)
     const [records, setRecords] = useState<Record[]>([])
     useEffect(() => {
-        fetchFromApi<Record[]>(`/puzzle/${puzzleId}/records`, setState).then((data) => setRecords(data))
+        fetchFromApi<Record[]>(`/puzzle/${puzzleId}/records?includeFrontier=true`, setState).then((data) => setRecords(data))
     }, [puzzleId])
 
     let content: JSX.Element
@@ -47,7 +47,7 @@ export default function PuzzleView() {
             )
             break
         case ComponentState.READY:
-            content = <RecordGrid records={records} getTitle={(record) => record.smartFormattedCategories ?? ""} />
+            content = <RecordGrid records={records} getTitle={(record) => record.smartFormattedCategories || "Pareto Frontier"} />
             break
     }
 
