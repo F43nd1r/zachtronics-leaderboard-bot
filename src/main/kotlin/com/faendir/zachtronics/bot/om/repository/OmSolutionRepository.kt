@@ -109,7 +109,7 @@ class OmSolutionRepository(
     }
 
     override fun submit(submission: OmSubmission): SubmitResult<OmRecord, OmCategory> =
-        leaderboard.acquireWriteAccess().use { leaderboardScope->
+        leaderboard.acquireWriteAccess().use { leaderboardScope ->
             loadDataIfNecessary(leaderboardScope)
             val records = data.getValue(submission.puzzle)
             val newRecord by lazy { submission.createRecord(leaderboardScope) }
@@ -210,6 +210,7 @@ class OmSolutionRepository(
 
     fun findAll(category: OmCategory): Map<OmPuzzle, OmRecord?> {
         leaderboard.acquireReadAccess().use { l -> loadDataIfNecessary(l) }
-        return data.entries.associate { it.key to it.value.entries.find { (_, categories) -> categories.contains(category) }?.key }
+        return data.entries.filter { category.supportsPuzzle(it.key) }
+            .associate { it.key to it.value.entries.find { (_, categories) -> categories.contains(category) }?.key }
     }
 }

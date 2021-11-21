@@ -19,7 +19,7 @@ import Puzzle from "./Puzzle"
 export default interface Record {
     puzzle: Puzzle
     smartFormattedScore?: string
-    fullFormattedScore: string
+    fullFormattedScore?: string
     gif?: string
     solution?: string
     smartFormattedCategories?: string

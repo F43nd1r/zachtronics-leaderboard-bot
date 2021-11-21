@@ -29,7 +29,12 @@ export default function RecordGrid(props: RecordGridProps) {
         <Grid container spacing={3}>
             {props.records.map((record) => (
                 <Grid item xs>
-                    <Card>
+                    <Card
+                        sx={{
+                            minWidth: "min(100vw, 460px)",
+                            maxWidth: "100%",
+                        }}
+                    >
                         <CardActionArea href={record.gif ?? window.location.href}>
                             <CardHeader title={props.getTitle(record)} />
                             {record.gif ? (
@@ -37,11 +42,12 @@ export default function RecordGrid(props: RecordGridProps) {
                                     component={record.gif.endsWith(".mp4") || record.gif.endsWith(".webm") ? "video" : "img"}
                                     autoPlay
                                     loop
-                                    height="360"
                                     src={record.gif}
                                     alt="Gif not loading"
                                     style={{
+                                        height: "min(70vw, 360px)",
                                         width: "auto",
+                                        maxWidth: "100%",
                                         marginLeft: "auto",
                                         marginRight: "auto",
                                         lineHeight: "50px",
@@ -65,7 +71,7 @@ export default function RecordGrid(props: RecordGridProps) {
                                     <span>No gif found</span>
                                 </Box>
                             )}
-                            <CardContent>{record.smartFormattedScore ?? record.fullFormattedScore}</CardContent>
+                            <CardContent>{record.smartFormattedScore ?? record.fullFormattedScore ?? "None"}</CardContent>
                         </CardActionArea>
 
                         <CardActions
