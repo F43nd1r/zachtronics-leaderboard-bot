@@ -26,6 +26,7 @@ kaseChange = "1.3.0"
 kotlinCompileTesting = "1.4.6"
 junit = "5.8.1"
 springdoc = "1.5.12"
+gradle-node = "3.1.1"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -41,6 +42,7 @@ gradle-docker = { id = "com.palantir.docker", version.ref = "gradle-docker" }
 gradle-lombok = { id = "io.freefair.lombok", version.ref = "gradle-lombok" }
 gradle-gitProperties = { id = "com.gorylenko.gradle-git-properties", version.ref = "gradle-gitProperties" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+gradle-node = { id = "com.github.node-gradle.node", version.ref = "gradle-node"}
 
 [libraries]
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-json" }

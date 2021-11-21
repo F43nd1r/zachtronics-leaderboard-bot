@@ -75,7 +75,17 @@ fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> 
         }
 }
 
-fun Collection<Category>.toMetricsTree(): TreeRoot<Metric> = TreeRoot<Metric>().also { tree -> forEach { tree.addPath(it.metrics) } }
+fun Collection<Category>.toMetricsTree(): TreeRoot<Pair<Metric, Category?>> = TreeRoot<Pair<Metric, Category?>>().also { tree ->
+    forEach { category -> tree.addPath(category.metrics.dropLast(1).map { it to null } + (category.metrics.last() to category)) } }
+
+fun Collection<Category>.smartFormat(reference: TreeRoot<Pair<Metric, Category?>>): String {
+    val metricsTree = toMetricsTree()
+    metricsTree.collapseFullyPresentNodes(reference)
+    val shortenedCategories = metricsTree.getAllPaths()
+        .map { list -> list.map { it.first } to list.last().second }
+        .map { (metrics, category) -> category?.displayName ?: metrics.joinToString("") { it.displayName } }
+    return shortenedCategories.joinToString(", ")
+}
 
 @Suppress("UNCHECKED_CAST")
 fun <R : Record<C>?, C : Category> SafeEmbedMessageBuilder.embedCategoryRecords(
@@ -96,16 +106,10 @@ fun <R : Record<C>?, C : Category> SafeEmbedMessageBuilder.embedRecords(
     formatCategorySpecific: Boolean = false
 ): SafeEmbedMessageBuilder {
     val reference = supportedCategories.toMetricsTree()
-    val referencePaths = supportedCategories.associateBy { it.metrics }
     return this.addFields(
         records.map { (record, categories) ->
-            val metricsTree = categories.toMetricsTree()
-            metricsTree.collapseFullyPresentNodes(reference)
-            val shortenedCategories = metricsTree.getAllPaths().map { metrics ->
-                referencePaths[metrics]?.displayName ?: metrics.joinToString("") { it.displayName }
-            }
             EmbedCreateFields.Field.of(
-                shortenedCategories.joinToString(", ").ifEmptyZeroWidthSpace(),
+                categories.smartFormat(reference).ifEmptyZeroWidthSpace(),
                 record?.toDisplayString(DisplayContext(StringFormat.DISCORD, categories.takeIf { formatCategorySpecific }?.toList())) ?: "none",
                 true
             )

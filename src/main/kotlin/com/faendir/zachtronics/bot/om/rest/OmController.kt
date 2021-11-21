@@ -21,6 +21,7 @@ import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.om.createSubmission
 import com.faendir.zachtronics.bot.om.model.OmCategory
+import com.faendir.zachtronics.bot.om.model.OmGroup
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
@@ -32,6 +33,8 @@ import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.filterIsInstance
 import com.faendir.zachtronics.bot.utils.isValidLink
 import com.faendir.zachtronics.bot.utils.orEmpty
+import com.faendir.zachtronics.bot.utils.smartFormat
+import com.faendir.zachtronics.bot.utils.toMetricsTree
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.channel.MessageChannel
 import org.springframework.http.HttpStatus
@@ -50,8 +53,17 @@ import org.springframework.web.server.ResponseStatusException
 @RequestMapping("/om")
 class OmController(private val repository: OmSolutionRepository, private val discordClient: GatewayDiscordClient) {
 
+    @GetMapping(path = ["/groups"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun listGroups(): List<OmGroupDTO> = OmGroup.values().map { it.toDTO() }
+
     @GetMapping(path = ["/puzzles"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun listPuzzles(): List<OmPuzzleDTO> = OmPuzzle.values().map { it.toDTO() }
+
+    @GetMapping(path = ["/group/{groupId}/puzzles"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun listPuzzlesByGroup(@PathVariable groupId: String): List<OmPuzzleDTO> {
+        val group = OmGroup.values().find { it.name == groupId } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Group $groupId not found.")
+        return OmPuzzle.values().filter { it.group == group }.map { it.toDTO() }
+    }
 
     @GetMapping(path = ["/categories"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun listCategories(): List<OmCategoryDTO> = OmCategory.values().map { it.toDTO() }
@@ -62,12 +74,22 @@ class OmController(private val repository: OmSolutionRepository, private val dis
         return repository.findCategoryHolders(puzzle, includeFrontier ?: false).map { it.toDTO() }
     }
 
+    @GetMapping(path = ["/category/{categoryId}/records"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun listRecords(@PathVariable categoryId: String): List<OmRecordDTO> {
+        val category =
+            OmCategory.values().find { it.name == categoryId } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Category $categoryId not found.")
+        return OmPuzzle.values()
+            .filter { category.supportsPuzzle(it) }
+            .map { it to repository.find(it, category) }
+            .map { (puzzle, record) -> record?.withCategory(category)?.toDTO() ?: emptyRecord(puzzle) }
+    }
+
     @GetMapping(path = ["/puzzle/{puzzleId}/category/{categoryId}/record"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getRecord(@PathVariable puzzleId: String, @PathVariable categoryId: String): OmRecordDTO? {
         val puzzle = OmPuzzle.values().find { it.id == puzzleId } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Puzzle $puzzleId not found.")
         val category =
             OmCategory.values().find { it.name == categoryId } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Category $categoryId not found.")
-        return repository.find(puzzle, category)?.toDTO()
+        return repository.find(puzzle, category)?.withCategory(category)?.toDTO()
     }
 
     @PostMapping(path = ["/submit"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
@@ -105,6 +127,10 @@ class OmController(private val repository: OmSolutionRepository, private val dis
     }
 }
 
+data class OmGroupDTO(val id: String, val displayName: String)
+
+fun OmGroup.toDTO() = OmGroupDTO(name, displayName)
+
 data class OmPuzzleDTO(val id: String, val displayName: String)
 
 fun OmPuzzle.toDTO() = OmPuzzleDTO(id, displayName)
@@ -137,12 +163,41 @@ fun OmScore.toDTO() = OmScoreDTO(
     overlap = overlap
 )
 
-data class OmRecordDTO(val puzzleId: String, val score: OmScoreDTO, val gif: String?, val solution: String?, val categoryIds: List<String>? = null)
+data class OmRecordDTO(
+    val puzzle: OmPuzzleDTO,
+    val score: OmScoreDTO?,
+    val smartFormattedScore: String?,
+    val fullFormattedScore: String?,
+    val gif: String?,
+    val solution: String?,
+    val categoryIds: List<String>?,
+    val smartFormattedCategories: String?
+)
 
 fun CategoryRecord<OmRecord, OmCategory>.toDTO() =
-    OmRecordDTO(record.puzzle.id, record.score.toDTO(), record.displayLink, record.dataLink, categories.map { it.name })
+    OmRecordDTO(
+        puzzle = record.puzzle.toDTO(),
+        score = record.score.toDTO(),
+        smartFormattedScore = record.score.toDisplayString(DisplayContext(StringFormat.PLAIN_TEXT, categories.toList())),
+        fullFormattedScore = record.score.toDisplayString(DisplayContext.plainText()),
+        gif = record.displayLink,
+        solution = record.dataLink,
+        categoryIds = categories.map { it.name },
+        smartFormattedCategories = categories.smartFormat(record.puzzle.supportedCategories.toMetricsTree())
+    )
 
-fun OmRecord.toDTO() = OmRecordDTO(puzzle.id, score.toDTO(), displayLink, dataLink)
+fun emptyRecord(puzzle: OmPuzzle) = OmRecordDTO(
+    puzzle = puzzle.toDTO(),
+    score = null,
+    smartFormattedScore = null,
+    fullFormattedScore = null,
+    gif = null,
+    solution = null,
+    categoryIds = null,
+    smartFormattedCategories = null
+)
+
+fun OmRecord.withCategory(category: OmCategory) = CategoryRecord(this, setOf(category))
 
 data class OmSubmissionDTO(val gif: String, val author: String, val solution: MultipartFile)
 
