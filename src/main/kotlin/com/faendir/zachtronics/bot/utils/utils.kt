@@ -18,12 +18,7 @@ package com.faendir.zachtronics.bot.utils
 
 import com.faendir.discord4j.command.parse.SingleParseResult
 import com.faendir.zachtronics.bot.discord.Colors
-import com.faendir.zachtronics.bot.model.Category
-import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.model.Metric
-import com.faendir.zachtronics.bot.model.Puzzle
-import com.faendir.zachtronics.bot.model.Record
-import com.faendir.zachtronics.bot.model.StringFormat
+import com.faendir.zachtronics.bot.model.*
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import discord4j.core.`object`.entity.User
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
@@ -101,11 +96,14 @@ fun <R : Record<C>?, C : Category> SafeEmbedMessageBuilder.embedRecords(
     formatCategorySpecific: Boolean = false
 ): SafeEmbedMessageBuilder {
     val reference = supportedCategories.toMetricsTree()
+    val referencePaths = supportedCategories.associateBy { it.metrics }
     return this.addFields(
         records.map { (record, categories) ->
             val metricsTree = categories.toMetricsTree()
             metricsTree.collapseFullyPresentNodes(reference)
-            val shortenedCategories = metricsTree.getAllPaths().map { metrics -> metrics.joinToString("") { it.displayName } }
+            val shortenedCategories = metricsTree.getAllPaths().map { metrics ->
+                referencePaths[metrics] ?: metrics.joinToString("") { it.displayName }
+            }
             EmbedCreateFields.Field.of(
                 shortenedCategories.joinToString(", ").ifEmptyZeroWidthSpace(),
                 record?.toDisplayString(DisplayContext(StringFormat.DISCORD, categories.takeIf { formatCategorySpecific }?.toList())) ?: "none",

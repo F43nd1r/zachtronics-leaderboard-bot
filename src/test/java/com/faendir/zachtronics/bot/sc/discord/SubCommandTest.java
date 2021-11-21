@@ -91,7 +91,7 @@ public class SubCommandTest {
 
         args = Map.of("puzzle", "Dessication Station");
         result = runCommand("frontier", args); // all 3 C categories
-        assertTrue(result.contains("CRS\n") && result.contains("CRSNB\n") && result.contains("CRSNP\n"));
+        assertTrue(result.contains("C\n") && result.contains("CNB\n") && result.contains("CNP\n"));
     }
 
     @Test
