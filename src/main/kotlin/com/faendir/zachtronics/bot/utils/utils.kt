@@ -102,7 +102,7 @@ fun <R : Record<C>?, C : Category> SafeEmbedMessageBuilder.embedRecords(
             val metricsTree = categories.toMetricsTree()
             metricsTree.collapseFullyPresentNodes(reference)
             val shortenedCategories = metricsTree.getAllPaths().map { metrics ->
-                referencePaths[metrics] ?: metrics.joinToString("") { it.displayName }
+                referencePaths[metrics]?.displayName ?: metrics.joinToString("") { it.displayName }
             }
             EmbedCreateFields.Field.of(
                 shortenedCategories.joinToString(", ").ifEmptyZeroWidthSpace(),
