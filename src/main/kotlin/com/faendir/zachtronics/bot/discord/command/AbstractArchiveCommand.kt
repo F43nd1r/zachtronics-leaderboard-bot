@@ -49,7 +49,7 @@ abstract class AbstractArchiveCommand<T, C: Category, S : Submission<C, *>> : Ab
         for ((validationResult, submitResult) in validationResults.zip(submissionResults)) {
             val name = if (validationResult is ValidationResult.Unparseable) "*Failed*" else "*${validationResult.submission.puzzle.displayName}*"
             val value = when (validationResult) {
-                is ValidationResult.Valid<S> -> {
+                is ValidationResult.Valid<S>, is ValidationResult.Invalid<S> -> {
                     val score = validationResult.submission.score.toDisplayString(DisplayContext.discord())
                     when (submitResult) {
                         is SubmitResult.Success -> "`$score` has been archived.\n${submitResult.message}"
@@ -58,7 +58,7 @@ abstract class AbstractArchiveCommand<T, C: Category, S : Submission<C, *>> : Ab
                         is SubmitResult.Failure -> "`$score` failed.\n${submitResult.message}"
                     }
                 }
-                is ValidationResult.Invalid<S>, is ValidationResult.Unparseable -> validationResult.message
+               is ValidationResult.Unparseable -> validationResult.message
             }
             embed.addField(name, value, true)
         }

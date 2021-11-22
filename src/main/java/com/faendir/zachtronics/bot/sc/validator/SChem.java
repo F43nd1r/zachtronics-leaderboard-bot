@@ -90,7 +90,7 @@ public class SChem {
             return new ValidationResult.Unparseable<>(e.getMessage());
         }
 
-        if (result.getLevelName() == null || result.getAuthor() == null)
+        if (result.getLevelName() == null || result.getAuthor() == null || result.getCycles() == null)
             return new ValidationResult.Unparseable<>(result.getError());
 
         ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), false,

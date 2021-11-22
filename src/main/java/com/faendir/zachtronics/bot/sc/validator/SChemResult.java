@@ -42,8 +42,8 @@ public class SChemResult {
     @Nullable String levelName;
     /** <tt>null</tt> for main game */
     @Nullable int[] resnetId;
-    /** <tt>0</tt> for reaction error */
-    int cycles;
+    /** <tt>null</tt> for reaction error or timeout */
+    @Nullable Integer cycles;
     /** <tt>0</tt> for import error */
     int reactors;
     /** <tt>0</tt> for import error */

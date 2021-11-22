@@ -92,6 +92,20 @@ class SChemValidateTest {
     }
 
     @Test
+    void timeout() {
+        String export = """
+                SOLUTION:Of Pancakes and Spaceships,12345ieee,100-1-0,fails timeout
+                COMPONENT:'empty-research-reactor',2,0,''
+                MEMBER:'instr-start',0,0,128,0,1,0,0
+                MEMBER:'instr-start',180,0,32,1,1,0,0
+                PIPE:0,4,1
+                PIPE:1,4,2
+                """;
+
+        assertTrue(SChem.validate(export) instanceof ValidationResult.Unparseable);
+    }
+
+    @Test
     void duplicateLevelName() {
         String export = """
                 SOLUTION:Pyridine,12345ieee,123-1-29
