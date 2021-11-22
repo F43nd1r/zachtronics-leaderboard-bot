@@ -40,7 +40,7 @@ function Groups() {
     let content: JSX.Element[]
     switch (state) {
         case ComponentState.LOADING:
-            content = [<LoadingIndicator />]
+            content = [<LoadingIndicator key={"loading"} />]
             break
         case ComponentState.ERROR:
             content = [
@@ -81,7 +81,7 @@ function Puzzles(props: PuzzlesProps) {
     let content: JSX.Element[]
     switch (state) {
         case ComponentState.LOADING:
-            content = [<LoadingIndicator />]
+            content = [<LoadingIndicator key={"loading"} />]
             break
         case ComponentState.ERROR:
             content = [
@@ -121,7 +121,7 @@ function Categories() {
     let content: JSX.Element[]
     switch (state) {
         case ComponentState.LOADING:
-            content = [<LoadingIndicator />]
+            content = [<LoadingIndicator key={"loading"} />]
             break
         case ComponentState.ERROR:
             content = [

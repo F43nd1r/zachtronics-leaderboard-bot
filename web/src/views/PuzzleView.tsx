@@ -14,42 +14,35 @@
  * limitations under the License.
  */
 
-import { useParams } from "react-router-dom"
-import React, { useEffect, useState } from "react"
-import { ComponentState } from "../utils/ComponentState"
-import { Error } from "@mui/icons-material"
-import Record from "../model/Record"
-import RecordGrid from "../fragments/RecordGrid"
-import LoadingIndicator from "../components/LoadingIndicator"
-import fetchFromApi from "../utils/fetchFromApi"
+import Box from "@mui/material/Box"
+import { Tab, Tabs } from "@mui/material"
+import { Link, Outlet, useLocation } from "react-router-dom"
 
 export default function PuzzleView() {
-    const params = useParams()
-    const puzzleId = params.puzzleId as string
+    const location = useLocation()
+    const lastSegment = location.pathname.split("/").reverse()[0]
 
-    const [state, setState] = useState(ComponentState.LOADING)
-    const [records, setRecords] = useState<Record[]>([])
-    useEffect(() => {
-        fetchFromApi<Record[]>(`/puzzle/${puzzleId}/records?includeFrontier=true`, setState).then((data) => setRecords(data))
-    }, [puzzleId])
-
-    let content: JSX.Element
-    switch (state) {
-        case ComponentState.LOADING:
-            content = <LoadingIndicator />
-            break
-        case ComponentState.ERROR:
-            content = (
-                <>
-                    <Error />
-                    Failed to load records
-                </>
-            )
-            break
-        case ComponentState.READY:
-            content = <RecordGrid records={records} getTitle={(record) => record.smartFormattedCategories || "Pareto Frontier"} />
-            break
-    }
-
-    return content
+    return (
+        <Box
+            sx={{
+                display: "flex",
+                flexDirection: "column",
+                flexGrow: 1,
+            }}
+        >
+            <Box
+                sx={{
+                    borderBottom: 1,
+                    marginBottom: "1rem",
+                    borderColor: "divider",
+                }}
+            >
+                <Tabs value={lastSegment}>
+                    <Tab label="Records" value="records" to="records" component={Link} />
+                    <Tab label="Frontier" value="frontier" to="frontier" component={Link} />
+                </Tabs>
+            </Box>
+            <Outlet />
+        </Box>
+    )
 }

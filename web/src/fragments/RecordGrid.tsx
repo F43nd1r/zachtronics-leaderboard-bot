@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { Box, Button, Card, CardActionArea, CardActions, CardContent, CardHeader, CardMedia, Grid } from "@mui/material"
-import { SentimentVeryDissatisfied } from "@mui/icons-material"
+import { Grid } from "@mui/material"
 import React from "react"
 import Record from "../model/Record"
+import RecordCard from "./RecordCard"
 
 interface RecordGridProps {
     records: Record[]
@@ -29,72 +29,7 @@ export default function RecordGrid(props: RecordGridProps) {
         <Grid container spacing={3}>
             {props.records.map((record) => (
                 <Grid item xs>
-                    <Card
-                        sx={{
-                            minWidth: "min(100vw, 460px)",
-                            maxWidth: "100%",
-                        }}
-                    >
-                        <CardActionArea href={record.gif ?? window.location.href}>
-                            <CardHeader title={props.getTitle(record)} />
-                            {record.gif ? (
-                                <CardMedia
-                                    component={record.gif.endsWith(".mp4") || record.gif.endsWith(".webm") ? "video" : "img"}
-                                    autoPlay
-                                    loop
-                                    src={record.gif}
-                                    alt="Gif not loading"
-                                    style={{
-                                        height: "min(70vw, 360px)",
-                                        width: "auto",
-                                        maxWidth: "100%",
-                                        marginLeft: "auto",
-                                        marginRight: "auto",
-                                        lineHeight: "50px",
-                                        textAlign: "center",
-                                    }}
-                                />
-                            ) : (
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        height: "360px",
-                                        width: "480px",
-                                        marginLeft: "auto",
-                                        marginRight: "auto",
-                                        flexDirection: "column",
-                                    }}
-                                >
-                                    <SentimentVeryDissatisfied sx={{ margin: "1rem" }} fontSize="large" />
-                                    <span>No gif found</span>
-                                </Box>
-                            )}
-                            <CardContent>{record.smartFormattedScore ?? record.fullFormattedScore ?? "None"}</CardContent>
-                        </CardActionArea>
-
-                        <CardActions
-                            style={{
-                                padding: "1rem",
-                                display: "flex",
-                                justifyContent: "end",
-                            }}
-                        >
-                            <Button size="small" variant="outlined" color="primary" disabled={!record.solution}>
-                                <a
-                                    href={record.solution}
-                                    download
-                                    style={{
-                                        color: "inherit",
-                                        textDecoration: "none",
-                                    }}
-                                >
-                                    Download
-                                </a>
-                            </Button>
-                        </CardActions>
-                    </Card>
+                    <RecordCard record={record} title={props.getTitle(record)} />
                 </Grid>
             ))}
         </Grid>

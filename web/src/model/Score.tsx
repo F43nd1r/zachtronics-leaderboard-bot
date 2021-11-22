@@ -13,16 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import Puzzle from "./Puzzle"
-import Score from "./Score"
-
-export default interface Record {
-    puzzle: Puzzle
-    score?: Score
-    smartFormattedScore?: string
-    fullFormattedScore?: string
-    gif?: string
-    solution?: string
-    smartFormattedCategories?: string
+export default interface Score {
+    cost?: number
+    cycles?: number
+    area?: number
+    instructions?: number
+    height?: number
+    width?: number
+    rate?: number
+    trackless: boolean
+    overlap: boolean
 }
