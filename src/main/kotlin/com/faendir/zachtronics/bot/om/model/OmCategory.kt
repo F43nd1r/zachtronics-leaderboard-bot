@@ -99,9 +99,9 @@ enum class OmCategory(
     SUM4_A(NORMAL_TYPES, SUM4, AREA),
     SUM4_I(NORMAL_TYPES, SUM4, INSTRUCTIONS),
 
-    RG(setOf(NORMAL), RATE, COST, PRODUCT_AI),
-    RA(setOf(NORMAL), RATE, AREA, PRODUCT_GI),
-    RI(setOf(NORMAL), RATE, INSTRUCTIONS, PRODUCT_GA),
+    RG(NORMAL_TYPES, RATE, COST, PRODUCT_AI),
+    RA(NORMAL_TYPES, RATE, AREA, PRODUCT_GI),
+    RI(NORMAL_TYPES, RATE, INSTRUCTIONS, PRODUCT_GA),
     ;
 
     override val metrics: List<OmMetric> = metricsVararg.toList()
