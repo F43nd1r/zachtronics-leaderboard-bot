@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import Plot from "react-plotly.js"
 import { withSize } from "react-sizeme"
 import { useParams } from "react-router-dom"
 import React, { useEffect, useState } from "react"
@@ -25,6 +24,8 @@ import { Error } from "@mui/icons-material"
 import { Box, MenuItem, Modal, Select, ToggleButton, ToggleButtonGroup, useTheme } from "@mui/material"
 import OmRecord from "../model/Record"
 import RecordCard from "../fragments/RecordCard"
+import createPlotlyComponent from "react-plotly.js/factory"
+import Plotly from "plotly.js-gl3d-dist-min"
 
 interface PuzzleFrontierPlotProps {
     size: { width: number; height: number }
@@ -34,6 +35,8 @@ interface PuzzleFrontierPlotProps {
     y: Metric
     z: Metric
 }
+
+const Plot = createPlotlyComponent(Plotly)
 
 function PuzzleFrontierPlot(props: PuzzleFrontierPlotProps) {
     const theme = useTheme()
@@ -56,6 +59,7 @@ function PuzzleFrontierPlot(props: PuzzleFrontierPlotProps) {
                         mode: "markers",
                         marker: {
                             size: (props.mode === "2D" && 20) || 10,
+                            color: props.records.map((record) => (record.score?.overlap && "#880e4f") || "#0288d1"),
                         },
                     },
                 ]}

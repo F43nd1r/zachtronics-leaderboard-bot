@@ -9,7 +9,6 @@ RUN java -Djarmode=layertools -jar application.jar extract
 
 FROM openjdk:17-jdk-bullseye
 WORKDIR application
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg
 COPY --from=builder /python /root/.local
 RUN true
 COPY --from=builder application/dependencies/ ./

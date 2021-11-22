@@ -1,13 +1,14 @@
 import "./index.css"
 import App from "./App"
-import React from "react"
+import React, { lazy } from "react"
 import ReactDOM from "react-dom"
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
-import PuzzleRecordsView from "./views/PuzzleRecordsView"
-import CategoryView from "./views/CategoryView"
 import MainView from "./views/MainView"
-import PuzzleView from "./views/PuzzleView"
-import PuzzleFrontierView from "./views/PuzzleFrontierView"
+
+const PuzzleView = lazy(() => import("./views/PuzzleView"))
+const PuzzleRecordsView = lazy(() => import("./views/PuzzleRecordsView"))
+const PuzzleFrontierView = lazy(() => import("./views/PuzzleFrontierView"))
+const CategoryView = lazy(() => import("./views/CategoryView"))
 
 ReactDOM.render(
     <React.StrictMode>
