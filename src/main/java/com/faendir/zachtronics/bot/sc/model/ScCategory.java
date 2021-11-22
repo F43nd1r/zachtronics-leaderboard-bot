@@ -51,7 +51,7 @@ public enum ScCategory implements Category {
     private final Set<ScType> supportedTypes;
     private final boolean bugFree;
     private final boolean precogFree;
-    /** contains <tt>%s%s%c%d%c%d%s</tt> plus a bunch of <tt>*</tt> most likely */
+    /** contains <tt>%s%s%s%d%s%d%s</tt> plus a bunch of <tt>*</tt> most likely */
     private final String scoreFormatString;
 
     @SuppressWarnings("unchecked")

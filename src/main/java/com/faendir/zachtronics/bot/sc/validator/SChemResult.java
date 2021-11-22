@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
  <pre>{
  "level_name": "Fuming Nitric Acid",
  "resnet_id": [3, 7, 2], # null for main game
- "cycles": 115,
+ "cycles": 115, # null for reaction error
  "reactors": 1,
  "symbols": 6,
  "author": "12345ieee",

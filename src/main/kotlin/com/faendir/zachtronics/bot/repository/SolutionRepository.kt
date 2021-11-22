@@ -20,11 +20,14 @@ import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.Submission
+import com.faendir.zachtronics.bot.validation.ValidationResult
 
 interface SolutionRepository<C : Category, P : Puzzle<C>, S : Submission<C, P>, R: Record<C>> {
     fun submit(submission: S) : SubmitResult<R, C>
 
-    fun submitAll(submissions: Collection<S>): List<SubmitResult<R, C>> = submissions.map { submit(it) }
+    fun submitAll(validationResults: Collection<ValidationResult<S>>): List<SubmitResult<R, C>> {
+        throw NotImplementedError()
+    }
 
     fun find(puzzle: P, category: C) : R?
 

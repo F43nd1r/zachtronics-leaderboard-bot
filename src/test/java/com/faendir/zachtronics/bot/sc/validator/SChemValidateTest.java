@@ -20,15 +20,22 @@ import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
+import com.faendir.zachtronics.bot.validation.ValidationResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @BotTest(Application.class)
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
 class SChemValidateTest {
+
+    @Test
+    public void importError() {
+        String export = "Invalid";
+        assertTrue(SChem.validate(export) instanceof ValidationResult.Unparseable);
+    }
 
     @Test
     public void incoherentPrecog() {
@@ -57,7 +64,7 @@ class SChemValidateTest {
                 PIPE:1,4,2
                 """;
 
-        assertThrows(SChemException.class, () -> SChem.validate(export));
+        assertTrue(SChem.validate(export) instanceof ValidationResult.Invalid);
     }
 
     @Test
@@ -78,7 +85,7 @@ class SChemValidateTest {
                 PIPE:1,4,2
                 """;
 
-        assertThrows(SChemException.class, () -> SChem.validate(export));
+        assertTrue(SChem.validate(export) instanceof ValidationResult.Invalid);
     }
 
     @Test
@@ -129,7 +136,7 @@ class SChemValidateTest {
                 PIPE:1,4,2
                 """;
 
-        ScPuzzle result = SChem.validate(export).getPuzzle();
+        ScPuzzle result = SChem.validate(export).getSubmission().getPuzzle();
         assertEquals(ScPuzzle.published_13_1, result);
     }
 
@@ -138,7 +145,7 @@ class SChemValidateTest {
         String export = "SOLUTION:QT-3,Zig,109-1-24,/B telekinesys"; // it doesn't have to run at all
 
         ScScore expected = new ScScore(109, 1, 24, true, false);
-        ScScore result = SChem.validateMultiExport(export, null, true).get(0).getScore();
+        ScScore result = SChem.validateMultiExport(export, null, true).iterator().next().getSubmission().getScore();
         assertEquals(expected, result);
     }
 }

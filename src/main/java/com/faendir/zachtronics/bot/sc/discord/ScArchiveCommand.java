@@ -26,6 +26,7 @@ import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScSubmission;
 import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
+import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -34,12 +35,13 @@ import lombok.experimental.NonFinal;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Collection;
 
 @RequiredArgsConstructor
 @Component
 @ScQualifier
-public class ScArchiveCommand extends AbstractArchiveCommand<ScArchiveCommand.ArchiveData, ScCategory, ScSubmission> implements ScSecured {
+public class ScArchiveCommand extends AbstractArchiveCommand<ScArchiveCommand.ArchiveData, ScCategory, ScSubmission>
+        implements ScSecured {
     @Delegate
     private final ScArchiveCommand_ArchiveDataParser parser = ScArchiveCommand_ArchiveDataParser.INSTANCE;
     @Getter
@@ -47,7 +49,7 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScArchiveCommand.Ar
 
     @NotNull
     @Override
-    public List<ScSubmission> parseSubmissions(@NotNull ArchiveData parameters) {
+    public Collection<ValidationResult<ScSubmission>> parseSubmissions(@NotNull ArchiveData parameters) {
         boolean bypassValidation = parameters.bypassValidation != null && parameters.bypassValidation;
         return ScSubmission.fromExportLink(parameters.export, parameters.puzzle, bypassValidation);
     }

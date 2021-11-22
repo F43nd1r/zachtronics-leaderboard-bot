@@ -25,6 +25,7 @@ import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.sc.model.*;
+import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -86,11 +87,17 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
 
     @NotNull
     @Override
-    public List<SubmitResult<ScRecord, ScCategory>> submitAll(@NotNull Collection<? extends ScSubmission> submissions) {
+    public List<SubmitResult<ScRecord, ScCategory>> submitAll(
+            @NotNull Collection<? extends ValidationResult<ScSubmission>> validationResults) {
         try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
-            List<SubmitResult<ScRecord, ScCategory>> r = submissions.stream().map(s -> performArchive(access, s)).toList();
+            List<SubmitResult<ScRecord, ScCategory>> l = validationResults.stream().map(r -> {
+                if (r instanceof ValidationResult.Valid<ScSubmission>)
+                    return performArchive(access, r.getSubmission());
+                else
+                    return new SubmitResult.Failure<ScRecord, ScCategory>(r.getMessage());
+            }).toList();
             access.push();
-            return r;
+            return l;
         }
     }
 
@@ -361,15 +368,6 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     protected ScSolutionsIndex makeSolutionIndex(@NotNull Path puzzlePath, @NotNull ScPuzzle puzzle)
             throws IOException {
         return new ScSolutionsIndex(puzzlePath, puzzle);
-    }
-
-    @NotNull
-    @Override
-    protected SubmitResult<ScRecord, ScCategory> performArchive(@NotNull GitRepository.ReadWriteAccess access,
-                                                                @NotNull ScSubmission submission) {
-        if (!submission.isValid())
-            return new SubmitResult.Failure<>(submission.getData());
-        return super.performArchive(access, submission);
     }
 
     @Override

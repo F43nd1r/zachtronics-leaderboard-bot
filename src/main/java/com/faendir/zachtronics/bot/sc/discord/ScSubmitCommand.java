@@ -27,6 +27,7 @@ import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScSubmission;
 import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
+import com.faendir.zachtronics.bot.validation.ValidationResult;
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -53,9 +54,15 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScSubmitCommand.Submi
     public ScSubmission parseSubmission(@NotNull DeferrableInteractionEvent event, @NotNull SubmitData parameters) {
         if (parameters.getExport().equals(parameters.video))
             throw new IllegalArgumentException("Export link and video link cannot be the same link");
-        ScSubmission submission = archiveCommand.parseSubmissions(parameters).get(0);
-        return new ScSubmission(submission.getPuzzle(), submission.getScore(), parameters.author, parameters.video,
-                                submission.getData());
+        ValidationResult<ScSubmission> result = archiveCommand.parseSubmissions(parameters).iterator().next();
+        if (result instanceof ValidationResult.Valid<ScSubmission>) {
+            ScSubmission submission = result.getSubmission();
+            return new ScSubmission(submission.getPuzzle(), submission.getScore(), parameters.author, parameters.video,
+                                    submission.getData());
+        }
+        else {
+            throw new IllegalArgumentException(result.getMessage());
+        }
     }
 
     @ApplicationCommand(name = "submit", description = "Submit and archive a solution", subCommand = true)

@@ -136,7 +136,7 @@ public class SubCommandTest {
                             "master/RESEARCHNET3/published_26_3/156-1-45-B.txt";
         Map<String, ? extends Serializable> args = Map.of("export", exportLink);
         String result = runCommand("archive", args);
-        assertTrue(result.contains("Failed") && result.contains("Collision"));
+        assertTrue(result.contains("156-1-45") && result.contains("Collision"));
 
         args = Map.of("export", exportLink, "bypass-validation", true);
         result = runCommand("archive", args);
