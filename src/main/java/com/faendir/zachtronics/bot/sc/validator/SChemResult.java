@@ -19,14 +19,13 @@ package com.faendir.zachtronics.bot.sc.validator;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  <pre>{
  "level_name": "Fuming Nitric Acid",
- "resnet_id": [3, 7, 2], # null for main game
- "cycles": 115, # null for reaction error
+ "resnet_id": [3, 7, 2],
+ "cycles": 115,
  "reactors": 1,
  "symbols": 6,
  "author": "12345ieee",
@@ -39,14 +38,24 @@ import org.jetbrains.annotations.Nullable;
 @Value
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class SChemResult {
-    @NotNull String levelName;
+    /** <tt>null</tt> for import error */
+    @Nullable String levelName;
+    /** <tt>null</tt> for main game */
     @Nullable int[] resnetId;
+    /** <tt>0</tt> for reaction error */
     int cycles;
+    /** <tt>0</tt> for import error */
     int reactors;
+    /** <tt>0</tt> for import error */
     int symbols;
-    @NotNull String author;
+    /** <tt>null</tt> for import error */
+    @Nullable String author;
+    /** <tt>null</tt> if no comma */
     @Nullable String solutionName;
+    /** <tt>null</tt> if check timeout */
     @Nullable Boolean precog;
+    /** <tt>null</tt> if no check needed */
     @Nullable String precogExplanation;
+    /** <tt>null</tt> if submission is valid */
     @Nullable String error;
 }

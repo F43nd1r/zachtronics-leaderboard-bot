@@ -35,6 +35,9 @@ class SChemValidateTest {
     public void importError() {
         String export = "Invalid";
         assertTrue(SChem.validate(export) instanceof ValidationResult.Unparseable);
+
+        export = "SOLUTION:Of Pancakes and Spaceships,12345ieee,115-1-6,unparseable\nInvalid";
+        assertTrue(SChem.validate(export) instanceof ValidationResult.Unparseable);
     }
 
     @Test
