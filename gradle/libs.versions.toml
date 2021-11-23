@@ -27,6 +27,7 @@ kotlinCompileTesting = "1.4.6"
 junit = "5.8.1"
 springdoc = "1.5.12"
 gradle-node = "3.1.1"
+guava = "31.0.1-jre"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -79,4 +80,5 @@ kotlinCompileTesting = { module = "com.github.tschuchortdev:kotlin-compile-testi
 kaseChange = { module = "net.pearx.kasechange:kasechange-jvm", version.ref = "kaseChange" }
 junit = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 springdoc = { module = "org.springdoc:springdoc-openapi-ui", version.ref = "springdoc" }
+guava = { module = "com.google.guava:guava", version.ref = "guava"}
 

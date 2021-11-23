@@ -59,13 +59,13 @@ dependencies {
     implementation(libs.jgit)
     implementation(libs.java.curl)
     implementation(libs.jraw)
-    implementation(libs.java.ffmpeg)
     implementation(libs.om.dsl)
     implementation(projects.common)
     implementation(projects.native)
     implementation(libs.jackson.databind)
     implementation(libs.jackson.kotlin)
     implementation(libs.springdoc)
+    implementation(libs.guava)
 
     ksp(projects.processor)
 
@@ -130,10 +130,13 @@ afterEvaluate {
     tasks.named("generateMainEffectiveLombokConfig2") {
         dependsOn(tasks.named("kspKotlin"))
     }
+    tasks.named("generateTestEffectiveLombokConfig2") {
+        dependsOn(tasks.named("kspTestKotlin"))
+    }
 }
 
 node {
-    download.set(true)
+    download.set(Runtime.getRuntime().exec("node -v").waitFor() != 0)
     workDir.set(file("${project.buildDir}/nodejs"))
     yarnWorkDir.set(file("${project.buildDir}/yarn"))
     nodeProjectDir.set(file("web"))
@@ -153,6 +156,6 @@ val copyWebApp = tasks.register<Copy>("copyWebApp") {
     dependsOn(buildWebApp)
 }
 
-tasks.bootJar.configure {
+tasks.processResources.configure {
     dependsOn(copyWebApp)
 }
