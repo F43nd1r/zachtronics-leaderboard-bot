@@ -68,7 +68,7 @@ abstract class AbstractSubmitCommand<T, C : Category, P: Puzzle<C>, S : Submissi
                 return SafeEmbedMessageBuilder()
                     .title("No Scores beaten by *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.discord())}`")
                     .color(Colors.UNCHANGED)
-                    .description("Existing scores:")
+                    .description("Beaten by:")
                     .embedCategoryRecords(result.records, submission.puzzle.supportedCategories)
             is SubmitResult.Failure -> throw IllegalArgumentException(result.message)
         }

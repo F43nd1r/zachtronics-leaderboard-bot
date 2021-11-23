@@ -128,7 +128,7 @@ class OmSolutionRepository(
                     }
                 }
                 if (record.score.isStrictlyBetterThan(submission.score)) {
-                    return@use SubmitResult.NothingBeaten(findCategoryHolders(submission.puzzle, includeFrontier = false))
+                    return@use SubmitResult.NothingBeaten(records.filter { it.key.score.isStrictlyBetterThan(submission.score) }.map { CategoryRecord(it.key, it.value) })
                 }
                 if (categories.isEmpty()) {
                     if (submission.score.isStrictlyBetterThan(record.score)) {
