@@ -31,6 +31,7 @@ interface PuzzleFrontierPlotProps {
     size: { width: number; height: number }
     records: OmRecord[]
     mode: Mode
+    filter: RecordFilter
     x: Metric
     y: Metric
     z: Metric
@@ -42,16 +43,18 @@ function PuzzleFrontierPlot(props: PuzzleFrontierPlotProps) {
     const theme = useTheme()
 
     const [activeRecord, setActiveRecord] = useState<OmRecord | undefined>(undefined)
-
+    const records = props.records.filter((record: OmRecord) => {
+        return (props.filter.overlap === undefined || props.filter.overlap === record.score?.overlap) && (props.filter.trackless === undefined || props.filter.trackless === record.score?.trackless)
+    })
     return (
         <>
             <Plot
                 data={[
                     {
-                        x: props.records.map((record) => props.x.get(record) ?? 0),
-                        y: props.records.map((record) => props.y.get(record) ?? 0),
-                        z: props.records.map((record) => props.z.get(record) ?? 0),
-                        hovertext: props.records.map((record) => record.fullFormattedScore ?? "none"),
+                        x: records.map((record) => props.x.get(record) ?? 0),
+                        y: records.map((record) => props.y.get(record) ?? 0),
+                        z: records.map((record) => props.z.get(record) ?? 0),
+                        hovertext: records.map((record) => record.fullFormattedScore ?? "none"),
                         hovertemplate:
                             (props.mode === "2D" && `${props.x.name}: %{x}<br>${props.y.name}: %{y}<br>%{hovertext}<extra></extra>`) ||
                             `${props.x.name}: %{x}<br>${props.y.name}: %{y}<br>${props.z.name}: %{z}<br>%{hovertext}<extra></extra>`,
@@ -59,7 +62,7 @@ function PuzzleFrontierPlot(props: PuzzleFrontierPlotProps) {
                         mode: "markers",
                         marker: {
                             size: (props.mode === "2D" && 20) || 10,
-                            color: props.records.map((record) => (record.score?.overlap && "#880e4f") || "#0288d1"),
+                            color: records.map((record) => (record.score?.overlap ? "#880e4f" : record.score?.trackless ? "#558b2f" : "#0288d1")),
                         },
                     },
                 ]}
@@ -72,12 +75,10 @@ function PuzzleFrontierPlot(props: PuzzleFrontierPlotProps) {
                     xaxis: {
                         title: props.x.name,
                         color: theme.palette.text.primary,
-                        nticks: (props.x.isBoolean && 2) || undefined,
                     },
                     yaxis: {
                         title: props.y.name,
                         color: theme.palette.text.primary,
-                        nticks: (props.y.isBoolean && 2) || undefined,
                     },
                     legend: {
                         font: {
@@ -96,17 +97,14 @@ function PuzzleFrontierPlot(props: PuzzleFrontierPlotProps) {
                         xaxis: {
                             title: props.x.name,
                             color: theme.palette.text.primary,
-                            nticks: (props.x.isBoolean && 2) || undefined,
                         },
                         yaxis: {
                             title: props.y.name,
                             color: theme.palette.text.primary,
-                            nticks: (props.y.isBoolean && 2) || undefined,
                         },
                         zaxis: {
                             title: props.z.name,
                             color: theme.palette.text.primary,
-                            nticks: (props.z.isBoolean && 2) || undefined,
                         },
                     },
                 }}
@@ -171,7 +169,6 @@ interface Metric {
     id: MetricId
     name: string
     get: (record: OmRecord) => number | undefined
-    isBoolean?: boolean
 }
 
 const metrics: Metric[] = [
@@ -224,31 +221,22 @@ const metrics: Metric[] = [
             return record.score?.rate
         },
     },
-    {
-        id: "t",
-        name: "Trackless",
-        isBoolean: true,
-        get(record) {
-            return (record.score?.trackless && 1) || 0
-        },
-    },
-    {
-        id: "o",
-        name: "Overlap",
-        isBoolean: true,
-        get(record) {
-            return (record.score?.overlap && 1) || 0
-        },
-    },
 ]
 
 function getMetric(id: MetricId) {
     return metrics.find((metric) => metric.id === id)!
 }
 
+interface RecordFilter {
+    trackless?: boolean
+    overlap?: boolean
+}
+
 interface PuzzleFrontierConfigurationProps {
     mode: Mode
     setMode: (mode: Mode) => void
+    filter: RecordFilter
+    setFilter: (filter: RecordFilter) => void
     x: Metric
     setX: (metric: Metric) => void
     y: Metric
@@ -270,7 +258,7 @@ function PuzzleFrontierConfiguration(props: PuzzleFrontierConfigurationProps) {
                 flexDirection: "column",
             }}
         >
-            <ToggleButtonGroup value={props.mode} exclusive onChange={handleMode} aria-label="Mode">
+            <ToggleButtonGroup value={props.mode} exclusive onChange={handleMode} aria-label="Mode" fullWidth={true}>
                 <ToggleButton value={"2D"} aria-label={"2D"}>
                     2D
                 </ToggleButton>
@@ -281,7 +269,65 @@ function PuzzleFrontierConfiguration(props: PuzzleFrontierConfigurationProps) {
             <MetricSelect value={props.x} setValue={props.setX} />
             <MetricSelect value={props.y} setValue={props.setY} />
             <MetricSelect value={props.z} setValue={props.setZ} disabled={props.mode === "2D"} />
+            <FilterButtonGroup
+                filter={props.filter.overlap}
+                setFilter={(value) =>
+                    props.setFilter({
+                        ...props.filter,
+                        overlap: value,
+                    })
+                }
+                label={"Overlap"}
+                option1={"Overlap"}
+                option2={"Normal"}
+            />
+            <FilterButtonGroup
+                filter={props.filter.trackless}
+                setFilter={(value) =>
+                    props.setFilter({
+                        ...props.filter,
+                        trackless: value,
+                    })
+                }
+                label={"Trackless"}
+                option1={"Trackless"}
+                option2={"With Track"}
+            />
         </Box>
+    )
+}
+
+interface FilterButtonGroupProps {
+    filter?: boolean
+    setFilter: (filter: boolean | undefined) => void
+    label: string
+    option1: string
+    option2: string
+}
+
+function FilterButtonGroup(props: FilterButtonGroupProps) {
+    const handleChange = (event: React.MouseEvent<HTMLElement>, newFilterValue: string[]) => {
+        if (newFilterValue.length) {
+            props.setFilter(newFilterValue.length === 1 ? newFilterValue[0] === "on" : undefined)
+        } else if (props.filter !== undefined) {
+            props.setFilter(!props.filter)
+        }
+    }
+    return (
+        <ToggleButtonGroup
+            value={props.filter !== undefined ? [props.filter ? "on" : "off"] : ["on", "off"]}
+            onChange={handleChange}
+            aria-label={props.label}
+            sx={{ marginTop: "1rem" }}
+            fullWidth={true}
+        >
+            <ToggleButton value={"on"} aria-label={`${props.label}-on`}>
+                {props.option1}
+            </ToggleButton>
+            <ToggleButton value={"off"} aria-label={`${props.label}-off`}>
+                {props.option2}
+            </ToggleButton>
+        </ToggleButtonGroup>
     )
 }
 
@@ -293,7 +339,7 @@ interface MetricSelectProps {
 
 function MetricSelect(props: MetricSelectProps) {
     return (
-        <Select value={props.value.id} onChange={(event) => props.setValue(getMetric(event.target.value as MetricId))} sx={{ marginTop: "1rem" }} disabled={props.disabled}>
+        <Select value={props.value.id} onChange={(event) => props.setValue(getMetric(event.target.value as MetricId))} sx={{ marginTop: "1rem" }} disabled={props.disabled} fullWidth={true}>
             {metrics.map((metric) => (
                 <MenuItem value={metric.id} key={metric.id}>
                     {metric.name}
@@ -314,6 +360,7 @@ export default function PuzzleFrontierView() {
     }, [puzzleId])
 
     const [mode, setMode] = useState<Mode>("3D")
+    const [filter, setFilter] = useState<RecordFilter>({})
     const [x, setX] = useState<Metric>(getMetric("g"))
     const [y, setY] = useState<Metric>(getMetric("c"))
     const [z, setZ] = useState<Metric>(getMetric("a"))
@@ -332,7 +379,7 @@ export default function PuzzleFrontierView() {
             )
             break
         case ComponentState.READY:
-            content = <SizedPuzzleFrontierPlot records={records} mode={mode} x={x} y={y} z={z} />
+            content = <SizedPuzzleFrontierPlot records={records} mode={mode} x={x} y={y} z={z} filter={filter} />
             break
     }
 
@@ -344,7 +391,7 @@ export default function PuzzleFrontierView() {
                 height: "100%",
             }}
         >
-            <PuzzleFrontierConfiguration mode={mode} setMode={setMode} x={x} setX={setX} y={y} setY={setY} z={z} setZ={setZ} />
+            <PuzzleFrontierConfiguration mode={mode} setMode={setMode} x={x} setX={setX} y={y} setY={setY} z={z} setZ={setZ} filter={filter} setFilter={setFilter} />
             {content}
         </Box>
     )

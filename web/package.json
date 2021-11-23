@@ -45,7 +45,7 @@
     ]
   },
   "prettier": {
-    "printWidth": 240,
+    "printWidth": 200,
     "tabWidth": 4,
     "trailingComma": "es5",
     "semi": false
