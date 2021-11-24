@@ -59,7 +59,7 @@ function PuzzleFrontierPlot(props: PuzzleFrontierPlotProps) {
         )
     })
 
-    const gridColor = theme.palette.mode == "light" ? theme.palette.grey["200"] : theme.palette.grey["800"]
+    const gridColor = theme.palette.mode === "light" ? theme.palette.grey["200"] : theme.palette.grey["800"]
 
     const makeAxis = (metric: Metric): Partial<Axis> => {
         return {

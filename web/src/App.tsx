@@ -11,7 +11,7 @@ import Brightness7Icon from "@mui/icons-material/Brightness7"
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar"
 import Sidebar from "./fragments/Sidebar"
 import { Outlet } from "react-router-dom"
-import { usePersistedState, usePersistedStringState } from "./utils/usePersistedState"
+import { usePersistedStringState } from "./utils/usePersistedState"
 
 const ColorModeContext = React.createContext({
     toggleColorMode: () => {},

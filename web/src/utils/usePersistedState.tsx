@@ -35,7 +35,7 @@ export function usePersistedState<S>(key: string, defaultValue: S, serializer: S
 
     React.useEffect(() => {
         localStorage.setItem(key, serializer.toString(value))
-    }, [value])
+    }, [value, key, serializer])
 
     return [value, setValue]
 }
