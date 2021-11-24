@@ -5,7 +5,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { createTheme, ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
-import React from "react"
+import { createContext, useContext, useMemo, useState } from "react"
 import Brightness4Icon from "@mui/icons-material/Brightness4"
 import Brightness7Icon from "@mui/icons-material/Brightness7"
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar"
@@ -13,7 +13,7 @@ import Sidebar from "./fragments/Sidebar"
 import { Outlet } from "react-router-dom"
 import { usePersistedStringState } from "./utils/usePersistedState"
 
-const ColorModeContext = React.createContext({
+const ColorModeContext = createContext({
     toggleColorMode: () => {},
 })
 
@@ -73,8 +73,8 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
 
 function App() {
     const theme = useTheme()
-    const colorMode = React.useContext(ColorModeContext)
-    const [open, setOpen] = React.useState(true)
+    const colorMode = useContext(ColorModeContext)
+    const [open, setOpen] = useState(true)
     const handleDrawerOpen = () => {
         setOpen(true)
     }
@@ -128,16 +128,16 @@ function App() {
 export default function ThemedApp() {
     const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
     const [mode, setMode] = usePersistedStringState<"light" | "dark">("colorMode", prefersDarkMode ? "light" : "dark")
-    const colorMode = React.useMemo(
+    const colorMode = useMemo(
         () => ({
             toggleColorMode: () => {
                 setMode((prevMode) => (prevMode === "light" ? "dark" : "light"))
             },
         }),
-        []
+        [setMode]
     )
 
-    const theme = React.useMemo(
+    const theme = useMemo(
         () =>
             createTheme({
                 palette: {

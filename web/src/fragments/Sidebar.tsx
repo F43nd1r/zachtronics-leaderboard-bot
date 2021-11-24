@@ -16,7 +16,6 @@
 
 import { Divider, List, ListItemText } from "@mui/material"
 import ExpandableListItem from "../components/ExpandableListItem"
-import React from "react"
 import { Extension, Folder } from "@mui/icons-material"
 import CategoryIcon from "@mui/icons-material/Category"
 import { SxProps } from "@mui/system"

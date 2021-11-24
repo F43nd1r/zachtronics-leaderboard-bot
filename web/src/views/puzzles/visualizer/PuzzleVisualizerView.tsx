@@ -15,7 +15,6 @@
  */
 
 import { useParams } from "react-router-dom"
-import React from "react"
 import { Box } from "@mui/material"
 import OmRecord from "../../../model/Record"
 import { usePersistedState } from "../../../utils/usePersistedState"

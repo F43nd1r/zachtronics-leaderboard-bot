@@ -15,7 +15,7 @@
  */
 
 import { useTheme } from "@mui/material"
-import React, { useState } from "react"
+import { ComponentType, useState } from "react"
 import OmRecord from "../../../model/Record"
 import { Axis } from "plotly.js"
 import { PlotParams } from "react-plotly.js"
@@ -32,7 +32,7 @@ export interface PuzzleFrontierPlotProps {
     configuration: Configuration
 }
 
-const Plot: React.ComponentType<PlotParams> = createPlotlyComponent(Plotly)
+const Plot: ComponentType<PlotParams> = createPlotlyComponent(Plotly)
 
 function isStrictlyBetterInMetrics(r1: OmRecord, r2: OmRecord, metrics: Metric[]): boolean {
     const compares = metrics.map((metric) => (metric.get(r1) ?? Number.MAX_SAFE_INTEGER) - (metric.get(r2) ?? Number.MAX_SAFE_INTEGER))

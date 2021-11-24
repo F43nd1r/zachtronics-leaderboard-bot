@@ -15,7 +15,6 @@
  */
 
 import { Grid } from "@mui/material"
-import React from "react"
 import Record from "../model/Record"
 import RecordCard from "./RecordCard"
 

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React from "react"
 import LoadingIndicator from "../components/LoadingIndicator"
 import { Error } from "@mui/icons-material"
 import { ListItem, ListItemIcon, ListItemText } from "@mui/material"

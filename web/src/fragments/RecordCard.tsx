@@ -16,7 +16,6 @@
 
 import { Box, Button, Card, CardActionArea, CardActions, CardContent, CardHeader, CardMedia } from "@mui/material"
 import { SentimentVeryDissatisfied } from "@mui/icons-material"
-import React from "react"
 import Record from "../model/Record"
 import { SxProps } from "@mui/system"
 import { Theme } from "@mui/material/styles"

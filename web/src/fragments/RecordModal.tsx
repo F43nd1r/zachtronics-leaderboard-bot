@@ -16,7 +16,6 @@
 
 import { Box, Modal } from "@mui/material"
 import RecordCard from "./RecordCard"
-import React from "react"
 import OmRecord from "../model/Record"
 
 interface RecordModalProps {

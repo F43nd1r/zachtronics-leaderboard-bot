@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import React, { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 
 export interface Serializer<S> {
     fromString: (string: string) => S
@@ -31,9 +31,9 @@ export function usePersistedJsonState<S>(key: string, defaultValue: S): [S, Disp
 
 export function usePersistedState<S>(key: string, defaultValue: S, serializer: Serializer<S>): [S, Dispatch<SetStateAction<S>>] {
     const storedValue = localStorage.getItem(key)
-    const [value, setValue] = React.useState<S>((storedValue && serializer.fromString(storedValue)) || defaultValue)
+    const [value, setValue] = useState<S>((storedValue && serializer.fromString(storedValue)) || defaultValue)
 
-    React.useEffect(() => {
+    useEffect(() => {
         localStorage.setItem(key, serializer.toString(value))
     }, [value, key, serializer])
 

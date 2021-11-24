@@ -1,6 +1,6 @@
 import "./index.css"
 import App from "./App"
-import React, { lazy, Suspense } from "react"
+import { lazy, StrictMode, Suspense } from "react"
 import ReactDOM from "react-dom"
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
 import MainView from "./views/MainView"
@@ -13,7 +13,7 @@ const PuzzleVisualizerView = lazy(() => import("./views/puzzles/visualizer/Puzzl
 const CategoryView = lazy(() => import("./views/categories/CategoryView"))
 
 ReactDOM.render(
-    <React.StrictMode>
+    <StrictMode>
         <Suspense fallback={<LoadingIndicator />}>
             <BrowserRouter>
                 <Routes>
@@ -30,6 +30,6 @@ ReactDOM.render(
                 </Routes>
             </BrowserRouter>
         </Suspense>
-    </React.StrictMode>,
+    </StrictMode>,
     document.getElementById("root")
 )

@@ -15,7 +15,6 @@
  */
 
 import { ListItem, styled } from "@mui/material"
-import React from "react"
 import { SxProps } from "@mui/system"
 import { Theme } from "@mui/material/styles"
 import { Link } from "react-router-dom"

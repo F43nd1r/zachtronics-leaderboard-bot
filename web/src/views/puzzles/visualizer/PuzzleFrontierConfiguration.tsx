@@ -15,7 +15,6 @@
  */
 
 import { getMetric, Metric, MetricId, metrics } from "../../../model/Metric"
-import React from "react"
 import { Configuration, Mode } from "./Configuration"
 import { Box, MenuItem, Select, ToggleButton, ToggleButtonGroup } from "@mui/material"
 import { Legend } from "./Legend"

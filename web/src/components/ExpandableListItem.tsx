@@ -16,9 +16,9 @@
 
 import { Collapse, List, ListItemButton, ListItemIcon, ListItemText } from "@mui/material"
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
-import React from "react"
 import { SxProps } from "@mui/system"
 import { Theme } from "@mui/material/styles"
+import { useState } from "react"
 
 interface ExpandableListItemProps {
     title: string
@@ -28,7 +28,7 @@ interface ExpandableListItemProps {
 }
 
 export default function ExpandableListItem(props: ExpandableListItemProps) {
-    const [open, setOpen] = React.useState(false)
+    const [open, setOpen] = useState(false)
     const handleClick = () => {
         setOpen(!open)
     }

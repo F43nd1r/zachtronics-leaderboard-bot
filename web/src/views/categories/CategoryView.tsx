@@ -15,7 +15,6 @@
  */
 
 import { useParams } from "react-router-dom"
-import React from "react"
 import Record from "../../model/Record"
 import RecordGrid from "../../fragments/RecordGrid"
 import ApiResource from "../../utils/ApiResource"
