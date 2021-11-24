@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import { Divider, List, ListItem, ListItemIcon, ListItemText } from "@mui/material"
+import { Divider, List, ListItemText } from "@mui/material"
 import ExpandableListItem from "../components/ExpandableListItem"
-import React, { useEffect, useState } from "react"
-import { ComponentState } from "../utils/ComponentState"
-import { Error, Extension, Folder } from "@mui/icons-material"
+import React from "react"
+import { Extension, Folder } from "@mui/icons-material"
 import CategoryIcon from "@mui/icons-material/Category"
 import { SxProps } from "@mui/system"
 import { Theme } from "@mui/material/styles"
@@ -26,40 +25,20 @@ import LinkListItem from "../components/LinkListItem"
 import Group from "../model/Group"
 import Puzzle from "../model/Puzzle"
 import Category from "../model/Category"
-import LoadingIndicator from "../components/LoadingIndicator"
-import fetchFromApi from "../utils/fetchFromApi"
 import { useParams } from "react-router-dom"
+import ApiListResource from "../utils/ApiListResource"
 
 function Groups() {
-    const [state, setState] = useState(ComponentState.LOADING)
-    const [groups, setGroups] = useState<Group[]>([])
-    useEffect(() => {
-        fetchFromApi<Group[]>("/groups", setState).then((data) => setGroups(data))
-    }, [])
-
-    let content: JSX.Element[]
-    switch (state) {
-        case ComponentState.LOADING:
-            content = [<LoadingIndicator key={"loading"} />]
-            break
-        case ComponentState.ERROR:
-            content = [
-                <ListItem sx={{ pl: 4 }} key={"error"}>
-                    <ListItemIcon>
-                        <Error />
-                    </ListItemIcon>
-                    <ListItemText primary="Failed to load groups" />
-                </ListItem>,
-            ]
-            break
-        case ComponentState.READY:
-            content = groups.map((group) => <Puzzles group={group} key={group.id} sx={{ pl: 4 }} />)
-            break
-    }
-
     return (
         <List>
-            <ExpandableListItem title={"Puzzles"} icon={<Extension />} items={content} />
+            <ExpandableListItem
+                title={"Puzzles"}
+                icon={<Extension />}
+                items={ApiListResource<Group[]>({
+                    url: "/groups",
+                    element: (groups) => groups.map((group) => <Puzzles group={group} key={group.id} sx={{ pl: 4 }} />),
+                })}
+            />
         </List>
     )
 }
@@ -70,81 +49,45 @@ interface PuzzlesProps {
 }
 
 function Puzzles(props: PuzzlesProps) {
-    const [state, setState] = useState(ComponentState.LOADING)
-    const [puzzles, setPuzzles] = useState<Puzzle[]>([])
-    useEffect(() => {
-        fetchFromApi<Puzzle[]>(`/group/${props.group.id}/puzzles`, setState).then((data) => setPuzzles(data))
-    }, [props.group.id])
-    const params = useParams()
-    const puzzleId = params.puzzleId
-
-    let content: JSX.Element[]
-    switch (state) {
-        case ComponentState.LOADING:
-            content = [<LoadingIndicator key={"loading"} />]
-            break
-        case ComponentState.ERROR:
-            content = [
-                <ListItem sx={{ pl: 4 }} key={"error"}>
-                    <ListItemIcon>
-                        <Error />
-                    </ListItemIcon>
-                    <ListItemText primary="Failed to load puzzles" />
-                </ListItem>,
-            ]
-            break
-        case ComponentState.READY:
-            content = puzzles.map((puzzle) => (
-                <LinkListItem sx={{ pl: 4 }} key={puzzle.id} to={`/puzzles/${puzzle.id}`} selected={puzzleId === puzzle.id}>
-                    <ListItemText primary={puzzle.displayName} />
-                </LinkListItem>
-            ))
-            break
-    }
+    const puzzleId = useParams().puzzleId
 
     return (
         <List sx={props.sx}>
-            <ExpandableListItem title={props.group.displayName} icon={<Folder />} items={content} />
+            <ExpandableListItem
+                title={props.group.displayName}
+                icon={<Folder />}
+                items={ApiListResource<Puzzle[]>({
+                    url: `/group/${props.group.id}/puzzles`,
+                    element: (puzzles) =>
+                        puzzles.map((puzzle) => (
+                            <LinkListItem sx={{ pl: 4 }} key={puzzle.id} to={`/puzzles/${puzzle.id}`} selected={puzzleId === puzzle.id}>
+                                <ListItemText primary={puzzle.displayName} />
+                            </LinkListItem>
+                        )),
+                })}
+            />
         </List>
     )
 }
 
 function Categories() {
-    const [state, setState] = useState(ComponentState.LOADING)
-    const [categories, setCategories] = useState<Category[]>([])
-    useEffect(() => {
-        fetchFromApi<Category[]>("/categories", setState).then((data) => setCategories(data))
-    }, [])
-    const params = useParams()
-    const categoryId = params.categoryId
-
-    let content: JSX.Element[]
-    switch (state) {
-        case ComponentState.LOADING:
-            content = [<LoadingIndicator key={"loading"} />]
-            break
-        case ComponentState.ERROR:
-            content = [
-                <ListItem sx={{ pl: 4 }} key={"error"}>
-                    <ListItemIcon>
-                        <Error />
-                    </ListItemIcon>
-                    <ListItemText primary="Failed to load categories" />
-                </ListItem>,
-            ]
-            break
-        case ComponentState.READY:
-            content = categories.map((category) => (
-                <LinkListItem sx={{ pl: 4 }} key={category.id} to={`/categories/${category.id}`} selected={categoryId === category.id}>
-                    <ListItemText primary={`${category.displayName} (${category.metrics.join("→")})`} />
-                </LinkListItem>
-            ))
-            break
-    }
+    const categoryId = useParams().categoryId
 
     return (
         <List>
-            <ExpandableListItem title={"Categories"} icon={<CategoryIcon />} items={content} />
+            <ExpandableListItem
+                title={"Categories"}
+                icon={<CategoryIcon />}
+                items={ApiListResource<Category[]>({
+                    url: "/categories",
+                    element: (categories) =>
+                        categories.map((category) => (
+                            <LinkListItem sx={{ pl: 4 }} key={category.id} to={`/categories/${category.id}`} selected={categoryId === category.id}>
+                                <ListItemText primary={`${category.displayName} (${category.metrics.join("→")})`} />
+                            </LinkListItem>
+                        )),
+                })}
+            />
         </List>
     )
 }

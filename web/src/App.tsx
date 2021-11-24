@@ -11,6 +11,7 @@ import Brightness7Icon from "@mui/icons-material/Brightness7"
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar"
 import Sidebar from "./fragments/Sidebar"
 import { Outlet } from "react-router-dom"
+import { usePersistedState, usePersistedStringState } from "./utils/usePersistedState"
 
 const ColorModeContext = React.createContext({
     toggleColorMode: () => {},
@@ -126,7 +127,7 @@ function App() {
 
 export default function ThemedApp() {
     const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
-    const [mode, setMode] = React.useState<"light" | "dark">(prefersDarkMode ? "light" : "dark")
+    const [mode, setMode] = usePersistedStringState<"light" | "dark">("colorMode", prefersDarkMode ? "light" : "dark")
     const colorMode = React.useMemo(
         () => ({
             toggleColorMode: () => {

@@ -24,6 +24,7 @@ import { Theme } from "@mui/material/styles"
 interface RecordCardProps {
     record: Record
     title: string
+    score: JSX.Element | string
     sx?: SxProps<Theme>
 }
 
@@ -71,7 +72,7 @@ export default function RecordCard(props: RecordCardProps) {
                         <span>No gif found</span>
                     </Box>
                 )}
-                <CardContent>{props.record.smartFormattedScore ?? props.record.fullFormattedScore ?? "None"}</CardContent>
+                <CardContent>{props.score}</CardContent>
             </CardActionArea>
 
             <CardActions

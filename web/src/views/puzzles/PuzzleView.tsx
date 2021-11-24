@@ -40,6 +40,7 @@ export default function PuzzleView() {
                 <Tabs value={lastSegment}>
                     <Tab label="Records" value="records" to="records" component={Link} />
                     <Tab label="Frontier" value="frontier" to="frontier" component={Link} />
+                    <Tab label="Visualizer" value="visualizer" to="visualizer" component={Link} />
                 </Tabs>
             </Box>
             <Outlet />

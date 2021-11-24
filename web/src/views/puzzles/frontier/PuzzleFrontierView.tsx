@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-import { Grid } from "@mui/material"
+import { useParams } from "react-router-dom"
 import React from "react"
-import Record from "../model/Record"
-import RecordCard from "./RecordCard"
+import Record from "../../../model/Record"
+import RecordGrid from "../../../fragments/RecordGrid"
+import ApiResource from "../../../utils/ApiResource"
 
-interface RecordGridProps {
-    records: Record[]
-    getTitle: (record: Record) => string
-    getScore: (record: Record) => string
-}
-
-export default function RecordGrid(props: RecordGridProps) {
+export default function PuzzleFrontierView() {
     return (
-        <Grid container spacing={3}>
-            {props.records.map((record) => (
-                <Grid item xs>
-                    <RecordCard record={record} title={props.getTitle(record)} score={props.getScore(record)} />
-                </Grid>
-            ))}
-        </Grid>
+        <ApiResource<Record[]>
+            url={`/puzzle/${useParams().puzzleId}/records?includeFrontier=true`}
+            element={(records) => (
+                <RecordGrid records={records} getTitle={(record) => record.smartFormattedCategories || "Pareto Frontier"} getScore={(record) => record.fullFormattedScore ?? "None"} />
+            )}
+        />
     )
 }
