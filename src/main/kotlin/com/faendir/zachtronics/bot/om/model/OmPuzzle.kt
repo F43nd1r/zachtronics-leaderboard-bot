@@ -200,6 +200,7 @@ enum class OmPuzzle(
     ;
 
     override val supportedCategories: List<OmCategory> = OmCategory.values().filter { it.supportsPuzzle(this) }
+    override val link: String = "https://zlbb.faendir.com/puzzles/$id"
 
     val file by lazy {
         try {
@@ -218,10 +219,10 @@ enum class OmPuzzle(
     }
 
     fun getProductShape(io: IO): Set<Position> {
-        return if(io.type != IOType.INFINITE) {
+        return if (io.type != IOType.INFINITE) {
             data?.outputs?.get(io.index)?.atoms?.map { it.second }?.map { it.x.toInt() to it.y.toInt() }?.toSet()
         } else {
-            data?.outputs?.get(io.index)?.atoms?.let {atoms ->
+            data?.outputs?.get(io.index)?.atoms?.let { atoms ->
                 val repeatPosition = atoms.first { it.first == Atom.REPEAT }.second
                 val atomPositions = atoms.map { it.second }
                 (0 until 6).flatMap { i -> atomPositions.map { Position(it.x + i * repeatPosition.x, it.y + i * repeatPosition.y) } }.toSet()

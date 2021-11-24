@@ -38,6 +38,9 @@ class SafeEmbedMessageBuilder {
         current.title(safeTitle)
     }
 
+    fun url(url: String) = apply {
+        current.url(url)
+    }
     fun description(description: String) = apply {
         val safeDescription = description.truncateWithEllipsis(Limits.DESCRIPTION).ifEmptyZeroWidthSpace()
         increaseTotal(safeDescription.length)
