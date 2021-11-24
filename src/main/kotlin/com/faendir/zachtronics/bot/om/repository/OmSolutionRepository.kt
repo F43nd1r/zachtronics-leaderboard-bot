@@ -23,6 +23,7 @@ import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmSubmission
+import com.faendir.zachtronics.bot.om.shortenGithubLink
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
@@ -84,12 +85,7 @@ class OmSolutionRepository(
                 ?.listFiles()
                 ?.filter { file -> file.extension == "json" }
                 ?.map { file -> file.inputStream().buffered().use { json.decodeFromStream<OmRecord>(it) } }
-                ?.forEach { record ->
-                    records.add(record.copy(
-                        dataLink = record.dataPath?.let { leaderboard.rawFilesUrl + it.toString().ensurePrefix("/") },
-                        dataPath = record.dataPath?.let { leaderboardScope.repo.toPath().resolve(it) }
-                    ), mutableSetOf())
-                }
+                ?.forEach { record -> records.add(record.copy(dataPath = record.dataPath?.let { leaderboardScope.repo.toPath().resolve(it) }), mutableSetOf()) }
             if (records.isNotEmpty()) {
                 for (category in OmCategory.values().filter { it.supportsPuzzle(puzzle) }.toMutableSet()) {
                     records.entries.filter { category.supportsScore(it.key.score) }
@@ -178,7 +174,9 @@ class OmSolutionRepository(
             puzzle = puzzle,
             score = score,
             displayLink = displayLink,
-            dataLink = leaderboard.rawFilesUrl + path.toString().ensurePrefix("/"),
+            dataLink = path?.let {
+                shortenGithubLink(leaderboard.rawFilesUrl.replace("master", leaderboardScope.currentHash()) + it.toString().ensurePrefix("/"))
+            },
             dataPath = path,
         )
         leaderboardFile.outputStream().buffered().use { json.encodeToStream(record, it) }

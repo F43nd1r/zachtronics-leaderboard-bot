@@ -40,6 +40,11 @@ import okio.buffer
 import okio.sink
 import okio.source
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.web.client.RestTemplate
 import java.io.ByteArrayInputStream
 import java.io.File
 
@@ -136,4 +141,19 @@ fun createSubmission(gif: String, author: String, bytes: ByteArray): OmSubmissio
         overlap = solution.isOverlap(puzzle),
     )
     return OmSubmission(puzzle, score, author, gif, bytes)
+}
+
+private val restTemplate = RestTemplate()
+
+fun shortenGithubLink(githubLink: String): String {
+    return try {
+        val request = HttpEntity(
+            LinkedMultiValueMap(mapOf("url" to listOf(githubLink))),
+            HttpHeaders().apply { contentType = MediaType.APPLICATION_FORM_URLENCODED }
+        )
+        restTemplate.postForLocation("https://git.io", request)?.toString() ?: githubLink
+    } catch (e: Exception) {
+        logger.warn("Failed to shorten link $githubLink", e)
+        githubLink
+    }
 }
