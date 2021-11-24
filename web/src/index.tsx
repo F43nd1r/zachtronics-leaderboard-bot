@@ -2,14 +2,12 @@ import "./index.css"
 import App from "./App"
 import { lazy, StrictMode, Suspense } from "react"
 import ReactDOM from "react-dom"
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
+import { BrowserRouter, Route, Routes } from "react-router-dom"
 import MainView from "./views/MainView"
 import LoadingIndicator from "./components/LoadingIndicator"
+import { PuzzleRoutes } from "./views/puzzles/PuzzleView"
 
 const PuzzleView = lazy(() => import("./views/puzzles/PuzzleView"))
-const PuzzleRecordsView = lazy(() => import("./views/puzzles/records/PuzzleRecordsView"))
-const PuzzleFrontierView = lazy(() => import("./views/puzzles/frontier/PuzzleFrontierView"))
-const PuzzleVisualizerView = lazy(() => import("./views/puzzles/visualizer/PuzzleVisualizerView"))
 const CategoryView = lazy(() => import("./views/categories/CategoryView"))
 
 ReactDOM.render(
@@ -20,10 +18,9 @@ ReactDOM.render(
                     <Route path="/" element={<App />}>
                         <Route path="/" element={<MainView />} />
                         <Route path="puzzles/:puzzleId" element={<PuzzleView />}>
-                            <Route path="records" element={<PuzzleRecordsView />} />
-                            <Route path="frontier" element={<PuzzleFrontierView />} />
-                            <Route path="visualizer" element={<PuzzleVisualizerView />} />
-                            <Route path="" element={<Navigate to="records" />} />
+                            {PuzzleRoutes.map((route) => (
+                                <Route path={route.pathSegment} element={route.component} key={route.pathSegment} />
+                            ))}
                         </Route>
                         <Route path="categories/:categoryId" element={<CategoryView />} />
                     </Route>

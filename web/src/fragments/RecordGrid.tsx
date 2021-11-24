@@ -27,8 +27,8 @@ interface RecordGridProps {
 export default function RecordGrid(props: RecordGridProps) {
     return (
         <Grid container spacing={3}>
-            {props.records.map((record) => (
-                <Grid item xs>
+            {props.records.map((record, index) => (
+                <Grid item xs key={index}>
                     <RecordCard record={record} title={props.getTitle(record)} score={props.getScore(record)} />
                 </Grid>
             ))}

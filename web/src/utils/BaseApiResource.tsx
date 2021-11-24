@@ -52,7 +52,6 @@ export default function BaseApiResource<T, R>(props: BaseApiResourceProps<T, R>)
         case ComponentState.ERROR:
             return props.error
         case ComponentState.READY:
-            console.log(data)
             return props.element(data as T)
     }
 }

@@ -42,6 +42,7 @@ export default function RecordCard(props: RecordCardProps) {
                         component={props.record.gif.endsWith(".mp4") || props.record.gif.endsWith(".webm") ? "video" : "img"}
                         autoPlay
                         loop
+                        muted
                         src={props.record.gif}
                         alt="Gif not loading"
                         style={{
