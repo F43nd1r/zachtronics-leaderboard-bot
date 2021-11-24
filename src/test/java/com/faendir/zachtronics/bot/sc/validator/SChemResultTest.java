@@ -25,10 +25,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @BotTest(Application.class)
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
-class SChemRunTest {
+class SChemResultTest {
 
     @Test
-    void runGood() {
+    void validateGood() {
         String export = """
                 SOLUTION:QT-1,12345ieee,20-1-5,s
                 COMPONENT:'drag-quantum-reactor-x',2,0,''
@@ -45,9 +45,9 @@ class SChemRunTest {
                 PIPE:1,4,2
                 """;
 
-        SChemResult result = SChem.run(export);
+        SChemResult result = validateSingle(export);
         SChemResult expected = new SChemResult("QT-1", null, 20, 1, 5, "12345ieee", "s", false,
-                                               result.getPrecogExplanation(), null);
+                                               result.getPrecogExplanation(), result.getExport(), null);
         assertEquals(expected, result);
 
         export = """
@@ -67,20 +67,20 @@ class SChemRunTest {
                 PIPE:1,4,2
                 """;
 
-        result = SChem.run(export);
+        result = validateSingle(export);
         expected = new SChemResult("Tunnels I", new int[]{1, 1, 1}, 20, 1, 6, "12345ieee", null, false,
-                                   result.getPrecogExplanation(), null);
+                                   result.getPrecogExplanation(), result.getExport(), null);
         assertEquals(expected, result);
     }
 
     @Test
-    void runInvalid() {
-        String export = "invalid";
-        assertThrows(SChemException.class, () -> SChem.run(export));
+    void validateUnparseable() {
+        String export = "SOL:Completely unparseable";
+        assertThrows(SChemException.class, () -> validateSingle(export));
     }
 
     @Test
-    void runCrashing() {
+    void validateCrashing() {
         String export = """
                 SOLUTION:Of Pancakes and Spaceships,12345ieee,45-1-14
                 COMPONENT:'empty-research-reactor',2,0,''
@@ -102,12 +102,12 @@ class SChemRunTest {
                 PIPE:0,4,1
                 PIPE:1,4,2
                 """; // we're missing: MEMBER:'instr-grab',-1,1,32,2,1,0,0
-        SChemResult result = SChem.run(export);
+        SChemResult result = validateSingle(export);
         assertNotNull(result.getError());
     }
 
     @Test
-    void runNotMatching() {
+    void validateScoreNotMatching() {
         String export = """
                 SOLUTION:Of Pancakes and Spaceships,12345ieee,1000-1-14
                 COMPONENT:'empty-research-reactor',2,0,''
@@ -130,14 +130,18 @@ class SChemRunTest {
                 PIPE:0,4,1
                 PIPE:1,4,2
                 """; // we've messed up the cycles count
-        SChemResult result = SChem.run(export);
+        SChemResult result = validateSingle(export);
+        assertNotNull(result.getError());
+
+        export = "SOLUTION:Of Pancakes and Spaceships,12345ieee,1000-1-14"; // missing symbols
+        result = validateSingle(export);
         assertNotNull(result.getError());
     }
 
     @Test
-    public void runPrecog() {
+    public void validatePrecog() {
         String export = """
-                SOLUTION:Freon,Archiver,112-1-63,/P Archived Solution
+                SOLUTION:Freon,Andy,112-1-63,/P
                 COMPONENT:'custom-research-reactor',2,0,''
                 MEMBER:'instr-start',180,0,128,9,2,0,0
                 MEMBER:'instr-start',0,0,32,0,1,0,0
@@ -212,11 +216,23 @@ class SChemRunTest {
                 PIPE:1,4,2
                 """;
 
-        SChemResult result = SChem.run(export);
-        SChemResult expected = new SChemResult("Freon", new int[]{1, 10, 2}, 112, 1, 63, "Archiver",
-                                               "/P Archived Solution",
+        SChemResult result = validateSingle(export);
+        SChemResult expected = new SChemResult("Freon", new int[]{1, 10, 2}, 112, 1, 63, "Andy", "/P",
                                                // no need to care about the specific precog details
-                                               true, result.getPrecogExplanation(), null);
+                                               true, result.getPrecogExplanation(),
+                                               // export is normalized, so we pull it from the result
+                                               result.getExport(), null);
         assertEquals(expected, result);
+    }
+
+    @Test
+    void validateMany() {
+        String export = "SOLUTION:QT-1,12345ieee,0-1-0,s\n".repeat(3);
+        SChemResult[] results = SChem.validate(export, true);
+        assertEquals(3, results.length);
+    }
+
+    private static SChemResult validateSingle(String export) {
+        return SChem.validate(export, false)[0];
     }
 }

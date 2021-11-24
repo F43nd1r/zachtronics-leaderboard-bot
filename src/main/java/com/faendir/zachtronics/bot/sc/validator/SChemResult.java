@@ -56,6 +56,8 @@ public class SChemResult {
     @Nullable Boolean precog;
     /** <tt>null</tt> if no check needed */
     @Nullable String precogExplanation;
+    /** <tt>null</tt> unless the <tt>--export</tt> flag was passed */
+    @Nullable String export;
     /** <tt>null</tt> if submission is valid */
     @Nullable String error;
 }

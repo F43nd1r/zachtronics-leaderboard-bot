@@ -79,12 +79,10 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScSubmitCommand.Submi
                           @NotNull @Converter(LinkConverter.class) String export,
                           @Description("Name to appear on the Reddit leaderboard")
                           @NotNull String author,
-                          @Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
-                          @Converter(ScPuzzleConverter.class) ScPuzzle puzzle,
                           @Description("Skips running SChem on the solutions. Admin-only")
                           @Converter(value = ScAdminOnlyBooleanConverter.class, input = Boolean.class)
                                   Boolean bypassValidation) {
-            super(export, puzzle, bypassValidation);
+            super(export, bypassValidation);
             this.video = video;
             this.author = author;
         }

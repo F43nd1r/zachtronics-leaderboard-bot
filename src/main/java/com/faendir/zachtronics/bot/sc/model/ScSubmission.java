@@ -30,7 +30,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 
 /** Archive-only submissions have a <tt>null</tt> {@link #displayLink} */
 @Value
@@ -51,7 +50,7 @@ public class ScSubmission implements Submission<ScCategory, ScPuzzle> {
     }
 
     @NotNull
-    public static Collection<ValidationResult<ScSubmission>> fromExportLink(@NotNull String exportLink, ScPuzzle puzzle,
+    public static Collection<ValidationResult<ScSubmission>> fromExportLink(@NotNull String exportLink,
                                                                             boolean bypassValidation) {
         String export;
         try (InputStream is = new URL(Utils.rawContentURL(exportLink)).openStream()) {
@@ -59,12 +58,12 @@ public class ScSubmission implements Submission<ScCategory, ScPuzzle> {
             if (export.length() > 0 && export.charAt(0) == '\uFEFF') // remove BOM
                 export = export.substring(1);
         } catch (MalformedURLException e) {
-            return Collections.singletonList(new ValidationResult.Unparseable<>("Could not parse your link"));
+            throw new IllegalArgumentException("Could not parse your link");
         } catch (IOException e) {
-            return Collections.singletonList(new ValidationResult.Unparseable<>("Could not read your solution"));
+            throw new IllegalArgumentException("Could not read your solution");
         }
 
-        return SChem.validateMultiExport(export, puzzle, bypassValidation);
+        return SChem.validateMultiExport(export, bypassValidation);
     }
 
     public ScRecord extendToRecord(String dataLink, Path dataPath) {

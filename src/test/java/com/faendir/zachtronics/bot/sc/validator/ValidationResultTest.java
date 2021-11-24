@@ -20,24 +20,25 @@ import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
+import com.faendir.zachtronics.bot.sc.model.ScSubmission;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @BotTest(Application.class)
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
-class SChemValidateTest {
+class ValidationResultTest {
 
     @Test
     public void importError() {
-        String export = "Invalid";
-        assertTrue(SChem.validate(export) instanceof ValidationResult.Unparseable);
+        String export1 = "Invalid";
+        assertThrows(SChemException.class, () -> validateSingle(export1));
 
-        export = "SOLUTION:Of Pancakes and Spaceships,12345ieee,115-1-6,unparseable\nInvalid";
-        assertTrue(SChem.validate(export) instanceof ValidationResult.Unparseable);
+        String export = "SOLUTION:Of Pancakes and Spaceships,12345ieee,115-1-6,unparseable\nInvalid";
+        assertTrue(validateSingle(export) instanceof ValidationResult.Unparseable);
     }
 
     @Test
@@ -67,7 +68,7 @@ class SChemValidateTest {
                 PIPE:1,4,2
                 """;
 
-        assertTrue(SChem.validate(export) instanceof ValidationResult.Invalid);
+        assertTrue(validateSingle(export) instanceof ValidationResult.Invalid);
     }
 
     @Test
@@ -88,7 +89,7 @@ class SChemValidateTest {
                 PIPE:1,4,2
                 """;
 
-        assertTrue(SChem.validate(export) instanceof ValidationResult.Invalid);
+        assertTrue(validateSingle(export) instanceof ValidationResult.Invalid);
     }
 
     @Test
@@ -102,7 +103,7 @@ class SChemValidateTest {
                 PIPE:1,4,2
                 """;
 
-        assertTrue(SChem.validate(export) instanceof ValidationResult.Unparseable);
+        assertTrue(validateSingle(export) instanceof ValidationResult.Unparseable);
     }
 
     @Test
@@ -153,16 +154,21 @@ class SChemValidateTest {
                 PIPE:1,4,2
                 """;
 
-        ScPuzzle result = SChem.validate(export).getSubmission().getPuzzle();
+        ScPuzzle result = validateSingle(export).getSubmission().getPuzzle();
         assertEquals(ScPuzzle.published_13_1, result);
     }
 
     @Test
     public void testArchiveBugged() {
-        String export = "SOLUTION:QT-3,Zig,109-1-24,/B telekinesys"; // it doesn't have to run at all
+        String export = "SOLUTION:QT-3,Zig,109-1-0,/B telekinesys"; // it doesn't have to run at all
 
-        ScScore expected = new ScScore(109, 1, 24, true, false);
-        ScScore result = SChem.validateMultiExport(export, null, true).iterator().next().getSubmission().getScore();
+        ScScore expected = new ScScore(109, 1, 0, true, false);
+        ScScore result = SChem.validateMultiExport(export, true).iterator().next().getSubmission().getScore();
         assertEquals(expected, result);
+    }
+
+    @NotNull
+    private static ValidationResult<ScSubmission> validateSingle(String export) {
+        return SChem.validationResultFrom(SChem.validate(export, false)[0], false);
     }
 }
