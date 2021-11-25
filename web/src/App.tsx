@@ -106,6 +106,8 @@ function App() {
                         width: drawerWidth,
                         boxSizing: "border-box",
                     },
+                    display: "flex",
+                    flexDirection: "column",
                 }}
                 variant="persistent"
                 anchor="left"

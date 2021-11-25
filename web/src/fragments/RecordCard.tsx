@@ -72,8 +72,8 @@ export default function RecordCard(props: RecordCardProps) {
                         <span>No gif found</span>
                     </Box>
                 )}
-                <CardContent>{props.score}</CardContent>
             </CardActionArea>
+            <CardContent sx={{ userSelect: "text" }}>{props.score}</CardContent>
 
             <CardActions
                 style={{

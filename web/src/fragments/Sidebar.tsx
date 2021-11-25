@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Divider, List, ListItemText } from "@mui/material"
+import { Box, Divider, Link, List, ListItemText } from "@mui/material"
 import ExpandableListItem from "../components/ExpandableListItem"
 import { Extension, Folder } from "@mui/icons-material"
 import CategoryIcon from "@mui/icons-material/Category"
@@ -92,11 +92,16 @@ function Categories() {
 }
 
 export default function Sidebar() {
+    // noinspection HtmlUnknownTarget
     return (
         <>
             <Groups />
             <Divider />
             <Categories />
+            <Box sx={{ flexGrow: 1 }} />
+            <Link href="/swagger-ui.html" alignSelf="end" padding="1rem">
+                API docs
+            </Link>
         </>
     )
 }
