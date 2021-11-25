@@ -18,6 +18,7 @@ import { ListItem, styled } from "@mui/material"
 import { SxProps } from "@mui/system"
 import { Theme } from "@mui/material/styles"
 import { Link } from "react-router-dom"
+import { PropsWithChildren, useEffect, useRef } from "react"
 
 interface LinkListItemProps {
     to: string
@@ -25,9 +26,13 @@ interface LinkListItemProps {
     sx?: SxProps<Theme>
 }
 
-export default function LinkListItem(props: React.PropsWithChildren<LinkListItemProps>) {
+export default function LinkListItem(props: PropsWithChildren<LinkListItemProps>) {
+    const ref = useRef<any>(null)
+    useEffect(() => {
+        if (props.selected) ref.current?.scrollIntoView({ behavior: "smooth", block: "nearest" })
+    })
     return (
-        <ListItem component={UnstyledLink} {...props}>
+        <ListItem ref={ref} component={UnstyledLink} {...props}>
             {props.children}
         </ListItem>
     )

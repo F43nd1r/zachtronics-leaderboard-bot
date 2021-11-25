@@ -128,9 +128,9 @@ data class OmGroupDTO(val id: String, val displayName: String)
 
 fun OmGroup.toDTO() = OmGroupDTO(name, displayName)
 
-data class OmPuzzleDTO(val id: String, val displayName: String)
+data class OmPuzzleDTO(val id: String, val displayName: String, val group: OmGroupDTO)
 
-fun OmPuzzle.toDTO() = OmPuzzleDTO(id, displayName)
+fun OmPuzzle.toDTO() = OmPuzzleDTO(id, displayName, group.toDTO())
 
 data class OmCategoryDTO(val id: String, val displayName: String, val metrics: List<String>)
 

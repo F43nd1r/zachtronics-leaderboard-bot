@@ -12,6 +12,7 @@ import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar"
 import Sidebar from "./fragments/Sidebar"
 import { Outlet } from "react-router-dom"
 import { usePersistedStringState } from "./utils/usePersistedState"
+import SearchBar from "./fragments/SearchBar"
 
 const ColorModeContext = createContext({
     toggleColorMode: () => {},
@@ -90,9 +91,10 @@ function App() {
                     <IconButton size="large" edge="start" color="inherit" aria-label="menu" onClick={handleDrawerOpen} sx={{ mr: 2, ...(open && { display: "none" }) }}>
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" component="div">
                         Opus Magnum Leaderboards
                     </Typography>
+                    <SearchBar />
                     <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
                         {theme.palette.mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
                     </IconButton>

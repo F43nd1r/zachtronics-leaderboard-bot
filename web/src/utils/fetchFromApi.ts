@@ -14,24 +14,12 @@
  * limitations under the License.
  */
 
-import { ComponentState } from "./ComponentState"
-
-export default function fetchFromApi<T>(url: string, setState: (state: ComponentState) => void): Promise<T> {
-    return fetch(`${window.location.protocol}//${window.location.host}/om${url}`)
-        .then((response) => {
-            if (response.ok) {
-                return response.json()
-            } else {
-                return Promise.reject(response.status)
-            }
-        })
-        .then(
-            (data) => {
-                setState(ComponentState.READY)
-                return data
-            },
-            () => {
-                setState(ComponentState.ERROR)
-            }
-        )
+export default function fetchFromApi<T>(url: string): Promise<T> {
+    return fetch(`${window.location.protocol}//${window.location.host}/om${url}`).then((response) => {
+        if (response.ok) {
+            return response.json()
+        } else {
+            return Promise.reject(response.status)
+        }
+    })
 }

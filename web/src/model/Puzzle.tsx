@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
+import Group from "./Group"
+
 export default interface Puzzle {
     id: string
     displayName: string
+    group: Group
 }

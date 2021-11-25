@@ -18,20 +18,25 @@ import { Collapse, List, ListItemButton, ListItemIcon, ListItemText } from "@mui
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
 import { SxProps } from "@mui/system"
 import { Theme } from "@mui/material/styles"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 interface ExpandableListItemProps {
     title: string
     icon?: JSX.Element
     items: JSX.Element[]
     sx?: SxProps<Theme>
+    open?: boolean
 }
 
 export default function ExpandableListItem(props: ExpandableListItemProps) {
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState<boolean>(false)
+    useEffect(() => {
+        if (props.open !== undefined) setOpen(props.open)
+    }, [setOpen, props.open])
     const handleClick = () => {
         setOpen(!open)
     }
+    console.log(`${props.title} shouldOpen: ${props.open}, isOpen: ${open}`)
     return (
         <>
             <ListItemButton onClick={handleClick} sx={props.sx}>

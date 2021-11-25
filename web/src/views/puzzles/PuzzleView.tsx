@@ -16,7 +16,7 @@
 
 import Box from "@mui/material/Box"
 import { Tab, Tabs } from "@mui/material"
-import { Link, Navigate, Outlet, useLocation } from "react-router-dom"
+import { Link, Navigate, Outlet, useMatch } from "react-router-dom"
 import { usePersistedStringState } from "../../utils/usePersistedState"
 import { lazy, ReactElement, useEffect } from "react"
 
@@ -49,11 +49,13 @@ export const PuzzleRoutes: RouteDefinition[] = [
 ]
 
 export default function PuzzleView() {
-    const location = useLocation()
-    const lastSegment = location.pathname.split("/").reverse()[0]
+    const match = useMatch("puzzles/:puzzleId/:tab")
+    const lastSegment = match?.params?.tab
     const [activeTab, setActiveTab] = usePersistedStringState<string>("puzzleTab", PuzzleRoutes[0].pathSegment)
     const lastActiveTab = activeTab
-    useEffect(() => setActiveTab(lastSegment), [setActiveTab, lastSegment])
+    useEffect(() => {
+        lastSegment && setActiveTab(lastSegment)
+    }, [setActiveTab, lastSegment])
 
     if (!lastSegment || !PuzzleRoutes.some((route) => route.pathSegment === lastSegment)) {
         return <Navigate to={lastActiveTab} />

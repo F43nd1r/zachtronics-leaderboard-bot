@@ -24,10 +24,13 @@ import LinkListItem from "../components/LinkListItem"
 import Group from "../model/Group"
 import Puzzle from "../model/Puzzle"
 import Category from "../model/Category"
-import { useParams } from "react-router-dom"
+import { useMatch } from "react-router-dom"
 import ApiListResource from "../utils/ApiListResource"
+import ApiResource from "../utils/ApiResource"
 
 function Groups() {
+    const match = useMatch("/puzzles/*")
+
     return (
         <List>
             <ExpandableListItem
@@ -37,6 +40,7 @@ function Groups() {
                     url: "/groups",
                     element: (groups) => groups.map((group) => <Puzzles group={group} key={group.id} sx={{ pl: 4 }} />),
                 })}
+                open={match !== null}
             />
         </List>
     )
@@ -48,29 +52,34 @@ interface PuzzlesProps {
 }
 
 function Puzzles(props: PuzzlesProps) {
-    const puzzleId = useParams().puzzleId
+    const match = useMatch("/puzzles/:puzzleId/*")
+    const puzzleId = match?.params?.puzzleId
 
     return (
         <List sx={props.sx}>
-            <ExpandableListItem
-                title={props.group.displayName}
-                icon={<Folder />}
-                items={ApiListResource<Puzzle[]>({
-                    url: `/group/${props.group.id}/puzzles`,
-                    element: (puzzles) =>
-                        puzzles.map((puzzle) => (
+            {ApiResource<Puzzle[]>({
+                url: `/group/${props.group.id}/puzzles`,
+                element: (puzzles) => (
+                    <ExpandableListItem
+                        title={props.group.displayName}
+                        icon={<Folder />}
+                        items={puzzles.map((puzzle) => (
                             <LinkListItem sx={{ pl: 4 }} key={puzzle.id} to={`/puzzles/${puzzle.id}`} selected={puzzleId === puzzle.id}>
                                 <ListItemText primary={puzzle.displayName} />
                             </LinkListItem>
-                        )),
-                })}
-            />
+                        ))}
+                        open={puzzles.some((puzzle) => puzzleId === puzzle.id)}
+                    />
+                ),
+            })}
         </List>
     )
 }
 
 function Categories() {
-    const categoryId = useParams().categoryId
+    const match = useMatch("/categories/:categoryId/*")
+    const categoryId = match?.params?.categoryId
+    console.log(categoryId)
 
     return (
         <List>
@@ -86,6 +95,7 @@ function Categories() {
                             </LinkListItem>
                         )),
                 })}
+                open={categoryId !== undefined}
             />
         </List>
     )

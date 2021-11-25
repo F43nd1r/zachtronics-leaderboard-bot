@@ -15,6 +15,7 @@
  */
 import { useEffect, useState } from "react"
 import { ComponentState } from "./ComponentState"
+import fetchFromApi from "./fetchFromApi"
 
 interface BaseApiResourceProps<T, R> {
     url: string
@@ -27,23 +28,15 @@ export default function BaseApiResource<T, R>(props: BaseApiResourceProps<T, R>)
     const [state, setState] = useState(ComponentState.LOADING)
     const [data, setData] = useState<T | undefined>(undefined)
     useEffect(() => {
-        fetch(`${window.location.protocol}//${window.location.host}/om${props.url}`)
-            .then((response) => {
-                if (response.ok) {
-                    return response.json()
-                } else {
-                    return Promise.reject(response.status)
-                }
-            })
-            .then(
-                (data) => {
-                    setData(data)
-                    setState(ComponentState.READY)
-                },
-                () => {
-                    setState(ComponentState.ERROR)
-                }
-            )
+        fetchFromApi<T>(props.url).then(
+            (data) => {
+                setData(data)
+                setState(ComponentState.READY)
+            },
+            () => {
+                setState(ComponentState.ERROR)
+            }
+        )
     }, [props.url])
 
     switch (state) {

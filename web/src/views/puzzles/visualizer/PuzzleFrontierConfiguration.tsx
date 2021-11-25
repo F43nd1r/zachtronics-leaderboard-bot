@@ -18,6 +18,7 @@ import { getMetric, Metric, MetricId, metrics } from "../../../model/Metric"
 import { Configuration, Mode } from "./Configuration"
 import { Box, MenuItem, Select, ToggleButton, ToggleButtonGroup } from "@mui/material"
 import { Legend } from "./Legend"
+import { MouseEvent } from "react"
 
 interface PuzzleFrontierConfigurationProps {
     configuration: Configuration
@@ -25,7 +26,7 @@ interface PuzzleFrontierConfigurationProps {
 }
 
 export default function PuzzleFrontierConfiguration(props: PuzzleFrontierConfigurationProps) {
-    const handleMode = (event: React.MouseEvent<HTMLElement>, newMode: Mode | null) => {
+    const handleMode = (event: MouseEvent<HTMLElement>, newMode: Mode | null) => {
         if (newMode !== null) {
             props.setConfiguration({
                 ...props.configuration,
@@ -120,7 +121,7 @@ interface FilterButtonGroupProps {
 }
 
 function FilterButtonGroup(props: FilterButtonGroupProps) {
-    const handleChange = (event: React.MouseEvent<HTMLElement>, newFilterValue: string[]) => {
+    const handleChange = (event: MouseEvent<HTMLElement>, newFilterValue: string[]) => {
         if (newFilterValue.length) {
             props.setFilter(newFilterValue.length === 1 ? newFilterValue[0] === "on" : undefined)
         } else if (props.filter !== undefined) {
