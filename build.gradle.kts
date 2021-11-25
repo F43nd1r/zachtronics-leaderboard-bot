@@ -94,7 +94,8 @@ tasks.withType<Test> {
 }
 
 docker {
-    name = "f43nd1r/zachtronics-leaderboard-bot:latest"
+    name = "f43nd1r/zachtronics-leaderboard-bot"
+    tag("latest", "docker.io/f43nd1r/zachtronics-leaderboard-bot")
     files(tasks.getByName<BootJar>("bootJar").outputs)
     copySpec.into("build/libs")
 }
