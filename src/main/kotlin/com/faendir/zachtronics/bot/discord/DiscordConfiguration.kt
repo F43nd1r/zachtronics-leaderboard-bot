@@ -23,8 +23,10 @@ import discord4j.core.`object`.presence.ClientPresence
 import org.springframework.cloud.context.restart.RestartEndpoint
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 
 @Configuration
+@Profile("!test")
 class DiscordConfiguration {
 
     @Bean

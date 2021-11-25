@@ -88,6 +88,10 @@ public class SubCommandTest {
         result = runCommand("frontier", args); // 2 valid files
         assertTrue(result.contains("Fission I"));
         assertEquals(2, StringUtils.countMatches(result, "[\uD83D\uDCC4](file:/"));
+
+        args = Map.of("puzzle", "Dessication Station");
+        result = runCommand("frontier", args); // all 3 C categories
+        assertTrue(result.contains("C\n") && result.contains("CNB\n") && result.contains("CNP\n"));
     }
 
     @Test
@@ -132,7 +136,7 @@ public class SubCommandTest {
                             "master/RESEARCHNET3/published_26_3/156-1-45-B.txt";
         Map<String, ? extends Serializable> args = Map.of("export", exportLink);
         String result = runCommand("archive", args);
-        assertTrue(result.contains("Failed") && result.contains("Collision"));
+        assertTrue(result.contains("156-1-45") && result.contains("Collision"));
 
         args = Map.of("export", exportLink, "bypass-validation", true);
         result = runCommand("archive", args);

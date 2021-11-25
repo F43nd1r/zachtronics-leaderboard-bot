@@ -7,5 +7,6 @@
   "requireConfig": false,
   "platform": "github",
   "dependencyDashboard": false,
-  "repositories": ["F43nd1r/zachtronics-leaderboard-bot"]
+  "repositories": ["F43nd1r/zachtronics-leaderboard-bot"],
+  "ignoreDeps": ["openjdk"]
 }

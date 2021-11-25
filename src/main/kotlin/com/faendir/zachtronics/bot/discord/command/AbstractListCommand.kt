@@ -37,6 +37,7 @@ abstract class AbstractListCommand<T, C : Category, P : Puzzle<C>, R : Record<C>
             .color(Colors.READ)
             .embedCategoryRecords(records, puzzle.supportedCategories)
             .apply {
+                puzzle.link?.let { url(it) }
                 val missing = puzzle.supportedCategories - records.flatMap { it.categories }
                 if (missing.isNotEmpty()) {
                     addField(missing.joinToString(", ") { it.displayName }, "None")

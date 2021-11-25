@@ -22,4 +22,7 @@ interface Puzzle<C : Category> {
     val displayName: String
 
     val supportedCategories: List<C>
+
+    val link: String?
+        get() = null
 }

@@ -5,7 +5,7 @@ A discord & reddit bot for automating solution submission/display for [Zachtroni
 Currently included:
  - Opus Magnum
  - SpaceChem
- - Shenzen-IO
+ - Shenzhen I/O
  
 # Build
 0. Set up docker-compose, create a discord bot, create a reddit app, get a github personal access token. Follow respective guides.
@@ -32,7 +32,7 @@ services:
       REDDIT_PASSWORD: stu
       IMGUR_CLIENT_ID: wvx
 ```
-Alternatively to `build .` you can use prebuilt `image: f43nd1r/om-leaderboard-discord-bot:latest`. This makes the gradle build obsolete.
+Alternatively to `build .` you can use prebuilt `image: f43nd1r/zachtronics-leaderboard-bot:latest`. This makes the gradle build obsolete.
 
 ---
 

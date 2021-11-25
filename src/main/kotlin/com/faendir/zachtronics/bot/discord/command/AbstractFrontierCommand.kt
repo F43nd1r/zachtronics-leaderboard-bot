@@ -36,6 +36,7 @@ abstract class AbstractFrontierCommand<T, C: Category, P : Puzzle<C>, R: Record<
             .title("*${puzzle.displayName}*")
             .color(Colors.READ)
             .embedRecords(records, puzzle.supportedCategories)
+            .apply { puzzle.link?.let { url(it) } }
             .send(event)
     }
 

@@ -24,6 +24,7 @@ import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzSubmission;
 import com.faendir.zachtronics.bot.sz.repository.SzSolutionRepository;
+import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -35,8 +36,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Component
@@ -49,19 +50,19 @@ public class SzArchiveCommand extends AbstractArchiveCommand<SzArchiveCommand.Ar
 
     @NotNull
     @Override
-    public List<SzSubmission> parseSubmissions(@NotNull ArchiveData parameters) {
-        SzSubmission solution;
+    public Collection<ValidationResult<SzSubmission>> parseSubmissions(@NotNull ArchiveData parameters) {
+        ValidationResult<SzSubmission> result;
         try (InputStream is = new URL(parameters.link).openStream()) {
             String content = new String(is.readAllBytes());
-            solution = new SzSubmission(content);
+            result = new ValidationResult.Valid<>(new SzSubmission(content));
         } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("Could not parse your link");
+            result = new ValidationResult.Unparseable<>("Could not parse your link");
         } catch (IOException e) {
-            throw new IllegalArgumentException("Could not read your solution");
+            result = new ValidationResult.Unparseable<>("Could not read your solution");
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Could not parse a valid solution");
+            result = new ValidationResult.Unparseable<>("Could not parse a valid solution");
         }
-        return Collections.singletonList(solution);
+        return Collections.singleton(result);
     }
 
     @ApplicationCommand(name = "archive", subCommand = true)

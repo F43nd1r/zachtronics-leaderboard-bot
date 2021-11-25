@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.Score
+import com.faendir.zachtronics.bot.model.StringFormat
 import kotlinx.serialization.Serializable
 import kotlin.reflect.full.memberProperties
 
@@ -29,24 +30,28 @@ data class OmScore(
     val instructions: Int? = null,
     val height: Int? = null,
     val width: Double? = null,
+    val rate: Double? = null,
     val trackless: Boolean = false,
     val overlap: Boolean = false,
 ) : Score<OmCategory> {
 
     override fun toDisplayString(context: DisplayContext<OmCategory>): String =
         ((context.categories?.takeIf { it.isNotEmpty() }?.flatMap { it.requiredParts }?.distinct() ?: OmScorePart.values()
-            .toList()).map { it.format(this) } + when {
+            .toList()).map { part -> part.format(this)?.let { if(context.format == StringFormat.FILE_NAME) it.replace("∞", "INF") else it } } + when {
             overlap -> "O"
             trackless -> "T"
             else -> null
-        }).filterNotNull().joinToString(context.separator) + (
-                context.categories
-                    ?.flatMap { it.metrics.toList() }
-                    ?.distinct()
-                    ?.mapNotNull { metric -> metric.describe(this) }
-                    ?.takeIf { it.isNotEmpty() }
-                    ?.joinToString(separator = ", ", prefix = " (", postfix = ")") ?: ""
-                )
+        }).filterNotNull().joinToString(context.separator) + when (context.format) {
+            StringFormat.DISCORD, StringFormat.PLAIN_TEXT -> (
+                    context.categories
+                        ?.flatMap { it.metrics.toList() }
+                        ?.distinct()
+                        ?.mapNotNull { metric -> metric.describe(this) }
+                        ?.takeIf { it.isNotEmpty() }
+                        ?.joinToString(separator = ", ", prefix = " (", postfix = ")") ?: ""
+                    )
+            else -> ""
+        }
 
     fun isSupersetOf(other: OmScore): Boolean {
         var hasMoreData = false

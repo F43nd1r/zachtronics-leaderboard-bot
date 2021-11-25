@@ -22,15 +22,19 @@ import net.dean.jraw.http.OkHttpNetworkAdapter
 import net.dean.jraw.http.UserAgent
 import net.dean.jraw.oauth.Credentials
 import net.dean.jraw.oauth.OAuthHelper
-import org.springframework.stereotype.Service
 
-@Service
 class ProductionRedditService(redditProperties: RedditProperties) : RedditService {
-    private val reddit: RedditClient = OAuthHelper.automatic(OkHttpNetworkAdapter(UserAgent("bot",
-        "com.faendir.zachtronics.bot",
-        "1.0",
-        redditProperties.username)),
-        Credentials.script(redditProperties.username, redditProperties.password, redditProperties.clientId, redditProperties.accessToken))
+    private val reddit: RedditClient = OAuthHelper.automatic(
+        OkHttpNetworkAdapter(
+            UserAgent(
+                "bot",
+                "com.faendir.zachtronics.bot",
+                "1.0",
+                redditProperties.username
+            )
+        ),
+        Credentials.script(redditProperties.username, redditProperties.password, redditProperties.clientId, redditProperties.accessToken)
+    )
 
     private fun subreddit(subreddit: Subreddit) = reddit.subreddit(subreddit.id)
 

@@ -23,9 +23,9 @@ import com.faendir.zachtronics.bot.discord.LinkConverter;
 import com.faendir.zachtronics.bot.discord.command.AbstractArchiveCommand;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
-import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScSubmission;
 import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
+import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -34,12 +34,13 @@ import lombok.experimental.NonFinal;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Collection;
 
 @RequiredArgsConstructor
 @Component
 @ScQualifier
-public class ScArchiveCommand extends AbstractArchiveCommand<ScArchiveCommand.ArchiveData, ScCategory, ScSubmission> implements ScSecured {
+public class ScArchiveCommand extends AbstractArchiveCommand<ScArchiveCommand.ArchiveData, ScCategory, ScSubmission>
+        implements ScSecured {
     @Delegate
     private final ScArchiveCommand_ArchiveDataParser parser = ScArchiveCommand_ArchiveDataParser.INSTANCE;
     @Getter
@@ -47,9 +48,9 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScArchiveCommand.Ar
 
     @NotNull
     @Override
-    public List<ScSubmission> parseSubmissions(@NotNull ArchiveData parameters) {
+    public Collection<ValidationResult<ScSubmission>> parseSubmissions(@NotNull ArchiveData parameters) {
         boolean bypassValidation = parameters.bypassValidation != null && parameters.bypassValidation;
-        return ScSubmission.fromExportLink(parameters.export, parameters.puzzle, bypassValidation);
+        return ScSubmission.fromExportLink(parameters.export, bypassValidation);
     }
 
     @ApplicationCommand(name = "archive", description = "Archive any number of solutions in an export file", subCommand = true)
@@ -57,19 +58,15 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScArchiveCommand.Ar
     @NonFinal
     public static class ArchiveData {
         @NotNull String export;
-        ScPuzzle puzzle;
         Boolean bypassValidation;
 
         public ArchiveData(@NotNull
                            @Description("Link or `m1` to scrape it from your last message. " +
                                         "Start the solution name with `/B?P?` to set flags")
                            @Converter(LinkConverter.class) String export,
-                           @Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
-                           @Converter(ScPuzzleConverter.class) ScPuzzle puzzle,
                            @Description("Skips running SChem on the solutions. Admin-only")
                            @Converter(value=ScAdminOnlyBooleanConverter.class, input=Boolean.class) Boolean bypassValidation) {
             this.export = export;
-            this.puzzle = puzzle;
             this.bypassValidation = bypassValidation;
         }
     }

@@ -52,7 +52,6 @@ class OmSolutionRepositoryTest {
     private lateinit var archiveDir: File
 
     private lateinit var leaderboard: GitRepository
-    private lateinit var archive: GitRepository
 
     private lateinit var repository: OmSolutionRepository
 
@@ -62,13 +61,12 @@ class OmSolutionRepositoryTest {
         archiveDir = Files.createTempDir()
 
         leaderboard = createGitRepositoryFrom(leaderboardDir, gitProperties)
-        archive = createGitRepositoryFrom(archiveDir, gitProperties)
-        repository = OmSolutionRepository(archive, leaderboard, emptyList())
+        repository = OmSolutionRepository(leaderboard, emptyList())
     }
 
     @AfterEach
     internal fun tearDown() {
-        listOf(leaderboard, archive).forEach { it.cleanup() }
+        leaderboard.cleanup()
     }
 
     @Test
@@ -191,7 +189,7 @@ class OmSolutionRepositoryTest {
         val data = repository.findCategoryHolders(OmPuzzle.STABILIZED_WATER, true)
 
         val newLeaderboard = TestGitRepository(gitProperties, leaderboardDir)
-        val newRepository = OmSolutionRepository(archive, newLeaderboard, emptyList())
+        val newRepository = OmSolutionRepository(newLeaderboard, emptyList())
 
         expectThat(newRepository.findCategoryHolders(OmPuzzle.STABILIZED_WATER, true)) {
             hasSize(data.size)

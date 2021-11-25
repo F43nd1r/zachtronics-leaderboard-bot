@@ -29,6 +29,7 @@ plugins {
     alias(libs.plugins.gradle.docker)
     alias(libs.plugins.gradle.lombok)
     alias(libs.plugins.gradle.gitProperties)
+    alias(libs.plugins.gradle.node)
 }
 
 allprojects {
@@ -58,13 +59,13 @@ dependencies {
     implementation(libs.jgit)
     implementation(libs.java.curl)
     implementation(libs.jraw)
-    implementation(libs.java.ffmpeg)
     implementation(libs.om.dsl)
     implementation(projects.common)
     implementation(projects.native)
     implementation(libs.jackson.databind)
     implementation(libs.jackson.kotlin)
     implementation(libs.springdoc)
+    implementation(libs.guava)
 
     ksp(projects.processor)
 
@@ -129,4 +130,32 @@ afterEvaluate {
     tasks.named("generateMainEffectiveLombokConfig2") {
         dependsOn(tasks.named("kspKotlin"))
     }
+    tasks.named("generateTestEffectiveLombokConfig2") {
+        dependsOn(tasks.named("kspTestKotlin"))
+    }
+}
+
+node {
+    download.set(Runtime.getRuntime().exec("node -v").waitFor() != 0)
+    workDir.set(file("${project.buildDir}/nodejs"))
+    yarnWorkDir.set(file("${project.buildDir}/yarn"))
+    nodeProjectDir.set(file("web"))
+}
+
+val buildWebApp = tasks.register<com.github.gradle.node.yarn.task.YarnTask>("yarnBuild") {
+    group = "yarn"
+    args.set(listOf("run", "build"))
+    inputs.dir("web/src")
+    outputs.dir("web/build")
+    dependsOn("yarn")
+}
+
+val copyWebApp = tasks.register<Copy>("copyWebApp") {
+    from("web/build")
+    into("${project.buildDir}/resources/main/static/")
+    dependsOn(buildWebApp)
+}
+
+tasks.processResources.configure {
+    dependsOn(copyWebApp)
 }

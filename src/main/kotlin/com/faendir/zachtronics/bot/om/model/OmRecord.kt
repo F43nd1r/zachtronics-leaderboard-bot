@@ -27,7 +27,6 @@ data class OmRecord(
     override val puzzle: OmPuzzle,
     override val score: OmScore,
     override val displayLink: String?,
-    @Transient
     override val dataLink: String? = null,
     @Serializable(with = PathSerializer::class)
     override val dataPath: Path?,

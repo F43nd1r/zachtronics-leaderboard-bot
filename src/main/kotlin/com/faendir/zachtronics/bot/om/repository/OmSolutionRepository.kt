@@ -23,12 +23,12 @@ import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmSubmission
+import com.faendir.zachtronics.bot.om.shortenGithubLink
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.add
 import com.faendir.zachtronics.bot.utils.ensurePrefix
-import com.faendir.zachtronics.bot.utils.use
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -42,11 +42,13 @@ import javax.annotation.PostConstruct
 @OptIn(ExperimentalSerializationApi::class)
 @Component
 class OmSolutionRepository(
-    @Qualifier("omArchiveRepository") private val archive: GitRepository,
-    @Qualifier("omGithubPagesLeaderboardRepository") private val leaderboard: GitRepository,
+    @Qualifier("omLeaderboardRepository") private val leaderboard: GitRepository,
     private val pageGenerators: List<AbstractOmPageGenerator>
 ) : SolutionRepository<OmCategory, OmPuzzle, OmSubmission, OmRecord> {
-    private val json = Json { prettyPrint = true }
+    private val json = Json {
+        prettyPrint = true
+        allowSpecialFloatingPointValues = true
+    }
     private val recordOrder = Comparator
         .comparing<OmRecord, Int> {
             when {
@@ -66,8 +68,8 @@ class OmSolutionRepository(
 
     @PostConstruct
     fun init() {
-        (leaderboard.acquireWriteAccess() to archive.acquireReadAccess()).use { leaderboardScope, archiveScope ->
-            loadData(leaderboardScope, archiveScope)
+        leaderboard.acquireWriteAccess().use { leaderboardScope ->
+            loadData(leaderboardScope)
             pageGenerators.forEach { it.update(leaderboardScope, OmCategory.values().toList(), data) }
             if (leaderboardScope.status().run { added.isNotEmpty() || changed.isNotEmpty() }) {
                 leaderboardScope.commitAndPush("Update page formatting")
@@ -75,19 +77,15 @@ class OmSolutionRepository(
         }
     }
 
-    private fun loadData(leaderboardScope: GitRepository.ReadAccess, archiveScope: GitRepository.ReadAccess) {
+    private fun loadData(leaderboardScope: GitRepository.ReadAccess) {
         data = OmPuzzle.values().associateWith { sortedMapOf(recordOrder) }
         for (puzzle in OmPuzzle.values()) {
             val records = data.getValue(puzzle)
             leaderboardScope.getPuzzleDir(puzzle).takeIf { it.exists() }
                 ?.listFiles()
+                ?.filter { file -> file.extension == "json" }
                 ?.map { file -> file.inputStream().buffered().use { json.decodeFromStream<OmRecord>(it) } }
-                ?.forEach { record ->
-                    records.add(record.copy(
-                        dataLink = record.dataPath?.let { archive.rawFilesUrl + it.toString().ensurePrefix("/") },
-                        dataPath = record.dataPath?.let { archiveScope.repo.toPath().resolve(it) }
-                    ), mutableSetOf())
-                }
+                ?.forEach { record -> records.add(record.copy(dataPath = record.dataPath?.let { leaderboardScope.repo.toPath().resolve(it) }), mutableSetOf()) }
             if (records.isNotEmpty()) {
                 for (category in OmCategory.values().filter { it.supportsPuzzle(puzzle) }.toMutableSet()) {
                     records.entries.filter { category.supportsScore(it.key.score) }
@@ -98,25 +96,25 @@ class OmSolutionRepository(
         }
     }
 
-    private fun loadDataIfNecessary(leaderboardScope: GitRepository.ReadAccess, archiveScope: GitRepository.ReadAccess) {
+    private fun loadDataIfNecessary(leaderboardScope: GitRepository.ReadAccess) {
         val currentHash = leaderboardScope.currentHash()
         if (hash != currentHash) {
-            loadData(leaderboardScope, archiveScope)
+            loadData(leaderboardScope)
             hash = currentHash
         }
     }
 
     override fun submit(submission: OmSubmission): SubmitResult<OmRecord, OmCategory> =
-        (leaderboard.acquireWriteAccess() to archive.acquireWriteAccess()).use { leaderboardScope, archiveScope ->
-            loadDataIfNecessary(leaderboardScope, archiveScope)
+        leaderboard.acquireWriteAccess().use { leaderboardScope ->
+            loadDataIfNecessary(leaderboardScope)
             val records = data.getValue(submission.puzzle)
-            val newRecord by lazy { submission.createRecord(archiveScope, leaderboardScope) }
+            val newRecord by lazy { submission.createRecord(leaderboardScope) }
             val unclaimedCategories = OmCategory.values().filter { it.supportsPuzzle(submission.puzzle) && it.supportsScore(submission.score) }.toMutableSet()
             val result = mutableListOf<CategoryRecord<OmRecord?, OmCategory>>()
             for ((record, categories) in records.toMap()) {
                 if (submission.score == record.score || submission.score.isSupersetOf(record.score)) {
                     if (submission.score.isSupersetOf(record.score) || submission.displayLink != record.displayLink || record.dataLink == null) {
-                        record.remove(archiveScope, leaderboardScope)
+                        record.remove(leaderboardScope)
                         records.add(newRecord, categories)
                         unclaimedCategories -= categories
                         result.add(CategoryRecord(record, categories.toSet()))
@@ -126,11 +124,11 @@ class OmSolutionRepository(
                     }
                 }
                 if (record.score.isStrictlyBetterThan(submission.score)) {
-                    return@use SubmitResult.NothingBeaten(findCategoryHolders(submission.puzzle, includeFrontier = false))
+                    return@use SubmitResult.NothingBeaten(records.filter { it.key.score.isStrictlyBetterThan(submission.score) }.map { CategoryRecord(it.key, it.value) })
                 }
                 if (categories.isEmpty()) {
                     if (submission.score.isStrictlyBetterThan(record.score)) {
-                        record.remove(archiveScope, leaderboardScope)
+                        record.remove(leaderboardScope)
                         records.add(newRecord, mutableSetOf())
                         result.add(CategoryRecord(record, emptySet()))
                     }
@@ -144,7 +142,7 @@ class OmSolutionRepository(
                     if (beatenCategories.isNotEmpty()) {
                         categories -= beatenCategories
                         if (categories.isEmpty() && submission.score.isStrictlyBetterThan(record.score)) {
-                            record.remove(archiveScope, leaderboardScope)
+                            record.remove(leaderboardScope)
                         }
                         records.add(newRecord, beatenCategories.toMutableSet())
                         result.add(CategoryRecord(record, beatenCategories))
@@ -156,30 +154,29 @@ class OmSolutionRepository(
                 result.add(CategoryRecord(null, unclaimedCategories))
             }
             pageGenerators.forEach { it.update(leaderboardScope, OmCategory.values().toList(), data) }
-            archiveScope.commitAndPush(submission.author, submission.puzzle, submission.score, result.flatMap { it.categories }.map { it.toString() })
             leaderboardScope.commitAndPush(submission.author, submission.puzzle, submission.score, result.flatMap { it.categories }.map { it.toString() })
             hash = leaderboardScope.currentHash()
             SubmitResult.Success(null, result)
         }
 
 
-    private fun OmSubmission.createRecord(archiveScope: GitRepository.ReadWriteAccess, leaderboardScope: GitRepository.ReadWriteAccess): OmRecord {
+    private fun OmSubmission.createRecord(leaderboardScope: GitRepository.ReadWriteAccess): OmRecord {
         val name = "${score.toFileString()}_${puzzle.name}"
-        val archiveDir = archiveScope.getPuzzleDir(puzzle)
-        archiveDir.mkdirs()
-        val archiveFile = File(archiveDir, "$name.solution")
+        val dir = leaderboardScope.getPuzzleDir(puzzle)
+        dir.mkdirs()
+        val archiveFile = File(dir, "$name.solution")
         archiveFile.writeBytes(data)
-        archiveScope.add(archiveFile)
-        val path = archiveFile.relativeTo(archiveScope.repo).toPath()
+        leaderboardScope.add(archiveFile)
+        val path = archiveFile.relativeTo(leaderboardScope.repo).toPath()
 
-        val leaderboardDir = leaderboardScope.getPuzzleDir(puzzle)
-        leaderboardDir.mkdirs()
-        val leaderboardFile = File(leaderboardDir, "$name.json")
+        val leaderboardFile = File(dir, "$name.json")
         val record = OmRecord(
             puzzle = puzzle,
             score = score,
             displayLink = displayLink,
-            dataLink = archive.rawFilesUrl + path.toString().ensurePrefix("/"),
+            dataLink = path?.let {
+                shortenGithubLink(leaderboard.rawFilesUrl.replace("master", leaderboardScope.currentHash()) + it.toString().ensurePrefix("/"))
+            },
             dataPath = path,
         )
         leaderboardFile.outputStream().buffered().use { json.encodeToStream(record, it) }
@@ -188,8 +185,8 @@ class OmSolutionRepository(
         return record.copy(dataPath = archiveFile.toPath())
     }
 
-    private fun OmRecord.remove(archiveScope: GitRepository.ReadWriteAccess, leaderboardScope: GitRepository.ReadWriteAccess) {
-        dataPath?.let { dataPath -> archiveScope.rm(dataPath.toFile()) }
+    private fun OmRecord.remove(leaderboardScope: GitRepository.ReadWriteAccess) {
+        dataPath?.let { dataPath -> leaderboardScope.rm(dataPath.toFile()) }
         leaderboardScope.rm(File(leaderboardScope.getPuzzleDir(puzzle), "${score.toFileString()}_${puzzle.name}.json"))
         data[puzzle]?.remove(this)
     }
@@ -199,13 +196,19 @@ class OmSolutionRepository(
     private fun OmScore.toFileString() = toDisplayString(DisplayContext.fileName())
 
     override fun find(puzzle: OmPuzzle, category: OmCategory): OmRecord? {
-        (leaderboard.acquireReadAccess() to archive.acquireReadAccess()).use { l, a -> loadDataIfNecessary(l, a) }
+        leaderboard.acquireReadAccess().use { l -> loadDataIfNecessary(l) }
         return data[puzzle]?.entries?.find { (_, categories) -> categories.contains(category) }?.key
     }
 
     override fun findCategoryHolders(puzzle: OmPuzzle, includeFrontier: Boolean): List<CategoryRecord<OmRecord, OmCategory>> {
-        (leaderboard.acquireReadAccess() to archive.acquireReadAccess()).use { l, a -> loadDataIfNecessary(l, a) }
+        leaderboard.acquireReadAccess().use { l -> loadDataIfNecessary(l) }
         return data[puzzle]?.entries?.filter { (_, categories) -> includeFrontier || categories.isNotEmpty() }
             ?.map { (record, categories) -> CategoryRecord(record, categories) } ?: emptyList()
+    }
+
+    fun findAll(category: OmCategory): Map<OmPuzzle, OmRecord?> {
+        leaderboard.acquireReadAccess().use { l -> loadDataIfNecessary(l) }
+        return data.entries.filter { category.supportsPuzzle(it.key) }
+            .associate { it.key to it.value.entries.find { (_, categories) -> categories.contains(category) }?.key }
     }
 }

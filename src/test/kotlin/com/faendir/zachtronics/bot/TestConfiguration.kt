@@ -20,16 +20,15 @@ import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.main.git.TestGitRepository
 import com.faendir.zachtronics.bot.main.reddit.TestRedditService
-import com.faendir.zachtronics.bot.om.imgur.ImgurService
-import com.faendir.zachtronics.bot.om.imgur.TestImgurService
 import com.faendir.zachtronics.bot.reddit.RedditService
 import discord4j.core.GatewayDiscordClient
+import discord4j.rest.RestClient
 import io.mockk.every
 import io.mockk.mockk
 import org.eclipse.jgit.api.Git
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.cloud.context.restart.RestartEndpoint
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Primary
 import org.springframework.util.ResourceUtils
 import reactor.core.publisher.Flux
 import java.io.File
@@ -37,20 +36,9 @@ import java.nio.file.Files
 
 @TestConfiguration
 class TestConfiguration(private val gitProperties: GitProperties) {
-
-    @Bean("configRepository")
-    fun configRepository(): GitRepository {
-        return createTestGitRepository("repositories/config")
-    }
-
-    @Bean("omGithubPagesLeaderboardRepository")
+    @Bean("omLeaderboardRepository")
     fun omGithubPagesLeaderboardRepository(): GitRepository {
         return createTestGitRepository("repositories/om-leaderboard")
-    }
-
-    @Bean("omRedditLeaderboardRepository")
-    fun omRedditLeaderboardRepository(): GitRepository {
-        return createTestGitRepository("repositories/om-wiki")
     }
 
     @Bean("scArchiveRepository")
@@ -63,25 +51,22 @@ class TestConfiguration(private val gitProperties: GitProperties) {
         return createTestGitRepository("repositories/sz-leaderboard")
     }
 
-    @Primary
     @Bean
     fun redditService(): RedditService {
         return TestRedditService(extractResourceDirectory("reddit"))
     }
 
-    @Primary
-    @Bean
-    fun imgurService(): ImgurService {
-        return TestImgurService()
-    }
-
-    @Primary
     @Bean
     fun discordClient(): GatewayDiscordClient {
-        val client = mockk<GatewayDiscordClient>()
+        val client = mockk<GatewayDiscordClient>(relaxed = true)
         every { client.guilds } returns Flux.empty()
+        val restClient = mockk<RestClient>(relaxed = true)
+        every { client.restClient } returns restClient
         return client
     }
+
+    @Bean
+    fun restartEndpoint() = mockk<RestartEndpoint>(relaxed = true)
 
     private fun createTestGitRepository(dir: String): GitRepository = createGitRepositoryFrom(extractResourceDirectory(dir), gitProperties)
 

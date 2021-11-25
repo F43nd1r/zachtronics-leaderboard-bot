@@ -25,12 +25,13 @@ enum class OmScorePart(val key: Char, val displayName: String?, val getValue: (O
     INSTRUCTIONS('i', "Instructions", OmScore::instructions),
     HEIGHT('h', "Height", OmScore::height),
     WIDTH('w', "Width", OmScore::width),
+    RATE('r', "Rate", OmScore::rate),
     ;
 
     fun format(score: OmScore) = getValue(score)?.let { numberFormat.format(it) }?.plus(key)
 
     companion object {
-        private val numberFormat = DecimalFormat("0.#")
+        private val numberFormat = DecimalFormat("0.###")
 
 
         fun parse(string: String): Pair<OmScorePart, Double>? {

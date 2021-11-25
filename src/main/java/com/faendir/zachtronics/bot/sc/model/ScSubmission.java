@@ -19,8 +19,8 @@ package com.faendir.zachtronics.bot.sc.model;
 import com.faendir.zachtronics.bot.model.Submission;
 import com.faendir.zachtronics.bot.sc.validator.SChem;
 import com.faendir.zachtronics.bot.utils.Utils;
+import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Value;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,7 +29,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Collection;
 
 /** Archive-only submissions have a <tt>null</tt> {@link #displayLink} */
 @Value
@@ -50,7 +50,8 @@ public class ScSubmission implements Submission<ScCategory, ScPuzzle> {
     }
 
     @NotNull
-    public static List<ScSubmission> fromExportLink(@NotNull String exportLink, ScPuzzle puzzle, boolean bypassValidation) {
+    public static Collection<ValidationResult<ScSubmission>> fromExportLink(@NotNull String exportLink,
+                                                                            boolean bypassValidation) {
         String export;
         try (InputStream is = new URL(Utils.rawContentURL(exportLink)).openStream()) {
             export = new String(is.readAllBytes()).replace("\r\n", "\n");
@@ -62,19 +63,7 @@ public class ScSubmission implements Submission<ScCategory, ScPuzzle> {
             throw new IllegalArgumentException("Could not read your solution");
         }
 
-        return SChem.validateMultiExport(export, puzzle, bypassValidation);
-    }
-
-    /** <tt>{{@link ScPuzzle#bonding_boss}, {@link ScScore#INVALID_SCORE}, "", null, "$reason"}</tt> */
-    @NotNull
-    @Contract("_ -> new")
-    public static ScSubmission invalidSubmission(String reason) {
-        return new ScSubmission(ScPuzzle.bonding_boss, ScScore.INVALID_SCORE, "", null, reason);
-    }
-
-    /** If returns <tt>false</tt>, the reason is in {@link #data} */
-    public boolean isValid() {
-        return score != ScScore.INVALID_SCORE;
+        return SChem.validateMultiExport(export, bypassValidation);
     }
 
     public ScRecord extendToRecord(String dataLink, Path dataPath) {

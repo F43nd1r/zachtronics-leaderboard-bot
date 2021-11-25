@@ -21,95 +21,68 @@ import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSolutionMetadata;
 import com.faendir.zachtronics.bot.sc.model.ScSubmission;
+import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 /** Wrapper for a schem package installed on the system */
 public class SChem {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper().configure(
+            DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
 
     /**
      * validates a possibly multi SpaceChem export
      *
      * @param export multiExport to check
-     * @param puzzle to aid in puzzle resolution
-     * @param bypassValidation skip validation and checks entirely, just parse everything
-     * @return list of solutions, possibly invalid
+     * @param bypassValidation only check it imports
      */
     @NotNull
-    public static List<ScSubmission> validateMultiExport(@NotNull String export, ScPuzzle puzzle, boolean bypassValidation) {
-        String[] solutions = export.trim().split("(?=SOLUTION:)");
-        if (solutions.length > 50 && !bypassValidation) {
+    public static Collection<ValidationResult<ScSubmission>> validateMultiExport(@NotNull String export,
+                                                                                 boolean bypassValidation) {
+        int solutionsNumber = StringUtils.countMatches(export, "SOLUTION:");
+        if (solutionsNumber > 50 && !bypassValidation) {
             throw new IllegalArgumentException(
-                    "You can archive a maximum of 50 solutions at a time, you tried " + solutions.length);
-        }
-        LinkedHashSet<ScSubmission> result = new LinkedHashSet<>();
-        for (String data : solutions) {
-            data = data.replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
-            try {
-                ScSubmission submission;
-                if (bypassValidation) {
-                    submission = ScSubmission.fromDataNoValidation(data, puzzle);
-                }
-                else {
-                    submission = validate(data).extendToSubmission(null, data);
-                }
-                result.add(submission);
-            } catch (IllegalArgumentException | SChemException e) {
-                result.add(ScSubmission.invalidSubmission(e.getMessage()));
-            }
+                    "You can archive a maximum of 50 solutions at a time, you tried " + solutionsNumber);
         }
 
-        return Arrays.asList(result.toArray(new ScSubmission[0]));
+        return Arrays.stream(validate(export, bypassValidation))
+                     .map(r -> validationResultFrom(r, bypassValidation))
+                     .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    /**
-     * validates a single SpaceChem export
-     *
-     * @param export **single** export to check
-     * @return metadata if validation succeeded
-     * @throws SChemException if validation failed, reason is in message
-     */
     @NotNull
-    static ScSolutionMetadata validate(@NotNull String export) throws SChemException {
-        SChemResult result = run(export);
+    static ValidationResult<ScSubmission> validationResultFrom(@NotNull SChemResult result, boolean bypassValidation)
+            throws SChemException {
 
-        // TODO make multisol work
-        if (result.getError() != null)
-            throw new SChemException(result.getError());
+        if (result.getLevelName() == null || result.getAuthor() == null || result.getCycles() == null)
+            return new ValidationResult.Unparseable<>(result.getError());
 
-        ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), false,
-                                    result.getPrecog() != null && result.getPrecog());
-
+        // we pull flags from the input
         boolean declaresBugged = false;
         boolean declaresPrecog = false;
         if (result.getSolutionName() != null) {
             Matcher m = ScSolutionMetadata.SOLUTION_NAME_REGEX.matcher(result.getSolutionName());
             if (!m.matches()) {
-                throw new SChemException("Invalid solution name: \"" + result.getSolutionName() + "\"");
+                return new ValidationResult.Unparseable<>(
+                        "Invalid solution name: \"" + result.getSolutionName() + "\"");
             }
             declaresBugged = m.group("Bflag") != null;
             declaresPrecog = m.group("Pflag") != null;
         }
 
-        // check if the user is lying:
-        // we know the score isn't bugged because SChem ran it and we can check SChem's precog opinion
-        if (declaresBugged || (result.getPrecog() != null && declaresPrecog != result.getPrecog())) {
-            throw new SChemException("Incoherent solution flags, given " +
-                                     "\"" + ScScore.sepFlags("/", declaresBugged, declaresPrecog) + "\"" +
-                                     " but SChem wanted \"" + score.sepFlags("/") + "\"\n" +
-                                     "SChem reports the following precognition analysis:\n" +
-                                     result.getPrecogExplanation());
-        }
+        ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), declaresBugged,
+                                    declaresPrecog);
 
         SingleParseResult<ScPuzzle> puzzleParseResult = ScPuzzle.parsePuzzle(result.getLevelName());
         if (puzzleParseResult instanceof SingleParseResult.Ambiguous && result.getResnetId() != null) {
@@ -119,13 +92,43 @@ public class SChem {
         }
         ScPuzzle puzzle = puzzleParseResult.orElseThrow();
 
-        return new ScSolutionMetadata(puzzle, result.getAuthor(), score, result.getSolutionName());
+        ScSubmission submission = new ScSolutionMetadata(puzzle, result.getAuthor(), score, result.getSolutionName())
+                                     .extendToSubmission(null, result.getExport());
+
+        if (!bypassValidation) {
+            if (result.getError() != null)
+                return new ValidationResult.Invalid<>(submission, result.getError());
+
+            // check if the user is lying part 1, we know the score isn't bugged because SChem ran it
+            if (declaresBugged) {
+                return new ValidationResult.Invalid<>(submission,
+                                                      "Submission was declared bugged, but SChem ran it successfully");
+            }
+
+            // check if the user is lying part 2, we can check SChem's precog opinion
+            if (result.getPrecog() != null && declaresPrecog != result.getPrecog()) {
+                return new ValidationResult.Invalid<>(submission, "Incoherent precognition flag, given " +
+                                                                  "\"" + score.sepFlags("/") + "\"" +
+                                                                  " but SChem wanted \"" +
+                                                                  ScScore.sepFlags("/", false, result.getPrecog()) +
+                                                                  "\"\n" + result.getPrecogExplanation());
+            }
+        }
+        return new ValidationResult.Valid<>(submission);
     }
 
+    /**
+     *
+     * @param export the (possibly multi) export string
+     * @param onlyImport if <tt>true</tt> we only check the solution(s) imports, not that they runs
+     * @return results, arrays of size 1 are correctly generated
+     * @throws SChemException if there is a communication error, solution errors are handled in the onject
+     */
     @NotNull
-    static SChemResult run(@NotNull String export) throws SChemException {
+    static SChemResult[] validate(@NotNull String export, boolean onlyImport) throws SChemException {
         ProcessBuilder builder = new ProcessBuilder();
-        builder.command("python3", "-m", "schem", "--json", "--check-precog");
+        String runFlag = onlyImport ? "--no-run" : "--check-precog";
+        builder.command("python3", "-m", "schem", "--json", "--export", runFlag);
 
         try {
             Process process = builder.start();
@@ -137,7 +140,7 @@ public class SChem {
                 throw new SChemException(new String(process.getErrorStream().readAllBytes()));
             }
 
-            return objectMapper.readValue(process.getInputStream(), SChemResult.class);
+            return objectMapper.readValue(process.getInputStream(), SChemResult[].class);
 
         } catch (JsonProcessingException e) {
             throw new SChemException("Error in reading back results", e);

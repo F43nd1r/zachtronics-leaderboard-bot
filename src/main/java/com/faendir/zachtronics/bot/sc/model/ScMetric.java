@@ -28,6 +28,7 @@ public enum ScMetric implements Metric {
     CYCLES("C", ScScore::getCycles),
     REACTORS("R", ScScore::getReactors),
     SYMBOLS("S", ScScore::getSymbols),
+    ANY_FLAG("", null),
     NO_BUGS("NB", null),
     NO_PRECOG("NP", null);
 

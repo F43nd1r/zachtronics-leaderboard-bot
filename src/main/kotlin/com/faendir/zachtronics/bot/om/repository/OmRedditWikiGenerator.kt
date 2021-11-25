@@ -38,12 +38,12 @@ import com.faendir.zachtronics.bot.om.model.OmCategory.GXP
 import com.faendir.zachtronics.bot.om.model.OmCategory.IC
 import com.faendir.zachtronics.bot.om.model.OmCategory.IG
 import com.faendir.zachtronics.bot.om.model.OmCategory.IX
-import com.faendir.zachtronics.bot.om.model.OmCategory.SA
-import com.faendir.zachtronics.bot.om.model.OmCategory.SC
-import com.faendir.zachtronics.bot.om.model.OmCategory.SCP
-import com.faendir.zachtronics.bot.om.model.OmCategory.SG
-import com.faendir.zachtronics.bot.om.model.OmCategory.SGP
-import com.faendir.zachtronics.bot.om.model.OmCategory.SI
+import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_A
+import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_C
+import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_CP
+import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_G
+import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_GP
+import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_I
 import com.faendir.zachtronics.bot.om.model.OmGroup
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
@@ -58,7 +58,7 @@ import java.time.ZoneOffset
 
 @Component
 class OmRedditWikiGenerator(private val reddit: RedditService) : AbstractOmPageGenerator(
-    mapOf("." to listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SG, SGP, SC, SCP, SA, SI)),
+    mapOf("." to listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SUM_G, SUM_GP, SUM_C, SUM_CP, SUM_A, SUM_I)),
 ) {
     companion object {
         private const val wikiPage = "index"
@@ -68,7 +68,7 @@ class OmRedditWikiGenerator(private val reddit: RedditService) : AbstractOmPageG
     private val costCategories = listOf(GC, GA, GX, GCP, GI, GXP)
     private val cycleCategories = listOf(CG, CA, CX, CGP, CI, CXP)
     private val areaInstructionCategories = listOf(AG, AC, AX, IG, IC, IX)
-    private val sumCategories = listOf(SG, SGP, SC, SCP, SA, SI)
+    private val sumCategories = listOf(SUM_G, SUM_GP, SUM_C, SUM_CP, SUM_A, SUM_I)
 
     private fun filterRecords(records: Map<OmRecord, Set<OmCategory>>, filter: List<OmCategory>): MutableList<Pair<OmRecord, List<OmCategory>>> {
         return records.map { (record, categories) -> Pair(record, categories.filter { filter.contains(it) }.sorted()) }
@@ -99,7 +99,7 @@ class OmRedditWikiGenerator(private val reddit: RedditService) : AbstractOmPageG
             table += "Name|Cost|Cycles|${thirdCategory}|Sum\n:-|:-|:-|:-|:-\n"
             for (puzzle in puzzles) {
                 val entry = data[puzzle] ?: emptyMap()
-                table += "[**${puzzle.displayName}**](##Frontier: ${entry.keys.joinToString(" ") { it.score.toDisplayString() }}##)"
+                table += "[**${puzzle.displayName}**](##Frontier: ${entry.keys.joinToString(" ") { it.score.toDisplayString(DisplayContext.reddit()) }}##)"
 
                 val costScores = filterRecords(entry, costCategories)
                 val cycleScores = filterRecords(entry, cycleCategories)

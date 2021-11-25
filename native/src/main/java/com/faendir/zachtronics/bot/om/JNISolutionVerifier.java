@@ -75,4 +75,10 @@ public class JNISolutionVerifier {
     }
 
     native int getInstructions(String puzzleFile, String solutionFile);
+
+    public double getRate(File puzzle, File solution) {
+        return getRate(puzzle.getAbsolutePath(), solution.getAbsolutePath());
+    }
+
+    native double getRate(String puzzleFile, String solutionFile);
 }
