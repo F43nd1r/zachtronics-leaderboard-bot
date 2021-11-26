@@ -26,6 +26,8 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import reactor.core.publisher.Flux
 import java.time.Instant
 
+private val regex = Regex("m(?<message>\\d{1,2})(\\.(?<attachment>\\d{1,2}))?")
+
 class LinkConverter : OptionConverter<String, String> {
     override fun fromValue(context: ChatInputInteractionEvent, value: String): SingleParseResult<String> {
         return findLink(
@@ -35,18 +37,19 @@ class LinkConverter : OptionConverter<String, String> {
     }
 
     private fun findLink(input: String, messages: Flux<Message>): SingleParseResult<String> {
-        val link = if (Regex("m\\d{1,2}").matches(input)) {
-            val num = input.removePrefix("m").toInt()
+
+        val link = regex.matchEntire(input)?.let { match ->
+            val num = match.groups["message"]!!.value.toInt()
+            val attachment = match.groups["attachment"]?.value?.toInt()
             val message = messages.elementAt(num - 1).block()!!
-            message.attachments.firstOrNull()?.url?.also { message.addReaction(ReactionEmoji.unicode("\uD83D\uDC4D"/* 👍 */)).block() }
+            message.attachments.getOrNull(attachment?.minus(1) ?: 0)?.url?.also { message.addReaction(ReactionEmoji.unicode("\uD83D\uDC4D"/* 👍 */)).block() }
                 ?: return SingleParseResult.Failure(
                     "https://discord.com/channels/${
                         message.guild.block()!!.id.asLong().toString().ifEmpty { "@me" }
                     }/${message.channelId.asLong()}/${message.id.asLong()} had no attachments"
                 )
-        } else {
-            input
-        }
+        } ?: input
+
         if (!isValidLink(link)) {
             return SingleParseResult.Failure("\"$link\" is not a valid link")
         }
