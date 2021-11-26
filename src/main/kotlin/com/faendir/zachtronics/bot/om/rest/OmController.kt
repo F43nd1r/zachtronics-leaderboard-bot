@@ -61,7 +61,7 @@ class OmController(private val repository: OmSolutionRepository, private val dis
 
     @GetMapping(path = ["/group/{groupId}/puzzles"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun listPuzzlesByGroup(@PathVariable groupId: String): List<OmPuzzleDTO> {
-        val group = OmGroup.values().find { it.name == groupId } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Group $groupId not found.")
+        val group = findGroup(groupId)
         return OmPuzzle.values().filter { it.group == group }.map { it.toDTO() }
     }
 
@@ -70,22 +70,20 @@ class OmController(private val repository: OmSolutionRepository, private val dis
 
     @GetMapping(path = ["/puzzle/{puzzleId}/records"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun listRecords(@PathVariable puzzleId: String, @RequestParam(required = false) includeFrontier: Boolean?): List<OmRecordDTO> {
-        val puzzle = OmPuzzle.values().find { it.id == puzzleId } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Puzzle $puzzleId not found.")
+        val puzzle = findPuzzle(puzzleId)
         return repository.findCategoryHolders(puzzle, includeFrontier ?: false).map { it.toDTO() }
     }
 
     @GetMapping(path = ["/category/{categoryId}/records"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun listRecords(@PathVariable categoryId: String): List<OmRecordDTO> {
-        val category =
-            OmCategory.values().find { it.name == categoryId } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Category $categoryId not found.")
+        val category = findCategory(categoryId)
         return repository.findAll(category).entries.sortedBy { it.key }.map { it.value?.withCategory(category)?.toDTO() ?: emptyRecord(it.key) }
     }
 
     @GetMapping(path = ["/puzzle/{puzzleId}/category/{categoryId}/record"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getRecord(@PathVariable puzzleId: String, @PathVariable categoryId: String): OmRecordDTO? {
-        val puzzle = OmPuzzle.values().find { it.id == puzzleId } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Puzzle $puzzleId not found.")
-        val category =
-            OmCategory.values().find { it.name == categoryId } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Category $categoryId not found.")
+        val puzzle = findPuzzle(puzzleId)
+        val category = findCategory(categoryId)
         return repository.find(puzzle, category)?.withCategory(category)?.toDTO()
     }
 
@@ -123,6 +121,12 @@ class OmController(private val repository: OmSolutionRepository, private val dis
             .subscribe()
     }
 }
+
+private fun findPuzzle(puzzleId: String) = OmPuzzle.values().find { it.id.equals(puzzleId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Puzzle $puzzleId not found.")
+
+private fun findCategory(categoryId: String) = OmCategory.values().find { it.name.equals(categoryId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Category $categoryId not found.")
+
+private fun findGroup(groupId: String) = OmGroup.values().find { it.name.equals(groupId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Group $groupId not found.")
 
 data class OmGroupDTO(val id: String, val displayName: String)
 
