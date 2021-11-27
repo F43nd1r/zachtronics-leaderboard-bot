@@ -27,6 +27,7 @@ import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.google.common.io.Files
+import io.mockk.mockk
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -61,7 +62,7 @@ class OmSolutionRepositoryTest {
         archiveDir = Files.createTempDir()
 
         leaderboard = createGitRepositoryFrom(leaderboardDir, gitProperties)
-        repository = OmSolutionRepository(leaderboard, emptyList())
+        repository = OmSolutionRepository(leaderboard, mockk())
     }
 
     @AfterEach
@@ -189,7 +190,7 @@ class OmSolutionRepositoryTest {
         val data = repository.findCategoryHolders(OmPuzzle.STABILIZED_WATER, true)
 
         val newLeaderboard = TestGitRepository(gitProperties, leaderboardDir)
-        val newRepository = OmSolutionRepository(newLeaderboard, emptyList())
+        val newRepository = OmSolutionRepository(newLeaderboard, mockk())
 
         expectThat(newRepository.findCategoryHolders(OmPuzzle.STABILIZED_WATER, true)) {
             hasSize(data.size)
