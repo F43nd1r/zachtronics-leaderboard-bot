@@ -25,6 +25,8 @@ import com.faendir.zachtronics.bot.om.model.OmGroup
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
+import com.faendir.zachtronics.bot.om.repository.OmRecordChange
+import com.faendir.zachtronics.bot.om.repository.OmRecordChangeType
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SubmitResult
@@ -37,6 +39,7 @@ import com.faendir.zachtronics.bot.utils.smartFormat
 import com.faendir.zachtronics.bot.utils.toMetricsTree
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.channel.MessageChannel
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
@@ -48,6 +51,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
+import java.time.Instant
 
 @RestController
 @RequestMapping("/om")
@@ -112,6 +116,11 @@ class OmController(private val repository: OmSolutionRepository, private val dis
         }
     }
 
+    @GetMapping(path = ["/records/changes/{since}"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getRecordChanges(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: Instant): List<OmRecordChangeDTO> {
+        return repository.computeChangesSince(since).map { it.toDTO() }
+    }
+
     private fun sendDiscordMessage(message: SafeEmbedMessageBuilder) {
         discordClient.guilds
             .flatMap { it.channels }
@@ -122,11 +131,16 @@ class OmController(private val repository: OmSolutionRepository, private val dis
     }
 }
 
-private fun findPuzzle(puzzleId: String) = OmPuzzle.values().find { it.id.equals(puzzleId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Puzzle $puzzleId not found.")
+private fun findPuzzle(puzzleId: String) =
+    OmPuzzle.values().find { it.id.equals(puzzleId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Puzzle $puzzleId not found.")
 
-private fun findCategory(categoryId: String) = OmCategory.values().find { it.name.equals(categoryId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Category $categoryId not found.")
+private fun findCategory(categoryId: String) = OmCategory.values().find { it.name.equals(categoryId, ignoreCase = true) } ?: throw ResponseStatusException(
+    HttpStatus.NOT_FOUND,
+    "Category $categoryId not found."
+)
 
-private fun findGroup(groupId: String) = OmGroup.values().find { it.name.equals(groupId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Group $groupId not found.")
+private fun findGroup(groupId: String) =
+    OmGroup.values().find { it.name.equals(groupId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Group $groupId not found.")
 
 data class OmGroupDTO(val id: String, val displayName: String)
 
@@ -187,6 +201,18 @@ fun CategoryRecord<OmRecord, OmCategory>.toDTO() =
         smartFormattedCategories = categories.smartFormat(record.puzzle.supportedCategories.toMetricsTree())
     )
 
+fun OmRecord.toDTO() =
+    OmRecordDTO(
+        puzzle = puzzle.toDTO(),
+        score = score.toDTO(),
+        smartFormattedScore = null,
+        fullFormattedScore = score.toDisplayString(DisplayContext.plainText()),
+        gif = displayLink,
+        solution = dataLink,
+        categoryIds = null,
+        smartFormattedCategories = null
+    )
+
 fun emptyRecord(puzzle: OmPuzzle) = OmRecordDTO(
     puzzle = puzzle.toDTO(),
     score = null,
@@ -207,3 +233,7 @@ enum class SubmitResultType {
     NOTHING_BEATEN,
     SUCCESS
 }
+
+data class OmRecordChangeDTO(val type: OmRecordChangeType, val record: OmRecordDTO)
+
+fun OmRecordChange.toDTO() = OmRecordChangeDTO(type, record.toDTO())

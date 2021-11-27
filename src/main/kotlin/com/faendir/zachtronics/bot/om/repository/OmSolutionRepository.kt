@@ -33,9 +33,11 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
+import org.eclipse.jgit.diff.DiffEntry
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import java.io.File
+import java.time.Instant
 import java.util.*
 import javax.annotation.PostConstruct
 
@@ -124,7 +126,8 @@ class OmSolutionRepository(
                     }
                 }
                 if (record.score.isStrictlyBetterThan(submission.score)) {
-                    return@use SubmitResult.NothingBeaten(records.filter { it.key.score.isStrictlyBetterThan(submission.score) }.map { CategoryRecord(it.key, it.value) })
+                    return@use SubmitResult.NothingBeaten(records.filter { it.key.score.isStrictlyBetterThan(submission.score) }
+                        .map { CategoryRecord(it.key, it.value) })
                 }
                 if (categories.isEmpty()) {
                     if (submission.score.isStrictlyBetterThan(record.score)) {
@@ -158,6 +161,31 @@ class OmSolutionRepository(
             hash = leaderboardScope.currentHash()
             SubmitResult.Success(null, result)
         }
+
+    fun computeChangesSince(instant: Instant) : List<OmRecordChange> {
+        return leaderboard.acquireReadAccess().use { leaderboardScope ->
+            leaderboardScope.changesSince(instant).mapNotNull { change ->
+
+                try {
+                    when (change.type) {
+                        DiffEntry.ChangeType.ADD -> if (change.newName!!.endsWith(".json")) {
+                            OmRecordChange(OmRecordChangeType.ADD, change.newContent!!.openStream().use { json.decodeFromStream(it) })
+                        } else {
+                            null
+                        }
+                        DiffEntry.ChangeType.DELETE -> if (change.oldName!!.endsWith(".json")) {
+                            OmRecordChange(OmRecordChangeType.REMOVE, change.oldContent!!.openStream().use { json.decodeFromStream(it) })
+                        } else {
+                            null
+                        }
+                        else -> null
+                    }
+                } catch (e: Exception) {
+                    null
+                }
+            }
+        }
+    }
 
 
     private fun OmSubmission.createRecord(leaderboardScope: GitRepository.ReadWriteAccess): OmRecord {
@@ -212,3 +240,10 @@ class OmSolutionRepository(
             .associate { it.key to it.value.entries.find { (_, categories) -> categories.contains(category) }?.key }
     }
 }
+
+enum class OmRecordChangeType {
+    ADD,
+    REMOVE
+}
+
+data class OmRecordChange(val type: OmRecordChangeType, val record: OmRecord)

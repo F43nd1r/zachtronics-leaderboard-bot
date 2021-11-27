@@ -43,7 +43,7 @@ gradle-docker = { id = "com.palantir.docker", version.ref = "gradle-docker" }
 gradle-lombok = { id = "io.freefair.lombok", version.ref = "gradle-lombok" }
 gradle-gitProperties = { id = "com.gorylenko.gradle-git-properties", version.ref = "gradle-gitProperties" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-gradle-node = { id = "com.github.node-gradle.node", version.ref = "gradle-node"}
+gradle-node = { id = "com.github.node-gradle.node", version.ref = "gradle-node" }
 
 [libraries]
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-json" }
@@ -63,6 +63,7 @@ jraw = { module = "com.faendir.jraw:JRAW", version.ref = "jraw" }
 java-ffmpeg = { module = "net.bramp.ffmpeg:ffmpeg", version.ref = "java-ffmpeg" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin" }
+jackson-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 om-dsl = { module = "com.faendir.om:dsl", version.ref = "om-dsl" }
 querydsl-jpa = { module = "com.querydsl:querydsl-jpa", version.ref = "querydsl" }
 querydsl-core = { module = "com.querydsl:querydsl-core", version.ref = "querydsl" }
@@ -80,5 +81,5 @@ kotlinCompileTesting = { module = "com.github.tschuchortdev:kotlin-compile-testi
 kaseChange = { module = "net.pearx.kasechange:kasechange-jvm", version.ref = "kaseChange" }
 junit = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 springdoc = { module = "org.springdoc:springdoc-openapi-ui", version.ref = "springdoc" }
-guava = { module = "com.google.guava:guava", version.ref = "guava"}
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
 

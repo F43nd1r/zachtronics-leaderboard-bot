@@ -22,12 +22,23 @@ import com.faendir.zachtronics.bot.model.Score
 import com.google.common.util.concurrent.CycleDetectingLockFactory
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.Status
+import org.eclipse.jgit.diff.DiffEntry
+import org.eclipse.jgit.diff.DiffFormatter
+import org.eclipse.jgit.lib.Config
+import org.eclipse.jgit.lib.Constants
+import org.eclipse.jgit.lib.ObjectLoader
 import org.eclipse.jgit.revwalk.RevCommit
+import org.eclipse.jgit.revwalk.RevSort
+import org.eclipse.jgit.revwalk.RevWalk
+import org.eclipse.jgit.revwalk.filter.CommitTimeRevFilter
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
+import org.eclipse.jgit.treewalk.TreeWalk
 import org.slf4j.LoggerFactory
 import java.io.Closeable
 import java.io.File
 import java.nio.file.Files
+import java.time.Instant
+import java.util.*
 import java.util.concurrent.locks.Lock
 import javax.annotation.PreDestroy
 
@@ -113,6 +124,37 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
             lock.unlock()
         }
 
+        fun changesSince(instant: Instant): List<Change> {
+            return RevWalk(git.repository).use { walk ->
+                val latestCommit = walk.parseCommit(git.repository.resolve(Constants.HEAD))
+                walk.markStart(latestCommit)
+                walk.sort(RevSort.COMMIT_TIME_DESC)
+                walk.sort(RevSort.REVERSE, true)
+                walk.revFilter = CommitTimeRevFilter.after(Date.from(instant))
+                val firstCommit = walk.firstOrNull() ?: return@use emptyList()
+                DiffFormatter(null).use { diffFormatter ->
+                    diffFormatter.setReader(walk.objectReader, Config())
+                    diffFormatter.scan(firstCommit.tree, latestCommit.tree).map { diff ->
+                        Change(
+                            diff.changeType,
+                            diff.oldPath,
+                            diff.oldPath?.let { oldPath ->
+                                TreeWalk.forPath(walk.objectReader, oldPath, firstCommit.tree)?.let {
+                                    it.objectReader.open(it.getObjectId(0))
+                                }
+                            },
+                            diff.newPath,
+                            diff.newPath?.let { newPath ->
+                                TreeWalk.forPath(walk.objectReader, newPath, latestCommit.tree)?.let {
+                                    it.objectReader.open(it.getObjectId(0))
+                                }
+                            },
+                        )
+                    }
+                }
+            }
+        }
+
     }
 
     inner class ReadWriteAccess(lock: Lock, repo: File) : ReadAccess(lock, repo) {
@@ -164,3 +206,5 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
         repo.deleteRecursively()
     }
 }
+
+data class Change(val type: DiffEntry.ChangeType, val oldName: String?, val oldContent: ObjectLoader?, val newName: String?, val newContent: ObjectLoader?)
