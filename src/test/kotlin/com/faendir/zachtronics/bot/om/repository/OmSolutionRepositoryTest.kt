@@ -62,7 +62,7 @@ class OmSolutionRepositoryTest {
         archiveDir = Files.createTempDir()
 
         leaderboard = createGitRepositoryFrom(leaderboardDir, gitProperties)
-        repository = OmSolutionRepository(leaderboard, mockk())
+        repository = OmSolutionRepository(leaderboard, mockk(relaxed = true))
     }
 
     @AfterEach
@@ -190,7 +190,7 @@ class OmSolutionRepositoryTest {
         val data = repository.findCategoryHolders(OmPuzzle.STABILIZED_WATER, true)
 
         val newLeaderboard = TestGitRepository(gitProperties, leaderboardDir)
-        val newRepository = OmSolutionRepository(newLeaderboard, mockk())
+        val newRepository = OmSolutionRepository(newLeaderboard, mockk(relaxed = true))
 
         expectThat(newRepository.findCategoryHolders(OmPuzzle.STABILIZED_WATER, true)) {
             hasSize(data.size)
