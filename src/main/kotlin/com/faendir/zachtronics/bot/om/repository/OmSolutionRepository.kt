@@ -162,7 +162,7 @@ class OmSolutionRepository(
             SubmitResult.Success(null, result)
         }
 
-    fun computeChangesSince(instant: Instant) : List<OmRecordChange> {
+    fun computeChangesSince(instant: Instant): List<OmRecordChange> {
         return leaderboard.acquireReadAccess().use { leaderboardScope ->
             leaderboardScope.changesSince(instant).mapNotNull { change ->
 
@@ -195,6 +195,7 @@ class OmSolutionRepository(
         val archiveFile = File(dir, "$name.solution")
         archiveFile.writeBytes(data)
         leaderboardScope.add(archiveFile)
+        leaderboardScope.commit(author, puzzle, score, listOf("Solution"))
         val path = archiveFile.relativeTo(leaderboardScope.repo).toPath()
 
         val leaderboardFile = File(dir, "$name.json")

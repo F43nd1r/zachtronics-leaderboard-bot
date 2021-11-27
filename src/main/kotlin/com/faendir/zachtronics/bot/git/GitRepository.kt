@@ -174,12 +174,17 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
         }
 
         fun commitAndPush(user: String?, puzzle: Puzzle<*>, score: Score<*>, updated: Collection<String>) {
-            commitAndPush("${puzzle.displayName} ${score.toDisplayString()} $updated by ${user ?: "unknown"}")
+            commit(user, puzzle, score, updated)
+            push()
         }
 
         fun commitAndPush(message: String) {
             commit(message)
             push()
+        }
+
+        fun commit(user: String?, puzzle: Puzzle<*>, score: Score<*>, updated: Collection<String>) {
+            commit("${puzzle.displayName} ${score.toDisplayString()} $updated by ${user ?: "unknown"}")
         }
 
         fun commit(message: String): RevCommit =
