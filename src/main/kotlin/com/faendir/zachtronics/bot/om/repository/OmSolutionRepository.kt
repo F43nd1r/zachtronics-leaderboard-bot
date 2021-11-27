@@ -45,7 +45,7 @@ import javax.annotation.PostConstruct
 @Component
 class OmSolutionRepository(
     @Qualifier("omLeaderboardRepository") private val leaderboard: GitRepository,
-    private val pageGenerators: List<AbstractOmPageGenerator>
+    private val pageGenerator: OmRedditWikiGenerator
 ) : SolutionRepository<OmCategory, OmPuzzle, OmSubmission, OmRecord> {
     private val json = Json {
         prettyPrint = true
@@ -70,12 +70,9 @@ class OmSolutionRepository(
 
     @PostConstruct
     fun init() {
-        leaderboard.acquireWriteAccess().use { leaderboardScope ->
+        leaderboard.acquireReadAccess().use { leaderboardScope ->
             loadData(leaderboardScope)
-            pageGenerators.forEach { it.update(leaderboardScope, OmCategory.values().toList(), data) }
-            if (leaderboardScope.status().run { added.isNotEmpty() || changed.isNotEmpty() }) {
-                leaderboardScope.commitAndPush("Update page formatting")
-            }
+            pageGenerator.update(leaderboardScope, OmCategory.values().toList(), data)
         }
     }
 
@@ -156,7 +153,7 @@ class OmSolutionRepository(
             if (unclaimedCategories.isNotEmpty()) {
                 result.add(CategoryRecord(null, unclaimedCategories))
             }
-            pageGenerators.forEach { it.update(leaderboardScope, OmCategory.values().toList(), data) }
+            pageGenerator.update(leaderboardScope, result.flatMap { it.categories }, data)
             leaderboardScope.commitAndPush(submission.author, submission.puzzle, submission.score, result.flatMap { it.categories }.map { it.toString() })
             hash = leaderboardScope.currentHash()
             SubmitResult.Success(null, result)

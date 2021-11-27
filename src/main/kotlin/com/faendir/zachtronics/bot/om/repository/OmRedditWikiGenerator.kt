@@ -45,8 +45,10 @@ import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_G
 import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_GP
 import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_I
 import com.faendir.zachtronics.bot.om.model.OmGroup
+import com.faendir.zachtronics.bot.om.model.OmMetric
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
 import com.faendir.zachtronics.bot.reddit.RedditService
@@ -57,9 +59,8 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
 @Component
-class OmRedditWikiGenerator(private val reddit: RedditService) : AbstractOmPageGenerator(
-    mapOf("." to listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SUM_G, SUM_GP, SUM_C, SUM_CP, SUM_A, SUM_I)),
-) {
+class OmRedditWikiGenerator(private val reddit: RedditService) {
+    private val categories = listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SUM_G, SUM_GP, SUM_C, SUM_CP, SUM_A, SUM_I)
     companion object {
         private const val wikiPage = "index"
         private const val datePrefix = "Table built on "
@@ -80,46 +81,65 @@ class OmRedditWikiGenerator(private val reddit: RedditService) : AbstractOmPageG
     private fun Pair<OmRecord, List<OmCategory>>?.toMarkdown(): String {
         if (this == null) return ""
         val score = first.score.toDisplayString(DisplayContext(StringFormat.REDDIT, second))
-        return "${first.displayLink ?.let { "[$score]($it)" } ?: score}${if (second.any { it.name.contains("X") }) "*" else ""}"
+        return "${first.displayLink?.let { "[$score]($it)" } ?: score}${if (second.any { it.name.contains("X") }) "*" else ""}"
     }
 
-    override fun GitRepository.ReadWriteAccess.updatePage(dir: File, categories: List<OmCategory>, data: Map<OmPuzzle, Map<OmRecord, Set<OmCategory>>>) {
-        val prefix = File(repo, "reddit/prefix.md").readText()
-        val suffix = File(repo, "reddit/suffix.md").readText()
-        var table = ""
-        for (group in OmGroup.values()) {
-            table += "## ${group.displayName}\n\n"
-            val puzzles = OmPuzzle.values().filter { it.group == group }
-            val thirdCategory = puzzles.map {
-                when (it.type) {
-                    OmType.NORMAL, OmType.INFINITE -> "Area"
-                    PRODUCTION -> "Instructions"
-                }
-            }.distinct().joinToString("/")
-            table += "Name|Cost|Cycles|${thirdCategory}|Sum\n:-|:-|:-|:-|:-\n"
-            for (puzzle in puzzles) {
-                val entry = data[puzzle] ?: emptyMap()
-                table += "[**${puzzle.displayName}**](##Frontier: ${entry.keys.joinToString(" ") { it.score.toDisplayString(DisplayContext.reddit()) }}##)"
+    fun update(readAccess: GitRepository.ReadAccess, categories: List<OmCategory>, data: Map<OmPuzzle, Map<OmRecord, Set<OmCategory>>>) {
+        if (categories.any { this.categories.contains(it) }) {
+            val prefix = File(readAccess.repo, "reddit/prefix.md").readText()
+            val suffix = File(readAccess.repo, "reddit/suffix.md").readText()
+            var table = ""
+            for (group in OmGroup.values()) {
+                table += "## ${group.displayName}\n\n"
+                val puzzles = OmPuzzle.values().filter { it.group == group }
+                val thirdCategory = puzzles.map {
+                    when (it.type) {
+                        OmType.NORMAL, OmType.INFINITE -> "Area"
+                        PRODUCTION -> "Instructions"
+                    }
+                }.distinct().joinToString("/")
+                table += "Name|Cost|Cycles|${thirdCategory}|Sum\n:-|:-|:-|:-|:-\n"
+                for (puzzle in puzzles) {
+                    val entry = data[puzzle] ?: emptyMap()
+                    val frontierCategory = if (puzzle.type == PRODUCTION) GCP else GC
+                    table += "[**${puzzle.displayName}**](##Frontier: ${
+                        entry.keys.frontierOf(frontierCategory.metrics).joinToString(" ") {
+                            it.score.toDisplayString(DisplayContext(StringFormat.REDDIT, frontierCategory))
+                        }
+                    }##)"
 
-                val costScores = filterRecords(entry, costCategories)
-                val cycleScores = filterRecords(entry, cycleCategories)
-                val areaInstructionScores = filterRecords(entry, areaInstructionCategories)
-                val sumScores = filterRecords(entry, sumCategories)
-                while (costScores.isNotEmpty() || cycleScores.isNotEmpty() || areaInstructionScores.isNotEmpty() || sumScores.isNotEmpty()) {
-                    table += "|${costScores.removeFirstOrNull().toMarkdown()}|${
-                        cycleScores.removeFirstOrNull().toMarkdown()
-                    }|${areaInstructionScores.removeFirstOrNull().toMarkdown()}|${
-                        sumScores.removeFirstOrNull().toMarkdown()
-                    }|\n|"
+                    val costScores = filterRecords(entry, costCategories)
+                    val cycleScores = filterRecords(entry, cycleCategories)
+                    val areaInstructionScores = filterRecords(entry, areaInstructionCategories)
+                    val sumScores = filterRecords(entry, sumCategories)
+                    while (costScores.isNotEmpty() || cycleScores.isNotEmpty() || areaInstructionScores.isNotEmpty() || sumScores.isNotEmpty()) {
+                        table += "|${costScores.removeFirstOrNull().toMarkdown()}|${
+                            cycleScores.removeFirstOrNull().toMarkdown()
+                        }|${areaInstructionScores.removeFirstOrNull().toMarkdown()}|${
+                            sumScores.removeFirstOrNull().toMarkdown()
+                        }|\n|"
+                    }
+                    table += "\n"
                 }
                 table += "\n"
             }
-            table += "\n"
-        }
-        table += datePrefix + OffsetDateTime.now(ZoneOffset.UTC)
-        val content = "$prefix\n$table\n$suffix".trim()
-        if (content.lines().filter { !it.contains(datePrefix) } != reddit.getWikiPage(OPUS_MAGNUM, wikiPage).lines().filter { !it.contains(datePrefix) }) {
-            reddit.updateWikiPage(OPUS_MAGNUM, wikiPage, content, "bot update")
+            table += datePrefix + OffsetDateTime.now(ZoneOffset.UTC)
+            val content = "$prefix\n$table\n$suffix".trim()
+            if (content.lines().filter { !it.contains(datePrefix) } != reddit.getWikiPage(OPUS_MAGNUM, wikiPage).lines().filter { !it.contains(datePrefix) }) {
+                reddit.updateWikiPage(OPUS_MAGNUM, wikiPage, content, "bot update")
+            }
         }
     }
+
+}
+
+private fun Collection<OmRecord>.frontierOf(metrics: List<OmMetric>): List<OmRecord> {
+    val nonOverlapRecords = filterNot { it.score.overlap }
+    return nonOverlapRecords.filter { record -> nonOverlapRecords.none { it.score.isStrictlyBetterInMetricsThan(record.score, metrics) } }
+
+}
+
+fun OmScore.isStrictlyBetterInMetricsThan(other: OmScore, metrics: List<OmMetric>): Boolean {
+    val compares = metrics.map { it.comparator.compare(this, other) }
+    return compares.none { it > 0 } && compares.any { it < 0 }
 }

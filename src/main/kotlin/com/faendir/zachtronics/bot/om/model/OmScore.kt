@@ -36,22 +36,28 @@ data class OmScore(
 ) : Score<OmCategory> {
 
     override fun toDisplayString(context: DisplayContext<OmCategory>): String =
-        ((context.categories?.takeIf { it.isNotEmpty() }?.flatMap { it.requiredParts }?.distinct() ?: OmScorePart.values()
-            .toList()).map { part -> part.format(this)?.let { if(context.format == StringFormat.FILE_NAME) it.replace("∞", "INF") else it } } + when {
-            overlap -> "O"
-            trackless -> "T"
-            else -> null
-        }).filterNotNull().joinToString(context.separator) + when (context.format) {
-            StringFormat.DISCORD, StringFormat.PLAIN_TEXT -> (
-                    context.categories
-                        ?.flatMap { it.metrics.toList() }
-                        ?.distinct()
-                        ?.mapNotNull { metric -> metric.describe(this) }
-                        ?.takeIf { it.isNotEmpty() }
-                        ?.joinToString(separator = ", ", prefix = " (", postfix = ")") ?: ""
-                    )
-            else -> ""
-        }
+        (getMetricDescriptions(context) + getModifierDescriptions(context)).joinToString(context.separator) + getAdditionalMetricDescriptions(context)
+
+    private fun getMetricDescriptions(context: DisplayContext<OmCategory>): List<String> =
+        (context.categories?.takeIf { it.isNotEmpty() }?.flatMap { it.requiredParts }?.distinct() ?: OmScorePart.values().toList())
+            .mapNotNull { part -> part.format(this)?.let { if (context.format == StringFormat.FILE_NAME) it.replace("∞", "INF") else it } }
+
+    private fun getModifierDescriptions(context: DisplayContext<OmCategory>): List<String> = when (context.format) {
+        StringFormat.DISCORD, StringFormat.PLAIN_TEXT, StringFormat.FILE_NAME ->
+            listOfNotNull("O".takeIf { overlap }, "T".takeIf { trackless })
+        else -> emptyList()
+    }
+
+    private fun getAdditionalMetricDescriptions(context: DisplayContext<OmCategory>): String = when (context.format) {
+        StringFormat.DISCORD, StringFormat.PLAIN_TEXT ->
+            context.categories
+                ?.flatMap { it.metrics.toList() }
+                ?.distinct()
+                ?.mapNotNull { metric -> metric.describe(this) }
+                ?.takeIf { it.isNotEmpty() }
+                ?.joinToString(separator = ", ", prefix = " (", postfix = ")")
+        else -> null
+    }.orEmpty()
 
     fun isSupersetOf(other: OmScore): Boolean {
         var hasMoreData = false
