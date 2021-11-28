@@ -16,20 +16,22 @@
 
 import { useTheme } from "@mui/material"
 import { ComponentType, useState } from "react"
-import OmRecord from "../../../model/Record"
+import OmRecord from "../../../../model/Record"
 import { Axis } from "plotly.js"
 import { PlotParams } from "react-plotly.js"
 import createPlotlyComponent from "react-plotly.js/factory"
 import Plotly from "plotly.js-gl3d-dist-min"
-import { Metric } from "../../../model/Metric"
-import { Configuration } from "./Configuration"
-import { RecordModal } from "../../../fragments/RecordModal"
+import { getMetric, Metric } from "../../../../model/Metric"
+import { Configuration } from "../../../../model/Configuration"
+import { RecordModal } from "../../../../fragments/RecordModal"
 import { withSize } from "react-sizeme"
+import { applyFilter, Filter } from "../../../../model/Filter"
 
-export interface PuzzleFrontierPlotProps {
+export interface PlotViewProps {
     size: { width: number; height: number }
     records: OmRecord[]
     configuration: Configuration
+    filter: Filter
 }
 
 const Plot: ComponentType<PlotParams> = createPlotlyComponent(Plotly)
@@ -47,17 +49,12 @@ function buildInnerColorGetter(records: OmRecord[], metrics: Metric[]) {
     return (record: OmRecord) => (records.some((r) => isStrictlyBetterInMetrics(r, record, metrics)) ? "#00000000" : getColor(record))
 }
 
-function PuzzleFrontierPlot(props: PuzzleFrontierPlotProps) {
+function PlotView(props: PlotViewProps) {
     const theme = useTheme()
 
     const [activeRecord, setActiveRecord] = useState<OmRecord | undefined>(undefined)
     const configuration = props.configuration
-    const records = props.records.filter((record: OmRecord) => {
-        return (
-            (configuration.filter.overlap === undefined || configuration.filter.overlap === record.score?.overlap) &&
-            (configuration.filter.trackless === undefined || configuration.filter.trackless === record.score?.trackless)
-        )
-    })
+    const records = applyFilter(props.filter, props.records)
 
     const gridColor = theme.palette.mode === "light" ? theme.palette.grey["200"] : theme.palette.grey["800"]
 
@@ -71,21 +68,24 @@ function PuzzleFrontierPlot(props: PuzzleFrontierPlotProps) {
         }
     }
 
+    const x = getMetric(configuration.x)
+    const y = getMetric(configuration.y)
+    const z = getMetric(configuration.z)
     return (
         <>
             <Plot
                 data={[
                     configuration.mode === "2D"
                         ? {
-                              x: records.map((record) => configuration.x.get(record) ?? 0),
-                              y: records.map((record) => configuration.y.get(record) ?? 0),
+                              x: records.map((record) => x.get(record) ?? 0),
+                              y: records.map((record) => y.get(record) ?? 0),
                               hovertext: records.map((record) => record.fullFormattedScore ?? "none"),
-                              hovertemplate: `${configuration.x.name}: %{x}<br>${configuration.y.name}: %{y}<br>%{hovertext}<extra></extra>`,
+                              hovertemplate: `${x.name}: %{x}<br>${y.name}: %{y}<br>%{hovertext}<extra></extra>`,
                               type: "scatter",
                               mode: "markers",
                               marker: {
                                   size: 20,
-                                  color: records.map(buildInnerColorGetter(records, [configuration.x, configuration.y])),
+                                  color: records.map(buildInnerColorGetter(records, [x, y])),
                                   line: {
                                       width: 3,
                                       color: records.map(getColor),
@@ -93,16 +93,16 @@ function PuzzleFrontierPlot(props: PuzzleFrontierPlotProps) {
                               },
                           }
                         : {
-                              x: records.map((record) => configuration.x.get(record) ?? 0),
-                              y: records.map((record) => configuration.y.get(record) ?? 0),
-                              z: records.map((record) => configuration.z.get(record) ?? 0),
+                              x: records.map((record) => x.get(record) ?? 0),
+                              y: records.map((record) => y.get(record) ?? 0),
+                              z: records.map((record) => z.get(record) ?? 0),
                               hovertext: records.map((record) => record.fullFormattedScore ?? "none"),
-                              hovertemplate: `${configuration.x.name}: %{x}<br>${configuration.y.name}: %{y}<br>${configuration.z.name}: %{z}<br>%{hovertext}<extra></extra>`,
+                              hovertemplate: `${x.name}: %{x}<br>${y.name}: %{y}<br>${z.name}: %{z}<br>%{hovertext}<extra></extra>`,
                               type: "scatter3d",
                               mode: "markers",
                               marker: {
                                   size: 10,
-                                  color: records.map(buildInnerColorGetter(records, [configuration.x, configuration.y, configuration.z])),
+                                  color: records.map(buildInnerColorGetter(records, [x, y, z])),
                                   line: {
                                       width: 2,
                                       color: records.map(getColor),
@@ -116,15 +116,15 @@ function PuzzleFrontierPlot(props: PuzzleFrontierPlotProps) {
                     height: props.size.height ?? undefined,
                     paper_bgcolor: "transparent",
                     plot_bgcolor: "transparent",
-                    xaxis: makeAxis(configuration.x),
-                    yaxis: makeAxis(configuration.y),
+                    xaxis: makeAxis(x),
+                    yaxis: makeAxis(y),
                     hoverlabel: {
                         bgcolor: theme.palette.background.paper,
                     },
                     scene: {
-                        xaxis: makeAxis(configuration.x),
-                        yaxis: makeAxis(configuration.y),
-                        zaxis: makeAxis(configuration.z),
+                        xaxis: makeAxis(x),
+                        yaxis: makeAxis(y),
+                        zaxis: makeAxis(z),
                     },
                 }}
                 config={{
@@ -138,9 +138,7 @@ function PuzzleFrontierPlot(props: PuzzleFrontierPlotProps) {
                 useResizeHandler={true}
                 onClick={(event) => {
                     const point: any = event.points[0]
-                    const record = props.records.find(
-                        (record) => configuration.x.get(record) === point.x && configuration.y.get(record) === point.y && (configuration.mode === "2D" || configuration.z.get(record) === point.z)
-                    )
+                    const record = props.records.find((record) => x.get(record) === point.x && y.get(record) === point.y && (configuration.mode === "2D" || z.get(record) === point.z))
                     setActiveRecord(record)
                 }}
             />
@@ -149,6 +147,6 @@ function PuzzleFrontierPlot(props: PuzzleFrontierPlotProps) {
     )
 }
 
-const SizedPuzzleFrontierPlot = withSize({ monitorHeight: true })<PuzzleFrontierPlotProps>(PuzzleFrontierPlot)
+const SizedPuzzleFrontierPlot = withSize({ monitorHeight: true })<PlotViewProps>(PlotView)
 
 export default SizedPuzzleFrontierPlot

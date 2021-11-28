@@ -79,8 +79,6 @@ function Puzzles(props: PuzzlesProps) {
 function Categories() {
     const match = useMatch("/categories/:categoryId/*")
     const categoryId = match?.params?.categoryId
-    console.log(categoryId)
-
     return (
         <List>
             <ExpandableListItem

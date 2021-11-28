@@ -16,7 +16,7 @@
 
 import OmRecord from "./Record"
 
-export type MetricId = "g" | "c" | "a" | "i" | "h" | "w" | "r" | "t" | "o"
+export type MetricId = "g" | "c" | "a" | "i" | "h" | "w" | "r"
 
 export interface Metric {
     id: MetricId

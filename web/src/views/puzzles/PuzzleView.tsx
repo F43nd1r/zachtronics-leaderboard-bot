@@ -66,7 +66,9 @@ export default function PuzzleView() {
             sx={{
                 display: "flex",
                 flexDirection: "column",
+                minHeight: 0,
                 flexGrow: 1,
+                flexShrink: 1,
             }}
         >
             <Box

@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-import { Box } from "@mui/material"
+import { Box, Stack } from "@mui/material"
 import { FiberManualRecord, FiberManualRecordOutlined } from "@mui/icons-material"
+import FieldSet from "../../../../components/FieldSet"
 
-export function Legend() {
+export function LegendView() {
     return (
-        <>
-            <LegendItem label={"Overlap"} color={"#880e4f"} filled={true} />
-            <LegendItem label={"Normal"} color={"#0288d1"} filled={true} />
-            <LegendItem label={"Trackless"} color={"#558b2f"} filled={true} />
-            <LegendItem label={"Not on the selected frontier"} color={"#888888"} filled={false} />
-        </>
+        <FieldSet title="Legend">
+            <Stack spacing={1}>
+                <LegendItem label={"Overlap"} color={"#880e4f"} filled={true} />
+                <LegendItem label={"Normal"} color={"#0288d1"} filled={true} />
+                <LegendItem label={"Trackless"} color={"#558b2f"} filled={true} />
+                <LegendItem label={"Not on the selected frontier"} color={"#888888"} filled={false} />
+            </Stack>
+        </FieldSet>
     )
 }
 
@@ -39,7 +42,7 @@ function LegendItem(props: LegendItemProps) {
         <Box
             sx={{
                 display: "flex",
-                marginTop: "1rem",
+                marginTop: "0.5rem",
             }}
         >
             {props.filled ? <FiberManualRecord htmlColor={props.color} /> : <FiberManualRecordOutlined htmlColor={props.color} />}

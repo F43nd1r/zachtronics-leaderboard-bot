@@ -36,7 +36,6 @@ export default function ExpandableListItem(props: ExpandableListItemProps) {
     const handleClick = () => {
         setOpen(!open)
     }
-    console.log(`${props.title} shouldOpen: ${props.open}, isOpen: ${open}`)
     return (
         <>
             <ListItemButton onClick={handleClick} sx={props.sx}>

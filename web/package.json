@@ -47,7 +47,7 @@
   "prettier": {
     "printWidth": 200,
     "tabWidth": 4,
-    "trailingComma": "es5",
+    "trailingComma": "all",
     "semi": false
   },
   "browserslist": {
