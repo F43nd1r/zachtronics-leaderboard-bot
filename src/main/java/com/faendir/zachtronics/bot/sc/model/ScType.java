@@ -26,7 +26,8 @@ public enum ScType implements Type {
     RESEARCH("research"),
     PRODUCTION("production"),
     PRODUCTION_TRIVIAL("production"),
-    BOSS("boss");
+    BOSS("boss"),
+    BOSS_RANDOM("boss");
 
     private final String displayName;
 }

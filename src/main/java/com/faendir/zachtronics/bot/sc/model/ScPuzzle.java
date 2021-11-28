@@ -78,16 +78,16 @@ public enum ScPuzzle implements Puzzle<ScCategory> {
     research_6(ScGroup.MAIN, ScType.RESEARCH, "No Employment Record Found", false),
     research_5(ScGroup.MAIN, ScType.RESEARCH, "Right All Along", true),
     research_2(ScGroup.MAIN, ScType.RESEARCH, "Accidents Happen", false),
-    research_boss(ScGroup.MAIN, ScType.BOSS, "Don't Fear the Reaper", true),
+    research_boss(ScGroup.MAIN, ScType.BOSS_RANDOM, "Don't Fear the Reaper", true),
 
     organic_1(ScGroup.MAIN, ScType.RESEARCH, "Special Assignment", true),
     organic_2(ScGroup.MAIN, ScType.RESEARCH, "Suspicious Behavior", true),
     organic_3(ScGroup.MAIN, ScType.RESEARCH, "I Told You So", true),
-    organic_5(ScGroup.MAIN, ScType.RESEARCH, "Ω-Pseudoethyne", false),
-    organic_6(ScGroup.MAIN, ScType.RESEARCH, "Σ-Ethylene", true),
+    organic_5(ScGroup.MAIN, ScType.PRODUCTION_TRIVIAL, "Ω-Pseudoethyne", false),
+    organic_6(ScGroup.MAIN, ScType.PRODUCTION_TRIVIAL, "Σ-Ethylene", true),
     organic_boss(ScGroup.MAIN, ScType.BOSS, "Freedom of Choice", true),
 
-    warp_boss(ScGroup.MAIN, ScType.BOSS, "End of the Line", true),
+    warp_boss(ScGroup.MAIN, ScType.BOSS_RANDOM, "End of the Line", true),
 
 
     tf2_1(ScGroup.TF2, ScType.RESEARCH, "Moustachium 602", true),
