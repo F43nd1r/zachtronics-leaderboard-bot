@@ -28,6 +28,8 @@ import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.orEmpty
+import com.faendir.zachtronics.bot.utils.smartFormat
+import com.faendir.zachtronics.bot.utils.toMetricsTree
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import reactor.core.publisher.Mono
 
@@ -46,7 +48,7 @@ abstract class AbstractSubmitCommand<T, C : Category, P: Puzzle<C>, S : Submissi
                 return SafeEmbedMessageBuilder()
                     .title(
                         "Success: *${submission.puzzle.displayName}* ${
-                            beatenCategories.takeIf { it.isNotEmpty() }?.joinToString { it.displayName } ?: "Pareto"
+                            beatenCategories.takeIf { it.isNotEmpty() }?.smartFormat(submission.puzzle.supportedCategories.toMetricsTree()) ?: "Pareto"
                         }")
                     .color(Colors.SUCCESS)
                     .description(
