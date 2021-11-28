@@ -26,7 +26,6 @@ import Puzzle from "../model/Puzzle"
 import Category from "../model/Category"
 import { useMatch } from "react-router-dom"
 import ApiListResource from "../utils/ApiListResource"
-import ApiResource from "../utils/ApiResource"
 
 function Groups() {
     const match = useMatch("/puzzles/*")
@@ -36,9 +35,18 @@ function Groups() {
             <ExpandableListItem
                 title={"Puzzles"}
                 icon={<Extension />}
-                items={ApiListResource<Group[]>({
-                    url: "/groups",
-                    element: (groups) => groups.map((group) => <Puzzles group={group} key={group.id} sx={{ pl: 4 }} />),
+                items={ApiListResource<Puzzle[]>({
+                    url: "/puzzles",
+                    element: (puzzles) =>
+                        [
+                            ...puzzles
+                                .reduce<Map<string, Puzzle[]>>((acc, puzzle) => {
+                                    if (!acc.has(puzzle.group.id)) acc.set(puzzle.group.id, [puzzle])
+                                    else acc.get(puzzle.group.id)!.push(puzzle)
+                                    return acc
+                                }, new Map())
+                                .entries(),
+                        ].map(([group, puzzles]) => <Puzzles group={puzzles[0].group} puzzles={puzzles} key={group} sx={{ pl: 4 }} />),
                 })}
                 open={match !== null}
             />
@@ -48,30 +56,25 @@ function Groups() {
 
 interface PuzzlesProps {
     group: Group
+    puzzles: Puzzle[]
     sx?: SxProps<Theme>
 }
 
 function Puzzles(props: PuzzlesProps) {
     const match = useMatch("/puzzles/:puzzleId/*")
     const puzzleId = match?.params?.puzzleId
-
     return (
         <List sx={props.sx}>
-            {ApiResource<Puzzle[]>({
-                url: `/group/${props.group.id}/puzzles`,
-                element: (puzzles) => (
-                    <ExpandableListItem
-                        title={props.group.displayName}
-                        icon={<Folder />}
-                        items={puzzles.map((puzzle) => (
-                            <LinkListItem sx={{ pl: 4 }} key={puzzle.id} to={`/puzzles/${puzzle.id}`} selected={puzzleId === puzzle.id}>
-                                <ListItemText primary={puzzle.displayName} />
-                            </LinkListItem>
-                        ))}
-                        open={puzzles.some((puzzle) => puzzleId === puzzle.id)}
-                    />
-                ),
-            })}
+            <ExpandableListItem
+                title={props.group.displayName}
+                icon={<Folder />}
+                items={props.puzzles.map((puzzle) => (
+                    <LinkListItem sx={{ pl: 4 }} key={puzzle.id} to={`/puzzles/${puzzle.id}`} selected={puzzleId === puzzle.id}>
+                        <ListItemText primary={puzzle.displayName} />
+                    </LinkListItem>
+                ))}
+                open={props.puzzles.some((puzzle) => puzzleId === puzzle.id)}
+            />
         </List>
     )
 }
