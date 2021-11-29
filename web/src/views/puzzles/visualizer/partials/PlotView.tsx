@@ -17,7 +17,7 @@
 import { useTheme } from "@mui/material"
 import { ComponentType, useState } from "react"
 import OmRecord from "../../../../model/Record"
-import { Axis } from "plotly.js"
+import { Axis, Data, PlotData, Point } from "plotly.js"
 import { PlotParams } from "react-plotly.js"
 import createPlotlyComponent from "react-plotly.js/factory"
 import Plotly from "plotly.js-gl3d-dist-min"
@@ -45,19 +45,17 @@ function getColor(record: OmRecord) {
     return record.score?.overlap ? "#880e4f" : record.score?.trackless ? "#558b2f" : "#0288d1"
 }
 
-function buildInnerColorGetter(records: OmRecord[], metrics: Metric[]) {
-    return (record: OmRecord) => (records.some((r) => isStrictlyBetterInMetrics(r, record, metrics)) ? "#00000000" : getColor(record))
-}
-
 function PlotView(props: PlotViewProps) {
-    const theme = useTheme()
-
     const [activeRecord, setActiveRecord] = useState<OmRecord | undefined>(undefined)
-    const configuration = props.configuration
+
     const records = applyFilter(props.filter, props.records)
+    const configuration = props.configuration
+    const x = getMetric(configuration.x)
+    const y = getMetric(configuration.y)
+    const z = getMetric(configuration.z)
 
+    const theme = useTheme()
     const gridColor = theme.palette.mode === "light" ? theme.palette.grey["200"] : theme.palette.grey["800"]
-
     const makeAxis = (metric: Metric): Partial<Axis> => {
         return {
             title: metric.name,
@@ -68,44 +66,47 @@ function PlotView(props: PlotViewProps) {
         }
     }
 
-    const x = getMetric(configuration.x)
-    const y = getMetric(configuration.y)
-    const z = getMetric(configuration.z)
+    const common: Partial<PlotData> = {
+        hovertext: records.map((record: OmRecord) => `${record.fullFormattedScore ?? "none"}<br>${record.smartFormattedCategories}`),
+        x: records.map((record) => x.get(record) ?? 0),
+        y: records.map((record) => y.get(record) ?? 0),
+        mode: "markers",
+        marker: {
+            color: records.map((record: OmRecord) => (records.some((r) => isStrictlyBetterInMetrics(r, record, [x, y])) ? "#00000000" : getColor(record))),
+            line: {
+                color: records.map(getColor),
+            },
+        },
+    }
     return (
         <>
             <Plot
                 data={[
                     configuration.mode === "2D"
                         ? {
-                              x: records.map((record) => x.get(record) ?? 0),
-                              y: records.map((record) => y.get(record) ?? 0),
-                              hovertext: records.map((record) => record.fullFormattedScore ?? "none"),
+                              ...common,
                               hovertemplate: `${x.name}: %{x}<br>${y.name}: %{y}<br>%{hovertext}<extra></extra>`,
                               type: "scatter",
-                              mode: "markers",
                               marker: {
+                                  ...common.marker,
                                   size: 20,
-                                  color: records.map(buildInnerColorGetter(records, [x, y])),
                                   line: {
+                                      ...common.marker?.line,
                                       width: 3,
-                                      color: records.map(getColor),
                                   },
                               },
                           }
                         : {
-                              x: records.map((record) => x.get(record) ?? 0),
-                              y: records.map((record) => y.get(record) ?? 0),
+                              ...common,
                               z: records.map((record) => z.get(record) ?? 0),
-                              hovertext: records.map((record) => record.fullFormattedScore ?? "none"),
                               hovertemplate: `${x.name}: %{x}<br>${y.name}: %{y}<br>${z.name}: %{z}<br>%{hovertext}<extra></extra>`,
                               type: "scatter3d",
-                              mode: "markers",
                               marker: {
+                                  ...common.marker,
                                   size: 10,
-                                  color: records.map(buildInnerColorGetter(records, [x, y, z])),
                                   line: {
+                                      ...common.marker?.line,
                                       width: 2,
-                                      color: records.map(getColor),
                                   },
                               },
                           },
@@ -137,7 +138,7 @@ function PlotView(props: PlotViewProps) {
                 }}
                 useResizeHandler={true}
                 onClick={(event) => {
-                    const point: any = event.points[0]
+                    const point = event.points[0] as Partial<Point>
                     const record = props.records.find((record) => x.get(record) === point.x && y.get(record) === point.y && (configuration.mode === "2D" || z.get(record) === point.z))
                     setActiveRecord(record)
                 }}
