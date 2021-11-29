@@ -53,8 +53,9 @@ public class ScScore implements Score<ScCategory> {
     @NotNull
     public String toDisplayString(@NotNull DisplayContext<ScCategory> context, String oldRNGMarker) {
         String separator = context.getSeparator();
-        String cyclesStr = cycles >= 100000 ? NumberFormat.getNumberInstance(Locale.ROOT).format(cycles)
-                                            : Integer.toString(cycles);
+        String cyclesStr = context.getFormat() != StringFormat.FILE_NAME && cycles >= 100000 ?
+                           NumberFormat.getNumberInstance(Locale.ROOT).format(cycles) :
+                           Integer.toString(cycles);
         String formatString = ScCategory.ScScoreFormatStrings.F000;
         if (context.getFormat() == StringFormat.REDDIT && context.getCategories() != null) {
             Set<String> formatStrings = context.getCategories().stream()
