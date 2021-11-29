@@ -17,7 +17,7 @@
 import { useTheme } from "@mui/material"
 import { ComponentType, useState } from "react"
 import OmRecord from "../../../../model/Record"
-import { Axis, Data, PlotData, Point } from "plotly.js"
+import { Axis, PlotData, Point } from "plotly.js"
 import { PlotParams } from "react-plotly.js"
 import createPlotlyComponent from "react-plotly.js/factory"
 import Plotly from "plotly.js-gl3d-dist-min"
