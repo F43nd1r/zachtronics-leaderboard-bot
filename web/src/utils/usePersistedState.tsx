@@ -31,7 +31,7 @@ export function usePersistedJsonState<S>(key: string, defaultValue: S): [S, Disp
 
 export function usePersistedState<S>(key: string, defaultValue: S, serializer: Serializer<S>): [S, Dispatch<SetStateAction<S>>] {
     const storedValue = localStorage.getItem(key)
-    const [value, setValue] = useState<S>((storedValue && serializer.fromString(storedValue)) || defaultValue)
+    const [value, setValue] = useState<S>(storedValue !== null ? serializer.fromString(storedValue) : defaultValue)
 
     useEffect(() => {
         localStorage.setItem(key, serializer.toString(value))
