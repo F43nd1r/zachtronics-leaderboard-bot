@@ -74,7 +74,7 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
             throw t
         }
         if (hash == remoteHash) {
-            logger.info("$name is up to date, not pulling")
+            logger.debug("$name is up to date, not pulling")
             return read
         }
         read.close()
@@ -86,7 +86,7 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
             write?.close()
             throw t
         }
-        logger.info("pulled $name")
+        logger.debug("pulled $name")
         return write
     }
 

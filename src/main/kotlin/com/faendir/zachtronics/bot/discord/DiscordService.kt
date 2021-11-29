@@ -97,7 +97,7 @@ class DiscordService(
                 if (originalEvent.user() == event.user()) {
                     event.deferEdit().awaitSingleOrNull()
                     command.handleSelect(originalEvent, id, partial + (name to optionNameCache.getValue(event.values.first())))
-                    logger.info("Handled select on ${originalEvent.commandName} by ${event.interaction.user.username}")
+                    logger.debug("Handled select on ${originalEvent.commandName} by ${event.interaction.user.username}")
                 } else {
                     event.reply("You can't interact with other persons slash commands.").withEphemeral(true).awaitSingleOrNull()
                 }
@@ -112,7 +112,7 @@ class DiscordService(
                     throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
                 }
                 event.respondWithSuggestions(command.autoComplete(event)?.takeIf { it.size <= 25 } ?: emptyList()).awaitSingleOrNull()
-                logger.info("Autocompleted ${event.commandName} by ${event.interaction.user.username}")
+                logger.debug("Autocompleted ${event.commandName} by ${event.interaction.user.username}")
             }
         }.subscribe()
         logger.info("Connected to discord with version ${gitProperties.shortCommitId}")
