@@ -11,7 +11,7 @@ import Brightness7Icon from "@mui/icons-material/Brightness7"
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar"
 import Sidebar from "./fragments/Sidebar"
 import { Outlet } from "react-router-dom"
-import { usePersistedStringState } from "./utils/usePersistedState"
+import { usePersistedJsonState, usePersistedStringState } from "./utils/usePersistedState"
 import SearchBar from "./fragments/SearchBar"
 
 const ColorModeContext = createContext({
@@ -75,7 +75,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
 function App() {
     const theme = useTheme()
     const colorMode = useContext(ColorModeContext)
-    const [open, setOpen] = useState(true)
+    const [open, setOpen] = usePersistedJsonState("sidebarOpen", true)
     const handleDrawerOpen = () => {
         setOpen(true)
     }
@@ -138,7 +138,7 @@ export default function ThemedApp() {
                 setMode((prevMode) => (prevMode === "light" ? "dark" : "light"))
             },
         }),
-        [setMode]
+        [setMode],
     )
 
     const theme = useMemo(
@@ -148,7 +148,7 @@ export default function ThemedApp() {
                     mode,
                 },
             }),
-        [mode]
+        [mode],
     )
 
     return (
