@@ -17,7 +17,7 @@
 import { useTheme } from "@mui/material"
 import { ComponentType, useState } from "react"
 import OmRecord from "../../../../model/Record"
-import { Axis, PlotData, Point } from "plotly.js"
+import { Axis, PlotData } from "plotly.js"
 import { PlotParams } from "react-plotly.js"
 import createPlotlyComponent from "react-plotly.js/factory"
 import Plotly from "plotly.js-gl3d-dist-min"
@@ -138,9 +138,7 @@ function PlotView(props: PlotViewProps) {
                 }}
                 useResizeHandler={true}
                 onClick={(event) => {
-                    const point = event.points[0] as Partial<Point>
-                    const record = props.records.find((record) => x.get(record) === point.x && y.get(record) === point.y && (configuration.mode === "2D" || z.get(record) === point.z))
-                    setActiveRecord(record)
+                    setActiveRecord(records[event.points[0].pointIndex])
                 }}
             />
             <RecordModal record={activeRecord} setRecord={setActiveRecord} />

@@ -56,9 +56,7 @@ export default function PuzzleVisualizerView() {
                                 records={records}
                                 filter={filter}
                                 setFilter={(filter) => {
-                                    console.log(`Trying to set filter ${JSON.stringify(filter)}`)
                                     if (applyFilter(filter, records).length) {
-                                        console.log("Success")
                                         setFilter(filter)
                                         return true
                                     }
