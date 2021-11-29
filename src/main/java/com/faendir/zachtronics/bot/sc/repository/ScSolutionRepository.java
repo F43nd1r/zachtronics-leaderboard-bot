@@ -462,7 +462,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
 
             String filename = makeScoreFilename(candidate);
             Path solutionPath = puzzlePath.resolve(filename);
-            Files.write(solutionPath, submission.getData().getBytes(), StandardOpenOption.CREATE_NEW);
+            Files.writeString(solutionPath, submission.getData(), StandardOpenOption.CREATE_NEW);
             return true;
         }
 
