@@ -160,7 +160,8 @@ class Generator(
                     returns(List::class.parameterizedBy(ApplicationCommandOptionChoiceData::class).nullable)
                     addParameter("event", ChatInputAutoCompleteEvent::class)
                     addCode {
-                        addStatement("val option = event.focusedOption")
+                        if (parameters.any { it.autoCompletionProvider != null })
+                            addStatement("val option = event.focusedOption")
                         for(parameter in parameters) {
                             parameter.autoCompletionProvider?.let {
                                `if`("option.name == %S", parameter.name) {
