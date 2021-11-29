@@ -118,7 +118,6 @@ public class ScSolutionMetadata {
     }
 
     public ScSubmission extendToSubmission(String displayLink, String data) {
-        data = data.replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
         data = SOLUTION_HEADER.matcher(data).replaceFirst(this.toHeader()); // normalization
         return new ScSubmission(puzzle, score, author, displayLink, data);
     }

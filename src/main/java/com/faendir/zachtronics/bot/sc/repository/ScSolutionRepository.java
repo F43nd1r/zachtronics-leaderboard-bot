@@ -462,7 +462,8 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
 
             String filename = makeScoreFilename(candidate);
             Path solutionPath = puzzlePath.resolve(filename);
-            Files.writeString(solutionPath, submission.getData(), StandardOpenOption.CREATE_NEW);
+            String data = submission.getData().replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
+            Files.writeString(solutionPath, data, StandardOpenOption.CREATE_NEW);
             return true;
         }
 
