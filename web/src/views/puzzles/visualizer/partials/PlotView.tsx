@@ -16,12 +16,12 @@
 
 import { useTheme } from "@mui/material"
 import { ComponentType, useState } from "react"
-import OmRecord from "../../../../model/Record"
+import OmRecord, { isStrictlyBetterInMetrics } from "../../../../model/Record"
 import { Axis, PlotData } from "plotly.js"
 import { PlotParams } from "react-plotly.js"
 import createPlotlyComponent from "react-plotly.js/factory"
 import Plotly from "plotly.js-gl3d-dist-min"
-import { getMetric, Metric } from "../../../../model/Metric"
+import Metric, { getMetric } from "../../../../model/Metric"
 import { Configuration } from "../../../../model/Configuration"
 import { RecordModal } from "../../../../fragments/RecordModal"
 import { withSize } from "react-sizeme"
@@ -35,11 +35,6 @@ export interface PlotViewProps {
 }
 
 const Plot: ComponentType<PlotParams> = createPlotlyComponent(Plotly)
-
-function isStrictlyBetterInMetrics(r1: OmRecord, r2: OmRecord, metrics: Metric[]): boolean {
-    const compares = metrics.map((metric) => (metric.get(r1) ?? Number.MAX_SAFE_INTEGER) - (metric.get(r2) ?? Number.MAX_SAFE_INTEGER))
-    return !compares.some((compare) => compare > 0) && compares.some((compare) => compare < 0)
-}
 
 function getColor(record: OmRecord) {
     return record.score?.overlap ? "#880e4f" : record.score?.trackless ? "#558b2f" : "#0288d1"
@@ -72,12 +67,14 @@ function PlotView(props: PlotViewProps) {
         y: records.map((record) => y.get(record) ?? 0),
         mode: "markers",
         marker: {
-            color: records.map((record: OmRecord) => (records.some((r) => isStrictlyBetterInMetrics(r, record, [x, y])) ? "#00000000" : getColor(record))),
             line: {
                 color: records.map(getColor),
             },
         },
     }
+
+    const getMarkerColors = (...metrics: Metric[]) => records.map((record: OmRecord) => (records.some((r) => isStrictlyBetterInMetrics(r, record, metrics)) ? "#00000000" : getColor(record)))
+
     return (
         <>
             <Plot
@@ -90,6 +87,7 @@ function PlotView(props: PlotViewProps) {
                               marker: {
                                   ...common.marker,
                                   size: 20,
+                                  color: getMarkerColors(x, y),
                                   line: {
                                       ...common.marker?.line,
                                       width: 3,
@@ -104,6 +102,7 @@ function PlotView(props: PlotViewProps) {
                               marker: {
                                   ...common.marker,
                                   size: 10,
+                                  color: getMarkerColors(x, y, z),
                                   line: {
                                       ...common.marker?.line,
                                       width: 2,

@@ -18,7 +18,7 @@ import OmRecord from "./Record"
 
 export type MetricId = "g" | "c" | "a" | "i" | "h" | "w" | "r"
 
-export interface Metric {
+export default interface Metric {
     id: MetricId
     name: string
     get: (record: OmRecord) => number | undefined

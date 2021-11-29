@@ -16,6 +16,7 @@
 
 import Puzzle from "./Puzzle"
 import Score from "./Score"
+import Metric from "./Metric"
 
 export default interface Record {
     puzzle: Puzzle
@@ -25,4 +26,9 @@ export default interface Record {
     gif?: string
     solution?: string
     smartFormattedCategories?: string
+}
+
+export function isStrictlyBetterInMetrics(r1: Record, r2: Record, metrics: Metric[]): boolean {
+    const compares = metrics.map((metric) => (metric.get(r1) ?? Number.MAX_SAFE_INTEGER) - (metric.get(r2) ?? Number.MAX_SAFE_INTEGER))
+    return !compares.some((compare) => compare > 0) && compares.some((compare) => compare < 0)
 }
