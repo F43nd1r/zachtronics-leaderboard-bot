@@ -15,28 +15,27 @@
  */
 
 import { getMetric, MetricId } from "./Metric"
-import OmRecord from "./Record"
+import OmRecord, { isStrictlyBetterInMetrics } from "./Record"
+import { Configuration } from "./Configuration"
 
 export interface Filter {
     trackless?: boolean
     overlap?: boolean
+    showOnlyFrontier?: boolean
     max?: Record<MetricId, number | undefined>
 }
 
-export function applyFilter(filter: Filter, records: OmRecord[]): OmRecord[] {
-    const filteredMetrics = filter.max
-        ? Object.entries(filter.max).map(([key, max]) => {
-              return { metric: getMetric(key as MetricId), max: max }
-          })
-        : []
-    return records.filter((record: OmRecord) => {
-        return (
+export function applyFilter(filter: Filter, configuration: Configuration, records: OmRecord[]): OmRecord[] {
+    const filteredMetrics = filter.max ? Object.entries(filter.max).map(([key, max]) => ({ metric: getMetric(key as MetricId), max: max })) : []
+    const activeMetrics = (configuration.mode === "2D" ? [configuration.x, configuration.y] : [configuration.x, configuration.y, configuration.z]).map((id) => getMetric(id))
+    const filteredRecords = records.filter(
+        (record: OmRecord) =>
             (filter.overlap === undefined || filter.overlap === record.score?.overlap) &&
             (filter.trackless === undefined || filter.trackless === record.score?.trackless) &&
             !filteredMetrics.some(({ metric, max }) => {
                 const value = metric.get(record)
                 return max && (!value || value > max)
-            })
-        )
-    })
+            }),
+    )
+    return filteredRecords.filter((record: OmRecord) => !filter.showOnlyFrontier || !filteredRecords.some((r) => isStrictlyBetterInMetrics(r, record, activeMetrics)))
 }

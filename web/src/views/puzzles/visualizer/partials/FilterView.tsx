@@ -32,6 +32,20 @@ export function FilterView(props: FilterProps) {
     return (
         <FieldSet title={"Filter"}>
             <Stack spacing={1}>
+                <ToggleButton
+                    value={"check"}
+                    selected={props.filter.showOnlyFrontier ?? false}
+                    onChange={() => {
+                        console.log(!props.filter.showOnlyFrontier)
+                        props.setFilter({
+                            ...props.filter,
+                            showOnlyFrontier: !props.filter.showOnlyFrontier,
+                        })
+                    }}
+                    sx={{ textTransform: "none" }}
+                >
+                    Show only frontier
+                </ToggleButton>
                 <FilterButtonGroup
                     filter={props.filter.overlap}
                     setFilter={(value) =>
@@ -91,8 +105,8 @@ interface FilterButtonGroupProps {
     filter?: boolean
     setFilter: (filter: boolean | undefined) => void
     label: string
-    option1: string
-    option2: string
+    option1: string | JSX.Element
+    option2: string | JSX.Element
     sx?: SxProps<Theme>
 }
 
@@ -112,10 +126,10 @@ function FilterButtonGroup(props: FilterButtonGroupProps) {
             fullWidth
             size="small"
         >
-            <ToggleButton value={"on"} aria-label={`${props.label}-on`}>
+            <ToggleButton value={"on"} aria-label={`${props.label}-on`} sx={{ textTransform: "none" }}>
                 {props.option1}
             </ToggleButton>
-            <ToggleButton value={"off"} aria-label={`${props.label}-off`}>
+            <ToggleButton value={"off"} aria-label={`${props.label}-off`} sx={{ textTransform: "none" }}>
                 {props.option2}
             </ToggleButton>
         </ToggleButtonGroup>

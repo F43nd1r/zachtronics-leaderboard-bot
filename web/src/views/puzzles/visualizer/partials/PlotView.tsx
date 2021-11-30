@@ -43,8 +43,8 @@ function getColor(record: OmRecord) {
 function PlotView(props: PlotViewProps) {
     const [activeRecord, setActiveRecord] = useState<OmRecord | undefined>(undefined)
 
-    const records = applyFilter(props.filter, props.records)
     const configuration = props.configuration
+    const records = applyFilter(props.filter, configuration, props.records)
     const x = getMetric(configuration.x)
     const y = getMetric(configuration.y)
     const z = getMetric(configuration.z)
@@ -71,6 +71,7 @@ function PlotView(props: PlotViewProps) {
                 color: records.map(getColor),
             },
         },
+        ids: records.map((record) => record.fullFormattedScore ?? "none"),
     }
 
     const getMarkerColors = (...metrics: Metric[]) => records.map((record: OmRecord) => (records.some((r) => isStrictlyBetterInMetrics(r, record, metrics)) ? "#00000000" : getColor(record)))
@@ -125,6 +126,10 @@ function PlotView(props: PlotViewProps) {
                         xaxis: makeAxis(x),
                         yaxis: makeAxis(y),
                         zaxis: makeAxis(z),
+                    },
+                    transition: {
+                        duration: 500,
+                        easing: "cubic-in-out",
                     },
                 }}
                 config={{

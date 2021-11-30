@@ -56,7 +56,7 @@ export default function PuzzleVisualizerView() {
                                 records={records}
                                 filter={filter}
                                 setFilter={(filter) => {
-                                    if (applyFilter(filter, records).length) {
+                                    if (applyFilter(filter, configuration, records).length) {
                                         setFilter(filter)
                                         return true
                                     }
