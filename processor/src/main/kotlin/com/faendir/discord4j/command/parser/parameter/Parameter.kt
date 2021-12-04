@@ -50,6 +50,7 @@ abstract class Parameter(private val parameter: KSValueParameter, private val in
     val typeName = type.asTypeName().copy(nullable = !isRequired)
     val name = parameter.findAnnotationProperty(Name::value) ?: (parameter.name?.asString() ?: "var$index").toKebabCase()
     val autoCompletionProvider = parameter.findAnnotationTypeProperty(AutoComplete::value)
+    open val dependencies = listOfNotNull(autoCompletionProvider)
 
     abstract val optionType: ApplicationCommandOption.Type
 

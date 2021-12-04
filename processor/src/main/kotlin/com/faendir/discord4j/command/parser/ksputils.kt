@@ -22,6 +22,7 @@ import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSDeclaration
 import com.google.devtools.ksp.symbol.KSType
+import org.jetbrains.kotlin.util.capitalizeDecapitalize.decapitalizeSmart
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 
@@ -73,3 +74,6 @@ val KSDeclaration.normalizedPackageName
 
 val KSType.simpleName
     get() = declaration.simpleName.asString()
+
+val KSType.decapitalizedSimpleName
+    get() = simpleName.decapitalizeSmart()

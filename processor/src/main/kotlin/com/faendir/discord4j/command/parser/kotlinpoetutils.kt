@@ -65,17 +65,7 @@ fun FileSpec.writeTo(source: KSFile, codeGenerator: CodeGenerator) {
 val <T : TypeName> T.nonnull: T
     get() = copy(nullable = false) as T
 
-fun TypeName.toRawType(): ClassName = when (this) {
-    is ParameterizedTypeName -> this.rawType
-    is ClassName -> this
-    else -> throw IllegalArgumentException()
-}
-
 fun ClassName.withParserSuffix() = ClassName(packageName, "${simpleNames.joinToString("_")}Parser")
-
-fun TypeName.withParserSuffix() = toRawType().withParserSuffix()
-
-fun TypeName.asLambdaReceiver() = LambdaTypeName.get(receiver = this, returnType = Unit::class.asClassName())
 
 private val primitives = listOf(BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, BOOLEAN, CHAR)
 

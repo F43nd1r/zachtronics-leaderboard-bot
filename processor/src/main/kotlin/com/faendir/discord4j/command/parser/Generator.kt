@@ -50,6 +50,7 @@ import io.github.enjoydambience.kotlinbard.`while`
 import io.github.enjoydambience.kotlinbard.addCode
 import io.github.enjoydambience.kotlinbard.addFunction
 import io.github.enjoydambience.kotlinbard.addObject
+import io.github.enjoydambience.kotlinbard.addProperty
 import io.github.enjoydambience.kotlinbard.buildFile
 import io.github.enjoydambience.kotlinbard.nullable
 import net.pearx.kasechange.toKebabCase
@@ -98,6 +99,12 @@ class Generator(
         buildFile(parserType.packageName, parserType.simpleName) {
             addObject(parserType) {
                 addSuperinterface(ApplicationCommandParser::class.asClassName().parameterizedBy(type, dataType.asClassName()))
+                for(dependency in parameters.flatMap { it.dependencies }.distinct()) {
+                    val typeName = dependency.asTypeName()
+                    addProperty(dependency.decapitalizedSimpleName, typeName, KModifier.PRIVATE) {
+                        initializer("%T()", typeName)
+                    }
+                }
                 addFunction("buildData") {
                     addModifiers(KModifier.OVERRIDE)
                     returns(dataType)
@@ -165,8 +172,8 @@ class Generator(
                         for(parameter in parameters) {
                             parameter.autoCompletionProvider?.let {
                                `if`("option.name == %S", parameter.name) {
-                                   addStatement("return %T().autoComplete(option.value.orElse(null)?.asString() ?: \"\").map·{ %T.builder().name(it).value(it).build() }",
-                                   it.asClassName(), ApplicationCommandOptionChoiceData::class)
+                                   addStatement("return %L.autoComplete(option.value.orElse(null)?.asString() ?: \"\").map·{ %T.builder().name(it).value(it).build() }",
+                                   it.decapitalizedSimpleName, ApplicationCommandOptionChoiceData::class)
                                }
                             }
                         }

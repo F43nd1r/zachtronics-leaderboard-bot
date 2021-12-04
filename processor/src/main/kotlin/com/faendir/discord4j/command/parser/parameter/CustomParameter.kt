@@ -18,7 +18,7 @@ package com.faendir.discord4j.command.parser.parameter
 
 import com.faendir.discord4j.command.parse.SingleParseResult
 import com.faendir.discord4j.command.parser.asClassName
-import com.faendir.discord4j.command.parser.asTypeName
+import com.faendir.discord4j.command.parser.decapitalizedSimpleName
 import com.faendir.discord4j.command.parser.mapToKotlin
 import com.faendir.discord4j.command.parser.simpleName
 import com.google.devtools.ksp.symbol.KSType
@@ -36,9 +36,10 @@ class CustomParameter(
 ) : Parameter(parameter, index) {
     override val optionType: ApplicationCommandOption.Type =
         if (inputType.asClassName().mapToKotlin() == BOOLEAN) ApplicationCommandOption.Type.BOOLEAN else ApplicationCommandOption.Type.STRING
+    override val dependencies = super.dependencies + converter
     override fun convertValue(): CodeBlock =
         codeBlock {
-            add("let·{·value·-> %T().fromValue(event, value.as%L()) }", converter.asTypeName(), inputType.simpleName)
+            add("let·{·value·-> %L.fromValue(event, value.as%L()) }", converter.decapitalizedSimpleName, inputType.simpleName)
             if (!isRequired)
                 add(" ?: %T(null)", SingleParseResult.Success::class)
         }
