@@ -3,7 +3,9 @@
 #include <limits.h>
 
 JNIEXPORT jlong JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_prepareVerifier
-    (JNIEnv *env, jclass, jstring jPuzzle, jstring jSolution) {
+    (JNIEnv *env, jclass cls, jstring jPuzzle, jstring jSolution) {
+    (void)cls;
+
     const char *puzzle = (*env)->GetStringUTFChars(env, jPuzzle, 0);
     const char *solution = (*env)->GetStringUTFChars(env, jSolution, 0);
     void *verifier = verifier_create(puzzle, solution);
@@ -13,13 +15,18 @@ JNIEXPORT jlong JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_
 }
 
 JNIEXPORT void JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_closeVerifier
-    (JNIEnv *, jclass, jlong jVerifier) {
+    (JNIEnv *env, jclass cls, jlong jVerifier) {
+    (void)env;
+    (void)cls;
+
     void *verifier = (void*) jVerifier;
     verifier_destroy(verifier);
 }
 
 JNIEXPORT jint JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_getMetric
-    (JNIEnv *env, jclass, jlong jVerifier, jstring jMetric) {
+    (JNIEnv *env, jclass cls, jlong jVerifier, jstring jMetric) {
+    (void)cls;
+
     void *verifier = (void*) jVerifier;
     const char *metric = (*env)->GetStringUTFChars(env, jMetric, 0);
     int result = verifier_evaluate_metric(verifier, metric);
