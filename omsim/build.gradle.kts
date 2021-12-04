@@ -36,3 +36,9 @@ library {
         }
     }
 }
+
+tasks {
+    withType<CCompile> {
+        isOptimized = true
+    }
+}

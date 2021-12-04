@@ -29,16 +29,9 @@ public class JNISolutionVerifier implements Closeable {
         NativeLoader.loadLibrary(JNISolutionVerifier.class.getClassLoader(), "native");
     }
 
-    private final long verifier;
-
-    public int getMetric(Metrics metric) {
-        return JNISolutionVerifier.getMetric(verifier, metric.id);
-    }
-
-    @Override
-    public void close() {
-        JNISolutionVerifier.closeVerifier(verifier);
-    }
+    private final File puzzle;
+    private final File solution;
+    private Long verifier = null;
 
     private static native long prepareVerifier(String puzzleFile, String solutionFile);
 
@@ -47,7 +40,23 @@ public class JNISolutionVerifier implements Closeable {
     private static native int getMetric(long verifier, String name);
 
     public static JNISolutionVerifier open(File puzzle, File solution) {
-        return new JNISolutionVerifier(prepareVerifier(puzzle.getAbsolutePath(), solution.getAbsolutePath()));
+        return new JNISolutionVerifier(puzzle, solution);
+    }
+
+    public int getMetric(Metrics metric) {
+        if (verifier == null) verifier = prepareVerifier(puzzle.getAbsolutePath(), solution.getAbsolutePath());
+        try {
+            return getMetric(verifier, metric.id);
+        } catch (Throwable t) {
+            close();
+            throw t;
+        }
+    }
+
+    @Override
+    public void close() {
+        closeVerifier(verifier);
+        verifier = null;
     }
 
     public enum Metrics {

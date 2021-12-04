@@ -40,7 +40,30 @@ tasks {
     withType<Test> {
         useJUnitPlatform()
     }
-    compileJava {
-        options.compilerArgs.addAll(listOf("-h", file("src/main/headers").absolutePath))
+    withType<CCompile> {
+        isOptimized = true
+        compilerArgs.addAll(
+            listOf(
+                "-Wall",
+                "-Wextra",
+                "-Wfloat-equal",
+                "-Wundef",
+                "-Wshadow",
+                "-Wpointer-arith",
+                "-Wcast-align",
+                "-Wstrict-prototypes",
+                "-Wstrict-overflow=5",
+                "-Wwrite-strings",
+                "-Waggregate-return",
+                "-Wcast-qual",
+                "-Wswitch-default",
+                "-Wswitch-enum",
+                "-Wconversion",
+                "-Wunreachable-code",
+                "-Wmissing-declarations",
+                "-Werror",
+                "-std=c11"
+            )
+        )
     }
 }
