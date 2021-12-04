@@ -30,7 +30,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@BotTest(Application.class)
+@BotTest
 public class SolRepoFindTest {
 
     @Autowired

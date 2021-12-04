@@ -28,7 +28,7 @@ import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@BotTest(Application.class)
+@BotTest
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
 class ValidationResultTest {
 

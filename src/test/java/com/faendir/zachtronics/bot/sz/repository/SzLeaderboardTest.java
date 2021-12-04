@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@BotTest(Application.class)
+@BotTest
 public class SzLeaderboardTest {
 
     @Autowired

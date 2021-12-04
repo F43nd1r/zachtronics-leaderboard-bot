@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.stream.Collectors;
 
-@BotTest(Application.class)
+@BotTest
 @Disabled("Massive tests only for manual testing or migrations")
 class SolRepoManualTest {
 

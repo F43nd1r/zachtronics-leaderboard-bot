@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@BotTest(Application.class)
+@BotTest
 public class SolRepoSubmitTest {
 
     @Autowired

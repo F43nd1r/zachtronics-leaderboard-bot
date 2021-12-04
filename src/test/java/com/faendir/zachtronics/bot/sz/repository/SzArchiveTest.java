@@ -32,7 +32,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@BotTest(Application.class)
+@BotTest
 public class SzArchiveTest {
 
     @Autowired

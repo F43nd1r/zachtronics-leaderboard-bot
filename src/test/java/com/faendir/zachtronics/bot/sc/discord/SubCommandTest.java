@@ -53,7 +53,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@BotTest(Application.class)
+@BotTest
 public class SubCommandTest {
 
     @Autowired

@@ -19,9 +19,11 @@ package com.faendir.zachtronics.bot
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest(properties = ["spring.main.lazy-initialization=false"])
 @Import(TestConfiguration::class)
+@ActiveProfiles("test")
 class ApplicationTest {
     @Test
     fun `application context loads`() {

@@ -15,8 +15,3 @@ spring:
         allow-bean-definition-overriding: true
         banner-mode: 'off'
         lazy-initialization: true
-    profiles:
-        active: test
-    mvc:
-        pathmatch:
-            matching-strategy: ant_path_matcher

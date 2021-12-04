@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@BotTest(Application.class)
+@BotTest
 class ScSolutionMetadataTest {
     @Test
     public void testNoFlags() {
