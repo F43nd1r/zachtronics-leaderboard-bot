@@ -7,6 +7,16 @@
   "requireConfig": false,
   "platform": "github",
   "dependencyDashboard": false,
-  "repositories": ["F43nd1r/zachtronics-leaderboard-bot"],
-  "ignoreDeps": ["openjdk"]
+  "repositories": [
+    "F43nd1r/zachtronics-leaderboard-bot"
+  ],
+  "ignoreDeps": [
+    "openjdk"
+  ],
+  "extends": [
+    "group:monorepos",
+    "group:recommended",
+    "packages:react",
+    "workarounds:all"
+  ]
 }
