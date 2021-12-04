@@ -17,13 +17,17 @@ enableFeaturePreview("VERSION_CATALOGS")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "zachtronics-leaderboard-bot"
-include("native")
-include("common")
-include("processor")
+rootDir.listFiles()?.forEach {
+    if(it.isDirectory && it.list()?.contains("build.gradle.kts") == true) {
+        include(it.name)
+    }
+}
 
 pluginManagement {
     repositories {
         gradlePluginPortal()
         mavenCentral() //required for ksp
+        maven { url = uri("https://repo.nokee.dev/release") }
+        maven { url = uri("https://repo.nokee.dev/snapshot") }
     }
 }

@@ -17,17 +17,21 @@
 package com.faendir.zachtronics.bot.om;
 
 
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class JNISolutionVerifierTest {
+public class JNISolutionVerifierTest {
 
-    @org.junit.jupiter.api.Test
+    @Test
     void getHeight() {
-        JNISolutionVerifier verifier = new JNISolutionVerifier();
-        int height = verifier.getHeight(
-                getClass().getClassLoader().getResource("P009.puzzle").getFile(),
-                getClass().getClassLoader().getResource("Face_Powder_Height_1.solution").getFile()
-        );
-        assertEquals(1, height);
+        try(JNISolutionVerifier verifier = JNISolutionVerifier.open(
+                new File(getClass().getClassLoader().getResource("P009.puzzle").getFile()),
+                new File(getClass().getClassLoader().getResource("Face_Powder_Height_1.solution").getFile()))) {
+            int height = verifier.getMetric(JNISolutionVerifier.Metrics.HEIGHT);
+            assertEquals(1, height);
+        }
     }
 }

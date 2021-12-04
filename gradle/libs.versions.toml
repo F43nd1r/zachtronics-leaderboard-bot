@@ -28,6 +28,7 @@ junit = "5.8.1"
 springdoc = "1.5.12"
 gradle-node = "3.1.1"
 guava = "31.0.1-jre"
+nokee = "0.5.0-930919a0"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -36,6 +37,9 @@ kotlin-plugin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kot
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-plugin-lombok = { id = "org.jetbrains.kotlin.plugin.lombok", version.ref = "kotlin" }
 kotlin-plugin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+nokee-jni = { id = "dev.nokee.jni-library", version.ref = "nokee" }
+nokee-c-language = { id = "dev.nokee.c-language", version.ref = "nokee" }
+nokee-c-library = { id = "dev.nokee.c-library", version.ref = "nokee" }
 
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependencyManagement = { id = "io.spring.dependency-management", version.ref = "spring-dependencyManagement" }
@@ -53,6 +57,7 @@ kotlin-scriptingCompiler = { module = "org.jetbrains.kotlin:kotlin-scripting-com
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
 spring-boot-web = { module = "org.springframework.boot:spring-boot-starter-web" }
 spring-boot-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring-boot-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
 mysqlConnector = { module = "mysql:mysql-connector-java" }
 spring-cloud = { module = "org.springframework.cloud:spring-cloud-starter", version.ref = "spring-cloud" }
 discord4j = { module = "com.discord4j:discord4j-core", version.ref = "discord4j" }
@@ -82,4 +87,5 @@ kaseChange = { module = "net.pearx.kasechange:kasechange-jvm", version.ref = "ka
 junit = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 springdoc = { module = "org.springdoc:springdoc-openapi-ui", version.ref = "springdoc" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
+spring-core = { module = "org.springframework:spring-core" }
 

@@ -49,32 +49,39 @@ import java.io.ByteArrayInputStream
 import java.io.File
 
 
-private val verifier = JNISolutionVerifier()
 private val logger = LoggerFactory.getLogger("OM Utils")
 
-fun Solution.getMetrics(puzzle: OmPuzzle, vararg metrics: OmScorePart): Map<OmScorePart, Double?>? {
+fun Solution.getMetrics(puzzle: OmPuzzle, vararg metrics: OmScorePart): Map<OmScorePart, Number?>? {
     val puzzleFile = puzzle.file?.takeIf { it.exists() } ?: return null
     val solution = File.createTempFile(puzzle.id, ".solution").also { SolutionParser.write(this, it.outputStream().sink().buffer()) }
-    return metrics.associateWith { metric ->
-        try {
-            when (metric) {
-                OmScorePart.HEIGHT -> verifier.getHeight(puzzleFile, solution).takeIf { it != -1 }?.toDouble()
-                OmScorePart.WIDTH -> verifier.getWidth(puzzleFile, solution).let {
-                    when (it) {
-                        -1 -> null
-                        Int.MAX_VALUE -> Int.MAX_VALUE.toDouble()
-                        else -> it.toDouble() / 2
+    return JNISolutionVerifier.open(puzzleFile, solution).use { verifier ->
+        metrics.associateWith { metric ->
+            try {
+                when (metric) {
+                    OmScorePart.HEIGHT -> verifier.getMetric(JNISolutionVerifier.Metrics.HEIGHT).takeIf { it != -1 }
+                    OmScorePart.WIDTH -> verifier.getMetric(JNISolutionVerifier.Metrics.WIDTH_TIMES_TWO).let {
+                        when (it) {
+                            -1 -> null
+                            Int.MAX_VALUE -> Int.MAX_VALUE
+                            else -> it.toDouble() / 2
+                        }
+                    }
+                    OmScorePart.COST -> verifier.getMetric(JNISolutionVerifier.Metrics.COST).takeIf { it != -1 }
+                    OmScorePart.CYCLES -> verifier.getMetric(JNISolutionVerifier.Metrics.CYCLES).takeIf { it != -1 }
+                    OmScorePart.AREA -> verifier.getMetric(JNISolutionVerifier.Metrics.AREA).takeIf { it != -1 }
+                    OmScorePart.INSTRUCTIONS -> verifier.getMetric(JNISolutionVerifier.Metrics.INSTRUCTIONS).takeIf { it != -1 }
+                    OmScorePart.RATE -> verifier.getMetric(JNISolutionVerifier.Metrics.THROUGHPUT_CYCLES).let {
+                        when(it) {
+                            -1 -> null
+                            Int.MAX_VALUE -> Int.MAX_VALUE
+                            else -> it.toDouble() / verifier.getMetric(JNISolutionVerifier.Metrics.THROUGHPUT_OUTPUTS)
+                        }
                     }
                 }
-                OmScorePart.COST -> verifier.getCost(puzzleFile, solution).takeIf { it != -1 }?.toDouble()
-                OmScorePart.CYCLES -> verifier.getCycles(puzzleFile, solution).takeIf { it != -1 }?.toDouble()
-                OmScorePart.AREA -> verifier.getArea(puzzleFile, solution).takeIf { it != -1 }?.toDouble()
-                OmScorePart.INSTRUCTIONS -> verifier.getInstructions(puzzleFile, solution).takeIf { it != -1 }?.toDouble()
-                OmScorePart.RATE -> verifier.getRate(puzzleFile, solution)
+            } catch (e: Exception) {
+                logger.info("Verifier threw exception", e)
+                null
             }
-        } catch (e: Exception) {
-            logger.info("Verifier threw exception", e)
-            null
         }
     }
 }
@@ -135,8 +142,8 @@ fun createSubmission(gif: String, author: String, bytes: ByteArray): OmSubmissio
         area = solution.area,
         instructions = solution.instructions,
         height = computed?.get(OmScorePart.HEIGHT)?.toInt(),
-        width = computed?.get(OmScorePart.WIDTH),
-        rate = computed?.get(OmScorePart.RATE),
+        width = computed?.get(OmScorePart.WIDTH)?.toDouble(),
+        rate = computed?.get(OmScorePart.RATE)?.toDouble(),
         trackless = solution.isTrackless(),
         overlap = solution.isOverlap(puzzle),
     )

@@ -16,69 +16,54 @@
 
 package com.faendir.zachtronics.bot.om;
 
-import org.springframework.util.ResourceUtils;
-import org.springframework.util.StreamUtils;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
-import java.io.*;
-import java.net.URL;
+import java.io.Closeable;
+import java.io.File;
 
-public class JNISolutionVerifier {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public class JNISolutionVerifier implements Closeable {
     static {
-        try {
-            System.load(ResourceUtils.getFile("classpath:shared/libzachtronicsjni.so").getAbsolutePath());
-        } catch (FileNotFoundException f) {
-            try {
-                URL url = ResourceUtils.getURL("classpath:shared/libzachtronicsjni.so");
-                File file = File.createTempFile("libzachtronicsjni", ".so");
-                try(InputStream in = url.openStream(); OutputStream out = new FileOutputStream(file)) {
-                    StreamUtils.copy(in, out);
-                }
-                System.load(file.getAbsolutePath());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        NativeLoader.loadLibrary(JNISolutionVerifier.class.getClassLoader(), "omsim");
+        NativeLoader.loadLibrary(JNISolutionVerifier.class.getClassLoader(), "native");
+    }
+
+    private final long verifier;
+
+    public int getMetric(Metrics metric) {
+        return JNISolutionVerifier.getMetric(verifier, metric.id);
+    }
+
+    @Override
+    public void close() {
+        JNISolutionVerifier.closeVerifier(verifier);
+    }
+
+    private static native long prepareVerifier(String puzzleFile, String solutionFile);
+
+    private static native void closeVerifier(long verifier);
+
+    private static native int getMetric(long verifier, String name);
+
+    public static JNISolutionVerifier open(File puzzle, File solution) {
+        return new JNISolutionVerifier(prepareVerifier(puzzle.getAbsolutePath(), solution.getAbsolutePath()));
+    }
+
+    public enum Metrics {
+        // see verifier.h
+        CYCLES("cycles"),
+        COST("cost"),
+        AREA("area (approximate)"),
+        INSTRUCTIONS("instructions"),
+        THROUGHPUT_CYCLES("throughput cycles"),
+        THROUGHPUT_OUTPUTS("throughput outputs"),
+        HEIGHT("height"),
+        WIDTH_TIMES_TWO("width*2");
+        private final String id;
+
+        Metrics(String id) {
+            this.id = id;
         }
     }
-
-    public int getHeight(File puzzle, File solution) {
-        return getHeight(puzzle.getAbsolutePath(), solution.getAbsolutePath());
-    }
-
-    native int getHeight(String puzzleFile, String solutionFile);
-
-    public int getWidth(File puzzle, File solution) {
-        return getWidth(puzzle.getAbsolutePath(), solution.getAbsolutePath());
-    }
-
-    native int getWidth(String puzzleFile, String solutionFile);
-
-    public int getCost(File puzzle, File solution) {
-        return getCost(puzzle.getAbsolutePath(), solution.getAbsolutePath());
-    }
-
-    native int getCost(String puzzleFile, String solutionFile);
-
-    public int getCycles(File puzzle, File solution) {
-        return getCycles(puzzle.getAbsolutePath(), solution.getAbsolutePath());
-    }
-
-    native int getCycles(String puzzleFile, String solutionFile);
-
-    public int getArea(File puzzle, File solution) {
-        return getArea(puzzle.getAbsolutePath(), solution.getAbsolutePath());
-    }
-
-    native int getArea(String puzzleFile, String solutionFile);
-
-    public int getInstructions(File puzzle, File solution) {
-        return getInstructions(puzzle.getAbsolutePath(), solution.getAbsolutePath());
-    }
-
-    native int getInstructions(String puzzleFile, String solutionFile);
-
-    public double getRate(File puzzle, File solution) {
-        return getRate(puzzle.getAbsolutePath(), solution.getAbsolutePath());
-    }
-
-    native double getRate(String puzzleFile, String solutionFile);
 }
