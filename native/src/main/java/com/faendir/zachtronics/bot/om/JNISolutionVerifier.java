@@ -55,8 +55,10 @@ public class JNISolutionVerifier implements Closeable {
 
     @Override
     public void close() {
-        closeVerifier(verifier);
-        verifier = null;
+        if(verifier != null) {
+            closeVerifier(verifier);
+            verifier = null;
+        }
     }
 
     public enum Metrics {
