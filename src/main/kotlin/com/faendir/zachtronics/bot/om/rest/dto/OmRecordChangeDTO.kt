@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-export default interface Category {
-    id: string
-    displayName: string
-    metrics: string[]
-    puzzleTypes: ("NORMAL" | "INFINITE" | "PRODUCTION")[]
-}
+package com.faendir.zachtronics.bot.om.rest.dto
+
+import com.faendir.zachtronics.bot.om.repository.OmRecordChange
+import com.faendir.zachtronics.bot.om.repository.OmRecordChangeType
+
+data class OmRecordChangeDTO(val type: OmRecordChangeType, val record: OmRecordDTO)
+
+fun OmRecordChange.toDTO() = OmRecordChangeDTO(type, record.toDTO())

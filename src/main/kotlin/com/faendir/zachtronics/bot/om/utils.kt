@@ -31,11 +31,14 @@ import com.faendir.om.parser.solution.model.part.Track
 import com.faendir.zachtronics.bot.om.discord.plus
 import com.faendir.zachtronics.bot.om.discord.rotate
 import com.faendir.zachtronics.bot.om.model.FULL_CIRCLE
+import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmScorePart
 import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.model.SINGLE
+import com.faendir.zachtronics.bot.repository.CategoryRecord
 import okio.buffer
 import okio.sink
 import okio.source
@@ -164,3 +167,5 @@ fun shortenGithubLink(githubLink: String): String {
         githubLink
     }
 }
+
+fun OmRecord.withCategory(category: OmCategory) = CategoryRecord(this, setOf(category))

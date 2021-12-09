@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-export default interface Category {
-    id: string
-    displayName: string
-    metrics: string[]
-    puzzleTypes: ("NORMAL" | "INFINITE" | "PRODUCTION")[]
-}
+package com.faendir.zachtronics.bot.om.rest.dto
+
+import com.faendir.zachtronics.bot.om.model.OmCategory
+
+data class OmCategoryDTO(val id: String, val displayName: String, val metrics: List<String>, val puzzleTypes: List<String>)
+
+fun OmCategory.toDTO() = OmCategoryDTO(name, displayName, metrics.map { metric -> metric.description }, supportedTypes.map { it.name })

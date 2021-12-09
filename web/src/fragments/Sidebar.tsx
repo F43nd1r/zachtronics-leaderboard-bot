@@ -90,11 +90,13 @@ function Categories() {
                 items={ApiListResource<Category[]>({
                     url: "/categories",
                     element: (categories) =>
-                        categories.map((category) => (
-                            <LinkListItem sx={{ pl: 4 }} key={category.id} to={`/categories/${category.id}`} selected={categoryId === category.id}>
-                                <ListItemText primary={`${category.displayName} (${category.metrics.join("→")})`} />
-                            </LinkListItem>
-                        )),
+                        categories
+                            .sort((a, b) => (a.puzzleTypes.includes("PRODUCTION") && !b.puzzleTypes.includes("PRODUCTION") ? 1 : -1))
+                            .map((category) => (
+                                <LinkListItem sx={{ pl: 4 }} key={category.id} to={`/categories/${category.id}`} selected={categoryId === category.id}>
+                                    <ListItemText primary={`${category.displayName} (${category.metrics.join("→")})${category.puzzleTypes.includes("PRODUCTION") ? " (Production)" : ""}`} />
+                                </LinkListItem>
+                            )),
                 })}
                 open={categoryId !== undefined}
             />

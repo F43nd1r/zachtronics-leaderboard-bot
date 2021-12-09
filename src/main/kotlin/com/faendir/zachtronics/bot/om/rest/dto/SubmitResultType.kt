@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-export default interface Category {
-    id: string
-    displayName: string
-    metrics: string[]
-    puzzleTypes: ("NORMAL" | "INFINITE" | "PRODUCTION")[]
+package com.faendir.zachtronics.bot.om.rest.dto
+
+enum class SubmitResultType {
+    ALREADY_PRESENT,
+    NOTHING_BEATEN,
+    SUCCESS
 }

@@ -23,20 +23,23 @@ import com.faendir.zachtronics.bot.om.createSubmission
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmGroup
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
-import com.faendir.zachtronics.bot.om.model.OmRecord
-import com.faendir.zachtronics.bot.om.model.OmScore
-import com.faendir.zachtronics.bot.om.repository.OmRecordChange
-import com.faendir.zachtronics.bot.om.repository.OmRecordChangeType
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
-import com.faendir.zachtronics.bot.repository.CategoryRecord
+import com.faendir.zachtronics.bot.om.rest.dto.OmCategoryDTO
+import com.faendir.zachtronics.bot.om.rest.dto.OmGroupDTO
+import com.faendir.zachtronics.bot.om.rest.dto.OmPuzzleDTO
+import com.faendir.zachtronics.bot.om.rest.dto.OmRecordChangeDTO
+import com.faendir.zachtronics.bot.om.rest.dto.OmRecordDTO
+import com.faendir.zachtronics.bot.om.rest.dto.OmSubmissionDTO
+import com.faendir.zachtronics.bot.om.rest.dto.SubmitResultType
+import com.faendir.zachtronics.bot.om.rest.dto.emptyRecord
+import com.faendir.zachtronics.bot.om.rest.dto.toDTO
+import com.faendir.zachtronics.bot.om.withCategory
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.filterIsInstance
 import com.faendir.zachtronics.bot.utils.isValidLink
 import com.faendir.zachtronics.bot.utils.orEmpty
-import com.faendir.zachtronics.bot.utils.smartFormat
-import com.faendir.zachtronics.bot.utils.toMetricsTree
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.channel.MessageChannel
 import org.springframework.format.annotation.DateTimeFormat
@@ -49,7 +52,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import java.time.Instant
 
@@ -142,98 +144,3 @@ private fun findCategory(categoryId: String) = OmCategory.values().find { it.nam
 private fun findGroup(groupId: String) =
     OmGroup.values().find { it.name.equals(groupId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Group $groupId not found.")
 
-data class OmGroupDTO(val id: String, val displayName: String)
-
-fun OmGroup.toDTO() = OmGroupDTO(name, displayName)
-
-data class OmPuzzleDTO(val id: String, val displayName: String, val group: OmGroupDTO)
-
-fun OmPuzzle.toDTO() = OmPuzzleDTO(id, displayName, group.toDTO())
-
-data class OmCategoryDTO(val id: String, val displayName: String, val metrics: List<String>)
-
-fun OmCategory.toDTO() = OmCategoryDTO(name, displayName, metrics.map { metric -> metric.description })
-
-data class OmScoreDTO(
-    val cost: Int? = null,
-    val cycles: Int? = null,
-    val area: Int? = null,
-    val instructions: Int? = null,
-    val height: Int? = null,
-    val width: Double? = null,
-    val rate: Double? = null,
-    val trackless: Boolean = false,
-    val overlap: Boolean = false,
-)
-
-fun OmScore.toDTO() = OmScoreDTO(
-    cost = cost,
-    cycles = cycles,
-    area = area,
-    instructions = instructions,
-    height = height,
-    width = width,
-    rate = rate,
-    trackless = trackless,
-    overlap = overlap
-)
-
-data class OmRecordDTO(
-    val puzzle: OmPuzzleDTO,
-    val score: OmScoreDTO?,
-    val smartFormattedScore: String?,
-    val fullFormattedScore: String?,
-    val gif: String?,
-    val solution: String?,
-    val categoryIds: List<String>?,
-    val smartFormattedCategories: String?
-)
-
-fun CategoryRecord<OmRecord, OmCategory>.toDTO() =
-    OmRecordDTO(
-        puzzle = record.puzzle.toDTO(),
-        score = record.score.toDTO(),
-        smartFormattedScore = record.score.toDisplayString(DisplayContext(StringFormat.PLAIN_TEXT, categories.toList())),
-        fullFormattedScore = record.score.toDisplayString(DisplayContext.plainText()),
-        gif = record.displayLink,
-        solution = record.dataLink,
-        categoryIds = categories.map { it.name },
-        smartFormattedCategories = categories.smartFormat(record.puzzle.supportedCategories.toMetricsTree())
-    )
-
-fun OmRecord.toDTO() =
-    OmRecordDTO(
-        puzzle = puzzle.toDTO(),
-        score = score.toDTO(),
-        smartFormattedScore = null,
-        fullFormattedScore = score.toDisplayString(DisplayContext.plainText()),
-        gif = displayLink,
-        solution = dataLink,
-        categoryIds = null,
-        smartFormattedCategories = null
-    )
-
-fun emptyRecord(puzzle: OmPuzzle) = OmRecordDTO(
-    puzzle = puzzle.toDTO(),
-    score = null,
-    smartFormattedScore = null,
-    fullFormattedScore = null,
-    gif = null,
-    solution = null,
-    categoryIds = null,
-    smartFormattedCategories = null
-)
-
-fun OmRecord.withCategory(category: OmCategory) = CategoryRecord(this, setOf(category))
-
-data class OmSubmissionDTO(val gif: String, val author: String, val solution: MultipartFile)
-
-enum class SubmitResultType {
-    ALREADY_PRESENT,
-    NOTHING_BEATEN,
-    SUCCESS
-}
-
-data class OmRecordChangeDTO(val type: OmRecordChangeType, val record: OmRecordDTO)
-
-fun OmRecordChange.toDTO() = OmRecordChangeDTO(type, record.toDTO())
