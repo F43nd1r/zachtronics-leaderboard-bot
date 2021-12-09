@@ -23,6 +23,6 @@ import com.faendir.zachtronics.bot.utils.fuzzyMatch
 class CategoryAutoCompletionProvider : AutoCompletionProvider {
     private val list = OmCategory.values().toList()
     override fun autoComplete(partial: String): List<String> {
-        return list.fuzzyMatch(partial) { displayName }.map { it.displayName }
+        return list.fuzzyMatch(partial) { displayName }.map { it.displayName }.distinct()
     }
 }
