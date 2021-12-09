@@ -21,6 +21,7 @@ import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
+import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.clear
@@ -36,7 +37,7 @@ abstract class AbstractShowCommand<T, C : Category, P : Puzzle<C>, R : Record<C>
         val record = repository.find(puzzle, category)
         return if (record != null) {
             event.editReply().clear()
-                .withContentOrNull("*${puzzle.displayName}* **${category.displayName}**\n${record.toDisplayString(DisplayContext.plainText())}")
+                .withContentOrNull("*${puzzle.displayName}* **${category.displayName}**\n${record.toDisplayString(DisplayContext(StringFormat.PLAIN_TEXT, category))}")
                 .withFiles(record.attachments().map { (name, data) -> MessageCreateFields.File.of(name, data) })
                 .then()
         } else {
