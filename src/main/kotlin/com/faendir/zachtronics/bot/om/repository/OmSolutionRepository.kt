@@ -103,8 +103,9 @@ class OmSolutionRepository(
         }
     }
 
-    override fun submit(submission: OmSubmission): SubmitResult<OmRecord, OmCategory> =
-        leaderboard.acquireWriteAccess().use { leaderboardScope ->
+    override fun submit(submission: OmSubmission): SubmitResult<OmRecord, OmCategory> {
+        if(submission.displayLink.endsWith(".solution")) throw IllegalArgumentException("You cannot use solution files as gifs.")
+        return leaderboard.acquireWriteAccess().use { leaderboardScope ->
             loadDataIfNecessary(leaderboardScope)
             val records = data.getValue(submission.puzzle)
             val newRecord by lazy { submission.createRecord(leaderboardScope) }
@@ -158,6 +159,7 @@ class OmSolutionRepository(
             hash = leaderboardScope.currentHash()
             SubmitResult.Success(null, result)
         }
+    }
 
     fun computeChangesSince(instant: Instant): List<OmRecordChange> {
         return leaderboard.acquireReadAccess().use { leaderboardScope ->
