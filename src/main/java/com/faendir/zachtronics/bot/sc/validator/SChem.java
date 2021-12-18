@@ -135,12 +135,12 @@ public class SChem {
             process.getOutputStream().write(export.getBytes());
             process.getOutputStream().close();
 
-            SChemResult[] results = objectMapper.readValue(process.getInputStream(), SChemResult[].class);
+            byte[] result = process.getInputStream().readAllBytes();
             int exitCode = process.waitFor();
             if (exitCode != 0) {
                 throw new SChemException(new String(process.getErrorStream().readAllBytes()));
             }
-            return results;
+            return objectMapper.readValue(result, SChemResult[].class);
 
         } catch (JsonProcessingException e) {
             throw new SChemException("Error in reading back results", e);
