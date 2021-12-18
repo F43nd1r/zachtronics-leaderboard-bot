@@ -83,11 +83,15 @@ class SafeEmbedMessageBuilder {
         current.image(image)
     }
 
+    private val imgurMp4 = Regex("""https?://i\.imgur\.com/(?<id>.*)\.mp4""")
     private val allowedImageTypes = setOf("gif", "png", "jpg")
 
     fun link(link: String?) = apply {
         if (link != null) {
-            if (allowedImageTypes.contains(link.substringAfterLast(".", ""))) {
+            val match = imgurMp4.matchEntire(link)
+            if(match != null) {
+              image("https://i.imgur.com/${match.groups["id"]!!.value}.gif")
+            } else if (allowedImageTypes.contains(link.substringAfterLast(".", ""))) {
                 image(link)
             } else {
                 addField("Link", "[$link]($link)")
