@@ -65,6 +65,9 @@ class OmController(private val repository: OmSolutionRepository, private val dis
     @GetMapping(path = ["/puzzles"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun listPuzzles(): List<OmPuzzleDTO> = OmPuzzle.values().map { it.toDTO() }
 
+    @GetMapping(path = ["/puzzle/{puzzleId}"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getPuzzle(@PathVariable puzzleId: String): OmPuzzleDTO = findPuzzle(puzzleId).toDTO()
+
     @GetMapping(path = ["/group/{groupId}/puzzles"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun listPuzzlesByGroup(@PathVariable groupId: String): List<OmPuzzleDTO> {
         val group = findGroup(groupId)
@@ -73,6 +76,9 @@ class OmController(private val repository: OmSolutionRepository, private val dis
 
     @GetMapping(path = ["/categories"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun listCategories(): List<OmCategoryDTO> = OmCategory.values().map { it.toDTO() }
+
+    @GetMapping(path = ["/category/{categoryId}"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getCategory(@PathVariable categoryId: String): OmCategoryDTO = findCategory(categoryId).toDTO()
 
     @GetMapping(path = ["/puzzle/{puzzleId}/records"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun listRecords(@PathVariable puzzleId: String, @RequestParam(required = false) includeFrontier: Boolean?): List<OmRecordDTO> {

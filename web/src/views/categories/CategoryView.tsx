@@ -18,8 +18,18 @@ import { useParams } from "react-router-dom"
 import Record from "../../model/Record"
 import RecordGrid from "../../fragments/RecordGrid"
 import ApiResource from "../../utils/ApiResource"
+import fetchFromApi from "../../utils/fetchFromApi"
+import { useEffect } from "react"
+import Category from "../../model/Category"
 
 export default function CategoryView() {
+    const params = useParams()
+    const categoryId = params.categoryId
+
+    useEffect(() => {
+        fetchFromApi<Category>(`/category/${categoryId}`).then((category) => (document.title = `${category.displayName} - Opus Magnum Leaderboards`))
+    }, [categoryId])
+
     return (
         <ApiResource<Record[]>
             url={`/category/${useParams().categoryId}/records`}

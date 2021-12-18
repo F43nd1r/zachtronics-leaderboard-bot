@@ -19,6 +19,8 @@ import { Tab, Tabs } from "@mui/material"
 import { Link, Navigate, Outlet, useMatch } from "react-router-dom"
 import { usePersistedStringState } from "../../utils/usePersistedState"
 import { lazy, ReactElement, useEffect } from "react"
+import fetchFromApi from "../../utils/fetchFromApi"
+import Puzzle from "../../model/Puzzle"
 
 const PuzzleRecordsView = lazy(() => import("./records/PuzzleRecordsView"))
 const PuzzleFrontierView = lazy(() => import("./frontier/PuzzleFrontierView"))
@@ -56,6 +58,11 @@ export default function PuzzleView() {
     useEffect(() => {
         lastSegment && setActiveTab(lastSegment)
     }, [setActiveTab, lastSegment])
+    const puzzleId = match?.params?.puzzleId
+
+    useEffect(() => {
+        fetchFromApi<Puzzle>(`/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - Opus Magnum Leaderboards`))
+    }, [puzzleId])
 
     if (!lastSegment || !PuzzleRoutes.some((route) => route.pathSegment === lastSegment)) {
         return <Navigate to={lastActiveTab} />
