@@ -24,6 +24,7 @@ import com.faendir.om.parser.solution.model.Position
 import com.faendir.zachtronics.bot.discord.LinkConverter
 import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand
 import com.faendir.zachtronics.bot.discord.command.Secured
+import com.faendir.zachtronics.bot.discord.command.TrustedLeaderboardPosterRoleSecured
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.createSubmission
 import com.faendir.zachtronics.bot.om.model.OmCategory
@@ -41,8 +42,8 @@ import java.util.*
 @Component
 @OmQualifier
 class OmSubmitCommand(override val repository: OmSolutionRepository) : AbstractSubmitCommand<SubmitParams, OmCategory, OmPuzzle, OmSubmission, OmRecord>(),
-    Secured by OmSecured,
     ApplicationCommandParser<SubmitParams, ApplicationCommandOptionData> by SubmitParamsParser {
+    override val secured: Secured = TrustedLeaderboardPosterRoleSecured
 
     override fun parseSubmission(event: DeferrableInteractionEvent, parameters: SubmitParams): OmSubmission {
         val bytes = try {

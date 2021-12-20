@@ -16,15 +16,12 @@
 
 package com.faendir.zachtronics.bot.sz.discord;
 
+import com.faendir.zachtronics.bot.discord.DiscordUser;
+import com.faendir.zachtronics.bot.discord.DiscordUserSecured;
 import com.faendir.zachtronics.bot.discord.command.Secured;
-import discord4j.core.object.entity.User;
-import org.jetbrains.annotations.NotNull;
 
-public interface SzSecured extends Secured {
-    long WIKI_ADMIN = 295868901042946048L; // 12345ieee
+import java.util.Set;
 
-    @Override
-    default boolean hasExecutionPermission(@NotNull User user) {
-        return user.getId().asLong() == WIKI_ADMIN;
-    }
+public class SzSecured {
+    public static Secured INSTANCE = new DiscordUserSecured(Set.of(DiscordUser.IEEE12345));
 }

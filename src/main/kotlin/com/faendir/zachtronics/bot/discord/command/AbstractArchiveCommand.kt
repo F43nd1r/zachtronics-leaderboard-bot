@@ -27,8 +27,9 @@ import com.faendir.zachtronics.bot.validation.ValidationResult
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import reactor.core.publisher.Mono
 
-abstract class AbstractArchiveCommand<T, C: Category, S : Submission<C, *>> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
+abstract class AbstractArchiveCommand<T, C: Category, S : Submission<C, *>> : AbstractSubCommand<T>() {
     protected abstract val repository: SolutionRepository<*, *, S, *>
+    abstract override val secured: Secured
 
     override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
         val validationResults = parseSubmissions(parameters)

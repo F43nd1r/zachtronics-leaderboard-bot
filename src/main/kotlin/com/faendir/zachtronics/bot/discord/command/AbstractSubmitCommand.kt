@@ -33,8 +33,9 @@ import com.faendir.zachtronics.bot.utils.toMetricsTree
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import reactor.core.publisher.Mono
 
-abstract class AbstractSubmitCommand<T, C : Category, P: Puzzle<C>, S : Submission<C, P>, R : Record<C>> : AbstractSubCommand<T>(), SecuredSubCommand<T> {
+abstract class AbstractSubmitCommand<T, C : Category, P: Puzzle<C>, S : Submission<C, P>, R : Record<C>> : AbstractSubCommand<T>() {
     protected abstract val repository: SolutionRepository<C, P, S, R>
+    abstract override val secured: Secured
 
     override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
         val submission = parseSubmission(event, parameters)

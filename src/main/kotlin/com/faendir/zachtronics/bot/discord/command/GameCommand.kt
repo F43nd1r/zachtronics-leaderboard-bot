@@ -62,7 +62,7 @@ interface GameCommand : TopLevelCommand<GameCommand.SubCommandWithParameters<*>>
         val option = event.options.first()
         val subCommand = subCommands.find { it.data.name() == option.name }
             ?: return CombinedParseResult.Failure(listOf("I did not recognize the command \"${option.name}\"."))
-        if (subCommand is Secured && !subCommand.hasExecutionPermission(event.user())) {
+        if (subCommand.secured?.hasExecutionPermission(event.user()) == false) {
             return CombinedParseResult.Failure(listOf("sorry, you do not have the permission to use this command."))
         }
         return parseSubCommand(subCommand, event)

@@ -16,5 +16,15 @@
 
 package com.faendir.zachtronics.bot.discord.command
 
-interface SecuredSubCommand<T> : Secured, SubCommand<T> {
+import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
+import reactor.core.publisher.Mono
+
+/**
+ * @param T dataclass holding the parsed command parameters
+ */
+interface Command<T> {
+    fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void>
+
+    val secured: Secured?
+        get() = null
 }

@@ -16,11 +16,11 @@
 
 package com.faendir.zachtronics.bot.discord.command
 
+import discord4j.core.`object`.entity.Member
 import discord4j.core.`object`.entity.User
 
-fun interface Secured {
-    fun hasExecutionPermission(user: User): Boolean
+object TrustedLeaderboardPosterRoleSecured : Secured {
+    override fun hasExecutionPermission(user: User): Boolean {
+        return (user as? Member)?.roles?.any { it.name == "trusted-leaderboard-poster" }?.block() ?: false
+    }
 }
-
-infix fun Secured.or(alternative: Secured) = Secured { user: User -> this.hasExecutionPermission(user) || alternative.hasExecutionPermission(user) }
-

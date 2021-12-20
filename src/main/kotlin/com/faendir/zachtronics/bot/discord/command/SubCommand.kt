@@ -24,9 +24,7 @@ import reactor.core.publisher.Mono
 /**
  * @param T dataclass holding the parsed command parameters
  */
-interface SubCommand<T>  : ApplicationCommandParser<T, ApplicationCommandOptionData> {
-    fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void>
-
+interface SubCommand<T>  : ApplicationCommandParser<T, ApplicationCommandOptionData>, Command<T> {
     val data: ApplicationCommandOptionData
         get() = buildData()
 }

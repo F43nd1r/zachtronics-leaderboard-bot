@@ -24,12 +24,10 @@ import reactor.core.publisher.Mono
 /**
  * @param T dataclass holding the parsed command parameters
  */
-interface TopLevelCommand<T> : ApplicationCommandParser<T, ApplicationCommandRequest> {
+interface TopLevelCommand<T> : ApplicationCommandParser<T, ApplicationCommandRequest>, Command<T> {
     val commandName: String
         get() = request.name()
 
     val request: ApplicationCommandRequest
         get() = buildData()
-
-    fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void>
 }

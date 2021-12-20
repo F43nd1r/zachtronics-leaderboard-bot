@@ -21,6 +21,7 @@ import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.LinkConverter;
 import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand;
+import com.faendir.zachtronics.bot.discord.command.Secured;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
@@ -40,10 +41,11 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @ScQualifier
-public class ScSubmitCommand extends AbstractSubmitCommand<ScSubmitCommand.SubmitData, ScCategory, ScPuzzle, ScSubmission, ScRecord>
-        implements ScSecured {
+public class ScSubmitCommand extends AbstractSubmitCommand<ScSubmitCommand.SubmitData, ScCategory, ScPuzzle, ScSubmission, ScRecord> {
     @Delegate
     private final ScSubmitCommand_SubmitDataParser parser = ScSubmitCommand_SubmitDataParser.INSTANCE;
+    @Getter
+    private final Secured secured = ScSecured.INSTANCE;
     @Getter
     private final ScSolutionRepository repository;
     @Getter

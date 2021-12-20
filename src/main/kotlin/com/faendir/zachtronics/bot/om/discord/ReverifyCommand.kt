@@ -20,8 +20,10 @@ import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.AutoComplete
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.parse.ApplicationCommandParser
+import com.faendir.zachtronics.bot.discord.DiscordUser
+import com.faendir.zachtronics.bot.discord.DiscordUserSecured
 import com.faendir.zachtronics.bot.discord.command.AbstractSubCommand
-import com.faendir.zachtronics.bot.discord.command.SecuredSubCommand
+import com.faendir.zachtronics.bot.discord.command.Secured
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.JNISolutionVerifier
 import com.faendir.zachtronics.bot.om.OmQualifier
@@ -34,7 +36,6 @@ import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.orEmpty
-import discord4j.core.`object`.entity.User
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import org.springframework.stereotype.Component
@@ -42,12 +43,9 @@ import reactor.core.publisher.Mono
 
 @Component
 @OmQualifier
-class ReverifyCommand(private val repository: OmSolutionRepository) : AbstractSubCommand<Reverify>(), SecuredSubCommand<Reverify>,
+class ReverifyCommand(private val repository: OmSolutionRepository) : AbstractSubCommand<Reverify>(),
+    Secured by DiscordUserSecured(DiscordUser.BOT_OWNERS),
     ApplicationCommandParser<Reverify, ApplicationCommandOptionData> by ReverifyParser {
-
-    override fun hasExecutionPermission(user: User): Boolean {
-        return BOT_OWNERS.contains(user.id.asLong())
-    }
 
     override fun handle(event: DeferrableInteractionEvent, parameters: Reverify): Mono<Void> {
         val puzzles = (parameters.puzzle?.let { listOf(it) } ?: OmPuzzle.values().toList()).filter {

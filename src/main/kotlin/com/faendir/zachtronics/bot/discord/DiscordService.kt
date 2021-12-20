@@ -84,7 +84,7 @@ class DiscordService(
         discordClient.subscribeEvent<ChatInputInteractionEvent> { event ->
             event.deferReply().awaitSingleOrNull()
             val command = findCommand(event.commandName)
-            if (command is Secured && !command.hasExecutionPermission(event.user())) {
+            if (command.secured?.hasExecutionPermission(event.user()) == false) {
                 throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
             }
             command.handleChatInput(event)

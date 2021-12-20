@@ -17,6 +17,8 @@
 package com.faendir.zachtronics.bot.discord.command;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
+import com.faendir.zachtronics.bot.discord.DiscordUser;
+import com.faendir.zachtronics.bot.discord.DiscordUserSecured;
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent;
 import discord4j.core.object.entity.User;
 import lombok.Getter;
@@ -35,9 +37,11 @@ import java.util.Set;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class RestartCommand implements TopLevelCommand<RestartCommand.RestartData>, Secured {
+public class RestartCommand implements TopLevelCommand<RestartCommand.RestartData> {
     @Delegate
     private final RestartCommand_RestartDataParser parser = RestartCommand_RestartDataParser.INSTANCE;
+    @Getter
+    private final Secured secured = new DiscordUserSecured(DiscordUser.BOT_OWNERS);
     @Getter
     private final String commandName = "restart";
     @Getter
@@ -54,15 +58,6 @@ public class RestartCommand implements TopLevelCommand<RestartCommand.RestartDat
             System.exit(0);
             return null;
         }));
-    }
-
-    private final Set<Long> BOT_OWNERS = Set.of(295868901042946048L, // 12345ieee,
-                                                288766560938622976L  // F43nd1r
-    );
-
-    @Override
-    public boolean hasExecutionPermission(@NotNull User user) {
-        return BOT_OWNERS.contains(user.getId().asLong());
     }
 
     @ApplicationCommand(name = "restart", description = "Stops the bot, which will restart with the latest image")
