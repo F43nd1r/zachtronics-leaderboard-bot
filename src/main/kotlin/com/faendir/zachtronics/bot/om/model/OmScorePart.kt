@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.om.model
 
 import java.text.DecimalFormat
 
-enum class OmScorePart(val key: Char, val displayName: String?, val getValue: (OmScore) -> Number?) {
+enum class OmScorePart(val key: Char, val displayName: String, val getValue: (OmScore) -> Number?) {
     COST('g', "Cost", OmScore::cost),
     CYCLES('c', "Cycles", OmScore::cycles),
     AREA('a', "Area", OmScore::area),

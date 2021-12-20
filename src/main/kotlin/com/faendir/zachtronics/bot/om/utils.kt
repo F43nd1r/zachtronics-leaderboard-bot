@@ -58,36 +58,39 @@ fun Solution.getMetrics(puzzle: OmPuzzle, vararg metrics: OmScorePart): Map<OmSc
     val puzzleFile = puzzle.file?.takeIf { it.exists() } ?: return null
     val solution = File.createTempFile(puzzle.id, ".solution").also { SolutionParser.write(this, it.outputStream().sink().buffer()) }
     return JNISolutionVerifier.open(puzzleFile, solution).use { verifier ->
-        metrics.associateWith { metric ->
-            try {
-                when (metric) {
-                    OmScorePart.HEIGHT -> verifier.getMetric(JNISolutionVerifier.Metrics.HEIGHT).takeIf { it != -1 }
-                    OmScorePart.WIDTH -> verifier.getMetric(JNISolutionVerifier.Metrics.WIDTH_TIMES_TWO).let {
-                        when (it) {
-                            -1 -> null
-                            Int.MAX_VALUE -> Int.MAX_VALUE
-                            else -> it.toDouble() / 2
-                        }
-                    }
-                    OmScorePart.COST -> verifier.getMetric(JNISolutionVerifier.Metrics.COST).takeIf { it != -1 }
-                    OmScorePart.CYCLES -> verifier.getMetric(JNISolutionVerifier.Metrics.CYCLES).takeIf { it != -1 }
-                    OmScorePart.AREA -> verifier.getMetric(JNISolutionVerifier.Metrics.AREA).takeIf { it != -1 }
-                    OmScorePart.INSTRUCTIONS -> verifier.getMetric(JNISolutionVerifier.Metrics.INSTRUCTIONS).takeIf { it != -1 }
-                    OmScorePart.RATE -> verifier.getMetric(JNISolutionVerifier.Metrics.THROUGHPUT_CYCLES).let {
-                        when(it) {
-                            -1 -> null
-                            Int.MAX_VALUE -> Int.MAX_VALUE
-                            else -> it.toDouble() / verifier.getMetric(JNISolutionVerifier.Metrics.THROUGHPUT_OUTPUTS)
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                logger.info("Verifier threw exception", e)
-                null
-            }
-        }
+        verifier.getMetrics(metrics.toList()) { e, _ -> logger.info("Verifier threw exception", e) }
     }
 }
+
+fun JNISolutionVerifier.getMetrics(metrics: List<OmScorePart>, handleException: (Exception, OmScorePart) -> Unit): Map<OmScorePart, Number?> =
+    metrics.associateWith { metric ->
+        try {
+            when (metric) {
+                OmScorePart.HEIGHT -> getMetric(JNISolutionVerifier.Metrics.HEIGHT).takeIf { it != -1 }
+                OmScorePart.WIDTH -> getMetric(JNISolutionVerifier.Metrics.WIDTH_TIMES_TWO).let {
+                    when (it) {
+                        -1 -> null
+                        Int.MAX_VALUE -> Int.MAX_VALUE
+                        else -> it.toDouble() / 2
+                    }
+                }
+                OmScorePart.COST -> getMetric(JNISolutionVerifier.Metrics.COST).takeIf { it != -1 }
+                OmScorePart.CYCLES -> getMetric(JNISolutionVerifier.Metrics.CYCLES).takeIf { it != -1 }
+                OmScorePart.AREA -> getMetric(JNISolutionVerifier.Metrics.AREA).takeIf { it != -1 }
+                OmScorePart.INSTRUCTIONS -> getMetric(JNISolutionVerifier.Metrics.INSTRUCTIONS).takeIf { it != -1 }
+                OmScorePart.RATE -> getMetric(JNISolutionVerifier.Metrics.THROUGHPUT_CYCLES).let {
+                    when (it) {
+                        -1 -> null
+                        Int.MAX_VALUE -> Int.MAX_VALUE
+                        else -> it.toDouble() / getMetric(JNISolutionVerifier.Metrics.THROUGHPUT_OUTPUTS)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            handleException(e, metric)
+            null
+        }
+    }
 
 fun Solution.isTrackless(): Boolean = parts.none { it is Track }
 

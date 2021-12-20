@@ -40,6 +40,7 @@ import java.io.File
 import java.time.Instant
 import java.util.*
 import javax.annotation.PostConstruct
+import kotlin.io.path.relativeTo
 
 @OptIn(ExperimentalSerializationApi::class)
 @Component
@@ -104,7 +105,7 @@ class OmSolutionRepository(
     }
 
     override fun submit(submission: OmSubmission): SubmitResult<OmRecord, OmCategory> {
-        if(submission.displayLink.endsWith(".solution")) throw IllegalArgumentException("You cannot use solution files as gifs.")
+        if(submission.displayLink?.endsWith(".solution") == true) throw IllegalArgumentException("You cannot use solution files as gifs.")
         return leaderboard.acquireWriteAccess().use { leaderboardScope ->
             loadDataIfNecessary(leaderboardScope)
             val records = data.getValue(submission.puzzle)
@@ -158,6 +159,23 @@ class OmSolutionRepository(
             leaderboardScope.commitAndPush(submission.author, submission.puzzle, submission.score, result.flatMap { it.categories }.map { it.toString() })
             hash = leaderboardScope.currentHash()
             SubmitResult.Success(null, result)
+        }
+    }
+
+    fun overrideScores(overrides: List<Pair<OmRecord, OmScore>>) {
+        leaderboard.acquireWriteAccess().use { leaderboardScope ->
+            for((record, newScore) in overrides) {
+                val puzzle = record.puzzle
+                val dir = leaderboardScope.getPuzzleDir(puzzle)
+                leaderboardScope.rm(File(dir, "${record.score.toFileString()}_${puzzle.name}.json"))
+                val leaderboardFile = File(dir, "${newScore.toFileString()}_${puzzle.name}.json")
+                val newRecord = record.copy(score = newScore, dataPath = record.dataPath?.relativeTo(leaderboardScope.repo.toPath()))
+                leaderboardFile.outputStream().buffered().use { json.encodeToStream(newRecord, it) }
+                leaderboardScope.add(leaderboardFile)
+            }
+            leaderboardScope.commitAndPush("Score overrides")
+            loadData(leaderboardScope)
+            pageGenerator.update(leaderboardScope, OmCategory.values().toList(), data)
         }
     }
 
