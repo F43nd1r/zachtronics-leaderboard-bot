@@ -74,7 +74,7 @@ public class ScScore implements Score<ScCategory> {
             "\\**(?<cycles>[\\d,]+)\\**(?<oldRNG>\\\\\\*)?[/-]" +
             "\\**(?<reactors>\\d+)\\**[/-]" +
             "\\**(?<symbols>\\d+)\\**" +
-            "(?:[/-](?<Bflag>B)?(?<Pflag>P)?)?");
+            "(?:[/-](?<Bflag>[bB])?(?<Pflag>[pP])?)?");
 
     /** <tt>ccc/r/ss[/BP]</tt>, tolerates extra <tt>*</tt> */
     @Nullable

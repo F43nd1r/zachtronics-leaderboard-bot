@@ -36,7 +36,8 @@ public class ScSolutionMetadata {
     /** Contains flags at start if any */
     String description;
 
-    public static final Pattern SOLUTION_NAME_REGEX = Pattern.compile("'?(?:[/-](?<Bflag>B)?(?<Pflag>P)?(?:$| ))?.*'?");
+    public static final Pattern SOLUTION_NAME_REGEX = Pattern.compile(
+            "'?(?:[/-](?<Bflag>[bB])?(?<Pflag>[pP])?(?:$| ))?.*'?");
 
     /** <tt>SOLUTION:$puzzle,$author,$c-$r-$s[,$description]</tt> */
     private static final Pattern SOLUTION_HEADER = Pattern.compile(
