@@ -18,11 +18,7 @@ package com.faendir.zachtronics.bot.om.repository
 
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.om.model.OmCategory
-import com.faendir.zachtronics.bot.om.model.OmPuzzle
-import com.faendir.zachtronics.bot.om.model.OmRecord
-import com.faendir.zachtronics.bot.om.model.OmScore
-import com.faendir.zachtronics.bot.om.model.OmSubmission
+import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.om.shortenGithubLink
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
@@ -37,10 +33,10 @@ import org.eclipse.jgit.diff.DiffEntry
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import java.io.File
+import java.nio.file.Path
 import java.time.Instant
 import java.util.*
 import javax.annotation.PostConstruct
-import kotlin.io.path.relativeTo
 
 @OptIn(ExperimentalSerializationApi::class)
 @Component
@@ -105,7 +101,7 @@ class OmSolutionRepository(
     }
 
     override fun submit(submission: OmSubmission): SubmitResult<OmRecord, OmCategory> {
-        if(submission.displayLink?.endsWith(".solution") == true) throw IllegalArgumentException("You cannot use solution files as gifs.")
+        if (submission.displayLink?.endsWith(".solution") == true) throw IllegalArgumentException("You cannot use solution files as gifs.")
         return leaderboard.acquireWriteAccess().use { leaderboardScope ->
             loadDataIfNecessary(leaderboardScope)
             val records = data.getValue(submission.puzzle)
@@ -164,16 +160,32 @@ class OmSolutionRepository(
 
     fun overrideScores(overrides: List<Pair<OmRecord, OmScore>>) {
         leaderboard.acquireWriteAccess().use { leaderboardScope ->
-            for((record, newScore) in overrides) {
+            for ((record, newScore) in overrides) {
+                val puzzle = record.puzzle
+                val dir = leaderboardScope.getPuzzleDir(puzzle)
+                val oldFile = record.dataPath?.toFile() ?: continue
+                val newFile = File(dir, "${newScore.toFileString()}_${puzzle.name}.solution")
+                oldFile.renameTo(newFile)
+                leaderboardScope.rm(oldFile)
+                leaderboardScope.add(newFile)
+            }
+            leaderboardScope.commit("Score overrides (solution)")
+            for ((record, newScore) in overrides) {
                 val puzzle = record.puzzle
                 val dir = leaderboardScope.getPuzzleDir(puzzle)
                 leaderboardScope.rm(File(dir, "${record.score.toFileString()}_${puzzle.name}.json"))
-                val leaderboardFile = File(dir, "${newScore.toFileString()}_${puzzle.name}.json")
-                val newRecord = record.copy(score = newScore, dataPath = record.dataPath?.relativeTo(leaderboardScope.repo.toPath()))
+                val newName = "${newScore.toFileString()}_${puzzle.name}"
+                val leaderboardFile = File(dir, "$newName.json")
+                val newPath = File(dir, "$newName.solution").takeIf { it.exists() }?.relativeTo(leaderboardScope.repo)?.toPath()
+                val newRecord = record.copy(
+                    score = newScore,
+                    dataPath = newPath,
+                    dataLink = newPath?.toLink(leaderboardScope)
+                )
                 leaderboardFile.outputStream().buffered().use { json.encodeToStream(newRecord, it) }
                 leaderboardScope.add(leaderboardFile)
             }
-            leaderboardScope.commitAndPush("Score overrides")
+            leaderboardScope.commitAndPush("Score overrides (metadata)")
             loadData(leaderboardScope)
             pageGenerator.update(leaderboardScope, OmCategory.values().toList(), data)
         }
@@ -220,9 +232,7 @@ class OmSolutionRepository(
             puzzle = puzzle,
             score = score,
             displayLink = displayLink,
-            dataLink = path?.let {
-                shortenGithubLink(leaderboard.rawFilesUrl.replace("master", leaderboardScope.currentHash()) + it.toString().ensurePrefix("/"))
-            },
+            dataLink = path.toLink(leaderboardScope),
             dataPath = path,
         )
         leaderboardFile.outputStream().buffered().use { json.encodeToStream(record, it) }
@@ -230,6 +240,9 @@ class OmSolutionRepository(
 
         return record.copy(dataPath = archiveFile.toPath())
     }
+
+    private fun Path.toLink(leaderboardScope: GitRepository.ReadAccess) =
+        shortenGithubLink(leaderboard.rawFilesUrl.replace("master", leaderboardScope.currentHash()) + this.toString().ensurePrefix("/"))
 
     private fun OmRecord.remove(leaderboardScope: GitRepository.ReadWriteAccess) {
         dataPath?.let { dataPath -> leaderboardScope.rm(dataPath.toFile()) }
