@@ -44,8 +44,8 @@ import reactor.core.publisher.Mono
 @Component
 @OmQualifier
 class ReverifyCommand(private val repository: OmSolutionRepository) : AbstractSubCommand<Reverify>(),
-    Secured by DiscordUserSecured(DiscordUser.BOT_OWNERS),
     ApplicationCommandParser<Reverify, ApplicationCommandOptionData> by ReverifyParser {
+    override val secured = DiscordUserSecured(DiscordUser.BOT_OWNERS)
 
     override fun handle(event: DeferrableInteractionEvent, parameters: Reverify): Mono<Void> {
         val puzzles = (parameters.puzzle?.let { listOf(it) } ?: OmPuzzle.values().toList()).filter {
