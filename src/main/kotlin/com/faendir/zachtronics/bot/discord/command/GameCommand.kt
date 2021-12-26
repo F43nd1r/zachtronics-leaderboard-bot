@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.discord4j.command.parse.CombinedParseResult
+import com.faendir.zachtronics.bot.discord.command.security.NotSecured
 import com.faendir.zachtronics.bot.utils.user
 import discord4j.core.event.domain.interaction.ChatInputAutoCompleteEvent
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
@@ -28,6 +29,10 @@ import reactor.core.publisher.Mono
 private const val COMMAND_KEY = "command"
 
 interface GameCommand : TopLevelCommand<GameCommand.SubCommandWithParameters<*>> {
+    // TODO move security check after parse? would allow to check sub command secured here
+    override val secured
+        get() = NotSecured
+
     val displayName: String
 
     val subCommands: List<SubCommand<*>>
@@ -62,7 +67,7 @@ interface GameCommand : TopLevelCommand<GameCommand.SubCommandWithParameters<*>>
         val option = event.options.first()
         val subCommand = subCommands.find { it.data.name() == option.name }
             ?: return CombinedParseResult.Failure(listOf("I did not recognize the command \"${option.name}\"."))
-        if (subCommand.secured?.hasExecutionPermission(event.user()) == false) {
+        if (!subCommand.secured.hasExecutionPermission(event.user())) {
             return CombinedParseResult.Failure(listOf("sorry, you do not have the permission to use this command."))
         }
         return parseSubCommand(subCommand, event)

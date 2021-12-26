@@ -23,8 +23,8 @@ import com.faendir.discord4j.command.parse.ApplicationCommandParser
 import com.faendir.om.parser.solution.model.Position
 import com.faendir.zachtronics.bot.discord.LinkConverter
 import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand
-import com.faendir.zachtronics.bot.discord.command.Secured
-import com.faendir.zachtronics.bot.discord.command.TrustedLeaderboardPosterRoleSecured
+import com.faendir.zachtronics.bot.discord.command.security.Secured
+import com.faendir.zachtronics.bot.discord.command.security.TrustedLeaderboardPosterRoleSecured
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.createSubmission
 import com.faendir.zachtronics.bot.om.model.OmCategory

@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.discord.command
+package com.faendir.zachtronics.bot.discord.command.security
 
-import discord4j.core.`object`.entity.Member
 import discord4j.core.`object`.entity.User
 
-object TrustedLeaderboardPosterRoleSecured : Secured {
-    override fun hasExecutionPermission(user: User): Boolean {
-        return (user as? Member)?.roles?.any { it.name == "trusted-leaderboard-poster" }?.block() ?: false
-    }
+object NotSecured : Secured {
+    override fun hasExecutionPermission(user: User) = true
 }

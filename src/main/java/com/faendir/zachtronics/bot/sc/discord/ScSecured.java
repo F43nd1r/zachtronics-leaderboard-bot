@@ -16,12 +16,12 @@
 
 package com.faendir.zachtronics.bot.sc.discord;
 
-import com.faendir.zachtronics.bot.discord.DiscordUser;
-import com.faendir.zachtronics.bot.discord.DiscordUserKt;
-import com.faendir.zachtronics.bot.discord.DiscordUserSecured;
-import com.faendir.zachtronics.bot.discord.command.Secured;
-import com.faendir.zachtronics.bot.discord.command.SecuredKt;
-import com.faendir.zachtronics.bot.discord.command.TrustedLeaderboardPosterRoleSecured;
+import com.faendir.zachtronics.bot.discord.command.security.DiscordUser;
+import com.faendir.zachtronics.bot.discord.command.security.DiscordUserKt;
+import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured;
+import com.faendir.zachtronics.bot.discord.command.security.Secured;
+import com.faendir.zachtronics.bot.discord.command.security.SecuredKt;
+import com.faendir.zachtronics.bot.discord.command.security.TrustedLeaderboardPosterRoleSecured;
 import discord4j.core.object.entity.User;
 import org.jetbrains.annotations.NotNull;
 

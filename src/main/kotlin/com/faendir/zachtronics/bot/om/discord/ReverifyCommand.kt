@@ -20,10 +20,9 @@ import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.AutoComplete
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.parse.ApplicationCommandParser
-import com.faendir.zachtronics.bot.discord.DiscordUser
-import com.faendir.zachtronics.bot.discord.DiscordUserSecured
+import com.faendir.zachtronics.bot.discord.command.security.DiscordUser
+import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured
 import com.faendir.zachtronics.bot.discord.command.AbstractSubCommand
-import com.faendir.zachtronics.bot.discord.command.Secured
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.JNISolutionVerifier
 import com.faendir.zachtronics.bot.om.OmQualifier

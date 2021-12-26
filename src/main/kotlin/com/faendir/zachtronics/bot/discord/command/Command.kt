@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.discord.command
 
+import com.faendir.zachtronics.bot.discord.command.security.Secured
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import reactor.core.publisher.Mono
 
@@ -25,6 +26,5 @@ import reactor.core.publisher.Mono
 interface Command<T> {
     fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void>
 
-    val secured: Secured?
-        get() = null
+    val secured: Secured
 }

@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.zachtronics.bot.discord.Colors
+import com.faendir.zachtronics.bot.discord.command.security.NotSecured
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.Puzzle
@@ -30,6 +31,7 @@ import discord4j.core.spec.MessageCreateFields
 import reactor.core.publisher.Mono
 
 abstract class AbstractShowCommand<T, C : Category, P : Puzzle<C>, R : Record<C>> : AbstractSubCommand<T>() {
+    override val secured = NotSecured
     abstract val repository: SolutionRepository<C, P, *, R>
 
     override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {

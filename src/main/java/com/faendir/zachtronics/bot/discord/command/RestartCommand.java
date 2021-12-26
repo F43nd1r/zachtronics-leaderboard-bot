@@ -17,10 +17,10 @@
 package com.faendir.zachtronics.bot.discord.command;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
-import com.faendir.zachtronics.bot.discord.DiscordUser;
-import com.faendir.zachtronics.bot.discord.DiscordUserSecured;
+import com.faendir.zachtronics.bot.discord.command.security.DiscordUser;
+import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured;
+import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent;
-import discord4j.core.object.entity.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -31,8 +31,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor

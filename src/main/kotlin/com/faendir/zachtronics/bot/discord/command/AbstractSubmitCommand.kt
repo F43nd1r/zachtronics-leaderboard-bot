@@ -35,7 +35,6 @@ import reactor.core.publisher.Mono
 
 abstract class AbstractSubmitCommand<T, C : Category, P: Puzzle<C>, S : Submission<C, P>, R : Record<C>> : AbstractSubCommand<T>() {
     protected abstract val repository: SolutionRepository<C, P, S, R>
-    abstract override val secured: Secured
 
     override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
         val submission = parseSubmission(event, parameters)

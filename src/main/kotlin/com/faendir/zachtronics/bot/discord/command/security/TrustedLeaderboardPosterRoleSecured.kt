@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.sz.discord;
+package com.faendir.zachtronics.bot.discord.command.security
 
-import com.faendir.zachtronics.bot.discord.command.security.DiscordUser;
-import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured;
-import com.faendir.zachtronics.bot.discord.command.security.Secured;
+import discord4j.core.`object`.entity.Member
+import discord4j.core.`object`.entity.User
 
-import java.util.Set;
-
-public class SzSecured {
-    public static Secured INSTANCE = new DiscordUserSecured(Set.of(DiscordUser.IEEE12345));
+object TrustedLeaderboardPosterRoleSecured : Secured {
+    override fun hasExecutionPermission(user: User): Boolean {
+        return (user as? Member)?.roles?.any { it.name == "trusted-leaderboard-poster" }?.block() ?: false
+    }
 }

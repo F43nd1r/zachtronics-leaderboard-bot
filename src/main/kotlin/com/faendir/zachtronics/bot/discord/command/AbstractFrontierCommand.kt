@@ -17,6 +17,8 @@
 package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.zachtronics.bot.discord.Colors
+import com.faendir.zachtronics.bot.discord.command.security.NotSecured
+import com.faendir.zachtronics.bot.discord.command.security.Secured
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
@@ -27,6 +29,7 @@ import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import reactor.core.publisher.Mono
 
 abstract class AbstractFrontierCommand<T, C: Category, P : Puzzle<C>, R: Record<C>> : AbstractSubCommand<T>() {
+    override val secured = NotSecured
     abstract val repository: SolutionRepository<C, P, *, R>
 
     override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
