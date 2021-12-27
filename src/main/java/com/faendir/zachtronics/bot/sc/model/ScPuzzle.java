@@ -314,7 +314,7 @@ public enum ScPuzzle implements Puzzle<ScCategory> {
     published_74_1(ScGroup.RESEARCHNET7, ScType.RESEARCH, "Dessication Station", false),
     published_74_2(ScGroup.RESEARCHNET7, ScType.PRODUCTION, "Vinegar Distillation", false),
     published_74_3(ScGroup.RESEARCHNET7, ScType.PRODUCTION, "A Glass of Water", false),
-    published_75_1(ScGroup.RESEARCHNET7, ScType.RESEARCH, "Pertetroxide Synthesis", true),
+    published_75_1(ScGroup.RESEARCHNET7, ScType.RESEARCH, "Pertetroxide Synthesis EX", true),
     published_75_2(ScGroup.RESEARCHNET7, ScType.PRODUCTION, "Fantastic Metals", true),
     published_75_3(ScGroup.RESEARCHNET7, ScType.PRODUCTION, "Reppe Chemistry", false),
     published_76_1(ScGroup.RESEARCHNET7, ScType.RESEARCH, "Better Than Graphene", true),
