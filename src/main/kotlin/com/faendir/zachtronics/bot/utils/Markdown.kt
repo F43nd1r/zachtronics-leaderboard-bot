@@ -17,9 +17,9 @@
 package com.faendir.zachtronics.bot.utils
 
 object Markdown {
-    fun link(text: String, link: String) = "[$text]($link)"
+    fun link(text: String, link: String, embed: Boolean = true) = "[$text](${if (embed) link else "<$link>"})"
 
-    fun linkOrText(text: String, link: String?) = link?.let { link(text, it) } ?: text
+    fun linkOrText(text: String, link: String?, embed: Boolean = true) = link?.let { link(text, it, embed) } ?: text
 
     fun fileLinkOrEmpty(link: String?) = link?.let { link("\uD83D\uDCC4", it) } ?: "" // 📄
 }

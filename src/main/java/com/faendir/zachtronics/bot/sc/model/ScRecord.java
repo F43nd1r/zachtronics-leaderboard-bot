@@ -54,6 +54,6 @@ public class ScRecord implements Record<ScCategory> {
         String scoreAuthor = "(" + score.toDisplayString(context, oldVideoRNG ? "\\*" : "") + ")" +
                              (author != null ? " " + author : "");
         return Markdown.INSTANCE.fileLinkOrEmpty(dataLink) +
-               reactorPrefix + Markdown.INSTANCE.linkOrText(scoreAuthor, displayLink);
+               reactorPrefix + Markdown.INSTANCE.linkOrText(scoreAuthor, displayLink, true);
     }
 }

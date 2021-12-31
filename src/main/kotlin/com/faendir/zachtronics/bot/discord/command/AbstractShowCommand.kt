@@ -40,7 +40,7 @@ abstract class AbstractShowCommand<T, C : Category, P : Puzzle<C>, R : Record<C>
         val record = repository.find(puzzle, category)
         return if (record != null) {
             val lines = mutableListOf(
-                Markdown.linkOrText("***${puzzle.displayName}***", "<${puzzle.link}>"),
+                Markdown.linkOrText("***${puzzle.displayName}***", puzzle.link, embed = false),
                 "**${category.displayName}**",
                 record.toDisplayString(DisplayContext(StringFormat.DISCORD, category))
             )
