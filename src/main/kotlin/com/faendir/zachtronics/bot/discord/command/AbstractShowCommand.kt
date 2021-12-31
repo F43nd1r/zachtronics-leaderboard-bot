@@ -24,6 +24,7 @@ import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.repository.SolutionRepository
+import com.faendir.zachtronics.bot.utils.Markdown
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.clear
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
@@ -38,8 +39,19 @@ abstract class AbstractShowCommand<T, C : Category, P : Puzzle<C>, R : Record<C>
         val (puzzle, category) = findPuzzleAndCategory(parameters)
         val record = repository.find(puzzle, category)
         return if (record != null) {
+            val lines = mutableListOf(
+                Markdown.linkOrText("***${puzzle.displayName}***", "<${puzzle.link}>"),
+                "**${category.displayName}**",
+                record.toDisplayString(DisplayContext(StringFormat.DISCORD, category))
+            )
+            val fullScore = record.score.toDisplayString(DisplayContext.discord())
+            val smartScore = record.score.toDisplayString(DisplayContext(StringFormat.DISCORD, category))
+            if (fullScore != smartScore) {
+                lines.add("**Full Score**")
+                lines.add(fullScore)
+            }
             event.editReply().clear()
-                .withContentOrNull("*${puzzle.displayName}* **${category.displayName}**\n${record.toDisplayString(DisplayContext(StringFormat.PLAIN_TEXT, category))}")
+                .withContentOrNull(lines.joinToString("\n"))
                 .withFiles(record.attachments().map { (name, data) -> MessageCreateFields.File.of(name, data) })
                 .then()
         } else {

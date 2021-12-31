@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.model
 
+import com.faendir.zachtronics.bot.utils.Markdown
 import com.faendir.zachtronics.bot.utils.orEmpty
 import lombok.SneakyThrows
 import java.nio.file.Path
@@ -38,11 +39,8 @@ interface Record<C : Category> {
 
     fun toDisplayString(context: DisplayContext<C>): String {
         return when (context.format) {
-            StringFormat.DISCORD, StringFormat.REDDIT -> {
-                val scoreAndAuthor = score.toDisplayString(context) + author.orEmpty(prefix = " ")
-                dataLink.orEmpty(prefix = "[\uD83D\uDCC4](", suffix = ") ") +  // 📄
-                        (displayLink?.let { "[$scoreAndAuthor]($it)" } ?: scoreAndAuthor)
-            }
+            StringFormat.DISCORD, StringFormat.REDDIT -> Markdown.fileLinkOrEmpty(dataLink) +
+                    Markdown.linkOrText(score.toDisplayString(context) + author.orEmpty(prefix = " "), displayLink)
             else -> score.toDisplayString(context) + author.orEmpty(prefix = " by ") + displayLink.orEmpty(prefix = " ")
         }
     }

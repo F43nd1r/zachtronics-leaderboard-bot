@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Record;
+import com.faendir.zachtronics.bot.utils.Markdown;
 import lombok.Builder;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
@@ -52,7 +53,7 @@ public class ScRecord implements Record<ScCategory> {
     public String toDisplayString(@NotNull DisplayContext<ScCategory> context, String reactorPrefix) {
         String scoreAuthor = "(" + score.toDisplayString(context, oldVideoRNG ? "\\*" : "") + ")" +
                              (author != null ? " " + author : "");
-        return (dataLink != null ? "[\uD83D\uDCC4](" + dataLink + ") " : "") +  // 📄
-               reactorPrefix + (displayLink != null ? "[" + scoreAuthor + "](" + displayLink + ")" : scoreAuthor);
+        return Markdown.INSTANCE.fileLinkOrEmpty(dataLink) +
+               reactorPrefix + Markdown.INSTANCE.linkOrText(scoreAuthor, displayLink);
     }
 }

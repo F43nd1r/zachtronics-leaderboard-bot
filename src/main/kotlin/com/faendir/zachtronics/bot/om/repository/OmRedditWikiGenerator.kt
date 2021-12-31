@@ -53,6 +53,7 @@ import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
 import com.faendir.zachtronics.bot.reddit.RedditService
 import com.faendir.zachtronics.bot.reddit.Subreddit.OPUS_MAGNUM
+import com.faendir.zachtronics.bot.utils.Markdown
 import org.springframework.stereotype.Component
 import java.io.File
 import java.time.OffsetDateTime
@@ -81,7 +82,7 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
     private fun Pair<OmRecord, List<OmCategory>>?.toMarkdown(): String {
         if (this == null) return ""
         val score = first.score.toDisplayString(DisplayContext(StringFormat.REDDIT, second))
-        return "${first.displayLink?.let { "[$score]($it)" } ?: score}${if (second.any { it.name.contains("X") }) "*" else ""}"
+        return "${Markdown.linkOrText(score, first.displayLink)}${if (second.any { it.name.contains("X") }) "*" else ""}"
     }
 
     fun update(readAccess: GitRepository.ReadAccess, categories: List<OmCategory>, data: Map<OmPuzzle, Map<OmRecord, Set<OmCategory>>>) {
