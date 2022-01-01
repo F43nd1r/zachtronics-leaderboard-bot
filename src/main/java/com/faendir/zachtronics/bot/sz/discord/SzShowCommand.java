@@ -45,7 +45,12 @@ public class SzShowCommand extends AbstractShowCommand<SzShowCommand.ShowData, S
     @NotNull
     @Override
     public Pair<SzPuzzle, SzCategory> findPuzzleAndCategory(@NotNull ShowData parameters) {
-        return new Pair<>(parameters.puzzle, parameters.category);
+        SzPuzzle puzzle = parameters.puzzle;
+        SzCategory category = parameters.category;
+        if (!parameters.puzzle.getSupportedCategories().contains(category))
+            throw new IllegalArgumentException(
+                    "Category " + category.getDisplayName() + " does not support " + puzzle.getDisplayName());
+        return new Pair<>(puzzle, category);
     }
 
     @ApplicationCommand(name = "show", subCommand = true)

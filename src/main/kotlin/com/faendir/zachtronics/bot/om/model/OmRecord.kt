@@ -20,7 +20,6 @@ import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.utils.PathSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import java.io.InputStream
 import java.nio.file.Path
 
 @Serializable
@@ -34,6 +33,4 @@ data class OmRecord(
 ) : Record<OmCategory> {
     @Transient
     override val author: String? = null
-
-    override fun attachments(): List<Pair<String, InputStream>> = emptyList()
 }

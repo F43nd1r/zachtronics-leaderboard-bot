@@ -46,7 +46,12 @@ public class ScShowCommand extends AbstractShowCommand<ScShowCommand.ShowData, S
     @NotNull
     @Override
     public Pair<ScPuzzle, ScCategory> findPuzzleAndCategory(@NotNull ShowData parameters) {
-        return new Pair<>(parameters.puzzle, parameters.category);
+        ScPuzzle puzzle = parameters.puzzle;
+        ScCategory category = parameters.category;
+        if (!parameters.puzzle.getSupportedCategories().contains(category))
+            throw new IllegalArgumentException(
+                    "Category " + category.getDisplayName() + " does not support " + puzzle.getDisplayName());
+        return new Pair<>(puzzle, category);
     }
 
     @ApplicationCommand(name = "show", description = "Show a record", subCommand = true)

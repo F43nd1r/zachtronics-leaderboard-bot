@@ -18,12 +18,17 @@ package com.faendir.zachtronics.bot.sz.model;
 
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Record;
-import com.faendir.zachtronics.bot.model.StringFormat;
+import kotlin.Pair;
+import lombok.SneakyThrows;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 
 @Value
 public class SzRecord implements Record<SzCategory> {
@@ -53,5 +58,15 @@ public class SzRecord implements Record<SzCategory> {
             case DISCORD, REDDIT -> "[" + score.toDisplayString() + "](" + link + ")";
             default -> Record.super.toDisplayString(context);
         };
+    }
+
+    @SneakyThrows
+    @NotNull
+    @Override
+    public List<Pair<String, InputStream>> attachments() {
+        if (dataPath != null)
+            return Collections.singletonList(new Pair<>(dataPath.getFileName().toString(), Files.newInputStream(dataPath)));
+        else
+            return Collections.emptyList();
     }
 }

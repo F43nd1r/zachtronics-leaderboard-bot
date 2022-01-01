@@ -18,9 +18,8 @@ package com.faendir.zachtronics.bot.model
 
 import com.faendir.zachtronics.bot.utils.Markdown
 import com.faendir.zachtronics.bot.utils.orEmpty
-import lombok.SneakyThrows
+import java.io.InputStream
 import java.nio.file.Path
-import kotlin.io.path.inputStream
 
 /** Read interface, used to store data from the repositories that needs to be displayed */
 interface Record<C : Category> {
@@ -45,8 +44,6 @@ interface Record<C : Category> {
         }
     }
 
-    @SneakyThrows
-    fun attachments() = dataPath?.let {
-        listOf(it.fileName.toString() to it.inputStream())
-    } ?: emptyList()
+    /** Override for games whose [displayLink] does not embed on Discord, to add an attachment to show */
+    fun attachments(): List<Pair<String, InputStream>> = emptyList()
 }
