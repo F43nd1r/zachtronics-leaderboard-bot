@@ -168,9 +168,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
             ScRecord.ScRecordBuilder builder = ScRecord.builder().puzzle(puzzle).score(score);
             String filename = makeScoreFilename(score);
             Path path = puzzlePath.resolve(filename);
-            if (Files.exists(path)) {
-                builder.dataLink(makeArchiveLink(puzzle, filename)).dataPath(path);
-            }
+            builder.dataLink(makeArchiveLink(puzzle, filename)).dataPath(path);
             rbcMap.put(score, Map.entry(builder, EnumSet.noneOf(ScCategory.class)));
         }
         return rbcMap;
@@ -446,7 +444,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                     else if (r < 0) {
                         // remove beaten score
                         it.remove();
-                        Files.deleteIfExists(puzzlePath.resolve(makeScoreFilename(score)));
+                        Files.delete(puzzlePath.resolve(makeScoreFilename(score)));
                     }
                 }
 

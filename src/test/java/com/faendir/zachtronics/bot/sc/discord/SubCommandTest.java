@@ -17,10 +17,10 @@
 package com.faendir.zachtronics.bot.sc.discord;
 
 import com.faendir.discord4j.command.parse.CombinedParseResult;
-import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.discord.command.GameCommand;
 import com.faendir.zachtronics.bot.discord.command.SubCommand;
+import com.faendir.zachtronics.bot.discord.command.security.DiscordUser;
 import com.faendir.zachtronics.bot.model.StringFormat;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
@@ -80,9 +80,9 @@ public class SubCommandTest {
         Map<String, String> args = Map.of("puzzle", "OPAS");
         String result = runCommand("frontier", args); // 9 frontier scores, 2 holding categories
         assertTrue(result.contains("Pancakes"));
+        assertEquals(9, StringUtils.countMatches(result, "[\uD83D\uDCC4]"));
         assertEquals(9, StringUtils.countMatches(result, "/1/"));
-        assertEquals(2, StringUtils.countMatches(result, "]("));
-        assertEquals(0, StringUtils.countMatches(result, "[\uD83D\uDCC4]"));
+        assertEquals(2, StringUtils.countMatches(result, "http"));
 
         args = Map.of("puzzle", "Fission I");
         result = runCommand("frontier", args); // 2 valid files
@@ -171,7 +171,7 @@ public class SubCommandTest {
         Mockito.when(interactionEvent.getOptions()).thenReturn(Collections.singletonList(subCommandOption));
 
         User ieee = new User(Mockito.mock(GatewayDiscordClient.class), Mockito.mock(UserData.class, Mockito.RETURNS_DEEP_STUBS));
-        Mockito.when(ieee.getId().asLong()).thenReturn(295868901042946048L);
+        Mockito.when(ieee.getId().asLong()).thenReturn(DiscordUser.IEEE12345.getId());
         Mockito.when(interactionEvent.getInteraction().getUser()).thenReturn(ieee);
 
         CombinedParseResult<GameCommand.SubCommandWithParameters<?>> parseResult = scCommand.parse(interactionEvent);
