@@ -31,8 +31,8 @@ enum class DiscordUser(val id: Long) {
     }
 }
 
-fun Set<DiscordUser>.contains(user: User) = any { it.id == user.id.asLong() }
+class DiscordUserSecured(users: Collection<DiscordUser>) : Secured {
+    private val ids = users.map { it.id }.toSet()
 
-class DiscordUserSecured(private val users: Set<DiscordUser>) : Secured {
-    override fun hasExecutionPermission(user: User): Boolean = users.contains(user)
+    override fun hasExecutionPermission(user: User): Boolean = ids.contains(user.id.asLong())
 }

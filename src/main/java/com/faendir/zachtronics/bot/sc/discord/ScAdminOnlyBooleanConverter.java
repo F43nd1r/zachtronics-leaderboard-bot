@@ -28,7 +28,7 @@ public class ScAdminOnlyBooleanConverter implements OptionConverter<Boolean, Boo
     @Override
     public SingleParseResult<Boolean> fromValue(@NotNull ChatInputInteractionEvent context,
                                                 @NotNull Boolean value) {
-        if (value && !ScSecured.isWikiAdmin(UtilsKt.user(context)))
+        if (value && !ScSecured.WIKI_ADMINS_ONLY.hasExecutionPermission(UtilsKt.user(context)))
             return new SingleParseResult.Failure<>("Only a wiki admin can use this parameter");
         else
             return new SingleParseResult.Success<>(value);
