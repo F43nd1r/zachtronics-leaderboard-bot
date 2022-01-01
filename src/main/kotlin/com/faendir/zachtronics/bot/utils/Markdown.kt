@@ -23,5 +23,5 @@ object Markdown {
     fun linkOrText(text: String, link: String?, embed: Boolean = true) = link?.let { link(text, it, embed) } ?: text
 
     @JvmStatic
-    fun fileLinkOrEmpty(link: String?) = link?.let { link("\uD83D\uDCC4", it) } ?: "" // 📄
+    fun fileLinkOrEmpty(link: String?) = link?.let { "${link("\uD83D\uDCC4", it)} " } ?: "" // 📄
 }
