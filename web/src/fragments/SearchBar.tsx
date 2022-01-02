@@ -25,7 +25,7 @@ export default function SearchBar() {
     const [options, setOptions] = useState<(Puzzle | Category)[]>([])
     useEffect(() => {
         Promise.all([fetchFromApi<Puzzle[]>("/puzzles"), fetchFromApi<Category[]>("/categories")]).then((data) => setOptions(data.flat()))
-    }, [options])
+    }, [])
     return (
         <Autocomplete<Puzzle | Category>
             renderInput={(params) => <TextField {...params} label="Search…" variant="standard" sx={{}} />}
