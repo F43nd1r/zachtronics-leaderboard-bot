@@ -29,7 +29,7 @@ import java.nio.file.Path;
 @Builder
 public class ScRecord implements Record<ScCategory> {
     public static final ScRecord IMPOSSIBLE_CATEGORY = new ScRecord(ScPuzzle.bonding_boss, ScScore.INVALID_SCORE,
-                                                                    null, null, false, "", Path.of(""));
+                                                                    null, null, false, null, null);
 
     @NotNull ScPuzzle puzzle;
     @NotNull ScScore score;
@@ -37,8 +37,10 @@ public class ScRecord implements Record<ScCategory> {
     /** not-<tt>null</tt> IFF the solution holds a category */
     String displayLink;
     boolean oldVideoRNG;
-    @NotNull String dataLink;
-    @NotNull Path dataPath;
+    /** <tt>null</tt> if the solution holds a lb spot but has since been out-pareto'd */
+    String dataLink;
+    /** <tt>null</tt> if the solution holds a lb spot but has since been out-pareto'd */
+    Path dataPath;
 
     @NotNull
     @Override
