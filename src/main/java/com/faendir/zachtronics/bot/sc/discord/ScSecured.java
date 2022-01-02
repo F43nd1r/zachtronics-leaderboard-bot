@@ -16,15 +16,14 @@
 
 package com.faendir.zachtronics.bot.sc.discord;
 
-import com.faendir.zachtronics.bot.discord.command.security.DiscordUser;
-import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured;
-import com.faendir.zachtronics.bot.discord.command.security.Secured;
-import com.faendir.zachtronics.bot.discord.command.security.SecuredKt;
-import com.faendir.zachtronics.bot.discord.command.security.TrustedLeaderboardPosterRoleSecured;
+import com.faendir.zachtronics.bot.discord.command.security.*;
 
 import java.util.Set;
 
 public class ScSecured {
-    public static final DiscordUserSecured WIKI_ADMINS_ONLY = new DiscordUserSecured(Set.of(DiscordUser.IEEE12345, DiscordUser.TT, DiscordUser.ZIG));
-    public static Secured INSTANCE = SecuredKt.or(WIKI_ADMINS_ONLY, TrustedLeaderboardPosterRoleSecured.INSTANCE);
+    public static final DiscordUserSecured WIKI_ADMINS_ONLY = new DiscordUserSecured(
+            Set.of(DiscordUser.IEEE12345, DiscordUser.TT, DiscordUser.ZIG));
+    public static final Secured INSTANCE = SecuredKt.or(WIKI_ADMINS_ONLY, TrustedLeaderboardPosterRoleSecured.INSTANCE);
+
+    private ScSecured() {}
 }

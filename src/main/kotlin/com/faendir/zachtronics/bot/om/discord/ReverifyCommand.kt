@@ -20,18 +20,14 @@ import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.AutoComplete
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.parse.ApplicationCommandParser
+import com.faendir.zachtronics.bot.discord.command.AbstractSubCommand
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUser
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured
-import com.faendir.zachtronics.bot.discord.command.AbstractSubCommand
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.JNISolutionVerifier
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.getMetrics
-import com.faendir.zachtronics.bot.om.model.OmPuzzle
-import com.faendir.zachtronics.bot.om.model.OmRecord
-import com.faendir.zachtronics.bot.om.model.OmScore
-import com.faendir.zachtronics.bot.om.model.OmScorePart
-import com.faendir.zachtronics.bot.om.model.OmType
+import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.orEmpty
@@ -122,13 +118,6 @@ class ReverifyCommand(private val repository: OmSolutionRepository) : AbstractSu
             )
             .description("**Modified Records:** ${overrideRecords.size}\n\n**Errors:**\n${errors.joinToString("\n")}")
             .send(event)
-    }
-
-    companion object {
-        private val BOT_OWNERS = setOf(
-            295868901042946048L,  // 12345ieee
-            288766560938622976L, // F43nd1r
-        )
     }
 }
 

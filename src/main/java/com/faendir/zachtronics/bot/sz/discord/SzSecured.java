@@ -23,5 +23,7 @@ import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import java.util.Set;
 
 public class SzSecured {
-    public static Secured INSTANCE = new DiscordUserSecured(Set.of(DiscordUser.IEEE12345));
+    public static final Secured INSTANCE = new DiscordUserSecured(Set.of(DiscordUser.IEEE12345));
+
+    private SzSecured() {}
 }
