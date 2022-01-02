@@ -79,6 +79,7 @@ function PlotView(props: PlotViewProps) {
     return (
         <>
             <Plot
+                key={configuration.mode}
                 data={[
                     configuration.mode === "2D"
                         ? {
