@@ -25,6 +25,14 @@ export function usePersistedStringState<S extends string>(key: string, defaultVa
     return usePersistedState(key, defaultValue, { fromString: (s) => s as S, toString: (s) => s })
 }
 
+export function usePersistedNumberState<S extends number>(key: string, defaultValue: S): [S, Dispatch<SetStateAction<S>>] {
+    return usePersistedState(key, defaultValue, { fromString: (s) => Number(s) as S, toString: (s) => s.toString() })
+}
+
+export function usePersistedDateState<S extends Date | null>(key: string, defaultValue: S): [S, Dispatch<SetStateAction<S>>] {
+    return usePersistedState(key, defaultValue, { fromString: (s) => new Date(s) as S, toString: (s) => s?.toISOString() ?? "" })
+}
+
 export function usePersistedJsonState<S>(key: string, defaultValue: S): [S, Dispatch<SetStateAction<S>>] {
     return usePersistedState(key, defaultValue, { fromString: (s) => JSON.parse(s), toString: (s) => JSON.stringify(s) })
 }

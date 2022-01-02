@@ -3,10 +3,10 @@ import App from "./App"
 import { lazy, StrictMode, Suspense } from "react"
 import ReactDOM from "react-dom"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
-import MainView from "./views/MainView"
 import LoadingIndicator from "./components/LoadingIndicator"
 import { PuzzleRoutes } from "./views/puzzles/PuzzleView"
 
+const RecentSubmissionsView = lazy(() => import("./views/recent/RecentSubmissionsView"))
 const PuzzleView = lazy(() => import("./views/puzzles/PuzzleView"))
 const CategoryView = lazy(() => import("./views/categories/CategoryView"))
 
@@ -16,7 +16,7 @@ ReactDOM.render(
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<App />}>
-                        <Route path="/" element={<MainView />} />
+                        <Route path="/" element={<RecentSubmissionsView />} />
                         <Route path="puzzles/:puzzleId" element={<PuzzleView />}>
                             {PuzzleRoutes.map((route) => (
                                 <Route path={route.pathSegment} element={route.component} key={route.pathSegment} />
@@ -28,5 +28,5 @@ ReactDOM.render(
             </BrowserRouter>
         </Suspense>
     </StrictMode>,
-    document.getElementById("root")
+    document.getElementById("root"),
 )
