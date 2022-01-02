@@ -29,9 +29,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useEffect, useMemo } from "react"
-import fetchFromApi from "../../utils/fetchFromApi"
-import Category from "../../model/Category"
+import { useMemo } from "react"
 import ApiResource from "../../utils/ApiResource"
 import RecordGrid from "../../fragments/RecordGrid"
 import { usePersistedNumberState } from "../../utils/usePersistedState"
@@ -48,10 +46,6 @@ export default function RecentSubmissionsView() {
     const [sinceLast, setSinceLast] = usePersistedNumberState<SinceLast>("submissionsSince", SinceLast.WEEK)
 
     const dateSince: Date = useMemo(() => new Date(new Date().getTime() - sinceLast), [sinceLast])
-
-    useEffect(() => {
-        fetchFromApi<Category>(`/records/changes/${dateSince.toISOString()}`).then((category) => (document.title = `${category.displayName} - Opus Magnum Leaderboards`))
-    }, [dateSince])
 
     return (
         <Box
@@ -86,7 +80,7 @@ export default function RecentSubmissionsView() {
                 url={`/records/changes/${dateSince.toISOString()}`}
                 element={(changes) => (
                     <RecordGrid
-                        records={changes.filter((change) => change.type == "ADD").map((change) => change.record)}
+                        records={changes.filter((change) => change.type === "ADD").map((change) => change.record)}
                         getTitle={(record) => record.puzzle.displayName}
                         getScore={(record) => record.fullFormattedScore ?? "None"}
                     />
