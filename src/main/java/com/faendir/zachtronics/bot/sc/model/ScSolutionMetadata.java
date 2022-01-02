@@ -118,7 +118,7 @@ public class ScSolutionMetadata {
                              score.getCycles(), score.getReactors(), score.getSymbols(), commaDescr);
     }
 
-    public ScSubmission extendToSubmission(String displayLink, String data) {
+    public ScSubmission extendToSubmission(String displayLink, @NotNull String data) {
         data = SOLUTION_HEADER.matcher(data).replaceFirst(this.toHeader()); // normalization
         return new ScSubmission(puzzle, score, author, displayLink, data);
     }

@@ -17,10 +17,7 @@
 package com.faendir.zachtronics.bot.sc.validator;
 
 import com.faendir.discord4j.command.parse.SingleParseResult;
-import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
-import com.faendir.zachtronics.bot.sc.model.ScScore;
-import com.faendir.zachtronics.bot.sc.model.ScSolutionMetadata;
-import com.faendir.zachtronics.bot.sc.model.ScSubmission;
+import com.faendir.zachtronics.bot.sc.model.*;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -67,6 +64,7 @@ public class SChem {
 
         if (result.getLevelName() == null || result.getAuthor() == null || result.getCycles() == null)
             return new ValidationResult.Unparseable<>(result.getError());
+        assert result.getExport() != null;
 
         // we pull flags from the input
         boolean declaresBugged = false;
@@ -114,6 +112,18 @@ public class SChem {
                                                                   "\"\n" + result.getPrecogExplanation());
             }
         }
+        else {
+            if (puzzle.getType() == ScType.BOSS_RANDOM) {
+                return new ValidationResult.Invalid<>(submission,
+                                                      "Boss levels with true randomness are not supported");
+            }
+
+            if (declaresPrecog && puzzle.isDeterministic()) {
+                return new ValidationResult.Invalid<>(submission,
+                                                      "Submission was declared precognitive, but the level is not random");
+            }
+        }
+
         return new ValidationResult.Valid<>(submission);
     }
 
