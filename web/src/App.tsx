@@ -32,12 +32,14 @@ const AppBar = styled(MuiAppBar, {
         duration: theme.transitions.duration.leavingScreen,
     }),
     ...(open && {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: `${drawerWidth}px`,
-        transition: theme.transitions.create(["margin", "width"], {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
+        [theme.breakpoints.up("md")]: {
+            width: `calc(100% - ${drawerWidth}px)`,
+            marginLeft: `${drawerWidth}px`,
+            transition: theme.transitions.create(["margin", "width"], {
+                easing: theme.transitions.easing.easeOut,
+                duration: theme.transitions.duration.enteringScreen,
+            }),
+        },
     }),
 }))
 
@@ -47,7 +49,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
     padding: theme.spacing(0, 1),
     // necessary for content to be below app bar
     ...theme.mixins.toolbar,
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
 }))
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
@@ -61,11 +63,13 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
     }),
     marginLeft: 0,
     ...(open && {
-        transition: theme.transitions.create("margin", {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-        marginLeft: `${drawerWidth}px`,
+        [theme.breakpoints.up("md")]: {
+            transition: theme.transitions.create("margin", {
+                easing: theme.transitions.easing.easeOut,
+                duration: theme.transitions.duration.enteringScreen,
+            }),
+            marginLeft: `${drawerWidth}px`,
+        },
     }),
     maxWidth: "100%",
     display: "flex",
@@ -75,11 +79,11 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
 function App() {
     const theme = useTheme()
     const colorMode = useContext(ColorModeContext)
-    const [open, setOpen] = usePersistedJsonState("sidebarOpen", true)
+    const isNotTinyScreen = useMediaQuery(theme.breakpoints.up("sm"))
+    const [open, setOpen] = usePersistedJsonState("sidebarOpen", isNotTinyScreen)
     const handleDrawerOpen = () => {
         setOpen(true)
     }
-
     const handleDrawerClose = () => {
         setOpen(false)
     }
@@ -87,17 +91,18 @@ function App() {
         <>
             <CssBaseline />
             <AppBar position="fixed" open={open}>
-                <Toolbar>
-                    <IconButton size="large" edge="start" color="inherit" aria-label="menu" onClick={handleDrawerOpen} sx={{ mr: 2, ...(open && { display: "none" }) }}>
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" component="div">
-                        Opus Magnum Leaderboards
-                    </Typography>
+                <Toolbar disableGutters={true} sx={{ paddingLeft: 2, paddingRight: 2 }}>
+                    {!open && (
+                        <IconButton size="large" edge="start" color="inherit" aria-label="menu" onClick={handleDrawerOpen} sx={{ mr: 1 }}>
+                            <MenuIcon />
+                        </IconButton>
+                    )}
+                    {isNotTinyScreen && (
+                        <Typography sx={{ fontWeight: "bold" }} paddingRight={"1rem"}>
+                            Opus Magnum Leaderboards
+                        </Typography>
+                    )}
                     <SearchBar />
-                    <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
-                        {theme.palette.mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
-                    </IconButton>
                 </Toolbar>
             </AppBar>
             <Drawer
@@ -116,6 +121,9 @@ function App() {
                 open={open}
             >
                 <DrawerHeader>
+                    <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
+                        {theme.palette.mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+                    </IconButton>
                     <IconButton onClick={handleDrawerClose}>{theme.direction === "ltr" ? <ChevronLeftIcon /> : <ChevronRightIcon />}</IconButton>
                 </DrawerHeader>
                 <Divider />

@@ -40,7 +40,6 @@ export default function SearchBar() {
             )}
             sx={{
                 flexGrow: 1,
-                paddingLeft: "1rem",
                 alignSelf: "start",
             }}
             onChange={(event, value) => {

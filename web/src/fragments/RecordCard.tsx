@@ -31,7 +31,7 @@ export default function RecordCard(props: RecordCardProps) {
     return (
         <Card
             sx={{
-                minWidth: "min(100vw, 460px)",
+                minWidth: "min(90vw, 460px)",
                 maxWidth: "100%",
             }}
         >

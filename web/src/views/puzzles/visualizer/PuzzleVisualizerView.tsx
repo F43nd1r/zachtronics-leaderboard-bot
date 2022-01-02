@@ -38,19 +38,32 @@ export default function PuzzleVisualizerView() {
 
     return (
         <Box
-            sx={{
+            sx={(theme) => ({
                 display: "flex",
-                flexDirection: "row",
                 minHeight: 0,
                 flexGrow: 1,
                 flexShrink: 1,
-            }}
+                [theme.breakpoints.down("md")]: {
+                    flexDirection: "column",
+                    minHeight: "unset",
+                },
+            })}
         >
             <ApiResource<OmRecord[]>
                 url={`/puzzle/${puzzleId}/records?includeFrontier=true`}
                 element={(records) => (
                     <>
-                        <Stack spacing={1} width={"25rem"} height={"100%"} overflow={"auto"}>
+                        <Stack
+                            spacing={1}
+                            sx={(theme) => ({
+                                width: "100%",
+                                [theme.breakpoints.up("md")]: {
+                                    width: "30rem",
+                                    height: "100%",
+                                    overflowY: "auto",
+                                },
+                            })}
+                        >
                             <ConfigurationView configuration={configuration} setConfiguration={setConfiguration} />
                             <FilterView
                                 records={records}

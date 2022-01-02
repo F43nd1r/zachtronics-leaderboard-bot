@@ -26,6 +26,7 @@ export default function MainView() {
                 height: "100%",
                 width: "100%",
                 flexDirection: "column",
+                textAlign: "center",
             }}
         >
             <h1>Welcome to the Opus Magnum Leaderboards!</h1>

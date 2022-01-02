@@ -136,7 +136,9 @@ function PlotView(props: PlotViewProps) {
                     displaylogo: false,
                 }}
                 style={{
+                    minWidth: 0,
                     width: "100%",
+                    minHeight: 0,
                     height: "100%",
                     flexGrow: 1,
                 }}
@@ -150,6 +152,6 @@ function PlotView(props: PlotViewProps) {
     )
 }
 
-const SizedPuzzleFrontierPlot = withSize({ monitorHeight: true })<PlotViewProps>(PlotView)
+const SizedPuzzleFrontierPlot = withSize({ monitorHeight: true, monitorWidth: true })<PlotViewProps>(PlotView)
 
 export default SizedPuzzleFrontierPlot
