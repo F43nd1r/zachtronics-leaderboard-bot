@@ -59,11 +59,11 @@ import java.time.Instant
 @RequestMapping("/om")
 class OmController(private val repository: OmSolutionRepository, private val discordClient: GatewayDiscordClient) {
 
-    @GetMapping(path = ["/groups"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun listGroups(): List<OmGroupDTO> = OmGroup.values().map { it.toDTO() }
+    @get:GetMapping(path = ["/groups"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    val groups: List<OmGroupDTO> = OmGroup.values().map { it.toDTO() }
 
-    @GetMapping(path = ["/puzzles"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun listPuzzles(): List<OmPuzzleDTO> = OmPuzzle.values().map { it.toDTO() }
+    @get:GetMapping(path = ["/puzzles"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    val puzzles: List<OmPuzzleDTO> = OmPuzzle.values().map { it.toDTO() }
 
     @GetMapping(path = ["/puzzle/{puzzleId}"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getPuzzle(@PathVariable puzzleId: String): OmPuzzleDTO = findPuzzle(puzzleId).toDTO()
@@ -74,8 +74,8 @@ class OmController(private val repository: OmSolutionRepository, private val dis
         return OmPuzzle.values().filter { it.group == group }.map { it.toDTO() }
     }
 
-    @GetMapping(path = ["/categories"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun listCategories(): List<OmCategoryDTO> = OmCategory.values().map { it.toDTO() }
+    @get:GetMapping(path = ["/categories"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    val categories: List<OmCategoryDTO> = OmCategory.values().map { it.toDTO() }
 
     @GetMapping(path = ["/category/{categoryId}"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getCategory(@PathVariable categoryId: String): OmCategoryDTO = findCategory(categoryId).toDTO()
