@@ -19,4 +19,5 @@ package com.faendir.zachtronics.bot.reddit
 interface RedditService {
     fun getWikiPage(subreddit: Subreddit, page: String): String
     fun updateWikiPage(subreddit: Subreddit, page: String, content: String, reason: String)
+    fun postInSubmission(submissionId: String, content: String)
 }

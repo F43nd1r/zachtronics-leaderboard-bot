@@ -44,4 +44,8 @@ class ProductionRedditService(redditProperties: RedditProperties) : RedditServic
         val latinReason = reason.replace("\\P{InBasic_Latin}".toRegex(), "?") // reddit cries if the reason has strange chars
         subreddit(subreddit).wiki().update(page, content, latinReason)
     }
+
+    override fun postInSubmission(submissionId: String, content: String) {
+        reddit.submission(submissionId).reply(content)
+    }
 }

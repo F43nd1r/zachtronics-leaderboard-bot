@@ -30,6 +30,8 @@ open class TestRedditService(private val directory: File) : RedditService {
         File(directory, "${subreddit.id}/wiki/$page.md").writeText(content)
     }
 
+    override fun postInSubmission(submissionId: String, content: String) {}
+
     @PreDestroy
     fun cleanup() {
         directory.deleteRecursively()

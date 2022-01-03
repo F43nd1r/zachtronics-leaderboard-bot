@@ -25,6 +25,7 @@ import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.sc.model.*;
+import com.faendir.zachtronics.bot.utils.Markdown;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -72,13 +73,19 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                         makeArchiveLink(submission.getPuzzle(), submission.getScore()),
                         makeArchivePath(submission.getPuzzle(), submission.getScore()));
                 SubmitResult<ScRecord, ScCategory> lbResult = submitToRedditLeaderboard(submissionRecord, oldRbcMap);
-                if (archiveResult instanceof SubmitResult.Success<ScRecord, ScCategory> archiveSuccess &&
-                    lbResult instanceof SubmitResult.Success<ScRecord, ScCategory> lbSuccess) {
-                    // we use the archive's message
-                    return new SubmitResult.Success<>(archiveSuccess.getMessage(), lbSuccess.getBeatenRecords());
+                if (lbResult instanceof SubmitResult.Success<ScRecord, ScCategory> lbSuccess) {
+                    // announce new record
+                    List<ScCategory> categories = lbSuccess.getBeatenRecords().stream()
+                                                           .map(CategoryRecord::getCategories)
+                                                           .flatMap(Set::stream)
+                                                           .toList();
+                    postAnnouncementToReddit(submissionRecord, categories);
+                    if (archiveResult instanceof SubmitResult.Success<ScRecord, ScCategory> archiveSuccess) {
+                        // we use the archive's message
+                        return new SubmitResult.Success<>(archiveSuccess.getMessage(), lbSuccess.getBeatenRecords());
+                    }
                 }
-                else
-                    return lbResult;
+                return lbResult;
             }
             else
                 return archiveResult;
@@ -151,8 +158,8 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     }
 
     @NotNull
-    private SortedMap<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> getRbcMap(
-            @NotNull ScPuzzle puzzle, @NotNull Path repoPath) {
+    private SortedMap<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> getRbcMap(@NotNull ScPuzzle puzzle,
+                                                                                               @NotNull Path repoPath) {
         Path puzzlePath = repoPath.resolve(relativePuzzlePath(puzzle));
         ScSolutionsIndex solutionsIndex;
         try {
@@ -360,6 +367,16 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         else
             heldCategories[2] = parseLeaderboardRecord(puzzle, rbcMap, halfTable.get(2));
         heldCategories[2].add(categories[2]);
+    }
+
+    private void postAnnouncementToReddit(@NotNull ScRecord record, List<ScCategory> categories) {
+        // see: https://www.reddit.com/r/spacechem/comments/mmcuzb
+        DisplayContext<ScCategory> context = new DisplayContext<>(StringFormat.REDDIT, categories);
+        redditService.postInSubmission("mmcuzb", "Added " + Markdown.fileLinkOrEmpty(record.getDataLink()) +
+                                                 "[" + record.getPuzzle().getDisplayName() +
+                                                 " (" + record.getScore().toDisplayString(context) +
+                                                 ")](" + record.getDisplayLink() +
+                                                 ") by " + record.getAuthor());
     }
 
     @Override
