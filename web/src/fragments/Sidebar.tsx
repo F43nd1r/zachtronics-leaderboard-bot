@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Box, Divider, Link, List, ListItemText } from "@mui/material"
+import { Box, Divider, List, ListItemText, useTheme } from "@mui/material"
 import ExpandableListItem from "../components/ExpandableListItem"
 import { Extension, Folder } from "@mui/icons-material"
 import CategoryIcon from "@mui/icons-material/Category"
@@ -24,7 +24,7 @@ import LinkListItem from "../components/LinkListItem"
 import Group from "../model/Group"
 import Puzzle from "../model/Puzzle"
 import Category from "../model/Category"
-import { useMatch } from "react-router-dom"
+import { Link, useMatch } from "react-router-dom"
 import ApiListResource from "../utils/ApiListResource"
 
 function Groups() {
@@ -105,6 +105,7 @@ function Categories() {
 }
 
 export default function Sidebar() {
+    const theme = useTheme()
     // noinspection HtmlUnknownTarget
     return (
         <>
@@ -112,9 +113,19 @@ export default function Sidebar() {
             <Divider />
             <Categories />
             <Box sx={{ flexGrow: 1 }} />
-            <Link href="/swagger-ui.html" alignSelf="end" padding="1rem">
-                API docs
-            </Link>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                }}
+            >
+                <Link to="/help" style={{ padding: "1rem", color: theme.palette.primary.main }}>
+                    Help
+                </Link>
+                <Link to="/swagger-ui.html" style={{ padding: "1rem", color: theme.palette.primary.main }}>
+                    API docs
+                </Link>
+            </Box>
         </>
     )
 }
