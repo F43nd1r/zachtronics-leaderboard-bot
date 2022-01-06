@@ -26,7 +26,7 @@ export default function HelpView() {
     document.title = "Help - Opus Magnum Leaderboards"
     return (
         <Grid container spacing={3} alignItems="stretch" sx={{ paddingBottom: 2 }}>
-            <MetricCard id="cost" title="Cost (g)" description={<>Sum of the cost of all parts in the solution, as defined by the game.</>} />
+            <MetricCard id="cost" title="Cost (g)" description={<>Cost of all parts in the solution, as defined by the game.</>} />
             <MetricCard id="cycles" title="Cycles (c)" description={<>Cycles needed to run the solution to completion, as defined by the game.</>} />
             <MetricCard
                 id="area"
@@ -79,7 +79,7 @@ export default function HelpView() {
                 description={
                     <>
                         Average cycles between outputs. A solution which does not run indefinitely has no rate.
-                        <p>This is often referred to as throughput, but is actually equal to 1/throughput. RG is also sometimes referred to as COFT ("cost over full throughput")</p>
+                        <p>This is often referred to as throughput, but is actually equal to 1/throughput. RG is also sometimes referred to as COFT ("cost optimized full throughput")</p>
                     </>
                 }
             />
