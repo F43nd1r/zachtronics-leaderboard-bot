@@ -143,7 +143,7 @@ function HelpCard(props: MetricCardProps) {
     const [linkVisibility, setLinkVisibility] = useState<"hidden" | "visible">("hidden")
     const theme = useTheme()
     const location = useLocation()
-    const highlight = useMemo(() => (theme.palette.mode === "light" ? theme.palette.grey["400"] : theme.palette.grey["800"]), [theme.palette.mode])
+    const highlight = useMemo(() => (theme.palette.mode === "light" ? theme.palette.grey["400"] : theme.palette.grey["800"]), [theme.palette.mode, theme.palette.grey])
     return (
         <Grid item xs key={props.id}>
             <div
