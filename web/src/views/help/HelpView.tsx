@@ -26,9 +26,9 @@ export default function HelpView() {
     document.title = "Help - Opus Magnum Leaderboards"
     return (
         <Grid container spacing={3} alignItems="stretch" sx={{ paddingBottom: 2 }}>
-            <MetricCard id="cost" title="Cost (g)" description={<>Cost of all parts in the solution, as defined by the game.</>} />
-            <MetricCard id="cycles" title="Cycles (c)" description={<>Cycles needed to run the solution to completion, as defined by the game.</>} />
-            <MetricCard
+            <HelpCard id="cost" title="Cost (g)" description={<>Cost of all parts in the solution, as defined by the game.</>} />
+            <HelpCard id="cycles" title="Cycles (c)" description={<>Cycles needed to run the solution to completion, as defined by the game.</>} />
+            <HelpCard
                 id="area"
                 title="Area (a)"
                 description={
@@ -38,7 +38,7 @@ export default function HelpView() {
                     </>
                 }
             />
-            <MetricCard
+            <HelpCard
                 id="instructions"
                 title="Instructions (i)"
                 description={
@@ -49,9 +49,9 @@ export default function HelpView() {
                     </>
                 }
             />
-            <MetricCard id="sum" title="Sum (g+c+a / g+c+i)" description={<>Sum of cost, cycles and area (or instructions in production puzzles).</>} />
-            <MetricCard id="sum4" title="Sum4 (g+c+a+i)" description={<>Sum of cost, cycles, area and instructions.</>} />
-            <MetricCard
+            <HelpCard id="sum" title="Sum (g+c+a / g+c+i)" description={<>Sum of cost, cycles and area (or instructions in production puzzles).</>} />
+            <HelpCard id="sum4" title="Sum4 (g+c+a+i)" description={<>Sum of cost, cycles, area and instructions.</>} />
+            <HelpCard
                 id="height"
                 title="Height (h)"
                 description={
@@ -62,7 +62,7 @@ export default function HelpView() {
                 }
                 image={{ location: heightExplanation, alt: "Height Explanation" }}
             />
-            <MetricCard
+            <HelpCard
                 id="width"
                 title="Width (w)"
                 description={
@@ -73,7 +73,7 @@ export default function HelpView() {
                 }
                 image={{ location: widthExplanation, alt: "Width Explanation" }}
             />
-            <MetricCard
+            <HelpCard
                 id="rate"
                 title="Rate (r)"
                 description={
@@ -83,7 +83,7 @@ export default function HelpView() {
                     </>
                 }
             />
-            <MetricCard
+            <HelpCard
                 id="overlap"
                 title="Overlap (O)"
                 description={
@@ -107,7 +107,23 @@ export default function HelpView() {
                     alt: "Overlap Explanation",
                 }}
             />
-            <MetricCard id="trackless" title="Trackless (T)" description={<>Solutions containing no tracks are classified as trackless.</>} />
+            <HelpCard id="trackless" title="Trackless (T)" description={<>Solutions containing no tracks are classified as trackless.</>} />
+            <HelpCard
+                id="pareto"
+                title="Pareto Frontier"
+                description={
+                    <>
+                        A solution is part of the pareto frontier of a puzzle if no other solution exists that is strictly better.
+                        <p>A solution is strictly better than another if it is at least equal in all metrics and better in at least one metric</p>
+                        <p>
+                            Displaying the full pareto frontier is not possible, as each metric would require a separate axis, but the visualizer allows you to view and filter 2D or 3D projections of
+                            it.
+                        </p>
+                        <p>If you enable "Show only frontier" you can view the pareto frontier as it would look like if only the selected metrics existed.</p>
+                        <p>Mapping out the full pareto frontier for a puzzle is usually not possible, as an infinite amount of tradeoffs between metrics exist.</p>
+                    </>
+                }
+            />
         </Grid>
     )
 }
@@ -122,7 +138,7 @@ interface MetricCardProps {
     }
 }
 
-function MetricCard(props: MetricCardProps) {
+function HelpCard(props: MetricCardProps) {
     const [linkVisibility, setLinkVisibility] = useState<"hidden" | "visible">("hidden")
     const theme = useTheme()
     console.log(theme.mixins.toolbar)
