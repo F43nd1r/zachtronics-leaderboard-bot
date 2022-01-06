@@ -36,7 +36,6 @@ export function FilterView(props: FilterProps) {
                     value={"check"}
                     selected={props.filter.showOnlyFrontier ?? false}
                     onChange={() => {
-                        console.log(!props.filter.showOnlyFrontier)
                         props.setFilter({
                             ...props.filter,
                             showOnlyFrontier: !props.filter.showOnlyFrontier,

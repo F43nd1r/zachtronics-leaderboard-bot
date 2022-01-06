@@ -19,8 +19,9 @@ import heightExplanation from "./height_explanation.jpg"
 import widthExplanation from "./width_explanation.jpg"
 import overlapExplanation from "./overlap_tutorial.mp4"
 import { LinkOutlined } from "@mui/icons-material"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { HashLink } from "react-router-hash-link"
+import { useLocation } from "react-router-dom"
 
 export default function HelpView() {
     document.title = "Help - Opus Magnum Leaderboards"
@@ -141,7 +142,8 @@ interface MetricCardProps {
 function HelpCard(props: MetricCardProps) {
     const [linkVisibility, setLinkVisibility] = useState<"hidden" | "visible">("hidden")
     const theme = useTheme()
-    console.log(theme.mixins.toolbar)
+    const location = useLocation()
+    const highlight = useMemo(() => (theme.palette.mode === "light" ? theme.palette.grey["400"] : theme.palette.grey["800"]), [theme.palette.mode])
     return (
         <Grid item xs key={props.id}>
             <div
@@ -158,6 +160,11 @@ function HelpCard(props: MetricCardProps) {
                     minWidth: "min(90vw, 460px)",
                     maxWidth: "100%",
                     height: "100%",
+                    animation: location.hash === `#${props.id}` ? "fade 3s ease-in-out" : "none",
+                    "@keyframes fade": {
+                        "0%": { backgroundColor: highlight },
+                        "100%": { backgroundColor: "transparent" },
+                    },
                 }}
                 onMouseEnter={() => setLinkVisibility("visible")}
                 onMouseLeave={() => setLinkVisibility("hidden")}
@@ -166,7 +173,7 @@ function HelpCard(props: MetricCardProps) {
                     title={
                         <>
                             {props.title}
-                            <HashLink to={`#${props.id}`} style={{ visibility: linkVisibility, color: theme.palette.text.primary, padding: "0.5rem" }}>
+                            <HashLink smooth to={`#${props.id}`} style={{ visibility: linkVisibility, color: theme.palette.text.primary, padding: "0.5rem" }}>
                                 <LinkOutlined fontSize={"small"} />
                             </HashLink>
                         </>
