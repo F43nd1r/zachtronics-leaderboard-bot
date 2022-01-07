@@ -16,17 +16,19 @@
 
 package com.faendir.zachtronics.bot.sc.repository;
 
-import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
-import com.faendir.zachtronics.bot.sc.model.ScCategory;
-import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
-import com.faendir.zachtronics.bot.sc.model.ScRecord;
-import com.faendir.zachtronics.bot.sc.model.ScSubmission;
+import com.faendir.zachtronics.bot.sc.model.*;
+import com.opencsv.CSVWriterBuilder;
+import com.opencsv.ICSVWriter;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 @BotTest
@@ -53,13 +55,33 @@ class SolRepoManualTest {
     }
 
     @Test
-    public void migrameMucho() {
-        for (ScPuzzle p : ScPuzzle.values()) {
-            repository.findCategoryHolders(p, true).stream()
-                      .map(cr -> cr.getRecord().getScore().toDisplayString() + " " +
-                                 cr.getCategories().stream().map(ScCategory::name)
-                                   .collect(Collectors.joining(",")))
-                      .forEach(System.out::println);
+    public void bootstrapPsv() throws IOException {
+        Path repoPath = Paths.get("../spacechem/archive");
+
+        for (ScPuzzle puzzle : ScPuzzle.values()) {
+            Path indexPath = repoPath.resolve(puzzle.getGroup().name()).resolve(puzzle.name()).resolve("solutions.psv");
+            try (ICSVWriter writer = new CSVWriterBuilder(Files.newBufferedWriter(indexPath)).withSeparator('|').build()) {
+
+                for (CategoryRecord<ScRecord, ScCategory> cr : repository.findCategoryHolders(puzzle, true)) {
+                    ScRecord record = cr.getRecord();
+                    String author = record.getAuthor();
+                    if (author == null) {
+                        // pull from file, which must exist
+                        assert record.getDataPath() != null;
+                        author = ScSolutionMetadata.fromPath(record.getDataPath(), puzzle).getAuthor();
+                    }
+                    String categories = cr.getCategories().stream()
+                                          .map(ScCategory::name)
+                                          .collect(Collectors.joining(","));
+
+                    String[] csvRecord = new String[]{record.getScore().toDisplayString(),
+                                                      author,
+                                                      record.getDisplayLink(),
+                                                      record.isOldVideoRNG() ? "linux" : null,
+                                                      categories};
+                    writer.writeNext(csvRecord, false);
+                }
+            }
         }
     }
 }

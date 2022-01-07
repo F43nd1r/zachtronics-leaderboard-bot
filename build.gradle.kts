@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.jackson.jsr310)
     implementation(libs.springdoc)
     implementation(libs.guava)
+    implementation(libs.opencsv)
 
     ksp(projects.processor)
 
