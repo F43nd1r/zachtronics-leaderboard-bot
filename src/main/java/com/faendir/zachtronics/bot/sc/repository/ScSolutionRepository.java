@@ -147,42 +147,56 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
             Set<ScCategory> wonCategories = submissionSolution.getCategories();
             if (!wonCategories.isEmpty()) {
                 // write the reddit lb, as there are changes to write
-                List<ScRecord> records = solutions.stream()
-                                                  .map(sol -> sol.extendToRecord(puzzle,
-                                                                                 makeArchiveLink(puzzle, sol.getScore()),
-                                                                                 puzzlePath.resolve(makeScoreFilename(sol.getScore()))))
-                                                  .toList();
-                Map<ScCategory, Map.Entry<ScRecord, ScRecord>> writingMap = new EnumMap<>(ScCategory.class);
-                for (int i = 0; i < solutions.size(); i++) {
-                    ScSolution solution = solutions.get(i);
-                    ScRecord record = records.get(i);
-                    for (ScCategory category : solution.getCategories()) {
-                        ScRecord videoRecord;
-                        if (record.getDisplayLink() != null)
-                            videoRecord = record;
-                        else {
-                            videoRecord = records.stream()
-                                                 .filter(r -> r.getDisplayLink() != null)
-                                                 .filter(r -> category.supportsScore(r.getScore()))
-                                                 .min(Comparator.comparing(ScRecord::getScore, category.getScoreComparator()))
-                                                 .orElseThrow();
-                        }
-                        writingMap.put(category, Map.entry(record, videoRecord));
-                    }
-                }
-
-                writeToRedditLeaderboard(puzzle, submission, writingMap);
+                String updateMessage = puzzle.getDisplayName() + " " + submission.getScore().toDisplayString() +
+                                       " by " + submission.getAuthor();
+                writeToRedditLeaderboard(puzzle, puzzlePath, solutions, updateMessage);
                 // post to lb thread
-                ScRecord submissionRecord = writingMap.get(wonCategories.iterator().next()).getKey();
-                postAnnouncementToReddit(submissionRecord, wonCategories);
+                postAnnouncementToReddit(submission, makeArchiveLink(puzzle, submission.getScore()), wonCategories);
             }
         }
 
         return submitResult;
     }
 
-    private void writeToRedditLeaderboard(@NotNull ScPuzzle puzzle, ScSubmission submission,
-                                          Map<ScCategory, Map.Entry<ScRecord, ScRecord>> recordMap) {
+    public void rebuildRedditLeaderboard(ScPuzzle puzzle, String updateMessage) {
+        try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
+            Path puzzlePath = access.getRepo().toPath().resolve(relativePuzzlePath(puzzle));
+            List<ScSolution> solutions = unmarshalSolutions(puzzlePath);
+            writeToRedditLeaderboard(puzzle, puzzlePath, solutions, updateMessage);
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+
+    private void writeToRedditLeaderboard(@NotNull ScPuzzle puzzle, Path puzzlePath, @NotNull List<ScSolution> solutions,
+                                         String updateMessage) {
+
+        List<ScRecord> records = solutions.stream()
+                                          .map(sol -> sol.extendToRecord(puzzle,
+                                                                         makeArchiveLink(puzzle, sol.getScore()),
+                                                                         puzzlePath.resolve(makeScoreFilename(sol.getScore()))))
+                                          .toList();
+        Map<ScCategory, Map.Entry<ScRecord, ScRecord>> recordMap = new EnumMap<>(ScCategory.class);
+        for (int i = 0; i < solutions.size(); i++) {
+            ScSolution solution = solutions.get(i);
+            ScRecord record = records.get(i);
+            for (ScCategory category : solution.getCategories()) {
+                ScRecord videoRecord;
+                if (record.getDisplayLink() != null)
+                    videoRecord = record;
+                else {
+                    videoRecord = records.stream()
+                                         .filter(r -> r.getDisplayLink() != null)
+                                         .filter(r -> category.supportsScore(r.getScore()))
+                                         .min(Comparator.comparing(ScRecord::getScore, category.getScoreComparator()))
+                                         .orElseThrow();
+                }
+                recordMap.put(category, Map.entry(record, videoRecord));
+            }
+        }
+
         String[] lines = redditService.getWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
         Pattern puzzleRegex = Pattern.compile("^\\s*\\|\\s*" + Pattern.quote(puzzle.getDisplayName()));
 
@@ -237,8 +251,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         }
 
         redditService.updateWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage(), String.join("\n", lines),
-                                     puzzle.getDisplayName() + " " + submission.getScore().toDisplayString() +
-                                     " by " + submission.getAuthor());
+                                     updateMessage);
     }
 
     @NotNull
@@ -261,14 +274,14 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         return cell;
     }
 
-    private void postAnnouncementToReddit(@NotNull ScRecord record, Collection<ScCategory> categories) {
+    private void postAnnouncementToReddit(@NotNull ScSubmission submission, String dataLink, Collection<ScCategory> categories) {
         // see: https://www.reddit.com/r/spacechem/comments/mmcuzb
         DisplayContext<ScCategory> context = new DisplayContext<>(StringFormat.REDDIT, categories);
-        redditService.postInSubmission("mmcuzb", "Added " + Markdown.fileLinkOrEmpty(record.getDataLink()) +
-                                                 "[" + record.getPuzzle().getDisplayName() +
-                                                 " (" + record.getScore().toDisplayString(context) +
-                                                 ")](" + record.getDisplayLink() +
-                                                 ") by " + record.getAuthor());
+        redditService.postInSubmission("mmcuzb", "Added " + Markdown.fileLinkOrEmpty(dataLink) +
+                                                 "[" + submission.getPuzzle().getDisplayName() +
+                                                 " (" + submission.getScore().toDisplayString(context) +
+                                                 ")](" + submission.getDisplayLink() +
+                                                 ") by " + submission.getAuthor());
     }
 
     @Override
