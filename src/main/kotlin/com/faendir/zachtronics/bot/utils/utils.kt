@@ -110,7 +110,7 @@ fun <R : Record<C>?, C : Category> SafeEmbedMessageBuilder.embedRecords(
         records.map { (record, categories) ->
             EmbedCreateFields.Field.of(
                 categories.smartFormat(reference).ifEmptyZeroWidthSpace(),
-                record?.toDisplayString(DisplayContext(StringFormat.DISCORD, categories.takeIf { formatCategorySpecific }?.toList())) ?: "none",
+                record?.toDisplayString(DisplayContext(StringFormat.DISCORD, categories.takeIf { formatCategorySpecific })) ?: "none",
                 true
             )
         }

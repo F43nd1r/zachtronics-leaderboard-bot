@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.sz.repository;
 
-import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
@@ -24,7 +23,6 @@ import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.sz.model.SzSubmission;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -48,14 +46,14 @@ public class SzArchiveTest {
                 [lines-of-code] 8
                 """;
 
-        assertTrue(doArchive(content) instanceof SubmitResult.Success); // different content
-        assertTrue(doArchive(content) instanceof SubmitResult.AlreadyPresent); // identical
+        assertInstanceOf(SubmitResult.Success.class, doArchive(content)); // different content
+        assertInstanceOf(SubmitResult.AlreadyPresent.class, doArchive(content)); // identical
 
         content = content.replace("[power-usage] 57", "[power-usage] 56");
-        assertTrue(doArchive(content) instanceof SubmitResult.Success); // better
+        assertInstanceOf(SubmitResult.Success.class, doArchive(content)); // better
 
         content = content.replace("[power-usage] 56", "[power-usage] 100");
-        assertTrue(doArchive(content) instanceof SubmitResult.NothingBeaten); // worse
+        assertInstanceOf(SubmitResult.NothingBeaten.class, doArchive(content)); // worse
 
         content = content.replace("[power-usage] 100", "nonsense");
         String finalContent = content;

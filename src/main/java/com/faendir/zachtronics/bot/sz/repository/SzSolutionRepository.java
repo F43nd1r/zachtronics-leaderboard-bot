@@ -20,6 +20,8 @@ import com.faendir.zachtronics.bot.git.GitRepository;
 import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
+import com.faendir.zachtronics.bot.sc.model.ScCategory;
+import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sz.model.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -58,10 +60,16 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
     @Override
     public SubmitResult<SzRecord, SzCategory> submit(@NotNull SzSubmission submission) {
         try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
-            SubmitResult<SzRecord, SzCategory> r = performArchive(access, submission);
+            SubmitResult<SzRecord, SzCategory> r = archive(access, submission);
             access.push();
             return r;
         }
+    }
+
+    @NotNull
+    private SubmitResult<SzRecord, SzCategory> archive(GitRepository.ReadWriteAccess access, SzSubmission submission) {
+        // TODO
+        return new SubmitResult.AlreadyPresent<>();
     }
 
     @Nullable
@@ -115,13 +123,6 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
     }
 
     @Override
-    protected SolutionsIndex<SzSubmission> makeSolutionIndex(@NotNull Path puzzlePath,
-                                                             @NotNull SzPuzzle puzzle)
-            throws IOException {
-        return new SzSolutionsIndex(puzzlePath, puzzle);
-    }
-
-    @Override
     public String makeArchiveLink(@NotNull SzPuzzle puzzle, @NotNull String filename) {
         return String.format("%s/%s/%s", gitRepo.getRawFilesUrl(), puzzle.getGroup().getRepoFolder(), filename);
     }
@@ -129,7 +130,7 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
     /**
      *  We use this to keep track of the solutions to a given level in the repo.
      */
-    static class SzSolutionsIndex implements SolutionsIndex<SzSubmission> {
+    static class SzSolutionsIndex {
 
         private final Path folderPath;
         @Getter
@@ -157,8 +158,7 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
 
         }
 
-        @Override
-        public boolean add(@NotNull SzSubmission solution) throws IOException {
+        public SubmitResult<ScRecord, ScCategory> add(@NotNull SzSubmission solution) throws IOException {
             boolean updated = false;
             SzScore candidate = solution.getScore();
             categoryLoop:
@@ -202,7 +202,7 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
                 updated = true;
             }
 
-            return updated;
+            return updated ? null : null;
         }
 
         @Deprecated

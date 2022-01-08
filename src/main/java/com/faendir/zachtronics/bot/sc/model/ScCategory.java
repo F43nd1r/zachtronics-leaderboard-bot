@@ -29,21 +29,25 @@ import static com.faendir.zachtronics.bot.sc.model.ScType.*;
 
 @Getter
 public enum ScCategory implements Category {
-    C("C", List.of(CYCLES, REACTORS, SYMBOLS, ANY_FLAG), EnumSet.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL, BOSS), F100),
-    CNB("CNB", List.of(CYCLES, REACTORS, SYMBOLS, NO_BUGS), EnumSet.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL, BOSS), F100),
-    CNP("CNP", List.of(CYCLES, REACTORS, SYMBOLS, NO_PRECOG), EnumSet.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL, BOSS), F100),
+    C("C", List.of(CYCLES, REACTORS, SYMBOLS, ANY_FLAG), ScTypeSets.ALL, F100),
+    CNB("CNB", List.of(CYCLES, REACTORS, SYMBOLS, NO_BUGS), ScTypeSets.ALL, F100),
+    CNP("CNP", List.of(CYCLES, REACTORS, SYMBOLS, NO_PRECOG), ScTypeSets.ALL, F100),
+    CNBP("CNBP", List.of(CYCLES, REACTORS, SYMBOLS, NO_FLAGS), ScTypeSets.ALL, F100),
 
-    S("S", List.of(SYMBOLS, REACTORS, CYCLES, ANY_FLAG), EnumSet.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL, BOSS), F001),
-    SNB("SNB", List.of(SYMBOLS, REACTORS, CYCLES, NO_BUGS), EnumSet.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL, BOSS), F001),
-    SNP("SNP", List.of(SYMBOLS, REACTORS, CYCLES, NO_PRECOG), EnumSet.of(RESEARCH, PRODUCTION, PRODUCTION_TRIVIAL, BOSS), F001),
+    S("S", List.of(SYMBOLS, REACTORS, CYCLES, ANY_FLAG), ScTypeSets.ALL, F001),
+    SNB("SNB", List.of(SYMBOLS, REACTORS, CYCLES, NO_BUGS), ScTypeSets.ALL, F001),
+    SNP("SNP", List.of(SYMBOLS, REACTORS, CYCLES, NO_PRECOG), ScTypeSets.ALL, F001),
+    SNBP("SNBP", List.of(SYMBOLS, REACTORS, CYCLES, NO_FLAGS), ScTypeSets.ALL, F001),
 
-    RC("RC", List.of(REACTORS, CYCLES, SYMBOLS, ANY_FLAG), EnumSet.of(PRODUCTION, BOSS), F110),
-    RCNB("RCNB", List.of(REACTORS, CYCLES, SYMBOLS, NO_BUGS), EnumSet.of(PRODUCTION, BOSS), F110),
-    RCNP("RCNP", List.of(REACTORS, CYCLES, SYMBOLS, NO_PRECOG), EnumSet.of(PRODUCTION, BOSS), F110),
+    RC("RC", List.of(REACTORS, CYCLES, SYMBOLS, ANY_FLAG), ScTypeSets.PROD, F110),
+    RCNB("RCNB", List.of(REACTORS, CYCLES, SYMBOLS, NO_BUGS), ScTypeSets.PROD, F110),
+    RCNP("RCNP", List.of(REACTORS, CYCLES, SYMBOLS, NO_PRECOG), ScTypeSets.PROD, F110),
+    RCNBP("RCNBP", List.of(REACTORS, CYCLES, SYMBOLS, NO_FLAGS), ScTypeSets.PROD, F110),
 
-    RS("RS", List.of(REACTORS, SYMBOLS, CYCLES, ANY_FLAG), EnumSet.of(PRODUCTION, BOSS), F011),
-    RSNB("RSNB", List.of(REACTORS, SYMBOLS, CYCLES, NO_BUGS), EnumSet.of(PRODUCTION, BOSS), F011),
-    RSNP("RSNP", List.of(REACTORS, SYMBOLS, CYCLES, NO_PRECOG), EnumSet.of(PRODUCTION, BOSS), F011);
+    RS("RS", List.of(REACTORS, SYMBOLS, CYCLES, ANY_FLAG), ScTypeSets.PROD, F011),
+    RSNB("RSNB", List.of(REACTORS, SYMBOLS, CYCLES, NO_BUGS), ScTypeSets.PROD, F011),
+    RSNP("RSNP", List.of(REACTORS, SYMBOLS, CYCLES, NO_PRECOG), ScTypeSets.PROD, F011),
+    RSNBP("RSNBP", List.of(REACTORS, SYMBOLS, CYCLES, NO_FLAGS), ScTypeSets.PROD, F011);
 
     private final String displayName;
     private final List<Metric> metrics;
@@ -65,8 +69,8 @@ public enum ScCategory implements Category {
                                       .reduce(Comparator::thenComparing)
                                       .orElseThrow();
         this.supportedTypes = supportedTypes;
-        this.bugFree = metrics.contains(NO_BUGS);
-        this.precogFree = metrics.contains(NO_PRECOG);
+        this.bugFree = metrics.contains(NO_BUGS) || metrics.contains(NO_FLAGS);
+        this.precogFree = metrics.contains(NO_PRECOG) || metrics.contains(NO_FLAGS);
         this.scoreFormatString = scoreFormatString;
     }
 
@@ -82,5 +86,20 @@ public enum ScCategory implements Category {
         static final String F011 = "%s%s%s**%d**%s**%d**%s";
 
         private ScScoreFormatStrings() {}
+    }
+
+    static class ScTypeSets {
+        static final EnumSet<ScType> RES = EnumSet.of(RESEARCH, PRODUCTION_TRIVIAL);
+        static final EnumSet<ScType> PROD = EnumSet.of(PRODUCTION, BOSS);
+        static final EnumSet<ScType> ALL = enumSetUnion(RES, PROD);
+
+        @NotNull
+        public static <T extends Enum<T>> EnumSet<T> enumSetUnion(EnumSet<T> s1, EnumSet<T> s2) {
+            EnumSet<T> res = EnumSet.copyOf(s1);
+            res.addAll(s2);
+            return res;
+        }
+
+        private ScTypeSets() {}
     }
 }

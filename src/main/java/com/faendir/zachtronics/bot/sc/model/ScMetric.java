@@ -30,7 +30,8 @@ public enum ScMetric implements Metric {
     SYMBOLS("S", ScScore::getSymbols),
     ANY_FLAG("", null),
     NO_BUGS("NB", null),
-    NO_PRECOG("NP", null);
+    NO_PRECOG("NP", null),
+    NO_FLAGS("NBP", null);
 
     private final String displayName;
     private final ToIntFunction<ScScore> extract;

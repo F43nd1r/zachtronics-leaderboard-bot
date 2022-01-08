@@ -26,15 +26,13 @@ import org.jetbrains.annotations.NotNull;
 import java.nio.file.Path;
 
 @Value
-@Builder
 public class ScRecord implements Record<ScCategory> {
     public static final ScRecord IMPOSSIBLE_CATEGORY = new ScRecord(ScPuzzle.bonding_boss, ScScore.INVALID_SCORE,
-                                                                    null, null, false, null, null);
+                                                                    "", null, false, null, null);
 
     @NotNull ScPuzzle puzzle;
     @NotNull ScScore score;
-    String author;
-    /** not-<tt>null</tt> IFF the solution holds a category */
+    @NotNull String author;
     String displayLink;
     boolean oldVideoRNG;
     /** <tt>null</tt> if the solution holds a lb spot but has since been out-pareto'd */
@@ -53,8 +51,7 @@ public class ScRecord implements Record<ScCategory> {
      */
     @NotNull
     public String toDisplayString(@NotNull DisplayContext<ScCategory> context, String reactorPrefix) {
-        String scoreAuthor = "(" + score.toDisplayString(context, oldVideoRNG ? "\\*" : "") + ")" +
-                             (author != null ? " " + author : "");
+        String scoreAuthor = "(" + score.toDisplayString(context, oldVideoRNG ? "\\*" : "") + ") " + author;
         return Markdown.fileLinkOrEmpty(dataLink) +
                reactorPrefix + Markdown.linkOrText(scoreAuthor, displayLink, true);
     }

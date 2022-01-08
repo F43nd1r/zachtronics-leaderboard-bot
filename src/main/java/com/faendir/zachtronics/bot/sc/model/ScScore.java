@@ -70,7 +70,7 @@ public class ScScore implements Score<ScCategory> {
     }
 
     /** <tt>ccc/r/ss[/BP]</tt>, tolerates extra <tt>*</tt> */
-    public static final Pattern REGEX_BP_SCORE = Pattern.compile(
+    private static final Pattern REGEX_BP_SCORE = Pattern.compile(
             "\\**(?<cycles>[\\d,]+)\\**(?<oldRNG>\\\\\\*)?[/-]" +
             "\\**(?<reactors>\\d+)\\**[/-]" +
             "\\**(?<symbols>\\d+)\\**" +

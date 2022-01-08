@@ -16,14 +16,10 @@
 
 package com.faendir.zachtronics.bot.sc.model;
 
-import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @BotTest
 class ScSubmissionTest {

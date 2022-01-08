@@ -40,7 +40,7 @@ fun CategoryRecord<OmRecord, OmCategory>.toDTO() =
     OmRecordDTO(
         puzzle = record.puzzle.toDTO(),
         score = record.score.toDTO(),
-        smartFormattedScore = record.score.toDisplayString(DisplayContext(StringFormat.PLAIN_TEXT, categories.toList())),
+        smartFormattedScore = record.score.toDisplayString(DisplayContext(StringFormat.PLAIN_TEXT, categories)),
         fullFormattedScore = record.score.toDisplayString(DisplayContext.plainText()),
         gif = record.displayLink,
         solution = record.dataLink,

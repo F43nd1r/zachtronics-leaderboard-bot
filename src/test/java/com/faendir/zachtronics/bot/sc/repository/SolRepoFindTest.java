@@ -39,13 +39,12 @@ public class SolRepoFindTest {
     @Test
     public void testGoodRecords() {
         ScRecord goodRecord = repository.find(ScPuzzle.research_example_1, ScCategory.C);
-        System.out.println(goodRecord);
+        assertNotNull(goodRecord);
         goodRecord = repository.find(ScPuzzle.published_2_1, ScCategory.S);
-        System.out.println(goodRecord);
+        assertNotNull(goodRecord);
         goodRecord = repository.find(ScPuzzle.sensing_6, ScCategory.RC);
-        System.out.println(goodRecord);
+        assertNotNull(goodRecord);
         goodRecord = repository.find(ScPuzzle.production_tutorial_1, ScCategory.C);
-        System.out.println(goodRecord);
         assertNotNull(goodRecord);
     }
 

@@ -23,7 +23,7 @@ enum class StringFormat(val separator: String) {
     FILE_NAME("-")
 }
 
-data class DisplayContext<C : Category>(val format: StringFormat, val categories: List<C>? = null) {
+data class DisplayContext<C : Category>(val format: StringFormat, val categories: Collection<C>? = null) {
     constructor(format: StringFormat, category: C) : this(format, listOf(category))
     val separator by format::separator
 

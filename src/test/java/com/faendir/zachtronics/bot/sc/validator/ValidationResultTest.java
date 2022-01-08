@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.sc.validator;
 
-import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
@@ -38,7 +37,7 @@ class ValidationResultTest {
         assertThrows(SChemException.class, () -> validateSingle(export1));
 
         String export = "SOLUTION:Of Pancakes and Spaceships,12345ieee,115-1-6,unparseable\nInvalid";
-        assertTrue(validateSingle(export) instanceof ValidationResult.Unparseable);
+        assertInstanceOf(ValidationResult.Unparseable.class, validateSingle(export));
     }
 
     @Test
@@ -68,7 +67,7 @@ class ValidationResultTest {
                 PIPE:1,4,2
                 """;
 
-        assertTrue(validateSingle(export) instanceof ValidationResult.Invalid);
+        assertInstanceOf(ValidationResult.Invalid.class, validateSingle(export));
     }
 
     @Test
@@ -89,7 +88,7 @@ class ValidationResultTest {
                 PIPE:1,4,2
                 """;
 
-        assertTrue(validateSingle(export) instanceof ValidationResult.Invalid);
+        assertInstanceOf(ValidationResult.Invalid.class, validateSingle(export));
     }
 
     @Test
@@ -103,7 +102,7 @@ class ValidationResultTest {
                 PIPE:1,4,2
                 """;
 
-        assertTrue(validateSingle(export) instanceof ValidationResult.Unparseable);
+        assertInstanceOf(ValidationResult.Unparseable.class, validateSingle(export));
     }
 
     @Test

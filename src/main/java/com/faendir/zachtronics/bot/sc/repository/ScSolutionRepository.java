@@ -27,30 +27,35 @@ import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.sc.model.*;
 import com.faendir.zachtronics.bot.utils.Markdown;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
+import com.opencsv.*;
+import com.opencsv.enums.CSVReaderNullFieldIndicator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.*;
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static com.faendir.zachtronics.bot.sc.model.ScCategory.*;
 
 @Component
 @RequiredArgsConstructor
 public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory, ScPuzzle, ScSubmission, ScRecord> {
-    private static final ScCategory[][] CATEGORIES = {{C,  CNB,  CNP},  {S,  SNB,  SNP},
-                                                      {RC, RCNB, RCNP}, {RS, RSNB, RSNP}};
+    private static final ScCategory[][] CATEGORIES = {{C,  CNB,  CNP,  CNBP},  {S,  SNB,  SNP, SNBP},
+                                                      {RC, RCNB, RCNP, RCNBP}, {RS, RSNB, RSNP, RSNBP}};
 
     private final RedditService redditService;
     @Getter(AccessLevel.PROTECTED)
@@ -61,34 +66,10 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     @Override
     public SubmitResult<ScRecord, ScCategory> submit(@NotNull ScSubmission submission) {
         try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
-            // get the map before we change it by archiving
-            Map<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> oldRbcMap =
-                    getRbcMap(submission.getPuzzle(), access.getRepo().toPath());
-            SubmitResult<ScRecord, ScCategory> archiveResult = performArchive(access, submission);
-            access.push();
-            if ((archiveResult instanceof SubmitResult.Success ||
-                 archiveResult instanceof SubmitResult.AlreadyPresent) && submission.getDisplayLink() != null) {
-                // we try the reddit LB only if the record made the archive, as the former is a superset
-                ScRecord submissionRecord = submission.extendToRecord(
-                        makeArchiveLink(submission.getPuzzle(), submission.getScore()),
-                        makeArchivePath(submission.getPuzzle(), submission.getScore()));
-                SubmitResult<ScRecord, ScCategory> lbResult = submitToRedditLeaderboard(submissionRecord, oldRbcMap);
-                if (lbResult instanceof SubmitResult.Success<ScRecord, ScCategory> lbSuccess) {
-                    // announce new record
-                    List<ScCategory> categories = lbSuccess.getBeatenRecords().stream()
-                                                           .map(CategoryRecord::getCategories)
-                                                           .flatMap(Set::stream)
-                                                           .toList();
-                    postAnnouncementToReddit(submissionRecord, categories);
-                    if (archiveResult instanceof SubmitResult.Success<ScRecord, ScCategory> archiveSuccess) {
-                        // we use the archive's message
-                        return new SubmitResult.Success<>(archiveSuccess.getMessage(), lbSuccess.getBeatenRecords());
-                    }
-                }
-                return lbResult;
-            }
-            else
-                return archiveResult;
+            SubmitResult<ScRecord, ScCategory> r = submitOne(access, submission);
+            if (r instanceof SubmitResult.Success<ScRecord, ScCategory>)
+                access.push();
+            return r;
         }
     }
 
@@ -99,11 +80,12 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
             List<SubmitResult<ScRecord, ScCategory>> l = validationResults.stream().map(r -> {
                 if (r instanceof ValidationResult.Valid<ScSubmission>)
-                    return performArchive(access, r.getSubmission());
+                    return submitOne(access, r.getSubmission());
                 else
                     return new SubmitResult.Failure<ScRecord, ScCategory>(r.getMessage());
             }).toList();
-            access.push();
+            if (l.stream().anyMatch(s -> s instanceof SubmitResult.Success<ScRecord, ScCategory>))
+                access.push();
             return l;
         }
     }
@@ -120,256 +102,166 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
 
     @NotNull
     @Override
-    public List<CategoryRecord<ScRecord, ScCategory>> findCategoryHolders(@NotNull ScPuzzle puzzle,
-                                                                          boolean includeFrontier) {
+    public List<CategoryRecord<ScRecord, ScCategory>> findCategoryHolders(@NotNull ScPuzzle puzzle, boolean includeFrontier) {
         try (GitRepository.ReadAccess access = getGitRepo().acquireReadAccess()) {
-            Map<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> rbcMap =
-                    getRbcMap(puzzle, access.getRepo().toPath());
+            Path puzzlePath = access.getRepo().toPath().resolve(relativePuzzlePath(puzzle));
 
-            String[] lines = redditService.getWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage())
-                                          .split("\\r?\\n");
-            Pattern puzzleRegex = Pattern.compile("^\\s*\\|\\s*" + Pattern.quote(puzzle.getDisplayName()));
+            List<ScSolution> solutions = unmarshalSolutions(puzzlePath);
 
-            int seenRows = 0;
-            for (String line : lines) {
-                if (puzzleRegex.matcher(line).find()) {
-                    String[] pieces1 = line.trim().split("\\s*\\|\\s*");
-                    List<String> tableCols = Arrays.asList(pieces1).subList(2, pieces1.length);
-
-                    List<String> cyclesHalf1 = tableCols.subList(0, tableCols.size() / 2);
-                    parseHalfTable(puzzle, rbcMap, cyclesHalf1, CATEGORIES[2 * seenRows]);
-
-                    List<String> symbolsHalf = tableCols.subList(tableCols.size() / 2, tableCols.size());
-                    parseHalfTable(puzzle, rbcMap, symbolsHalf, CATEGORIES[2 * seenRows + 1]);
-                    seenRows++;
-                }
-                else if (seenRows != 0) {
-                    // we've already found the point and now we're past it, we're done
-                    break;
+            List<CategoryRecord<ScRecord, ScCategory>> result = new ArrayList<>();
+            for (ScSolution sol : solutions) {
+                if (includeFrontier || !sol.getCategories().isEmpty()) {
+                    CategoryRecord<ScRecord, ScCategory> categoryRecord =
+                            sol.extendToCategoryRecord(puzzle,
+                                                       makeArchiveLink(puzzle, sol.getScore()),
+                                                       puzzlePath.resolve(makeScoreFilename(sol.getScore())));
+                    result.add(categoryRecord);
                 }
             }
-
-            // TODO collapse with reshapeCategoryRecordMap(rbcMap, CategoryRecord::new);
-            return rbcMap.values().stream()
-                                  .filter(entry -> includeFrontier || !entry.getValue().isEmpty())
-                                  .map(entry -> new CategoryRecord<>(entry.getKey().build(), entry.getValue()))
-                                  .toList();
-        }
-    }
-
-    @NotNull
-    private SortedMap<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> getRbcMap(@NotNull ScPuzzle puzzle,
-                                                                                               @NotNull Path repoPath) {
-        Path puzzlePath = repoPath.resolve(relativePuzzlePath(puzzle));
-        ScSolutionsIndex solutionsIndex;
-        try {
-            solutionsIndex = makeSolutionIndex(puzzlePath, puzzle);
+            return result;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-
-        // TODO put categories in archive, so we can filter sooner and do the author right
-        SortedMap<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> rbcMap = new TreeMap<>(
-                ScSolutionsIndex.COMPARATOR);
-        for (ScScore score : solutionsIndex.getScores()) {
-            ScRecord.ScRecordBuilder builder = ScRecord.builder().puzzle(puzzle).score(score);
-            String filename = makeScoreFilename(score);
-            Path path = puzzlePath.resolve(filename);
-            builder.dataLink(makeArchiveLink(puzzle, filename)).dataPath(path);
-            rbcMap.put(score, Map.entry(builder, EnumSet.noneOf(ScCategory.class)));
-        }
-        return rbcMap;
     }
 
     @NotNull
-    private SubmitResult<ScRecord, ScCategory> submitToRedditLeaderboard(@NotNull ScRecord submissionRecord,
-                                                   Map<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> oldRbcMap) {
-        assert submissionRecord.getAuthor() != null;
-        assert submissionRecord.getDisplayLink() != null;
+    private SubmitResult<ScRecord, ScCategory> submitOne(@NotNull GitRepository.ReadWriteAccess access,
+                                                         @NotNull ScSubmission submission) {
+        ScPuzzle puzzle = submission.getPuzzle();
+        Path puzzlePath = access.getRepo().toPath().resolve(relativePuzzlePath(puzzle));
+        List<ScSolution> solutions;
+        try {
+            solutions = unmarshalSolutions(puzzlePath);
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
 
-        ScPuzzle puzzle = submissionRecord.getPuzzle();
+        SubmitResult<ScRecord, ScCategory> submitResult = archiveOne(access, solutions, submission);
+
+        if (submitResult instanceof SubmitResult.Success<ScRecord, ScCategory>) {
+            ScSolution submissionSolution = solutions.stream()
+                                                     .filter(s -> s.getScore().equals(submission.getScore()))
+                                                     .findFirst()
+                                                     .orElseThrow();
+            Set<ScCategory> wonCategories = submissionSolution.getCategories();
+            if (!wonCategories.isEmpty()) {
+                // write the reddit lb, as there are changes to write
+                List<ScRecord> records = solutions.stream()
+                                                  .map(sol -> sol.extendToRecord(puzzle,
+                                                                                 makeArchiveLink(puzzle, sol.getScore()),
+                                                                                 puzzlePath.resolve(makeScoreFilename(sol.getScore()))))
+                                                  .toList();
+                Map<ScCategory, Map.Entry<ScRecord, ScRecord>> writingMap = new EnumMap<>(ScCategory.class);
+                for (int i = 0; i < solutions.size(); i++) {
+                    ScSolution solution = solutions.get(i);
+                    ScRecord record = records.get(i);
+                    for (ScCategory category : solution.getCategories()) {
+                        ScRecord videoRecord;
+                        if (record.getDisplayLink() != null)
+                            videoRecord = record;
+                        else {
+                            videoRecord = records.stream()
+                                                 .filter(r -> r.getDisplayLink() != null)
+                                                 .filter(r -> category.supportsScore(r.getScore()))
+                                                 .min(Comparator.comparing(ScRecord::getScore, category.getScoreComparator()))
+                                                 .orElseThrow();
+                        }
+                        writingMap.put(category, Map.entry(record, videoRecord));
+                    }
+                }
+
+                writeToRedditLeaderboard(puzzle, submission, writingMap);
+                // post to lb thread
+                ScRecord submissionRecord = writingMap.get(wonCategories.iterator().next()).getKey();
+                postAnnouncementToReddit(submissionRecord, wonCategories);
+            }
+        }
+
+        return submitResult;
+    }
+
+    private void writeToRedditLeaderboard(@NotNull ScPuzzle puzzle, ScSubmission submission,
+                                          Map<ScCategory, Map.Entry<ScRecord, ScRecord>> recordMap) {
         String[] lines = redditService.getWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
         Pattern puzzleRegex = Pattern.compile("^\\s*\\|\\s*" + Pattern.quote(puzzle.getDisplayName()));
 
-        int startingRow = -1;
-        int seenRows = 0;
-        int halfSize = -1;
+        int rowIdx = 0;
 
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i];
+        // |Puzzle | [(**ccc**/r/ss) author](https://li.nk) | ← | [(ccc/r/**ss**) author](https://li.nk) | ←
+        // |Puzzle - 1 Reactor | [(**ccc**/**r**/ss) author](https://li.nk) | ← | [(ccc/**r**/**ss**) author](https://li.nk) | ←
+        for (int lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+            String line = lines[lineIdx];
             if (puzzleRegex.matcher(line).find()) {
-                String[] pieces = line.trim().split("\\s*\\|\\s*");
-                List<String> tableCols = Arrays.asList(pieces).subList(2, pieces.length);
+                String[] prevElems = line.trim().split("\\s*\\|\\s*");
+                int halfSize = (prevElems.length - 2) / 2;
 
-                List<String> cyclesHalf = tableCols.subList(0, tableCols.size() / 2);
-                parseHalfTable(puzzle, oldRbcMap, cyclesHalf, CATEGORIES[2 * seenRows]);
-                List<String> symbolsHalf = tableCols.subList(tableCols.size() / 2, tableCols.size());
-                parseHalfTable(puzzle, oldRbcMap, symbolsHalf, CATEGORIES[2 * seenRows + 1]);
-
-                if (seenRows == 0) {
-                    startingRow = i;
-                    halfSize = tableCols.size() / 2;
+                StringBuilder row = new StringBuilder("|");
+                int minReactors = Integer.MAX_VALUE;
+                if (rowIdx == 1) {
+                    minReactors = recordMap.values().stream().mapToInt(r -> r.getKey().getScore().getReactors()).min().orElseThrow();
+                    row.append(puzzle.getDisplayName()).append(" - ")
+                       .append(minReactors).append(" Reactor").append(minReactors == 1 ? "" : "s");
                 }
-                seenRows++;
+                else {
+                    row.append(prevElems[1]);
+                }
+
+                Map.Entry<ScRecord, ScRecord> impossible = Map.entry(ScRecord.IMPOSSIBLE_CATEGORY, ScRecord.IMPOSSIBLE_CATEGORY);
+                for (int block = 0; block < 2; block++) {
+                    ScCategory[] blockCategories = CATEGORIES[2 * rowIdx + block];
+                    @SuppressWarnings("unchecked")
+                    Map.Entry<ScRecord, ScRecord>[] blockRecords =
+                            (Map.Entry<ScRecord, ScRecord>[]) Arrays.stream(blockCategories)
+                                                                    .map(c -> recordMap.getOrDefault(c, impossible))
+                                                                    .toArray(Map.Entry[]::new);
+
+                    for (int i = 0; i < halfSize; i++) {
+                        ScCategory thisCategory = blockCategories[i];
+                        row.append(" | ");
+                        if (blockRecords[i].getKey() != ScRecord.IMPOSSIBLE_CATEGORY) {
+                            row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory));
+                        }
+                        else
+                            row.append(prevElems[2 + block * halfSize + i]);
+                    }
+                }
+                lines[lineIdx] = row.toString();
+
+                rowIdx++;
             }
-            else if (seenRows != 0) {
+            else if (rowIdx != 0) {
                 // we've already found the point and now we're past it, we're done
                 break;
             }
         }
 
-        Map<ScRecord, Set<ScCategory>> beatenRecords = new HashMap<>();
-        Map<ScRecord, Set<ScCategory>> categoryRecords = new HashMap<>();
-        // |Puzzle | [(**ccc**/r/ss) author](https://li.nk) | ← | [(ccc/r/**ss**) author](https://li.nk) | ←
-        // |Puzzle - 1 Reactor | [(**ccc**/**r**/ss) author](https://li.nk) | ← | [(ccc/**r**/**ss**) author](https://li.nk) | ←
-        for (int rowIdx = 0; rowIdx < seenRows; rowIdx++) {
-            String[] prevElems = lines[startingRow + rowIdx].trim().split("\\s*\\|\\s*");
-            StringBuilder row = new StringBuilder("|");
-            int minReactors = Integer.MAX_VALUE;
-            if (rowIdx == 1) {
-                minReactors = Math.min(submissionRecord.getScore().getReactors(),
-                                       oldRbcMap.keySet().stream().mapToInt(ScScore::getReactors).min().orElseThrow());
-                row.append(puzzle.getDisplayName()).append(" - ").append(minReactors).append(" Reactor")
-                   .append(minReactors == 1 ? "" : "s");
-            }
-            else {
-                row.append(prevElems[1]);
-            }
-
-            Map<ScCategory, ScRecord> recordMap = new EnumMap<>(ScCategory.class);
-            for (Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>> rbc : oldRbcMap.values()) {
-                ScRecord record = rbc.getKey().build();
-                for (ScCategory category : rbc.getValue()) {
-                    recordMap.put(category, record);
-                }
-            }
-
-            for (int block = 0; block < 2; block++) {
-                ScCategory[] blockCategories = CATEGORIES[2 * rowIdx + block];
-                ScRecord[] blockRecords = Arrays.stream(blockCategories)
-                                                .map(c -> recordMap.getOrDefault(c, ScRecord.IMPOSSIBLE_CATEGORY))
-                                                .toArray(ScRecord[]::new);
-
-                for (int i = 0; i < halfSize; i++) {
-                    ScCategory thisCategory = blockCategories[i];
-                    row.append(" | ");
-                    int comparison = thisCategory.getScoreComparator()
-                                                 .compare(submissionRecord.getScore(), blockRecords[i].getScore());
-                    if (thisCategory.supportsScore(submissionRecord.getScore()) && comparison <= 0) {
-                        if (comparison == 0 && submissionRecord.getAuthor().equals(blockRecords[i].getAuthor()) &&
-                            submissionRecord.getDisplayLink().equals(blockRecords[i].getDisplayLink()))
-                            return new SubmitResult.AlreadyPresent<>();
-                        addRC(beatenRecords, blockRecords[i], thisCategory);
-                        blockRecords[i] = submissionRecord;
-
-                        row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory));
-                    }
-                    else {
-                        String prevElem = prevElems[block * halfSize + i + 2];
-                        if (beatenRecords.containsKey(blockRecords[i]) && prevElem.matches("←+")) {
-                            // "dangling" reference to beaten score, we need to write the actual score or change the pointer
-                            row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory));
-                        }
-                        else {
-                            if (blockRecords[i] != ScRecord.IMPOSSIBLE_CATEGORY &&
-                                thisCategory.supportsScore(submissionRecord.getScore()))
-                                addRC(categoryRecords, blockRecords[i], thisCategory);
-                            row.append(prevElem);
-                        }
-                    }
-                }
-            }
-            lines[startingRow + rowIdx] = row.toString();
-        }
-
-        if (!beatenRecords.isEmpty()) {
-            redditService.updateWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage(), String.join("\n", lines),
-                                         puzzle.getDisplayName() + " " + submissionRecord.getScore().toDisplayString() + " by " +
-                                         submissionRecord.getAuthor());
-            return new SubmitResult.Success<>(null, reshapeCategoryRecordMap(beatenRecords, CategoryRecord::new));
-        }
-        else {
-            return new SubmitResult.NothingBeaten<>(reshapeCategoryRecordMap(categoryRecords, CategoryRecord::new));
-        }
-    }
-
-    private static void addRC(@NotNull Map<ScRecord, Set<ScCategory>> map, ScRecord record, ScCategory category) {
-        map.computeIfAbsent(record, k -> EnumSet.noneOf(ScCategory.class)).add(category);
+        redditService.updateWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage(), String.join("\n", lines),
+                                     puzzle.getDisplayName() + " " + submission.getScore().toDisplayString() +
+                                     " by " + submission.getAuthor());
     }
 
     @NotNull
-    private static String makeLeaderboardCell(@NotNull ScRecord[] blockRecords, int i, int minReactors,
+    private static String makeLeaderboardCell(@NotNull Map.Entry<ScRecord, ScRecord>[] blockRecords, int i, int minReactors,
                                               ScCategory thisCategory) {
-        ScRecord record = blockRecords[i];
+        Map.Entry<ScRecord, ScRecord> recordPair = blockRecords[i];
         for (int prev = 0; prev < i; prev++) {
-            if (record == blockRecords[prev]) {
+            if (recordPair.equals(blockRecords[prev])) {
                 return "←".repeat(i - prev);
             }
         }
 
+        ScRecord record = recordPair.getKey();
         String reactorPrefix = (record.getScore().getReactors() > minReactors) ? "† " : "";
-        return record.toDisplayString(new DisplayContext<>(StringFormat.REDDIT, thisCategory), reactorPrefix);
-    }
+        String cell = record.toDisplayString(new DisplayContext<>(StringFormat.REDDIT, thisCategory), reactorPrefix);
 
-    private static final Pattern REGEX_SCORE_CELL =
-            Pattern.compile("\\[\uD83D\uDCC4]\\((?<dataLink>.+\\.txt)\\) " +
-                            "(?:† )?" +
-                            "\\[\\((?<score>" + ScScore.REGEX_BP_SCORE + ")\\) (?<author>[^]]+)]" +
-                            "\\((?<link>[^)]+)\\).*?");
-
-    /**
-     * @return set of categories held for updating
-     */
-    @NotNull
-    private static Set<ScCategory> parseLeaderboardRecord(ScPuzzle puzzle,
-                                                          Map<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> rbcMap,
-                                                          String recordCell) {
-        Matcher m = REGEX_SCORE_CELL.matcher(recordCell);
-        if (m.matches()) {
-            ScScore score = ScScore.parseBPScore(m);
-            Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>> entry = rbcMap.get(score);
-            if (entry == null) {
-                // we don't have this sol in the archive, which means it has been out-pareto'd but still not submitted
-                ScRecord.ScRecordBuilder builder = ScRecord.builder().puzzle(puzzle).score(score);
-                entry = Map.entry(builder, EnumSet.noneOf(ScCategory.class));
-                rbcMap.put(score, entry);
-            }
-            ScRecord.ScRecordBuilder builder = entry.getKey();
-            builder.author(m.group("author")).displayLink(m.group("link")).oldVideoRNG(m.group("oldRNG") != null);
-            return entry.getValue();
+        if (record.getDisplayLink() == null) { // show the best video we have
+            cell += ". Best video: " + recordPair.getValue().toDisplayString(new DisplayContext<>(StringFormat.REDDIT, thisCategory));
         }
-        throw new IllegalStateException("Leaderboard record unparseable: " + recordCell);
+        return cell;
     }
 
-    private static void parseHalfTable(ScPuzzle puzzle,
-                                       Map<ScScore, Map.Entry<ScRecord.ScRecordBuilder, Set<ScCategory>>> rbcMap,
-                                       @NotNull List<String> halfTable, @NotNull ScCategory[] categories) {
-
-        @SuppressWarnings("unchecked")
-        Set<ScCategory>[] heldCategories = (Set<ScCategory>[]) new Set[3];
-        heldCategories[0] = parseLeaderboardRecord(puzzle, rbcMap, halfTable.get(0));
-        heldCategories[0].add(categories[0]);
-
-        if (halfTable.get(1).startsWith("X"))
-            heldCategories[1] = EnumSet.noneOf(ScCategory.class); // impossible category
-        else if (halfTable.get(1).equals("←"))
-            heldCategories[1] = heldCategories[0];
-        else
-            heldCategories[1] = parseLeaderboardRecord(puzzle, rbcMap, halfTable.get(1));
-        heldCategories[1].add(categories[1]);
-
-        if (halfTable.size() != 3 || halfTable.get(2).startsWith("X"))
-            heldCategories[2] = EnumSet.noneOf(ScCategory.class); // impossible category
-        else if (halfTable.get(2).equals("←←"))
-            heldCategories[2] = heldCategories[0];
-        else if (halfTable.get(2).equals("←"))
-            heldCategories[2] = heldCategories[1];
-        else
-            heldCategories[2] = parseLeaderboardRecord(puzzle, rbcMap, halfTable.get(2));
-        heldCategories[2].add(categories[2]);
-    }
-
-    private void postAnnouncementToReddit(@NotNull ScRecord record, List<ScCategory> categories) {
+    private void postAnnouncementToReddit(@NotNull ScRecord record, Collection<ScCategory> categories) {
         // see: https://www.reddit.com/r/spacechem/comments/mmcuzb
         DisplayContext<ScCategory> context = new DisplayContext<>(StringFormat.REDDIT, categories);
         redditService.postInSubmission("mmcuzb", "Added " + Markdown.fileLinkOrEmpty(record.getDataLink()) +
@@ -377,12 +269,6 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                                                  " (" + record.getScore().toDisplayString(context) +
                                                  ")](" + record.getDisplayLink() +
                                                  ") by " + record.getAuthor());
-    }
-
-    @Override
-    protected ScSolutionsIndex makeSolutionIndex(@NotNull Path puzzlePath, @NotNull ScPuzzle puzzle)
-            throws IOException {
-        return new ScSolutionsIndex(puzzlePath, puzzle);
     }
 
     @Override
@@ -405,104 +291,168 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         return makeArchiveLink(puzzle, makeScoreFilename(score));
     }
 
+    /** Sorting order of the solutions index */
+    private static final Comparator<ScSolution> COMPARATOR =
+            Comparator.comparing(ScSolution::getScore, ScCategory.C.getScoreComparator()
+                                                                   .thenComparing(ScScore::isBugged)
+                                                                   .thenComparing(ScScore::isPrecognitive))
+                      .thenComparing(s -> s.getDisplayLink() == null);
+
     /**
-     *  We use this to (de)serialize the index that is in each level folder and keep track of the export files.<br>
-     *  The index is a list sorted in CRS order of BPScores
+     * @param solutions the list is modified with the updated state
      */
-    static class ScSolutionsIndex implements SolutionsIndex<ScSubmission> {
-        private static final Comparator<ScScore> COMPARATOR = ScCategory.C.getScoreComparator()
-                                                                          .thenComparing(ScScore::isBugged)
-                                                                          .thenComparing(ScScore::isPrecognitive);
-        private final ScPuzzle puzzle;
-        private final Path puzzlePath;
-        @Getter
-        private final List<ScScore> scores;
+    @NotNull
+    protected SubmitResult<ScRecord, ScCategory> archiveOne(@NotNull GitRepository.ReadWriteAccess access,
+                                                            @NotNull List<ScSolution> solutions,
+                                                            @NotNull ScSubmission submission) {
+        ScPuzzle puzzle = submission.getPuzzle();
+        Path puzzlePath = access.getRepo().toPath().resolve(relativePuzzlePath(puzzle));
 
-        ScSolutionsIndex(@NotNull Path puzzlePath, @NotNull ScPuzzle puzzle) throws IOException {
-            this.puzzlePath = puzzlePath;
-            this.puzzle = puzzle;
-            List<ScScore> scores;
-            try (Stream<String> lines = Files.lines(puzzlePath.resolve("scores.txt"))) {
-                scores = lines.map(ScScore::parseBPScore).collect(Collectors.toList());
-            }
-            catch (NoSuchFileException e) {
-                Files.createDirectories(puzzlePath);
-                Files.createFile(puzzlePath.resolve("scores.txt"));
-                scores = new ArrayList<>();
-            }
-            this.scores = scores;
-        }
+        List<CategoryRecord<ScRecord, ScCategory>> beatenCategoryRecords = new ArrayList<>();
+        ScSolution candidate = new ScSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink(), false);
 
-        @Override
-        public boolean add(@NotNull ScSubmission submission) throws IOException {
-            ScScore candidate = submission.getScore();
-
-            if (scores.contains(candidate)) {
-                Path solutionPath = puzzlePath.resolve(makeScoreFilename(candidate));
-                if (Files.exists(solutionPath)) {
-                    // we allow file replacement only if the author is the same
-                    String diskAuthor = ScSolutionMetadata.fromPath(solutionPath, puzzle).getAuthor();
-                    if (submission.getAuthor().equals(diskAuthor)) {
-                        Files.delete(solutionPath);
+        try {
+            for (ListIterator<ScSolution> it = solutions.listIterator(); it.hasNext(); ) {
+                ScSolution solution = it.next();
+                int r = dominanceCompare(candidate, solution);
+                if (r > 0) {
+                    // TODO actually return all of the beating sols
+                    CategoryRecord<ScRecord, ScCategory> categoryRecord =
+                            solution.extendToCategoryRecord(puzzle,
+                                                            makeArchiveLink(puzzle, solution.getScore()),
+                                                            puzzlePath.resolve(makeScoreFilename(solution.getScore())));
+                    return new SubmitResult.NothingBeaten<>(Collections.singletonList(categoryRecord));
+                }
+                else if (r < 0) {
+                    // allow same-score author/video changes if you are the original author or you bring a video
+                    if (candidate.getScore().equals(solution.getScore()) &&
+                        !candidate.getAuthor().equals(solution.getAuthor()) &&
+                        candidate.getDisplayLink() == null) {
+                        return new SubmitResult.AlreadyPresent<>();
                     }
-                    else {
-                        // we won't change the files, but return true so that we'll realize we already had it
-                        return true;
-                    }
+                    // remove beaten score and get categories
+                    it.remove();
+                    Files.delete(puzzlePath.resolve(makeScoreFilename(solution.getScore())));
+                    candidate.getCategories().addAll(solution.getCategories());
+                    beatenCategoryRecords.add(solution.extendToCategoryRecord(puzzle, null, null)); // the beaten record has no data anymore
                 }
             }
-            else {
-                ListIterator<ScScore> it = scores.listIterator();
-                while (it.hasNext()) {
-                    ScScore score = it.next();
-                    int r = dominanceCompare(candidate, score);
-                    if (r > 0)
-                        return false;
-                    else if (r < 0) {
-                        // remove beaten score
-                        it.remove();
-                        Files.delete(puzzlePath.resolve(makeScoreFilename(score)));
+
+            // the new record may have gained categories of records it didn't pareto-beat, do the transfers
+            for (ScSolution solution: solutions) {
+                EnumSet<ScCategory> lostCategories = EnumSet.noneOf(ScCategory.class);
+                for (ScCategory category : solution.getCategories()) {
+                    if (category.supportsScore(candidate.getScore()) &&
+                        category.getScoreComparator().compare(candidate.getScore(), solution.getScore()) < 0) {
+                        lostCategories.add(category);
                     }
                 }
+                if (!lostCategories.isEmpty()) {
+                    // add a CR holding the lost categories, then correct the solutions
+                    CategoryRecord<ScRecord, ScCategory> beatenCR = new CategoryRecord<>(
+                            solution.extendToRecord(puzzle,
+                                                    makeArchiveLink(puzzle, solution.getScore()),
+                                                    puzzlePath.resolve(makeScoreFilename(solution.getScore()))),
+                            lostCategories);
+                    beatenCategoryRecords.add(beatenCR);
 
-                int index = Collections.binarySearch(scores, candidate, COMPARATOR);
-                if (index < 0) {
-                    index = -index - 1;
+                    solution.getCategories().removeAll(lostCategories);
+                    candidate.getCategories().addAll(lostCategories);
                 }
-                scores.add(index, candidate);
-
-                Iterable<String> lines = scores.stream().map(ScScore::toDisplayString)::iterator;
-                Files.write(puzzlePath.resolve("scores.txt"), lines, StandardOpenOption.TRUNCATE_EXISTING);
             }
 
-            String filename = makeScoreFilename(candidate);
+            int index = Collections.binarySearch(solutions, candidate, COMPARATOR);
+            if (index < 0) {
+                index = -index - 1;
+            }
+            solutions.add(index, candidate);
+
+            String filename = makeScoreFilename(candidate.getScore());
             Path solutionPath = puzzlePath.resolve(filename);
             String data = submission.getData().replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
             Files.writeString(solutionPath, data, StandardOpenOption.CREATE_NEW);
-            return true;
+
+            marshalSolutions(solutions, puzzlePath);
+        }
+        catch (IOException e) {
+            // failures could happen after we dirtied the repo, so we call reset&clean on the puzzle dir
+            access.resetAndClean(puzzlePath.toFile());
+            return new SubmitResult.Failure<>(e.toString());
         }
 
-        /**
-         * If equal, s1 dominates
-         */
-        private static int dominanceCompare(@NotNull ScScore s1, @NotNull ScScore s2) {
-            int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
-            int r2 = Integer.compare(s1.getReactors(), s2.getReactors());
-            int r3 = Integer.compare(s1.getSymbols(), s2.getSymbols());
-            int r4 = Boolean.compare(s1.isBugged(), s2.isBugged());
-            int r5 = Boolean.compare(s1.isPrecognitive(), s2.isPrecognitive());
-            if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0 && r5 <= 0) {
-                // s1 dominates
-                return -1;
-            }
-            else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0 && r5 >= 0) {
-                // s2 dominates
-                return 1;
-            }
-            else {
-                // equal is already captured by the 1st check, this is for "not comparable"
-                return 0;
-            }
+        if (access.status().isClean()) {
+            // the same exact sol was already archived,
+            return new SubmitResult.AlreadyPresent<>();
+        }
+
+        access.addAll(puzzlePath.toFile());
+        String result = Stream.concat(access.status().getChanged().stream(),
+                                      access.status().getAdded().stream())
+                              .map(f -> "[" + f.replaceFirst(".+/", "") + "]" +
+                                        "(" + getGitRepo().getRawFilesUrl() + "/" + f + ")")
+                              .collect(Collectors.joining(", "));
+        RevCommit rev = access.commit("Added " + submission.getScore().toDisplayString() +
+                                      " for " + submission.getPuzzle().getDisplayName() +
+                                      " by " + submission.getAuthor());
+        result += "\n[commit " + rev.name().substring(0, 7) + "]" +
+                  "(" + getGitRepo().getUrl().replaceFirst(".git$", "") + "/commit/" + rev.name() + ")";
+
+        return new SubmitResult.Success<>(result, beatenCategoryRecords);
+    }
+
+    /**
+     * @return a mutable list
+     */
+    private static List<ScSolution> unmarshalSolutions(@NotNull Path puzzlePath) throws IOException {
+        Path indexPath = puzzlePath.resolve("solutions.psv");
+        try (BufferedReader reader = Files.newBufferedReader(indexPath)) {
+
+            CSVParser parser = new CSVParserBuilder().withSeparator('|').withFieldAsNull(CSVReaderNullFieldIndicator.BOTH).build();
+            CSVReader csvReader = new CSVReaderBuilder(reader).withCSVParser(parser).build();
+            return StreamSupport.stream(csvReader.spliterator(), false)
+                                .map(ScSolution::unmarshal)
+                                .collect(Collectors.toList());
+        }
+        catch (NoSuchFileException e) {
+            Files.createDirectories(puzzlePath);
+            Files.createFile(indexPath);
+            return new ArrayList<>();
         }
     }
+
+    private static void marshalSolutions(@NotNull List<ScSolution> solutions, @NotNull Path puzzlePath) throws IOException {
+        try (BufferedWriter writer = Files.newBufferedWriter(puzzlePath.resolve("solutions.psv"),
+                                                             StandardOpenOption.TRUNCATE_EXISTING)) {
+            ICSVWriter csvWriter = new CSVWriterBuilder(writer).withSeparator('|').build();
+            csvWriter.writeAll(solutions.stream().map(ScSolution::marshal)::iterator, false);
+        }
+    }
+
+    /**
+     * If equal, sol1 dominates
+     */
+    private static int dominanceCompare(@NotNull ScSolution sol1, @NotNull ScSolution sol2) {
+        ScScore s1 = sol1.getScore();
+        ScScore s2 = sol2.getScore();
+        int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
+        int r2 = Integer.compare(s1.getReactors(), s2.getReactors());
+        int r3 = Integer.compare(s1.getSymbols(), s2.getSymbols());
+        int r4 = Boolean.compare(s1.isBugged(), s2.isBugged());
+        int r5 = Boolean.compare(s1.isPrecognitive(), s2.isPrecognitive());
+        int r6 = Boolean.compare(sol1.getDisplayLink() == null, sol2.getDisplayLink() == null);
+
+        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0 && r5 <= 0 && r6 <= 0) {
+            // sol1 dominates
+            return -1;
+        }
+        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0 && r5 >= 0 && r6 >= 0) {
+            // sol2 dominates
+            return 1;
+        }
+        else {
+            // equal is already captured by the 1st check, this is for "not comparable"
+            return 0;
+        }
+    }
+
 }

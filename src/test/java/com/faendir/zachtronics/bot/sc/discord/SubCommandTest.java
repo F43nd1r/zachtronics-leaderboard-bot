@@ -64,7 +64,7 @@ public class SubCommandTest {
         Map<String, String> args = Map.of("puzzle", "fission I",
                                           "category", "C");
         String result = runCommand("show", args);
-        assertTrue(result.contains("Fission I") && result.contains("C"));
+        assertTrue(result.contains("Fission I") && result.contains("C") && result.contains("]("));
     }
 
     @Test

@@ -16,17 +16,15 @@
 
 package com.faendir.zachtronics.bot.sc.repository;
 
-import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.sc.model.*;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 @BotTest
 public class SolRepoSubmitTest {
@@ -38,41 +36,41 @@ public class SolRepoSubmitTest {
     public void testArchiveScore() {
         // we start with a 100/100/100
         ScScore score = new ScScore(100, 100, 100, true, true);
-        assertTrue(doSubmitScore(score) instanceof SubmitResult.NothingBeaten); // our score is a BP, fail
+        assertInstanceOf(SubmitResult.NothingBeaten.class, doSubmitScore(score)); // our score is a BP, fail
         score = new ScScore(100, 100, 100, false, true);
-        assertTrue(doSubmitScore(score) instanceof SubmitResult.NothingBeaten); // our score is a P, fail
+        assertInstanceOf(SubmitResult.NothingBeaten.class, doSubmitScore(score)); // our score is a P, fail
         score = new ScScore(100, 100, 100, false, false);
-        assertTrue(doSubmitScore(score) instanceof SubmitResult.Success); // identical score, different content, accept
+        assertInstanceOf(SubmitResult.Success.class, doSubmitScore(score)); // identical score, different content, accept
         score = new ScScore(10, 100, 1000, true, true);
-        assertTrue(doSubmitScore(score) instanceof SubmitResult.Success); // new frontier piece
+        assertInstanceOf(SubmitResult.Success.class, doSubmitScore(score)); // new frontier piece
         score = new ScScore(1000, 100, 10, true, true);
-        assertTrue(doSubmitScore(score) instanceof SubmitResult.Success); // new frontier piece
+        assertInstanceOf(SubmitResult.Success.class, doSubmitScore(score)); // new frontier piece
         score = new ScScore(10, 10, 10, true, true);
-        assertTrue(doSubmitScore(score) instanceof SubmitResult.Success); // beats them both
+        assertInstanceOf(SubmitResult.Success.class, doSubmitScore(score)); // beats them both
         score = new ScScore(20, 20, 20, true, true);
-        assertTrue(doSubmitScore(score) instanceof SubmitResult.NothingBeaten); // falls flat
+        assertInstanceOf(SubmitResult.NothingBeaten.class, doSubmitScore(score)); // falls flat
         score = new ScScore(20, 20, 20, false, true);
-        assertTrue(doSubmitScore(score) instanceof SubmitResult.Success); // new non bugged record
+        assertInstanceOf(SubmitResult.Success.class, doSubmitScore(score)); // new non bugged record
     }
 
     @Test
     public void testSubmitData() {
         // we start at 100/100/100
         ScScore score = new ScScore(50, 50, 50, false, false);
-        assertTrue(doSubmitScore(score) instanceof SubmitResult.Success); // 50/50/50
+        assertInstanceOf(SubmitResult.Success.class, doSubmitScore(score)); // 50/50/50
 
         String content = "SOLUTION:A Most Unfortunate Malfunction,12345ieee,45-1-14\nbunch of stuff...";
-        assertTrue(doSubmitData(content) instanceof SubmitResult.Success); // 45/1/14
-        assertTrue(doSubmitData(content) instanceof SubmitResult.AlreadyPresent); // identical
+        assertInstanceOf(SubmitResult.Success.class, doSubmitData(content)); // 45/1/14
+        assertInstanceOf(SubmitResult.AlreadyPresent.class, doSubmitData(content)); // identical
 
         content = "SOLUTION:A Most Unfortunate Malfunction,12345ieee,45-1-14\ndifferent stuff...";
-        assertTrue(doSubmitData(content) instanceof SubmitResult.Success); // changed content, I can
+        assertInstanceOf(SubmitResult.Success.class, doSubmitData(content)); // changed content, I can
 
         content = "SOLUTION:A Most Unfortunate Malfunction,BadGuy,45-1-14\ndifferent stuff...";
-        assertTrue(doSubmitData(content) instanceof SubmitResult.AlreadyPresent); // stealing is bad
+        assertInstanceOf(SubmitResult.AlreadyPresent.class, doSubmitData(content)); // stealing is bad
 
         content = "SOLUTION:A Most Unfortunate Malfunction,BadGuy,50-1-50\nsome more stuff...";
-        assertTrue(doSubmitData(content) instanceof SubmitResult.NothingBeaten); // just give up, man
+        assertInstanceOf(SubmitResult.NothingBeaten.class, doSubmitData(content)); // just give up, man
     }
 
     @NotNull

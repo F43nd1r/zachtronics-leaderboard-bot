@@ -19,8 +19,10 @@ package com.faendir.zachtronics.bot.sc.repository;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.sc.model.*;
+import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +31,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static java.util.function.Predicate.not;
 
 @BotTest
 @Disabled("Massive tests only for manual testing or migrations")
@@ -41,17 +47,33 @@ class SolRepoManualTest {
     @Test
     public void testFullIO() {
         for (ScPuzzle p : ScPuzzle.values()) {
-            Iterable<ScRecord> records = repository.findCategoryHolders(p, false).stream()
-                                                   .map(CategoryRecord::getRecord)
-                                                   .distinct()::iterator;
-            for (ScRecord r : records) {
-                ScSubmission submission = new ScSubmission(p, r.getScore(), r.getAuthor(), r.getDisplayLink(), "data");
-                repository.submit(submission);
-            }
+            List<ValidationResult<ScSubmission>> submissions =
+                    repository.findCategoryHolders(p, true)
+                              .stream()
+                              .map(CategoryRecord::getRecord)
+                              .filter(not(ScRecord::isOldVideoRNG)) // would be added with no asterisk
+                              .mapMulti(SolRepoManualTest::addRecordToSubmissions)
+                              .<ValidationResult<ScSubmission>>map(ValidationResult.Valid::new)
+                              .toList();
+
+            repository.submitAll(submissions);
 
             System.out.println("Done " + p.getDisplayName());
         }
         System.out.println("Done");
+    }
+
+    private static void addRecordToSubmissions(@NotNull ScRecord record, Consumer<ScSubmission> cons) {
+        if (record.getDataPath() != null) {
+            try {
+                String data = Files.readString(record.getDataPath());
+                ScSubmission s = new ScSubmission(record.getPuzzle(), record.getScore(), record.getAuthor(),
+                                                  record.getDisplayLink(), data);
+                cons.accept(s);
+            }
+            catch (IOException ignored) {
+            }
+        }
     }
 
     @Test
