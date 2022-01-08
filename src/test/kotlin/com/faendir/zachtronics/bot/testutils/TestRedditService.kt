@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.main.reddit
+package com.faendir.zachtronics.bot.testutils
 
 import com.faendir.zachtronics.bot.reddit.RedditService
 import com.faendir.zachtronics.bot.reddit.Subreddit

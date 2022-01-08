@@ -129,18 +129,20 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
                 val latestCommit = walk.parseCommit(git.repository.resolve(Constants.HEAD))
                 walk.markStart(latestCommit)
                 walk.sort(RevSort.COMMIT_TIME_DESC)
-                walk.sort(RevSort.REVERSE, true)
                 walk.revFilter = CommitTimeRevFilter.after(Date.from(instant))
-                val firstCommit = walk.firstOrNull() ?: return@use emptyList()
+                val firstCommit = walk.lastOrNull() ?: return@use emptyList()
+                val beforeCommit: RevCommit? = git.repository.resolve(firstCommit.name + "^")?.let { walk.parseCommit(it) }
                 DiffFormatter(null).use { diffFormatter ->
                     diffFormatter.setReader(walk.objectReader, Config())
-                    diffFormatter.scan(firstCommit.tree, latestCommit.tree).map { diff ->
+                    diffFormatter.scan(beforeCommit?.tree, latestCommit.tree).map { diff ->
                         Change(
                             diff.changeType,
                             diff.oldPath,
                             diff.oldPath?.let { oldPath ->
-                                TreeWalk.forPath(walk.objectReader, oldPath, firstCommit.tree)?.let {
-                                    it.objectReader.open(it.getObjectId(0))
+                                beforeCommit?.tree?.let { oldTree ->
+                                    TreeWalk.forPath(walk.objectReader, oldPath, oldTree)?.let {
+                                        it.objectReader.open(it.getObjectId(0))
+                                    }
                                 }
                             },
                             diff.newPath,

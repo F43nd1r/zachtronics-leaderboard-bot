@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.main.git
+package com.faendir.zachtronics.bot.git
 
 import com.faendir.zachtronics.bot.config.GitProperties
-import com.faendir.zachtronics.bot.git.GitRepository
-import java.io.File
+import com.google.common.hash.HashFunction
+import com.google.common.hash.Hashing
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 
-class TestGitRepository(gitProperties: GitProperties, private val directory: File) :
-    GitRepository(gitProperties, directory.name, directory.toURI().toString()) {
-
-    override fun cleanup() {
-        super.cleanup()
-        directory.deleteRecursively()
-    }
+@Configuration
+class GithubConfiguration(private val gitProperties: GitProperties) {
+    @Bean
+    fun githubHashFunction(): HashFunction = Hashing.hmacSha256(gitProperties.webhookSecret.toByteArray(Charsets.UTF_8))
 }

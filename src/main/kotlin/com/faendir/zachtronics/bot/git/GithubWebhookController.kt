@@ -16,11 +16,10 @@
 
 package com.faendir.zachtronics.bot.git
 
-import com.faendir.zachtronics.bot.config.GitProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.google.common.hash.Hashing
+import com.google.common.hash.HashFunction
 import io.swagger.v3.oas.annotations.Hidden
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -33,7 +32,7 @@ import org.springframework.web.server.ResponseStatusException
 
 @Hidden
 @RestController
-class GithubWebhookController(private val repositories: List<GitRepository>, private val gitProperties: GitProperties, private val objectMapper: ObjectMapper) {
+class GithubWebhookController(private val repositories: List<GitRepository>, private val hashFunction: HashFunction, private val objectMapper: ObjectMapper) {
     companion object {
         private val logger = LoggerFactory.getLogger(GithubWebhookController::class.java)
     }
@@ -68,7 +67,7 @@ class GithubWebhookController(private val repositories: List<GitRepository>, pri
     }
 
     private fun hash(payload: String): String {
-        return Hashing.hmacSha256(gitProperties.webhookSecret.toByteArray(Charsets.UTF_8)).hashString(payload, Charsets.UTF_8).toString()
+        return hashFunction.hashString(payload, Charsets.UTF_8).toString()
     }
 }
 

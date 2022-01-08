@@ -18,8 +18,8 @@ package com.faendir.zachtronics.bot
 
 import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.git.GitRepository
-import com.faendir.zachtronics.bot.main.git.TestGitRepository
-import com.faendir.zachtronics.bot.main.reddit.TestRedditService
+import com.faendir.zachtronics.bot.testutils.TestGitRepository
+import com.faendir.zachtronics.bot.testutils.TestRedditService
 import com.faendir.zachtronics.bot.reddit.RedditService
 import discord4j.core.GatewayDiscordClient
 import discord4j.rest.RestClient

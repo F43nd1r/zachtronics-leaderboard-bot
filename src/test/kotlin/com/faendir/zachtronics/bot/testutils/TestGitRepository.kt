@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.config
+package com.faendir.zachtronics.bot.testutils
 
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.context.annotation.Configuration
+import com.faendir.zachtronics.bot.config.GitProperties
+import com.faendir.zachtronics.bot.git.GitRepository
+import java.io.File
 
-@Configuration("gitAccessProperties")
-@ConfigurationProperties(prefix = "git")
-class GitProperties {
-    lateinit var accessToken: String
-    lateinit var username: String
-    var webhookSecret: String = " "
+class TestGitRepository(gitProperties: GitProperties, private val directory: File) :
+    GitRepository(gitProperties, directory.name, directory.toURI().toString()) {
+
+    override fun cleanup() {
+        super.cleanup()
+        directory.deleteRecursively()
+    }
 }

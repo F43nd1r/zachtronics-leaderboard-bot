@@ -19,7 +19,7 @@ package com.faendir.zachtronics.bot.om.repository
 import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.createGitRepositoryFrom
 import com.faendir.zachtronics.bot.git.GitRepository
-import com.faendir.zachtronics.bot.main.git.TestGitRepository
+import com.faendir.zachtronics.bot.testutils.TestGitRepository
 import com.faendir.zachtronics.bot.om.dummyOmSubmission
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
@@ -33,7 +33,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.any
-import strikt.assertions.contains
 import strikt.assertions.containsExactlyInAnyOrder
 import strikt.assertions.first
 import strikt.assertions.hasSize
