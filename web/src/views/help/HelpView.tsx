@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Card, CardContent, CardHeader, CardMedia, Grid, useTheme } from "@mui/material"
+import { Card, CardContent, CardHeader, CardMedia, Grid, styled, useTheme } from "@mui/material"
 import heightExplanation from "./height_explanation.jpg"
 import widthExplanation from "./width_explanation.jpg"
 import overlapExplanation from "./overlap_tutorial.mp4"
@@ -125,6 +125,32 @@ export default function HelpView() {
                     </>
                 }
             />
+            <HelpCard
+                id="bot"
+                title="Discord Bot"
+                description={
+                    <>
+                        The Discord Bot allows you to submit or query records.
+                        <p>
+                            Use
+                            <Code>/om submit solution:&lt;solution link&gt; gif:&lt;gif link&gt;</Code>
+                            to submit your solution to the leaderboards.
+                        </p>
+                        <p>
+                            If you want to use discord attachments instead of links, you can use <Code>mX</Code> or <Code>mX.Y</Code> in place of one or both of the links, where X refers to your Xth
+                            previous message (e.g. <Code>m1</Code> refers to your last message) and Y refers to the Yth attachment on the message (e.g. <Code>m1.2</Code> refers to the second
+                            attachment on your last message).
+                        </p>
+                        <p>
+                            To view records, use <Code>/om show puzzle:&lt;puzzle name&gt; category:&lt;short category name&gt;</Code>
+                        </p>
+                        <p>
+                            To browse records, use either <Code>/om list puzzle:&lt;puzzle name&gt;</Code> if you're looking for only records, or <Code>/om frontier puzzle:&lt;puzzle name&gt;</Code>
+                            if you're looking for the full pareto frontier.
+                        </p>
+                    </>
+                }
+            />
         </Grid>
     )
 }
@@ -185,3 +211,8 @@ function HelpCard(props: MetricCardProps) {
         </Grid>
     )
 }
+
+const Code = styled("code")`
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+`
