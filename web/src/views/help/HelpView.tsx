@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Card, CardContent, CardHeader, CardMedia, Grid, styled, useTheme } from "@mui/material"
+import { Card, CardContent, CardHeader, CardMedia, styled, useTheme } from "@mui/material"
 import heightExplanation from "./height_explanation.jpg"
 import widthExplanation from "./width_explanation.jpg"
 import overlapExplanation from "./overlap_tutorial.mp4"
@@ -22,11 +22,12 @@ import { LinkOutlined } from "@mui/icons-material"
 import { useMemo, useState } from "react"
 import { HashLink } from "react-router-hash-link"
 import { useLocation } from "react-router-dom"
+import { Masonry } from "@mui/lab"
 
 export default function HelpView() {
     document.title = "Help - Opus Magnum Leaderboards"
     return (
-        <Grid container spacing={3} alignItems="stretch" sx={{ paddingBottom: 2 }}>
+        <Masonry spacing={3} columns={{ xs: 1, sm: 2, md: 2, lg: 2, xl: 3, xxl: 3, xxxl: 4 }}>
             <HelpCard id="cost" title="Cost (g)" description={<>Cost of all parts in the solution, as defined by the game.</>} />
             <HelpCard id="cycles" title="Cycles (c)" description={<>Cycles needed to run the solution to completion, as defined by the game.</>} />
             <HelpCard
@@ -151,7 +152,7 @@ export default function HelpView() {
                     </>
                 }
             />
-        </Grid>
+        </Masonry>
     )
 }
 
@@ -171,7 +172,18 @@ function HelpCard(props: MetricCardProps) {
     const location = useLocation()
     const highlight = useMemo(() => (theme.palette.mode === "light" ? theme.palette.grey["400"] : theme.palette.grey["800"]), [theme.palette.mode, theme.palette.grey])
     return (
-        <Grid item xs key={props.id}>
+        <Card
+            key={props.id}
+            sx={{
+                animation: location.hash === `#${props.id}` ? "fade 3s ease-in-out" : "none",
+                "@keyframes fade": {
+                    "0%": { backgroundColor: highlight },
+                    "100%": { backgroundColor: "transparent" },
+                },
+            }}
+            onMouseEnter={() => setLinkVisibility("visible")}
+            onMouseLeave={() => setLinkVisibility("hidden")}
+        >
             <div
                 id={props.id}
                 style={{
@@ -181,34 +193,19 @@ function HelpCard(props: MetricCardProps) {
                     visibility: "hidden",
                 }}
             />
-            <Card
-                sx={{
-                    minWidth: "min(90vw, 400px)",
-                    maxWidth: "100%",
-                    height: "100%",
-                    animation: location.hash === `#${props.id}` ? "fade 3s ease-in-out" : "none",
-                    "@keyframes fade": {
-                        "0%": { backgroundColor: highlight },
-                        "100%": { backgroundColor: "transparent" },
-                    },
-                }}
-                onMouseEnter={() => setLinkVisibility("visible")}
-                onMouseLeave={() => setLinkVisibility("hidden")}
-            >
-                <CardHeader
-                    title={
-                        <>
-                            {props.title}
-                            <HashLink smooth to={`#${props.id}`} style={{ visibility: linkVisibility, color: theme.palette.text.primary, padding: "0.5rem" }}>
-                                <LinkOutlined fontSize={"small"} />
-                            </HashLink>
-                        </>
-                    }
-                />
-                {props.image && <CardMedia autoPlay loop muted component={props.image.location.endsWith(".mp4") ? "video" : "img"} src={props.image.location} alt={props.image.alt} />}
-                <CardContent>{props.description}</CardContent>
-            </Card>
-        </Grid>
+            <CardHeader
+                title={
+                    <>
+                        {props.title}
+                        <HashLink smooth to={`#${props.id}`} style={{ visibility: linkVisibility, color: theme.palette.text.primary, padding: "0.5rem" }}>
+                            <LinkOutlined fontSize={"small"} />
+                        </HashLink>
+                    </>
+                }
+            />
+            {props.image && <CardMedia autoPlay loop muted component={props.image.location.endsWith(".mp4") ? "video" : "img"} src={props.image.location} alt={props.image.alt} />}
+            <CardContent>{props.description}</CardContent>
+        </Card>
     )
 }
 

@@ -171,6 +171,17 @@ export default function ThemedApp() {
                 palette: {
                     mode,
                 },
+                breakpoints: {
+                    values: {
+                        xs: 0,
+                        sm: 640,
+                        md: 960,
+                        lg: 1280,
+                        xl: 1600,
+                        xxl: 1920,
+                        xxxl: 2240,
+                    },
+                },
             }),
         [mode],
     )
@@ -182,4 +193,11 @@ export default function ThemedApp() {
             </ThemeProvider>
         </ColorModeContext.Provider>
     )
+}
+
+declare module "@mui/material/styles" {
+    interface BreakpointOverrides {
+        xxl: true
+        xxxl: true
+    }
 }
