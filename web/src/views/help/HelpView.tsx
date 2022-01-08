@@ -183,7 +183,7 @@ function HelpCard(props: MetricCardProps) {
             />
             <Card
                 sx={{
-                    minWidth: "min(90vw, 460px)",
+                    minWidth: "min(90vw, 400px)",
                     maxWidth: "100%",
                     height: "100%",
                     animation: location.hash === `#${props.id}` ? "fade 3s ease-in-out" : "none",
