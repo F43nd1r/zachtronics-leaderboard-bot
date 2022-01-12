@@ -66,9 +66,12 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     @Override
     public SubmitResult<ScRecord, ScCategory> submit(@NotNull ScSubmission submission) {
         try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
-            SubmitResult<ScRecord, ScCategory> r = submitOne(access, submission);
-            if (r instanceof SubmitResult.Success<ScRecord, ScCategory>)
+            List<String> redditAnnouncementLines = new ArrayList<>();
+            SubmitResult<ScRecord, ScCategory> r = submitOne(access, submission, redditAnnouncementLines);
+            if (r instanceof SubmitResult.Success<ScRecord, ScCategory>) {
                 access.push();
+                postAnnouncementToReddit(String.join("\n", redditAnnouncementLines));
+            }
             return r;
         }
     }
@@ -78,14 +81,17 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     public List<SubmitResult<ScRecord, ScCategory>> submitAll(
             @NotNull Collection<? extends ValidationResult<ScSubmission>> validationResults) {
         try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
+            List<String> redditAnnouncementLines = new ArrayList<>();
             List<SubmitResult<ScRecord, ScCategory>> l = validationResults.stream().map(r -> {
                 if (r instanceof ValidationResult.Valid<ScSubmission>)
-                    return submitOne(access, r.getSubmission());
+                    return submitOne(access, r.getSubmission(), redditAnnouncementLines);
                 else
                     return new SubmitResult.Failure<ScRecord, ScCategory>(r.getMessage());
             }).toList();
-            if (l.stream().anyMatch(s -> s instanceof SubmitResult.Success<ScRecord, ScCategory>))
+            if (l.stream().anyMatch(s -> s instanceof SubmitResult.Success<ScRecord, ScCategory>)) {
                 access.push();
+                postAnnouncementToReddit(String.join("\n", redditAnnouncementLines));
+            }
             return l;
         }
     }
@@ -125,8 +131,8 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     }
 
     @NotNull
-    private SubmitResult<ScRecord, ScCategory> submitOne(@NotNull GitRepository.ReadWriteAccess access,
-                                                         @NotNull ScSubmission submission) {
+    private SubmitResult<ScRecord, ScCategory> submitOne(@NotNull GitRepository.ReadWriteAccess access, @NotNull ScSubmission submission,
+                                                         @NotNull List<String> redditAnnouncementLines) {
         ScPuzzle puzzle = submission.getPuzzle();
         Path puzzlePath = access.getRepo().toPath().resolve(relativePuzzlePath(puzzle));
         List<ScSolution> solutions;
@@ -150,8 +156,13 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                 String updateMessage = puzzle.getDisplayName() + " " + submission.getScore().toDisplayString() +
                                        " by " + submission.getAuthor();
                 writeToRedditLeaderboard(puzzle, puzzlePath, solutions, updateMessage);
-                // post to lb thread
-                postAnnouncementToReddit(submission, makeArchiveLink(puzzle, submission.getScore()), wonCategories);
+
+                DisplayContext<ScCategory> context = new DisplayContext<>(StringFormat.REDDIT, wonCategories);
+                redditAnnouncementLines.add("Added " + Markdown.fileLinkOrEmpty(makeArchiveLink(puzzle, submission.getScore())) +
+                                            Markdown.linkOrText(submission.getPuzzle().getDisplayName() +
+                                                                " (" + submission.getScore().toDisplayString(context) + ")",
+                                                                submission.getDisplayLink(), true) +
+                                            " by " + submission.getAuthor());
             }
         }
 
@@ -273,14 +284,9 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         return record.toDisplayString(displayContext, reactorPrefix);
     }
 
-    private void postAnnouncementToReddit(@NotNull ScSubmission submission, String dataLink, Collection<ScCategory> categories) {
+    private void postAnnouncementToReddit(String content) {
         // see: https://www.reddit.com/r/spacechem/comments/mmcuzb
-        DisplayContext<ScCategory> context = new DisplayContext<>(StringFormat.REDDIT, categories);
-        redditService.postInSubmission("mmcuzb", "Added " + Markdown.fileLinkOrEmpty(dataLink) +
-                                                 "[" + submission.getPuzzle().getDisplayName() +
-                                                 " (" + submission.getScore().toDisplayString(context) +
-                                                 ")](" + submission.getDisplayLink() +
-                                                 ") by " + submission.getAuthor());
+        redditService.postInSubmission("mmcuzb", content);
     }
 
     @Override
