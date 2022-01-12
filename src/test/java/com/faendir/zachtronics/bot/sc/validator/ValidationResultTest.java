@@ -162,12 +162,12 @@ class ValidationResultTest {
         String export = "SOLUTION:QT-3,Zig,109-1-0,/B telekinesys"; // it doesn't have to run at all
 
         ScScore expected = new ScScore(109, 1, 0, true, false);
-        ScScore result = SChem.validateMultiExport(export, true).iterator().next().getSubmission().getScore();
+        ScScore result = SChem.validateMultiExport(export, true, null).iterator().next().getSubmission().getScore();
         assertEquals(expected, result);
     }
 
     @NotNull
     private static ValidationResult<ScSubmission> validateSingle(String export) {
-        return SChem.validationResultFrom(SChem.validate(export, false)[0], false);
+        return SChem.validationResultFrom(SChem.validate(export, false)[0], false, null);
     }
 }

@@ -52,7 +52,7 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScArchiveCommand.Ar
     @Override
     public Collection<ValidationResult<ScSubmission>> parseSubmissions(@NotNull ArchiveData parameters) {
         boolean bypassValidation = parameters.bypassValidation != null && parameters.bypassValidation;
-        return ScSubmission.fromExportLink(parameters.export, bypassValidation);
+        return ScSubmission.fromExportLink(parameters.export, bypassValidation, parameters.author);
     }
 
     @ApplicationCommand(name = "archive", description = "Archive any number of solutions in an export file", subCommand = true)
@@ -61,15 +61,19 @@ public class ScArchiveCommand extends AbstractArchiveCommand<ScArchiveCommand.Ar
     public static class ArchiveData {
         @NotNull String export;
         Boolean bypassValidation;
+        String author;
 
         public ArchiveData(@NotNull
                            @Description("Link or `m1` to scrape it from your last message. " +
                                         "Start the solution name with `/B?P?` to set flags")
                            @Converter(LinkConverter.class) String export,
                            @Description("Skips running SChem on the solutions. Admin-only")
-                           @Converter(value=ScAdminOnlyBooleanConverter.class, input=Boolean.class) Boolean bypassValidation) {
+                           @Converter(value=ScAdminOnlyBooleanConverter.class, input=Boolean.class) Boolean bypassValidation,
+                           @Description("Name to appear on the Reddit leaderboard")
+                           String author) {
             this.export = export;
             this.bypassValidation = bypassValidation;
+            this.author = author;
         }
     }
 }

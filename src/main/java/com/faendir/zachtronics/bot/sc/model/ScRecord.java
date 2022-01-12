@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.sc.model;
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.utils.Markdown;
-import lombok.Builder;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,9 +26,6 @@ import java.nio.file.Path;
 
 @Value
 public class ScRecord implements Record<ScCategory> {
-    public static final ScRecord IMPOSSIBLE_CATEGORY = new ScRecord(ScPuzzle.bonding_boss, ScScore.INVALID_SCORE,
-                                                                    "", null, false, null, null);
-
     @NotNull ScPuzzle puzzle;
     @NotNull ScScore score;
     @NotNull String author;

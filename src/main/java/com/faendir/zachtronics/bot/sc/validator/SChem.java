@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -40,13 +41,13 @@ public class SChem {
 
     /**
      * validates a possibly multi SpaceChem export
-     *
      * @param export multiExport to check
      * @param bypassValidation only check it imports
+     * @param author author to override all imports
      */
     @NotNull
-    public static Collection<ValidationResult<ScSubmission>> validateMultiExport(@NotNull String export,
-                                                                                 boolean bypassValidation) {
+    public static Collection<ValidationResult<ScSubmission>> validateMultiExport(@NotNull String export, boolean bypassValidation,
+                                                                                 @Nullable String author) {
         int solutionsNumber = StringUtils.countMatches(export, "SOLUTION:");
         if (solutionsNumber > 50 && !bypassValidation) {
             throw new IllegalArgumentException(
@@ -54,18 +55,33 @@ public class SChem {
         }
 
         return Arrays.stream(validate(export, bypassValidation))
-                     .map(r -> validationResultFrom(r, bypassValidation))
+                     .map(r -> validationResultFrom(r, bypassValidation, author))
                      .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @NotNull
-    static ValidationResult<ScSubmission> validationResultFrom(@NotNull SChemResult result, boolean bypassValidation)
+    static ValidationResult<ScSubmission> validationResultFrom(@NotNull SChemResult result, boolean bypassValidation,
+                                                               String author)
             throws SChemException {
 
         if (result.getLevelName() == null || result.getAuthor() == null || result.getCycles() == null)
             return new ValidationResult.Unparseable<>(result.getError());
         assert result.getExport() != null;
 
+        // puzzle
+        SingleParseResult<ScPuzzle> puzzleParseResult = ScPuzzle.parsePuzzle(result.getLevelName());
+        if (puzzleParseResult instanceof SingleParseResult.Ambiguous && result.getResnetId() != null) {
+            puzzleParseResult = ScPuzzle.parsePuzzle(result.getLevelName() +
+                                                     Arrays.stream(result.getResnetId()).mapToObj(Integer::toString)
+                                                           .collect(Collectors.joining("-", " (", ")")));
+        }
+        ScPuzzle puzzle = puzzleParseResult.orElseThrow();
+
+        // author
+        if (author == null)
+            author = result.getAuthor();
+
+        // score
         // we pull flags from the input
         boolean declaresBugged = false;
         boolean declaresPrecog = false;
@@ -82,15 +98,8 @@ public class SChem {
         ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), declaresBugged,
                                     declaresPrecog);
 
-        SingleParseResult<ScPuzzle> puzzleParseResult = ScPuzzle.parsePuzzle(result.getLevelName());
-        if (puzzleParseResult instanceof SingleParseResult.Ambiguous && result.getResnetId() != null) {
-            puzzleParseResult = ScPuzzle.parsePuzzle(result.getLevelName() +
-                                                     Arrays.stream(result.getResnetId()).mapToObj(Integer::toString)
-                                                           .collect(Collectors.joining("-", " (", ")")));
-        }
-        ScPuzzle puzzle = puzzleParseResult.orElseThrow();
-
-        ScSubmission submission = new ScSolutionMetadata(puzzle, result.getAuthor(), score, result.getSolutionName())
+        // build submission
+        ScSubmission submission = new ScSolutionMetadata(puzzle, author, score, result.getSolutionName())
                                      .extendToSubmission(null, result.getExport());
 
         if (!bypassValidation) {

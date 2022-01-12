@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.Collection;
 
 /** Archive-only submissions have a <tt>null</tt> {@link #displayLink} */
@@ -50,8 +49,8 @@ public class ScSubmission implements Submission<ScCategory, ScPuzzle> {
     }
 
     @NotNull
-    public static Collection<ValidationResult<ScSubmission>> fromExportLink(@NotNull String exportLink,
-                                                                            boolean bypassValidation) {
+    public static Collection<ValidationResult<ScSubmission>> fromExportLink(@NotNull String exportLink, boolean bypassValidation,
+                                                                            String author) {
         String export;
         try (InputStream is = new URL(Utils.rawContentURL(exportLink)).openStream()) {
             export = new String(is.readAllBytes()).replace("\r\n", "\n");
@@ -63,10 +62,7 @@ public class ScSubmission implements Submission<ScCategory, ScPuzzle> {
             throw new IllegalArgumentException("Could not read your solution");
         }
 
-        return SChem.validateMultiExport(export, bypassValidation);
+        return SChem.validateMultiExport(export, bypassValidation, author);
     }
 
-    public ScRecord extendToRecord(String dataLink, Path dataPath) {
-        return new ScRecord(puzzle, score, author, displayLink, false, dataLink, dataPath);
-    }
 }

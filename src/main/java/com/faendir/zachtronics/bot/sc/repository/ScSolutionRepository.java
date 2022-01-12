@@ -173,27 +173,25 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     private void writeToRedditLeaderboard(@NotNull ScPuzzle puzzle, Path puzzlePath, @NotNull List<ScSolution> solutions,
                                          String updateMessage) {
 
-        List<ScRecord> records = solutions.stream()
-                                          .map(sol -> sol.extendToRecord(puzzle,
-                                                                         makeArchiveLink(puzzle, sol.getScore()),
-                                                                         puzzlePath.resolve(makeScoreFilename(sol.getScore()))))
-                                          .toList();
-        Map<ScCategory, Map.Entry<ScRecord, ScRecord>> recordMap = new EnumMap<>(ScCategory.class);
-        for (int i = 0; i < solutions.size(); i++) {
-            ScSolution solution = solutions.get(i);
-            ScRecord record = records.get(i);
+        Map<ScCategory, ScRecord> recordMap = new EnumMap<>(ScCategory.class);
+        Map<ScCategory, ScRecord> videoRecordMap = new EnumMap<>(ScCategory.class);
+        List<ScRecord> videoRecords = solutions.stream()
+                                               .filter(s -> s.getDisplayLink() != null)
+                                               .map(s -> s.extendToRecord(puzzle, null, null)) // no export
+                                               .toList();
+        for (ScSolution solution: solutions) {
+            ScRecord record = solution.extendToRecord(puzzle,
+                                                      makeArchiveLink(puzzle, solution.getScore()),
+                                                      puzzlePath.resolve(makeScoreFilename(solution.getScore())));
             for (ScCategory category : solution.getCategories()) {
-                ScRecord videoRecord;
-                if (record.getDisplayLink() != null)
-                    videoRecord = record;
-                else {
-                    videoRecord = records.stream()
-                                         .filter(r -> r.getDisplayLink() != null)
-                                         .filter(r -> category.supportsScore(r.getScore()))
-                                         .min(Comparator.comparing(ScRecord::getScore, category.getScoreComparator()))
-                                         .orElseThrow();
+                recordMap.put(category, record);
+                if (record.getDisplayLink() == null) {
+                    ScRecord videoRecord = videoRecords.stream()
+                                                    .filter(s -> category.supportsScore(s.getScore()))
+                                                    .min(Comparator.comparing(ScRecord::getScore, category.getScoreComparator()))
+                                                    .orElseThrow();
+                    videoRecordMap.put(category, videoRecord);
                 }
-                recordMap.put(category, Map.entry(record, videoRecord));
             }
         }
 
@@ -213,7 +211,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                 StringBuilder row = new StringBuilder("|");
                 int minReactors = Integer.MAX_VALUE;
                 if (rowIdx == 1) {
-                    minReactors = recordMap.values().stream().mapToInt(r -> r.getKey().getScore().getReactors()).min().orElseThrow();
+                    minReactors = recordMap.get(ScCategory.RC).getScore().getReactors();
                     row.append(puzzle.getDisplayName()).append(" - ")
                        .append(minReactors).append(" Reactor").append(minReactors == 1 ? "" : "s");
                 }
@@ -221,20 +219,27 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                     row.append(prevElems[1]);
                 }
 
-                Map.Entry<ScRecord, ScRecord> impossible = Map.entry(ScRecord.IMPOSSIBLE_CATEGORY, ScRecord.IMPOSSIBLE_CATEGORY);
                 for (int block = 0; block < 2; block++) {
                     ScCategory[] blockCategories = CATEGORIES[2 * rowIdx + block];
-                    @SuppressWarnings("unchecked")
-                    Map.Entry<ScRecord, ScRecord>[] blockRecords =
-                            (Map.Entry<ScRecord, ScRecord>[]) Arrays.stream(blockCategories)
-                                                                    .map(c -> recordMap.getOrDefault(c, impossible))
-                                                                    .toArray(Map.Entry[]::new);
+                    ScRecord[] blockRecords = Arrays.stream(blockCategories)
+                                                    .map(recordMap::get)
+                                                    .toArray(ScRecord[]::new);
+                    ScRecord[] blockVideoRecords = Arrays.stream(blockCategories)
+                                                         .map(videoRecordMap::get)
+                                                         .toArray(ScRecord[]::new);
 
                     for (int i = 0; i < halfSize; i++) {
                         ScCategory thisCategory = blockCategories[i];
                         row.append(" | ");
-                        if (blockRecords[i].getKey() != ScRecord.IMPOSSIBLE_CATEGORY) {
-                            row.append(makeLeaderboardCell(blockRecords, i, minReactors, thisCategory));
+                        if (blockRecords[i] != null) {
+                            DisplayContext<ScCategory> displayContext = new DisplayContext<>(StringFormat.REDDIT, thisCategory);
+                            String cell = makeLeaderboardCell(blockRecords, i, minReactors, displayContext);
+                            row.append(cell);
+                            if (blockVideoRecords[i] != null) {
+                                String videoCell = makeLeaderboardCell(blockVideoRecords, i, Integer.MAX_VALUE, displayContext);
+                                if (!cell.equals(videoCell))
+                                    row.append(". Top&nbsp;video&nbsp;").append(videoCell);
+                            }
                         }
                         else
                             row.append(prevElems[2 + block * halfSize + i]);
@@ -255,23 +260,17 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     }
 
     @NotNull
-    private static String makeLeaderboardCell(@NotNull Map.Entry<ScRecord, ScRecord>[] blockRecords, int i, int minReactors,
-                                              ScCategory thisCategory) {
-        Map.Entry<ScRecord, ScRecord> recordPair = blockRecords[i];
+    private static String makeLeaderboardCell(@NotNull ScRecord[] blockRecords, int i, int minReactors,
+                                              DisplayContext<ScCategory> displayContext) {
+        ScRecord record = blockRecords[i];
         for (int prev = 0; prev < i; prev++) {
-            if (recordPair.equals(blockRecords[prev])) {
+            if (record == blockRecords[prev]) {
                 return "←".repeat(i - prev);
             }
         }
 
-        ScRecord record = recordPair.getKey();
         String reactorPrefix = (record.getScore().getReactors() > minReactors) ? "† " : "";
-        String cell = record.toDisplayString(new DisplayContext<>(StringFormat.REDDIT, thisCategory), reactorPrefix);
-
-        if (record.getDisplayLink() == null) { // show the best video we have
-            cell += ". Best video: " + recordPair.getValue().toDisplayString(new DisplayContext<>(StringFormat.REDDIT, thisCategory));
-        }
-        return cell;
+        return record.toDisplayString(displayContext, reactorPrefix);
     }
 
     private void postAnnouncementToReddit(@NotNull ScSubmission submission, String dataLink, Collection<ScCategory> categories) {

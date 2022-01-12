@@ -17,6 +17,8 @@
 package com.faendir.zachtronics.bot.sc.repository;
 
 import com.faendir.zachtronics.bot.BotTest;
+import com.faendir.zachtronics.bot.reddit.RedditService;
+import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.sc.model.*;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
@@ -31,6 +33,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -43,6 +46,8 @@ class SolRepoManualTest {
 
     @Autowired
     private ScSolutionRepository repository;
+    @Autowired
+    private RedditService redditService;
 
     @Test
     public void testFullIO() {
@@ -74,6 +79,22 @@ class SolRepoManualTest {
             catch (IOException ignored) {
             }
         }
+    }
+
+    @Test
+    public void rebuildAllWiki() {
+        for (ScPuzzle puzzle: ScPuzzle.values()) {
+            repository.rebuildRedditLeaderboard(puzzle, "");
+            System.out.println("Done " + puzzle.getDisplayName());
+        }
+
+        String pages = Arrays.stream(ScGroup.values())
+                             .map(ScGroup::getWikiPage).distinct()
+                             .map(p -> redditService.getWikiPage(Subreddit.SPACECHEM, p))
+                             .map(s -> s.replaceAll("file:/tmp/sc-archive[0-9]+/",
+                                                    "https://raw.githubusercontent.com/spacechem-community-developers/spacechem-archive/master"))
+                             .collect(Collectors.joining("\n\n---\n"));
+        System.out.println(pages);
     }
 
     @Test

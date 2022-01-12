@@ -59,7 +59,7 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScSubmitCommand.Submi
         ValidationResult<ScSubmission> result = archiveCommand.parseSubmissions(parameters).iterator().next();
         if (result instanceof ValidationResult.Valid<ScSubmission>) {
             ScSubmission submission = result.getSubmission();
-            return new ScSubmission(submission.getPuzzle(), submission.getScore(), parameters.author, parameters.video,
+            return new ScSubmission(submission.getPuzzle(), submission.getScore(), parameters.getAuthor(), parameters.video,
                                     submission.getData());
         }
         else {
@@ -72,7 +72,6 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScSubmitCommand.Submi
     @EqualsAndHashCode(callSuper = true)
     public static class SubmitData extends ScArchiveCommand.ArchiveData {
         @NotNull String video;
-        @NotNull String author;
 
         public SubmitData(@Description("Link to your video of the solution, can be `m1` to scrape it from your last message")
                           @NotNull @Converter(LinkConverter.class) String video,
@@ -84,9 +83,8 @@ public class ScSubmitCommand extends AbstractSubmitCommand<ScSubmitCommand.Submi
                           @Description("Skips running SChem on the solutions. Admin-only")
                           @Converter(value = ScAdminOnlyBooleanConverter.class, input = Boolean.class)
                                   Boolean bypassValidation) {
-            super(export, bypassValidation);
+            super(export, bypassValidation, author);
             this.video = video;
-            this.author = author;
         }
     }
 }
