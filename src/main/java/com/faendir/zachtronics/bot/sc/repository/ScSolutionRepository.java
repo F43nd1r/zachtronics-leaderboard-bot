@@ -415,7 +415,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     /**
      * @return a mutable list
      */
-    private static List<ScSolution> unmarshalSolutions(@NotNull Path puzzlePath) throws IOException {
+    static List<ScSolution> unmarshalSolutions(@NotNull Path puzzlePath) throws IOException {
         Path indexPath = puzzlePath.resolve("solutions.psv");
         try (BufferedReader reader = Files.newBufferedReader(indexPath)) {
 
@@ -432,7 +432,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         }
     }
 
-    private static void marshalSolutions(@NotNull List<ScSolution> solutions, @NotNull Path puzzlePath) throws IOException {
+    static void marshalSolutions(@NotNull List<ScSolution> solutions, @NotNull Path puzzlePath) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(puzzlePath.resolve("solutions.psv"),
                                                              StandardOpenOption.TRUNCATE_EXISTING)) {
             ICSVWriter csvWriter = new CSVWriterBuilder(writer).withSeparator('|').build();

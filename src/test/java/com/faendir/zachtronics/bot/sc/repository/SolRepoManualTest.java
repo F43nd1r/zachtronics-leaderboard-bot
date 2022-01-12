@@ -34,10 +34,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static com.faendir.zachtronics.bot.sc.model.ScCategory.*;
 import static java.util.function.Predicate.not;
 
 @BotTest
@@ -125,6 +127,30 @@ class SolRepoManualTest {
                     writer.writeNext(csvRecord, false);
                 }
             }
+        }
+    }
+
+    @Test
+    public void tagNewCategories() throws IOException {
+        Path repoPath = Paths.get("../spacechem/archive");
+        List<ScCategory> newCategories = List.of(CNBP, SNBP, RCNBP, RSNBP);
+
+        for (ScPuzzle puzzle : ScPuzzle.values()) {
+            Path puzzlePath = repoPath.resolve(puzzle.getGroup().name()).resolve(puzzle.name());
+            List<ScSolution> solutions = ScSolutionRepository.unmarshalSolutions(puzzlePath);
+            if (solutions.isEmpty())
+                continue;
+            for (ScCategory category : newCategories) {
+                if (!puzzle.getSupportedCategories().contains(category))
+                    continue;
+                solutions.stream()
+                         .filter(s -> category.supportsScore(s.getScore()))
+                         .min(Comparator.comparing(ScSolution::getScore, category.getScoreComparator()))
+                         .orElseThrow()
+                         .getCategories()
+                         .add(category);
+            }
+            ScSolutionRepository.marshalSolutions(solutions, puzzlePath);
         }
     }
 }
