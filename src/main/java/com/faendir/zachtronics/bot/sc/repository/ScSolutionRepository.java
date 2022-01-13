@@ -70,7 +70,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
             SubmitResult<ScRecord, ScCategory> r = submitOne(access, submission, redditAnnouncementLines);
             if (r instanceof SubmitResult.Success<ScRecord, ScCategory>) {
                 access.push();
-                postAnnouncementToReddit(String.join("\n", redditAnnouncementLines));
+                postAnnouncementToReddit(String.join("  \n", redditAnnouncementLines));
             }
             return r;
         }
