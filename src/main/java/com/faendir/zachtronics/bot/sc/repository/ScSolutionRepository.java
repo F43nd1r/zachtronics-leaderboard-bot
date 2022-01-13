@@ -90,7 +90,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
             }).toList();
             if (l.stream().anyMatch(s -> s instanceof SubmitResult.Success<ScRecord, ScCategory>)) {
                 access.push();
-                postAnnouncementToReddit(String.join("\n", redditAnnouncementLines));
+                postAnnouncementToReddit(String.join("  \n", redditAnnouncementLines));
             }
             return l;
         }
