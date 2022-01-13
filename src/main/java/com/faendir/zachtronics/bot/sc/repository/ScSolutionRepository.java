@@ -197,11 +197,10 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
             for (ScCategory category : solution.getCategories()) {
                 recordMap.put(category, record);
                 if (record.getDisplayLink() == null) {
-                    ScRecord videoRecord = videoRecords.stream()
-                                                    .filter(s -> category.supportsScore(s.getScore()))
-                                                    .min(Comparator.comparing(ScRecord::getScore, category.getScoreComparator()))
-                                                    .orElseThrow();
-                    videoRecordMap.put(category, videoRecord);
+                    videoRecords.stream()
+                                .filter(s -> category.supportsScore(s.getScore()))
+                                .min(Comparator.comparing(ScRecord::getScore, category.getScoreComparator()))
+                                .ifPresent(videoRecord -> videoRecordMap.put(category, videoRecord)); // bosses have no videos at all
                 }
             }
         }
@@ -216,7 +215,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         for (int lineIdx = 0; lineIdx < lines.length; lineIdx++) {
             String line = lines[lineIdx];
             if (puzzleRegex.matcher(line).find()) {
-                String[] prevElems = line.trim().split("\\s*\\|\\s*");
+                String[] prevElems = line.trim().split("\\s*\\|\\s*", -1);
                 int halfSize = (prevElems.length - 2) / 2;
 
                 StringBuilder row = new StringBuilder("|");
