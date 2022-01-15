@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.config
+package com.faendir.zachtronics.bot.rest
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

@@ -18,13 +18,16 @@ package com.faendir.zachtronics.bot.om.repository
 
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.om.model.*
-import com.faendir.zachtronics.bot.om.shortenGithubLink
+import com.faendir.zachtronics.bot.om.model.OmCategory
+import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.om.model.OmScore
+import com.faendir.zachtronics.bot.om.model.OmSubmission
+import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.add
-import com.faendir.zachtronics.bot.utils.ensurePrefix
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -33,7 +36,6 @@ import org.eclipse.jgit.diff.DiffEntry
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import java.io.File
-import java.nio.file.Path
 import java.time.Instant
 import java.util.*
 import javax.annotation.PostConstruct
@@ -42,7 +44,8 @@ import javax.annotation.PostConstruct
 @Component
 class OmSolutionRepository(
     @Qualifier("omLeaderboardRepository") private val leaderboard: GitRepository,
-    private val pageGenerator: OmRedditWikiGenerator
+    private val pageGenerator: OmRedditWikiGenerator,
+    private val omUrlMapper: OmUrlMapper,
 ) : SolutionRepository<OmCategory, OmPuzzle, OmSubmission, OmRecord> {
     private val json = Json {
         prettyPrint = true
@@ -180,7 +183,7 @@ class OmSolutionRepository(
                 val newRecord = record.copy(
                     score = newScore,
                     dataPath = newPath,
-                    dataLink = newPath?.toLink(leaderboardScope)
+                    dataLink = createLink(leaderboardScope, puzzle, newName)
                 )
                 leaderboardFile.outputStream().buffered().use { json.encodeToStream(newRecord, it) }
                 leaderboardScope.add(leaderboardFile)
@@ -232,7 +235,7 @@ class OmSolutionRepository(
             puzzle = puzzle,
             score = score,
             displayLink = displayLink,
-            dataLink = path.toLink(leaderboardScope),
+            dataLink = createLink(leaderboardScope, puzzle, name),
             dataPath = path,
         )
         leaderboardFile.outputStream().buffered().use { json.encodeToStream(record, it) }
@@ -241,8 +244,8 @@ class OmSolutionRepository(
         return record.copy(dataPath = archiveFile.toPath())
     }
 
-    private fun Path.toLink(leaderboardScope: GitRepository.ReadAccess) =
-        shortenGithubLink(leaderboard.rawFilesUrl.replace("master", leaderboardScope.currentHash()) + this.toString().ensurePrefix("/"))
+    private fun createLink(leaderboardScope: GitRepository.ReadAccess, puzzle: OmPuzzle, name: String) =
+        omUrlMapper.createShortUrl(leaderboardScope.shortCurrentHash(), puzzle, name)
 
     private fun OmRecord.remove(leaderboardScope: GitRepository.ReadWriteAccess) {
         dataPath?.let { dataPath -> leaderboardScope.rm(dataPath.toFile()) }

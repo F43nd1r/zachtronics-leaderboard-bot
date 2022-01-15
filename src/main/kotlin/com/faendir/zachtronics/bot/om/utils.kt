@@ -156,19 +156,4 @@ fun createSubmission(gif: String, author: String, bytes: ByteArray): OmSubmissio
     return OmSubmission(puzzle, score, author, gif, bytes)
 }
 
-private val restTemplate = RestTemplate()
-
-fun shortenGithubLink(githubLink: String): String {
-    return try {
-        val request = HttpEntity(
-            LinkedMultiValueMap(mapOf("url" to listOf(githubLink))),
-            HttpHeaders().apply { contentType = MediaType.APPLICATION_FORM_URLENCODED }
-        )
-        restTemplate.postForLocation("https://git.io", request)?.toString() ?: githubLink
-    } catch (e: Exception) {
-        logger.warn("Failed to shorten link $githubLink", e)
-        githubLink
-    }
-}
-
 fun OmRecord.withCategory(category: OmCategory) = CategoryRecord(this, setOf(category))

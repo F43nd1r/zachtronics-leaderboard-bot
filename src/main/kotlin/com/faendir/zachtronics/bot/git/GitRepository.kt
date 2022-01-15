@@ -120,6 +120,8 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
 
         fun currentHash(): String = git.repository.resolve("HEAD").name()
 
+        fun shortCurrentHash(): String = git.repository.resolve("HEAD").abbreviate(7).name()
+
         override fun close() {
             lock.unlock()
         }
