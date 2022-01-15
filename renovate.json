@@ -21,12 +21,18 @@
   ],
   "packageRules": [
     {
-      "matchUpdateTypes": ["patch", "pin", "digest"],
+      "matchUpdateTypes": [
+        "patch",
+        "pin",
+        "digest"
+      ],
       "automerge": true,
       "automergeType": "branch"
     },
     {
-      "matchPackagePrefixes": "renovatebot",
+      "matchPackagePrefixes": [
+        "renovatebot"
+      ],
       "automerge": true,
       "automergeType": "branch"
     }
