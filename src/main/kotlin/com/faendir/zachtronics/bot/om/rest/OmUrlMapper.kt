@@ -32,5 +32,5 @@ class OmUrlMapper : UrlMapper {
         return "https://raw.githubusercontent.com/f43nd1r/om-leaderboard/${commit}/${puzzle.group.name}/${puzzle.name}/${fileName}.solution"
     }
 
-    fun createShortUrl(commitId: String, puzzle: OmPuzzle, name: String): String = "${UrlMapper.basePath}/$commitId/${puzzle.id}/$name"
+    fun createShortUrl(commitId: String, puzzle: OmPuzzle, name: String): String = "${UrlMapper.basePath}/$pathId/$commitId/${puzzle.id}/$name"
 }

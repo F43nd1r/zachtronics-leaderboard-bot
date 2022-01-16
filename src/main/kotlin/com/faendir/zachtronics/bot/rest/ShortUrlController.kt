@@ -33,7 +33,7 @@ class ShortUrlController(urlMappers: List<UrlMapper>) {
 
     @GetMapping(path = ["/{mapperId}/**"])
     fun proxyUrl(@PathVariable mapperId: String, request: HttpServletRequest): ResponseEntity<Unit> {
-        val path = request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE) as String
+        val path = (request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE) as String).removePrefix("/l/$mapperId/")
         val mapper = mappers[mapperId] ?: return ResponseEntity.badRequest().build()
         val longUrl = mapper.map(path) ?: return ResponseEntity.notFound().build()
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).header("Location", longUrl).build()
