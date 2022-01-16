@@ -29,7 +29,8 @@ interface SolutionRepository<C : Category, P : Puzzle<C>, S : Submission<C, P>, 
         throw NotImplementedError()
     }
 
-    fun find(puzzle: P, category: C) : R?
+    fun find(puzzle: P, category: C) : R? =
+        findCategoryHolders(puzzle, false).firstOrNull { it.categories.contains(category) }?.record
 
     fun findCategoryHolders(puzzle: P, includeFrontier: Boolean) : List<CategoryRecord<R, C>>
 }

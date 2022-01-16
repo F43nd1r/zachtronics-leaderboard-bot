@@ -34,7 +34,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -94,16 +93,6 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
             }
             return l;
         }
-    }
-
-    @Nullable
-    @Override
-    public ScRecord find(@NotNull ScPuzzle puzzle, @NotNull ScCategory category) {
-        return findCategoryHolders(puzzle, false).stream()
-                                                 .filter(cr -> cr.getCategories().contains(category))
-                                                 .findFirst()
-                                                 .map(CategoryRecord::getRecord)
-                                                 .orElse(null);
     }
 
     @NotNull
@@ -283,9 +272,10 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         return record.toDisplayString(displayContext, reactorPrefix);
     }
 
-    private void postAnnouncementToReddit(String content) {
+    private void postAnnouncementToReddit(@NotNull String content) {
         // see: https://www.reddit.com/r/spacechem/comments/mmcuzb
-        redditService.postInSubmission("mmcuzb", content);
+        if (!content.isEmpty())
+            redditService.postInSubmission("mmcuzb", content);
     }
 
     @Override
