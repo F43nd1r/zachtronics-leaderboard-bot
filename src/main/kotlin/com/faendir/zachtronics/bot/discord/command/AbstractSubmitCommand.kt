@@ -17,14 +17,23 @@
 package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.zachtronics.bot.discord.Colors
-import com.faendir.zachtronics.bot.model.*
+import com.faendir.zachtronics.bot.model.Category
+import com.faendir.zachtronics.bot.model.DisplayContext
+import com.faendir.zachtronics.bot.model.Puzzle
+import com.faendir.zachtronics.bot.model.Record
+import com.faendir.zachtronics.bot.model.StringFormat
+import com.faendir.zachtronics.bot.model.Submission
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
-import com.faendir.zachtronics.bot.utils.*
+import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.embedCategoryRecords
+import com.faendir.zachtronics.bot.utils.orEmpty
+import com.faendir.zachtronics.bot.utils.smartFormat
+import com.faendir.zachtronics.bot.utils.toMetricsTree
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import reactor.core.publisher.Mono
 
-abstract class AbstractSubmitCommand<T, C : Category, P: Puzzle<C>, S : Submission<C, P>, R : Record<C>> : AbstractSubCommand<T>() {
+abstract class AbstractSubmitCommand<T, C : Category, P : Puzzle<C>, S : Submission<C, P>, R : Record<C>> : AbstractSubCommand<T>() {
     protected abstract val repository: SolutionRepository<C, P, S, R>
 
     override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
@@ -40,7 +49,8 @@ abstract class AbstractSubmitCommand<T, C : Category, P: Puzzle<C>, S : Submissi
                     .title(
                         "Success: *${submission.puzzle.displayName}* ${
                             beatenCategories.takeIf { it.isNotEmpty() }?.smartFormat(submission.puzzle.supportedCategories.toMetricsTree()) ?: "Pareto"
-                        }")
+                        }"
+                    )
                     .color(Colors.SUCCESS)
                     .description(
                         "`${submission.score.toDisplayString(DisplayContext(StringFormat.DISCORD, beatenCategories))}`"
