@@ -285,7 +285,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     }
 
     @NotNull
-    private static String makeScoreFilename(@NotNull ScScore score) {
+    static String makeScoreFilename(@NotNull ScScore score) {
         return score.toDisplayString(DisplayContext.fileName()) + ".txt";
     }
 

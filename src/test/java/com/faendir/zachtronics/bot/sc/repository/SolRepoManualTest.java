@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -110,11 +111,6 @@ class SolRepoManualTest {
                 for (CategoryRecord<ScRecord, ScCategory> cr : repository.findCategoryHolders(puzzle, true)) {
                     ScRecord record = cr.getRecord();
                     String author = record.getAuthor();
-                    if (author == null) {
-                        // pull from file, which must exist
-                        assert record.getDataPath() != null;
-                        author = ScSolutionMetadata.fromPath(record.getDataPath(), puzzle).getAuthor();
-                    }
                     String categories = cr.getCategories().stream()
                                           .map(ScCategory::name)
                                           .collect(Collectors.joining(","));
@@ -151,6 +147,29 @@ class SolRepoManualTest {
                          .add(category);
             }
             ScSolutionRepository.marshalSolutions(solutions, puzzlePath);
+        }
+    }
+
+    @Test
+    public void pushStateAuthorsToSolutionFiles() throws IOException {
+        Path repoPath = Paths.get("../spacechem/archive");
+
+        for (ScPuzzle puzzle : ScPuzzle.values()) {
+            Path puzzlePath = repoPath.resolve(puzzle.getGroup().name()).resolve(puzzle.name());
+            List<ScSolution> solutions = ScSolutionRepository.unmarshalSolutions(puzzlePath);
+            for (ScSolution solution : solutions) {
+                Path path = puzzlePath.resolve(ScSolutionRepository.makeScoreFilename(solution.getScore()));
+                if (Files.exists(path)) {
+                    String export = Files.readString(path);
+                    ScSolutionMetadata metadata = ScSolutionMetadata.fromHeader(export, puzzle);
+                    if (!solution.getAuthor().equalsIgnoreCase(metadata.getAuthor())) {
+                        ScSolutionMetadata newMetadata = new ScSolutionMetadata(puzzle, solution.getAuthor(), solution.getScore(),
+                                                                                metadata.getDescription());
+                        ScSubmission submission = newMetadata.extendToSubmission(null, export);
+                        Files.writeString(path, submission.getData(), StandardOpenOption.TRUNCATE_EXISTING);
+                    }
+                }
+            }
         }
     }
 }

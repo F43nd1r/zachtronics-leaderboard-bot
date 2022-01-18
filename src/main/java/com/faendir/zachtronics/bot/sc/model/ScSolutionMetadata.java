@@ -16,13 +16,10 @@
 
 package com.faendir.zachtronics.bot.sc.model;
 
-import lombok.SneakyThrows;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,13 +42,6 @@ public class ScSolutionMetadata {
             "(?<author>[^,]+)," +
             "(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)" +
             "(?:,(?<description>" + SOLUTION_NAME_REGEX + "))?$", Pattern.MULTILINE);
-
-    @SneakyThrows
-    @NotNull
-    public static ScSolutionMetadata fromPath(@NotNull Path path, @Nullable ScPuzzle puzzle) throws IllegalArgumentException {
-        String diskHeader = Files.newBufferedReader(path).readLine();
-        return ScSolutionMetadata.fromHeader(diskHeader, puzzle);
-    }
 
     /**
      * @param header can also be the whole export, the first <tt>SOLUTION:</tt> match will dictate the line
@@ -114,7 +104,7 @@ public class ScSolutionMetadata {
             commaDescr = "," + encode(normalizeDescription(description));
         }
         return String.format("SOLUTION:%s,%s,%d-%d-%d%s",
-                             encode(puzzle.getDisplayName().replaceFirst(" \\(.-.-.\\)", "")), author,
+                             encode(puzzle.getDisplayName().replaceFirst(" \\(.-.-.\\)$", "")), encode(author),
                              score.getCycles(), score.getReactors(), score.getSymbols(), commaDescr);
     }
 
