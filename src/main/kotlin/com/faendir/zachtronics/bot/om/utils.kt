@@ -24,6 +24,7 @@ import com.faendir.om.parser.solution.model.part.Arm
 import com.faendir.om.parser.solution.model.part.ArmType
 import com.faendir.om.parser.solution.model.part.Conduit
 import com.faendir.om.parser.solution.model.part.Glyph
+import com.faendir.om.parser.solution.model.part.GlyphType
 import com.faendir.om.parser.solution.model.part.IO
 import com.faendir.om.parser.solution.model.part.IOType
 import com.faendir.om.parser.solution.model.part.Part
@@ -43,11 +44,6 @@ import okio.buffer
 import okio.sink
 import okio.source
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
-import org.springframework.util.LinkedMultiValueMap
-import org.springframework.web.client.RestTemplate
 import java.io.ByteArrayInputStream
 import java.io.File
 
@@ -139,7 +135,19 @@ fun createSubmission(gif: String, author: String, bytes: ByteArray): OmSubmissio
     } catch (e: Exception) {
         throw IllegalArgumentException("I could not parse your solution")
     }
-    if (solution !is SolvedSolution) throw IllegalArgumentException("only solved solutions are accepted")
+    if (solution !is SolvedSolution) {
+        throw IllegalArgumentException("only solved solutions are accepted")
+    }
+    if (solution.parts.count { it is Arm && it.type == ArmType.VAN_BERLOS_WHEEL } > 1) {
+        throw IllegalArgumentException("Multiple Van Berlo's Wheels are banned.")
+    }
+    if (solution.parts.count { it is Glyph && it.type == GlyphType.DISPOSAL } > 1) {
+        throw IllegalArgumentException("Multiple Disposal glyphs are banned.")
+    }
+    if (solution.parts.filterIsInstance<IO>().groupBy { it.type to it.index }.values.any { it.size > 1 }) {
+        throw IllegalArgumentException("Duplicated Inputs or Outputs are banned.")
+    }
+
     val puzzle = OmPuzzle.values().find { it.id == solution.puzzle } ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
     val computed = solution.getMetrics(puzzle, OmScorePart.WIDTH, OmScorePart.HEIGHT, OmScorePart.RATE)
     val score = OmScore(

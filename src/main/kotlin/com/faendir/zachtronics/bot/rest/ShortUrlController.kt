@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.rest
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.util.AntPathMatcher
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -44,7 +43,5 @@ interface UrlMapper {
     val pathId: String
     fun map(shortUrl: String): String?
 
-    companion object {
-        const val basePath = "https://zlbb.faendir.com/l"
-    }
+    fun buildUrl(path: String) = "https://zlbb.faendir.com/l/${pathId}/${path.removePrefix("/")}"
 }
