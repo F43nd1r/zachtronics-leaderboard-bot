@@ -30,6 +30,7 @@ import com.faendir.zachtronics.bot.om.getMetrics
 import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.orEmpty
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
@@ -42,7 +43,7 @@ class ReverifyCommand(private val repository: OmSolutionRepository) : AbstractSu
     ApplicationCommandParser<Reverify, ApplicationCommandOptionData> by ReverifyParser {
     override val secured = DiscordUserSecured(DiscordUser.BOT_OWNERS)
 
-    override fun handle(event: DeferrableInteractionEvent, parameters: Reverify): Mono<Void> {
+    override fun handleEvent(event: DeferrableInteractionEvent, parameters: Reverify): SafeMessageBuilder {
         val puzzles = (parameters.puzzle?.let { listOf(it) } ?: OmPuzzle.values().toList()).filter {
             parameters.type == null || parameters.type == it.type
         }
@@ -117,7 +118,6 @@ class ReverifyCommand(private val repository: OmSolutionRepository) : AbstractSu
                         if (parameters.overrideExisting == true) " overriding existing values!" else ""
             )
             .description("**Modified Records:** ${overrideRecords.size}\n\n**Errors:**\n${errors.joinToString("\n")}")
-            .send(event)
     }
 }
 

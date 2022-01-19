@@ -127,7 +127,7 @@ fun DeferrableInteractionEvent.editReplyWithFailure(message: String?) =
         EmbedCreateSpec.builder()
             .title("Failed")
             .color(Colors.FAILURE)
-            .description(message?.truncateWithEllipsis(Limits.DESCRIPTION) ?: "Something went wrong")
+            .description(message?.truncateWithEllipsis(EmbedLimits.DESCRIPTION) ?: "Something went wrong")
             .build()
     ).then()
 

@@ -26,6 +26,8 @@ import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.utils.Markdown
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
+import com.faendir.zachtronics.bot.utils.SafePlainMessageBuilder
 import com.faendir.zachtronics.bot.utils.clear
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.spec.MessageCreateFields
@@ -35,7 +37,7 @@ abstract class AbstractShowCommand<T, C : Category, P : Puzzle<C>, R : Record<C>
     override val secured = NotSecured
     abstract val repository: SolutionRepository<C, P, *, R>
 
-    override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
+    override fun handleEvent(event: DeferrableInteractionEvent, parameters: T): SafeMessageBuilder {
         val (puzzle, category) = findPuzzleAndCategory(parameters)
         val record = repository.find(puzzle, category)
         return if (record != null) {
@@ -50,16 +52,14 @@ abstract class AbstractShowCommand<T, C : Category, P : Puzzle<C>, R : Record<C>
                 lines.add("**Full Score**")
                 lines.add(fullScore)
             }
-            event.editReply().clear()
-                .withContentOrNull(lines.joinToString("\n"))
-                .withFiles(record.attachments().map { (name, data) -> MessageCreateFields.File.of(name, data) })
-                .then()
+            SafePlainMessageBuilder()
+                .content(lines.joinToString("\n"))
+                .files(record.attachments())
         } else {
             SafeEmbedMessageBuilder()
                 .title("No score")
                 .description("sorry, there is no score for ${puzzle.displayName} ${category.displayName}.")
                 .color(Colors.UNCHANGED)
-                .send(event)
         }
     }
 

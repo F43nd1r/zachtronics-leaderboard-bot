@@ -23,6 +23,7 @@ import com.faendir.zachtronics.bot.model.Submission
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.validation.ValidationResult
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import reactor.core.publisher.Mono
@@ -30,9 +31,9 @@ import reactor.core.publisher.Mono
 abstract class AbstractArchiveCommand<T, C: Category, S : Submission<C, *>> : AbstractSubCommand<T>() {
     protected abstract val repository: SolutionRepository<*, *, S, *>
 
-    override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
+    override fun handleEvent(event: DeferrableInteractionEvent, parameters: T): SafeMessageBuilder {
         val validationResults = parseSubmissions(parameters)
-        return archiveAll(validationResults).send(event)
+        return archiveAll(validationResults)
     }
 
     private fun archiveAll(validationResults: Collection<ValidationResult<S>>): SafeEmbedMessageBuilder {

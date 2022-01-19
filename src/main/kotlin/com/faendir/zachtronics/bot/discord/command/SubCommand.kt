@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.discord4j.command.parse.ApplicationCommandParser
+import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import reactor.core.publisher.Mono
@@ -27,4 +28,11 @@ import reactor.core.publisher.Mono
 interface SubCommand<T>  : ApplicationCommandParser<T, ApplicationCommandOptionData>, Command<T> {
     val data: ApplicationCommandOptionData
         get() = buildData()
+
+
+    override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
+        return handleEvent(event, parameters).send(event)
+    }
+
+    fun handleEvent(event: DeferrableInteractionEvent, parameters: T): SafeMessageBuilder
 }

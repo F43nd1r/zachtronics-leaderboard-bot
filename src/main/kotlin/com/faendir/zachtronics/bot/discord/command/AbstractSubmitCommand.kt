@@ -26,6 +26,7 @@ import com.faendir.zachtronics.bot.model.Submission
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.orEmpty
 import com.faendir.zachtronics.bot.utils.smartFormat
@@ -36,9 +37,9 @@ import reactor.core.publisher.Mono
 abstract class AbstractSubmitCommand<T, C : Category, P : Puzzle<C>, S : Submission<C, P>, R : Record<C>> : AbstractSubCommand<T>() {
     protected abstract val repository: SolutionRepository<C, P, S, R>
 
-    override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
+    override fun handleEvent(event: DeferrableInteractionEvent, parameters: T): SafeMessageBuilder {
         val submission = parseSubmission(event, parameters)
-        return submitToLeaderboards(submission).send(event)
+        return submitToLeaderboards(submission)
     }
 
     private fun submitToLeaderboards(submission: S): SafeEmbedMessageBuilder {

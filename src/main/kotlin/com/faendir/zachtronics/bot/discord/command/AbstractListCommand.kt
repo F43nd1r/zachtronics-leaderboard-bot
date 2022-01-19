@@ -23,15 +23,15 @@ import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
-import reactor.core.publisher.Mono
 
 abstract class AbstractListCommand<T, C : Category, P : Puzzle<C>, R : Record<C>> : AbstractSubCommand<T>() {
     override val secured = NotSecured
     abstract val repository: SolutionRepository<C, P, *, R>
 
-    override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
+    override fun handleEvent(event: DeferrableInteractionEvent, parameters: T): SafeMessageBuilder {
         val puzzle = findPuzzle(parameters)
         val records = repository.findCategoryHolders(puzzle, includeFrontier = false)
         return SafeEmbedMessageBuilder()
@@ -44,7 +44,7 @@ abstract class AbstractListCommand<T, C : Category, P : Puzzle<C>, R : Record<C>
                 if (missing.isNotEmpty()) {
                     addField(missing.joinToString(", ") { it.displayName }, "None")
                 }
-            }.send(event)
+            }
     }
 
     abstract fun findPuzzle(parameters: T): P

@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.utils
 
+import com.google.common.annotations.VisibleForTesting
 import discord4j.core.`object`.entity.channel.MessageChannel
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.spec.EmbedCreateFields
@@ -25,7 +26,7 @@ import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import reactor.core.publisher.Mono
 
-class SafeEmbedMessageBuilder {
+class SafeEmbedMessageBuilder : SafeMessageBuilder {
     private val result = mutableListOf<Pair<EmbedCreateSpec, Int>>()
     private var current = EmbedCreateSpec.builder()
     private var total = 0
@@ -33,7 +34,7 @@ class SafeEmbedMessageBuilder {
     private var color: Color? = null
 
     fun title(title: String) = apply {
-        val safeTitle = title.truncateWithEllipsis(Limits.TITLE).ifEmptyZeroWidthSpace()
+        val safeTitle = title.truncateWithEllipsis(EmbedLimits.TITLE).ifEmptyZeroWidthSpace()
         increaseTotal(safeTitle.length)
         current.title(safeTitle)
     }
@@ -42,17 +43,17 @@ class SafeEmbedMessageBuilder {
         current.url(url)
     }
     fun description(description: String) = apply {
-        val safeDescription = description.truncateWithEllipsis(Limits.DESCRIPTION).ifEmptyZeroWidthSpace()
+        val safeDescription = description.truncateWithEllipsis(EmbedLimits.DESCRIPTION).ifEmptyZeroWidthSpace()
         increaseTotal(safeDescription.length)
         current.description(safeDescription)
     }
 
     fun addField(name: String, value: String, inline: Boolean = false) = apply {
-        if (fields >= Limits.FIELDS) {
+        if (fields >= EmbedLimits.FIELDS) {
             nextBuilder()
         }
-        val safeName = name.truncateWithEllipsis(Limits.FIELD_NAME).ifEmptyZeroWidthSpace()
-        val safeValue = value.truncateWithEllipsis(Limits.FIELD_VALUE).ifEmptyZeroWidthSpace()
+        val safeName = name.truncateWithEllipsis(EmbedLimits.FIELD_NAME).ifEmptyZeroWidthSpace()
+        val safeValue = value.truncateWithEllipsis(EmbedLimits.FIELD_VALUE).ifEmptyZeroWidthSpace()
         increaseTotal(safeName.length + safeValue.length)
         current.addField(EmbedCreateFields.Field.of(safeName, safeValue, inline))
         fields++
@@ -63,13 +64,13 @@ class SafeEmbedMessageBuilder {
     }
 
     fun footer(footer: String, iconUrl: String? = null) = apply {
-        val safeFooter = footer.truncateWithEllipsis(Limits.FOOTER).ifEmptyZeroWidthSpace()
+        val safeFooter = footer.truncateWithEllipsis(EmbedLimits.FOOTER).ifEmptyZeroWidthSpace()
         increaseTotal(safeFooter.length)
         current.footer(safeFooter, iconUrl)
     }
 
     fun author(author: String, url: String? = null, iconUrl: String? = null) = apply {
-        val safeAuthor = author.truncateWithEllipsis(Limits.AUTHOR).ifEmptyZeroWidthSpace()
+        val safeAuthor = author.truncateWithEllipsis(EmbedLimits.AUTHOR).ifEmptyZeroWidthSpace()
         increaseTotal(safeAuthor.length)
         current.author(safeAuthor, url, iconUrl)
     }
@@ -100,7 +101,7 @@ class SafeEmbedMessageBuilder {
     }
 
     private fun increaseTotal(by: Int) {
-        if (total + by > Limits.TOTAL) {
+        if (total + by > EmbedLimits.TOTAL) {
             nextBuilder()
         }
         total += by
@@ -125,7 +126,7 @@ class SafeEmbedMessageBuilder {
         }
     }
 
-    fun send(event: DeferrableInteractionEvent): Mono<Void> = mono {
+    override fun send(event: DeferrableInteractionEvent): Mono<Void> = mono {
         val embeds = getEmbeds().toMutableList()
         event.editReply().clear().withEmbedsOrNull(embeds.removeFirst()).awaitSingleOrNull()
         for (embed in embeds) {
@@ -139,14 +140,15 @@ class SafeEmbedMessageBuilder {
         }
     }.then()
 
-    private fun getEmbeds(): List<List<EmbedCreateSpec>> {
+    @VisibleForTesting
+    internal fun getEmbeds(): List<List<EmbedCreateSpec>> {
         if (total > 0) {
             nextBuilder()
         }
         return result.fold(listOf(Pair(emptyList<EmbedCreateSpec>(), 0))) { acc, (spec, total) ->
             val last = acc.last()
             val (list, lastTotal) = last
-            if (lastTotal + total <= Limits.TOTAL) {
+            if (lastTotal + total <= EmbedLimits.TOTAL) {
                 acc - last + ((list + spec) to (lastTotal + total))
             } else {
                 acc + (listOf(spec) to total)
@@ -155,7 +157,7 @@ class SafeEmbedMessageBuilder {
     }
 }
 
-object Limits {
+object EmbedLimits {
     const val TITLE = 256
     const val DESCRIPTION = 4096
     const val FIELDS = 25

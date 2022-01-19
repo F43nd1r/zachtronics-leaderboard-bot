@@ -22,6 +22,7 @@ import com.faendir.zachtronics.bot.discord.command.GameCommand;
 import com.faendir.zachtronics.bot.discord.command.SubCommand;
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUser;
 import com.faendir.zachtronics.bot.model.StringFormat;
+import com.faendir.zachtronics.bot.testutils.RunCommandKt;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
@@ -29,6 +30,7 @@ import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
 import discord4j.core.object.command.ApplicationCommandOption;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.EmbedCreateFields;
+import discord4j.core.spec.InteractionFollowupCreateSpec;
 import discord4j.core.spec.InteractionReplyEditSpec;
 import discord4j.core.spec.MessageCreateFields;
 import discord4j.discordjson.json.UserData;
@@ -43,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -144,81 +147,8 @@ public class SubCommandTest {
     }
 
     @NotNull
-    private static ApplicationCommandInteractionOption mockOption(String name, @NotNull Serializable value) {
-        ApplicationCommandOption.Type type = value instanceof Boolean ? ApplicationCommandOption.Type.BOOLEAN :
-                                                                        ApplicationCommandOption.Type.STRING;
-        ApplicationCommandInteractionOptionValue optionValue = new ApplicationCommandInteractionOptionValue(
-                Mockito.mock(GatewayDiscordClient.class), null, type.getValue(), value.toString());
-
-        ApplicationCommandInteractionOption option = Mockito.mock(ApplicationCommandInteractionOption.class);
-        Mockito.when(option.getName()).thenReturn(name);
-        Mockito.when(option.getValue()).thenReturn(Optional.of(optionValue));
-        return option;
-    }
-
-    @NotNull
-    private <T> String runCommand(String commandName, @NotNull Map<String, ? extends Serializable> args) {
-        ApplicationCommandInteractionOption subCommandOption = Mockito.mock(ApplicationCommandInteractionOption.class);
-        Mockito.when(subCommandOption.getName()).thenReturn(commandName);
-        Mockito.when(subCommandOption.getType()).thenReturn(ApplicationCommandOption.Type.SUB_COMMAND);
-
-        List<ApplicationCommandInteractionOption> options = args.entrySet().stream()
-                                                                .map(e -> mockOption(e.getKey(), e.getValue()))
-                                                                .toList();
-        Mockito.when(subCommandOption.getOptions()).thenReturn(options);
-
-        ChatInputInteractionEvent interactionEvent = Mockito.mock(ChatInputInteractionEvent.class, Mockito.RETURNS_DEEP_STUBS);
-        Mockito.when(interactionEvent.getOptions()).thenReturn(Collections.singletonList(subCommandOption));
-
-        User ieee = new User(Mockito.mock(GatewayDiscordClient.class), Mockito.mock(UserData.class, Mockito.RETURNS_DEEP_STUBS));
-        Mockito.when(ieee.getId().asLong()).thenReturn(DiscordUser.IEEE12345.getId());
-        Mockito.when(interactionEvent.getInteraction().getUser()).thenReturn(ieee);
-
-        CombinedParseResult<GameCommand.SubCommandWithParameters<?>> parseResult = scCommand.parse(interactionEvent);
-        if (!(parseResult instanceof CombinedParseResult.Success))
-            return parseResult.toString();
-
-        @SuppressWarnings("unchecked")
-        GameCommand.SubCommandWithParameters<T> subCommandWithParameters = (GameCommand.SubCommandWithParameters<T>)(
-                (CombinedParseResult.Success<GameCommand.SubCommandWithParameters<?>>) parseResult).getValue();
-        SubCommand<T> subCommand = subCommandWithParameters.getSubCommand();
-
-        Mockito.when(interactionEvent.editReply()).thenCallRealMethod();
-        Mockito.when(interactionEvent.createFollowup()).thenCallRealMethod();
-        var editSpecWrapper = new Object() {
-            InteractionReplyEditSpec editSpec = null;
-        };
-        Mockito.when(interactionEvent.editReply(ArgumentMatchers.<InteractionReplyEditSpec>any())).then(invocation -> {
-            editSpecWrapper.editSpec = invocation.getArgument(0, InteractionReplyEditSpec.class);
-            return Mono.empty();
-        });
-
-        subCommand.handle(interactionEvent, subCommandWithParameters.getParameters()).block();
-
-        var editSpec = editSpecWrapper.editSpec;
-        String result = Stream.<Stream<String>>of(flatStream(editSpec.content()),
-                                                  flatStream(editSpec.embeds()).flatMap(
-                                                          l -> l.stream().mapMulti((e, d) -> {
-                                                              e.title().toOptional().ifPresent(d);
-                                                              e.description().toOptional().ifPresent(d);
-                                                              e.fields().stream()
-                                                               .map(f -> f.name() + "\n" + f.value())
-                                                               .forEach(d);
-                                                              EmbedCreateFields.Footer footer = e.footer();
-                                                              if (footer != null)
-                                                                  d.accept(footer.text());
-                                                          })),
-                                                  editSpec.files().stream().map(MessageCreateFields.File::name))
-                              .flatMap(Function.identity())
-                              .map(s -> s.replace(StringFormat.DISCORD.getSeparator(), "/"))
-                              .collect(Collectors.joining("\n"));
-        System.out.println(result);
-        return result;
-    }
-
-    @NotNull
-    private static <T> Stream<T> flatStream(@NotNull Possible<Optional<T>> p) {
-        return Possible.flatOpt(p).stream();
+    private String runCommand(String commandName, @NotNull Map<String, ? extends Serializable> args) {
+        return RunCommandKt.mockGameCommandRun(scCommand, commandName, args);
     }
 
 }

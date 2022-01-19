@@ -18,21 +18,20 @@ package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured
-import com.faendir.zachtronics.bot.discord.command.security.Secured
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedRecords
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
-import reactor.core.publisher.Mono
 
-abstract class AbstractFrontierCommand<T, C: Category, P : Puzzle<C>, R: Record<C>> : AbstractSubCommand<T>() {
+abstract class AbstractFrontierCommand<T, C : Category, P : Puzzle<C>, R : Record<C>> : AbstractSubCommand<T>() {
     override val secured = NotSecured
     abstract val repository: SolutionRepository<C, P, *, R>
 
-    override fun handle(event: DeferrableInteractionEvent, parameters: T): Mono<Void> {
+    override fun handleEvent(event: DeferrableInteractionEvent, parameters: T): SafeMessageBuilder {
         val puzzle = findPuzzle(parameters)
         val records = repository.findCategoryHolders(puzzle, includeFrontier = true)
         return SafeEmbedMessageBuilder()
@@ -40,7 +39,6 @@ abstract class AbstractFrontierCommand<T, C: Category, P : Puzzle<C>, R: Record<
             .apply { puzzle.link?.let { url(it) } }
             .color(Colors.READ)
             .embedRecords(records, puzzle.supportedCategories)
-            .send(event)
     }
 
     abstract fun findPuzzle(parameters: T): P

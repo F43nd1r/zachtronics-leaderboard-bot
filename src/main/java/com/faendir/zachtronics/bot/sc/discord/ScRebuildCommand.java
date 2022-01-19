@@ -26,6 +26,7 @@ import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder;
+import com.faendir.zachtronics.bot.utils.SafeMessageBuilder;
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent;
 import lombok.Getter;
 import lombok.NonNull;
@@ -49,13 +50,12 @@ public class ScRebuildCommand extends AbstractSubCommand<ScRebuildCommand.Rebuil
 
     @NotNull
     @Override
-    public Mono<Void> handle(@NotNull DeferrableInteractionEvent event, @NotNull RebuildData parameters) {
+    public SafeMessageBuilder handleEvent(@NotNull DeferrableInteractionEvent event, @NotNull RebuildData parameters) {
         String updateMessage = "Rebuilt wiki section of " + parameters.puzzle.getDisplayName();
         repository.rebuildRedditLeaderboard(parameters.puzzle, updateMessage);
         return new SafeEmbedMessageBuilder()
                 .title(updateMessage)
-                .color(Colors.SUCCESS)
-                .send(event);
+                .color(Colors.SUCCESS);
     }
 
     @ApplicationCommand(name = "rebuild", description = "Rebuilds wiki section", subCommand = true)
