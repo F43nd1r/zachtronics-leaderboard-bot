@@ -70,7 +70,9 @@ public class JNISolutionVerifier implements Closeable {
         THROUGHPUT_CYCLES("throughput cycles"),
         THROUGHPUT_OUTPUTS("throughput outputs"),
         HEIGHT("height"),
-        WIDTH_TIMES_TWO("width*2");
+        WIDTH_TIMES_TWO("width*2"),
+        MAX_ARM_ROTATION("maximum absolute arm rotation")
+        ;
         private final String id;
 
         Metrics(String id) {

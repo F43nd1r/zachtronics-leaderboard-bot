@@ -50,11 +50,22 @@ import java.io.File
 
 private val logger = LoggerFactory.getLogger("OM Utils")
 
-fun Solution.getMetrics(puzzle: OmPuzzle, vararg metrics: OmScorePart): Map<OmScorePart, Number?>? {
+data class VerifierResult(val metrics: Map<OmScorePart, Number?>, val maxArmRotation: Int?)
+
+fun Solution.getMetrics(puzzle: OmPuzzle, vararg metrics: OmScorePart): VerifierResult? {
     val puzzleFile = puzzle.file?.takeIf { it.exists() } ?: return null
     val solution = File.createTempFile(puzzle.id, ".solution").also { SolutionParser.write(this, it.outputStream().sink().buffer()) }
     return JNISolutionVerifier.open(puzzleFile, solution).use { verifier ->
-        verifier.getMetrics(metrics.toList()) { e, _ -> logger.info("Verifier threw exception", e) }
+        VerifierResult(
+            metrics = verifier.getMetrics(metrics.toList()) { e, metric -> logger.info("Verifier threw exception for $metric", e) },
+            maxArmRotation = try {
+                verifier.getMetric(JNISolutionVerifier.Metrics.MAX_ARM_ROTATION)
+            } catch (e: Exception) {
+                logger.info("Verifier threw exception for max arm rotation", e)
+                null
+            }
+        )
+
     }
 }
 
@@ -150,14 +161,17 @@ fun createSubmission(gif: String, author: String, bytes: ByteArray): OmSubmissio
 
     val puzzle = OmPuzzle.values().find { it.id == solution.puzzle } ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
     val computed = solution.getMetrics(puzzle, OmScorePart.WIDTH, OmScorePart.HEIGHT, OmScorePart.RATE)
+    if(computed?.maxArmRotation != null && computed.maxArmRotation >= 4096) {
+        throw IllegalArgumentException("Maximum arm rotation should be below 4096 but was ${computed.maxArmRotation}.")
+    }
     val score = OmScore(
         cost = solution.cost,
         cycles = solution.cycles,
         area = solution.area,
         instructions = solution.instructions,
-        height = computed?.get(OmScorePart.HEIGHT)?.toInt(),
-        width = computed?.get(OmScorePart.WIDTH)?.toDouble(),
-        rate = computed?.get(OmScorePart.RATE)?.toDouble(),
+        height = computed?.metrics?.get(OmScorePart.HEIGHT)?.toInt(),
+        width = computed?.metrics?.get(OmScorePart.WIDTH)?.toDouble(),
+        rate = computed?.metrics?.get(OmScorePart.RATE)?.toDouble(),
         trackless = solution.isTrackless(),
         overlap = solution.isOverlap(puzzle),
     )
