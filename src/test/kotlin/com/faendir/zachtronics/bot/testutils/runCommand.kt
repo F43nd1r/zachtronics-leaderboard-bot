@@ -50,7 +50,7 @@ fun mockGameCommandRun(gameCommand: GameCommand, subCommandName: String, args: M
     val ieee = Member(gatewayDiscordClient, mockk(relaxed = true), 0)
     every { ieee.id.asLong() } returns DiscordUser.IEEE12345.id
 
-    val interactionEvent = mockk<ChatInputInteractionEvent>()
+    val interactionEvent = mockk<ChatInputInteractionEvent>(relaxed = true)
     every { interactionEvent.options } returns listOf(subCommandOption)
     every { interactionEvent.interaction.user } returns ieee
     every { interactionEvent.interaction.member } returns Optional.of(ieee)
