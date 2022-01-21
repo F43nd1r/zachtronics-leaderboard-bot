@@ -17,17 +17,18 @@
 package com.faendir.zachtronics.bot.sz.repository;
 
 import com.faendir.zachtronics.bot.git.GitRepository;
+import com.faendir.zachtronics.bot.model.DisplayContext;
+import com.faendir.zachtronics.bot.model.StringFormat;
+import com.faendir.zachtronics.bot.reddit.RedditService;
+import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
-import com.faendir.zachtronics.bot.sc.model.ScCategory;
-import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sz.model.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -37,89 +38,122 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
-import java.util.regex.Matcher;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
+import static com.faendir.zachtronics.bot.sz.model.SzCategory.*;
 
 @Component
 @RequiredArgsConstructor
-public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory, SzPuzzle, SzSubmission, SzRecord> {
-    private static final Pattern NAME_REGEX = Pattern.compile(
-            "top solution (?:cost|power|lines)(?:->(?:cost|power|lines))?(?: - (?<author>.+))?",
-            Pattern.CASE_INSENSITIVE);
+public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory, SzPuzzle, SzScore, SzSubmission, SzRecord, SzSolution> {
+    private static final SzCategory[][] CATEGORIES = {{CP, PC, LC},
+                                                      {CL, PL, LP}};
 
-    //TODO Reddit
+    private final RedditService redditService;
     @Getter(AccessLevel.PROTECTED)
     @Qualifier("szRepository")
     private final GitRepository gitRepo;
+    @Getter
+    Function<String[], SzSolution> solUnmarshaller = SzSolution::unmarshal;
 
     @NotNull
     @Override
     public SubmitResult<SzRecord, SzCategory> submit(@NotNull SzSubmission submission) {
         try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
-            SubmitResult<SzRecord, SzCategory> r = archive(access, submission);
-            access.push();
+            SubmitResult<SzRecord, SzCategory> r = submitOne(access, submission);
+            if (r instanceof SubmitResult.Success<SzRecord, SzCategory>)
+                access.push();
             return r;
         }
     }
 
-    @NotNull
-    private SubmitResult<SzRecord, SzCategory> archive(GitRepository.ReadWriteAccess access, SzSubmission submission) {
-        // TODO
-        return new SubmitResult.AlreadyPresent<>();
-    }
-
-    @Nullable
     @Override
-    public SzRecord find(@NotNull SzPuzzle puzzle, @NotNull SzCategory category) {
-        try (GitRepository.ReadAccess access = gitRepo.acquireReadAccess()) {
-            Path filePath = findPuzzleFile(access.getRepo().toPath(), puzzle, category);
-            return readSolutionFile(filePath);
+    protected void writeToRedditLeaderboard(SzPuzzle puzzle, Path puzzlePath, @NotNull List<SzSolution> solutions, String updateMessage) {
+        Map<SzCategory, SzRecord> recordMap = new EnumMap<>(SzCategory.class);
+        for (SzSolution solution: solutions) {
+            SzRecord record = solution.extendToRecord(puzzle,
+                                                      makeArchiveLink(puzzle, solution.getScore()),
+                                                      makeArchivePath(puzzlePath, solution.getScore()));
+            for (SzCategory category : solution.getCategories()) {
+                recordMap.put(category, record);
+            }
         }
-    }
 
-    @NotNull
-    @Override
-    public List<CategoryRecord<SzRecord, SzCategory>> findCategoryHolders(@NotNull SzPuzzle puzzle,
-                                                                          boolean includeFrontier) { // FIXME
-        try (GitRepository.ReadAccess access = gitRepo.acquireReadAccess()) {
-            Path repoPath = access.getRepo().toPath();
-            // TODO
-            Map<SzRecord, Set<SzCategory>> categoryRecords = Arrays.stream(SzCategory.values()).collect(
-                    Collectors.groupingBy(c -> readSolutionFile(findPuzzleFile(repoPath, puzzle, c)),
-                                          Collectors.mapping(c -> c, Collectors.toSet())));
-            return reshapeCategoryRecordMap(categoryRecords, CategoryRecord::new);
+        List<String> lines = Pattern.compile("\\r?\\n")
+                                    .splitAsStream(redditService.getWikiPage(Subreddit.SHENZHEN_IO, "index"))
+                                    .collect(Collectors.toList()); // mutable list
+        Pattern puzzleRegex = Pattern.compile("^\\|\\s*" + Pattern.quote(puzzle.getDisplayName()));
+
+        ListIterator<String> it = lines.listIterator();
+
+        // | Puzzle | [(**c**/pp/l)](https://cp.txt) | [(c/**pp**/l)](https://pc.txt) | [(c/pp/**l**)](https://lc.txt)
+        // |        | [(**c**/pp/l)](https://cl.txt) |                                | [(c/pp/**l**)](https://lp.txt)
+        while (it.hasNext()) {
+            String line = it.next();
+            if (puzzleRegex.matcher(line).find()) {
+                it.remove();
+                break;
+            }
         }
-    }
 
-    @NotNull
-    private SzRecord readSolutionFile(Path solutionFile) {
-        SzSubmission submission = new SzSubmission(solutionFile); // FIXME
-        Matcher m = NAME_REGEX.matcher(submission.getTitle());
-        if (!m.matches())
-            throw new IllegalStateException("Name does not match standard format: " + m.replaceFirst(""));
-        String author = m.group("author");
-        String link = makeArchiveLink(submission.getPuzzle(), solutionFile.getFileName().toString());
-        return new SzRecord(submission.getPuzzle(), submission.getScore(), author, link, solutionFile);
-    }
-
-    private Path findPuzzleFile(@NotNull Path repoPath, @NotNull SzPuzzle puzzle, @NotNull SzCategory category) {
-        Path puzzleFolder = repoPath.resolve(relativePuzzlePath(puzzle));
-        Path puzzleFile = puzzleFolder.resolve(puzzle.getId() + "-" + category.getRepoSuffix() + ".txt");
-        if (!Files.exists(puzzleFile)) {
-            // we're missing the X02 subcategory, we just have a X01 file
-            puzzleFile = puzzleFolder.resolve(puzzle.getId() + "-" + (category.getRepoSuffix() - 1) + ".txt");
+        while (it.hasNext()) {
+            String line = it.next();
+            if (line.equals("|")) {
+                it.previous();
+                break;
+            } else {
+                it.remove();
+            }
         }
-        return puzzleFile;
+
+        for (int rowIdx = 0; rowIdx < 2; rowIdx++) {
+            StringBuilder row = new StringBuilder("| ");
+            if (rowIdx == 0)
+                row.append(puzzle.getDisplayName());
+
+            SzCategory[] blockCategories = CATEGORIES[rowIdx];
+
+            boolean usefulLine = false;
+            for (int i = 0; i < 3; i++) {
+                SzCategory thisCategory = blockCategories[i];
+                row.append(" | ");
+                SzRecord thisRecord = recordMap.get(thisCategory);
+                if (rowIdx == 0 || thisRecord != recordMap.get(CATEGORIES[0][i])) {
+                    DisplayContext<SzCategory> displayContext = new DisplayContext<>(StringFormat.REDDIT, thisCategory);
+                    String cell = thisRecord.toDisplayString(displayContext);
+                    row.append(cell);
+                    usefulLine = true;
+                }
+            }
+            if (usefulLine)
+                it.add(row.toString());
+        }
+
+        redditService.updateWikiPage(Subreddit.SHENZHEN_IO, "index", String.join("\n", lines), updateMessage);
     }
 
     @Override
     @NotNull
     protected Path relativePuzzlePath(@NotNull SzPuzzle puzzle) {
-        return Paths.get(puzzle.getGroup().getRepoFolder());
+        return Paths.get(puzzle.getGroup().getRepoFolder()).resolve(puzzle.getId());
+    }
+
+    @NotNull
+    static String makeFilename(@NotNull String puzzleId, @NotNull SzScore score) {
+        return puzzleId + "-" + score.toDisplayString(DisplayContext.fileName()) + ".txt";
+    }
+
+    @NotNull
+    @Override
+    protected String makeArchiveLink(@NotNull SzPuzzle puzzle, @NotNull SzScore score) {
+        return makeArchiveLink(puzzle, makeFilename(puzzle.getId(), score));
+    }
+
+    @Override
+    @NotNull
+    protected Path makeArchivePath(@NotNull Path puzzlePath, SzScore score) {
+        return puzzlePath.resolve(makeFilename(puzzlePath.getFileName().toString(), score));
     }
 
     @Override
@@ -127,110 +161,116 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
         return String.format("%s/%s/%s", gitRepo.getRawFilesUrl(), puzzle.getGroup().getRepoFolder(), filename);
     }
 
+    /** Sorting order of the solutions index */
+    private static final Comparator<SzSolution> COMPARATOR = Comparator.comparing(SzSolution::getScore, SzCategory.CP.getScoreComparator());
+
     /**
-     *  We use this to keep track of the solutions to a given level in the repo.
+     * @param solutions the list is modified with the updated state
      */
-    static class SzSolutionsIndex {
+    @Override
+    @NotNull
+    protected SubmitResult<SzRecord, SzCategory> archiveOne(@NotNull GitRepository.ReadWriteAccess access,
+                                                            @NotNull List<SzSolution> solutions,
+                                                            @NotNull SzSubmission submission) {
+        SzPuzzle puzzle = submission.getPuzzle();
+        Path puzzlePath = getPuzzlePath(access, puzzle);
 
-        private final Path folderPath;
-        @Getter
-        private final SzPuzzle puzzle;
-        /** <tt>{1: [sols C], 2: [sols P], 3: [sols L]}</tt> */
-        private final Map<Integer, List<SzSubmission>> diskSolutions;
-        private static final Map<Integer, Comparator<SzSubmission>> COMPARATOR_MAP = Map
-                .of(1, makeComparator(SzCategory.CP),
-                    2, makeComparator(SzCategory.PC),
-                    3, makeComparator(SzCategory.LC));
+        List<CategoryRecord<SzRecord, SzCategory>> beatenCategoryRecords = new ArrayList<>();
+        SzSolution candidate = new SzSolution(submission.getScore(), submission.getAuthor());
 
-        private static Comparator<SzSubmission> makeComparator(@NotNull SzCategory category) {
-            return Comparator.comparing(SzSubmission::getScore, category.getScoreComparator());
-        }
+        try {
+            for (ListIterator<SzSolution> it = solutions.listIterator(); it.hasNext(); ) {
+                SzSolution solution = it.next();
+                int r = dominanceCompare(candidate.getScore(), solution.getScore());
+                if (r > 0) {
+                    // TODO actually return all of the beating sols
+                    CategoryRecord<SzRecord, SzCategory> categoryRecord =
+                            solution.extendToCategoryRecord(puzzle,
+                                                            makeArchiveLink(puzzle, solution.getScore()),
+                                                            makeArchivePath(puzzlePath, solution.getScore()));
+                    return new SubmitResult.NothingBeaten<>(Collections.singletonList(categoryRecord));
+                }
+                else if (r < 0) {
+                    // allow same-score solution changes only if you are the original author
+                    if (candidate.getScore().equals(solution.getScore()) &&
+                        !candidate.getAuthor().equals(solution.getAuthor())) {
+                        return new SubmitResult.AlreadyPresent<>();
+                    }
+                    // remove beaten score and get categories
+                    it.remove();
+                    Files.delete(makeArchivePath(puzzlePath, solution.getScore()));
+                    candidate.getCategories().addAll(solution.getCategories());
+                    beatenCategoryRecords.add(solution.extendToCategoryRecord(puzzle, null, null)); // the beaten record has no data anymore
+                }
+            }
 
-        SzSolutionsIndex(Path folderPath, @NotNull SzPuzzle puzzle) throws IOException {
-            this.folderPath = folderPath;
-            this.puzzle = puzzle;
-            diskSolutions = Files.list(folderPath)
-                                 .filter(p -> p.getFileName().toString().startsWith(this.puzzle.getId()))
-                                 .collect(groupingBy(p -> Character.getNumericValue(
-                                                             p.getFileName().toString()
-                                                              .charAt(this.puzzle.getId().length() + 1)),
-                                                     Collectors.mapping(SzSubmission::new, toList())));
-
-        }
-
-        public SubmitResult<ScRecord, ScCategory> add(@NotNull SzSubmission solution) throws IOException {
-            boolean updated = false;
-            SzScore candidate = solution.getScore();
-            categoryLoop:
-            for (Map.Entry<Integer, List<SzSubmission>> entry : diskSolutions.entrySet()) {
-                List<SzSubmission> categorySolutions = entry.getValue();
-                ListIterator<SzSubmission> it = categorySolutions.listIterator();
-                while (it.hasNext()) {
-                    SzSubmission solutionDisk = it.next();
-                    SzScore score = solutionDisk.getScore();
-                    int r = dominanceCompare(candidate, score);
-                    if (r > 0)
-                        continue categoryLoop;
-                    else if (r < 0) {
-                        // remove beaten score
-                        it.remove();
-                        assert solutionDisk.getPath() != null;
-                        Files.delete(solutionDisk.getPath());
+            // the new record may have gained categories of records it didn't pareto-beat, do the transfers
+            for (SzSolution solution: solutions) {
+                EnumSet<SzCategory> lostCategories = EnumSet.noneOf(SzCategory.class);
+                for (SzCategory category : solution.getCategories()) {
+                    if (category.supportsScore(candidate.getScore()) &&
+                        category.getScoreComparator().compare(candidate.getScore(), solution.getScore()) < 0) {
+                        lostCategories.add(category);
                     }
                 }
+                if (!lostCategories.isEmpty()) {
+                    // add a CR holding the lost categories, then correct the solutions
+                    CategoryRecord<SzRecord, SzCategory> beatenCR = new CategoryRecord<>(
+                            solution.extendToRecord(puzzle,
+                                                    makeArchiveLink(puzzle, solution.getScore()),
+                                                    makeArchivePath(puzzlePath, solution.getScore())),
+                            lostCategories);
+                    beatenCategoryRecords.add(beatenCR);
 
-                Integer category = entry.getKey();
-                int index = Collections.binarySearch(categorySolutions, solution, COMPARATOR_MAP.get(category));
-                if (index < 0) {
-                    index = -index - 1;
+                    solution.getCategories().removeAll(lostCategories);
+                    candidate.getCategories().addAll(lostCategories);
                 }
-                categorySolutions.add(index, solution);
-
-                for (int i = 0; i < categorySolutions.size(); i++) {
-                    Path newPath = folderPath.resolve(String.format("%s-%d%02d.txt", puzzle.getId(), category, i + 1));
-                    Path oldPath = categorySolutions.get(i).getPath();
-                    if (!newPath.equals(oldPath)) {
-                        if (oldPath != null) { // an old sol
-                            Files.move(oldPath, newPath);
-                            categorySolutions.get(i).setPath(newPath);
-                        }
-                        else { // it's our new sol
-                            Files.write(newPath, solution.getData().getBytes(), StandardOpenOption.CREATE_NEW);
-                        }
-                    }
-                }
-                updated = true;
             }
 
-            return updated ? null : null;
+            int index = Collections.binarySearch(solutions, candidate, COMPARATOR);
+            if (index < 0) {
+                index = -index - 1;
+            }
+            solutions.add(index, candidate);
+
+            String filename = makeFilename(submission.getPuzzle().getId(), candidate.getScore());
+            Path solutionPath = puzzlePath.resolve(filename);
+            String data = submission.getData().replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
+            Files.writeString(solutionPath, data, StandardOpenOption.CREATE_NEW);
+
+            marshalSolutions(solutions, puzzlePath);
+        }
+        catch (IOException e) {
+            // failures could happen after we dirtied the repo, so we call reset&clean on the puzzle dir
+            access.resetAndClean(puzzlePath.toFile());
+            return new SubmitResult.Failure<>(e.toString());
         }
 
-        @Deprecated
-        public List<SzRecord> findAll() {
-            return diskSolutions.values()
-                                .stream()
-                                .flatMap(List::stream)
-                                .map(SzSubmission::toRecord)
-                                .toList();
+        if (access.status().isClean()) {
+            // the same exact sol was already archived,
+            return new SubmitResult.AlreadyPresent<>();
         }
 
-        /** If equal, s1 dominates */
-        private static int dominanceCompare(@NotNull SzScore s1, @NotNull SzScore s2) {
-            int r1 = Integer.compare(s1.getCost(), s2.getCost());
-            int r2 = Integer.compare(s1.getPower(), s2.getPower());
-            int r3 = Integer.compare(s1.getLines(), s2.getLines());
-            if (r1 <= 0 && r2 <= 0 && r3 <= 0) {
-                // s1 dominates
-                return -1;
-            }
-            else if (r1 >= 0 && r2 >= 0 && r3 >= 0) {
-                // s2 dominates
-                return 1;
-            }
-            else {
-                // equal is already captured by the 1st check, this is for "not comparable"
-                return 0;
-            }
+        String result = commit(access, submission, puzzlePath);
+        return new SubmitResult.Success<>(result, beatenCategoryRecords);
+    }
+
+    /** If equal, s1 dominates */
+    private static int dominanceCompare(@NotNull SzScore s1, @NotNull SzScore s2) {
+        int r1 = Integer.compare(s1.getCost(), s2.getCost());
+        int r2 = Integer.compare(s1.getPower(), s2.getPower());
+        int r3 = Integer.compare(s1.getLines(), s2.getLines());
+        if (r1 <= 0 && r2 <= 0 && r3 <= 0) {
+            // s1 dominates
+            return -1;
+        }
+        else if (r1 >= 0 && r2 >= 0 && r3 >= 0) {
+            // s2 dominates
+            return 1;
+        }
+        else {
+            // equal is already captured by the 1st check, this is for "not comparable"
+            return 0;
         }
     }
 }

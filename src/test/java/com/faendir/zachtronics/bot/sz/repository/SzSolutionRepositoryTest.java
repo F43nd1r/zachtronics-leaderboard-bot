@@ -23,7 +23,6 @@ import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.sz.model.SzSubmission;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,12 +31,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @BotTest
-public class SzArchiveTest {
+public class SzSolutionRepositoryTest {
 
     @Autowired
     private SzSolutionRepository repository;
 
-    @Disabled // TODO
     @Test
     public void testArchive() {
         String content = """
@@ -48,8 +46,7 @@ public class SzArchiveTest {
                 [lines-of-code] 8
                 """;
 
-        assertInstanceOf(SubmitResult.Success.class, doArchive(content)); // different content
-        assertInstanceOf(SubmitResult.AlreadyPresent.class, doArchive(content)); // identical
+        assertInstanceOf(SubmitResult.AlreadyPresent.class, doArchive(content)); // identical score
 
         content = content.replace("[power-usage] 57", "[power-usage] 56");
         assertInstanceOf(SubmitResult.Success.class, doArchive(content)); // better
@@ -65,11 +62,11 @@ public class SzArchiveTest {
     @Test
     public void testFrontier() {
         List<?> solutions = repository.findCategoryHolders(SzPuzzle.Sz000, true);
-        assertEquals(4, solutions.size());
+        assertEquals(3, solutions.size());
     }
 
     @NotNull
     private SubmitResult<SzRecord, SzCategory> doArchive(String content) {
-        return repository.submit(new SzSubmission(content));
+        return repository.submit(SzSubmission.fromData(content, "someguy"));
     }
 }

@@ -29,18 +29,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Value
-public class ScSolution implements Solution<ScScore, ScCategory> {
+public class ScSolution implements Solution<ScCategory, ScPuzzle, ScScore, ScRecord> {
     @NotNull ScScore score;
     @NotNull String author;
     String displayLink;
     boolean oldVideoRNG;
     /** empty if it holds no categories */
-    Set<ScCategory> categories = EnumSet.noneOf(ScCategory.class);
+    EnumSet<ScCategory> categories = EnumSet.noneOf(ScCategory.class);
 
     public ScRecord extendToRecord(ScPuzzle puzzle, String dataLink, Path dataPath) {
         if (dataPath != null && Files.exists(dataPath))
@@ -49,6 +48,7 @@ public class ScSolution implements Solution<ScScore, ScCategory> {
             return new ScRecord(puzzle, score, author, displayLink, oldVideoRNG, null, null);
     }
 
+    @Override
     public CategoryRecord<ScRecord, ScCategory> extendToCategoryRecord(ScPuzzle puzzle, String dataLink, Path dataPath) {
         return new CategoryRecord<>(extendToRecord(puzzle, dataLink, dataPath), categories);
     }
@@ -68,6 +68,7 @@ public class ScSolution implements Solution<ScScore, ScCategory> {
         return solution;
     }
 
+    @Override
     @NotNull
     public String[] marshal() {
         return new String[]{

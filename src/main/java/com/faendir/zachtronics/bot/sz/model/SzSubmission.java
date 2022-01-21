@@ -17,42 +17,37 @@
 package com.faendir.zachtronics.bot.sz.model;
 
 import com.faendir.zachtronics.bot.model.Submission;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Delegate;
+import com.faendir.zachtronics.bot.utils.Utils;
+import lombok.Value;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.nio.file.Path;
-import java.util.regex.Pattern;
-
-@Getter
+@Value
 public class SzSubmission implements Submission<SzCategory, SzPuzzle> {
-    @Delegate
-    private final SzSolutionMetadata solutionMetadata;
-    private final String author;
-    private final String displayLink;
-    private final String data;
-    @Setter
-    private Path path;
+    @NotNull SzPuzzle puzzle;
+    @NotNull SzScore score;
+    @NotNull String author;
+    @NotNull String data;
 
-    public SzSubmission(@NotNull String data) { // FIXME
-        solutionMetadata = new SzSolutionMetadata(Pattern.compile("\r?\n").splitAsStream(data));
-        this.data = data;
-        this.author = null;
-        this.displayLink = null;
-        this.path = null;
+    @Nullable
+    @Override
+    public String getDisplayLink() {
+        return null;
     }
 
-    public SzSubmission(@NotNull Path path) { // FIXME
-        solutionMetadata = SzSolutionMetadata.fromPath(path);
-        this.author = null;
-        this.displayLink = null;
-        this.data = null;
-        this.path = path;
+    /**
+     * @throws IllegalArgumentException if we can't correctly parse metadata
+     */
+    @NotNull
+    public static SzSubmission fromData(@NotNull String data, @NotNull String author) throws IllegalArgumentException {
+        SzSolutionMetadata metadata = SzSolutionMetadata.fromData(data);
+        return metadata.extendToSubmission(author, data);
     }
 
-    @Deprecated
-    public SzRecord toRecord() {
-        return new SzRecord(getPuzzle(), getScore(), author, displayLink, path);
+    @NotNull
+    public static SzSubmission fromLink(@NotNull String link, String author) {
+        String data = Utils.downloadSolutionFile(link);
+        SzSolutionMetadata metadata = SzSolutionMetadata.fromData(data);
+        return metadata.extendToSubmission(author, data);
     }
 }

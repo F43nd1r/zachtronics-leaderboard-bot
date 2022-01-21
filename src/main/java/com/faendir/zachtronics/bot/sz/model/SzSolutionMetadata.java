@@ -20,12 +20,8 @@ import lombok.Value;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Iterator;
-import java.util.stream.Stream;
+import java.util.regex.Pattern;
 
 @Value
 class SzSolutionMetadata {
@@ -35,17 +31,8 @@ class SzSolutionMetadata {
 
     @NotNull
     @Contract("_ -> new")
-    public static SzSolutionMetadata fromPath(@NotNull Path path) {
-        try (Stream<String> lines = Files.lines(path)) {
-            return new SzSolutionMetadata(lines);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    /** Closing the stream (if needed) is the caller's issue */
-    SzSolutionMetadata(@NotNull Stream<String> lines) {
-        Iterator<String> it = lines.iterator();
+    public static SzSolutionMetadata fromData(@NotNull String data) {
+        Iterator<String> it = Pattern.compile("\n").splitAsStream(data).iterator();
         /*
         [name] Top solution Cost->Power - andersk
         [puzzle] Sz040
@@ -53,11 +40,18 @@ class SzSolutionMetadata {
         [power-usage] 679
         [lines-of-code] 31
          */
-        title = it.next().replaceFirst("^.+] ", "");
-        puzzle = SzPuzzle.valueOf(it.next().replaceFirst("^.+] ", ""));
+        String title = it.next().replaceFirst("^.+] ", "");
+        SzPuzzle puzzle = SzPuzzle.valueOf(it.next().replaceFirst("^.+] ", ""));
         int cost = Integer.parseInt(it.next().replaceFirst("^.+] ", "")) / 100;
         int power = Integer.parseInt(it.next().replaceFirst("^.+] ", ""));
         int loc = Integer.parseInt(it.next().replaceFirst("^.+] ", ""));
-        score = new SzScore(cost, power, loc);
+        SzScore score = new SzScore(cost, power, loc);
+
+        return new SzSolutionMetadata(title, puzzle, score);
+    }
+
+    public SzSubmission extendToSubmission(@NotNull String author, @NotNull String data) {
+        // TODO push the author at the end of the title
+        return new SzSubmission(puzzle, score, author, data);
     }
 }

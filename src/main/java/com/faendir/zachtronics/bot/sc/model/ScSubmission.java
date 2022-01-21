@@ -24,10 +24,6 @@ import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collection;
 
 /** Archive-only submissions have a <tt>null</tt> {@link #displayLink} */
@@ -51,17 +47,7 @@ public class ScSubmission implements Submission<ScCategory, ScPuzzle> {
     @NotNull
     public static Collection<ValidationResult<ScSubmission>> fromExportLink(@NotNull String exportLink, boolean bypassValidation,
                                                                             String author) {
-        String export;
-        try (InputStream is = new URL(Utils.rawContentURL(exportLink)).openStream()) {
-            export = new String(is.readAllBytes()).replace("\r\n", "\n");
-            if (export.length() > 0 && export.charAt(0) == '\uFEFF') // remove BOM
-                export = export.substring(1);
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("Could not parse your link");
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Could not read your solution");
-        }
-
+        String export = Utils.downloadSolutionFile(exportLink);
         return SChem.validateMultiExport(export, bypassValidation, author);
     }
 

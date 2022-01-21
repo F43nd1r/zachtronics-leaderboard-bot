@@ -20,6 +20,7 @@ object Markdown {
     fun link(text: String, link: String, embed: Boolean = true) = "[$text](${if (embed) link else "<$link>"})"
 
     @JvmStatic
+    @JvmOverloads
     fun linkOrText(text: String, link: String?, embed: Boolean = true) = link?.let { link(text, it, embed) } ?: text
 
     @JvmStatic

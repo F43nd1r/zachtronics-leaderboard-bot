@@ -45,11 +45,11 @@ public enum SzCategory implements Category {
     private final List<Metric> metrics;
     private final Comparator<SzScore> scoreComparator;
     private final Set<SzType> supportedTypes = Collections.singleton(STANDARD);
-    private final String formatStringLb;
+    private final String scoreFormatString;
     private final int repoSuffix;
 
     @SuppressWarnings("unchecked")
-    SzCategory(String displayName, @NotNull List<SzMetric> metrics, String formatStringLb, int repoSuffix) {
+    SzCategory(String displayName, @NotNull List<SzMetric> metrics, String scoreFormatString, int repoSuffix) {
         this.displayName = displayName;
         this.metrics = (List<Metric>)(List<?>) metrics;
         this.scoreComparator = metrics.stream()
@@ -57,7 +57,7 @@ public enum SzCategory implements Category {
                                       .map(Comparator::comparingInt)
                                       .reduce(Comparator::thenComparing)
                                       .orElseThrow();
-        this.formatStringLb = formatStringLb;
+        this.scoreFormatString = scoreFormatString;
         this.repoSuffix = repoSuffix;
     }
 
@@ -66,8 +66,9 @@ public enum SzCategory implements Category {
     }
 
     static class SzScoreFormatStrings {
-        static final String F100 = "**%d**/%d/%d";
-        static final String F010 = "%d/**%d**/%d";
-        static final String F001 = "%d/%d/**%d**";
+        static final String F000 = "%d%s%d%s%d";
+        static final String F100 = "**%d**%s%d%s%d";
+        static final String F010 = "%d%s**%d**%s%d";
+        static final String F001 = "%d%s%d%s**%d**";
     }
 }

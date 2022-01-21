@@ -18,6 +18,11 @@ package com.faendir.zachtronics.bot.utils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.EnumSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,5 +44,27 @@ public final class Utils {
         }
 
         return link;
+    }
+
+    @NotNull
+    public static String downloadSolutionFile(@NotNull String link) {
+        String export;
+        try (InputStream is = new URL(Utils.rawContentURL(link)).openStream()) {
+            export = new String(is.readAllBytes()).replace("\r\n", "\n");
+            if (export.length() > 0 && export.charAt(0) == '\uFEFF') // remove BOM
+                export = export.substring(1);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Could not parse your link");
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Could not read your solution");
+        }
+        return export;
+    }
+
+    @NotNull
+    public static <T extends Enum<T>> EnumSet<T> enumSetUnion(EnumSet<T> s1, EnumSet<T> s2) {
+        EnumSet<T> res = EnumSet.copyOf(s1);
+        res.addAll(s2);
+        return res;
     }
 }

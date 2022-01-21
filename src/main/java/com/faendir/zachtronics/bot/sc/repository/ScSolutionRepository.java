@@ -27,49 +27,47 @@ import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.sc.model.*;
 import com.faendir.zachtronics.bot.utils.Markdown;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
-import com.opencsv.*;
-import com.opencsv.enums.CSVReaderNullFieldIndicator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.jgit.revwalk.RevCommit;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static com.faendir.zachtronics.bot.sc.model.ScCategory.*;
 
 @Component
 @RequiredArgsConstructor
-public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory, ScPuzzle, ScSubmission, ScRecord> {
-    private static final ScCategory[][] CATEGORIES = {{C,  CNB,  CNP,  CNBP},  {S,  SNB,  SNP, SNBP},
+public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory, ScPuzzle, ScScore, ScSubmission, ScRecord, ScSolution> {
+    private static final ScCategory[][] CATEGORIES = {{ C,  CNB,  CNP,  CNBP}, { S,  SNB,  SNP,  SNBP},
                                                       {RC, RCNB, RCNP, RCNBP}, {RS, RSNB, RSNP, RSNBP}};
 
     private final RedditService redditService;
     @Getter(AccessLevel.PROTECTED)
     @Qualifier("scArchiveRepository")
     private final GitRepository gitRepo;
+    @Getter
+    Function<String[], ScSolution> solUnmarshaller = ScSolution::unmarshal;
 
     @NotNull
     @Override
     public SubmitResult<ScRecord, ScCategory> submit(@NotNull ScSubmission submission) {
         try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
-            List<String> redditAnnouncementLines = new ArrayList<>();
-            SubmitResult<ScRecord, ScCategory> r = submitOne(access, submission, redditAnnouncementLines);
-            if (r instanceof SubmitResult.Success<ScRecord, ScCategory>) {
+            SubmitResult<ScRecord, ScCategory> r = submitOne(access, submission);
+            if (r instanceof SubmitResult.Success<ScRecord, ScCategory> success) {
                 access.push();
-                postAnnouncementToReddit(String.join("  \n", redditAnnouncementLines));
+                String redditAnnouncement = makeRedditAnnouncement(success, submission);
+                postAnnouncementToReddit(redditAnnouncement);
             }
             return r;
         }
@@ -80,87 +78,33 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     public List<SubmitResult<ScRecord, ScCategory>> submitAll(
             @NotNull Collection<? extends ValidationResult<ScSubmission>> validationResults) {
         try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
-            List<String> redditAnnouncementLines = new ArrayList<>();
-            List<SubmitResult<ScRecord, ScCategory>> l = validationResults.stream().map(r -> {
-                if (r instanceof ValidationResult.Valid<ScSubmission>)
-                    return submitOne(access, r.getSubmission(), redditAnnouncementLines);
-                else
-                    return new SubmitResult.Failure<ScRecord, ScCategory>(r.getMessage());
-            }).toList();
-            if (l.stream().anyMatch(s -> s instanceof SubmitResult.Success<ScRecord, ScCategory>)) {
-                access.push();
-                postAnnouncementToReddit(String.join("  \n", redditAnnouncementLines));
-            }
-            return l;
-        }
-    }
-
-    @NotNull
-    @Override
-    public List<CategoryRecord<ScRecord, ScCategory>> findCategoryHolders(@NotNull ScPuzzle puzzle, boolean includeFrontier) {
-        try (GitRepository.ReadAccess access = getGitRepo().acquireReadAccess()) {
-            Path puzzlePath = access.getRepo().toPath().resolve(relativePuzzlePath(puzzle));
-
-            List<ScSolution> solutions = unmarshalSolutions(puzzlePath);
-
-            List<CategoryRecord<ScRecord, ScCategory>> result = new ArrayList<>();
-            for (ScSolution sol : solutions) {
-                if (includeFrontier || !sol.getCategories().isEmpty()) {
-                    CategoryRecord<ScRecord, ScCategory> categoryRecord =
-                            sol.extendToCategoryRecord(puzzle,
-                                                       makeArchiveLink(puzzle, sol.getScore()),
-                                                       puzzlePath.resolve(makeScoreFilename(sol.getScore())));
-                    result.add(categoryRecord);
+            List<SubmitResult<ScRecord, ScCategory>> submitResults = new ArrayList<>();
+            StringJoiner redditAnnouncement = new StringJoiner("  \n");
+            for (ValidationResult<ScSubmission> validationResult : validationResults) {
+                if (validationResult instanceof ValidationResult.Valid<ScSubmission>) {
+                    ScSubmission submission = validationResult.getSubmission();
+                    SubmitResult<ScRecord, ScCategory> submitResult = submitOne(access, submission);
+                    submitResults.add(submitResult);
+                    if (submitResult instanceof SubmitResult.Success<ScRecord, ScCategory> success) {
+                        redditAnnouncement.add(makeRedditAnnouncement(success, submission));
+                    }
+                }
+                else {
+                    submitResults.add(new SubmitResult.Failure<>(validationResult.getMessage()));
                 }
             }
-            return result;
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
 
-    @NotNull
-    private SubmitResult<ScRecord, ScCategory> submitOne(@NotNull GitRepository.ReadWriteAccess access, @NotNull ScSubmission submission,
-                                                         @NotNull List<String> redditAnnouncementLines) {
-        ScPuzzle puzzle = submission.getPuzzle();
-        Path puzzlePath = access.getRepo().toPath().resolve(relativePuzzlePath(puzzle));
-        List<ScSolution> solutions;
-        try {
-            solutions = unmarshalSolutions(puzzlePath);
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-
-        SubmitResult<ScRecord, ScCategory> submitResult = archiveOne(access, solutions, submission);
-
-        if (submitResult instanceof SubmitResult.Success<ScRecord, ScCategory>) {
-            ScSolution submissionSolution = solutions.stream()
-                                                     .filter(s -> s.getScore().equals(submission.getScore()))
-                                                     .findFirst()
-                                                     .orElseThrow();
-            Set<ScCategory> wonCategories = submissionSolution.getCategories();
-            if (!wonCategories.isEmpty()) {
-                // write the reddit lb, as there are changes to write
-                String updateMessage = puzzle.getDisplayName() + " " + submission.getScore().toDisplayString() +
-                                       " by " + submission.getAuthor();
-                writeToRedditLeaderboard(puzzle, puzzlePath, solutions, updateMessage);
-
-                DisplayContext<ScCategory> context = new DisplayContext<>(StringFormat.REDDIT, wonCategories);
-                redditAnnouncementLines.add("Added " + Markdown.fileLinkOrEmpty(makeArchiveLink(puzzle, submission.getScore())) +
-                                            Markdown.linkOrText(submission.getPuzzle().getDisplayName() +
-                                                                " (" + submission.getScore().toDisplayString(context) + ")",
-                                                                submission.getDisplayLink(), true) +
-                                            " by " + submission.getAuthor());
+            if (redditAnnouncement.length() != 0) {
+                access.push();
+                postAnnouncementToReddit(redditAnnouncement.toString());
             }
+            return submitResults;
         }
-
-        return submitResult;
     }
 
     public void rebuildRedditLeaderboard(ScPuzzle puzzle, String updateMessage) {
         try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
-            Path puzzlePath = access.getRepo().toPath().resolve(relativePuzzlePath(puzzle));
+            Path puzzlePath = getPuzzlePath(access, puzzle);
             List<ScSolution> solutions = unmarshalSolutions(puzzlePath);
             writeToRedditLeaderboard(puzzle, puzzlePath, solutions, updateMessage);
         }
@@ -169,9 +113,9 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         }
     }
 
-
-    private void writeToRedditLeaderboard(@NotNull ScPuzzle puzzle, Path puzzlePath, @NotNull List<ScSolution> solutions,
-                                         String updateMessage) {
+    @Override
+    protected void writeToRedditLeaderboard(@NotNull ScPuzzle puzzle, Path puzzlePath, @NotNull List<ScSolution> solutions,
+                                            String updateMessage) {
 
         Map<ScCategory, ScRecord> recordMap = new EnumMap<>(ScCategory.class);
         Map<ScCategory, ScRecord> videoRecordMap = new EnumMap<>(ScCategory.class);
@@ -182,7 +126,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         for (ScSolution solution: solutions) {
             ScRecord record = solution.extendToRecord(puzzle,
                                                       makeArchiveLink(puzzle, solution.getScore()),
-                                                      puzzlePath.resolve(makeScoreFilename(solution.getScore())));
+                                                      makeArchivePath(puzzlePath, solution.getScore()));
             for (ScCategory category : solution.getCategories()) {
                 recordMap.put(category, record);
                 if (record.getDisplayLink() == null) {
@@ -195,7 +139,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         }
 
         String[] lines = redditService.getWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
-        Pattern puzzleRegex = Pattern.compile("^\\s*\\|\\s*" + Pattern.quote(puzzle.getDisplayName()));
+        Pattern puzzleRegex = Pattern.compile("^\\|\\s*" + Pattern.quote(puzzle.getDisplayName()));
 
         int rowIdx = 0;
 
@@ -272,6 +216,20 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         return record.toDisplayString(displayContext, reactorPrefix);
     }
 
+    @NotNull
+    private String makeRedditAnnouncement(@NotNull SubmitResult.Success<ScRecord, ScCategory> result, @NotNull ScSubmission submission) {
+        List<ScCategory> wonCategories = result.getBeatenRecords().stream()
+                                               .map(CategoryRecord::getCategories)
+                                               .flatMap(Set::stream)
+                                               .toList();
+        DisplayContext<ScCategory> context = new DisplayContext<>(StringFormat.REDDIT, wonCategories);
+        return "Added " + Markdown.fileLinkOrEmpty(makeArchiveLink(submission.getPuzzle(), submission.getScore())) +
+               Markdown.linkOrText(submission.getPuzzle().getDisplayName() +
+                                   " (" + submission.getScore().toDisplayString(context) + ")",
+                                   submission.getDisplayLink()) +
+               " by " + submission.getAuthor();
+    }
+
     private void postAnnouncementToReddit(@NotNull String content) {
         // see: https://www.reddit.com/r/spacechem/comments/mmcuzb
         if (!content.isEmpty())
@@ -290,12 +248,15 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     }
 
     @NotNull
-    Path makeArchivePath(@NotNull ScPuzzle puzzle, @NotNull ScScore score) {
-        return makeArchivePath(puzzle, makeScoreFilename(score));
+    @Override
+    protected String makeArchiveLink(@NotNull ScPuzzle puzzle, @NotNull ScScore score) {
+        return makeArchiveLink(puzzle, makeScoreFilename(score));
     }
 
-    String makeArchiveLink(@NotNull ScPuzzle puzzle, @NotNull ScScore score) {
-        return makeArchiveLink(puzzle, makeScoreFilename(score));
+    @Override
+    @NotNull
+    protected Path makeArchivePath(@NotNull Path puzzlePath, ScScore score) {
+        return puzzlePath.resolve(makeScoreFilename(score));
     }
 
     /** Sorting order of the solutions index */
@@ -308,12 +269,13 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     /**
      * @param solutions the list is modified with the updated state
      */
+    @Override
     @NotNull
     protected SubmitResult<ScRecord, ScCategory> archiveOne(@NotNull GitRepository.ReadWriteAccess access,
                                                             @NotNull List<ScSolution> solutions,
                                                             @NotNull ScSubmission submission) {
         ScPuzzle puzzle = submission.getPuzzle();
-        Path puzzlePath = access.getRepo().toPath().resolve(relativePuzzlePath(puzzle));
+        Path puzzlePath = getPuzzlePath(access, puzzle);
 
         List<CategoryRecord<ScRecord, ScCategory>> beatenCategoryRecords = new ArrayList<>();
         ScSolution candidate = new ScSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink(), false);
@@ -327,7 +289,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                     CategoryRecord<ScRecord, ScCategory> categoryRecord =
                             solution.extendToCategoryRecord(puzzle,
                                                             makeArchiveLink(puzzle, solution.getScore()),
-                                                            puzzlePath.resolve(makeScoreFilename(solution.getScore())));
+                                                            makeArchivePath(puzzlePath, solution.getScore()));
                     return new SubmitResult.NothingBeaten<>(Collections.singletonList(categoryRecord));
                 }
                 else if (r < 0) {
@@ -339,7 +301,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                     }
                     // remove beaten score and get categories
                     it.remove();
-                    Files.delete(puzzlePath.resolve(makeScoreFilename(solution.getScore())));
+                    Files.delete(makeArchivePath(puzzlePath, solution.getScore()));
                     candidate.getCategories().addAll(solution.getCategories());
                     beatenCategoryRecords.add(solution.extendToCategoryRecord(puzzle, null, null)); // the beaten record has no data anymore
                 }
@@ -359,7 +321,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                     CategoryRecord<ScRecord, ScCategory> beatenCR = new CategoryRecord<>(
                             solution.extendToRecord(puzzle,
                                                     makeArchiveLink(puzzle, solution.getScore()),
-                                                    puzzlePath.resolve(makeScoreFilename(solution.getScore()))),
+                                                    makeArchivePath(puzzlePath, solution.getScore())),
                             lostCategories);
                     beatenCategoryRecords.add(beatenCR);
 
@@ -392,47 +354,8 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
             return new SubmitResult.AlreadyPresent<>();
         }
 
-        access.addAll(puzzlePath.toFile());
-        String result = Stream.concat(access.status().getChanged().stream(),
-                                      access.status().getAdded().stream())
-                              .map(f -> "[" + f.replaceFirst(".+/", "") + "]" +
-                                        "(" + getGitRepo().getRawFilesUrl() + "/" + f + ")")
-                              .collect(Collectors.joining(", "));
-        RevCommit rev = access.commit("Added " + submission.getScore().toDisplayString() +
-                                      " for " + submission.getPuzzle().getDisplayName() +
-                                      " by " + submission.getAuthor());
-        result += "\n[commit " + rev.name().substring(0, 7) + "]" +
-                  "(" + getGitRepo().getUrl().replaceFirst(".git$", "") + "/commit/" + rev.name() + ")";
-
+        String result = commit(access, submission, puzzlePath);
         return new SubmitResult.Success<>(result, beatenCategoryRecords);
-    }
-
-    /**
-     * @return a mutable list
-     */
-    static List<ScSolution> unmarshalSolutions(@NotNull Path puzzlePath) throws IOException {
-        Path indexPath = puzzlePath.resolve("solutions.psv");
-        try (BufferedReader reader = Files.newBufferedReader(indexPath)) {
-
-            CSVParser parser = new CSVParserBuilder().withSeparator('|').withFieldAsNull(CSVReaderNullFieldIndicator.BOTH).build();
-            CSVReader csvReader = new CSVReaderBuilder(reader).withCSVParser(parser).build();
-            return StreamSupport.stream(csvReader.spliterator(), false)
-                                .map(ScSolution::unmarshal)
-                                .collect(Collectors.toList());
-        }
-        catch (NoSuchFileException e) {
-            Files.createDirectories(puzzlePath);
-            Files.createFile(indexPath);
-            return new ArrayList<>();
-        }
-    }
-
-    static void marshalSolutions(@NotNull List<ScSolution> solutions, @NotNull Path puzzlePath) throws IOException {
-        try (BufferedWriter writer = Files.newBufferedWriter(puzzlePath.resolve("solutions.psv"),
-                                                             StandardOpenOption.TRUNCATE_EXISTING)) {
-            ICSVWriter csvWriter = new CSVWriterBuilder(writer).withSeparator('|').build();
-            csvWriter.writeAll(solutions.stream().map(ScSolution::marshal)::iterator, false);
-        }
     }
 
     /**

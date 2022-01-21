@@ -133,7 +133,7 @@ class SolRepoManualTest {
 
         for (ScPuzzle puzzle : ScPuzzle.values()) {
             Path puzzlePath = repoPath.resolve(puzzle.getGroup().name()).resolve(puzzle.name());
-            List<ScSolution> solutions = ScSolutionRepository.unmarshalSolutions(puzzlePath);
+            List<ScSolution> solutions = repository.unmarshalSolutions(puzzlePath);
             if (solutions.isEmpty())
                 continue;
             for (ScCategory category : newCategories) {
@@ -146,7 +146,7 @@ class SolRepoManualTest {
                          .getCategories()
                          .add(category);
             }
-            ScSolutionRepository.marshalSolutions(solutions, puzzlePath);
+            repository.marshalSolutions(solutions, puzzlePath);
         }
     }
 
@@ -156,7 +156,7 @@ class SolRepoManualTest {
 
         for (ScPuzzle puzzle : ScPuzzle.values()) {
             Path puzzlePath = repoPath.resolve(puzzle.getGroup().name()).resolve(puzzle.name());
-            List<ScSolution> solutions = ScSolutionRepository.unmarshalSolutions(puzzlePath);
+            List<ScSolution> solutions = repository.unmarshalSolutions(puzzlePath);
             for (ScSolution solution : solutions) {
                 Path path = puzzlePath.resolve(ScSolutionRepository.makeScoreFilename(solution.getScore()));
                 if (Files.exists(path)) {

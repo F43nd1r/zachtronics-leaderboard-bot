@@ -18,11 +18,11 @@ package com.faendir.zachtronics.bot.sz.model;
 
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Record;
+import com.faendir.zachtronics.bot.utils.Markdown;
 import kotlin.Pair;
 import lombok.SneakyThrows;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -38,13 +38,13 @@ public class SzRecord implements Record<SzCategory> {
     String link;
     Path dataPath;
 
-    @Nullable
+    @NotNull
     @Override
     public String getDisplayLink() {
         return link;
     }
 
-    @Nullable
+    @NotNull
     @Override
     public String getDataLink() {
         return link;
@@ -53,11 +53,8 @@ public class SzRecord implements Record<SzCategory> {
     @NotNull
     @Override
     public String toDisplayString(@NotNull DisplayContext<SzCategory> context) {
-        //TODO: could also set archiveLink to null and use super instead?
-        return switch (context.getFormat()) {
-            case DISCORD, REDDIT -> "[" + score.toDisplayString() + "](" + link + ")";
-            default -> Record.super.toDisplayString(context);
-        };
+        String scoreAuthor = "(" + score.toDisplayString(context) + ")" + (author != null ? " " + author : "");
+        return Markdown.linkOrText(scoreAuthor, link);
     }
 
     @SneakyThrows

@@ -18,15 +18,17 @@ package com.faendir.zachtronics.bot.sz.discord;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
+import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.LinkConverter;
-import com.faendir.zachtronics.bot.discord.command.AbstractArchiveCommand;
+import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
-import com.faendir.zachtronics.bot.sc.discord.ScSecured;
 import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
+import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
+import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.sz.model.SzSubmission;
 import com.faendir.zachtronics.bot.sz.repository.SzSolutionRepository;
-import com.faendir.zachtronics.bot.validation.ValidationResult;
+import discord4j.core.event.domain.interaction.DeferrableInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -34,19 +36,12 @@ import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collection;
-import java.util.Collections;
-
 @RequiredArgsConstructor
 @Component
 @SzQualifier
-public class SzArchiveCommand extends AbstractArchiveCommand<SzArchiveCommand.ArchiveData, SzCategory, SzSubmission> {
+public class SzSubmitCommand extends AbstractSubmitCommand<SzSubmitCommand.SubmitData, SzCategory, SzPuzzle, SzSubmission, SzRecord> {
     @Delegate
-    private final SzArchiveCommand_ArchiveDataParser parser = SzArchiveCommand_ArchiveDataParser.INSTANCE;
+    private final SzSubmitCommand_SubmitDataParser parser = SzSubmitCommand_SubmitDataParser.INSTANCE;
     @Getter
     private final Secured secured = SzSecured.INSTANCE;
     @Getter
@@ -54,29 +49,20 @@ public class SzArchiveCommand extends AbstractArchiveCommand<SzArchiveCommand.Ar
 
     @NotNull
     @Override
-    public Collection<ValidationResult<SzSubmission>> parseSubmissions(@NotNull ArchiveData parameters) {
-        ValidationResult<SzSubmission> result;
-        try (InputStream is = new URL(parameters.link).openStream()) {
-            String content = new String(is.readAllBytes());
-            result = new ValidationResult.Valid<>(new SzSubmission(content));
-        } catch (MalformedURLException e) {
-            result = new ValidationResult.Unparseable<>("Could not parse your link");
-        } catch (IOException e) {
-            result = new ValidationResult.Unparseable<>("Could not read your solution");
-        } catch (IllegalArgumentException e) {
-            result = new ValidationResult.Unparseable<>("Could not parse a valid solution");
-        }
-        return Collections.singleton(result);
+    public SzSubmission parseSubmission(@NotNull DeferrableInteractionEvent event, @NotNull SzSubmitCommand.SubmitData parameters) {
+        return SzSubmission.fromLink(parameters.getSolution(), parameters.getAuthor());
     }
 
     @ApplicationCommand(name = "archive", subCommand = true)
     @Value
-    public static class ArchiveData {
-        @NotNull
-        String link;
+    public static class SubmitData {
+        @NotNull String solution;
+        @NotNull String author;
 
-        public ArchiveData(@NotNull @Converter(LinkConverter.class) String link) {
-            this.link = link;
+        public SubmitData(@NotNull @Converter(LinkConverter.class) String solution,
+                          @NotNull @Description("Name to appear on the Reddit leaderboard") String author) {
+            this.solution = solution;
+            this.author = author;
         }
     }
 }

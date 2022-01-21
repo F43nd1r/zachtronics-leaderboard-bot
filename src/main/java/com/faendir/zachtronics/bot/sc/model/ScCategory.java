@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.Category;
 import com.faendir.zachtronics.bot.model.Metric;
+import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -91,14 +92,7 @@ public enum ScCategory implements Category {
     static class ScTypeSets {
         static final EnumSet<ScType> RES = EnumSet.of(RESEARCH, PRODUCTION_TRIVIAL);
         static final EnumSet<ScType> PROD = EnumSet.of(PRODUCTION, BOSS);
-        static final EnumSet<ScType> ALL = enumSetUnion(RES, PROD);
-
-        @NotNull
-        public static <T extends Enum<T>> EnumSet<T> enumSetUnion(EnumSet<T> s1, EnumSet<T> s2) {
-            EnumSet<T> res = EnumSet.copyOf(s1);
-            res.addAll(s2);
-            return res;
-        }
+        static final EnumSet<ScType> ALL = Utils.enumSetUnion(RES, PROD);
 
         private ScTypeSets() {}
     }
