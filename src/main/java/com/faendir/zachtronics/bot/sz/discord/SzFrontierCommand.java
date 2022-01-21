@@ -53,8 +53,8 @@ public class SzFrontierCommand extends AbstractFrontierCommand<SzFrontierCommand
     public static class FrontierData {
         @NonNull SzPuzzle puzzle;
 
-        public FrontierData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
-                        @Converter(SzPuzzleConverter.class) @NonNull SzPuzzle puzzle) {
+        public FrontierData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `fake surv`, `HD`")
+                            @Converter(SzPuzzleConverter.class) @NonNull SzPuzzle puzzle) {
             this.puzzle = puzzle;
         }
     }

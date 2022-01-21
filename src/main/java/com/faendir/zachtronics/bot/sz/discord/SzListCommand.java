@@ -18,13 +18,13 @@ package com.faendir.zachtronics.bot.sz.discord;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
+import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractListCommand;
 import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.sz.repository.SzSolutionRepository;
-import kotlin.Pair;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +32,6 @@ import lombok.Value;
 import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Component
@@ -56,7 +53,8 @@ public class SzListCommand extends AbstractListCommand<SzListCommand.ListData, S
     public static class ListData {
         @NonNull SzPuzzle puzzle;
 
-        public ListData(@Converter(SzPuzzleConverter.class) @NonNull SzPuzzle puzzle) {
+        public ListData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `fake surv`, `HD`")
+                        @Converter(SzPuzzleConverter.class) @NonNull SzPuzzle puzzle) {
             this.puzzle = puzzle;
         }
     }

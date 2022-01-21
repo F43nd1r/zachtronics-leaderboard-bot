@@ -53,13 +53,14 @@ public class SzSubmitCommand extends AbstractSubmitCommand<SzSubmitCommand.Submi
         return SzSubmission.fromLink(parameters.getSolution(), parameters.getAuthor());
     }
 
-    @ApplicationCommand(name = "archive", subCommand = true)
+    @ApplicationCommand(name = "submit", subCommand = true)
     @Value
     public static class SubmitData {
         @NotNull String solution;
         @NotNull String author;
 
-        public SubmitData(@NotNull @Converter(LinkConverter.class) String solution,
+        public SubmitData(@Description("Link to the solution file, can be `m1` to scrape it from your last message")
+                          @NotNull @Converter(LinkConverter.class) String solution,
                           @NotNull @Description("Name to appear on the Reddit leaderboard") String author) {
             this.solution = solution;
             this.author = author;

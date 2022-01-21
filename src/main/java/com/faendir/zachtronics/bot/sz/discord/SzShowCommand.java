@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.sz.discord;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
+import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractShowCommand;
 import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
@@ -59,7 +60,10 @@ public class SzShowCommand extends AbstractShowCommand<SzShowCommand.ShowData, S
         @NonNull SzPuzzle puzzle;
         @NonNull SzCategory category;
 
-        public ShowData(@Converter(SzPuzzleConverter.class) @NonNull SzPuzzle puzzle, @NonNull SzCategory category) {
+        public ShowData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `fake surv`, `HD`")
+                        @Converter(SzPuzzleConverter.class) @NonNull SzPuzzle puzzle,
+                        @Description("Category. E.g. `CP`, `LC`")
+                        @NonNull SzCategory category) {
             this.puzzle = puzzle;
             this.category = category;
         }
