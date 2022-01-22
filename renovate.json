@@ -1,15 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "branchPrefix": "renovate/",
-  "username": "renovate-release",
-  "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
   "onboarding": false,
-  "requireConfig": false,
   "platform": "github",
   "dependencyDashboard": false,
-  "repositories": [
-    "F43nd1r/zachtronics-leaderboard-bot"
-  ],
   "ignoreDeps": [
     "openjdk"
   ],
@@ -25,13 +18,6 @@
         "patch",
         "pin",
         "digest"
-      ],
-      "automerge": true,
-      "automergeType": "branch"
-    },
-    {
-      "matchPackagePrefixes": [
-        "renovatebot"
       ],
       "automerge": true,
       "automergeType": "branch"
