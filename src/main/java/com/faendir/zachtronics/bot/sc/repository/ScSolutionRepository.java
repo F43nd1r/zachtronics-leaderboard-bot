@@ -96,8 +96,8 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                 }
             }
 
+            access.push();
             if (redditAnnouncement.length() != 0) {
-                access.push();
                 postAnnouncementToReddit(redditAnnouncement.toString());
             }
             return submitResults;
