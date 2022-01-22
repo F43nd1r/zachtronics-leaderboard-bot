@@ -33,8 +33,10 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -71,7 +73,8 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & Category, P
     }
 
     @NotNull
-    protected SubmitResult<R, C> submitOne(@NotNull GitRepository.ReadWriteAccess access, @NotNull Sub submission) {
+    protected SubmitResult<R, C> submitOne(@NotNull GitRepository.ReadWriteAccess access, @NotNull Sub submission,
+                                           BiConsumer<Sub, Collection<C>> successCallback) {
         P puzzle = submission.getPuzzle();
         Path puzzlePath = getPuzzlePath(access, puzzle);
         List<Sol> solutions;
@@ -96,6 +99,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & Category, P
                                        " by " + submission.getAuthor();
                 writeToRedditLeaderboard(puzzle, puzzlePath, solutions, updateMessage);
             }
+            successCallback.accept(submission, wonCategories);
         }
 
         return submitResult;

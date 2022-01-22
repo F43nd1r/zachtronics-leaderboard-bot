@@ -40,6 +40,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -62,13 +63,14 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     @Override
     public SubmitResult<ScRecord, ScCategory> submit(@NotNull ScSubmission submission) {
         try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
-            SubmitResult<ScRecord, ScCategory> r = submitOne(access, submission);
-            if (r instanceof SubmitResult.Success<ScRecord, ScCategory> success) {
+            BiConsumer<ScSubmission, Collection<ScCategory>> successCallback = (sub, wonCategories) -> {
                 access.push();
-                String redditAnnouncement = makeRedditAnnouncement(success, submission);
-                postAnnouncementToReddit(redditAnnouncement);
-            }
-            return r;
+                if (!wonCategories.isEmpty()) {
+                    String redditAnnouncement = makeRedditAnnouncement(sub, wonCategories);
+                    postAnnouncementToReddit(redditAnnouncement);
+                }
+            };
+            return submitOne(access, submission, successCallback);
         }
     }
 
@@ -79,14 +81,15 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
             List<SubmitResult<ScRecord, ScCategory>> submitResults = new ArrayList<>();
             StringJoiner redditAnnouncement = new StringJoiner("  \n");
+            BiConsumer<ScSubmission, Collection<ScCategory>> successCallback = (sub, wonCategories) -> {
+                if (!wonCategories.isEmpty())
+                    redditAnnouncement.add(makeRedditAnnouncement(sub, wonCategories));
+            };
+
             for (ValidationResult<ScSubmission> validationResult : validationResults) {
                 if (validationResult instanceof ValidationResult.Valid<ScSubmission>) {
                     ScSubmission submission = validationResult.getSubmission();
-                    SubmitResult<ScRecord, ScCategory> submitResult = submitOne(access, submission);
-                    submitResults.add(submitResult);
-                    if (submitResult instanceof SubmitResult.Success<ScRecord, ScCategory> success) {
-                        redditAnnouncement.add(makeRedditAnnouncement(success, submission));
-                    }
+                    submitResults.add(submitOne(access, submission, successCallback));
                 }
                 else {
                     submitResults.add(new SubmitResult.Failure<>(validationResult.getMessage()));
@@ -205,11 +208,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     }
 
     @NotNull
-    private String makeRedditAnnouncement(@NotNull SubmitResult.Success<ScRecord, ScCategory> result, @NotNull ScSubmission submission) {
-        List<ScCategory> wonCategories = result.getBeatenRecords().stream()
-                                               .map(CategoryRecord::getCategories)
-                                               .flatMap(Set::stream)
-                                               .toList();
+    private String makeRedditAnnouncement(@NotNull ScSubmission submission, Collection<ScCategory> wonCategories) {
         DisplayContext<ScCategory> context = new DisplayContext<>(StringFormat.REDDIT, wonCategories);
         return "Added " + Markdown.fileLinkOrEmpty(makeArchiveLink(submission.getPuzzle(), submission.getScore())) +
                Markdown.linkOrText(submission.getPuzzle().getDisplayName() +

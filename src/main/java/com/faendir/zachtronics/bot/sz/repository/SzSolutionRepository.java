@@ -61,10 +61,7 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
     @Override
     public SubmitResult<SzRecord, SzCategory> submit(@NotNull SzSubmission submission) {
         try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
-            SubmitResult<SzRecord, SzCategory> r = submitOne(access, submission);
-            if (r instanceof SubmitResult.Success<SzRecord, SzCategory>)
-                access.push();
-            return r;
+            return submitOne(access, submission, (s, c) -> access.push());
         }
     }
 
