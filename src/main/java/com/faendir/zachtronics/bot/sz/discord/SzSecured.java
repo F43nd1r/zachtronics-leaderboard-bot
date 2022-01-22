@@ -16,14 +16,13 @@
 
 package com.faendir.zachtronics.bot.sz.discord;
 
-import com.faendir.zachtronics.bot.discord.command.security.DiscordUser;
-import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured;
-import com.faendir.zachtronics.bot.discord.command.security.Secured;
+import com.faendir.zachtronics.bot.discord.command.security.*;
 
 import java.util.Set;
 
 public class SzSecured {
-    public static final Secured INSTANCE = new DiscordUserSecured(Set.of(DiscordUser.IEEE12345));
+    public static final DiscordUserSecured ADMINS_ONLY = new DiscordUserSecured(Set.of(DiscordUser.IEEE12345));
+    public static final Secured INSTANCE = SecuredKt.or(ADMINS_ONLY, TrustedLeaderboardPosterRoleSecured.INSTANCE);
 
     private SzSecured() {}
 }
