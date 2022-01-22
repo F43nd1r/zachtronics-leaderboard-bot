@@ -147,6 +147,17 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & Category, P
         }
     }
 
+    public void rebuildRedditLeaderboard(P puzzle, String updateMessage) {
+        try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
+            Path puzzlePath = getPuzzlePath(access, puzzle);
+            List<Sol> solutions = unmarshalSolutions(puzzlePath);
+            writeToRedditLeaderboard(puzzle, puzzlePath, solutions, updateMessage);
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     protected abstract void writeToRedditLeaderboard(P puzzle, Path puzzlePath, @NotNull List<Sol> solutions, String updateMessage);
 
     @NotNull

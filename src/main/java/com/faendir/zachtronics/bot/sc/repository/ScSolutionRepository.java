@@ -35,7 +35,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -99,17 +98,6 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                 postAnnouncementToReddit(redditAnnouncement.toString());
             }
             return submitResults;
-        }
-    }
-
-    public void rebuildRedditLeaderboard(ScPuzzle puzzle, String updateMessage) {
-        try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
-            Path puzzlePath = getPuzzlePath(access, puzzle);
-            List<ScSolution> solutions = unmarshalSolutions(puzzlePath);
-            writeToRedditLeaderboard(puzzle, puzzlePath, solutions, updateMessage);
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
         }
     }
 

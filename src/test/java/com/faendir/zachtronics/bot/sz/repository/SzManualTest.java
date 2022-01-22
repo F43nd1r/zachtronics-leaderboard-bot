@@ -18,6 +18,8 @@ package com.faendir.zachtronics.bot.sz.repository;
 
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.model.DisplayContext;
+import com.faendir.zachtronics.bot.reddit.RedditService;
+import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.sz.model.*;
 import com.opencsv.CSVWriterBuilder;
@@ -42,6 +44,8 @@ public class SzManualTest {
 
     @Autowired
     private SzSolutionRepository repository;
+    @Autowired
+    private RedditService redditService;
 
     @Test
     public void testFullIO() throws IOException {
@@ -59,6 +63,22 @@ public class SzManualTest {
             System.out.println("Done " + p.getDisplayName());
         }
         System.out.println("Done");
+    }
+
+    @Test
+    public void rebuildRedditWiki() {
+        for (SzPuzzle puzzle : SzPuzzle.values()) {
+            if (puzzle.getType() == SzType.SANDBOX)
+                continue;
+            repository.rebuildRedditLeaderboard(puzzle, "");
+
+            System.out.println("Done " + puzzle.getDisplayName());
+        }
+
+        String page = redditService.getWikiPage(Subreddit.SHENZHEN_IO, "index")
+                                   .replaceAll("file:/tmp/sz-leaderboard[0-9]+/",
+                                               "https://raw.githubusercontent.com/12345ieee/shenzhenIO-leaderboard/master");
+        System.out.println(page);
     }
 
     @Test

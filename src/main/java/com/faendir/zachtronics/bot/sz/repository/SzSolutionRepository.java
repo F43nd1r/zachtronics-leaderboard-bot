@@ -99,7 +99,7 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
 
         while (it.hasNext()) {
             String line = it.next();
-            if (line.equals("|")) {
+            if (line.equals("|") || line.isBlank()) {
                 it.previous();
                 break;
             } else {
