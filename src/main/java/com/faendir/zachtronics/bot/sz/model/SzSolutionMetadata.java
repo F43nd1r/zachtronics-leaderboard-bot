@@ -32,7 +32,7 @@ class SzSolutionMetadata {
     @NotNull
     @Contract("_ -> new")
     public static SzSolutionMetadata fromData(@NotNull String data) {
-        Iterator<String> it = Pattern.compile("\n").splitAsStream(data).iterator();
+        Iterator<String> it = Pattern.compile("\n").splitAsStream(data).dropWhile(String::isBlank).iterator();
         /*
         [name] Top solution Cost->Power - andersk
         [puzzle] Sz040
@@ -40,7 +40,11 @@ class SzSolutionMetadata {
         [power-usage] 679
         [lines-of-code] 31
          */
-        String title = it.next().replaceFirst("^.+] ", "");
+        String firstLine = it.next();
+        if (!firstLine.startsWith("[name]"))
+            throw new IllegalArgumentException("Invalid solution file, first line: \"" + firstLine + "\"");
+
+        String title = firstLine.replaceFirst("^.+] ", "");
         SzPuzzle puzzle = SzPuzzle.valueOf(it.next().replaceFirst("^.+] ", ""));
         int cost = Integer.parseInt(it.next().replaceFirst("^.+] ", "")) / 100;
         int power = Integer.parseInt(it.next().replaceFirst("^.+] ", ""));
