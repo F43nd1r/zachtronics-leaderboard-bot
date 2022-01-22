@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,6 +79,49 @@ public class SzManualTest {
                                    .replaceAll("file:/tmp/sz-leaderboard[0-9]+/",
                                                "https://raw.githubusercontent.com/12345ieee/shenzhenIO-leaderboard/master");
         System.out.println(page);
+    }
+
+    @Test
+    public void submitSaveFolder() throws IOException {
+        String author = "12345ieee";
+
+        Path savesPath = Paths.get("../shenzhenIO/saves");
+        /*
+        cp -r ../shenzhenIO/leaderboard/* src/test/resources/repositories/sz-leaderboard/
+        */
+
+        for (SzPuzzle puzzle : SzPuzzle.values()) {
+            if (puzzle.getType() != SzType.STANDARD)
+                continue;
+
+            Iterable<Path> paths = Files.list(savesPath)
+                                        .filter(p -> p.getFileName().toString().startsWith(puzzle.getId()))
+                                        ::iterator;
+            for (Path path : paths) {
+                String data = Files.readString(path).replace("\r\n", "\n");
+                SzSubmission submission;
+                try {
+                    submission = SzSubmission.fromData(data, author);
+                }
+                catch (IllegalArgumentException e) {
+                    if (e.getMessage().equals("Solution must be solved"))
+                        continue;
+                    System.err.println(path);
+                    throw e;
+                }
+
+                repository.submit(submission);
+            }
+        }
+
+        /*
+        rm -r src/test/resources/repositories/sz-leaderboard/
+        git reset -- src/test/resources/repositories/sz-leaderboard
+        git checkout -- src/test/resources/repositories/sz-leaderboard/
+        cp -r $(ls -dt /tmp/sz-leaderboard* | head -n1)/* ../shenzhenIO/leaderboard/
+         */
+
+        System.out.println("Done");
     }
 
     @Test

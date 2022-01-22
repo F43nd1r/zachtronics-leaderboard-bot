@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.sz.model;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SzSubmissionTest {
@@ -30,5 +31,23 @@ class SzSubmissionTest {
                       <html lang="en" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
                       """;
         assertThrows(IllegalArgumentException.class, () -> SzSubmission.fromData(data, "837951602"));
+    }
+
+    @Test
+    public void testCopyBad() {
+        String baseContent = """
+                [name] TITLE
+                [puzzle] Sz000
+                [production-cost] 600
+                [power-usage] 57
+                [lines-of-code] 8
+                """;
+        for (String title : new String[]{"title (Copy)", "title (Copy) (Copy)"}) {
+            String content = baseContent.replace("TITLE", title);
+            SzSubmission result = SzSubmission.fromData(content, "12345ieee");
+            SzSubmission expected = new SzSubmission(SzPuzzle.Sz000, new SzScore(6, 57, 8),
+                                                     "12345ieee", content.replace(" (Copy)", ""));
+            assertEquals(expected, result);
+        }
     }
 }

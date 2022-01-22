@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,7 +137,7 @@ class SolRepoManualTest {
         List<ScCategory> newCategories = List.of(CNBP, SNBP, RCNBP, RSNBP);
 
         for (ScPuzzle puzzle : ScPuzzle.values()) {
-            Path puzzlePath = repoPath.resolve(puzzle.getGroup().name()).resolve(puzzle.name());
+            Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
             List<ScSolution> solutions = repository.unmarshalSolutions(puzzlePath);
             if (solutions.isEmpty())
                 continue;
