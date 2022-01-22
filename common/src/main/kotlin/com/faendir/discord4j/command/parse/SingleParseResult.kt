@@ -23,6 +23,17 @@ sealed class SingleParseResult<T> {
     class Failure<T>(val message: String) : SingleParseResult<T>()
 
     /**
+     * If it's [Success], returns the value, otherwise returns
+     * [other]
+     *
+     * @param [other] the value to be returned, if it's not a [Success]
+     * @return the value, if present, otherwise [other]
+     */
+    fun orElse(other: T): T {
+        return if (this is Success) value else other
+    }
+
+    /**
      * If it's [Success], returns the value, otherwise throws
      * [IllegalArgumentException]
      *
