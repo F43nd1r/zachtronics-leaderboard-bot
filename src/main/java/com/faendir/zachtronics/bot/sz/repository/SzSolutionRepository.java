@@ -156,11 +156,6 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
         return puzzlePath.resolve(makeFilename(puzzlePath.getFileName().toString(), score));
     }
 
-    @Override
-    public String makeArchiveLink(@NotNull SzPuzzle puzzle, @NotNull String filename) {
-        return String.format("%s/%s/%s", gitRepo.getRawFilesUrl(), puzzle.getGroup().getRepoFolder(), filename);
-    }
-
     /** Sorting order of the solutions index */
     private static final Comparator<SzSolution> COMPARATOR = Comparator.comparing(SzSolution::getScore, SzCategory.CP.getScoreComparator());
 
