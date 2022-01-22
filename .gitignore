@@ -1,5 +1,6 @@
 .gradle
 .idea
+!.idea/copyright
 *.iml
 build
 docker-compose.yml
