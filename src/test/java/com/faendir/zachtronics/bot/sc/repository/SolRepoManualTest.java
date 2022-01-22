@@ -189,7 +189,6 @@ class SolRepoManualTest {
         Map<ScPuzzle, List<ScSubmission>> solnetSubmissions = StreamSupport.stream(reader.spliterator(), false)
                                                                            .map(SolRepoManualTest::fromSolnetData)
                                                                            .filter(s -> s.getDisplayLink() != null)
-                                                                           .filter(s -> s.getPuzzle() != ScPuzzle.warp_boss)
                                                                            .collect(groupingBy(ScSubmission::getPuzzle));
 
         for (ScPuzzle puzzle : ScPuzzle.values()) {
@@ -233,15 +232,26 @@ class SolRepoManualTest {
     private static ScSubmission fromSolnetData(@NotNull String[] fields) {
         // Username,Level Category,Level Number,Level Name,Reactor Count,Cycle Count,Symbol Count,Upload Time,Youtube Link
         // Iridium,63corvi,1,QT-1,1,20,5,2011-07-09 07:51:58.320983,https://www.youtube.com/watch?v=hRM5IpSv5aU
+        // ToughThought,researchnet,1-7-2,Glyoxylic Acid,1,167,23,2014-01-17 09:32:10.854625,https://youtu.be/GUz4sihkigQ
+        // jp26,researchnet,44-3,ResearchNet Published 44-3,1,162,43,2013-01-22 17:47:11.370534,
+
         assert fields.length == 9 : Arrays.toString(fields);
         String author = fields[0];
 
+        ScPuzzle puzzle;
         String levelName = StringEscapeUtils.unescapeHtml3(fields[3]);
-        SingleParseResult<ScPuzzle> puzzleParseResult = ScPuzzle.parsePuzzle(levelName);
-        if (puzzleParseResult instanceof SingleParseResult.Ambiguous) {
-            puzzleParseResult = ScPuzzle.parsePuzzle(levelName + " (" + fields[2] + ")");
+        if (levelName.startsWith("ResearchNet Published")) {
+            // badly named resnet puzzles, we extract the real code from the level number
+            String levelCode = "published_" + fields[2].replace("-", "_");
+            puzzle = ScPuzzle.valueOf(levelCode);
         }
-        ScPuzzle puzzle = puzzleParseResult.orElse(ScPuzzle.warp_boss);
+        else {
+            SingleParseResult<ScPuzzle> puzzleParseResult = ScPuzzle.parsePuzzle(levelName);
+            if (puzzleParseResult instanceof SingleParseResult.Ambiguous) {
+                puzzleParseResult = ScPuzzle.parsePuzzle(levelName + " (" + fields[2] + ")");
+            }
+            puzzle = puzzleParseResult.orElseThrow();
+        }
 
         ScScore score = new ScScore(Integer.parseInt(fields[5]), Integer.parseInt(fields[4]), Integer.parseInt(fields[6]), false, false);
         String videoLink = fields[8];
