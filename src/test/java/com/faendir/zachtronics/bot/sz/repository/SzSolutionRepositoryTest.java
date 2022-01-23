@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,19 @@ public class SzSolutionRepositoryTest {
     private SzSolutionRepository repository;
 
     @Test
-    public void testArchive() {
+    public void testList() {
+        List<?> solutions = repository.findCategoryHolders(SzPuzzle.Sz000, false);
+        assertEquals(3, solutions.size());
+    }
+
+    @Test
+    public void testFrontier() {
+        List<?> solutions = repository.findCategoryHolders(SzPuzzle.Sz000, true);
+        assertEquals(4, solutions.size());
+    }
+
+    @Test
+    public void testSubmit() {
         String content = """
                 [name] Top solution Cost
                 [puzzle] Sz000
@@ -46,27 +58,21 @@ public class SzSolutionRepositoryTest {
                 [lines-of-code] 8
                 """;
 
-        assertInstanceOf(SubmitResult.AlreadyPresent.class, doArchive(content)); // identical score
+        assertInstanceOf(SubmitResult.AlreadyPresent.class, doSubmit(content)); // identical score
 
         content = content.replace("[power-usage] 57", "[power-usage] 56");
-        assertInstanceOf(SubmitResult.Success.class, doArchive(content)); // better
+        assertInstanceOf(SubmitResult.Success.class, doSubmit(content)); // better
 
         content = content.replace("[power-usage] 56", "[power-usage] 100");
-        assertInstanceOf(SubmitResult.NothingBeaten.class, doArchive(content)); // worse
+        assertInstanceOf(SubmitResult.NothingBeaten.class, doSubmit(content)); // worse
 
         content = content.replace("[power-usage] 100", "nonsense");
         String finalContent = content;
-        assertThrows(RuntimeException.class, () -> doArchive(finalContent)); // nonsensical
-    }
-
-    @Test
-    public void testFrontier() {
-        List<?> solutions = repository.findCategoryHolders(SzPuzzle.Sz000, true);
-        assertEquals(3, solutions.size());
+        assertThrows(RuntimeException.class, () -> doSubmit(finalContent)); // nonsensical
     }
 
     @NotNull
-    private SubmitResult<SzRecord, SzCategory> doArchive(String content) {
+    private SubmitResult<SzRecord, SzCategory> doSubmit(String content) {
         return repository.submit(SzSubmission.fromData(content, "someguy"));
     }
 }
