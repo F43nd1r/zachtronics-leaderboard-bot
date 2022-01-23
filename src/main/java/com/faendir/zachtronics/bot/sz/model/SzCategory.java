@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,30 +26,31 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import static com.faendir.zachtronics.bot.sz.model.SzCategory.SzScoreFormatStrings.*;
 import static com.faendir.zachtronics.bot.sz.model.SzMetric.*;
 import static com.faendir.zachtronics.bot.sz.model.SzType.STANDARD;
 
 @Getter
 public enum SzCategory implements Category {
-    CP("CP", List.of(COST, POWER, LINES), F100, 101),
-    CL("CL", List.of(COST, LINES, POWER), F100, 102),
+    CP("CP", List.of(COST, POWER, LINES), 0b100),
+    CL("CL", List.of(COST, LINES, POWER), 0b100),
 
-    PC("PC", List.of(POWER, COST, LINES), F010, 201),
-    PL("PL", List.of(POWER, LINES, COST), F010, 202),
+    PC("PC", List.of(POWER, COST, LINES), 0b010),
+    PL("PL", List.of(POWER, LINES, COST), 0b010),
 
-    LC("LC", List.of(LINES, COST, POWER), F001, 301),
-    LP("LP", List.of(LINES, POWER, COST), F001, 302);
+    LC("LC", List.of(LINES, COST, POWER), 0b001),
+    LP("LP", List.of(LINES, POWER, COST), 0b001);
+
+    /** contains <tt>%d%s%d%s%d</tt> plus a bunch of <tt>*</tt> most likely */
+    static final String[] FORMAT_STRINGS = {"%d%s%d%s%d", "%d%s%d%s**%d**", "%d%s**%d**%s%d", null, "**%d**%s%d%s%d"};
 
     private final String displayName;
     private final List<Metric> metrics;
     private final Comparator<SzScore> scoreComparator;
     private final Set<SzType> supportedTypes = Collections.singleton(STANDARD);
-    private final String scoreFormatString;
-    private final int repoSuffix;
+    private final int scoreFormatId;
 
     @SuppressWarnings("unchecked")
-    SzCategory(String displayName, @NotNull List<SzMetric> metrics, String scoreFormatString, int repoSuffix) {
+    SzCategory(String displayName, @NotNull List<SzMetric> metrics, int scoreFormatId) {
         this.displayName = displayName;
         this.metrics = (List<Metric>)(List<?>) metrics;
         this.scoreComparator = metrics.stream()
@@ -57,18 +58,10 @@ public enum SzCategory implements Category {
                                       .map(Comparator::comparingInt)
                                       .reduce(Comparator::thenComparing)
                                       .orElseThrow();
-        this.scoreFormatString = scoreFormatString;
-        this.repoSuffix = repoSuffix;
+        this.scoreFormatId = scoreFormatId;
     }
 
     public boolean supportsScore(@NotNull SzScore score) {
         return true;
-    }
-
-    static class SzScoreFormatStrings {
-        static final String F000 = "%d%s%d%s%d";
-        static final String F100 = "**%d**%s%d%s%d";
-        static final String F010 = "%d%s**%d**%s%d";
-        static final String F001 = "%d%s%d%s**%d**";
     }
 }

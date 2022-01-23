@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@ import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Value
 public class SzScore implements Score<SzCategory> {
@@ -39,16 +37,15 @@ public class SzScore implements Score<SzCategory> {
     @Override
     public String toDisplayString(@NotNull DisplayContext<SzCategory> context) {
         String separator = context.getSeparator();
-        String formatString = SzCategory.SzScoreFormatStrings.F000;
+        int formatId = 0b000;
         if (context.getFormat() == StringFormat.REDDIT && context.getCategories() != null) {
-            Set<String> formatStrings = context.getCategories().stream()
-                                               .map(SzCategory::getScoreFormatString)
-                                               .collect(Collectors.toSet());
-            if (formatStrings.size() == 1)
-                formatString = formatStrings.iterator().next();
+            formatId = context.getCategories().stream()
+                              .map(SzCategory::getScoreFormatId)
+                              .reduce((a, b) -> a & b)
+                              .orElse(0b000);
         }
 
-        return String.format(formatString, cost, separator, power, separator, lines);
+        return String.format(SzCategory.FORMAT_STRINGS[formatId], cost, separator, power, separator, lines);
     }
 
     /** cc/ppp/ll */

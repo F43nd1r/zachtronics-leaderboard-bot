@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,31 +24,36 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-import static com.faendir.zachtronics.bot.sc.model.ScCategory.ScScoreFormatStrings.*;
 import static com.faendir.zachtronics.bot.sc.model.ScMetric.*;
 import static com.faendir.zachtronics.bot.sc.model.ScType.*;
 
 @Getter
 public enum ScCategory implements Category {
-    C("C", List.of(CYCLES, REACTORS, SYMBOLS, ANY_FLAG), ScTypeSets.ALL, F100),
-    CNB("CNB", List.of(CYCLES, REACTORS, SYMBOLS, NO_BUGS), ScTypeSets.ALL, F100),
-    CNP("CNP", List.of(CYCLES, REACTORS, SYMBOLS, NO_PRECOG), ScTypeSets.ALL, F100),
-    CNBP("CNBP", List.of(CYCLES, REACTORS, SYMBOLS, NO_FLAGS), ScTypeSets.ALL, F100),
+    C("C", List.of(CYCLES, REACTORS, SYMBOLS, ANY_FLAG), ScTypeSets.ALL, 0b100),
+    CNB("CNB", List.of(CYCLES, REACTORS, SYMBOLS, NO_BUGS), ScTypeSets.ALL, 0b100),
+    CNP("CNP", List.of(CYCLES, REACTORS, SYMBOLS, NO_PRECOG), ScTypeSets.ALL, 0b100),
+    CNBP("CNBP", List.of(CYCLES, REACTORS, SYMBOLS, NO_FLAGS), ScTypeSets.ALL, 0b100),
 
-    S("S", List.of(SYMBOLS, REACTORS, CYCLES, ANY_FLAG), ScTypeSets.ALL, F001),
-    SNB("SNB", List.of(SYMBOLS, REACTORS, CYCLES, NO_BUGS), ScTypeSets.ALL, F001),
-    SNP("SNP", List.of(SYMBOLS, REACTORS, CYCLES, NO_PRECOG), ScTypeSets.ALL, F001),
-    SNBP("SNBP", List.of(SYMBOLS, REACTORS, CYCLES, NO_FLAGS), ScTypeSets.ALL, F001),
+    S("S", List.of(SYMBOLS, REACTORS, CYCLES, ANY_FLAG), ScTypeSets.ALL, 0b001),
+    SNB("SNB", List.of(SYMBOLS, REACTORS, CYCLES, NO_BUGS), ScTypeSets.ALL, 0b001),
+    SNP("SNP", List.of(SYMBOLS, REACTORS, CYCLES, NO_PRECOG), ScTypeSets.ALL, 0b001),
+    SNBP("SNBP", List.of(SYMBOLS, REACTORS, CYCLES, NO_FLAGS), ScTypeSets.ALL, 0b001),
 
-    RC("RC", List.of(REACTORS, CYCLES, SYMBOLS, ANY_FLAG), ScTypeSets.PROD, F110),
-    RCNB("RCNB", List.of(REACTORS, CYCLES, SYMBOLS, NO_BUGS), ScTypeSets.PROD, F110),
-    RCNP("RCNP", List.of(REACTORS, CYCLES, SYMBOLS, NO_PRECOG), ScTypeSets.PROD, F110),
-    RCNBP("RCNBP", List.of(REACTORS, CYCLES, SYMBOLS, NO_FLAGS), ScTypeSets.PROD, F110),
+    RC("RC", List.of(REACTORS, CYCLES, SYMBOLS, ANY_FLAG), ScTypeSets.PROD, 0b110),
+    RCNB("RCNB", List.of(REACTORS, CYCLES, SYMBOLS, NO_BUGS), ScTypeSets.PROD, 0b110),
+    RCNP("RCNP", List.of(REACTORS, CYCLES, SYMBOLS, NO_PRECOG), ScTypeSets.PROD, 0b110),
+    RCNBP("RCNBP", List.of(REACTORS, CYCLES, SYMBOLS, NO_FLAGS), ScTypeSets.PROD, 0b110),
 
-    RS("RS", List.of(REACTORS, SYMBOLS, CYCLES, ANY_FLAG), ScTypeSets.PROD, F011),
-    RSNB("RSNB", List.of(REACTORS, SYMBOLS, CYCLES, NO_BUGS), ScTypeSets.PROD, F011),
-    RSNP("RSNP", List.of(REACTORS, SYMBOLS, CYCLES, NO_PRECOG), ScTypeSets.PROD, F011),
-    RSNBP("RSNBP", List.of(REACTORS, SYMBOLS, CYCLES, NO_FLAGS), ScTypeSets.PROD, F011);
+    RS("RS", List.of(REACTORS, SYMBOLS, CYCLES, ANY_FLAG), ScTypeSets.PROD, 0b011),
+    RSNB("RSNB", List.of(REACTORS, SYMBOLS, CYCLES, NO_BUGS), ScTypeSets.PROD, 0b011),
+    RSNP("RSNP", List.of(REACTORS, SYMBOLS, CYCLES, NO_PRECOG), ScTypeSets.PROD, 0b011),
+    RSNBP("RSNBP", List.of(REACTORS, SYMBOLS, CYCLES, NO_FLAGS), ScTypeSets.PROD, 0b011);
+
+    /** contains <tt>%s%s%s%d%s%d%s</tt> plus a bunch of <tt>*</tt> most likely */
+    static final String[] FORMAT_STRINGS = {"%s%s%s%d%s%d%s", "%s%s%s%d%s**%d**%s",
+                                            "%s%s%s**%d**%s%d%s", "%s%s%s**%d**%s**%d**%s",
+                                            "**%s**%s%s%d%s%d%s", "**%s**%s%s%d%s**%d**%s",
+                                            "**%s**%s%s**%d**%s%d%s", "**%s**%s%s**%d**%s**%d**%s"};
 
     private final String displayName;
     private final List<Metric> metrics;
@@ -56,11 +61,10 @@ public enum ScCategory implements Category {
     private final Set<ScType> supportedTypes;
     private final boolean bugFree;
     private final boolean precogFree;
-    /** contains <tt>%s%s%s%d%s%d%s</tt> plus a bunch of <tt>*</tt> most likely */
-    private final String scoreFormatString;
+    private final int scoreFormatId;
 
     @SuppressWarnings("unchecked")
-    ScCategory(String displayName, @NotNull List<ScMetric> metrics, Set<ScType> supportedTypes, String scoreFormatString) {
+    ScCategory(String displayName, @NotNull List<ScMetric> metrics, Set<ScType> supportedTypes, int scoreFormatId) {
         this.displayName = displayName;
         this.metrics = (List<Metric>)(List<?>) metrics;
         this.scoreComparator = metrics.stream()
@@ -72,21 +76,11 @@ public enum ScCategory implements Category {
         this.supportedTypes = supportedTypes;
         this.bugFree = metrics.contains(NO_BUGS) || metrics.contains(NO_FLAGS);
         this.precogFree = metrics.contains(NO_PRECOG) || metrics.contains(NO_FLAGS);
-        this.scoreFormatString = scoreFormatString;
+        this.scoreFormatId = scoreFormatId;
     }
 
     public boolean supportsScore(@NotNull ScScore score) {
         return !(score.isBugged() && bugFree) && !(score.isPrecognitive() && precogFree);
-    }
-
-    static class ScScoreFormatStrings {
-        static final String F000 = "%s%s%s%d%s%d%s";
-        static final String F100 = "**%s**%s%s%d%s%d%s";
-        static final String F001 = "%s%s%s%d%s**%d**%s";
-        static final String F110 = "**%s**%s%s**%d**%s%d%s";
-        static final String F011 = "%s%s%s**%d**%s**%d**%s";
-
-        private ScScoreFormatStrings() {}
     }
 
     static class ScTypeSets {

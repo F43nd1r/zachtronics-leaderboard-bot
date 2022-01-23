@@ -25,6 +25,7 @@ import java.util.function.Function;
 public final class LambdaUtils {
     private LambdaUtils() {}
 
+    @FunctionalInterface
     public interface FunctionIOException<T, R> {
         R apply(T t) throws IOException;
     }

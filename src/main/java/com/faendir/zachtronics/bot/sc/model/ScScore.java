@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,16 +25,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.NumberFormat;
 import java.util.Locale;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Value
 public class ScScore implements Score<ScCategory> {
-    /** it's also unbeatable */
-    public static final ScScore INVALID_SCORE = new ScScore(-1, -1, -1, false, false);
-
     int cycles;
     int reactors;
     int symbols;
@@ -56,16 +51,15 @@ public class ScScore implements Score<ScCategory> {
         String cyclesStr = context.getFormat() != StringFormat.FILE_NAME && cycles >= 100000 ?
                            NumberFormat.getNumberInstance(Locale.ROOT).format(cycles) :
                            Integer.toString(cycles);
-        String formatString = ScCategory.ScScoreFormatStrings.F000;
+        int formatId = 0b000;
         if (context.getFormat() == StringFormat.REDDIT && context.getCategories() != null) {
-            Set<String> formatStrings = context.getCategories().stream()
-                                               .map(ScCategory::getScoreFormatString)
-                                               .collect(Collectors.toSet());
-            if (formatStrings.size() == 1)
-                formatString = formatStrings.iterator().next();
+            formatId = context.getCategories().stream()
+                              .map(ScCategory::getScoreFormatId)
+                              .reduce((a, b) -> a & b)
+                              .orElse(0b000);
         }
 
-        return String.format(formatString,
+        return String.format(ScCategory.FORMAT_STRINGS[formatId],
                              cyclesStr, oldRNGMarker, separator, reactors, separator, symbols, sepFlags(separator));
     }
 
