@@ -55,8 +55,7 @@ public class SzManualTest {
                                                    .map(CategoryRecord::getRecord)
                                                    ::iterator;
             for (SzRecord r : records) {
-                String author = r.getAuthor() != null ? r.getAuthor() : "";
-                SzSubmission submission = new SzSubmission(p, r.getScore(), author, Files.readString(r.getDataPath()));
+                SzSubmission submission = new SzSubmission(p, r.getScore(), r.getAuthor(), Files.readString(r.getDataPath()));
                 repository.submit(submission);
             }
 
@@ -87,8 +86,8 @@ public class SzManualTest {
 
         Path savesPath = Paths.get("../shenzhenIO/saves");
         /*
-        cp -r ../shenzhenIO/leaderboard/* src/test/resources/repositories/sz-leaderboard/
-        */
+        cp -a ../shenzhenIO/leaderboard/* src/test/resources/repositories/sz-leaderboard/
+         */
 
         for (SzPuzzle puzzle : SzPuzzle.values()) {
             if (puzzle.getType() != SzType.STANDARD)
@@ -116,9 +115,11 @@ public class SzManualTest {
 
         /*
         rm -r src/test/resources/repositories/sz-leaderboard/
-        git reset -- src/test/resources/repositories/sz-leaderboard
+        git reset -q -- src/test/resources/repositories/sz-leaderboard
         git checkout -- src/test/resources/repositories/sz-leaderboard/
-        cp -r $(ls -dt /tmp/sz-leaderboard* | head -n1)/* ../shenzhenIO/leaderboard/
+        rm -r ../shenzhenIO/leaderboard/*
+        cp -a $(ls -1dt /tmp/sz-leaderboard* | head -n1)/* ../shenzhenIO/leaderboard/
+        git -C ../shenzhenIO/leaderboard/ checkout -- *[a-z]/*[a-z]/README.txt
          */
 
         System.out.println("Done");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import java.util.List;
 public class SzRecord implements Record<SzCategory> {
     @NotNull SzPuzzle puzzle;
     @NotNull SzScore score;
-    String author;
+    @NotNull String author;
     String link;
     Path dataPath;
 
@@ -53,7 +53,7 @@ public class SzRecord implements Record<SzCategory> {
     @NotNull
     @Override
     public String toDisplayString(@NotNull DisplayContext<SzCategory> context) {
-        String scoreAuthor = "(" + score.toDisplayString(context) + ")" + (author != null ? " " + author : "");
+        String scoreAuthor = "(" + score.toDisplayString(context) + ")" + " " + author;
         return Markdown.linkOrText(scoreAuthor, link);
     }
 
