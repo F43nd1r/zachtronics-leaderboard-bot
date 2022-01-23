@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.sc.discord;
+package com.faendir.zachtronics.bot.sz.discord;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
 import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractRebuildCommand;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
-import com.faendir.zachtronics.bot.sc.ScQualifier;
-import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
-import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
+import com.faendir.zachtronics.bot.sz.SzQualifier;
+import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
+import com.faendir.zachtronics.bot.sz.repository.SzSolutionRepository;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -34,28 +34,28 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@ScQualifier
-public class ScRebuildCommand extends AbstractRebuildCommand<ScRebuildCommand.RebuildData, ScPuzzle> {
+@SzQualifier
+public class SzRebuildCommand extends AbstractRebuildCommand<SzRebuildCommand.RebuildData, SzPuzzle> {
     @Delegate
-    private final ScRebuildCommand_RebuildDataParser parser = ScRebuildCommand_RebuildDataParser.INSTANCE;
+    private final SzRebuildCommand_RebuildDataParser parser = SzRebuildCommand_RebuildDataParser.INSTANCE;
     @Getter
-    private final Secured secured = ScSecured.WIKI_ADMINS_ONLY;
+    private final Secured secured = SzSecured.ADMINS_ONLY;
     @Getter
-    private final ScSolutionRepository repository;
+    private final SzSolutionRepository repository;
 
     @NotNull
     @Override
-    protected ScPuzzle findPuzzle(@NotNull RebuildData parameters) {
+    protected SzPuzzle findPuzzle(@NotNull RebuildData parameters) {
         return parameters.puzzle;
     }
 
     @ApplicationCommand(name = "rebuild", description = "Rebuilds wiki section", subCommand = true)
     @Value
     public static class RebuildData {
-        @NotNull ScPuzzle puzzle;
+        @NotNull SzPuzzle puzzle;
 
         public RebuildData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
-                           @Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle) {
+                           @Converter(SzPuzzleConverter.class) @NonNull SzPuzzle puzzle) {
             this.puzzle = puzzle;
         }
     }
