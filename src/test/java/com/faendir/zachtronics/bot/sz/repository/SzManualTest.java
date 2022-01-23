@@ -114,11 +114,8 @@ public class SzManualTest {
         }
 
         /*
-        rm -r src/test/resources/repositories/sz-leaderboard/
-        git reset -q -- src/test/resources/repositories/sz-leaderboard
-        git checkout -- src/test/resources/repositories/sz-leaderboard/
-        rm -r ../shenzhenIO/leaderboard/*
-        cp -a $(ls -1dt /tmp/sz-leaderboard* | head -n1)/* ../shenzhenIO/leaderboard/
+        git restore --source=HEAD --staged --worktree -- src/test/resources/repositories/sz-leaderboard/
+        rsync -a --delete $(ls -1dt /tmp/sz-leaderboard* | head -n1)/* ../shenzhenIO/leaderboard/
         git -C ../shenzhenIO/leaderboard/ checkout -- *[a-z]/*[a-z]/README.txt
          */
 
