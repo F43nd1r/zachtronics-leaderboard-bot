@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,33 @@
 
 import { Box, Stack } from "@mui/material"
 import { FiberManualRecord, FiberManualRecordOutlined } from "@mui/icons-material"
-import FieldSet from "../../../../components/FieldSet"
+import FieldSet from "../../FieldSet"
+import Modifier from "../../../model/Modifier"
+import iterate from "../../../utils/iterate"
 
-export function LegendView() {
+interface LegendViewProps<MODIFIER_ID extends string> {
+    modifiers: Record<MODIFIER_ID, Modifier<any>>
+    defaultColor: string
+}
+
+export function LegendView<MODIFIER_ID extends string>(props: LegendViewProps<MODIFIER_ID>) {
     return (
         <FieldSet title="Legend">
             <Stack spacing={1}>
-                <LegendItem label={"Overlap"} color={"#880e4f"} filled={true} />
-                <LegendItem label={"Normal"} color={"#0288d1"} filled={true} />
-                <LegendItem label={"Trackless"} color={"#558b2f"} filled={true} />
+                {iterate(props.modifiers)
+                    .map(([_, modifier]) => modifier)
+                    .concat({
+                        name: "normal",
+                        color: props.defaultColor,
+                        legendOrder: 0,
+                        option1: "Normal",
+                        option2: "never",
+                        get: () => undefined,
+                    })
+                    .sort((modifier) => modifier.legendOrder)
+                    .map((modifier) => (
+                        <LegendItem key={modifier.name} label={modifier.option1} color={modifier.color} filled={true} />
+                    ))}
                 <LegendItem label={"Not on the selected frontier"} color={"#888888"} filled={false} />
             </Stack>
         </FieldSet>

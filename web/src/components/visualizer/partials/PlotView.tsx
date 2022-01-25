@@ -16,42 +16,42 @@
 
 import { useTheme } from "@mui/material"
 import { ComponentType, useState } from "react"
-import OmRecord, { isStrictlyBetterInMetrics } from "../../../../model/Record"
+import RecordDTO, { isStrictlyBetterInMetrics } from "../../../model/RecordDTO"
 import { Axis, PlotData } from "plotly.js"
 import { PlotParams } from "react-plotly.js"
 import createPlotlyComponent from "react-plotly.js/factory"
 import Plotly from "plotly.js-gl3d-dist-min"
-import Metric, { getMetric } from "../../../../model/Metric"
-import { Configuration } from "../../../../model/Configuration"
-import { RecordModal } from "../../../../fragments/RecordModal"
-import { withSize } from "react-sizeme"
-import { applyFilter, Filter } from "../../../../model/Filter"
+import Metric from "../../../model/Metric"
+import { Configuration } from "../../../model/Configuration"
+import { RecordModal } from "../../RecordModal"
+import { SizeMe, SizeMeProps } from "react-sizeme"
+import { applyFilter, Filter } from "../../../model/Filter"
+import Modifier from "../../../model/Modifier"
+import iterate from "../../../utils/iterate"
 
-export interface PlotViewProps {
-    size: { width: number; height: number }
-    records: OmRecord[]
-    configuration: Configuration
-    filter: Filter
+export interface PlotViewProps<MODIFIER_ID extends string, METRIC_ID extends string, SCORE> {
+    metrics: Record<METRIC_ID, Metric<SCORE>>
+    modifiers: Record<MODIFIER_ID, Modifier<SCORE>>
+    defaultColor: string
+    records: RecordDTO<SCORE>[]
+    configuration: Configuration<METRIC_ID>
+    filter: Filter<MODIFIER_ID, METRIC_ID>
 }
 
 const Plot: ComponentType<PlotParams> = createPlotlyComponent(Plotly)
 
-function getColor(record: OmRecord) {
-    return record.score?.overlap ? "#880e4f" : record.score?.trackless ? "#558b2f" : "#0288d1"
-}
-
-function PlotView(props: PlotViewProps) {
-    const [activeRecord, setActiveRecord] = useState<OmRecord | undefined>(undefined)
+function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string, SCORE>(props: PlotViewProps<MODIFIER_ID, METRIC_ID, SCORE> & SizeMeProps) {
+    const [activeRecord, setActiveRecord] = useState<RecordDTO<SCORE> | undefined>(undefined)
 
     const configuration = props.configuration
-    const records = applyFilter(props.filter, configuration, props.records)
-    const x = getMetric(configuration.x)
-    const y = getMetric(configuration.y)
-    const z = getMetric(configuration.z)
+    const records = applyFilter(props.metrics, props.modifiers, props.filter, configuration, props.records)
+    const x = props.metrics[configuration.x]
+    const y = props.metrics[configuration.y]
+    const z = props.metrics[configuration.z]
 
     const theme = useTheme()
     const gridColor = theme.palette.mode === "light" ? theme.palette.grey["200"] : theme.palette.grey["800"]
-    const makeAxis = (metric: Metric): Partial<Axis> => {
+    const makeAxis = (metric: Metric<SCORE>): Partial<Axis> => {
         return {
             title: metric.name,
             color: theme.palette.text.primary,
@@ -61,10 +61,18 @@ function PlotView(props: PlotViewProps) {
         }
     }
 
+    const getColor = (record: RecordDTO<SCORE>) => {
+        const modifier = iterate(props.modifiers)
+            .map(([_, modifier]) => modifier)
+            .find((modifier) => modifier.get(record.score))
+        return modifier ? modifier.color : props.defaultColor
+    }
+    const getMarkerColors = (...metrics: Metric<SCORE>[]) => records.map((record) => (records.some((r) => isStrictlyBetterInMetrics(r, record, metrics)) ? "#00000000" : getColor(record)))
+
     const common: Partial<PlotData> = {
-        hovertext: records.map((record: OmRecord) => `${record.fullFormattedScore ?? "none"}<br>${record.smartFormattedCategories}`),
-        x: records.map((record) => x.get(record) ?? 0),
-        y: records.map((record) => y.get(record) ?? 0),
+        hovertext: records.map((record: RecordDTO<SCORE>) => `${record.fullFormattedScore ?? "none"}<br>${record.smartFormattedCategories}`),
+        x: records.map((record) => x.get(record.score) ?? 0),
+        y: records.map((record) => y.get(record.score) ?? 0),
         mode: "markers",
         marker: {
             line: {
@@ -73,8 +81,6 @@ function PlotView(props: PlotViewProps) {
         },
         ids: records.map((record) => record.fullFormattedScore ?? "none"),
     }
-
-    const getMarkerColors = (...metrics: Metric[]) => records.map((record: OmRecord) => (records.some((r) => isStrictlyBetterInMetrics(r, record, metrics)) ? "#00000000" : getColor(record)))
 
     return (
         <>
@@ -98,7 +104,7 @@ function PlotView(props: PlotViewProps) {
                           }
                         : {
                               ...common,
-                              z: records.map((record) => z.get(record) ?? 0),
+                              z: records.map((record) => z.get(record.score) ?? 0),
                               hovertemplate: `${x.name}: %{x}<br>${y.name}: %{y}<br>${z.name}: %{z}<br>%{hovertext}<extra></extra>`,
                               type: "scatter3d",
                               marker: {
@@ -153,6 +159,10 @@ function PlotView(props: PlotViewProps) {
     )
 }
 
-const SizedPuzzleFrontierPlot = withSize({ monitorHeight: true, monitorWidth: true })<PlotViewProps>(PlotView)
-
-export default SizedPuzzleFrontierPlot
+export default function PlotView<MODIFIER_ID extends string, METRIC_ID extends string, SCORE>(props: PlotViewProps<MODIFIER_ID, METRIC_ID, SCORE>) {
+    return (
+        <SizeMe monitorHeight={true} monitorWidth={true}>
+            {({ size }) => <SizeAwarePlotView size={size} {...props} />}
+        </SizeMe>
+    )
+}

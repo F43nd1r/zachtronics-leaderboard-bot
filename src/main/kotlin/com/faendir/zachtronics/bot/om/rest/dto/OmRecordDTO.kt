@@ -22,19 +22,20 @@ import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.repository.CategoryRecord
+import com.faendir.zachtronics.bot.rest.dto.RecordDTO
 import com.faendir.zachtronics.bot.utils.smartFormat
 import com.faendir.zachtronics.bot.utils.toMetricsTree
 
 data class OmRecordDTO(
     val puzzle: OmPuzzleDTO,
-    val score: OmScoreDTO?,
+    override val score: OmScoreDTO?,
     val smartFormattedScore: String?,
-    val fullFormattedScore: String?,
-    val gif: String?,
-    val solution: String?,
+    override val fullFormattedScore: String?,
+    override val gif: String?,
+    override val solution: String?,
     val categoryIds: List<String>?,
-    val smartFormattedCategories: String?
-)
+    override val smartFormattedCategories: String?
+) : RecordDTO<OmScoreDTO>
 
 fun CategoryRecord<OmRecord, OmCategory>.toDTO() =
     OmRecordDTO(

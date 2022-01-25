@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-import { MetricId } from "./Metric"
-
 export type Mode = "2D" | "3D"
 
-export interface Configuration {
+export interface Configuration<ID extends string> {
     mode: Mode
-    x: MetricId
-    y: MetricId
-    z: MetricId
+    x: ID
+    y: ID
+    z: ID
 }

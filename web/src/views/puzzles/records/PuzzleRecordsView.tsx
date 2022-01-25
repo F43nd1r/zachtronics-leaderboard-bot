@@ -15,13 +15,13 @@
  */
 
 import { useParams } from "react-router-dom"
-import Record from "../../../model/Record"
-import RecordGrid from "../../../fragments/RecordGrid"
+import RecordGrid from "../../../components/RecordGrid"
 import ApiResource from "../../../utils/ApiResource"
+import { OmRecord } from "../../../model/om/OmRecord"
 
 export default function PuzzleRecordsView() {
     return (
-        <ApiResource<Record[]>
+        <ApiResource<OmRecord[]>
             url={`/puzzle/${useParams().puzzleId}/records`}
             element={(records) => (
                 <RecordGrid

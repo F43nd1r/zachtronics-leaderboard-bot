@@ -16,11 +16,11 @@
 
 import { Box, Modal } from "@mui/material"
 import RecordCard from "./RecordCard"
-import OmRecord from "../model/Record"
+import RecordDTO from "../model/RecordDTO"
 
 interface RecordModalProps {
-    record?: OmRecord
-    setRecord: (record: OmRecord | undefined) => void
+    record?: RecordDTO<any>
+    setRecord: (record: RecordDTO<any> | undefined) => void
 }
 
 export function RecordModal(props: RecordModalProps) {

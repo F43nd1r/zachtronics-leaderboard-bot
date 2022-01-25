@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-import { MetricId, metrics } from "../../../../model/Metric"
-import { Configuration, Mode } from "../../../../model/Configuration"
+import Metric from "../../../model/Metric"
+import { Configuration, Mode } from "../../../model/Configuration"
 import { FormControl, MenuItem, Select, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material"
 import { MouseEvent } from "react"
-import FieldSet from "../../../../components/FieldSet"
+import FieldSet from "../../FieldSet"
+import iterate from "../../../utils/iterate"
 
-interface ConfigurationViewProps {
-    configuration: Configuration
-    setConfiguration: (configuration: Configuration) => void
+interface ConfigurationViewProps<METRIC_ID extends string> {
+    metrics: Record<METRIC_ID, Metric<any>>
+    configuration: Configuration<METRIC_ID>
+    setConfiguration: (configuration: Configuration<METRIC_ID>) => void
 }
 
-export default function ConfigurationView(props: ConfigurationViewProps) {
+export default function ConfigurationView<METRIC_ID extends string>(props: ConfigurationViewProps<METRIC_ID>) {
     return (
         <FieldSet title="Configuration">
             <Stack spacing={1}>
@@ -52,6 +54,7 @@ export default function ConfigurationView(props: ConfigurationViewProps) {
                     </ToggleButton>
                 </ToggleButtonGroup>
                 <MetricSelect
+                    metrics={props.metrics}
                     value={props.configuration.x}
                     setValue={(value) =>
                         props.setConfiguration({
@@ -61,6 +64,7 @@ export default function ConfigurationView(props: ConfigurationViewProps) {
                     }
                 />
                 <MetricSelect
+                    metrics={props.metrics}
                     value={props.configuration.y}
                     setValue={(value) =>
                         props.setConfiguration({
@@ -70,6 +74,7 @@ export default function ConfigurationView(props: ConfigurationViewProps) {
                     }
                 />
                 <MetricSelect
+                    metrics={props.metrics}
                     value={props.configuration.z}
                     setValue={(value) =>
                         props.setConfiguration({
@@ -84,18 +89,19 @@ export default function ConfigurationView(props: ConfigurationViewProps) {
     )
 }
 
-interface MetricSelectProps {
-    value: MetricId
-    setValue: (metric: MetricId) => void
+interface MetricSelectProps<METRIC_ID extends string> {
+    metrics: Record<METRIC_ID, Metric<any>>
+    value: METRIC_ID
+    setValue: (metric: METRIC_ID) => void
     disabled?: boolean
 }
 
-function MetricSelect(props: MetricSelectProps) {
+function MetricSelect<METRIC_ID extends string>(props: MetricSelectProps<METRIC_ID>) {
     return (
         <FormControl variant={"standard"} fullWidth>
-            <Select value={props.value} onChange={(event) => props.setValue(event.target.value as MetricId)} disabled={props.disabled} fullWidth={true}>
-                {metrics.map((metric) => (
-                    <MenuItem value={metric.id} key={metric.id}>
+            <Select value={props.value} onChange={(event) => props.setValue(event.target.value as METRIC_ID)} disabled={props.disabled} fullWidth={true}>
+                {iterate(props.metrics).map(([metricId, metric]) => (
+                    <MenuItem value={metricId} key={metricId}>
                         {metric.name}
                     </MenuItem>
                 ))}

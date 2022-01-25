@@ -15,73 +15,45 @@
  */
 
 import { useParams } from "react-router-dom"
-import { Box, Stack } from "@mui/material"
-import OmRecord from "../../../model/Record"
-import { usePersistedJsonState } from "../../../utils/usePersistedState"
-import ApiResource from "../../../utils/ApiResource"
-import PlotView from "./partials/PlotView"
-import { Configuration } from "../../../model/Configuration"
-import ConfigurationView from "./partials/ConfigurationView"
-import { applyFilter, Filter } from "../../../model/Filter"
-import { FilterView } from "./partials/FilterView"
-import { LegendView } from "./partials/LegendView"
+import { Visualizer } from "../../../components/visualizer/Visualizer"
+import OmScore from "../../../model/om/OmScore"
 
 export default function PuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId
-    const [configuration, setConfiguration] = usePersistedJsonState<Configuration>("visualizerConfig", {
-        mode: "3D",
-        x: "g",
-        y: "c",
-        z: "a",
-    })
-    const [filter, setFilter] = usePersistedJsonState<Filter>(`visualizerFilter-${puzzleId}`, {})
 
     return (
-        <Box
-            sx={(theme) => ({
-                display: "flex",
-                minHeight: 0,
-                flexGrow: 1,
-                flexShrink: 1,
-                [theme.breakpoints.down("md")]: {
-                    flexDirection: "column",
-                    minHeight: "unset",
+        <Visualizer<string, string, OmScore>
+            url={`/puzzle/${puzzleId}/records?includeFrontier=true`}
+            config={{ key: "visualizerConfig", default: { mode: "3D", x: "g", y: "c", z: "a" } }}
+            filter={{ key: `visualizerFilter-${puzzleId}`, default: {} }}
+            metrics={{
+                g: { name: "Cost", get: (score) => score?.cost },
+                c: { name: "Cycles", get: (score) => score?.cycles },
+                a: { name: "Area", get: (score) => score?.area },
+                i: { name: "Instructions", get: (score) => score?.instructions },
+                h: { name: "Height", get: (score) => score?.height },
+                w: { name: "Width", get: (score) => score?.width },
+                r: { name: "Rate", get: (score) => score?.rate },
+            }}
+            modifiers={{
+                overlap: {
+                    get: (score) => score?.overlap,
+                    name: "overlap",
+                    color: "#880e4f",
+                    legendOrder: -1,
+                    option1: "Overlap",
+                    option2: "Normal",
                 },
-            })}
-        >
-            <ApiResource<OmRecord[]>
-                url={`/puzzle/${puzzleId}/records?includeFrontier=true`}
-                element={(records) => (
-                    <>
-                        <Stack
-                            spacing={1}
-                            sx={(theme) => ({
-                                width: "100%",
-                                [theme.breakpoints.up("md")]: {
-                                    width: "30rem",
-                                    height: "100%",
-                                    overflowY: "auto",
-                                },
-                            })}
-                        >
-                            <ConfigurationView configuration={configuration} setConfiguration={setConfiguration} />
-                            <FilterView
-                                records={records}
-                                filter={filter}
-                                setFilter={(filter) => {
-                                    if (applyFilter(filter, configuration, records).length) {
-                                        setFilter(filter)
-                                        return true
-                                    }
-                                    return false
-                                }}
-                            />
-                            <LegendView />
-                        </Stack>
-                        <PlotView records={records} configuration={configuration} filter={filter} />
-                    </>
-                )}
-            />
-        </Box>
+                trackless: {
+                    get: (score) => score?.trackless,
+                    name: "trackless",
+                    color: "#558b2f",
+                    legendOrder: 1,
+                    option1: "Trackless",
+                    option2: "With Track",
+                },
+            }}
+            defaultColor={"#0288d1"}
+        />
     )
 }

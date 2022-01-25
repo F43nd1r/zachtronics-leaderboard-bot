@@ -14,7 +14,17 @@
  * limitations under the License.
  */
 
-export default interface Metric<SCORE> {
-    name: string
-    get: (score?: SCORE) => number | undefined
+import Metric from "./Metric"
+
+export default interface RecordDTO<SCORE> {
+    score?: SCORE
+    fullFormattedScore?: string
+    gif?: string
+    solution?: string
+    smartFormattedCategories?: string
+}
+
+export function isStrictlyBetterInMetrics<SCORE>(r1: RecordDTO<SCORE>, r2: RecordDTO<SCORE>, metrics: Metric<SCORE>[]): boolean {
+    const compares = metrics.map((metric) => (metric.get(r1.score) ?? Number.MAX_SAFE_INTEGER) - (metric.get(r2.score) ?? Number.MAX_SAFE_INTEGER))
+    return !compares.some((compare) => compare > 0) && compares.some((compare) => compare < 0)
 }

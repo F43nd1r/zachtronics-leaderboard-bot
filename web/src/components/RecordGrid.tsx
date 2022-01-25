@@ -15,16 +15,16 @@
  */
 
 import { Grid } from "@mui/material"
-import Record from "../model/Record"
+import RecordDTO from "../model/RecordDTO"
 import RecordCard from "./RecordCard"
 
-interface RecordGridProps {
-    records: Record[]
-    getTitle: (record: Record) => string
-    getScore: (record: Record) => string
+interface RecordGridProps<RECORD extends RecordDTO<any>> {
+    records: RECORD[]
+    getTitle: (record: RECORD) => string
+    getScore: (record: RECORD) => string
 }
 
-export default function RecordGrid(props: RecordGridProps) {
+export default function RecordGrid<RECORD extends RecordDTO<any>>(props: RecordGridProps<RECORD>) {
     return (
         <Grid container spacing={3}>
             {props.records.map((record, index) => (

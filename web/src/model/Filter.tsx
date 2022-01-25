@@ -14,28 +14,34 @@
  * limitations under the License.
  */
 
-import { getMetric, MetricId } from "./Metric"
-import OmRecord, { isStrictlyBetterInMetrics } from "./Record"
+import Metric from "./Metric"
+import RecordDTO, { isStrictlyBetterInMetrics } from "./RecordDTO"
 import { Configuration } from "./Configuration"
+import iterate from "../utils/iterate"
+import Modifier from "./Modifier"
 
-export interface Filter {
-    trackless?: boolean
-    overlap?: boolean
+export interface Filter<MODIFIER_ID extends string, METRIC_ID extends string> {
+    modifiers?: Record<MODIFIER_ID, boolean | undefined>
     showOnlyFrontier?: boolean
-    max?: Record<MetricId, number | undefined>
+    max?: Record<METRIC_ID, number | undefined>
 }
 
-export function applyFilter(filter: Filter, configuration: Configuration, records: OmRecord[]): OmRecord[] {
-    const filteredMetrics = filter.max ? Object.entries(filter.max).map(([key, max]) => ({ metric: getMetric(key as MetricId), max: max })) : []
-    const activeMetrics = (configuration.mode === "2D" ? [configuration.x, configuration.y] : [configuration.x, configuration.y, configuration.z]).map((id) => getMetric(id))
+export function applyFilter<MODIFIER_ID extends string, METRIC_ID extends string, SCORE>(
+    metrics: Record<METRIC_ID, Metric<SCORE>>,
+    modifiers: Record<MODIFIER_ID, Modifier<SCORE>>,
+    filter: Filter<MODIFIER_ID, METRIC_ID>,
+    configuration: Configuration<METRIC_ID>,
+    records: RecordDTO<SCORE>[],
+): RecordDTO<SCORE>[] {
+    const filteredMetrics = filter.max ? iterate(filter.max).map(([key, max]) => ({ metric: metrics[key], max: max })) : []
+    const activeMetrics = (configuration.mode === "2D" ? [configuration.x, configuration.y] : [configuration.x, configuration.y, configuration.z]).map((id) => metrics[id])
     const filteredRecords = records.filter(
-        (record: OmRecord) =>
-            (filter.overlap === undefined || filter.overlap === record.score?.overlap) &&
-            (filter.trackless === undefined || filter.trackless === record.score?.trackless) &&
+        (record: RecordDTO<SCORE>) =>
+            (!filter.modifiers || iterate(filter.modifiers).every(([modifierId, value]) => value === undefined || value === modifiers[modifierId].get(record.score))) &&
             !filteredMetrics.some(({ metric, max }) => {
-                const value = metric.get(record)
+                const value = metric.get(record.score)
                 return max && (!value || value > max)
             }),
     )
-    return filteredRecords.filter((record: OmRecord) => !filter.showOnlyFrontier || !filteredRecords.some((r) => isStrictlyBetterInMetrics(r, record, activeMetrics)))
+    return filteredRecords.filter((record: RecordDTO<SCORE>) => !filter.showOnlyFrontier || !filteredRecords.some((r) => isStrictlyBetterInMetrics(r, record, activeMetrics)))
 }

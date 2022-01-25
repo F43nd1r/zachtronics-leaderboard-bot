@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-import OmRecord from "../../../../model/Record"
-import { metrics } from "../../../../model/Metric"
+import RecordDTO from "../../../model/RecordDTO"
 import { SxProps } from "@mui/system"
 import { Theme } from "@mui/material/styles"
 import { Box, Slider, Stack, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material"
-import { Filter } from "../../../../model/Filter"
-import FieldSet from "../../../../components/FieldSet"
+import { Filter } from "../../../model/Filter"
+import FieldSet from "../../FieldSet"
+import Metric from "../../../model/Metric"
+import Modifier from "../../../model/Modifier"
+import iterate from "../../../utils/iterate"
 
-interface FilterProps {
-    filter: Filter
-    setFilter: (filter: Filter) => boolean
-    records: OmRecord[]
+interface FilterProps<MODIFIER_ID extends string, METRIC_ID extends string, SCORE> {
+    metrics: Record<METRIC_ID, Metric<SCORE>>
+    modifiers: Record<MODIFIER_ID, Modifier<SCORE>>
+    filter: Filter<MODIFIER_ID, METRIC_ID>
+    setFilter: (filter: Filter<MODIFIER_ID, METRIC_ID>) => boolean
+    records: RecordDTO<SCORE>[]
 }
 
-export function FilterView(props: FilterProps) {
+export function FilterView<MODIFIER_ID extends string, METRIC_ID extends string, SCORE>(props: FilterProps<MODIFIER_ID, METRIC_ID, SCORE>) {
     return (
         <FieldSet title={"Filter"}>
             <Stack spacing={1}>
@@ -45,53 +49,37 @@ export function FilterView(props: FilterProps) {
                 >
                     Show only frontier
                 </ToggleButton>
-                <FilterButtonGroup
-                    filter={props.filter.overlap}
-                    setFilter={(value) =>
-                        props.setFilter({
-                            ...props.filter,
-                            overlap: value,
-                        })
-                    }
-                    label={"Overlap"}
-                    option1={"Overlap"}
-                    option2={"Normal"}
-                />
-                <FilterButtonGroup
-                    filter={props.filter.trackless}
-                    setFilter={(value) =>
-                        props.setFilter({
-                            ...props.filter,
-                            trackless: value,
-                        })
-                    }
-                    label={"Trackless"}
-                    option1={"Trackless"}
-                    option2={"With Track"}
-                    sx={{ paddingBottom: 1 }}
-                />
-                {metrics.map((metric) => (
+                {iterate(props.modifiers).map(([modifierId, modifier]) => (
+                    <FilterButtonGroup
+                        filter={props.filter.modifiers && props.filter.modifiers[modifierId]}
+                        setFilter={(value) =>
+                            props.setFilter({
+                                ...props.filter,
+                                modifiers: {
+                                    ...(props.filter.modifiers ?? ({} as Record<MODIFIER_ID, Modifier<SCORE>>)),
+                                    [modifierId]: value,
+                                },
+                            })
+                        }
+                        label={modifier.name}
+                        option1={modifier.option1}
+                        option2={modifier.option2}
+                    />
+                ))}
+                {iterate(props.metrics).map(([metricId, metric]) => (
                     <FilterSlider
-                        key={metric.id}
-                        value={props.filter.max?.[metric.id]}
+                        key={metricId}
+                        value={props.filter.max?.[metricId]}
                         setValue={(value) =>
                             props.setFilter({
                                 ...props.filter,
                                 max: {
-                                    ...(props.filter.max ?? {
-                                        g: undefined,
-                                        c: undefined,
-                                        a: undefined,
-                                        i: undefined,
-                                        h: undefined,
-                                        w: undefined,
-                                        r: undefined,
-                                    }),
-                                    [metric.id]: value,
+                                    ...(props.filter.max ?? ({} as Record<METRIC_ID, Metric<SCORE>>)),
+                                    [metricId]: value,
                                 },
                             })
                         }
-                        values={props.records.map((record) => metric.get(record))}
+                        values={props.records.map((record) => metric.get(record.score))}
                         label={metric.name}
                     />
                 ))}

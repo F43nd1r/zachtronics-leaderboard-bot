@@ -16,15 +16,25 @@
 
 import { Box, Button, Card, CardActionArea, CardActions, CardContent, CardHeader, CardMedia } from "@mui/material"
 import { SentimentVeryDissatisfied } from "@mui/icons-material"
-import Record from "../model/Record"
+import RecordDTO from "../model/RecordDTO"
 import { SxProps } from "@mui/system"
 import { Theme } from "@mui/material/styles"
 
 interface RecordCardProps {
-    record: Record
+    record: RecordDTO<any>
     title: string
     score: JSX.Element | string
     sx?: SxProps<Theme>
+}
+
+function getVideoType(gif: string) {
+    if (gif.endsWith(".mp4") || gif.endsWith(".webm")) {
+        return "video"
+    } else if (gif.includes("youtu.be") || gif.includes("youtube.com")) {
+        return "iframe"
+    } else {
+        return "img"
+    }
 }
 
 export default function RecordCard(props: RecordCardProps) {
@@ -39,12 +49,12 @@ export default function RecordCard(props: RecordCardProps) {
                 <CardHeader title={props.title} />
                 {props.record.gif ? (
                     <CardMedia
-                        component={props.record.gif.endsWith(".mp4") || props.record.gif.endsWith(".webm") ? "video" : "img"}
+                        component={getVideoType(props.record.gif)}
                         autoPlay
                         loop
                         muted
                         src={props.record.gif}
-                        alt="Gif not loading"
+                        alt="Media not loading"
                         style={{
                             height: "min(70vw, 360px)",
                             width: "auto",
@@ -69,7 +79,7 @@ export default function RecordCard(props: RecordCardProps) {
                         }}
                     >
                         <SentimentVeryDissatisfied sx={{ margin: "1rem" }} fontSize="large" />
-                        <span>No gif found</span>
+                        <span>No media found</span>
                     </Box>
                 )}
             </CardActionArea>
