@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 
-export default function fetchFromApi<T>(url: string): Promise<T> {
-    return fetch(`${window.location.protocol}//${window.location.host}${url}`).then((response) => {
-        if (response.ok) {
-            return response.json()
-        } else {
-            return Promise.reject(response.status)
-        }
-    })
+package com.faendir.zachtronics.bot.sz.rest.dto;
+
+import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
+import lombok.Value;
+import org.jetbrains.annotations.NotNull;
+
+@Value
+public class SzPuzzleDTO {
+    @NotNull String id;
+    @NotNull String displayName;
+    @NotNull SzGroupDTO group;
+    @NotNull String type;
+
+    @NotNull
+    public static SzPuzzleDTO fromPuzzle(@NotNull SzPuzzle puzzle) {
+        return new SzPuzzleDTO(puzzle.getId(), puzzle.getDisplayName(), SzGroupDTO.fromGroup(puzzle.getGroup()), puzzle.getType().name());
+    }
 }

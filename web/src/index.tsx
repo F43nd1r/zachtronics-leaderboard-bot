@@ -15,36 +15,43 @@
  */
 
 import "./index.css"
-import App from "./App"
+import App from "./views/om/App"
 import { lazy, StrictMode, Suspense } from "react"
 import ReactDOM from "react-dom"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import LoadingIndicator from "./components/LoadingIndicator"
-import { PuzzleRoutes } from "./views/puzzles/PuzzleView"
+import { PuzzleRoutes } from "./views/om/puzzles/PuzzleView"
+import ScPuzzleVisualizerView from "./views/sc/ScPuzzleVisualizerView"
+import SzPuzzleVisualizerView from "./views/sz/SzPuzzleVisualizerView"
+import AppThemeProvider from "./fragments/AppThemeProvider"
 
-const RecentSubmissionsView = lazy(() => import("./views/recent/RecentSubmissionsView"))
-const PuzzleView = lazy(() => import("./views/puzzles/PuzzleView"))
-const CategoryView = lazy(() => import("./views/categories/CategoryView"))
-const HelpView = lazy(() => import("./views/help/HelpView"))
+const RecentSubmissionsView = lazy(() => import("./views/om/recent/RecentSubmissionsView"))
+const PuzzleView = lazy(() => import("./views/om/puzzles/PuzzleView"))
+const CategoryView = lazy(() => import("./views/om/categories/CategoryView"))
+const HelpView = lazy(() => import("./views/om/help/HelpView"))
 
 ReactDOM.render(
     <StrictMode>
-        <Suspense fallback={<LoadingIndicator />}>
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<App />}>
-                        <Route path="/" element={<RecentSubmissionsView />} />
-                        <Route path="puzzles/:puzzleId" element={<PuzzleView />}>
-                            {PuzzleRoutes.map((route) => (
-                                <Route path={route.pathSegment} element={route.component} key={route.pathSegment} />
-                            ))}
+        <AppThemeProvider>
+            <Suspense fallback={<LoadingIndicator />}>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/" element={<App />}>
+                            <Route path="/" element={<RecentSubmissionsView />} />
+                            <Route path="puzzles/:puzzleId" element={<PuzzleView />}>
+                                {PuzzleRoutes.map((route) => (
+                                    <Route path={route.pathSegment} element={route.component} key={route.pathSegment} />
+                                ))}
+                            </Route>
+                            <Route path="categories/:categoryId" element={<CategoryView />} />
+                            <Route path="help" element={<HelpView />} />
                         </Route>
-                        <Route path="categories/:categoryId" element={<CategoryView />} />
-                        <Route path="help" element={<HelpView />} />
-                    </Route>
-                </Routes>
-            </BrowserRouter>
-        </Suspense>
+                        <Route path="sc/:puzzleId" element={<ScPuzzleVisualizerView />} />
+                        <Route path="sz/:puzzleId" element={<SzPuzzleVisualizerView />} />
+                    </Routes>
+                </BrowserRouter>
+            </Suspense>
+        </AppThemeProvider>
     </StrictMode>,
     document.getElementById("root"),
 )

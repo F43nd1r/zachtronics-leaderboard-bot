@@ -30,11 +30,11 @@
  * limitations under the License.
  */
 import { useMemo } from "react"
-import ApiResource from "../../utils/ApiResource"
-import RecordGrid from "../../components/RecordGrid"
-import { usePersistedNumberState } from "../../utils/usePersistedState"
+import ApiResource from "../../../utils/ApiResource"
+import RecordGrid from "../../../components/RecordGrid"
+import { usePersistedNumberState } from "../../../utils/usePersistedState"
 import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material"
-import OmRecordChange from "../../model/om/OmRecordChange"
+import OmRecordChange from "../../../model/om/OmRecordChange"
 
 enum SinceLast {
     DAY = 1000 * 60 * 60 * 24,
@@ -77,7 +77,7 @@ export default function RecentSubmissionsView() {
                 </Select>
             </FormControl>
             <ApiResource<OmRecordChange[]>
-                url={`/records/changes/${dateSince.toISOString()}`}
+                url={`/om/records/changes/${dateSince.toISOString()}`}
                 element={(changes) => (
                     <RecordGrid
                         records={changes.filter((change) => change.type === "ADD").map((change) => change.record)}

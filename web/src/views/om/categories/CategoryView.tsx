@@ -15,24 +15,24 @@
  */
 
 import { useParams } from "react-router-dom"
-import RecordGrid from "../../components/RecordGrid"
-import ApiResource from "../../utils/ApiResource"
-import fetchFromApi from "../../utils/fetchFromApi"
+import RecordGrid from "../../../components/RecordGrid"
+import ApiResource from "../../../utils/ApiResource"
+import fetchFromApi from "../../../utils/fetchFromApi"
 import { useEffect } from "react"
-import Category from "../../model/Category"
-import { OmRecord } from "../../model/om/OmRecord"
+import Category from "../../../model/Category"
+import { OmRecord } from "../../../model/om/OmRecord"
 
 export default function CategoryView() {
     const params = useParams()
     const categoryId = params.categoryId
 
     useEffect(() => {
-        fetchFromApi<Category>(`/category/${categoryId}`).then((category) => (document.title = `${category.displayName} - Opus Magnum Leaderboards`))
+        fetchFromApi<Category>(`/om/category/${categoryId}`).then((category) => (document.title = `${category.displayName} - Opus Magnum Leaderboards`))
     }, [categoryId])
 
     return (
         <ApiResource<OmRecord[]>
-            url={`/category/${useParams().categoryId}/records`}
+            url={`/om/category/${useParams().categoryId}/records`}
             element={(records) => (
                 <RecordGrid records={records} getTitle={(record) => record.puzzle.displayName} getScore={(record) => record.smartFormattedScore ?? record.fullFormattedScore ?? "None"} />
             )}

@@ -15,16 +15,20 @@
  */
 
 import { useParams } from "react-router-dom"
-import RecordGrid from "../../../components/RecordGrid"
-import ApiResource from "../../../utils/ApiResource"
-import { OmRecord } from "../../../model/om/OmRecord"
+import RecordGrid from "../../../../components/RecordGrid"
+import ApiResource from "../../../../utils/ApiResource"
+import { OmRecord } from "../../../../model/om/OmRecord"
 
-export default function PuzzleFrontierView() {
+export default function PuzzleRecordsView() {
     return (
         <ApiResource<OmRecord[]>
-            url={`/puzzle/${useParams().puzzleId}/records?includeFrontier=true`}
+            url={`/om/puzzle/${useParams().puzzleId}/records`}
             element={(records) => (
-                <RecordGrid records={records} getTitle={(record) => record.smartFormattedCategories || "Pareto Frontier"} getScore={(record) => record.fullFormattedScore ?? "None"} />
+                <RecordGrid
+                    records={records}
+                    getTitle={(record) => record.smartFormattedCategories || "Pareto Frontier"}
+                    getScore={(record) => record.smartFormattedScore ?? record.fullFormattedScore ?? "None"}
+                />
             )}
         />
     )

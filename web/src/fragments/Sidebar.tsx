@@ -36,7 +36,7 @@ function Groups() {
                 title={"Puzzles"}
                 icon={<Extension />}
                 content={ApiResource<Puzzle[]>({
-                    url: "/puzzles",
+                    url: "/om/puzzles",
                     element: (puzzles) => (
                         <>
                             {[
@@ -76,7 +76,7 @@ function Puzzles(props: PuzzlesProps) {
                 content={
                     <>
                         {props.puzzles.map((puzzle) => (
-                            <LinkListItem sx={{ pl: 4 }} key={puzzle.id} to={`/puzzles/${puzzle.id}`} selected={puzzleId === puzzle.id}>
+                            <LinkListItem sx={{ pl: 4 }} key={puzzle.id} to={`/om/puzzles/${puzzle.id}`} selected={puzzleId === puzzle.id}>
                                 <ListItemText primary={puzzle.displayName} />
                             </LinkListItem>
                         ))}
@@ -97,7 +97,7 @@ function Categories() {
                 title={"Categories"}
                 icon={<CategoryIcon />}
                 content={ApiResource<Category[]>({
-                    url: "/categories",
+                    url: "/om/categories",
                     element: (categories) => (
                         <>
                             {categories

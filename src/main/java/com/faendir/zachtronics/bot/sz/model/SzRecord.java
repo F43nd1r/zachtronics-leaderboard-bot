@@ -35,26 +35,19 @@ public class SzRecord implements Record<SzCategory> {
     @NotNull SzPuzzle puzzle;
     @NotNull SzScore score;
     @NotNull String author;
-    String link;
+    String dataLink;
     Path dataPath;
 
-    @NotNull
     @Override
     public String getDisplayLink() {
-        return link;
-    }
-
-    @NotNull
-    @Override
-    public String getDataLink() {
-        return link;
+        return null;
     }
 
     @NotNull
     @Override
     public String toDisplayString(@NotNull DisplayContext<SzCategory> context) {
         String scoreAuthor = "(" + score.toDisplayString(context) + ")" + " " + author;
-        return Markdown.linkOrText(scoreAuthor, link);
+        return Markdown.linkOrText(scoreAuthor, dataLink);
     }
 
     @SneakyThrows

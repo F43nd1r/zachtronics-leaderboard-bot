@@ -15,15 +15,15 @@
  */
 
 import { useParams } from "react-router-dom"
-import { Visualizer } from "../../../components/visualizer/Visualizer"
-import OmScore from "../../../model/om/OmScore"
+import { Visualizer } from "../../../../components/visualizer/Visualizer"
+import OmScore from "../../../../model/om/OmScore"
 
 export default function PuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId
 
     return (
         <Visualizer<string, string, OmScore>
-            url={`/puzzle/${puzzleId}/records?includeFrontier=true`}
+            url={`/om/puzzle/${puzzleId}/records?includeFrontier=true`}
             config={{ key: "visualizerConfig", default: { mode: "3D", x: "g", y: "c", z: "a" } }}
             filter={{ key: `visualizerFilter-${puzzleId}`, default: {} }}
             metrics={{

@@ -13,13 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-export default function fetchFromApi<T>(url: string): Promise<T> {
-    return fetch(`${window.location.protocol}//${window.location.host}${url}`).then((response) => {
-        if (response.ok) {
-            return response.json()
-        } else {
-            return Promise.reject(response.status)
-        }
-    })
+export default interface SzScore {
+    cost: number
+    power: number
+    lines: number
 }

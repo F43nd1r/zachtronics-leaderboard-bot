@@ -28,13 +28,26 @@ interface RecordCardProps {
     sx?: SxProps<Theme>
 }
 
-function getVideoType(gif: string) {
+function isYoutube(gif: string): boolean {
+    return (gif.includes("youtu.be") || gif.includes("youtube.com"))
+}
+
+function getVideoType(gif: string): "video" | "iframe" | "img" {
     if (gif.endsWith(".mp4") || gif.endsWith(".webm")) {
         return "video"
-    } else if (gif.includes("youtu.be") || gif.includes("youtube.com")) {
+    } else if (isYoutube(gif)) {
         return "iframe"
     } else {
         return "img"
+    }
+}
+
+function getVideoUrl(gif: string) {
+    if (isYoutube(gif)) {
+        return gif.replace(/.+\/(\w+)(?:\\?.+)?$/, 'https://youtube.com/embed/$1')
+    }
+    else {
+        return gif
     }
 }
 
@@ -54,11 +67,11 @@ export default function RecordCard(props: RecordCardProps) {
                         autoPlay
                         loop
                         muted
-                        src={props.record.gif}
+                        src={getVideoUrl(props.record.gif)}
                         alt="Media not loading"
                         style={{
-                            height: "min(70vw, 360px)",
-                            width: "auto",
+                            height: "min(70vh, 360px)",
+                            width: isYoutube(props.record.gif) ? "min(70vw, 720px)" : "auto",
                             maxWidth: "100%",
                             marginLeft: "auto",
                             marginRight: "auto",

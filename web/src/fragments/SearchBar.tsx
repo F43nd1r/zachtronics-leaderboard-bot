@@ -24,7 +24,7 @@ export default function SearchBar() {
     const navigate = useNavigate()
     const [options, setOptions] = useState<(Puzzle | Category)[]>([])
     useEffect(() => {
-        Promise.all([fetchFromApi<Puzzle[]>("/puzzles"), fetchFromApi<Category[]>("/categories")]).then((data) => setOptions(data.flat()))
+        Promise.all([fetchFromApi<Puzzle[]>("/om/puzzles"), fetchFromApi<Category[]>("/om/categories")]).then((data) => setOptions(data.flat()))
     }, [])
     return (
         <Autocomplete<Puzzle | Category>

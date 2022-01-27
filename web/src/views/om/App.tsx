@@ -19,20 +19,15 @@ import MenuIcon from "@mui/icons-material/Menu"
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { createTheme, ThemeProvider } from "@mui/material/styles"
-import CssBaseline from "@mui/material/CssBaseline"
-import { createContext, useContext, useMemo } from "react"
+import { useContext } from "react"
 import Brightness4Icon from "@mui/icons-material/Brightness4"
 import Brightness7Icon from "@mui/icons-material/Brightness7"
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar"
-import Sidebar from "./fragments/Sidebar"
+import Sidebar from "../../fragments/Sidebar"
 import { Outlet } from "react-router-dom"
-import { usePersistedJsonState, usePersistedStringState } from "./utils/usePersistedState"
-import SearchBar from "./fragments/SearchBar"
-
-const ColorModeContext = createContext({
-    toggleColorMode: () => {},
-})
+import { usePersistedJsonState } from "../../utils/usePersistedState"
+import SearchBar from "../../fragments/SearchBar"
+import { AppThemeContext } from "../../fragments/AppThemeProvider"
 
 const drawerWidth = 300
 
@@ -92,9 +87,9 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
     flexDirection: "column",
 }))
 
-function App() {
+export default function App() {
     const theme = useTheme()
-    const colorMode = useContext(ColorModeContext)
+    const colorMode = useContext(AppThemeContext)
     const isNotTinyScreen = useMediaQuery(theme.breakpoints.up("sm"))
     const [open, setOpen] = usePersistedJsonState("sidebarOpen", isNotTinyScreen)
     const handleDrawerOpen = () => {
@@ -105,7 +100,6 @@ function App() {
     }
     return (
         <>
-            <CssBaseline />
             <AppBar position="fixed" open={open}>
                 <Toolbar disableGutters={true} sx={{ paddingLeft: 2, paddingRight: 2 }}>
                     {!open && (
@@ -151,53 +145,4 @@ function App() {
             </Main>
         </>
     )
-}
-
-export default function ThemedApp() {
-    const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
-    const [mode, setMode] = usePersistedStringState<"light" | "dark">("colorMode", prefersDarkMode ? "light" : "dark")
-    const colorMode = useMemo(
-        () => ({
-            toggleColorMode: () => {
-                setMode((prevMode) => (prevMode === "light" ? "dark" : "light"))
-            },
-        }),
-        [setMode],
-    )
-
-    const theme = useMemo(
-        () =>
-            createTheme({
-                palette: {
-                    mode,
-                },
-                breakpoints: {
-                    values: {
-                        xs: 0,
-                        sm: 640,
-                        md: 960,
-                        lg: 1280,
-                        xl: 1600,
-                        xxl: 1920,
-                        xxxl: 2240,
-                    },
-                },
-            }),
-        [mode],
-    )
-
-    return (
-        <ColorModeContext.Provider value={colorMode}>
-            <ThemeProvider theme={theme}>
-                <App />
-            </ThemeProvider>
-        </ColorModeContext.Provider>
-    )
-}
-
-declare module "@mui/material/styles" {
-    interface BreakpointOverrides {
-        xxl: true
-        xxxl: true
-    }
 }
