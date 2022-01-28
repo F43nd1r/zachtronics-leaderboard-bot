@@ -18,12 +18,12 @@ import { Collapse, List, ListItemButton, ListItemIcon, ListItemText } from "@mui
 import { ExpandLess, ExpandMore } from "@mui/icons-material"
 import { SxProps } from "@mui/system"
 import { Theme } from "@mui/material/styles"
-import { useEffect, useState } from "react"
+import { ReactNode, useEffect, useState } from "react"
 
 interface ExpandableListItemProps {
     title: string
-    icon?: JSX.Element
-    items: JSX.Element[]
+    icon?: ReactNode
+    content: ReactNode
     sx?: SxProps<Theme>
     open?: boolean
 }
@@ -45,7 +45,7 @@ export default function ExpandableListItem(props: ExpandableListItemProps) {
             </ListItemButton>
             <Collapse in={open} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                    {props.items}
+                    {props.content}
                 </List>
             </Collapse>
         </>

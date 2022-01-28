@@ -19,7 +19,7 @@ import heightExplanation from "./height_explanation.jpg"
 import widthExplanation from "./width_explanation.jpg"
 import overlapExplanation from "./overlap_tutorial.mp4"
 import { LinkOutlined } from "@mui/icons-material"
-import { useMemo, useState } from "react"
+import { ReactNode, useMemo, useState } from "react"
 import { HashLink } from "react-router-hash-link"
 import { useLocation } from "react-router-dom"
 import { Masonry } from "@mui/lab"
@@ -159,7 +159,7 @@ export default function HelpView() {
 interface MetricCardProps {
     id: string
     title: string
-    description: JSX.Element
+    description: ReactNode
     image?: {
         location: string
         alt: string

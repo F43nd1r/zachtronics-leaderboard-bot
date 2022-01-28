@@ -19,11 +19,12 @@ import { SentimentVeryDissatisfied } from "@mui/icons-material"
 import RecordDTO from "../model/RecordDTO"
 import { SxProps } from "@mui/system"
 import { Theme } from "@mui/material/styles"
+import { ReactNode } from "react"
 
 interface RecordCardProps {
     record: RecordDTO<any>
     title: string
-    score: JSX.Element | string
+    score: ReactNode
     sx?: SxProps<Theme>
 }
 

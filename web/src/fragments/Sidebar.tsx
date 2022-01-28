@@ -25,7 +25,7 @@ import Group from "../model/Group"
 import Puzzle from "../model/Puzzle"
 import Category from "../model/Category"
 import { Link, useMatch } from "react-router-dom"
-import ApiListResource from "../utils/ApiListResource"
+import ApiResource from "../utils/ApiResource"
 
 function Groups() {
     const match = useMatch("/puzzles/*")
@@ -35,18 +35,23 @@ function Groups() {
             <ExpandableListItem
                 title={"Puzzles"}
                 icon={<Extension />}
-                items={ApiListResource<Puzzle[]>({
+                content={ApiResource<Puzzle[]>({
                     url: "/puzzles",
-                    element: (puzzles) =>
-                        [
-                            ...puzzles
-                                .reduce<Map<string, Puzzle[]>>((acc, puzzle) => {
-                                    if (!acc.has(puzzle.group.id)) acc.set(puzzle.group.id, [puzzle])
-                                    else acc.get(puzzle.group.id)!.push(puzzle)
-                                    return acc
-                                }, new Map())
-                                .entries(),
-                        ].map(([group, puzzles]) => <Puzzles group={puzzles[0].group} puzzles={puzzles} key={group} sx={{ pl: 4 }} />),
+                    element: (puzzles) => (
+                        <>
+                            {[
+                                ...puzzles
+                                    .reduce<Map<string, Puzzle[]>>((acc, puzzle) => {
+                                        if (!acc.has(puzzle.group.id)) acc.set(puzzle.group.id, [puzzle])
+                                        else acc.get(puzzle.group.id)!.push(puzzle)
+                                        return acc
+                                    }, new Map())
+                                    .entries(),
+                            ].map(([group, puzzles]) => (
+                                <Puzzles group={puzzles[0].group} puzzles={puzzles} key={group} sx={{ pl: 4 }} />
+                            ))}
+                        </>
+                    ),
                 })}
                 open={match !== null}
             />
@@ -68,11 +73,15 @@ function Puzzles(props: PuzzlesProps) {
             <ExpandableListItem
                 title={props.group.displayName}
                 icon={<Folder />}
-                items={props.puzzles.map((puzzle) => (
-                    <LinkListItem sx={{ pl: 4 }} key={puzzle.id} to={`/puzzles/${puzzle.id}`} selected={puzzleId === puzzle.id}>
-                        <ListItemText primary={puzzle.displayName} />
-                    </LinkListItem>
-                ))}
+                content={
+                    <>
+                        {props.puzzles.map((puzzle) => (
+                            <LinkListItem sx={{ pl: 4 }} key={puzzle.id} to={`/puzzles/${puzzle.id}`} selected={puzzleId === puzzle.id}>
+                                <ListItemText primary={puzzle.displayName} />
+                            </LinkListItem>
+                        ))}
+                    </>
+                }
                 open={props.puzzles.some((puzzle) => puzzleId === puzzle.id)}
             />
         </List>
@@ -87,16 +96,19 @@ function Categories() {
             <ExpandableListItem
                 title={"Categories"}
                 icon={<CategoryIcon />}
-                items={ApiListResource<Category[]>({
+                content={ApiResource<Category[]>({
                     url: "/categories",
-                    element: (categories) =>
-                        categories
-                            .sort((a, b) => (a.puzzleTypes.includes("PRODUCTION") && !b.puzzleTypes.includes("PRODUCTION") ? 1 : -1))
-                            .map((category) => (
-                                <LinkListItem sx={{ pl: 4 }} key={category.id} to={`/categories/${category.id}`} selected={categoryId === category.id}>
-                                    <ListItemText primary={`${category.displayName} (${category.metrics.join("→")})${category.puzzleTypes.includes("PRODUCTION") ? " (Production)" : ""}`} />
-                                </LinkListItem>
-                            )),
+                    element: (categories) => (
+                        <>
+                            {categories
+                                .sort((a, b) => (a.puzzleTypes.includes("PRODUCTION") && !b.puzzleTypes.includes("PRODUCTION") ? 1 : -1))
+                                .map((category) => (
+                                    <LinkListItem sx={{ pl: 4 }} key={category.id} to={`/categories/${category.id}`} selected={categoryId === category.id}>
+                                        <ListItemText primary={`${category.displayName} (${category.metrics.join("→")})${category.puzzleTypes.includes("PRODUCTION") ? " (Production)" : ""}`} />
+                                    </LinkListItem>
+                                ))}
+                        </>
+                    ),
                 })}
                 open={categoryId !== undefined}
             />

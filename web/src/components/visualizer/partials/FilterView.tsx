@@ -23,6 +23,7 @@ import FieldSet from "../../FieldSet"
 import Metric from "../../../model/Metric"
 import Modifier from "../../../model/Modifier"
 import iterate from "../../../utils/iterate"
+import { ReactNode } from "react"
 
 interface FilterProps<MODIFIER_ID extends string, METRIC_ID extends string, SCORE> {
     metrics: Record<METRIC_ID, Metric<SCORE>>
@@ -92,8 +93,8 @@ interface FilterButtonGroupProps {
     filter?: boolean
     setFilter: (filter: boolean | undefined) => void
     label: string
-    option1: string | JSX.Element
-    option2: string | JSX.Element
+    option1: ReactNode
+    option2: ReactNode
     sx?: SxProps<Theme>
 }
 

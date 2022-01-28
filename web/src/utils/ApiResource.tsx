@@ -16,7 +16,9 @@
 import LoadingIndicator from "../components/LoadingIndicator"
 import { Error } from "@mui/icons-material"
 import { Box } from "@mui/material"
-import BaseApiResource from "./BaseApiResource"
+import { useEffect, useState } from "react"
+import { ComponentState } from "./ComponentState"
+import fetchFromApi from "./fetchFromApi"
 
 interface ApiResourceProps<T> {
     url: string
@@ -24,21 +26,38 @@ interface ApiResourceProps<T> {
 }
 
 export default function ApiResource<T>(props: ApiResourceProps<T>): JSX.Element {
-    return BaseApiResource({
-        ...props,
-        loading: <LoadingIndicator />,
-        error: (
-            <Box
-                sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    margin: "auto",
-                    alignItems: "center",
-                }}
-            >
-                <Error fontSize="large" sx={{ marginBottom: "1rem" }} />
-                <span>Failed to load data</span>
-            </Box>
-        ),
-    })
+    const [state, setState] = useState(ComponentState.LOADING)
+    const [data, setData] = useState<T | undefined>(undefined)
+    useEffect(() => {
+        fetchFromApi<T>(props.url).then(
+            (data) => {
+                setData(data)
+                setState(ComponentState.READY)
+            },
+            () => {
+                setState(ComponentState.ERROR)
+            },
+        )
+    }, [props.url])
+
+    switch (state) {
+        case ComponentState.LOADING:
+            return <LoadingIndicator />
+        case ComponentState.ERROR:
+            return (
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        margin: "auto",
+                        alignItems: "center",
+                    }}
+                >
+                    <Error fontSize="large" sx={{ marginBottom: "1rem" }} />
+                    <span>Failed to load data</span>
+                </Box>
+            )
+        case ComponentState.READY:
+            return props.element(data as T)
+    }
 }
