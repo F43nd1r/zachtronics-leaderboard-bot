@@ -12,6 +12,7 @@
     "packages:react",
     "workarounds:all"
   ],
+  "rangeStrategy": "pin",
   "packageRules": [
     {
       "matchUpdateTypes": [
