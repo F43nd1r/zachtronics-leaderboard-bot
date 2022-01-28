@@ -151,7 +151,7 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
                 }}
                 useResizeHandler={true}
                 onClick={(event) => {
-                    setActiveRecord(records[event.points[0].pointIndex])
+                    setActiveRecord(records[event.points[0].pointNumber])
                 }}
             />
             <RecordModal record={activeRecord} setRecord={setActiveRecord} />
