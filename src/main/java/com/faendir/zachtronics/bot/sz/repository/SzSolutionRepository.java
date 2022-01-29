@@ -81,12 +81,12 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
         List<String> lines = Pattern.compile("\\r?\\n")
                                     .splitAsStream(redditService.getWikiPage(Subreddit.SHENZHEN_IO, "index"))
                                     .collect(Collectors.toList()); // mutable list
-        Pattern puzzleRegex = Pattern.compile("^\\|\\s*" + Pattern.quote(puzzle.getDisplayName()));
+        Pattern puzzleRegex = Pattern.compile("^\\| \\[" + Pattern.quote(puzzle.getDisplayName()));
 
         ListIterator<String> it = lines.listIterator();
 
-        // | Puzzle | [(**c**/pp/l)](https://cp.txt) | [(c/**pp**/l)](https://pc.txt) | [(c/pp/**l**)](https://lc.txt)
-        // |        | [(**c**/pp/l)](https://cl.txt) |                                | [(c/pp/**l**)](https://lp.txt)
+        // | [Puzzle](https://zlbb) | [(**c**/pp/l)](https://cp.txt) | [(c/**pp**/l)](https://pc.txt) | [(c/pp/**l**)](https://lc.txt)
+        // |                        | [(**c**/pp/l)](https://cl.txt) |                                | [(c/pp/**l**)](https://lp.txt)
         while (it.hasNext()) {
             String line = it.next();
             if (puzzleRegex.matcher(line).find()) {

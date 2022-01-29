@@ -130,19 +130,19 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         }
 
         String[] lines = redditService.getWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
-        Pattern puzzleRegex = Pattern.compile("^\\|\\s*" + Pattern.quote(puzzle.getDisplayName()));
+        Pattern puzzleRegex = Pattern.compile("^\\| \\[" + Pattern.quote(puzzle.getDisplayName()));
 
         int rowIdx = 0;
 
-        // |Puzzle | [(**ccc**/r/ss) author](https://li.nk) | ← | [(ccc/r/**ss**) author](https://li.nk) | ←
-        // |Puzzle - 1 Reactor | [(**ccc**/**r**/ss) author](https://li.nk) | ← | [(ccc/**r**/**ss**) author](https://li.nk) | ←
+        // | [Puzzle](https://zlbb) | [(**ccc**/r/ss) author](https://li.nk) | ← | [(ccc/r/**ss**) author](https://li.nk) | ←
+        // | [Puzzle - 1 Reactor](https://zlbb) | [(**ccc**/**r**/ss) author](https://li.nk) | ← | [(ccc/**r**/**ss**) author](https://li.nk) | ←
         for (int lineIdx = 0; lineIdx < lines.length; lineIdx++) {
             String line = lines[lineIdx];
             if (puzzleRegex.matcher(line).find()) {
                 String[] prevElems = line.trim().split("\\s*\\|\\s*", -1);
                 int halfSize = (prevElems.length - 2) / 2;
 
-                StringBuilder row = new StringBuilder("|");
+                StringBuilder row = new StringBuilder("| ");
                 int minReactors = Integer.MAX_VALUE;
                 String rowTitle = puzzle.getDisplayName();
                 if (rowIdx == 1) {
