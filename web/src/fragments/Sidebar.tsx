@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Box, Divider, List, ListItemText, useTheme } from "@mui/material"
+import { Box, Divider, List, ListItemText, useTheme, Link as ExternalLink } from "@mui/material"
 import ExpandableListItem from "../components/ExpandableListItem"
 import { Extension, Folder } from "@mui/icons-material"
 import CategoryIcon from "@mui/icons-material/Category"
@@ -134,9 +134,9 @@ export default function Sidebar() {
                 <Link to="/help" style={{ padding: "1rem", color: theme.palette.primary.main }}>
                     Help
                 </Link>
-                <Link to="/swagger-ui.html" style={{ padding: "1rem", color: theme.palette.primary.main }}>
+                <ExternalLink href="/swagger-ui.html" style={{ padding: "1rem", color: theme.palette.primary.main }}>
                     API docs
-                </Link>
+                </ExternalLink>
             </Box>
         </>
     )
