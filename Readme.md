@@ -16,7 +16,7 @@ The official leaderboard copies managed by the bot are in the wiki page of the g
 0. Set up docker-compose, create a discord bot, create a reddit app, get a github personal access token. Follow respective guides.
 
 1. Run gradle:
-```
+```sh
 ./gradlew build
 ``` 
 2. Run via `docker-compose`:
@@ -28,7 +28,7 @@ services:
     build: .
     container_name: om-discord-bot
     environment:
-      JDA_TOKEN: abc
+      DISCORD_TOKEN: abc
       GIT_USERNAME: def
       GIT_ACCESS_TOKEN: ghi
       REDDIT_USERNAME: jkl
