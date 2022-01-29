@@ -76,7 +76,7 @@ function Puzzles(props: PuzzlesProps) {
                 content={
                     <>
                         {props.puzzles.map((puzzle) => (
-                            <LinkListItem sx={{ pl: 4 }} key={puzzle.id} to={`/om/puzzles/${puzzle.id}`} selected={puzzleId === puzzle.id}>
+                            <LinkListItem sx={{ pl: 4 }} key={puzzle.id} to={`/puzzles/${puzzle.id}`} selected={puzzleId === puzzle.id}>
                                 <ListItemText primary={puzzle.displayName} />
                             </LinkListItem>
                         ))}

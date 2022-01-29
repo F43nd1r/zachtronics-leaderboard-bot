@@ -25,7 +25,7 @@ export default function PuzzleVisualizerView() {
         <Visualizer<string, string, OmScore>
             url={`/om/puzzle/${puzzleId}/records?includeFrontier=true`}
             config={{ key: "visualizerConfig", default: { mode: "3D", x: "g", y: "c", z: "a" } }}
-            filter={{ key: `visualizerFilter-${puzzleId}`, default: {} }}
+            filter={{ key: `visualizerFilter-${puzzleId}`, default: { showOnlyFrontier: false } }}
             metrics={{
                 g: { name: "Cost", get: (score) => score?.cost },
                 c: { name: "Cycles", get: (score) => score?.cycles },

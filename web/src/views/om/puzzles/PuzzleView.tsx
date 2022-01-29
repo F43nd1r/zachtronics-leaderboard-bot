@@ -17,10 +17,11 @@
 import Box from "@mui/material/Box"
 import { Tab, Tabs } from "@mui/material"
 import { Link, Navigate, Outlet, useMatch } from "react-router-dom"
-import { usePersistedStringState } from "../../../utils/usePersistedState"
+import { usePersistedState } from "../../../utils/usePersistedState"
 import { lazy, ReactElement, useEffect } from "react"
 import fetchFromApi from "../../../utils/fetchFromApi"
 import Puzzle from "../../../model/Puzzle"
+import LoadingIndicator from "../../../components/LoadingIndicator"
 
 const PuzzleRecordsView = lazy(() => import("./records/PuzzleRecordsView"))
 const PuzzleFrontierView = lazy(() => import("./frontier/PuzzleFrontierView"))
@@ -53,7 +54,7 @@ export const PuzzleRoutes: RouteDefinition[] = [
 export default function PuzzleView() {
     const match = useMatch("puzzles/:puzzleId/:tab")
     const lastSegment = match?.params?.tab
-    const [activeTab, setActiveTab] = usePersistedStringState<string>("puzzleTab", PuzzleRoutes[0].pathSegment)
+    const [activeTab, setActiveTab] = usePersistedState("puzzleTab", PuzzleRoutes[0].pathSegment)
     const lastActiveTab = activeTab
     useEffect(() => {
         lastSegment && setActiveTab(lastSegment)
@@ -61,7 +62,7 @@ export default function PuzzleView() {
     const puzzleId = match?.params?.puzzleId
 
     useEffect(() => {
-        fetchFromApi<Puzzle>(`/om/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - Opus Magnum Leaderboards`))
+        puzzleId && fetchFromApi<Puzzle>(`/om/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - Opus Magnum Leaderboards`))
     }, [puzzleId])
 
     if (!lastSegment || !PuzzleRoutes.some((route) => route.pathSegment === lastSegment)) {
@@ -85,11 +86,15 @@ export default function PuzzleView() {
                     borderColor: "divider",
                 }}
             >
-                <Tabs value={activeTab} onChange={(event, value) => setActiveTab(value)}>
-                    {PuzzleRoutes.map((route) => (
-                        <Tab label={route.label} value={route.pathSegment} to={route.pathSegment} key={route.pathSegment} component={Link} />
-                    ))}
-                </Tabs>
+                {activeTab !== undefined ? (
+                    <Tabs value={activeTab} onChange={(event, value) => setActiveTab(value)}>
+                        {PuzzleRoutes.map((route) => (
+                            <Tab label={route.label} value={route.pathSegment} to={route.pathSegment} key={route.pathSegment} component={Link} />
+                        ))}
+                    </Tabs>
+                ) : (
+                    <LoadingIndicator />
+                )}
             </Box>
             <Outlet />
         </Box>

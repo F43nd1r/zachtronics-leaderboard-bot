@@ -21,23 +21,20 @@ export interface Serializer<S> {
     toString: (t: S) => string
 }
 
-export function usePersistedStringState<S extends string>(key: string, defaultValue: S): [S, Dispatch<SetStateAction<S>>] {
-    return usePersistedState(key, defaultValue, { fromString: (s) => s as S, toString: (s) => s })
+type Serializable = object | string | number | boolean
+
+export function getSerializer<S extends Serializable>(defaultValue: S) {
+    const serializer: Serializer<S> =
+        typeof defaultValue === "string"
+            ? { fromString: (s) => s as S, toString: (s) => s as string }
+            : typeof defaultValue === "number"
+            ? { fromString: (s) => Number(s) as S, toString: (s) => s.toString() }
+            : { fromString: (s) => JSON.parse(s), toString: (s) => JSON.stringify(s) }
+    return serializer
 }
 
-export function usePersistedNumberState<S extends number>(key: string, defaultValue: S): [S, Dispatch<SetStateAction<S>>] {
-    return usePersistedState(key, defaultValue, { fromString: (s) => Number(s) as S, toString: (s) => s.toString() })
-}
-
-export function usePersistedDateState<S extends Date | null>(key: string, defaultValue: S): [S, Dispatch<SetStateAction<S>>] {
-    return usePersistedState(key, defaultValue, { fromString: (s) => new Date(s) as S, toString: (s) => s?.toISOString() ?? "" })
-}
-
-export function usePersistedJsonState<S>(key: string, defaultValue: S): [S, Dispatch<SetStateAction<S>>] {
-    return usePersistedState(key, defaultValue, { fromString: (s) => JSON.parse(s), toString: (s) => JSON.stringify(s) })
-}
-
-export function usePersistedState<S>(key: string, defaultValue: S, serializer: Serializer<S>): [S, Dispatch<SetStateAction<S>>] {
+export function usePersistedState<S extends Serializable>(key: string, defaultValue: S): [S, Dispatch<SetStateAction<S>>] {
+    const serializer = getSerializer(defaultValue)
     const storedValue = localStorage.getItem(key)
     const [value, setValue] = useState<S>(storedValue !== null ? serializer.fromString(storedValue) : defaultValue)
 

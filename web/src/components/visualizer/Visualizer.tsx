@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { usePersistedJsonState } from "../../utils/usePersistedState"
 import { Configuration } from "../../model/Configuration"
 import { applyFilter, Filter } from "../../model/Filter"
 import { Box, Stack } from "@mui/material"
@@ -26,6 +25,7 @@ import PlotView from "./partials/PlotView"
 import Metric from "../../model/Metric"
 import Modifier from "../../model/Modifier"
 import { LegendView } from "./partials/LegendView"
+import { usePersistedUrlState } from "../../utils/usePersistedUrlState"
 
 export interface VisualizerProps<MODIFIER_ID extends string, METRIC_ID extends string, SCORE> {
     url: string
@@ -43,8 +43,8 @@ export interface VisualizerProps<MODIFIER_ID extends string, METRIC_ID extends s
 }
 
 export function Visualizer<MODIFIER_ID extends string, METRIC_ID extends string, SCORE>(props: VisualizerProps<MODIFIER_ID, METRIC_ID, SCORE>) {
-    const [configuration, setConfiguration] = usePersistedJsonState<Configuration<METRIC_ID>>(props.config.key, props.config.default)
-    const [filter, setFilter] = usePersistedJsonState<Filter<MODIFIER_ID, METRIC_ID>>(props.filter.key, props.filter.default)
+    const [configuration, setConfiguration] = usePersistedUrlState(props.config.key, props.config.default)
+    const [filter, setFilter] = usePersistedUrlState(props.filter.key, props.filter.default)
 
     return (
         <Box

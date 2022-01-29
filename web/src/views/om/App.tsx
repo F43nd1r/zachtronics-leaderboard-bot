@@ -25,7 +25,7 @@ import Brightness7Icon from "@mui/icons-material/Brightness7"
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar"
 import Sidebar from "../../fragments/Sidebar"
 import { Outlet } from "react-router-dom"
-import { usePersistedJsonState } from "../../utils/usePersistedState"
+import { usePersistedState } from "../../utils/usePersistedState"
 import SearchBar from "../../fragments/SearchBar"
 import { AppThemeContext } from "../../fragments/AppThemeProvider"
 
@@ -91,7 +91,7 @@ export default function App() {
     const theme = useTheme()
     const colorMode = useContext(AppThemeContext)
     const isNotTinyScreen = useMediaQuery(theme.breakpoints.up("sm"))
-    const [open, setOpen] = usePersistedJsonState("sidebarOpen", isNotTinyScreen)
+    const [open, setOpen] = usePersistedState("sidebarOpen", isNotTinyScreen)
     const handleDrawerOpen = () => {
         setOpen(true)
     }

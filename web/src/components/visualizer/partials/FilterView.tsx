@@ -52,6 +52,7 @@ export function FilterView<MODIFIER_ID extends string, METRIC_ID extends string,
                 </ToggleButton>
                 {iterate(props.modifiers).map(([modifierId, modifier]) => (
                     <FilterButtonGroup
+                        key={modifierId}
                         filter={props.filter.modifiers && props.filter.modifiers[modifierId]}
                         setFilter={(value) =>
                             props.setFilter({

@@ -32,7 +32,7 @@
 import { useMemo } from "react"
 import ApiResource from "../../../utils/ApiResource"
 import RecordGrid from "../../../components/RecordGrid"
-import { usePersistedNumberState } from "../../../utils/usePersistedState"
+import { usePersistedState } from "../../../utils/usePersistedState"
 import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material"
 import OmRecordChange from "../../../model/om/OmRecordChange"
 
@@ -43,7 +43,7 @@ enum SinceLast {
 }
 
 export default function RecentSubmissionsView() {
-    const [sinceLast, setSinceLast] = usePersistedNumberState<SinceLast>("submissionsSince", SinceLast.WEEK)
+    const [sinceLast, setSinceLast] = usePersistedState("submissionsSince", SinceLast.WEEK)
 
     const dateSince: Date = useMemo(() => new Date(new Date().getTime() - sinceLast), [sinceLast])
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { usePersistedStringState } from "../utils/usePersistedState"
+import { usePersistedState } from "../utils/usePersistedState"
 import { createContext, ReactNode, useMemo } from "react"
 import { createTheme, ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
@@ -25,7 +25,7 @@ export const AppThemeContext = createContext({
 
 export default function AppThemeProvider(props: { children?: ReactNode | undefined }) {
     const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
-    const [mode, setMode] = usePersistedStringState<"light" | "dark">("colorMode", prefersDarkMode ? "light" : "dark")
+    const [mode, setMode] = usePersistedState("colorMode", prefersDarkMode ? "light" : "dark")
     const colorMode = useMemo(
         () => ({
             toggleColorMode: () => {
