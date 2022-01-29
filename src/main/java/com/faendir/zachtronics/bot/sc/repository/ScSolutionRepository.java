@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,14 +144,12 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
 
                 StringBuilder row = new StringBuilder("|");
                 int minReactors = Integer.MAX_VALUE;
+                String rowTitle = puzzle.getDisplayName();
                 if (rowIdx == 1) {
                     minReactors = recordMap.get(ScCategory.RC).getScore().getReactors();
-                    row.append(puzzle.getDisplayName()).append(" - ")
-                       .append(minReactors).append(" Reactor").append(minReactors == 1 ? "" : "s");
+                    rowTitle += " - " + minReactors + " Reactor" + (minReactors == 1 ? "" : "s");
                 }
-                else {
-                    row.append(prevElems[1]);
-                }
+                row.append(Markdown.linkOrText(rowTitle, puzzle.getLink()));
 
                 for (int block = 0; block < 2; block++) {
                     ScCategory[] blockCategories = CATEGORIES[2 * rowIdx + block];

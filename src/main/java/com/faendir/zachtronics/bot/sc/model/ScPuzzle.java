@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -409,6 +409,7 @@ public enum ScPuzzle implements Puzzle<ScCategory> {
     private final String displayName;
     private final boolean isDeterministic;
     private final List<ScCategory> supportedCategories;
+    private final String link;
 
     ScPuzzle(ScGroup group, ScType type, String displayName, boolean isDeterministic) {
         this.group = group;
@@ -419,12 +420,13 @@ public enum ScPuzzle implements Puzzle<ScCategory> {
                                           .filter(c -> c.getSupportedTypes().contains(type) &&
                                                        !(isDeterministic && c.isPrecogFree()))
                                           .toList();
+        this.link = "https://zlbb.faendir.com/sc/" + name();
     }
 
     @NotNull
     public static SingleParseResult<ScPuzzle> parsePuzzle(@NotNull String name) {
         return Arrays.stream(ScPuzzle.values())
-                     .filter(p -> p.getDisplayName().equalsIgnoreCase(name))
+                     .filter(p -> p.displayName.equalsIgnoreCase(name))
                      .findFirst()
                      .<SingleParseResult<ScPuzzle>>map(SingleParseResult.Success::new)
                      .orElseGet(() -> UtilsKt.getSingleMatchingPuzzle(ScPuzzle.values(), name));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,5 +24,4 @@ interface Puzzle<C : Category> {
     val supportedCategories: List<C>
 
     val link: String?
-        get() = null
 }

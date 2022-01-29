@@ -25,6 +25,7 @@ import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.sz.model.*;
+import com.faendir.zachtronics.bot.utils.Markdown;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -107,7 +108,7 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
         for (int rowIdx = 0; rowIdx < 2; rowIdx++) {
             StringBuilder row = new StringBuilder("| ");
             if (rowIdx == 0)
-                row.append(puzzle.getDisplayName());
+                row.append(Markdown.linkOrText(puzzle.getDisplayName(), puzzle.getLink()));
 
             SzCategory[] blockCategories = CATEGORIES[rowIdx];
 

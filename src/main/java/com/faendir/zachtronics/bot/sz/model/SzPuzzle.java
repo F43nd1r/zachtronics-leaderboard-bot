@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,6 +80,7 @@ public enum SzPuzzle implements Puzzle<SzCategory> {
     private final SzType type;
     private final String displayName;
     private final List<SzCategory> supportedCategories;
+    private final String link;
 
     SzPuzzle(String id, SzGroup group, SzType type, String displayName) {
         this.id = id;
@@ -89,6 +90,7 @@ public enum SzPuzzle implements Puzzle<SzCategory> {
         this.supportedCategories = Arrays.stream(SzCategory.values())
                                          .filter(c -> c.getSupportedTypes().contains(type))
                                          .toList();
+        this.link = "https://zlbb.faendir.com/sz/" + id;
     }
 
     @NotNull
