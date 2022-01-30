@@ -26,5 +26,6 @@ export function useDebouncedEffect(effect: (isInitialRender: boolean) => void, d
             const id = setTimeout(() => effect(false), wait)
             return () => clearTimeout(id)
         }
-    })
+        //eslint-disable-next-line react-hooks/exhaustive-deps
+    }, deps)
 }

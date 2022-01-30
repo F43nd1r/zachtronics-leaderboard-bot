@@ -43,27 +43,35 @@ export function usePersistedUrlState<S extends object>(key: string, defaultValue
             }
 
             const valueDiff = deepValues(diff(defaultValue, value), key).map(({ path, value }) => ({ path: `${key}.${path}`, value }))
+            const newSearchParams = new URLSearchParams(searchParams)
             let anyChanged = false
             for (let pathValue of valueDiff) {
-                // eslint-disable-next-line eqeqeq
-                if (!searchParams.has(pathValue.path) || pathValue.value != searchParams.get(pathValue.path)) {
-                    if (pathValue.value === undefined) {
-                        searchParams.delete(pathValue.path)
-                    } else {
-                        searchParams.set(pathValue.path, pathValue.value)
+                if (!searchParams.has(pathValue.path)) {
+                    if (pathValue.value !== undefined) {
+                        newSearchParams.set(pathValue.path, pathValue.value.toString())
+                        anyChanged = true
                     }
-                    anyChanged = true
+                } else {
+                    const oldValue = parseUrlValue(searchParams.get(pathValue.path)!)
+                    if (pathValue.value !== oldValue) {
+                        if (pathValue.value === undefined) {
+                            newSearchParams.delete(pathValue.path)
+                        } else {
+                            newSearchParams.set(pathValue.path, pathValue.value.toString())
+                        }
+                        anyChanged = true
+                    }
                 }
             }
             const newKeys = valueDiff.map(({ path }) => path)
             const oldKeys = [...searchParams.keys()].filter((k) => k.startsWith(key))
             const removeKeys = oldKeys.filter((k) => !newKeys.includes(k))
             for (let removeKey of removeKeys) {
-                searchParams.delete(removeKey)
+                newSearchParams.delete(removeKey)
                 anyChanged = true
             }
             if (anyChanged) {
-                setSearchParams(searchParams)
+                setSearchParams(newSearchParams, { replace: true })
             }
         },
         [value, key, serializer, searchParams, setSearchParams, defaultValue],
@@ -83,18 +91,21 @@ function deepAssign(obj: Record<keyof any, any>, path: string[], value: string) 
         }
         current = current[segment]
     }
-    let parsedValue: any = value
+    current[lastSegment] = parseUrlValue(value)
+}
+
+function parseUrlValue(value: string): number | boolean | string {
     if (/\d+\.?\d*/.test(value)) {
-        parsedValue = parseFloat(value)
+        return parseFloat(value)
     } else if (/(true|false)/.test(value.toLowerCase())) {
-        parsedValue = !!value
+        return value.toLowerCase() === "true"
     }
-    current[lastSegment] = parsedValue
+    return value
 }
 
 interface PathValue {
     path: string
-    value: any
+    value: string | number | boolean
 }
 
 function deepValues(obj: Record<keyof any, any>, ignoreKey: string): PathValue[] {
