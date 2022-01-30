@@ -42,7 +42,7 @@ export function usePersistedUrlState<S extends object>(key: string, defaultValue
                 localStorage.setItem(key, serializer.toString(value))
             }
 
-            const valueDiff = deepValues(diff(defaultValue, value), key).map(({ path, value }) => ({ path: `${key}.${path}`, value }))
+            const valueDiff = deepValues(diff(defaultValue, value)).map(({ path, value }) => ({ path: `${key}.${path}`, value }))
             const newSearchParams = new URLSearchParams(searchParams)
             let anyChanged = false
             for (let pathValue of valueDiff) {
@@ -108,13 +108,12 @@ interface PathValue {
     value: string | number | boolean
 }
 
-function deepValues(obj: Record<keyof any, any>, ignoreKey: string): PathValue[] {
+function deepValues(obj: Record<keyof any, any>): PathValue[] {
     const values: PathValue[] = []
     for (let key in obj) {
-        if (key === ignoreKey) continue
         const value = obj[key]
         if (typeof value === "object") {
-            values.push(...deepValues(value, ignoreKey).map((pathValue) => ({ path: `${key}.${pathValue.path}`, value: pathValue.value })))
+            values.push(...deepValues(value).map((pathValue) => ({ path: `${key}.${pathValue.path}`, value: pathValue.value })))
         } else {
             values.push({
                 path: key,
