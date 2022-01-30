@@ -95,9 +95,9 @@ function deepAssign(obj: Record<keyof any, any>, path: string[], value: string) 
 }
 
 function parseUrlValue(value: string): number | boolean | string {
-    if (/\d+\.?\d*/.test(value)) {
+    if (/^\d+\.?\d*$/.test(value)) {
         return parseFloat(value)
-    } else if (/(true|false)/.test(value.toLowerCase())) {
+    } else if (/^(true|false)$/.test(value.toLowerCase())) {
         return value.toLowerCase() === "true"
     }
     return value
