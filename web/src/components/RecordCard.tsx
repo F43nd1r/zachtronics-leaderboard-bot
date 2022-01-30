@@ -29,7 +29,7 @@ interface RecordCardProps {
 }
 
 function isYoutube(gif: string): boolean {
-    return (gif.includes("youtu.be") || gif.includes("youtube.com"))
+    return gif.includes("youtu.be") || gif.includes("youtube.com")
 }
 
 function getVideoType(gif: string): "video" | "iframe" | "img" {
@@ -44,9 +44,8 @@ function getVideoType(gif: string): "video" | "iframe" | "img" {
 
 function getVideoUrl(gif: string) {
     if (isYoutube(gif)) {
-        return gif.replace(/.+\/(\w+)(?:\\?.+)?$/, 'https://youtube.com/embed/$1')
-    }
-    else {
+        return gif.replace(/.+\/(\w+)(?:\\?.+)?$/, "https://youtube.com/embed/$1")
+    } else {
         return gif
     }
 }
@@ -59,7 +58,7 @@ export default function RecordCard(props: RecordCardProps) {
                 maxWidth: "100%",
             }}
         >
-            <CardActionArea href={props.record.gif ?? window.location.href} sx={props.sx}>
+            <CardActionArea href={props.record.gif ?? ""} disabled={!props.record.gif} sx={props.sx}>
                 <CardHeader title={props.title} />
                 {props.record.gif ? (
                     <CardMedia
