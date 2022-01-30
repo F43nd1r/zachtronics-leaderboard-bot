@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,7 +104,7 @@ public class ScSolutionMetadata {
             commaDescr = "," + encode(normalizeDescription(description));
         }
         return String.format("SOLUTION:%s,%s,%d-%d-%d%s",
-                             encode(puzzle.getDisplayName().replaceFirst(" \\(.-.-.\\)$", "")), encode(author),
+                             encode(puzzle.getExportName()), encode(author),
                              score.getCycles(), score.getReactors(), score.getSymbols(), commaDescr);
     }
 

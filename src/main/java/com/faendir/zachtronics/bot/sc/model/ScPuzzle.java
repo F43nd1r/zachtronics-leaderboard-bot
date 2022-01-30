@@ -431,4 +431,9 @@ public enum ScPuzzle implements Puzzle<ScCategory> {
                      .<SingleParseResult<ScPuzzle>>map(SingleParseResult.Success::new)
                      .orElseGet(() -> UtilsKt.getSingleMatchingPuzzle(ScPuzzle.values(), name));
     }
+
+    @NotNull
+    public String getExportName() {
+        return displayName.replaceFirst(" \\(.+\\)$", "");
+    }
 }
