@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,31 +24,41 @@ import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
+import com.faendir.zachtronics.bot.utils.orEmpty
+import com.faendir.zachtronics.bot.utils.smartFormat
+import com.faendir.zachtronics.bot.utils.toMetricsTree
 import com.faendir.zachtronics.bot.validation.ValidationResult
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
-import reactor.core.publisher.Mono
 
 abstract class AbstractArchiveCommand<T, C: Category, S : Submission<C, *>> : AbstractSubCommand<T>() {
     protected abstract val repository: SolutionRepository<*, *, S, *>
 
     override fun handleEvent(event: DeferrableInteractionEvent, parameters: T): SafeMessageBuilder {
         val validationResults = parseSubmissions(parameters)
-        return archiveAll(validationResults)
+        return submitAll(validationResults)
     }
 
-    private fun archiveAll(validationResults: Collection<ValidationResult<S>>): SafeEmbedMessageBuilder {
+    private fun submitAll(validationResults: Collection<ValidationResult<S>>): SafeEmbedMessageBuilder {
         val submissionResults = repository.submitAll(validationResults)
 
-        val successes = submissionResults.count { it is SubmitResult.Success<*,*> }
+        val successes = submissionResults.count { it is SubmitResult.Success }
         val (title, color) = when {
             successes != 0 -> "Success: $successes solution(s) archived" to Colors.SUCCESS
-            submissionResults.any { it is SubmitResult.NothingBeaten<*, *> || it is SubmitResult.AlreadyPresent } -> "No solutions archived" to Colors.UNCHANGED
+            submissionResults.any { it is SubmitResult.NothingBeaten || it is SubmitResult.AlreadyPresent } -> "No solutions archived" to Colors.UNCHANGED
             else -> "Failure: no solutions archived" to Colors.FAILURE
         }
 
         val embed = SafeEmbedMessageBuilder().title(title).color(color)
         for ((validationResult, submitResult) in validationResults.zip(submissionResults)) {
-            val name = if (validationResult is ValidationResult.Unparseable) "*Failed*" else "*${validationResult.submission.puzzle.displayName}*"
+            val name = when (validationResult) {
+                is ValidationResult.Unparseable -> "*Failed*"
+                else -> "*${validationResult.submission.puzzle.displayName}*" +
+                        ((submitResult as? SubmitResult.Success)?.beatenRecords
+                            ?.flatMap { it.categories }
+                            ?.takeIf { it.isNotEmpty() }
+                            ?.smartFormat(validationResult.submission.puzzle.supportedCategories.toMetricsTree())
+                            ?.orEmpty(prefix = " "))
+            }
             val value = when (validationResult) {
                 is ValidationResult.Valid<S>, is ValidationResult.Invalid<S> -> {
                     val score = validationResult.submission.score.toDisplayString(DisplayContext.discord())
