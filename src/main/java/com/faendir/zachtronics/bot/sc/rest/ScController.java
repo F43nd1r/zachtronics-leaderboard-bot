@@ -68,9 +68,12 @@ public class ScController {
     }
 
     @GetMapping(path = "/puzzle/{puzzleId}/records", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ScRecordDTO> listRecords(@PathVariable String puzzleId, @RequestParam(required = false) Boolean includeFrontier) {
+    public List<ScRecordDTO> listRecords(@PathVariable String puzzleId, @RequestParam(required = false) Boolean includeFrontier,
+                                         @RequestParam(required = false) Boolean includeVideoOnly) {
         ScPuzzle puzzle = findPuzzle(puzzleId);
         return repository.findCategoryHolders(puzzle, includeFrontier != null && includeFrontier).stream()
+                         .filter(includeVideoOnly != null && includeVideoOnly ?
+                                 cr -> true : cr -> cr.getRecord().getDataLink() != null)
                          .map(ScRecordDTO::fromCategoryRecord)
                          .toList();
     }
