@@ -17,6 +17,7 @@
 import { Box } from "@mui/material"
 import { useParams } from "react-router-dom"
 import { Visualizer } from "../../components/visualizer/Visualizer"
+import { VisualizerColor } from "../../utils/VisualizerColor"
 import Puzzle from "../../model/Puzzle"
 import SzScore from "../../model/sz/SzScore"
 import fetchFromApi from "../../utils/fetchFromApi"
@@ -49,7 +50,7 @@ export default function SzPuzzleVisualizerView() {
                     l: { name: "Lines", get: (score) => score?.lines },
                 }}
                 modifiers={{}}
-                defaultColor={"#0288d1"}
+                defaultColor={VisualizerColor.DEFAULT}
             />
         </Box>
     )

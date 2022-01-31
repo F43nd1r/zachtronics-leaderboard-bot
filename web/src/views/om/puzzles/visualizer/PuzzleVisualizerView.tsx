@@ -16,6 +16,7 @@
 
 import { useParams } from "react-router-dom"
 import { Visualizer } from "../../../../components/visualizer/Visualizer"
+import { VisualizerColor } from "../../../../utils/VisualizerColor"
 import OmScore from "../../../../model/om/OmScore"
 
 export default function PuzzleVisualizerView() {
@@ -39,7 +40,7 @@ export default function PuzzleVisualizerView() {
                 overlap: {
                     get: (score) => score?.overlap,
                     name: "overlap",
-                    color: "#880e4f",
+                    color: VisualizerColor.MOD1,
                     legendOrder: -1,
                     option1: "Overlap",
                     option2: "Normal",
@@ -47,13 +48,13 @@ export default function PuzzleVisualizerView() {
                 trackless: {
                     get: (score) => score?.trackless,
                     name: "trackless",
-                    color: "#558b2f",
+                    color: VisualizerColor.MOD2,
                     legendOrder: 1,
                     option1: "Trackless",
                     option2: "With Track",
                 },
             }}
-            defaultColor={"#0288d1"}
+            defaultColor={VisualizerColor.DEFAULT}
         />
     )
 }

@@ -17,6 +17,7 @@
 import { Box } from "@mui/material"
 import { useParams } from "react-router-dom"
 import { Visualizer } from "../../components/visualizer/Visualizer"
+import { VisualizerColor } from "../../utils/VisualizerColor"
 import Puzzle from "../../model/Puzzle"
 import ScScore from "../../model/sc/ScScore"
 import fetchFromApi from "../../utils/fetchFromApi"
@@ -40,7 +41,7 @@ export default function ScPuzzleVisualizerView() {
             }}
         >
             <Visualizer<string, string, ScScore>
-                url={`/sc/puzzle/${puzzleId}/records?includeFrontier=true`}
+                url={`/sc/puzzle/${puzzleId}/records?includeFrontier=true&includeVideoOnly=false`}
                 config={{ key: "visualizerConfigSc", default: { mode: "3D", x: "c", y: "s", z: "r" } }}
                 filter={{ key: `visualizerFilterSc-${puzzleId}`, default: {} }}
                 metrics={{
@@ -52,7 +53,7 @@ export default function ScPuzzleVisualizerView() {
                     bugged: {
                         get: (score) => score?.bugged,
                         name: "bugged",
-                        color: "#880e4f",
+                        color: VisualizerColor.MOD1,
                         legendOrder: -1,
                         option1: "Bugged",
                         option2: "No Bugs",
@@ -60,13 +61,13 @@ export default function ScPuzzleVisualizerView() {
                     precognitive: {
                         get: (score) => score?.precognitive,
                         name: "precognitive",
-                        color: "#558b2f",
+                        color: VisualizerColor.MOD2,
                         legendOrder: 1,
                         option1: "Precognitive",
                         option2: "No Precog",
                     },
                 }}
-                defaultColor={"#0288d1"}
+                defaultColor={VisualizerColor.DEFAULT}
             />
         </Box>
     )
