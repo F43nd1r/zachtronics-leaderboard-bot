@@ -18,20 +18,26 @@ package com.faendir.zachtronics.bot.git
 
 import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.createGitRepositoryFrom
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.eclipse.jgit.diff.DiffEntry
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
+import strikt.api.expectThrows
 import strikt.assertions.first
 import strikt.assertions.hasSize
 import strikt.assertions.isEmpty
 import strikt.assertions.isEqualTo
+import strikt.assertions.isFalse
+import strikt.assertions.isTrue
 import java.io.File
 import java.nio.file.Files
 import java.time.Instant
+import java.util.concurrent.atomic.AtomicBoolean
 
 class GitRepositoryTest {
     private val gitProperties = GitProperties().apply {
@@ -122,6 +128,44 @@ class GitRepositoryTest {
     fun `should return empty if repo has no commits`() {
         gitRepository.acquireReadAccess().use { access ->
             expectThat(access.changesSince(Instant.now())).isEmpty()
+        }
+    }
+
+    @Test
+    fun `should allow concurrent read locks`() {
+        gitRepository.acquireReadAccess().use {
+            val thread = Thread {
+                gitRepository.acquireReadAccess().close()
+            }
+            thread.start()
+            thread.join(1000)
+            expectThat(thread.isAlive).isFalse()
+        }
+    }
+
+    @Test
+    fun `should not allow read lock during write`() {
+        gitRepository.acquireWriteAccess().use {
+            val thread = Thread {
+                gitRepository.acquireReadAccess().close()
+            }
+            thread.start()
+            thread.join(1000)
+            expectThat(thread.isAlive).isTrue()
+            thread.interrupt()
+        }
+    }
+
+    @Test
+    fun `should not allow additional write lock during write`() {
+        gitRepository.acquireWriteAccess().use {
+            val thread = Thread {
+                gitRepository.acquireWriteAccess().close()
+            }
+            thread.start()
+            thread.join(1000)
+            expectThat(thread.isAlive).isTrue()
+            thread.interrupt()
         }
     }
 }
