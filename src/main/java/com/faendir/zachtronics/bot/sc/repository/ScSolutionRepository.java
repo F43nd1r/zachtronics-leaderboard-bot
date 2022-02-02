@@ -268,7 +268,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         try {
             for (ListIterator<ScSolution> it = solutions.listIterator(); it.hasNext(); ) {
                 ScSolution solution = it.next();
-                int r = dominanceCompare(candidate, solution);
+                int r = dominanceCompare(candidate.getScore(), solution.getScore());
                 if (r > 0) {
                     // TODO actually return all of the beating sols
                     CategoryRecord<ScRecord, ScCategory> categoryRecord =
@@ -284,11 +284,19 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                         candidate.getDisplayLink() == null) {
                         return new SubmitResult.AlreadyPresent<>();
                     }
+
                     // remove beaten score and get categories
-                    it.remove();
-                    Files.delete(makeArchivePath(puzzlePath, solution.getScore()));
                     candidate.getCategories().addAll(solution.getCategories());
+                    Files.deleteIfExists(makeArchivePath(puzzlePath, solution.getScore())); // video-only sols have no data
                     beatenCategoryRecords.add(solution.extendToCategoryRecord(puzzle, null, null)); // the beaten record has no data anymore
+
+                    if (candidate.getDisplayLink() == null && solution.getDisplayLink() != null) {
+                        // we beat the solution, but we can't replace the video, we keep the solution entry as a video-only
+                        solution.getCategories().clear();
+                    }
+                    else {
+                        it.remove();
+                    }
                 }
             }
 
@@ -346,21 +354,18 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     /**
      * If equal, sol1 dominates
      */
-    private static int dominanceCompare(@NotNull ScSolution sol1, @NotNull ScSolution sol2) {
-        ScScore s1 = sol1.getScore();
-        ScScore s2 = sol2.getScore();
+    private static int dominanceCompare(@NotNull ScScore s1, @NotNull ScScore s2) {
         int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
         int r2 = Integer.compare(s1.getReactors(), s2.getReactors());
         int r3 = Integer.compare(s1.getSymbols(), s2.getSymbols());
         int r4 = Boolean.compare(s1.isBugged(), s2.isBugged());
         int r5 = Boolean.compare(s1.isPrecognitive(), s2.isPrecognitive());
-        int r6 = Boolean.compare(sol1.getDisplayLink() == null, sol2.getDisplayLink() == null);
 
-        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0 && r5 <= 0 && r6 <= 0) {
+        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0 && r5 <= 0) {
             // sol1 dominates
             return -1;
         }
-        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0 && r5 >= 0 && r6 >= 0) {
+        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0 && r5 >= 0) {
             // sol2 dominates
             return 1;
         }

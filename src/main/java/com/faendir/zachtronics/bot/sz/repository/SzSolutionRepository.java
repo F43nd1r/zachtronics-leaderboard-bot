@@ -190,10 +190,10 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
                         return new SubmitResult.AlreadyPresent<>();
                     }
                     // remove beaten score and get categories
-                    it.remove();
-                    Files.delete(makeArchivePath(puzzlePath, solution.getScore()));
                     candidate.getCategories().addAll(solution.getCategories());
+                    Files.delete(makeArchivePath(puzzlePath, solution.getScore()));
                     beatenCategoryRecords.add(solution.extendToCategoryRecord(puzzle, null, null)); // the beaten record has no data anymore
+                    it.remove();
                 }
             }
 
@@ -249,7 +249,7 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
     }
 
     /** If equal, s1 dominates */
-    static int dominanceCompare(@NotNull SzScore s1, @NotNull SzScore s2) {
+    private static int dominanceCompare(@NotNull SzScore s1, @NotNull SzScore s2) {
         int r1 = Integer.compare(s1.getCost(), s2.getCost());
         int r2 = Integer.compare(s1.getPower(), s2.getPower());
         int r3 = Integer.compare(s1.getLines(), s2.getLines());
