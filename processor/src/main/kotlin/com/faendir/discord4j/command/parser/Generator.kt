@@ -149,10 +149,10 @@ class Generator(
                             add("return %T(%T())", CombinedParseResult.Success::class, type)
                         } else {
                             addStatement("var options = event.options")
-                            addStatement("var option = options.first()")
-                            `while`("option.type·== %1T.Type.SUB_COMMAND || option.type·== %1T.Type.SUB_COMMAND_GROUP", ApplicationCommandOption::class) {
+                            addStatement("var option = options.firstOrNull()")
+                            `while`("option?.type·== %1T.Type.SUB_COMMAND || option?.type·== %1T.Type.SUB_COMMAND_GROUP", ApplicationCommandOption::class) {
                                 addStatement("options = option.options")
-                                addStatement("option = options.first()")
+                                addStatement("option = options.firstOrNull()")
                             }
                             addStatement("val results = mutableMapOf<%T, %T>()", String::class, SingleParseResult::class.asClassName().parameterizedBy(STAR))
                             for (parameter in parameters) {
