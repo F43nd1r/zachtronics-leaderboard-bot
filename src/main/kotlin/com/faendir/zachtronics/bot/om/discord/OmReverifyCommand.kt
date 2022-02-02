@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,9 +117,9 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Abstract
         return SafeEmbedMessageBuilder()
             .title(
                 "Reverify" +
-                        parameters.type?.displayName?.orEmpty(" ") +
-                        parameters.puzzle?.displayName?.orEmpty(" ") +
-                        parameters.part?.displayName?.orEmpty(" ") +
+                        parameters.type?.displayName.orEmpty(" ") +
+                        parameters.puzzle?.displayName.orEmpty(" ") +
+                        parameters.part?.displayName.orEmpty(" ") +
                         if (parameters.overrideExisting == true) " overriding existing values!" else ""
             )
             .description("**Modified Records:** ${overrideRecords.size}\n\n**Errors:**\n${errors.joinToString("\n")}")

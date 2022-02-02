@@ -57,7 +57,7 @@ abstract class AbstractArchiveCommand<T, C: Category, S : Submission<C, *>> : Ab
                             ?.flatMap { it.categories }
                             ?.takeIf { it.isNotEmpty() }
                             ?.smartFormat(validationResult.submission.puzzle.supportedCategories.toMetricsTree())
-                            ?.orEmpty(prefix = " "))
+                            .orEmpty(prefix = " "))
             }
             val value = when (validationResult) {
                 is ValidationResult.Valid<S>, is ValidationResult.Invalid<S> -> {

@@ -25,10 +25,10 @@ import com.faendir.zachtronics.bot.git.GitRepository;
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -50,11 +50,10 @@ public class RestartCommand implements TopLevelCommand<RestartCommand.RestartDat
     private final ApplicationContext applicationContext;
     private final List<GitRepository> repositories;
 
-    @SneakyThrows
     @NotNull
     @Override
     public Mono<Void> handle(@NotNull DeferrableInteractionEvent event, @NotNull RestartData parameters) {
-        if (!parameters.sudo) {
+        if (parameters.sudo == null || !parameters.sudo) {
             // acquire and hold all the repo write locks, which ensures no write operations are concurrently running
             repositories.parallelStream().forEach(GitRepository::acquireWriteAccess);
         }
@@ -70,7 +69,7 @@ public class RestartCommand implements TopLevelCommand<RestartCommand.RestartDat
 
     @ApplicationCommand(name = "restart", description = "Stops the bot, which will restart with the latest image")
     public static class RestartData {
-        Boolean sudo;
+        @Nullable Boolean sudo;
 
         public RestartData(@Description("Restarts immediately without waiting process termination") Boolean sudo) {
             this.sudo = sudo;
