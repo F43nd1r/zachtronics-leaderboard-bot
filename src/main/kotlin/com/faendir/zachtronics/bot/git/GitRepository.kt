@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Score
 import com.google.common.util.concurrent.CycleDetectingLockFactory
 import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.api.ResetCommand
 import org.eclipse.jgit.api.Status
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.diff.DiffFormatter
@@ -204,7 +205,7 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
         }
 
         fun resetAndClean(file: File) {
-            git.reset().addPath(file.relativeTo(repo).path).call()
+            git.reset().setMode(ResetCommand.ResetType.HARD).call()
             git.clean().setForce(true).setPaths(setOf(file.relativeTo(repo).path)).call()
         }
     }
