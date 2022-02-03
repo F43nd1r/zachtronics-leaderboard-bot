@@ -19,8 +19,9 @@ package com.faendir.zachtronics.bot.discord.command
 import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.DisplayContext
+import com.faendir.zachtronics.bot.model.Puzzle
+import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.Submission
-import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
@@ -30,12 +31,17 @@ import com.faendir.zachtronics.bot.utils.toMetricsTree
 import com.faendir.zachtronics.bot.validation.ValidationResult
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 
-abstract class AbstractArchiveCommand<T, C: Category, S : Submission<C, *>> : AbstractSubCommand<T>() {
-    protected abstract val repository: SolutionRepository<*, *, S, *>
+abstract class AbstractMultiSubmitCommand<T, C : Category, P : Puzzle<C>, S : Submission<C, P>, R : Record<C>> :
+    AbstractSubmitCommand<T, C, P, S, R>() {
 
     override fun handleEvent(event: DeferrableInteractionEvent, parameters: T): SafeMessageBuilder {
         val validationResults = parseSubmissions(parameters)
-        return submitAll(validationResults)
+        return if (validationResults.size == 1) {
+            when (val result = validationResults.first()) {
+                is ValidationResult.Valid -> submitToRepository(result.submission)
+                else -> throw IllegalArgumentException(result.message)
+            }
+        } else submitAll(validationResults)
     }
 
     private fun submitAll(validationResults: Collection<ValidationResult<S>>): SafeEmbedMessageBuilder {
@@ -43,9 +49,9 @@ abstract class AbstractArchiveCommand<T, C: Category, S : Submission<C, *>> : Ab
 
         val successes = submissionResults.count { it is SubmitResult.Success }
         val (title, color) = when {
-            successes != 0 -> "Success: $successes solution(s) archived" to Colors.SUCCESS
-            submissionResults.any { it is SubmitResult.NothingBeaten || it is SubmitResult.AlreadyPresent } -> "No solutions archived" to Colors.UNCHANGED
-            else -> "Failure: no solutions archived" to Colors.FAILURE
+            successes != 0 -> "Success: $successes solution${if (successes == 1) "" else "s"} added" to Colors.SUCCESS
+            submissionResults.any { it is SubmitResult.NothingBeaten || it is SubmitResult.AlreadyPresent } -> "No solutions added" to Colors.UNCHANGED
+            else -> "Failure: no solutions added" to Colors.FAILURE
         }
 
         val embed = SafeEmbedMessageBuilder().title(title).color(color)
@@ -63,7 +69,7 @@ abstract class AbstractArchiveCommand<T, C: Category, S : Submission<C, *>> : Ab
                 is ValidationResult.Valid<S>, is ValidationResult.Invalid<S> -> {
                     val score = validationResult.submission.score.toDisplayString(DisplayContext.discord())
                     when (submitResult) {
-                        is SubmitResult.Success -> "`$score` has been archived.\n${submitResult.message}"
+                        is SubmitResult.Success -> "`$score`${validationResult.submission.author.orEmpty(prefix = " by ")}.\n${submitResult.message}"
                         is SubmitResult.AlreadyPresent -> "`$score` was already present."
                         is SubmitResult.NothingBeaten -> "`$score` did not beat anything."
                         is SubmitResult.Failure -> "`$score` failed.\n${submitResult.message}"
@@ -77,4 +83,8 @@ abstract class AbstractArchiveCommand<T, C: Category, S : Submission<C, *>> : Ab
     }
 
     abstract fun parseSubmissions(parameters: T): Collection<ValidationResult<S>>
+
+    final override fun parseSubmission(event: DeferrableInteractionEvent, parameters: T): S {
+        throw NotImplementedError("Unneeded")
+    }
 }

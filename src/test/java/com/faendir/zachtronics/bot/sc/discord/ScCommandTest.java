@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,48 +16,21 @@
 
 package com.faendir.zachtronics.bot.sc.discord;
 
-import com.faendir.discord4j.command.parse.CombinedParseResult;
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.discord.command.GameCommand;
-import com.faendir.zachtronics.bot.discord.command.SubCommand;
-import com.faendir.zachtronics.bot.discord.command.security.DiscordUser;
-import com.faendir.zachtronics.bot.model.StringFormat;
 import com.faendir.zachtronics.bot.testutils.RunCommandKt;
-import discord4j.core.GatewayDiscordClient;
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
-import discord4j.core.object.command.ApplicationCommandInteractionOption;
-import discord4j.core.object.command.ApplicationCommandInteractionOptionValue;
-import discord4j.core.object.command.ApplicationCommandOption;
-import discord4j.core.object.entity.User;
-import discord4j.core.spec.EmbedCreateFields;
-import discord4j.core.spec.InteractionFollowupCreateSpec;
-import discord4j.core.spec.InteractionReplyEditSpec;
-import discord4j.core.spec.MessageCreateFields;
-import discord4j.discordjson.json.UserData;
-import discord4j.discordjson.possible.Possible;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @BotTest
-public class SubCommandTest {
+public class ScCommandTest {
 
     @Autowired
     private ScCommand scCommand;
@@ -99,50 +72,50 @@ public class SubCommandTest {
 
     @Test
     @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
-    public void testSubmit() {
-        Map<String, String> args = Map.of("video", "http://example.com",
-                                          "export", "https://pastebin.com/19smCuS8", // valid 45/1/14
-                                          "author", "testMan");
+    public void testSubmitVideo() {
+        Map<String, String> args = Map.of("export", "https://pastebin.com/19smCuS8", // valid 45/1/14
+                                          "author", "testMan",
+                                          "video", "http://example.com");
         String result = runCommand("submit", args);
         assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("45/1/14"));
     }
 
     @Test
     @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
-    public void testArchiveOne() {
+    public void testSubmitOne() {
         // we start at 100/100/100
         Map<String, String> args = Map.of("export", "https://pastebin.com/19smCuS8"); // valid 45/1/14
-        String result = runCommand("archive", args);
+        String result = runCommand("submit", args);
         assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14`"));
     }
 
     @Test
     @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
-    public void testArchiveMany() {
+    public void testSubmitMany() {
         // we start at 100/100/100
         Map<String, String> args = Map.of("export", "https://pastebin.com/kNnfTvMa"); // valid 45/1/14 and 115/1/6
-        String result = runCommand("archive", args);
+        String result = runCommand("submit", args);
         assertTrue(result.contains("Of Pancakes and Spaceships") && result.contains("`45/1/14`") &&
                    result.contains("`115/1/6`"));
     }
 
     @Test
-    public void testArchiveTooMany() {
+    public void testSubmitTooMany() {
         Map<String, String> args = Map.of("export", "https://pastebin.com/Tf9nZ55Z"); // 60x OPAS headers
-        assertThrows(IllegalArgumentException.class, () -> runCommand("archive", args));
+        assertThrows(IllegalArgumentException.class, () -> runCommand("submit", args));
     }
 
     @Test
     @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses SChem")
-    public void testArchiveSudo() {
+    public void testSubmitSudo() {
         String exportLink = "https://raw.githubusercontent.com/spacechem-community-developers/spacechem-archive/" +
                             "master/RESEARCHNET3/published_26_3/156-1-45-B.txt";
-        Map<String, ? extends Serializable> args = Map.of("export", exportLink);
-        String result = runCommand("archive", args);
-        assertTrue(result.contains("156-1-45") && result.contains("Collision"));
+        Map<String, ? extends Serializable> args1 = Map.of("export", exportLink);
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> runCommand("submit", args1));
+        assertTrue(e.getMessage().contains("156-1-45") && e.getMessage().contains("Collision"));
 
-        args = Map.of("export", exportLink, "bypass-validation", true);
-        result = runCommand("archive", args);
+        Map<String, ? extends Serializable> args2 = Map.of("export", exportLink, "bypass-validation", true);
+        String result = runCommand("submit", args2);
         assertTrue(result.contains("Passivation") && result.contains("`156/1/45/B`"));
     }
 

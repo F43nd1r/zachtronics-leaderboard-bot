@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,17 +32,16 @@ import com.faendir.zachtronics.bot.utils.orEmpty
 import com.faendir.zachtronics.bot.utils.smartFormat
 import com.faendir.zachtronics.bot.utils.toMetricsTree
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
-import reactor.core.publisher.Mono
 
 abstract class AbstractSubmitCommand<T, C : Category, P : Puzzle<C>, S : Submission<C, P>, R : Record<C>> : AbstractSubCommand<T>() {
     protected abstract val repository: SolutionRepository<C, P, S, R>
 
     override fun handleEvent(event: DeferrableInteractionEvent, parameters: T): SafeMessageBuilder {
         val submission = parseSubmission(event, parameters)
-        return submitToLeaderboards(submission)
+        return submitToRepository(submission)
     }
 
-    private fun submitToLeaderboards(submission: S): SafeEmbedMessageBuilder {
+    protected fun submitToRepository(submission: S): SafeEmbedMessageBuilder {
         when (val result = repository.submit(submission)) {
             is SubmitResult.Success -> {
                 val beatenCategories: List<C> = result.beatenRecords.flatMap { it.categories }
