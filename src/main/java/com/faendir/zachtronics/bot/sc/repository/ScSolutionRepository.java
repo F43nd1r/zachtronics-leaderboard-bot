@@ -292,7 +292,8 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
 
                     if (candidate.getDisplayLink() == null && solution.getDisplayLink() != null) {
                         // we beat the solution, but we can't replace the video, we keep the solution entry as a video-only
-                        solution.getCategories().clear();
+                        it.set(new ScSolution(solution.getScore(), solution.getAuthor(), solution.getDisplayLink(),
+                                              solution.isOldVideoRNG())); // empty categories
                     }
                     else {
                         it.remove();
