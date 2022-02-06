@@ -41,12 +41,6 @@ public class ScScore implements Score<ScCategory> {
     @NotNull
     @Override
     public String toDisplayString(@NotNull DisplayContext<ScCategory> context) {
-        return toDisplayString(context, "");
-    }
-
-    /** ccc{}/r/ss[/BP] */
-    @NotNull
-    public String toDisplayString(@NotNull DisplayContext<ScCategory> context, String oldRNGMarker) {
         String separator = context.getSeparator();
         String cyclesStr = context.getFormat() != StringFormat.FILE_NAME && cycles >= 100000 ?
                            NumberFormat.getNumberInstance(Locale.ROOT).format(cycles) :
@@ -60,12 +54,12 @@ public class ScScore implements Score<ScCategory> {
         }
 
         return String.format(ScCategory.FORMAT_STRINGS[formatId],
-                             cyclesStr, oldRNGMarker, separator, reactors, separator, symbols, sepFlags(separator));
+                             cyclesStr, separator, reactors, separator, symbols, sepFlags(separator));
     }
 
     /** <tt>ccc/r/ss[/BP]</tt>, tolerates extra <tt>*</tt> */
     private static final Pattern REGEX_BP_SCORE = Pattern.compile(
-            "\\**(?<cycles>[\\d,]+)\\**(?<oldRNG>\\\\\\*)?[/-]" +
+            "\\**(?<cycles>[\\d,]+)\\**[/-]" +
             "\\**(?<reactors>\\d+)\\**[/-]" +
             "\\**(?<symbols>\\d+)\\**" +
             "(?:[/-](?<Bflag>[bB])?(?<Pflag>[pP])?)?");
@@ -97,7 +91,7 @@ public class ScScore implements Score<ScCategory> {
      */
     public static String sepFlags(String separator, boolean bugged, boolean precognitive) {
         if (bugged || precognitive) {
-            String result = String.valueOf(separator);
+            String result = separator;
             if (bugged) result += "B";
             if (precognitive) result += "P";
             return result;

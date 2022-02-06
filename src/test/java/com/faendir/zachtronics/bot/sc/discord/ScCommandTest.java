@@ -37,10 +37,16 @@ public class ScCommandTest {
 
     @Test
     public void testShow() {
-        Map<String, String> args = Map.of("puzzle", "fission I",
+        // Getting Pumped lacks a video for the C record but has it for the S record
+        Map<String, String> args = Map.of("puzzle", "getting pumped",
                                           "category", "C");
         String result = runCommand("show", args);
-        assertTrue(result.contains("Fission I") && result.contains("C") && result.contains("]("));
+        assertTrue(result.contains("Getting Pumped") && result.contains("C") && !result.contains("](http"));
+
+        args = Map.of("puzzle", "getting pumped",
+                      "category", "S");
+        result = runCommand("show", args);
+        assertTrue(result.contains("Getting Pumped") && result.contains("S") && result.contains("](http"));
     }
 
     @Test
@@ -60,10 +66,12 @@ public class ScCommandTest {
         assertEquals(9, StringUtils.countMatches(result, "/1/"));
         assertEquals(2, StringUtils.countMatches(result, "http"));
 
-        args = Map.of("puzzle", "Fission I");
-        result = runCommand("frontier", args); // 2 valid files
-        assertTrue(result.contains("Fission I"));
+        args = Map.of("puzzle", "Get Pump");
+        result = runCommand("frontier", args); // 2 valid solutions, 1 video-only
+        assertTrue(result.contains("Getting Pumped"));
         assertEquals(2, StringUtils.countMatches(result, "[\uD83D\uDCC4](file:/"));
+        assertEquals(3, StringUtils.countMatches(result, "/1/"));
+        assertEquals(2, StringUtils.countMatches(result, "http"));
 
         args = Map.of("puzzle", "Dessication Station");
         result = runCommand("frontier", args); // all 3 C categories

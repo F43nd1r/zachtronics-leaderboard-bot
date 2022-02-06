@@ -49,11 +49,11 @@ public enum ScCategory implements Category {
     RSNP("RSNP", List.of(REACTORS, SYMBOLS, CYCLES, NO_PRECOG), ScTypeSets.PROD, 0b011),
     RSNBP("RSNBP", List.of(REACTORS, SYMBOLS, CYCLES, NO_FLAGS), ScTypeSets.PROD, 0b011);
 
-    /** contains <tt>%s%s%s%d%s%d%s</tt> plus a bunch of <tt>*</tt> most likely */
-    static final String[] FORMAT_STRINGS = {"%s%s%s%d%s%d%s", "%s%s%s%d%s**%d**%s",
-                                            "%s%s%s**%d**%s%d%s", "%s%s%s**%d**%s**%d**%s",
-                                            "**%s**%s%s%d%s%d%s", "**%s**%s%s%d%s**%d**%s",
-                                            "**%s**%s%s**%d**%s%d%s", "**%s**%s%s**%d**%s**%d**%s"};
+    /** contains <tt>%s%s%d%s%d%s</tt> plus a bunch of <tt>*</tt> most likely */
+    static final String[] FORMAT_STRINGS = {"%s%s%d%s%d%s", "%s%s%d%s**%d**%s",
+                                            "%s%s**%d**%s%d%s", "%s%s**%d**%s**%d**%s",
+                                            "**%s**%s%d%s%d%s", "**%s**%s%d%s**%d**%s",
+                                            "**%s**%s**%d**%s%d%s", "**%s**%s**%d**%s**%d**%s"};
 
     private final String displayName;
     private final List<Metric> metrics;

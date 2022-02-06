@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.sc.repository;
 
-import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
@@ -40,7 +39,7 @@ public class SolRepoFindTest {
     public void testGoodRecords() {
         ScRecord goodRecord = repository.find(ScPuzzle.research_example_1, ScCategory.C);
         assertNotNull(goodRecord);
-        goodRecord = repository.find(ScPuzzle.published_2_1, ScCategory.S);
+        goodRecord = repository.find(ScPuzzle.published_40_3, ScCategory.S);
         assertNotNull(goodRecord);
         goodRecord = repository.find(ScPuzzle.sensing_6, ScCategory.RC);
         assertNotNull(goodRecord);

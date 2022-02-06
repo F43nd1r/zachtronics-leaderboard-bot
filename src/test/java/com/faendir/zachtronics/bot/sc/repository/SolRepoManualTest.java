@@ -22,6 +22,7 @@ import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.sc.model.*;
+import com.faendir.zachtronics.bot.utils.LambdaUtils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -40,12 +41,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static com.faendir.zachtronics.bot.sc.model.ScCategory.*;
-import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.groupingBy;
 
 @BotTest
@@ -64,8 +63,8 @@ class SolRepoManualTest {
                     repository.findCategoryHolders(p, true)
                               .stream()
                               .map(CategoryRecord::getRecord)
-                              .filter(not(ScRecord::isOldVideoRNG)) // would be added with no asterisk
-                              .mapMulti(SolRepoManualTest::addRecordToSubmissions)
+                              .filter(r -> r.getDataPath() != null)
+                              .map(SolRepoManualTest::recordToSubmissions)
                               .<ValidationResult<ScSubmission>>map(ValidationResult.Valid::new)
                               .toList();
 
@@ -76,17 +75,12 @@ class SolRepoManualTest {
         System.out.println("Done");
     }
 
-    private static void addRecordToSubmissions(@NotNull ScRecord record, Consumer<ScSubmission> cons) {
-        if (record.getDataPath() != null) {
-            try {
-                String data = Files.readString(record.getDataPath());
-                ScSubmission s = new ScSubmission(record.getPuzzle(), record.getScore(), record.getAuthor(),
-                                                  record.getDisplayLink(), data);
-                cons.accept(s);
-            }
-            catch (IOException ignored) {
-            }
-        }
+    @NotNull
+    private static ScSubmission recordToSubmissions(@NotNull ScRecord record) {
+        assert record.getDataPath() != null;
+        String data = LambdaUtils.<Path, String>uncheckIOException(Files::readString).apply(record.getDataPath());
+        return new ScSubmission(record.getPuzzle(), record.getScore(), record.getAuthor(),
+                                record.getDisplayLink(), data);
     }
 
     @Test
@@ -120,11 +114,11 @@ class SolRepoManualTest {
                                           .map(ScCategory::name)
                                           .collect(Collectors.joining(","));
 
-                    String[] csvRecord = new String[]{record.getScore().toDisplayString(),
-                                                      author,
-                                                      record.getDisplayLink(),
-                                                      record.isOldVideoRNG() ? "linux" : null,
-                                                      categories};
+                    String[] csvRecord = {record.getScore().toDisplayString(),
+                                          author,
+                                          record.getDisplayLink(),
+                                          record.getDataPath() == null ? "video" : null,
+                                          categories};
                     writer.writeNext(csvRecord, false);
                 }
             }
@@ -152,6 +146,31 @@ class SolRepoManualTest {
                          .add(category);
             }
             repository.marshalSolutions(solutions, puzzlePath);
+        }
+    }
+
+    @Test
+    public void markVideoOnly() throws IOException {
+        Path repoPath = Paths.get("../spacechem/archive");
+
+        for (ScPuzzle puzzle : ScPuzzle.values()) {
+            Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
+            List<ScSolution> solutions = repository.unmarshalSolutions(puzzlePath);
+            if (solutions.isEmpty())
+                continue;
+
+            boolean edited = false;
+            for (ListIterator<ScSolution> it = solutions.listIterator(); it.hasNext(); )
+            {
+                ScSolution solution = it.next();
+                Path dataPath = repository.makeArchivePath(puzzlePath, solution.getScore());
+                if (!Files.exists(dataPath)) {
+                    it.set(new ScSolution(solution.getScore(), solution.getAuthor(), solution.getDisplayLink(), true));
+                    edited = true;
+                }
+            }
+            if (edited)
+                repository.marshalSolutions(solutions, puzzlePath);
         }
     }
 

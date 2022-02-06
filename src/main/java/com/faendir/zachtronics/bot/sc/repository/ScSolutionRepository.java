@@ -112,7 +112,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         Map<ScCategory, ScRecord> videoRecordMap = new EnumMap<>(ScCategory.class);
         List<ScRecord> videoRecords = solutions.stream()
                                                .filter(s -> s.getDisplayLink() != null)
-                                               .map(s -> s.extendToRecord(puzzle, null, null)) // no export
+                                               .map(s -> s.extendToRecord(puzzle, null, null)) // no export needed
                                                .toList();
         for (ScSolution solution: solutions) {
             ScRecord record = solution.extendToRecord(puzzle,
@@ -287,13 +287,14 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
 
                     // remove beaten score and get categories
                     candidate.getCategories().addAll(solution.getCategories());
-                    Files.deleteIfExists(makeArchivePath(puzzlePath, solution.getScore())); // video-only sols have no data
+                    if (!solution.isVideoOnly()) // video-only sols have no data
+                        Files.delete(makeArchivePath(puzzlePath, solution.getScore()));
                     beatenCategoryRecords.add(solution.extendToCategoryRecord(puzzle, null, null)); // the beaten record has no data anymore
 
                     if (candidate.getDisplayLink() == null && solution.getDisplayLink() != null) {
                         // we beat the solution, but we can't replace the video, we keep the solution entry as a video-only
                         it.set(new ScSolution(solution.getScore(), solution.getAuthor(), solution.getDisplayLink(),
-                                              solution.isOldVideoRNG())); // empty categories
+                                              true)); // empty categories
                     }
                     else {
                         it.remove();

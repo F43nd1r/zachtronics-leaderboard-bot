@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ public class ScRecord implements Record<ScCategory> {
     @NotNull ScScore score;
     @NotNull String author;
     String displayLink;
-    boolean oldVideoRNG;
     /** <tt>null</tt> if the solution holds a lb spot but has since been out-pareto'd */
     String dataLink;
     /** <tt>null</tt> if the solution holds a lb spot but has since been out-pareto'd */
@@ -47,7 +46,7 @@ public class ScRecord implements Record<ScCategory> {
      */
     @NotNull
     public String toDisplayString(@NotNull DisplayContext<ScCategory> context, String reactorPrefix) {
-        String scoreAuthor = "(" + score.toDisplayString(context, oldVideoRNG ? "\\*" : "") + ") " + author;
+        String scoreAuthor = "(" + score.toDisplayString(context) + ") " + author;
         return Markdown.fileLinkOrEmpty(dataLink) +
                reactorPrefix + Markdown.linkOrText(scoreAuthor, displayLink);
     }

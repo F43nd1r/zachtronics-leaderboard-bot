@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import com.faendir.zachtronics.bot.sc.model.ScScore;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Objects;
@@ -37,15 +36,15 @@ public class ScSolution implements Solution<ScCategory, ScPuzzle, ScScore, ScRec
     @NotNull ScScore score;
     @NotNull String author;
     String displayLink;
-    boolean oldVideoRNG;
+    boolean videoOnly;
     /** empty if it holds no categories */
     EnumSet<ScCategory> categories = EnumSet.noneOf(ScCategory.class);
 
     public ScRecord extendToRecord(ScPuzzle puzzle, String dataLink, Path dataPath) {
-        if (dataPath != null && Files.exists(dataPath))
-            return new ScRecord(puzzle, score, author, displayLink, oldVideoRNG, dataLink, dataPath);
+        if (videoOnly || dataPath == null)
+            return new ScRecord(puzzle, score, author, displayLink, null, null);
         else
-            return new ScRecord(puzzle, score, author, displayLink, oldVideoRNG, null, null);
+            return new ScRecord(puzzle, score, author, displayLink, dataLink, dataPath);
     }
 
     @Override
@@ -59,12 +58,12 @@ public class ScSolution implements Solution<ScCategory, ScPuzzle, ScScore, ScRec
         ScScore score = Objects.requireNonNull(ScScore.parseBPScore(fields[0]));
         String author = fields[1];
         String displayLink = fields[2];
-        boolean oldVideoRNG = fields[3] != null;
+        boolean videoOnly = fields[3] != null;
         String categories = fields[4];
 
-        ScSolution solution = new ScSolution(score, author, displayLink, oldVideoRNG);
+        ScSolution solution = new ScSolution(score, author, displayLink, videoOnly);
         if (categories != null)
-            Pattern.compile(",").splitAsStream(categories).map(ScCategory::valueOf).forEach(solution.getCategories()::add);
+            Pattern.compile(",").splitAsStream(categories).map(ScCategory::valueOf).forEach(solution.categories::add);
         return solution;
     }
 
@@ -75,7 +74,7 @@ public class ScSolution implements Solution<ScCategory, ScPuzzle, ScScore, ScRec
                 score.toDisplayString(),
                 author,
                 displayLink,
-                oldVideoRNG ? "linux" : null,
+                videoOnly ? "video" : null,
                 categories.stream()
                           .map(ScCategory::name)
                           .collect(Collectors.joining(","))
