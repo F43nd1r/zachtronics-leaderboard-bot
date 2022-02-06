@@ -59,6 +59,8 @@ public class ScSolutionMetadata {
             puzzle = ScPuzzle.parsePuzzle(puzzleStr).orElseThrow();
         }
 
+        String author = decode(m.group("author"));
+
         ScScore score = ScScore.parseBPScore(m);
         if (score.getCycles() == 0) {
             throw new IllegalArgumentException("Invalid score");
@@ -66,7 +68,7 @@ public class ScSolutionMetadata {
 
         String description = decode(m.group("description"));
 
-        return new ScSolutionMetadata(puzzle, m.group("author"), score, description);
+        return new ScSolutionMetadata(puzzle, author, score, description);
     }
 
     private static String decode(String field) {
