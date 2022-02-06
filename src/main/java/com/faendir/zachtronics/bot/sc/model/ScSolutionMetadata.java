@@ -61,7 +61,7 @@ public class ScSolutionMetadata {
 
         String author = decode(m.group("author"));
 
-        ScScore score = ScScore.parseBPScore(m);
+        ScScore score = ScScore.parseScore(m);
         if (score.getCycles() == 0) {
             throw new IllegalArgumentException("Invalid score");
         }

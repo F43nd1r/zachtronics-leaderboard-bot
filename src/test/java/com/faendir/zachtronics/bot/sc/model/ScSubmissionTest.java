@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ class ScSubmissionTest {
     public void testCopyBad() {
         for (String name : new String[]{"name (copy)", "'comma, comma (copy)'"}) {
             String content = "SOLUTION:Of Pancakes and Spaceships,12345ieee,50-50-50," + name;
-            ScSubmission result = ScSubmission.fromDataNoValidation(content, null);
+            ScSubmission result = ScSubmission.fromDataNoValidation(content, null, null);
             ScSubmission expected = new ScSubmission(ScPuzzle.research_example_1, new ScScore(50, 50, 50, false, false),
                                                      "12345ieee", null, content.replace(" (copy)", ""));
             assertEquals(expected, result);

@@ -57,6 +57,12 @@ public class ScScore implements Score<ScCategory> {
                              cyclesStr, separator, reactors, separator, symbols, sepFlags(separator));
     }
 
+    /** </tt>ccc-r-ss,[/BP]</tt>, includes comma in any case */
+    @NotNull
+    public String toExportString() {
+        return String.format("%d-%d-%d,%s", cycles, reactors, symbols, sepFlags("/"));
+    }
+
     /** <tt>ccc/r/ss[/BP]</tt>, tolerates extra <tt>*</tt> */
     private static final Pattern REGEX_BP_SCORE = Pattern.compile(
             "\\**(?<cycles>[\\d,]+)\\**[/-]" +
@@ -66,14 +72,14 @@ public class ScScore implements Score<ScCategory> {
 
     /** <tt>ccc/r/ss[/BP]</tt>, tolerates extra <tt>*</tt> */
     @Nullable
-    public static ScScore parseBPScore(@NotNull String string) {
+    public static ScScore parseScore(@NotNull String string) {
         Matcher m = REGEX_BP_SCORE.matcher(string);
-        return m.matches() ? parseBPScore(m) : null;
+        return m.matches() ? parseScore(m) : null;
     }
 
     /** we assume m matches */
     @NotNull
-    public static ScScore parseBPScore(@NotNull Matcher m) {
+    public static ScScore parseScore(@NotNull Matcher m) {
         int cycles = Integer.parseInt(m.group("cycles").replace(",", ""));
         int reactors = Integer.parseInt(m.group("reactors"));
         int symbols = Integer.parseInt(m.group("symbols"));

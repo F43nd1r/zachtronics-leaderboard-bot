@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,9 +39,10 @@ public class ScSubmission implements Submission<ScCategory, ScPuzzle> {
      * @throws IllegalArgumentException if we can't correctly parse metadata
      */
     @NotNull
-    public static ScSubmission fromDataNoValidation(@NotNull String data, @Nullable ScPuzzle puzzle) throws IllegalArgumentException {
+    public static ScSubmission fromDataNoValidation(@NotNull String data, @Nullable ScPuzzle puzzle, @Nullable String displayLink)
+    throws IllegalArgumentException {
         ScSolutionMetadata metadata = ScSolutionMetadata.fromHeader(data, puzzle);
-        return metadata.extendToSubmission(null, data);
+        return metadata.extendToSubmission(displayLink, data);
     }
 
     @NotNull

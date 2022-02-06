@@ -55,7 +55,7 @@ public class ScSolution implements Solution<ScCategory, ScPuzzle, ScScore, ScRec
     @NotNull
     public static ScSolution unmarshal(@NotNull String[] fields) {
         assert fields.length == 5;
-        ScScore score = Objects.requireNonNull(ScScore.parseBPScore(fields[0]));
+        ScScore score = Objects.requireNonNull(ScScore.parseScore(fields[0]));
         String author = fields[1];
         String displayLink = fields[2];
         boolean videoOnly = fields[3] != null;

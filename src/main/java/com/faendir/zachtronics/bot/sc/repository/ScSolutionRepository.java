@@ -278,10 +278,10 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                     return new SubmitResult.NothingBeaten<>(Collections.singletonList(categoryRecord));
                 }
                 else if (r < 0) {
-                    // allow same-score author/video changes if you are the original author or you bring a video
+                    // allow same-score changes if you bring a video or you are the original author and don't regress the video state
                     if (candidate.getScore().equals(solution.getScore()) &&
-                        !candidate.getAuthor().equals(solution.getAuthor()) &&
-                        candidate.getDisplayLink() == null) {
+                        candidate.getDisplayLink() == null &&
+                        !(candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null)) {
                         return new SubmitResult.AlreadyPresent<>();
                     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@
 package com.faendir.zachtronics.bot.sc.repository;
 
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
-import com.faendir.zachtronics.bot.sc.model.*;
+import com.faendir.zachtronics.bot.sc.model.ScCategory;
+import com.faendir.zachtronics.bot.sc.model.ScRecord;
+import com.faendir.zachtronics.bot.sc.model.ScScore;
+import com.faendir.zachtronics.bot.sc.model.ScSubmission;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +35,7 @@ public class SolRepoSubmitTest {
     private ScSolutionRepository repository;
 
     @Test
-    public void testArchiveScore() {
+    public void testSubmitScore() {
         // we start with a 100/100/100
         ScScore score = new ScScore(100, 100, 100, true, true);
         assertInstanceOf(SubmitResult.NothingBeaten.class, doSubmitScore(score)); // our score is a BP, fail
@@ -59,28 +61,46 @@ public class SolRepoSubmitTest {
         ScScore score = new ScScore(50, 50, 50, false, false);
         assertInstanceOf(SubmitResult.Success.class, doSubmitScore(score)); // 50/50/50
 
-        String content = "SOLUTION:A Most Unfortunate Malfunction,12345ieee,45-1-14\nbunch of stuff...";
-        assertInstanceOf(SubmitResult.Success.class, doSubmitData(content)); // 45/1/14
-        assertInstanceOf(SubmitResult.AlreadyPresent.class, doSubmitData(content)); // identical
+        String data = "SOLUTION:A Most Unfortunate Malfunction,12345ieee,45-1-14\nbunch of stuff...";
+        assertInstanceOf(SubmitResult.Success.class, doSubmitData(data)); // 45/1/14
+        assertInstanceOf(SubmitResult.AlreadyPresent.class, doSubmitData(data)); // identical
 
-        content = "SOLUTION:A Most Unfortunate Malfunction,12345ieee,45-1-14\ndifferent stuff...";
-        assertInstanceOf(SubmitResult.Success.class, doSubmitData(content)); // changed content, I can
+        data = "SOLUTION:A Most Unfortunate Malfunction,12345ieee,45-1-14\ndifferent stuff...";
+        assertInstanceOf(SubmitResult.Success.class, doSubmitData(data)); // changed data, I can
 
-        content = "SOLUTION:A Most Unfortunate Malfunction,BadGuy,45-1-14\ndifferent stuff...";
-        assertInstanceOf(SubmitResult.AlreadyPresent.class, doSubmitData(content)); // stealing is bad
+        data = "SOLUTION:A Most Unfortunate Malfunction,BadGuy,45-1-14\ndifferent stuff...";
+        assertInstanceOf(SubmitResult.AlreadyPresent.class, doSubmitData(data)); // stealing is bad
 
-        content = "SOLUTION:A Most Unfortunate Malfunction,BadGuy,50-1-50\nsome more stuff...";
-        assertInstanceOf(SubmitResult.NothingBeaten.class, doSubmitData(content)); // just give up, man
+        data = "SOLUTION:A Most Unfortunate Malfunction,BadGuy,50-1-50\nsome more stuff...";
+        assertInstanceOf(SubmitResult.NothingBeaten.class, doSubmitData(data)); // just give up, man
+    }
+
+    @Test
+    public void testSubmitDataVideo() {
+        // we start at 100/100/100
+        String data = "SOLUTION:A Most Unfortunate Malfunction,12345ieee,100-100-100\nhas video";
+        assertInstanceOf(SubmitResult.Success.class, doSubmitDataVideo(data, "http://my.video")); // add video
+
+        data = "SOLUTION:A Most Unfortunate Malfunction,AnotherGuy,100-100-100\ndifferent video";
+        assertInstanceOf(SubmitResult.Success.class, doSubmitDataVideo(data, "http://his.video")); // with a video you can steal
+
+        data = "SOLUTION:A Most Unfortunate Malfunction,AnotherGuy,100-100-100\nchanged data";
+        assertInstanceOf(SubmitResult.AlreadyPresent.class, doSubmitDataVideo(data, null)); // cannot regress video state
     }
 
     @NotNull
     private SubmitResult<ScRecord, ScCategory> doSubmitScore(@NotNull ScScore score) {
-        String content = "SOLUTION:A Most Unfortunate Malfunction," + score.toDisplayString(DisplayContext.fileName());
-        return repository.submit(new ScSubmission(ScPuzzle.bonding_boss, score, "12345ieee", null, content));
+        String data = "SOLUTION:A Most Unfortunate Malfunction,12345ieee," + score.toExportString();
+        return doSubmitData(data);
     }
 
     @NotNull
     private SubmitResult<ScRecord, ScCategory> doSubmitData(String data) {
-        return repository.submit(ScSubmission.fromDataNoValidation(data, null));
+        return doSubmitDataVideo(data, null);
+    }
+
+    @NotNull
+    private SubmitResult<ScRecord, ScCategory> doSubmitDataVideo(String data, String displayLink) {
+        return repository.submit(ScSubmission.fromDataNoValidation(data, null, displayLink));
     }
 }
