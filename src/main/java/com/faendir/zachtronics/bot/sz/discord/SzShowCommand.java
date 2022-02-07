@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.sz.discord;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
+import com.faendir.discord4j.command.annotation.AutoComplete;
 import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractShowCommand;
@@ -61,6 +62,7 @@ public class SzShowCommand extends AbstractShowCommand<SzShowCommand.ShowData, S
         @NonNull SzCategory category;
 
         public ShowData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `fake surv`, `HD`")
+                        @AutoComplete(SzPuzzleAutoCompletionProvider.class)
                         @Converter(SzPuzzleConverter.class) @NonNull SzPuzzle puzzle,
                         @Description("Category. E.g. `CP`, `LC`")
                         @NonNull SzCategory category) {

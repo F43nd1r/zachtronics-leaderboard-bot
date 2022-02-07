@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ class OmFrontierCommand(override val repository: SolutionRepository<OmCategory, 
 @ApplicationCommand(name = "frontier", description = "Displays the whole pareto frontier", subCommand = true)
 data class FrontierCommand(
     @Description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")
-    @Converter(PuzzleConverter::class)
-    @AutoComplete(PuzzleAutoCompletionProvider::class)
+    @Converter(OmPuzzleConverter::class)
+    @AutoComplete(OmPuzzleAutoCompletionProvider::class)
     val puzzle: OmPuzzle
 )

@@ -129,8 +129,8 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Abstract
 @ApplicationCommand(name = "reverify", description = "Recompute metrics based on filters", subCommand = true)
 data class Reverify(
     val type: OmType?,
-    @Converter(PuzzleConverter::class)
-    @AutoComplete(PuzzleAutoCompletionProvider::class)
+    @Converter(OmPuzzleConverter::class)
+    @AutoComplete(OmPuzzleAutoCompletionProvider::class)
     val puzzle: OmPuzzle?,
     val part: OmScorePart?,
     @Description("full score of the submission, e.g. 65g/80c/12a/4i/4h/4w/12r")

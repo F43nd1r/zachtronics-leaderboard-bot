@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.sz.discord;
 
 import com.faendir.discord4j.command.annotation.ApplicationCommand;
+import com.faendir.discord4j.command.annotation.AutoComplete;
 import com.faendir.discord4j.command.annotation.Converter;
 import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractRebuildCommand;
@@ -55,6 +56,7 @@ public class SzRebuildCommand extends AbstractRebuildCommand<SzRebuildCommand.Re
         @NotNull SzPuzzle puzzle;
 
         public RebuildData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
+                           @AutoComplete(SzPuzzleAutoCompletionProvider.class)
                            @Converter(SzPuzzleConverter.class) @NonNull SzPuzzle puzzle) {
             this.puzzle = puzzle;
         }

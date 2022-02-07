@@ -56,8 +56,8 @@ class OmDeleteCommand(private val repository: OmSolutionRepository) : AbstractSu
 
 @ApplicationCommand(name = "delete", description = "Remove a submission", subCommand = true)
 data class Delete(
-    @Converter(PuzzleConverter::class)
-    @AutoComplete(PuzzleAutoCompletionProvider::class)
+    @Converter(OmPuzzleConverter::class)
+    @AutoComplete(OmPuzzleAutoCompletionProvider::class)
     val puzzle: OmPuzzle,
     @Description("full score of the submission, e.g. 65g/80c/12a/4i/4h/4w/12r")
     val score: String,

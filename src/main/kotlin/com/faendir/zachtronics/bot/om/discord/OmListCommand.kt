@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ import com.faendir.discord4j.command.annotation.Description
 import com.faendir.discord4j.command.parse.ApplicationCommandParser
 import com.faendir.zachtronics.bot.discord.command.AbstractListCommand
 import com.faendir.zachtronics.bot.om.OmQualifier
-import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import org.springframework.stereotype.Component
 
@@ -41,8 +41,8 @@ class OmListCommand(override val repository: OmSolutionRepository) :
 @ApplicationCommand(name = "list", description = "List records", subCommand = true)
 data class ListCommand(
     @Description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")
-    @Converter(PuzzleConverter::class)
-    @AutoComplete(PuzzleAutoCompletionProvider::class)
+    @Converter(OmPuzzleConverter::class)
+    @AutoComplete(OmPuzzleAutoCompletionProvider::class)
     val puzzle: OmPuzzle
 )
 

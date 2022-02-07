@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 package com.faendir.zachtronics.bot.om.discord
 
-import com.faendir.discord4j.command.parse.OptionConverter
-import com.faendir.discord4j.command.parse.SingleParseResult
+import com.faendir.discord4j.command.parse.AutoCompletionProvider
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
-import com.faendir.zachtronics.bot.utils.getSingleMatchingPuzzle
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
+import com.faendir.zachtronics.bot.utils.fuzzyMatch
 
-class PuzzleConverter : OptionConverter<String, OmPuzzle> {
-    override fun fromValue(context: ChatInputInteractionEvent, value: String): SingleParseResult<OmPuzzle> =
-        OmPuzzle.values().getSingleMatchingPuzzle(value)
+class OmPuzzleAutoCompletionProvider : AutoCompletionProvider {
+    private val list = OmPuzzle.values().toList()
+    override fun autoComplete(partial: String): List<String> {
+        return list.fuzzyMatch(partial) { displayName }.map { it.displayName }
+    }
 }

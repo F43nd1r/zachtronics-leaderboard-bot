@@ -425,11 +425,7 @@ public enum ScPuzzle implements Puzzle<ScCategory> {
 
     @NotNull
     public static SingleParseResult<ScPuzzle> parsePuzzle(@NotNull String name) {
-        return Arrays.stream(ScPuzzle.values())
-                     .filter(p -> p.displayName.equalsIgnoreCase(name))
-                     .findFirst()
-                     .<SingleParseResult<ScPuzzle>>map(SingleParseResult.Success::new)
-                     .orElseGet(() -> UtilsKt.getSingleMatchingPuzzle(ScPuzzle.values(), name));
+        return UtilsKt.getSingleMatchingPuzzle(ScPuzzle.values(), name);
     }
 
     @NotNull
