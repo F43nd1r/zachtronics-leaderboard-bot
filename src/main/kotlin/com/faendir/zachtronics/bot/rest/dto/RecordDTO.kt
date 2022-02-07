@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.rest.dto
 interface RecordDTO<SCORE> {
     val score: SCORE?
     val fullFormattedScore: String?
+    val author: String?
     val gif: String?
     val solution: String?
     val smartFormattedCategories: String?

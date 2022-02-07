@@ -19,6 +19,7 @@ import Metric from "./Metric"
 export default interface RecordDTO<SCORE> {
     score?: SCORE
     fullFormattedScore?: string
+    author?: string
     gif?: string
     solution?: string
     smartFormattedCategories?: string

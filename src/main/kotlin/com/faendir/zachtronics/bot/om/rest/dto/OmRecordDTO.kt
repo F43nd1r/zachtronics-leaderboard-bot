@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,9 @@ data class OmRecordDTO(
     override val solution: String?,
     val categoryIds: List<String>?,
     override val smartFormattedCategories: String?
-) : RecordDTO<OmScoreDTO>
+) : RecordDTO<OmScoreDTO> {
+    override val author: String? = null
+}
 
 fun CategoryRecord<OmRecord, OmCategory>.toDTO() =
     OmRecordDTO(

@@ -70,7 +70,8 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
     const getMarkerColors = (...metrics: Metric<SCORE>[]) => records.map((record) => (records.some((r) => isStrictlyBetterInMetrics(r, record, metrics)) ? "#00000000" : getColor(record)))
 
     const common: Partial<PlotData> = {
-        hovertext: records.map((record: RecordDTO<SCORE>) => `${record.fullFormattedScore ?? "none"}<br>${record.smartFormattedCategories}`),
+        hovertext: records.map((record: RecordDTO<SCORE>) => 
+        `${record.fullFormattedScore ?? "none"}${record.author ? "<br>by " + record.author : ""}<br>${record.smartFormattedCategories}`),
         x: records.map((record) => x.get(record.score) ?? 0),
         y: records.map((record) => y.get(record.score) ?? 0),
         mode: "markers",

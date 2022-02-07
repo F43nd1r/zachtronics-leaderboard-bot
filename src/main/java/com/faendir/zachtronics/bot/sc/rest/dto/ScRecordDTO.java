@@ -32,6 +32,7 @@ import java.util.Set;
 public class ScRecordDTO implements RecordDTO<ScScoreDTO> {
     @NotNull ScScoreDTO score;
     @NotNull String fullFormattedScore;
+    @NotNull String author;
     @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
@@ -43,6 +44,7 @@ public class ScRecordDTO implements RecordDTO<ScScoreDTO> {
         return new ScRecordDTO(
                 ScScoreDTO.fromScore(record.getScore()),
                 record.getScore().toDisplayString(DisplayContext.plainText()),
+                record.getAuthor(),
                 record.getDisplayLink(),
                 record.getDataLink(),
                 UtilsKt.smartFormat(categories, UtilsKt.toMetricsTree(record.getPuzzle().getSupportedCategories()))
@@ -53,6 +55,7 @@ public class ScRecordDTO implements RecordDTO<ScScoreDTO> {
     public static ScRecordDTO fromRecord(@NotNull ScRecord record) {
         return new ScRecordDTO(ScScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
+                               record.getAuthor(),
                                record.getDisplayLink(),
                                record.getDataLink(),
                                null);
