@@ -59,7 +59,7 @@ public class SzSolution implements Solution<SzCategory, SzPuzzle, SzScore, SzRec
 
         SzSolution solution = new SzSolution(score, author);
         if (categories != null)
-            Pattern.compile(",").splitAsStream(categories).map(SzCategory::valueOf).forEach(solution.getCategories()::add);
+            Pattern.compile(",").splitAsStream(categories).map(SzCategory::valueOf).forEach(solution.categories::add);
         return solution;
     }
 

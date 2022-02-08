@@ -67,8 +67,7 @@ public class ScSubmitCommand extends AbstractMultiSubmitCommand<ScSubmitCommand.
             ValidationResult<ScSubmission> result = results.iterator().next();
             if (result instanceof ValidationResult.Valid<ScSubmission>) {
                 ScSubmission submission = result.getSubmission();
-                ScSubmission videoSubmission = new ScSubmission(submission.getPuzzle(), submission.getScore(), submission.getAuthor(), parameters.video,
-                                                                submission.getData());
+                ScSubmission videoSubmission = submission.withDisplayLink(parameters.video);
                 return Collections.singleton(new ValidationResult.Valid<>(videoSubmission));
             }
             else {

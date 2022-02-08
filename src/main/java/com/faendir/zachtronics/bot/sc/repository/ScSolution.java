@@ -23,6 +23,7 @@ import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import lombok.Value;
+import lombok.With;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
@@ -35,8 +36,8 @@ import java.util.stream.Collectors;
 public class ScSolution implements Solution<ScCategory, ScPuzzle, ScScore, ScRecord> {
     @NotNull ScScore score;
     @NotNull String author;
-    String displayLink;
-    boolean videoOnly;
+    @With String displayLink;
+    @With boolean videoOnly;
     /** empty if it holds no categories */
     EnumSet<ScCategory> categories = EnumSet.noneOf(ScCategory.class);
 

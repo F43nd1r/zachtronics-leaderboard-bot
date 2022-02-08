@@ -21,6 +21,7 @@ import com.faendir.zachtronics.bot.sc.validator.SChem;
 import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Value;
+import lombok.With;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +33,7 @@ public class ScSubmission implements Submission<ScCategory, ScPuzzle> {
     @NotNull ScPuzzle puzzle;
     @NotNull ScScore score;
     @NotNull String author;
-    String displayLink;
+    @With String displayLink;
     @NotNull String data;
 
     /**

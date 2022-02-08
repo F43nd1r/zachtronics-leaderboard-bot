@@ -165,7 +165,7 @@ class SolRepoManualTest {
                 ScSolution solution = it.next();
                 Path dataPath = repository.makeArchivePath(puzzlePath, solution.getScore());
                 if (!Files.exists(dataPath)) {
-                    it.set(new ScSolution(solution.getScore(), solution.getAuthor(), solution.getDisplayLink(), true));
+                    it.set(solution.withVideoOnly(true));
                     edited = true;
                 }
             }
@@ -225,16 +225,16 @@ class SolRepoManualTest {
                                                       solution.getScore().getSymbols(), false, false);
                     String searchAuthor = solution.getAuthor();
                     matchingVideo = puzzleSubmissions.stream()
-                                                            .filter(s -> s.getScore().equals(searchScore) &&
-                                                                         s.getAuthor().equalsIgnoreCase(searchAuthor))
-                                                            .findFirst()
-                                                            .map(ScSubmission::getDisplayLink)
-                                                            .orElse(null);
+                                                     .filter(s -> s.getScore().equals(searchScore) &&
+                                                                  s.getAuthor().equalsIgnoreCase(searchAuthor))
+                                                     .findFirst()
+                                                     .map(ScSubmission::getDisplayLink)
+                                                     .orElse(null);
                 }
 
                 if (matchingVideo != null) {
                     String cleanVideoLink = matchingVideo.replaceAll("&hd=1|hd=1&|&feature=share|&feature=related", "");
-                    newSolutions.add(new ScSolution(solution.getScore(), solution.getAuthor(), cleanVideoLink, false));
+                    newSolutions.add(solution.withDisplayLink(cleanVideoLink));
                     edited = true;
                 }
                 else {
