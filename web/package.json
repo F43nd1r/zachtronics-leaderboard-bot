@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@types/jest": "27.4.0",
-    "@types/node": "16.11.23",
+    "@types/node": "16.11.24",
     "@types/plotly.js": "1.54.20",
     "@types/react": "17.0.39",
     "@types/react-dom": "17.0.11",
