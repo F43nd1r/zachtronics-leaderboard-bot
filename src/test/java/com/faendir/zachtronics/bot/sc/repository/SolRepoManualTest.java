@@ -44,7 +44,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static com.faendir.zachtronics.bot.sc.model.ScCategory.*;
 import static java.util.stream.Collectors.groupingBy;
 
 @BotTest
@@ -128,14 +127,15 @@ class SolRepoManualTest {
     @Test
     public void tagNewCategories() throws IOException {
         Path repoPath = Paths.get("../spacechem/archive");
-        List<ScCategory> newCategories = List.of(CNBP, SNBP, RCNBP, RSNBP);
+        List<ScCategory> categories = List.of(ScCategory.values());
+        List<ScPuzzle> puzzles = List.of(ScPuzzle.values());
 
-        for (ScPuzzle puzzle : ScPuzzle.values()) {
+        for (ScPuzzle puzzle : puzzles) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
             List<ScSolution> solutions = repository.unmarshalSolutions(puzzlePath);
             if (solutions.isEmpty())
                 continue;
-            for (ScCategory category : newCategories) {
+            for (ScCategory category : categories) {
                 if (!puzzle.getSupportedCategories().contains(category))
                     continue;
                 solutions.stream()

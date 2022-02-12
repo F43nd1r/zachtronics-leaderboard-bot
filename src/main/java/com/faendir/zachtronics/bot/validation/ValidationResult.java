@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,19 @@ package com.faendir.zachtronics.bot.validation;
 
 import com.faendir.zachtronics.bot.model.Submission;
 import lombok.Value;
+import org.jetbrains.annotations.NotNull;
 
 public sealed interface ValidationResult<S extends Submission<?, ?>> permits ValidationResult.Valid,
                                                                              ValidationResult.Invalid,
                                                                              ValidationResult.Unparseable {
-    S getSubmission();
-    String getMessage();
+    @NotNull S getSubmission();
+    @NotNull String getMessage();
 
     @Value
     final class Valid<S extends Submission<?, ?>> implements ValidationResult<S> {
-        S submission;
+        @NotNull S submission;
 
+        @NotNull
         @Override
         public String getMessage() {
             throw new IllegalArgumentException();
@@ -38,14 +40,15 @@ public sealed interface ValidationResult<S extends Submission<?, ?>> permits Val
 
     @Value
     final class Invalid<S extends Submission<?, ?>> implements ValidationResult<S> {
-        S submission;
-        String message;
+        @NotNull S submission;
+        @NotNull String message;
     }
 
     @Value
     final class Unparseable<S extends Submission<?, ?>> implements ValidationResult<S> {
-        String message;
+        @NotNull String message;
 
+        @NotNull
         @Override
         public S getSubmission() {
             throw new IllegalArgumentException(message);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,8 +64,12 @@ public class SChem {
                                                                String author)
             throws SChemException {
 
-        if (result.getLevelName() == null || result.getAuthor() == null || result.getCycles() == null)
+        if (result.getLevelName() == null || result.getAuthor() == null) {
+            assert result.getError() != null;
             return new ValidationResult.Unparseable<>(result.getError());
+        }
+        if (result.getCycles() == null) // there is no associated error on the schem side
+            return new ValidationResult.Unparseable<>("Missing expected cycles for \"" + result.getSolutionName() + "\"");
         assert result.getExport() != null;
 
         // puzzle
