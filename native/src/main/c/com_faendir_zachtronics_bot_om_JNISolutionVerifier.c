@@ -3,14 +3,16 @@
 #include <limits.h>
 
 JNIEXPORT jlong JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_prepareVerifier
-    (JNIEnv *env, jclass cls, jstring jPuzzle, jstring jSolution) {
+    (JNIEnv *env, jclass cls, jbyteArray jPuzzle, jbyteArray jSolution) {
     (void)cls;
 
-    const char *puzzle = (*env)->GetStringUTFChars(env, jPuzzle, 0);
-    const char *solution = (*env)->GetStringUTFChars(env, jSolution, 0);
-    void *verifier = verifier_create(puzzle, solution);
-    (*env)->ReleaseStringUTFChars(env, jPuzzle, puzzle);
-    (*env)->ReleaseStringUTFChars(env, jSolution, solution);
+    jbyte *puzzle = (*env)->GetByteArrayElements(env, jPuzzle, NULL);
+    const int puzzle_length = (*env)->GetArrayLength(env, jPuzzle);
+    jbyte *solution = (*env)->GetByteArrayElements(env, jSolution, NULL);
+    const int solution_length = (*env)->GetArrayLength(env, jSolution);
+    void *verifier = verifier_create_from_bytes((const char*) puzzle, puzzle_length, (const char*) solution, solution_length);
+    (*env)->ReleaseByteArrayElements(env, jPuzzle, puzzle, JNI_ABORT);
+    (*env)->ReleaseByteArrayElements(env, jSolution, solution, JNI_ABORT);
     return (jlong) verifier;
 }
 

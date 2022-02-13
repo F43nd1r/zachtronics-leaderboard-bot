@@ -52,10 +52,9 @@ private val logger = LoggerFactory.getLogger("OM Utils")
 
 data class VerifierResult(val metrics: Map<OmScorePart, Number?>, val maxArmRotation: Int?)
 
-fun Solution.getMetrics(puzzle: OmPuzzle, vararg metrics: OmScorePart): VerifierResult? {
+fun getMetrics(solution: ByteArray, puzzle: OmPuzzle, vararg metrics: OmScorePart): VerifierResult? {
     val puzzleFile = puzzle.file?.takeIf { it.exists() } ?: return null
-    val solution = File.createTempFile(puzzle.id, ".solution").also { SolutionParser.write(this, it.outputStream().sink().buffer()) }
-    return JNISolutionVerifier.open(puzzleFile, solution).use { verifier ->
+    return JNISolutionVerifier.open(puzzleFile.readBytes(), solution).use { verifier ->
         VerifierResult(
             metrics = verifier.getMetrics(metrics.toList()) { e, metric -> logger.info("Verifier threw exception for $metric", e) },
             maxArmRotation = try {
@@ -65,7 +64,6 @@ fun Solution.getMetrics(puzzle: OmPuzzle, vararg metrics: OmScorePart): Verifier
                 null
             }
         )
-
     }
 }
 
@@ -160,7 +158,7 @@ fun createSubmission(gif: String, author: String, bytes: ByteArray): OmSubmissio
     }
 
     val puzzle = OmPuzzle.values().find { it.id == solution.puzzle } ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
-    val computed = solution.getMetrics(puzzle, OmScorePart.WIDTH, OmScorePart.HEIGHT, OmScorePart.RATE)
+    val computed = getMetrics(bytes, puzzle, OmScorePart.WIDTH, OmScorePart.HEIGHT, OmScorePart.RATE)
     if(computed?.maxArmRotation != null && computed.maxArmRotation >= 4096) {
         throw IllegalArgumentException("Maximum arm rotation should be below 4096 but was ${computed.maxArmRotation}.")
     }

@@ -18,16 +18,13 @@ package com.faendir.zachtronics.bot.git
 
 import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.createGitRepositoryFrom
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.eclipse.jgit.diff.DiffEntry
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
-import strikt.api.expectThrows
 import strikt.assertions.first
 import strikt.assertions.hasSize
 import strikt.assertions.isEmpty
@@ -37,7 +34,6 @@ import strikt.assertions.isTrue
 import java.io.File
 import java.nio.file.Files
 import java.time.Instant
-import java.util.concurrent.atomic.AtomicBoolean
 
 class GitRepositoryTest {
     private val gitProperties = GitProperties().apply {
@@ -73,7 +69,7 @@ class GitRepositoryTest {
                 access.commitAndPush("file2")
 
                 expectThat(access.changesSince(timestamp)).hasSize(1).and {
-                first().get { type }.isEqualTo(DiffEntry.ChangeType.ADD)
+                    first().get { type }.isEqualTo(DiffEntry.ChangeType.ADD)
                     first().get { newName }.isEqualTo("file2")
                 }
             }
@@ -92,7 +88,7 @@ class GitRepositoryTest {
                 access.commitAndPush("file")
 
                 expectThat(access.changesSince(timestamp)).hasSize(1).and {
-                first().get { type }.isEqualTo(DiffEntry.ChangeType.ADD)
+                    first().get { type }.isEqualTo(DiffEntry.ChangeType.ADD)
                     first().get { newName }.isEqualTo("file")
                     first().get { newContent!!.openStream().bufferedReader().use { it.readText() } }.isEqualTo("file")
                 }

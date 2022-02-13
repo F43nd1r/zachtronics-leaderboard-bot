@@ -40,6 +40,7 @@ import com.faendir.zachtronics.bot.utils.orEmpty
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import org.springframework.stereotype.Component
+import kotlin.io.path.readBytes
 
 @Component
 @OmQualifier
@@ -56,7 +57,8 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Abstract
         val overrideRecords = mutableListOf<Pair<OmRecord, OmScore>>()
         val errors = mutableListOf<String>()
         for (puzzle in puzzles) {
-            if (puzzle.file == null) {
+            val puzzleFile = puzzle.file
+            if (puzzleFile == null) {
                 errors.add("No puzzle file for ${puzzle.displayName}")
                 continue
             }
@@ -69,7 +71,7 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Abstract
                     continue
                 }
                 if (overrideExisting || parts.any { it.getValue(record.score) == null }) {
-                    val computed = JNISolutionVerifier.open(puzzle.file, record.dataPath.toFile())
+                    val computed = JNISolutionVerifier.open(puzzleFile.readBytes(), record.dataPath.readBytes())
                         .use { it.getMetrics(parts) { e, part -> errors.add("Failed to get ${part.displayName} for ${record.toDisplayString(DisplayContext.discord())}: ${e.message}") } }
                     if (computed.size < parts.size) {
                         errors.add(

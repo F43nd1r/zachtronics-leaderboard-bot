@@ -20,7 +20,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import java.io.Closeable;
-import java.io.File;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class JNISolutionVerifier implements Closeable {
@@ -29,22 +28,22 @@ public class JNISolutionVerifier implements Closeable {
         NativeLoader.loadLibrary(JNISolutionVerifier.class.getClassLoader(), "native");
     }
 
-    private final File puzzle;
-    private final File solution;
+    private final byte[] puzzle;
+    private final byte[] solution;
     private Long verifier = null;
 
-    private static native long prepareVerifier(String puzzleFile, String solutionFile);
+    private static native long prepareVerifier(byte[] puzzle, byte[] solution);
 
     private static native void closeVerifier(long verifier);
 
     private static native int getMetric(long verifier, String name);
 
-    public static JNISolutionVerifier open(File puzzle, File solution) {
+    public static JNISolutionVerifier open(byte[] puzzle, byte[] solution) {
         return new JNISolutionVerifier(puzzle, solution);
     }
 
     public int getMetric(Metrics metric) {
-        if (verifier == null) verifier = prepareVerifier(puzzle.getAbsolutePath(), solution.getAbsolutePath());
+        if (verifier == null) verifier = prepareVerifier(puzzle, solution);
         try {
             return getMetric(verifier, metric.id);
         } catch (Throwable t) {
@@ -55,7 +54,7 @@ public class JNISolutionVerifier implements Closeable {
 
     @Override
     public void close() {
-        if(verifier != null) {
+        if (verifier != null) {
             closeVerifier(verifier);
             verifier = null;
         }
@@ -71,7 +70,8 @@ public class JNISolutionVerifier implements Closeable {
         THROUGHPUT_OUTPUTS("throughput outputs"),
         HEIGHT("height"),
         WIDTH_TIMES_TWO("width*2"),
-        MAX_ARM_ROTATION("maximum absolute arm rotation")
+        MAX_ARM_ROTATION("maximum absolute arm rotation"),
+        OVERLAP("overlap"),
         ;
         private final String id;
 

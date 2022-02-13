@@ -20,16 +20,17 @@ package com.faendir.zachtronics.bot.om;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JNISolutionVerifierTest {
 
     @Test
-    void getHeight() {
+    void getHeight() throws IOException {
         try(JNISolutionVerifier verifier = JNISolutionVerifier.open(
-                new File(getClass().getClassLoader().getResource("P009.puzzle").getFile()),
-                new File(getClass().getClassLoader().getResource("Face_Powder_Height_1.solution").getFile()))) {
+                getClass().getClassLoader().getResource("P009.puzzle").openStream().readAllBytes(),
+                getClass().getClassLoader().getResource("Face_Powder_Height_1.solution").openStream().readAllBytes())) {
             int height = verifier.getMetric(JNISolutionVerifier.Metrics.HEIGHT);
             assertEquals(1, height);
         }
