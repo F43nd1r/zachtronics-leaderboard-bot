@@ -68,8 +68,12 @@ public class SChem {
             assert result.getError() != null;
             return new ValidationResult.Unparseable<>(result.getError());
         }
-        if (result.getCycles() == null) // there is no associated error on the schem side
-            return new ValidationResult.Unparseable<>("Missing expected cycles for \"" + result.getSolutionName() + "\"");
+        if (result.getCycles() == null) {
+            if (result.getError() != null)
+                return new ValidationResult.Unparseable<>(result.getError());
+            else // there is no associated error on the schem side
+                return new ValidationResult.Unparseable<>("Missing expected cycles for \"" + result.getSolutionName() + "\"");
+        }
         assert result.getExport() != null;
 
         // puzzle
