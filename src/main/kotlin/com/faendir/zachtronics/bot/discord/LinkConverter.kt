@@ -45,7 +45,7 @@ class LinkConverter : OptionConverter<String, String> {
             message.attachments.getOrNull(attachment?.minus(1) ?: 0)?.url?.also { message.addReaction(ReactionEmoji.unicode("\uD83D\uDC4D"/* 👍 */)).block() }
                 ?: return SingleParseResult.Failure(
                     "https://discord.com/channels/${
-                        message.guild.block()!!.id.asLong().toString().ifEmpty { "@me" }
+                        message.guild.block()?.id?.asLong()?.toString() ?: "@me" 
                     }/${message.channelId.asLong()}/${message.id.asLong()} had no attachments"
                 )
         } ?: input
