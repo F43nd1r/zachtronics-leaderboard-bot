@@ -135,6 +135,7 @@ data class Reverify(
     @AutoComplete(OmPuzzleAutoCompletionProvider::class)
     val puzzle: OmPuzzle?,
     val part: OmScorePart?,
+    @Converter(OmScoreCleaner::class)
     @Description("full score of the submission, e.g. 65g/80c/12a/4i/4h/4w/12r")
     val score: String?,
     val overrideExisting: Boolean?,
