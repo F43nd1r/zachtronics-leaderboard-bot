@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.sc.repository;
 
-import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.repository.Solution;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
@@ -41,16 +40,12 @@ public class ScSolution implements Solution<ScCategory, ScPuzzle, ScScore, ScRec
     /** empty if it holds no categories */
     EnumSet<ScCategory> categories = EnumSet.noneOf(ScCategory.class);
 
+    @Override
     public ScRecord extendToRecord(ScPuzzle puzzle, String dataLink, Path dataPath) {
         if (videoOnly || dataPath == null)
             return new ScRecord(puzzle, score, author, displayLink, null, null);
         else
             return new ScRecord(puzzle, score, author, displayLink, dataLink, dataPath);
-    }
-
-    @Override
-    public CategoryRecord<ScRecord, ScCategory> extendToCategoryRecord(ScPuzzle puzzle, String dataLink, Path dataPath) {
-        return new CategoryRecord<>(extendToRecord(puzzle, dataLink, dataPath), categories);
     }
 
     @NotNull

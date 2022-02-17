@@ -30,7 +30,11 @@ public interface Solution<C extends Enum<C> & Category, P extends Puzzle<C>, S e
     String getAuthor();
     @NotNull EnumSet<C> getCategories();
 
-    CategoryRecord<R, C> extendToCategoryRecord(P puzzle, String dataLink, Path dataPath);
+    R extendToRecord(P puzzle, String dataLink, Path dataPath);
+
+    default CategoryRecord<R, C> extendToCategoryRecord(P puzzle, String dataLink, Path dataPath) {
+        return new CategoryRecord<>(extendToRecord(puzzle, dataLink, dataPath), getCategories());
+    }
 
     @NotNull
     String[] marshal();

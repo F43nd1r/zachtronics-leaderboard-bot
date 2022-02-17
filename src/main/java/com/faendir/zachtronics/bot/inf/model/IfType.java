@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.inf.model;
 
-enum class Subreddit(val id: String) {
-    INFINIFACTORY("infinifactory"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
+import com.faendir.zachtronics.bot.model.Type;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+public enum IfType implements Type {
+    STANDARD("standard"),
+    BOSS("boss");
+
+    private final String displayName;
 }

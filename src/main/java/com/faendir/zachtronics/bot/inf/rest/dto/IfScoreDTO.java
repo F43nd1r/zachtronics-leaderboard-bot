@@ -14,11 +14,21 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.inf.rest.dto;
 
-enum class Subreddit(val id: String) {
-    INFINIFACTORY("infinifactory"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
+import com.faendir.zachtronics.bot.inf.model.IfScore;
+import lombok.Value;
+import org.jetbrains.annotations.NotNull;
+
+@Value
+public class IfScoreDTO {
+    int cost;
+    int power;
+    int lines;
+
+    @NotNull
+    public static IfScoreDTO fromScore(@NotNull IfScore score) {
+        return new IfScoreDTO(score.getCycles(), score.getFootprint(), score.getBlocks());
+    }
 }
+

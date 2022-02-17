@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.inf.discord;
 
-enum class Subreddit(val id: String) {
-    INFINIFACTORY("infinifactory"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
+import com.faendir.zachtronics.bot.discord.command.security.*;
+
+import java.util.Set;
+
+public class IfSecured {
+    public static final DiscordUserSecured ADMINS_ONLY = new DiscordUserSecured(Set.of(DiscordUser.IEEE12345));
+    public static final Secured INSTANCE = SecuredKt.or(ADMINS_ONLY, TrustedLeaderboardPosterRoleSecured.INSTANCE);
+
+    private IfSecured() {}
 }

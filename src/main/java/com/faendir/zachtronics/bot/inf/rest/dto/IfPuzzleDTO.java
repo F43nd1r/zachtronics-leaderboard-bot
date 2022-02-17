@@ -14,11 +14,21 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.inf.rest.dto;
 
-enum class Subreddit(val id: String) {
-    INFINIFACTORY("infinifactory"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
+import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
+import lombok.Value;
+import org.jetbrains.annotations.NotNull;
+
+@Value
+public class IfPuzzleDTO {
+    @NotNull String id;
+    @NotNull String displayName;
+    @NotNull IfGroupDTO group;
+    @NotNull String type;
+
+    @NotNull
+    public static IfPuzzleDTO fromPuzzle(@NotNull IfPuzzle puzzle) {
+        return new IfPuzzleDTO(puzzle.getId(), puzzle.getDisplayName(), IfGroupDTO.fromGroup(puzzle.getGroup()), puzzle.getType().name());
+    }
 }

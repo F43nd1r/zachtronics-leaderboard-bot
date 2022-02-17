@@ -14,47 +14,50 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.sz.repository;
+package com.faendir.zachtronics.bot.inf.repository;
 
+import com.faendir.zachtronics.bot.inf.model.IfCategory;
+import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
+import com.faendir.zachtronics.bot.inf.model.IfRecord;
+import com.faendir.zachtronics.bot.inf.model.IfScore;
 import com.faendir.zachtronics.bot.repository.Solution;
-import com.faendir.zachtronics.bot.sz.model.SzCategory;
-import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
-import com.faendir.zachtronics.bot.sz.model.SzRecord;
-import com.faendir.zachtronics.bot.sz.model.SzScore;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Value
-public class SzSolution implements Solution<SzCategory, SzPuzzle, SzScore, SzRecord> {
-    @NotNull SzScore score;
+public class IfSolution implements Solution<IfCategory, IfPuzzle, IfScore, IfRecord> {
+    @NotNull IfScore score;
     @NotNull String author;
+    @NotNull List<String> displayLinks;
     /** empty if it holds no categories */
-    EnumSet<SzCategory> categories = EnumSet.noneOf(SzCategory.class);
+    EnumSet<IfCategory> categories = EnumSet.noneOf(IfCategory.class);
 
     @Override
-    public SzRecord extendToRecord(SzPuzzle puzzle, String dataLink, Path dataPath) {
+    public IfRecord extendToRecord(IfPuzzle puzzle, String dataLink, Path dataPath) {
         if (dataPath != null)
-            return new SzRecord(puzzle, score, author, dataLink, dataPath);
+            return new IfRecord(puzzle, score, author, displayLinks, dataLink, dataPath);
         else
-            return new SzRecord(puzzle, score, author, null, null);
+            return new IfRecord(puzzle, score, author, displayLinks, null, null);
     }
 
     @NotNull
-    public static SzSolution unmarshal(@NotNull String[] fields) {
-        assert fields.length == 3;
-        SzScore score = Objects.requireNonNull(SzScore.parseScore(fields[0]));
+    public static IfSolution unmarshal(@NotNull String[] fields) {
+        assert fields.length == 4;
+        IfScore score = Objects.requireNonNull(IfScore.parseScore(fields[0]));
         String author = fields[1];
-        String categories = fields[2];
+        String displayLinks = fields[2];
+        String categories = fields[3];
 
-        SzSolution solution = new SzSolution(score, author);
+        IfSolution solution = new IfSolution(score, author, List.of(displayLinks.split(",")));
         if (categories != null)
-            Pattern.compile(",").splitAsStream(categories).map(SzCategory::valueOf).forEach(solution.categories::add);
+            Pattern.compile(",").splitAsStream(categories).map(IfCategory::valueOf).forEach(solution.categories::add);
         return solution;
     }
 
@@ -64,8 +67,9 @@ public class SzSolution implements Solution<SzCategory, SzPuzzle, SzScore, SzRec
         return new String[]{
                 score.toDisplayString(),
                 author,
+                String.join(",", displayLinks),
                 categories.stream()
-                          .map(SzCategory::name)
+                          .map(IfCategory::name)
                           .collect(Collectors.joining(","))
         };
     }

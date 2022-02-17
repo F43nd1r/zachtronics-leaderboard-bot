@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.inf.model;
 
-enum class Subreddit(val id: String) {
-    INFINIFACTORY("infinifactory"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
+import com.faendir.zachtronics.bot.model.Metric;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+import java.util.function.ToIntFunction;
+
+@Getter
+@RequiredArgsConstructor
+public enum IfMetric implements Metric {
+    CYCLES("C", IfScore::getCycles),
+    FOOTPRINT("P", IfScore::getFootprint),
+    BLOCKS("L", IfScore::getBlocks),
+    ANY_FLAG("", null),
+    NO_GRA("NG", null);
+
+    private final String displayName;
+    private final ToIntFunction<IfScore> extract;
 }
