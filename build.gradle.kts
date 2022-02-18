@@ -130,10 +130,10 @@ kotlinLombok {
 
 afterEvaluate {
     // shut up gradle
-    tasks.named("generateMainEffectiveLombokConfig2") {
+    tasks.named("generateEffectiveLombokConfig") {
         dependsOn(tasks.named("kspKotlin"))
     }
-    tasks.named("generateTestEffectiveLombokConfig2") {
+    tasks.named("generateTestEffectiveLombokConfig") {
         dependsOn(tasks.named("kspTestKotlin"))
     }
 }
