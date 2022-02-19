@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.sz.rest;
 
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
+import com.faendir.zachtronics.bot.rest.GameRestController;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzGroup;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
@@ -28,9 +29,10 @@ import com.faendir.zachtronics.bot.sz.rest.dto.SzPuzzleDTO;
 import com.faendir.zachtronics.bot.sz.rest.dto.SzRecordDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
@@ -40,43 +42,47 @@ import java.util.List;
 @RestController
 @RequestMapping("/sz")
 @RequiredArgsConstructor
-public class SzController {
+public class SzController implements GameRestController<SzGroupDTO, SzPuzzleDTO, SzCategoryDTO, SzRecordDTO> {
     
     private final SzSolutionRepository repository;
     
-    @Getter(onMethod_ = {@GetMapping(path = "/groups", produces = MediaType.APPLICATION_JSON_VALUE)})
+    @Getter
     private final List<SzGroupDTO> groups = Arrays.stream(SzGroup.values()).map(SzGroupDTO::fromGroup).toList();
 
-    @Getter(onMethod_ = {@GetMapping(path = "/puzzles", produces = MediaType.APPLICATION_JSON_VALUE)})
+    @Getter
     private final List<SzPuzzleDTO> puzzles = Arrays.stream(SzPuzzle.values()).map(SzPuzzleDTO::fromPuzzle).toList();
 
-    @GetMapping(path = "/puzzle/{puzzleId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SzPuzzleDTO getPuzzle(@PathVariable String puzzleId) { return SzPuzzleDTO.fromPuzzle(findPuzzle(puzzleId)); }
+    @Override
+    public SzPuzzleDTO getPuzzle(@NotNull String puzzleId) {
+        return SzPuzzleDTO.fromPuzzle(findPuzzle(puzzleId));
+    }
 
-    @GetMapping(path = "/group/{groupId}/puzzles", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<SzPuzzleDTO> listPuzzlesByGroup(@PathVariable String groupId) {
+    @Override
+    @NotNull
+    public List<SzPuzzleDTO> listPuzzlesByGroup(@NotNull String groupId) {
         SzGroup group = findGroup(groupId);
         return Arrays.stream(SzPuzzle.values()).filter(p -> p.getGroup() == group).map(SzPuzzleDTO::fromPuzzle).toList();
     }
 
-    @Getter(onMethod_ = {@GetMapping(path = "/categories", produces = MediaType.APPLICATION_JSON_VALUE)})
+    @Getter
     private final List<SzCategoryDTO> categories = Arrays.stream(SzCategory.values()).map(SzCategoryDTO::fromCategory).toList();
 
-    @GetMapping(path = "/category/{categoryId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SzCategoryDTO getCategory(@PathVariable String categoryId) {
+    @Override
+    public SzCategoryDTO getCategory(@NotNull String categoryId) {
         return SzCategoryDTO.fromCategory(findCategory(categoryId));
     }
 
-    @GetMapping(path = "/puzzle/{puzzleId}/records", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<SzRecordDTO> listRecords(@PathVariable String puzzleId, @RequestParam(required = false) Boolean includeFrontier) {
+    @Override
+    @NotNull
+    public List<SzRecordDTO> listRecords(@NotNull String puzzleId, Boolean includeFrontier) {
         SzPuzzle puzzle = findPuzzle(puzzleId);
         return repository.findCategoryHolders(puzzle, includeFrontier != null && includeFrontier).stream()
                          .map(SzRecordDTO::fromCategoryRecord)
                          .toList();
     }
 
-    @GetMapping(path = "/puzzle/{puzzleId}/category/{categoryId}/record", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SzRecordDTO getRecord(@PathVariable String puzzleId, @PathVariable String categoryId) {
+    @Override
+    public SzRecordDTO getRecord(@NotNull String puzzleId, @NotNull String categoryId) {
         SzPuzzle puzzle = findPuzzle(puzzleId);
         SzCategory category = findCategory(categoryId);
         SzRecord record = repository.find(puzzle, category);

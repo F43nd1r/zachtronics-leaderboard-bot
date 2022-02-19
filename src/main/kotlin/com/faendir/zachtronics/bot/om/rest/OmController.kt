@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,11 +30,12 @@ import com.faendir.zachtronics.bot.om.rest.dto.OmPuzzleDTO
 import com.faendir.zachtronics.bot.om.rest.dto.OmRecordChangeDTO
 import com.faendir.zachtronics.bot.om.rest.dto.OmRecordDTO
 import com.faendir.zachtronics.bot.om.rest.dto.OmSubmissionDTO
-import com.faendir.zachtronics.bot.om.rest.dto.SubmitResultType
 import com.faendir.zachtronics.bot.om.rest.dto.emptyRecord
 import com.faendir.zachtronics.bot.om.rest.dto.toDTO
 import com.faendir.zachtronics.bot.om.withCategory
 import com.faendir.zachtronics.bot.repository.SubmitResult
+import com.faendir.zachtronics.bot.rest.GameRestController
+import com.faendir.zachtronics.bot.rest.dto.SubmitResultType
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.filterIsInstance
@@ -50,38 +51,31 @@ import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import java.time.Instant
 
 @RestController
 @RequestMapping("/om")
-class OmController(private val repository: OmSolutionRepository, private val discordClient: GatewayDiscordClient) {
+class OmController(private val repository: OmSolutionRepository, private val discordClient: GatewayDiscordClient) :
+    GameRestController<OmGroupDTO, OmPuzzleDTO, OmCategoryDTO, OmRecordDTO> {
 
-    @get:GetMapping(path = ["/groups"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    val groups: List<OmGroupDTO> = OmGroup.values().map { it.toDTO() }
+    override val groups: List<OmGroupDTO> = OmGroup.values().map { it.toDTO() }
 
-    @get:GetMapping(path = ["/puzzles"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    val puzzles: List<OmPuzzleDTO> = OmPuzzle.values().map { it.toDTO() }
+    override val puzzles: List<OmPuzzleDTO> = OmPuzzle.values().map { it.toDTO() }
 
-    @GetMapping(path = ["/puzzle/{puzzleId}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getPuzzle(@PathVariable puzzleId: String): OmPuzzleDTO = findPuzzle(puzzleId).toDTO()
+    override fun getPuzzle(puzzleId: String): OmPuzzleDTO = findPuzzle(puzzleId).toDTO()
 
-    @GetMapping(path = ["/group/{groupId}/puzzles"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun listPuzzlesByGroup(@PathVariable groupId: String): List<OmPuzzleDTO> {
+    override fun listPuzzlesByGroup(groupId: String): List<OmPuzzleDTO> {
         val group = findGroup(groupId)
         return OmPuzzle.values().filter { it.group == group }.map { it.toDTO() }
     }
 
-    @get:GetMapping(path = ["/categories"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    val categories: List<OmCategoryDTO> = OmCategory.values().map { it.toDTO() }
+    override val categories: List<OmCategoryDTO> = OmCategory.values().map { it.toDTO() }
 
-    @GetMapping(path = ["/category/{categoryId}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getCategory(@PathVariable categoryId: String): OmCategoryDTO = findCategory(categoryId).toDTO()
+    override fun getCategory(categoryId: String): OmCategoryDTO = findCategory(categoryId).toDTO()
 
-    @GetMapping(path = ["/puzzle/{puzzleId}/records"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun listRecords(@PathVariable puzzleId: String, @RequestParam(required = false) includeFrontier: Boolean?): List<OmRecordDTO> {
+    override fun listRecords(puzzleId: String, includeFrontier: Boolean?): List<OmRecordDTO> {
         val puzzle = findPuzzle(puzzleId)
         return repository.findCategoryHolders(puzzle, includeFrontier ?: false).map { it.toDTO() }
     }
@@ -92,8 +86,7 @@ class OmController(private val repository: OmSolutionRepository, private val dis
         return repository.findAll(category).entries.sortedBy { it.key }.map { it.value?.withCategory(category)?.toDTO() ?: emptyRecord(it.key) }
     }
 
-    @GetMapping(path = ["/puzzle/{puzzleId}/category/{categoryId}/record"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getRecord(@PathVariable puzzleId: String, @PathVariable categoryId: String): OmRecordDTO? {
+    override fun getRecord(puzzleId: String, categoryId: String): OmRecordDTO? {
         val puzzle = findPuzzle(puzzleId)
         val category = findCategory(categoryId)
         return repository.find(puzzle, category)?.withCategory(category)?.toDTO()

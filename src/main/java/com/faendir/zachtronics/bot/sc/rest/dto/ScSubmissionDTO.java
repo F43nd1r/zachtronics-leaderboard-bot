@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.om.rest.dto
+package com.faendir.zachtronics.bot.sc.rest.dto;
 
-enum class SubmitResultType {
-    ALREADY_PRESENT,
-    NOTHING_BEATEN,
-    SUCCESS
+import lombok.Value;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.springframework.web.multipart.MultipartFile;
+
+@Value
+public class ScSubmissionDTO {
+    @NotNull MultipartFile export;
+    @Nullable String author;
+    @Nullable String video;
 }

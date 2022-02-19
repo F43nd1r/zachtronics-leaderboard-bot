@@ -41,7 +41,7 @@ export default function ScPuzzleVisualizerView() {
             }}
         >
             <Visualizer<string, string, ScScore>
-                url={`/sc/puzzle/${puzzleId}/records?includeFrontier=true&includeVideoOnly=false`}
+                url={`/sc/puzzle/${puzzleId}/records?includeFrontier=true`}
                 config={{ key: "visualizerConfigSc", default: { mode: "3D", x: "c", y: "s", z: "r" } }}
                 filter={{ key: `visualizerFilterSc-${puzzleId}`, default: {} }}
                 metrics={{

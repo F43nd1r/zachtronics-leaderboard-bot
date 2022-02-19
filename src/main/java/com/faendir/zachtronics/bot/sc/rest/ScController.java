@@ -17,69 +17,73 @@
 package com.faendir.zachtronics.bot.sc.rest;
 
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
-import com.faendir.zachtronics.bot.sc.model.ScCategory;
-import com.faendir.zachtronics.bot.sc.model.ScGroup;
-import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
-import com.faendir.zachtronics.bot.sc.model.ScRecord;
+import com.faendir.zachtronics.bot.rest.GameRestController;
+import com.faendir.zachtronics.bot.rest.dto.SubmitResultTypeKt;
+import com.faendir.zachtronics.bot.sc.model.*;
 import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
-import com.faendir.zachtronics.bot.sc.rest.dto.ScCategoryDTO;
-import com.faendir.zachtronics.bot.sc.rest.dto.ScGroupDTO;
-import com.faendir.zachtronics.bot.sc.rest.dto.ScPuzzleDTO;
-import com.faendir.zachtronics.bot.sc.rest.dto.ScRecordDTO;
+import com.faendir.zachtronics.bot.sc.rest.dto.*;
+import com.faendir.zachtronics.bot.sc.validator.SChem;
+import com.faendir.zachtronics.bot.utils.UtilsKt;
+import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 
 @RestController
 @RequestMapping("/sc")
 @RequiredArgsConstructor
-public class ScController {
+public class ScController implements GameRestController<ScGroupDTO, ScPuzzleDTO, ScCategoryDTO, ScRecordDTO> {
     
     private final ScSolutionRepository repository;
     
-    @Getter(onMethod_ = {@GetMapping(path = "/groups", produces = MediaType.APPLICATION_JSON_VALUE)})
+    @Getter
     private final List<ScGroupDTO> groups = Arrays.stream(ScGroup.values()).map(ScGroupDTO::fromGroup).toList();
 
-    @Getter(onMethod_ = {@GetMapping(path = "/puzzles", produces = MediaType.APPLICATION_JSON_VALUE)})
+    @Getter
     private final List<ScPuzzleDTO> puzzles = Arrays.stream(ScPuzzle.values()).map(ScPuzzleDTO::fromPuzzle).toList();
 
-    @GetMapping(path = "/puzzle/{puzzleId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ScPuzzleDTO getPuzzle(@PathVariable String puzzleId) { return ScPuzzleDTO.fromPuzzle(findPuzzle(puzzleId)); }
+    @Override
+    public ScPuzzleDTO getPuzzle(@NotNull String puzzleId) {
+        return ScPuzzleDTO.fromPuzzle(findPuzzle(puzzleId));
+    }
 
-    @GetMapping(path = "/group/{groupId}/puzzles", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ScPuzzleDTO> listPuzzlesByGroup(@PathVariable String groupId) {
+    @Override
+    @NotNull
+    public List<ScPuzzleDTO> listPuzzlesByGroup(@NotNull String groupId) {
         ScGroup group = findGroup(groupId);
         return Arrays.stream(ScPuzzle.values()).filter(p -> p.getGroup() == group).map(ScPuzzleDTO::fromPuzzle).toList();
     }
 
-    @Getter(onMethod_ = {@GetMapping(path = "/categories", produces = MediaType.APPLICATION_JSON_VALUE)})
+    @Getter
     private final List<ScCategoryDTO> categories = Arrays.stream(ScCategory.values()).map(ScCategoryDTO::fromCategory).toList();
 
-    @GetMapping(path = "/category/{categoryId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ScCategoryDTO getCategory(@PathVariable String categoryId) {
+    @Override
+    public ScCategoryDTO getCategory(@NotNull String categoryId) {
         return ScCategoryDTO.fromCategory(findCategory(categoryId));
     }
 
-    @GetMapping(path = "/puzzle/{puzzleId}/records", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ScRecordDTO> listRecords(@PathVariable String puzzleId, @RequestParam(required = false) Boolean includeFrontier,
-                                         @RequestParam(required = false) Boolean includeVideoOnly) {
+    @Override
+    @NotNull
+    public List<ScRecordDTO> listRecords(@NotNull String puzzleId, Boolean includeFrontier) {
         ScPuzzle puzzle = findPuzzle(puzzleId);
         return repository.findCategoryHolders(puzzle, includeFrontier != null && includeFrontier).stream()
-                         .filter(includeVideoOnly != null && includeVideoOnly ?
-                                 cr -> true : cr -> cr.getRecord().getDataLink() != null)
+                         .filter(cr -> cr.getRecord().getDataLink() != null)
                          .map(ScRecordDTO::fromCategoryRecord)
                          .toList();
     }
 
-    @GetMapping(path = "/puzzle/{puzzleId}/category/{categoryId}/record", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ScRecordDTO getRecord(@PathVariable String puzzleId, @PathVariable String categoryId) {
+    @Override
+    public ScRecordDTO getRecord(@NotNull String puzzleId, @NotNull String categoryId) {
         ScPuzzle puzzle = findPuzzle(puzzleId);
         ScCategory category = findCategory(categoryId);
         ScRecord record = repository.find(puzzle, category);
@@ -87,6 +91,18 @@ public class ScController {
             return ScRecordDTO.fromCategoryRecord(new CategoryRecord<>(record, EnumSet.of(category)));
         else
             return null;
+    }
+
+    @PostMapping(path = "/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Map<String, Object>> submit(@NotNull @ModelAttribute ScSubmissionDTO submissionDTO) throws IOException {
+        if (submissionDTO.getVideo() != null && !UtilsKt.isValidLink(submissionDTO.getVideo()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid video link");
+        String export = new String(submissionDTO.getExport().getBytes());
+        Collection<ValidationResult<ScSubmission>> submissions = SChem.validateMultiExport(export, false, submissionDTO.getAuthor());
+
+        return repository.submitAll(submissions).stream()
+                         .map(r -> Map.of("result", SubmitResultTypeKt.toType(r), "data", r))
+                         .toList();
     }
 
     private static ScPuzzle findPuzzle(String puzzleId) {
