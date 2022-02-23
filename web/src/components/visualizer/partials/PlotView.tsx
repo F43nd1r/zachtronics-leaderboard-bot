@@ -41,13 +41,23 @@ export interface PlotViewProps<MODIFIER_ID extends string, METRIC_ID extends str
 const Plot: ComponentType<PlotParams> = createPlotlyComponent(Plotly)
 
 function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string, SCORE>(props: PlotViewProps<MODIFIER_ID, METRIC_ID, SCORE> & SizeMeProps) {
-    const [activeRecord, setActiveRecord] = useState<RecordDTO<SCORE> | undefined>(undefined)
+    const [activeRecords, setActiveRecords] = useState<RecordDTO<SCORE>[] | undefined>(undefined)
 
     const configuration = props.configuration
     const records = applyFilter(props.metrics, props.modifiers, props.filter, configuration, props.records)
     const x = props.metrics[configuration.x]
     const y = props.metrics[configuration.y]
     const z = props.metrics[configuration.z]
+    const getPointString = (record: RecordDTO<SCORE>): string =>
+        JSON.stringify({
+            x: x.get(record.score) ?? 0,
+            y: y.get(record.score) ?? 0,
+            z: configuration.mode === "3D" ? z.get(record.score) : undefined,
+        })
+    const recordMap = records.reduce((acc, record) => {
+        const point = getPointString(record)
+        return { ...acc, [point]: [...(acc[point] ?? []), record] }
+    }, {} as Record<string, RecordDTO<SCORE>[]>)
 
     const theme = useTheme()
     const gridColor = theme.palette.mode === "light" ? theme.palette.grey["200"] : theme.palette.grey["800"]
@@ -67,11 +77,19 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
             .find((modifier) => modifier.get(record.score))
         return modifier ? modifier.color : props.defaultColor
     }
-    const getMarkerColors = (...metrics: Metric<SCORE>[]) => records.map((record) => (records.some((r) => isStrictlyBetterInMetrics(r, record, metrics)) ? "#00000000" : getColor(record)))
+    const getMarkerColors = (...metrics: Metric<SCORE>[]) => records.map((record) => (records.some((r) => isStrictlyBetterInMetrics(r, record, metrics)) ? "#000000" : getColor(record)))
 
     const common: Partial<PlotData> = {
-        hovertext: records.map((record: RecordDTO<SCORE>) => 
-        `${record.fullFormattedScore ?? "none"}${record.author ? "<br>by " + record.author : ""}<br>${record.smartFormattedCategories}`),
+        hovertext: records.map(
+            (r: RecordDTO<SCORE>) =>
+                "-----<br>" +
+                recordMap[getPointString(r)]
+                    .map(
+                        (record) =>
+                            `${record.fullFormattedScore ?? "none"}${record.author ? "<br>by " + record.author : ""}${record.smartFormattedCategories ? "<br>" + record.smartFormattedCategories : ""}`,
+                    )
+                    .join("<br>-----<br>"),
+        ),
         x: records.map((record) => x.get(record.score) ?? 0),
         y: records.map((record) => y.get(record.score) ?? 0),
         mode: "markers",
@@ -152,10 +170,10 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
                 }}
                 useResizeHandler={true}
                 onClick={(event) => {
-                    setActiveRecord(records[event.points[0].pointNumber])
+                    setActiveRecords(recordMap[getPointString(records[event.points[0].pointNumber])])
                 }}
             />
-            <RecordModal record={activeRecord} setRecord={setActiveRecord} />
+            <RecordModal records={activeRecords} setRecords={setActiveRecords} />
         </>
     )
 }

@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-import { Box, Modal } from "@mui/material"
+import { Card, Modal } from "@mui/material"
 import RecordCard from "./RecordCard"
 import RecordDTO from "../model/RecordDTO"
 
 interface RecordModalProps {
-    record?: RecordDTO<any>
-    setRecord: (record: RecordDTO<any> | undefined) => void
+    records?: RecordDTO<any>[]
+    setRecords: (records: RecordDTO<any>[] | undefined) => void
 }
 
 export function RecordModal(props: RecordModalProps) {
     return (
-        <Modal open={props.record !== undefined} onClose={() => props.setRecord(undefined)}>
-            <Box
+        <Modal open={props.records !== undefined} onClose={() => props.setRecords(undefined)}>
+            <Card
                 sx={{
                     position: "absolute",
                     top: "50%",
@@ -34,18 +34,16 @@ export function RecordModal(props: RecordModalProps) {
                     transform: "translate(-50%, -50%)",
                     boxShadow: 24,
                     outline: 0,
+                    display: "flex",
+                    paddingLeft: "1.5rem",
+                    paddingRight: "1.5rem",
+                    gap: "2rem",
                 }}
             >
-                <RecordCard
-                    record={props.record!}
-                    title={props.record?.smartFormattedCategories || "Pareto Frontier"}
-                    score={props.record?.fullFormattedScore ?? "None"}
-                    sx={{
-                        paddingLeft: "1rem",
-                        paddingRight: "1rem",
-                    }}
-                />
-            </Box>
+                {props.records?.map((record) => (
+                    <RecordCard record={record!} title={record!.smartFormattedCategories || "Pareto Frontier"} score={record!.fullFormattedScore ?? "None"} />
+                ))}
+            </Card>
         </Modal>
     )
 }

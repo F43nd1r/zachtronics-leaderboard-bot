@@ -17,15 +17,12 @@
 import { Box, Button, Card, CardActionArea, CardActions, CardContent, CardHeader, CardMedia } from "@mui/material"
 import { SentimentVeryDissatisfied } from "@mui/icons-material"
 import RecordDTO from "../model/RecordDTO"
-import { SxProps } from "@mui/system"
-import { Theme } from "@mui/material/styles"
 import { ReactNode } from "react"
 
 interface RecordCardProps {
     record: RecordDTO<any>
     title: string
     score: ReactNode
-    sx?: SxProps<Theme>
 }
 
 function isYoutube(gif: string): boolean {
@@ -58,9 +55,16 @@ export default function RecordCard(props: RecordCardProps) {
                 maxWidth: "100%",
             }}
         >
-            <CardActionArea href={props.record.gif ?? ""} disabled={!props.record.gif} sx={props.sx}>
-                <CardHeader title={props.title} />
-                {props.record.gif ? (
+            <CardHeader title={props.title} />
+            {props.record.gif ? (
+                <CardActionArea
+                    href={props.record.gif ?? ""}
+                    sx={{
+                        width: "fit-content",
+                        marginLeft: "auto",
+                        marginRight: "auto",
+                    }}
+                >
                     <CardMedia
                         component={getVideoType(props.record.gif)}
                         autoPlay
@@ -72,30 +76,28 @@ export default function RecordCard(props: RecordCardProps) {
                             height: "min(70vh, 360px)",
                             width: isYoutube(props.record.gif) ? "min(70vw, 720px)" : "auto",
                             maxWidth: "100%",
-                            marginLeft: "auto",
-                            marginRight: "auto",
                             lineHeight: "50px",
                             textAlign: "center",
                         }}
                     />
-                ) : (
-                    <Box
-                        sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            height: "360px",
-                            width: "480px",
-                            marginLeft: "auto",
-                            marginRight: "auto",
-                            flexDirection: "column",
-                        }}
-                    >
-                        <SentimentVeryDissatisfied sx={{ margin: "1rem" }} fontSize="large" />
-                        <span>No media found</span>
-                    </Box>
-                )}
-            </CardActionArea>
+                </CardActionArea>
+            ) : (
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "360px",
+                        width: "480px",
+                        marginLeft: "auto",
+                        marginRight: "auto",
+                        flexDirection: "column",
+                    }}
+                >
+                    <SentimentVeryDissatisfied sx={{ margin: "1rem" }} fontSize="large" />
+                    <span>No media found</span>
+                </Box>
+            )}
             <CardContent sx={{ userSelect: "text" }}>{props.score}</CardContent>
 
             <CardActions
