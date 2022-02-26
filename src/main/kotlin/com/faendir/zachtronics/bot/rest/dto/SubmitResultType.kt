@@ -28,7 +28,7 @@ enum class SubmitResultType {
 
 fun SubmitResult<*, *>.toType(): SubmitResultType {
     return when (this) {
-        is SubmitResult.Success -> SubmitResultType.SUCCESS
+        is SubmitResult.Success, is SubmitResult.Updated -> SubmitResultType.SUCCESS
         is SubmitResult.AlreadyPresent -> SubmitResultType.ALREADY_PRESENT
         is SubmitResult.NothingBeaten -> SubmitResultType.NOTHING_BEATEN
         is SubmitResult.Failure -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, this.message)

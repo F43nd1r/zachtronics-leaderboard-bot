@@ -70,6 +70,7 @@ abstract class AbstractMultiSubmitCommand<T, C : Category, P : Puzzle<C>, S : Su
                     val score = validationResult.submission.score.toDisplayString(DisplayContext.discord())
                     when (submitResult) {
                         is SubmitResult.Success -> "`$score`${validationResult.submission.author.orEmpty(prefix = " by ")} was added.\n${submitResult.message}"
+                        is SubmitResult.Updated -> "`$score` was updated."
                         is SubmitResult.AlreadyPresent -> "`$score` was already present."
                         is SubmitResult.NothingBeaten -> "`$score` did not beat anything."
                         is SubmitResult.Failure -> "`$score` failed.\n${submitResult.message}"

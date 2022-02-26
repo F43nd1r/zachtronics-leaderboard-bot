@@ -111,6 +111,7 @@ class OmController(private val repository: OmSolutionRepository, private val dis
                 )
                 SubmitResultType.SUCCESS
             }
+            is SubmitResult.Updated -> SubmitResultType.SUCCESS
             is SubmitResult.Failure -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, result.message)
             is SubmitResult.NothingBeaten -> SubmitResultType.NOTHING_BEATEN
             is SubmitResult.AlreadyPresent -> SubmitResultType.ALREADY_PRESENT

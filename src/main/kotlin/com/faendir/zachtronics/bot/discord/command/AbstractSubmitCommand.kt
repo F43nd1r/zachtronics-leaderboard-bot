@@ -57,11 +57,24 @@ abstract class AbstractSubmitCommand<T, C : Category, P : Puzzle<C>, S : Submiss
                                 + submission.author.orEmpty(prefix = " by ")
                                 + (if (beatenCategories.isEmpty()) " was included in the pareto frontier." else "")
                                 + (result.message.orEmpty(prefix = "\n"))
-                                + (if (result.beatenRecords.isNotEmpty()) "\npreviously:" else "")
+                                + (if (result.beatenRecords.isNotEmpty()) "\nPreviously:" else "")
                     )
                     .embedCategoryRecords(result.beatenRecords, submission.puzzle.supportedCategories)
                     .link(submission.displayLink)
             }
+            is SubmitResult.Updated ->
+                return SafeEmbedMessageBuilder()
+                    .title("Updated: *${submission.puzzle.displayName}* ${
+                        result.oldRecord.categories.takeIf { it.isNotEmpty() }?.smartFormat(submission.puzzle.supportedCategories.toMetricsTree()) ?: "Pareto"
+                    }")
+                    .color(Colors.SUCCESS)
+                    .description(
+                        "`${submission.score.toDisplayString(DisplayContext(StringFormat.DISCORD, result.oldRecord.categories))}`"
+                                + (" was updated.")
+                                + ("\nPreviously:")
+                    )
+                    .embedCategoryRecords(listOf(result.oldRecord), submission.puzzle.supportedCategories)
+                    .link(submission.displayLink)
             is SubmitResult.AlreadyPresent ->
                 return SafeEmbedMessageBuilder()
                     .title("Already present: *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.discord())}`")

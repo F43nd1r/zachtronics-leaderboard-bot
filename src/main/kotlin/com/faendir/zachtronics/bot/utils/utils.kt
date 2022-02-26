@@ -18,7 +18,12 @@ package com.faendir.zachtronics.bot.utils
 
 import com.faendir.discord4j.command.parse.SingleParseResult
 import com.faendir.zachtronics.bot.discord.Colors
-import com.faendir.zachtronics.bot.model.*
+import com.faendir.zachtronics.bot.model.Category
+import com.faendir.zachtronics.bot.model.DisplayContext
+import com.faendir.zachtronics.bot.model.Metric
+import com.faendir.zachtronics.bot.model.Puzzle
+import com.faendir.zachtronics.bot.model.Record
+import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import discord4j.core.`object`.entity.User
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
@@ -76,7 +81,8 @@ fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> 
 }
 
 fun Collection<Category>.toMetricsTree(): TreeRoot<Pair<Metric, Category?>> = TreeRoot<Pair<Metric, Category?>>().also { tree ->
-    forEach { category -> tree.addPath(category.metrics.dropLast(1).map { it to null } + (category.metrics.last() to category)) } }
+    forEach { category -> tree.addPath(category.metrics.dropLast(1).map { it to null } + (category.metrics.last() to category)) }
+}
 
 fun Collection<Category>.smartFormat(reference: TreeRoot<Pair<Metric, Category?>>): String {
     val metricsTree = toMetricsTree()
@@ -94,7 +100,12 @@ fun <R : Record<C>?, C : Category> SafeEmbedMessageBuilder.embedCategoryRecords(
 ): SafeEmbedMessageBuilder {
     return embedRecords(
         records = records.map { cr -> cr.copy(categories = cr.categories.sortedBy { it as? Comparable<Any> }.toCollection(LinkedHashSet())) }
-            .sortedBy { it.categories.firstOrNull() as? Comparable<Any> },
+            .sortedWith(
+                Comparator.comparing(
+                    { it.categories.firstOrNull() as? Comparable<Any> },
+                    Comparator.nullsLast(Comparator.naturalOrder<Comparable<Any>>())
+                )
+            ),
         supportedCategories = supportedCategories,
         formatCategorySpecific = true
     )

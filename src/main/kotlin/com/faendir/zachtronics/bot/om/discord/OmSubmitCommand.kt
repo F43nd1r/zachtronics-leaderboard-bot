@@ -20,7 +20,6 @@ import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.Converter
 import com.faendir.discord4j.command.annotation.Description
 import com.faendir.discord4j.command.parse.ApplicationCommandParser
-import com.faendir.om.parser.solution.model.Position
 import com.faendir.zachtronics.bot.discord.LinkConverter
 import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand
 import com.faendir.zachtronics.bot.discord.command.security.Secured
@@ -37,7 +36,6 @@ import com.roxstudio.utils.CUrl
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 @OmQualifier
@@ -64,24 +62,3 @@ data class SubmitParams(
     @Description("Link to your solution gif/mp4, can be `m1` to scrape it from your last message")
     val gif: String,
 )
-
-infix operator fun Position.plus(other: Position) = Position(this.x + other.x, this.y + other.y)
-
-data class CubicPosition(val x: Int, val y: Int, val z: Int) {
-
-    fun rotate(times: Int): CubicPosition {
-        val t = Math.floorMod(times, 6)
-        val coords = mutableListOf(x, y, z)
-        if (t % 2 != 0) {
-            coords.replaceAll { -it }
-        }
-        Collections.rotate(coords, t % 3)
-        return CubicPosition(coords[0], coords[1], coords[2])
-    }
-
-    fun toAxial(): Position = Position(x, z)
-}
-
-fun Position.toCubic(): CubicPosition = CubicPosition(x, -x - y, y)
-
-fun Position.rotate(times: Int) = this.toCubic().rotate(times).toAxial()

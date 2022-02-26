@@ -104,61 +104,93 @@ class OmSolutionRepository(
     }
 
     override fun submit(submission: OmSubmission): SubmitResult<OmRecord, OmCategory> {
-        if (submission.displayLink?.endsWith(".solution") == true) throw IllegalArgumentException("You cannot use solution files as gifs.")
+        if (submission.displayLink == null) throw IllegalArgumentException("Submissions must have a gif")
+        if (submission.displayLink.endsWith(".solution")) throw IllegalArgumentException("You cannot use solution files as gifs.")
         return leaderboard.acquireWriteAccess().use { leaderboardScope ->
-            loadDataIfNecessary(leaderboardScope)
             val records = data.getValue(submission.puzzle)
             val newRecord by lazy { submission.createRecord(leaderboardScope) }
-            val unclaimedCategories = OmCategory.values().filter { it.supportsPuzzle(submission.puzzle) && it.supportsScore(submission.score) }.toMutableSet()
-            val result = mutableListOf<CategoryRecord<OmRecord?, OmCategory>>()
-            for ((record, categories) in records.toMap()) {
-                if (submission.score == record.score || submission.score.isSupersetOf(record.score)) {
-                    if (submission.score.isSupersetOf(record.score) || submission.displayLink != record.displayLink || record.dataLink == null) {
-                        record.remove(leaderboardScope)
-                        records.add(newRecord, categories)
-                        unclaimedCategories -= categories
-                        result.add(CategoryRecord(record, categories.toSet()))
-                        continue
+            val result = submit(leaderboardScope, submission) { beatenRecord, beatenCategories, shouldRemain ->
+                if (beatenRecord != null) {
+                    if (shouldRemain) {
+                        records.getValue(beatenRecord) -= beatenCategories
                     } else {
-                        return@use SubmitResult.AlreadyPresent()
+                        beatenRecord.remove(leaderboardScope)
                     }
                 }
-                if (record.score.isStrictlyBetterThan(submission.score)) {
-                    return@use SubmitResult.NothingBeaten(records.filter { it.key.score.isStrictlyBetterThan(submission.score) }
-                        .map { CategoryRecord(it.key, it.value) })
-                }
-                if (categories.isEmpty()) {
-                    if (submission.score.isStrictlyBetterThan(record.score)) {
-                        record.remove(leaderboardScope)
-                        records.add(newRecord, mutableSetOf())
-                        result.add(CategoryRecord(record, emptySet()))
-                    }
-                } else {
-                    unclaimedCategories -= categories
-                    val beatenCategories = categories.filter { category ->
-                        category.supportsScore(submission.score) && category.scoreComparator.compare(submission.score, record.score).let {
-                            it < 0 || it == 0 && submission.displayLink != record.displayLink
-                        }
-                    }.toSet()
-                    if (beatenCategories.isNotEmpty()) {
-                        categories -= beatenCategories
-                        if (categories.isEmpty() && submission.score.isStrictlyBetterThan(record.score)) {
-                            record.remove(leaderboardScope)
-                        }
-                        records.add(newRecord, beatenCategories.toMutableSet())
-                        result.add(CategoryRecord(record, beatenCategories))
-                    }
-                }
+                records.add(newRecord, beatenCategories.toMutableSet())
             }
-            records.add(newRecord, unclaimedCategories)
-            if (unclaimedCategories.isNotEmpty()) {
-                result.add(CategoryRecord(null, unclaimedCategories))
+            if (result is SubmitResult.Success) {
+                pageGenerator.update(leaderboardScope, result.beatenRecords.flatMap { it.categories }, data)
+                leaderboardScope.commitAndPush(
+                    submission.author,
+                    submission.puzzle,
+                    submission.score,
+                    result.beatenRecords.flatMap { it.categories }.map { it.toString() })
+                hash = leaderboardScope.currentHash()
             }
-            pageGenerator.update(leaderboardScope, result.flatMap { it.categories }, data)
-            leaderboardScope.commitAndPush(submission.author, submission.puzzle, submission.score, result.flatMap { it.categories }.map { it.toString() })
-            hash = leaderboardScope.currentHash()
-            SubmitResult.Success(null, result)
+            result
         }
+    }
+
+    fun submitDryRun(submission: OmSubmission): SubmitResult<OmRecord, OmCategory> {
+        return leaderboard.acquireReadAccess().use { leaderboardScope -> submit(leaderboardScope, submission) { _, _, _ -> } }
+    }
+
+    private fun submit(
+        leaderboardScope: GitRepository.ReadAccess,
+        submission: OmSubmission,
+        handleBeatenRecord: (beatenRecord: OmRecord?, beatenCategories: Set<OmCategory>, shouldRemain: Boolean) -> Unit
+    ): SubmitResult<OmRecord, OmCategory> {
+        loadDataIfNecessary(leaderboardScope)
+        val records = data.getValue(submission.puzzle)
+        val unclaimedCategories = OmCategory.values().filter { it.supportsPuzzle(submission.puzzle) && it.supportsScore(submission.score) }.toMutableSet()
+        val result = mutableListOf<CategoryRecord<OmRecord?, OmCategory>>()
+        for ((record, categories) in records.toMap()) {
+            if (submission.score == record.score || submission.score.isSupersetOf(record.score)) {
+                @Suppress("LiftReturnOrAssignment")
+                if (submission.score.isSupersetOf(record.score)) {
+                    handleBeatenRecord(record, categories, false)
+                    unclaimedCategories -= categories
+                    result.add(CategoryRecord(record, categories.toSet()))
+                    continue
+                } else if (submission.displayLink != record.displayLink || record.dataLink == null) {
+                    handleBeatenRecord(record, categories, false)
+                    return SubmitResult.Updated(CategoryRecord(record, categories.toSet()))
+                } else {
+                    return SubmitResult.AlreadyPresent()
+                }
+            }
+            if (record.score.isStrictlyBetterThan(submission.score)) {
+                return SubmitResult.NothingBeaten(records.filter { it.key.score.isStrictlyBetterThan(submission.score) }
+                    .map { CategoryRecord(it.key, it.value) })
+            }
+            if (categories.isEmpty()) {
+                if (submission.score.isStrictlyBetterThan(record.score)) {
+                    handleBeatenRecord(record, emptySet(), false)
+                    result.add(CategoryRecord(record, emptySet()))
+                }
+            } else {
+                unclaimedCategories -= categories
+                val beatenCategories = categories.filter { category ->
+                    category.supportsScore(submission.score) && category.scoreComparator.compare(submission.score, record.score).let {
+                        it < 0 || it == 0 && submission.displayLink != record.displayLink
+                    }
+                }.toSet()
+                if (beatenCategories.isNotEmpty()) {
+                    handleBeatenRecord(
+                        record,
+                        beatenCategories,
+                        categories.size == beatenCategories.size && submission.score.isStrictlyBetterThan(record.score)
+                    )
+                    result.add(CategoryRecord(record, beatenCategories))
+                }
+            }
+        }
+        handleBeatenRecord(null, unclaimedCategories, false)
+        if (unclaimedCategories.isNotEmpty()) {
+            result.add(CategoryRecord(null, unclaimedCategories))
+        }
+        return SubmitResult.Success(null, result)
     }
 
     fun overrideScores(overrides: List<Pair<OmRecord, OmScore>>) {
