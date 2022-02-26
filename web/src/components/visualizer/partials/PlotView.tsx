@@ -109,7 +109,7 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
                     configuration.mode === "2D"
                         ? {
                               ...common,
-                              hovertemplate: `${x.name}: %{x}<br>${y.name}: %{y}<br>%{hovertext}<extra></extra>`,
+                              hovertemplate: `${x.name}: %{x:.3~f}<br>${y.name}: %{y:.3~f}<br>%{hovertext}<extra></extra>`,
                               type: "scatter",
                               marker: {
                                   ...common.marker,
@@ -124,7 +124,7 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
                         : {
                               ...common,
                               z: records.map((record) => z.get(record.score) ?? 0),
-                              hovertemplate: `${x.name}: %{x}<br>${y.name}: %{y}<br>${z.name}: %{z}<br>%{hovertext}<extra></extra>`,
+                              hovertemplate: `${x.name}: %{x:.3~f}<br>${y.name}: %{y:.3~f}<br>${z.name}: %{z:.3~f}<br>%{hovertext}<extra></extra>`,
                               type: "scatter3d",
                               marker: {
                                   ...common.marker,

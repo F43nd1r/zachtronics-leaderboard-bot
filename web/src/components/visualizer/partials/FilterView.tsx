@@ -24,6 +24,7 @@ import Metric from "../../../model/Metric"
 import Modifier from "../../../model/Modifier"
 import iterate from "../../../utils/iterate"
 import { ReactNode } from "react"
+import * as d3 from "d3-format"
 
 interface FilterProps<MODIFIER_ID extends string, METRIC_ID extends string, SCORE> {
     metrics: Record<METRIC_ID, Metric<SCORE>>
@@ -132,6 +133,8 @@ interface FilterSliderProps {
     label: string
 }
 
+const numberFormat = d3.format(".3~f")
+
 function FilterSlider(props: FilterSliderProps) {
     const values = [...new Set(props.values)].map((value) => value ?? Infinity).sort((a, b) => a - b)
     return (
@@ -145,7 +148,7 @@ function FilterSlider(props: FilterSliderProps) {
             <Typography id={`filter-slider-${props.label}`}>{props.label}</Typography>
             <Slider
                 aria-labelledby={`filter-slider-${props.label}`}
-                valueLabelFormat={(index) => values[index]?.toString() ?? "∞"}
+                valueLabelFormat={(index) => (values[index] ? numberFormat(values[index]) : "∞")}
                 valueLabelDisplay={"on"}
                 value={props.value ? values.indexOf(props.value) : values.length - 1}
                 onChange={(event, i) => {
