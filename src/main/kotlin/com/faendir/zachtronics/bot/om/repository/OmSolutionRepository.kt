@@ -107,7 +107,7 @@ class OmSolutionRepository(
         if (submission.displayLink == null) throw IllegalArgumentException("Submissions must have a gif")
         if (submission.displayLink.endsWith(".solution")) throw IllegalArgumentException("You cannot use solution files as gifs.")
         return leaderboard.acquireWriteAccess().use { leaderboardScope ->
-            val records = data.getValue(submission.puzzle)
+            val records by lazy { data.getValue(submission.puzzle) }
             val newRecord by lazy { submission.createRecord(leaderboardScope) }
             val result = submit(leaderboardScope, submission) { beatenRecord, beatenCategories, shouldRemain ->
                 if (beatenRecord != null) {
@@ -180,7 +180,7 @@ class OmSolutionRepository(
                     handleBeatenRecord(
                         record,
                         beatenCategories,
-                        categories.size == beatenCategories.size && submission.score.isStrictlyBetterThan(record.score)
+                        categories.size != beatenCategories.size || !submission.score.isStrictlyBetterThan(record.score)
                     )
                     result.add(CategoryRecord(record, beatenCategories))
                 }
