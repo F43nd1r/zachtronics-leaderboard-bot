@@ -8,7 +8,7 @@
     "@mui/icons-material": "5.4.2",
     "@mui/lab": "5.0.0-alpha.70",
     "@mui/material": "5.4.3",
-    "d3-format": "^3.1.0",
+    "d3-format": "3.1.0",
     "deep-object-diff": "1.1.7",
     "plotly.js-gl3d-dist-min": "2.9.0",
     "react": "17.0.2",
@@ -21,7 +21,7 @@
     "typescript": "4.5.5"
   },
   "devDependencies": {
-    "@types/d3-format": "^3.0.1",
+    "@types/d3-format": "3.0.1",
     "@types/jest": "27.4.1",
     "@types/node": "16.11.26",
     "@types/plotly.js": "1.54.20",
