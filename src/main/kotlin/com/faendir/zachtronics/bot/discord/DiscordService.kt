@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.discord
 
 import com.faendir.discord4j.command.parse.CombinedParseResult
 import com.faendir.discord4j.command.parse.SingleParseResult
+import com.faendir.zachtronics.bot.config.DiscordProperties
 import com.faendir.zachtronics.bot.discord.command.TopLevelCommand
 import com.faendir.zachtronics.bot.utils.editReplyWithFailure
 import com.faendir.zachtronics.bot.utils.user
@@ -25,12 +26,14 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.component.ActionRow
 import discord4j.core.`object`.component.SelectMenu
+import discord4j.core.`object`.entity.channel.Channel
 import discord4j.core.`object`.presence.ClientActivity
 import discord4j.core.`object`.presence.ClientPresence
 import discord4j.core.event.domain.interaction.ChatInputAutoCompleteEvent
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.event.domain.interaction.SelectMenuInteractionEvent
+import discord4j.core.event.domain.message.MessageCreateEvent
 import discord4j.rest.http.client.ClientException
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
@@ -44,11 +47,13 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
+import kotlin.random.Random
 
 @Service
 class DiscordService(
     private val discordClient: GatewayDiscordClient,
     private val commands: List<TopLevelCommand<*>>,
+    private val discordProperties: DiscordProperties,
     private val gitProperties: GitProperties,
     private val restartEndpoint: RestartEndpoint,
     private val objectMapper: ObjectMapper,
@@ -112,6 +117,17 @@ class DiscordService(
                 }
                 event.respondWithSuggestions(command.autoComplete(event)?.takeIf { it.size <= 25 } ?: emptyList()).awaitSingleOrNull()
                 logger.debug("Autocompleted ${event.commandName} by ${event.interaction.user.username}")
+            }
+        }.subscribe()
+        discordClient.on(MessageCreateEvent::class.java) { event ->
+            mono {
+                val messages = discordProperties.randomMessages
+                if(messages != null) {
+                    val channel = event.message.channel.awaitSingleOrNull()
+                    if (channel?.type == Channel.Type.DM && event.message.author.orElse(null)?.isBot == false && Random.nextInt(20) == 0) {
+                        channel.createMessage(messages.random()).awaitSingleOrNull()
+                    }
+                }
             }
         }.subscribe()
         logger.info("Connected to discord with version ${gitProperties.shortCommitId}")
