@@ -119,13 +119,18 @@ class OmSolutionRepository(
                 }
                 records.add(newRecord, beatenCategories.toMutableSet())
             }
-            if (result is SubmitResult.Success) {
-                pageGenerator.update(leaderboardScope, result.beatenRecords.flatMap { it.categories }, data)
+            val beatenRecords = when(result) {
+                is SubmitResult.Success -> result.beatenRecords
+                is SubmitResult.Updated -> listOf(result.oldRecord)
+                else -> null
+            }
+            if (beatenRecords != null) {
+                pageGenerator.update(leaderboardScope, beatenRecords.flatMap { it.categories }, data)
                 leaderboardScope.commitAndPush(
                     submission.author,
                     submission.puzzle,
                     submission.score,
-                    result.beatenRecords.flatMap { it.categories }.map { it.toString() })
+                    beatenRecords.flatMap { it.categories }.map { it.toString() })
                 hash = leaderboardScope.currentHash()
             }
             result
