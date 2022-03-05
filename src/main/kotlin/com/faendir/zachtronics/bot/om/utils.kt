@@ -38,6 +38,7 @@ import com.faendir.zachtronics.bot.om.model.OmScorePart
 import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.model.SINGLE
 import com.faendir.zachtronics.bot.repository.CategoryRecord
+import com.faendir.zachtronics.bot.utils.ceil
 import okio.buffer
 import okio.source
 import org.slf4j.LoggerFactory
@@ -84,7 +85,7 @@ fun JNISolutionVerifier.getMetrics(metrics: List<OmScorePart>, handleException: 
                     when (it) {
                         -1 -> null
                         Int.MAX_VALUE -> Int.MAX_VALUE
-                        else -> it.toDouble() / getMetric(JNISolutionVerifier.Metrics.THROUGHPUT_OUTPUTS)
+                        else -> (it.toDouble() / getMetric(JNISolutionVerifier.Metrics.THROUGHPUT_OUTPUTS)).ceil(precision = 2)
                     }
                 }
             }

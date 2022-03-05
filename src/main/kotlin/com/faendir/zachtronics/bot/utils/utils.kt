@@ -34,6 +34,7 @@ import discord4j.core.spec.InteractionReplyEditMono
 import java.io.Closeable
 import java.net.HttpURLConnection
 import java.net.URL
+import kotlin.math.pow
 
 inline fun <T, R> Collection<T>.ifNotEmpty(block: (Collection<T>) -> R): R? = takeIf { it.isNotEmpty() }?.let(block)
 
@@ -184,4 +185,9 @@ fun isValidLink(string: String): Boolean {
     } catch (e: Exception) {
         false
     }
+}
+
+fun Double.ceil(precision: Int): Double {
+    val factor = 10.0.pow(precision)
+    return kotlin.math.ceil(this * factor) / factor
 }
