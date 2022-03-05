@@ -1,6 +1,28 @@
 #include "com_faendir_zachtronics_bot_om_JNISolutionVerifier.h"
 #include "verifier.h"
 #include <limits.h>
+#include <string.h>
+
+JNIEXPORT jstring JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_getPuzzleNameFromSolution
+  (JNIEnv *env, jclass cls, jbyteArray jSolution) {
+    (void)cls;
+
+    jbyte *solution = (*env)->GetByteArrayElements(env, jSolution, NULL);
+    const int solution_length = (*env)->GetArrayLength(env, jSolution);
+
+    int puzzle_name_length;
+    const char *puzzle_name_pointer = verifier_find_puzzle_name_in_solution_bytes((const char*) solution, solution_length, &puzzle_name_length);
+    if (puzzle_name_pointer == 0 || puzzle_name_length > 50) {
+        (*env)->ReleaseByteArrayElements(env, jSolution, solution, JNI_ABORT);
+        return NULL;
+    }
+    char puzzle_name[puzzle_name_length + 1];
+    memcpy(puzzle_name, puzzle_name_pointer, (size_t) puzzle_name_length);
+    (*env)->ReleaseByteArrayElements(env, jSolution, solution, JNI_ABORT);
+    puzzle_name[puzzle_name_length] = '\0';
+    jstring result = (*env)->NewStringUTF(env, puzzle_name);
+    return result;
+}
 
 JNIEXPORT jlong JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_prepareVerifier
     (JNIEnv *env, jclass cls, jbyteArray jPuzzle, jbyteArray jSolution) {

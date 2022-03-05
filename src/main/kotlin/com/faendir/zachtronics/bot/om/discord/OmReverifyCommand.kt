@@ -27,13 +27,14 @@ import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.JNISolutionVerifier
 import com.faendir.zachtronics.bot.om.OmQualifier
-import com.faendir.zachtronics.bot.om.getMetrics
+import com.faendir.zachtronics.bot.om.getAllAvailableMetrics
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmScorePart
 import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
+import com.faendir.zachtronics.bot.om.toScore
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.orEmpty
@@ -58,10 +59,6 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Abstract
         val errors = mutableListOf<String>()
         for (puzzle in puzzles) {
             val puzzleFile = puzzle.file
-            if (puzzleFile == null) {
-                errors.add("No puzzle file for ${puzzle.displayName}")
-                continue
-            }
 
             val records = repository.findCategoryHolders(puzzle, true)
                 .filter { (record, _) -> parameters.score == null || record.score.toDisplayString().equals(parameters.score, ignoreCase = true) }
@@ -71,38 +68,30 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Abstract
                     continue
                 }
                 if (overrideExisting || parts.any { it.getValue(record.score) == null }) {
-                    val computed = JNISolutionVerifier.open(puzzleFile.readBytes(), record.dataPath.readBytes())
-                        .use { it.getMetrics(parts) { e, part -> errors.add("Failed to get ${part.displayName} for ${record.toDisplayString(DisplayContext.discord())}: ${e.message}") } }
-                    if (computed.size < parts.size) {
-                        errors.add(
-                            "Wanted ${parts.joinToString { it.displayName }}, but got ${computed.keys.joinToString { it.displayName }} for ${
-                                record.toDisplayString(
-                                    DisplayContext.discord()
-                                )
-                            }"
-                        )
-                    }
+                    val computed = JNISolutionVerifier.open(puzzleFile.readBytes(), record.dataPath.readBytes()).use { it.getAllAvailableMetrics() }.toScore()
                     val newScore = if (overrideExisting) {
                         OmScore(
-                            cost = computed[OmScorePart.COST]?.toInt() ?: record.score.cost,
-                            cycles = computed[OmScorePart.CYCLES]?.toInt() ?: record.score.cycles,
-                            area = computed[OmScorePart.AREA]?.toInt() ?: record.score.area,
-                            instructions = computed[OmScorePart.INSTRUCTIONS]?.toInt() ?: record.score.instructions,
-                            height = computed[OmScorePart.HEIGHT]?.toInt() ?: record.score.height,
-                            width = computed[OmScorePart.WIDTH]?.toDouble() ?: record.score.width,
-                            rate = computed[OmScorePart.RATE]?.toDouble() ?: record.score.rate,
+                            cost = computed.cost.takeIf { parts.contains(OmScorePart.COST) } ?: record.score.cost,
+                            cycles = computed.cycles.takeIf { parts.contains(OmScorePart.CYCLES) } ?: record.score.cycles,
+                            area = computed.area.takeIf { parts.contains(OmScorePart.AREA) } ?: record.score.area,
+                            areaAtInf = computed.areaAtInf.takeIf { parts.contains(OmScorePart.AREA_AT_INF) } ?: record.score.areaAtInf,
+                            instructions = computed.instructions.takeIf { parts.contains(OmScorePart.INSTRUCTIONS) } ?: record.score.instructions,
+                            height = computed.height.takeIf { parts.contains(OmScorePart.HEIGHT) } ?: record.score.height,
+                            width = computed.width.takeIf { parts.contains(OmScorePart.WIDTH) } ?: record.score.width,
+                            rate = computed.rate.takeIf { parts.contains(OmScorePart.RATE) } ?: record.score.rate,
                             trackless = record.score.trackless,
                             overlap = record.score.overlap,
                         )
                     } else {
                         OmScore(
-                            cost = record.score.cost ?: computed[OmScorePart.COST]?.toInt(),
-                            cycles = record.score.cycles ?: computed[OmScorePart.CYCLES]?.toInt(),
-                            area = record.score.area ?: computed[OmScorePart.AREA]?.toInt(),
-                            instructions = record.score.instructions ?: computed[OmScorePart.INSTRUCTIONS]?.toInt(),
-                            height = record.score.height ?: computed[OmScorePart.HEIGHT]?.toInt(),
-                            width = record.score.width ?: computed[OmScorePart.WIDTH]?.toDouble(),
-                            rate = record.score.rate ?: computed[OmScorePart.RATE]?.toDouble(),
+                            cost = record.score.cost ?: computed.cost.takeIf { parts.contains(OmScorePart.COST) },
+                            cycles = record.score.cycles ?: computed.cycles.takeIf { parts.contains(OmScorePart.CYCLES) },
+                            area = record.score.area ?: computed.area.takeIf { parts.contains(OmScorePart.AREA) },
+                            areaAtInf = record.score.areaAtInf ?: computed.areaAtInf.takeIf { parts.contains(OmScorePart.AREA_AT_INF) },
+                            instructions = record.score.instructions ?: computed.instructions.takeIf { parts.contains(OmScorePart.INSTRUCTIONS) },
+                            height = record.score.height ?: computed.height.takeIf { parts.contains(OmScorePart.HEIGHT) },
+                            width = record.score.width ?: computed.width.takeIf { parts.contains(OmScorePart.WIDTH) },
+                            rate = record.score.rate ?: computed.rate.takeIf { parts.contains(OmScorePart.RATE) },
                             trackless = record.score.trackless,
                             overlap = record.score.overlap,
                         )

@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.om;
 
 import lombok.AccessLevel;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.Closeable;
@@ -31,6 +32,8 @@ public class JNISolutionVerifier implements Closeable {
     private final byte[] puzzle;
     private final byte[] solution;
     private Long verifier = null;
+
+    public static native String getPuzzleNameFromSolution(byte[] solution);
 
     private static native long prepareVerifier(byte[] puzzle, byte[] solution);
 
@@ -62,16 +65,27 @@ public class JNISolutionVerifier implements Closeable {
 
     public enum Metrics {
         // see verifier.h
-        CYCLES("cycles"),
+        PARSED_CYCLES("parsed cycles"),
+        PARSED_COST("parsed cost"),
+        PARSED_AREA("parsed area"),
+        PARSED_INSTRUCTIONS("parsed instructions"),
+        PARTS_OF_TYPE_TRACK("parts of type track"),
+        PARTS_OF_TYPE_BARON("parts of type baron"),
+        PARTS_OF_TYPE_GLYPH_DISPOSAL("parts of type glyph-disposal"),
+        MAXIMUM_ABSOLUTE_ARM_ROTATION("maximum absolute arm rotation"),
+        OVERLAP("overlap"),
+        DUPLICATE_REAGENTS("duplicate reagents"),
+        DUPLICATE_PRODUCTS("duplicate products"),
+        MAXIMUM_TRACK_GAP_POW_2("maximum track gap^2"),
         COST("cost"),
-        AREA("area (approximate)"),
         INSTRUCTIONS("instructions"),
+        CYCLES("cycles"),
+        AREA_APPROXIMATE("area (approximate)"),
         THROUGHPUT_CYCLES("throughput cycles"),
         THROUGHPUT_OUTPUTS("throughput outputs"),
+        THROUGHPUT_WASTE("throughput waste"),
         HEIGHT("height"),
         WIDTH_TIMES_TWO("width*2"),
-        MAX_ARM_ROTATION("maximum absolute arm rotation"),
-        OVERLAP("overlap"),
         ;
         private final String id;
 

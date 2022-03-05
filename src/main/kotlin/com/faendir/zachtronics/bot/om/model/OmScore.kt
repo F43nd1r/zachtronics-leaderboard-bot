@@ -27,6 +27,7 @@ data class OmScore(
     val cost: Int? = null,
     val cycles: Int? = null,
     val area: Int? = null,
+    val areaAtInf: Double? = null,
     val instructions: Int? = null,
     val height: Int? = null,
     val width: Double? = null,

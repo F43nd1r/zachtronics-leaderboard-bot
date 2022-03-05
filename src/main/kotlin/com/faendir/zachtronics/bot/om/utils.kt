@@ -16,181 +16,80 @@
 
 package com.faendir.zachtronics.bot.om
 
-import com.faendir.om.parser.solution.SolutionParser
-import com.faendir.om.parser.solution.model.Position
-import com.faendir.om.parser.solution.model.Solution
-import com.faendir.om.parser.solution.model.SolvedSolution
-import com.faendir.om.parser.solution.model.part.Arm
-import com.faendir.om.parser.solution.model.part.ArmType
-import com.faendir.om.parser.solution.model.part.Conduit
-import com.faendir.om.parser.solution.model.part.Glyph
-import com.faendir.om.parser.solution.model.part.GlyphType
-import com.faendir.om.parser.solution.model.part.IO
-import com.faendir.om.parser.solution.model.part.IOType
-import com.faendir.om.parser.solution.model.part.Part
-import com.faendir.om.parser.solution.model.part.Track
-import com.faendir.zachtronics.bot.om.model.FULL_CIRCLE
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
-import com.faendir.zachtronics.bot.om.model.OmScorePart
 import com.faendir.zachtronics.bot.om.model.OmSubmission
-import com.faendir.zachtronics.bot.om.model.SINGLE
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.utils.ceil
-import okio.buffer
-import okio.source
 import org.slf4j.LoggerFactory
-import java.io.ByteArrayInputStream
-import java.util.*
+import java.lang.Integer.max
+import java.lang.Integer.min
 
 
 private val logger = LoggerFactory.getLogger("OM Utils")
 
-data class VerifierResult(val metrics: Map<OmScorePart, Number?>, val maxArmRotation: Int?)
-
-fun getMetrics(solution: ByteArray, puzzle: OmPuzzle, vararg metrics: OmScorePart): VerifierResult? {
-    val puzzleFile = puzzle.file?.takeIf { it.exists() } ?: return null
-    return JNISolutionVerifier.open(puzzleFile.readBytes(), solution).use { verifier ->
-        VerifierResult(
-            metrics = verifier.getMetrics(metrics.toList()) { e, metric -> logger.info("Verifier threw exception for $metric", e) },
-            maxArmRotation = try {
-                verifier.getMetric(JNISolutionVerifier.Metrics.MAX_ARM_ROTATION)
-            } catch (e: Exception) {
-                logger.info("Verifier threw exception for max arm rotation", e)
-                null
-            }
-        )
-    }
-}
-
-fun JNISolutionVerifier.getMetrics(metrics: List<OmScorePart>, handleException: (Exception, OmScorePart) -> Unit): Map<OmScorePart, Number?> =
-    metrics.associateWith { metric ->
+fun JNISolutionVerifier.getAllAvailableMetrics(): Map<JNISolutionVerifier.Metrics, Int?> =
+    JNISolutionVerifier.Metrics.values().associateWith { metric ->
         try {
-            when (metric) {
-                OmScorePart.HEIGHT -> getMetric(JNISolutionVerifier.Metrics.HEIGHT).takeIf { it != -1 }
-                OmScorePart.WIDTH -> getMetric(JNISolutionVerifier.Metrics.WIDTH_TIMES_TWO).let {
-                    when (it) {
-                        -1 -> null
-                        Int.MAX_VALUE -> Int.MAX_VALUE
-                        else -> it.toDouble() / 2
-                    }
-                }
-                OmScorePart.COST -> getMetric(JNISolutionVerifier.Metrics.COST).takeIf { it != -1 }
-                OmScorePart.CYCLES -> getMetric(JNISolutionVerifier.Metrics.CYCLES).takeIf { it != -1 }
-                OmScorePart.AREA -> getMetric(JNISolutionVerifier.Metrics.AREA).takeIf { it != -1 }
-                OmScorePart.INSTRUCTIONS -> getMetric(JNISolutionVerifier.Metrics.INSTRUCTIONS).takeIf { it != -1 }
-                OmScorePart.RATE -> getMetric(JNISolutionVerifier.Metrics.THROUGHPUT_CYCLES).let {
-                    when (it) {
-                        -1 -> null
-                        Int.MAX_VALUE -> Int.MAX_VALUE
-                        else -> (it.toDouble() / getMetric(JNISolutionVerifier.Metrics.THROUGHPUT_OUTPUTS)).ceil(precision = 2)
-                    }
-                }
-            }
+            getMetric(metric).takeIf { it != -1 }
         } catch (e: Exception) {
-            handleException(e, metric)
+            logger.info("Verifier threw exception for $metric", e)
             null
         }
     }
 
-fun Solution.isTrackless(): Boolean = parts.none { it is Track }
+fun Map<JNISolutionVerifier.Metrics, Int?>.toScore() =
+    OmScore(
+        cost = getValue(JNISolutionVerifier.Metrics.PARSED_COST).also {
+            if (it != getValue(JNISolutionVerifier.Metrics.COST)) throw IllegalArgumentException("Stored cost value does not match simulation. Run your solution to completion before submitting.")
+        },
+        cycles = getValue(JNISolutionVerifier.Metrics.PARSED_CYCLES).also {
+            if (it != getValue(JNISolutionVerifier.Metrics.CYCLES)) throw IllegalArgumentException("Stored cycles value does not match simulation. Run your solution to completion before submitting.")
+        },
+        area = getValue(JNISolutionVerifier.Metrics.PARSED_AREA).also {
+            val approx = getValue(JNISolutionVerifier.Metrics.AREA_APPROXIMATE)
+            if (it != null && approx != null && min(it, approx).toDouble() / max(it, approx) < 0.95) {
+                throw IllegalArgumentException("Stored area value does not match simulation. Run your solution to completion before submitting.")
+            }
+        },
+        areaAtInf = if (getValue(JNISolutionVerifier.Metrics.THROUGHPUT_WASTE) == 0) getValue(JNISolutionVerifier.Metrics.PARSED_AREA)?.toDouble() else Double.POSITIVE_INFINITY,
+        instructions = getValue(JNISolutionVerifier.Metrics.PARSED_INSTRUCTIONS).also {
+            if (it != getValue(JNISolutionVerifier.Metrics.INSTRUCTIONS)) throw IllegalArgumentException("Stored instructions value does not match simulation. Run your solution to completion before submitting.")
+        },
+        height = getValue(JNISolutionVerifier.Metrics.HEIGHT),
+        width = getValue(JNISolutionVerifier.Metrics.WIDTH_TIMES_TWO)?.let { it.toDouble() / 2 },
+        rate = getValue(JNISolutionVerifier.Metrics.THROUGHPUT_CYCLES)?.let {
+            (it.toDouble() / (getValue(JNISolutionVerifier.Metrics.THROUGHPUT_OUTPUTS) ?: 0)).ceil(precision = 2)
+        },
+        trackless = getValue(JNISolutionVerifier.Metrics.PARTS_OF_TYPE_TRACK) == 0,
+        overlap = getValue(JNISolutionVerifier.Metrics.OVERLAP) != 0
+    )
 
-fun Solution.isOverlap(puzzle: OmPuzzle): Boolean =
-    parts.flatMapIndexed { index, part -> parts.subList(0, index).map { it to part } }.any { (p1, p2) -> puzzle.overlap(p1, p2) }
-
-
-private fun OmPuzzle.overlap(p1: Part, p2: Part): Boolean {
-    return when {
-        p1 is Arm && p2 is Arm -> {
-            val s1 = shape(p1)
-            shape(p2).any { s1.contains(it) }
-        }
-        p1 is Arm && p2 is Track || p2 is Arm && p1 is Track -> false
-        p1 is Arm -> shape(p2).contains(p1.position)
-        p2 is Arm -> shape(p1).contains(p2.position)
-        else -> {
-            val s1 = shape(p1)
-            shape(p2).any { s1.contains(it) }
-        }
-    }
-}
-
-private fun OmPuzzle.shape(part: Part): List<Position> {
-    return when (part) {
-        is Arm -> if (part.type == ArmType.VAN_BERLOS_WHEEL) {
-            FULL_CIRCLE
-        } else {
-            SINGLE
-        }
-        is Conduit -> part.positions
-        is Glyph -> part.type.shape
-        is IO -> if (part.type == IOType.INPUT) {
-            this.getReagentShape(part)
-        } else {
-            this.getProductShape(part)
-        }
-        is Track -> part.positions
-        else -> throw IllegalArgumentException("Unknown part type ${part.name}")
-    }.map { it.rotate(part.rotation) }.map { it + part.position }
-}
-
-fun createSubmission(gif: String?, author: String, bytes: ByteArray): OmSubmission {
-    val solution = try {
-        SolutionParser.parse(ByteArrayInputStream(bytes).source().buffer())
-    } catch (e: Exception) {
-        throw IllegalArgumentException("I could not parse your solution")
-    }
-    if (solution !is SolvedSolution) {
-        throw IllegalArgumentException("only solved solutions are accepted")
-    }
-    if (solution.parts.count { it is Arm && it.type == ArmType.VAN_BERLOS_WHEEL } > 1) {
+fun createSubmission(gif: String?, author: String, solution: ByteArray): OmSubmission {
+    val puzzleName = JNISolutionVerifier.getPuzzleNameFromSolution(solution) ?: throw IllegalArgumentException("Cannot parse your solution")
+    val puzzle = OmPuzzle.values().find { it.id == puzzleName } ?: throw IllegalArgumentException("I do not know the puzzle \"${puzzleName}\"")
+    val metrics = JNISolutionVerifier.open(puzzle.file.readBytes(), solution).use { it.getAllAvailableMetrics() }
+    if ((metrics.getValue(JNISolutionVerifier.Metrics.PARTS_OF_TYPE_BARON) ?: 0) > 1) {
         throw IllegalArgumentException("Multiple Van Berlo's Wheels are banned.")
     }
-    if (solution.parts.count { it is Glyph && it.type == GlyphType.DISPOSAL } > 1) {
+    if ((metrics.getValue(JNISolutionVerifier.Metrics.PARTS_OF_TYPE_GLYPH_DISPOSAL) ?: 0) > 1) {
         throw IllegalArgumentException("Multiple Disposal glyphs are banned.")
     }
-    if (solution.parts.filterIsInstance<IO>().groupBy { it.type to it.index }.values.any { it.size > 1 }) {
-        throw IllegalArgumentException("Duplicated Inputs or Outputs are banned.")
+    if ((metrics.getValue(JNISolutionVerifier.Metrics.DUPLICATE_REAGENTS) ?: 0) > 1) {
+        throw IllegalArgumentException("Duplicated Reagents are banned.")
     }
-
-    val puzzle = OmPuzzle.values().find { it.id == solution.puzzle } ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
-    val computed = getMetrics(bytes, puzzle, OmScorePart.WIDTH, OmScorePart.HEIGHT, OmScorePart.RATE)
-    if(computed?.maxArmRotation != null && computed.maxArmRotation >= 4096) {
-        throw IllegalArgumentException("Maximum arm rotation should be below 4096 but was ${computed.maxArmRotation}.")
+    if ((metrics.getValue(JNISolutionVerifier.Metrics.DUPLICATE_PRODUCTS) ?: 0) > 1) {
+        throw IllegalArgumentException("Duplicated Products are banned.")
     }
-    val score = OmScore(
-        cost = solution.cost,
-        cycles = solution.cycles,
-        area = solution.area,
-        instructions = solution.instructions,
-        height = computed?.metrics?.get(OmScorePart.HEIGHT)?.toInt(),
-        width = computed?.metrics?.get(OmScorePart.WIDTH)?.toDouble(),
-        rate = computed?.metrics?.get(OmScorePart.RATE)?.toDouble(),
-        trackless = solution.isTrackless(),
-        overlap = solution.isOverlap(puzzle),
-    )
-    return OmSubmission(puzzle, score, author, gif, bytes)
+    if ((metrics.getValue(JNISolutionVerifier.Metrics.MAXIMUM_TRACK_GAP_POW_2) ?: 0) > 1) {
+        throw IllegalArgumentException("Quantum Tracks are banned.")
+    }
+    if ((metrics.getValue(JNISolutionVerifier.Metrics.MAXIMUM_ABSOLUTE_ARM_ROTATION) ?: 0) >= 4096) {
+        throw IllegalArgumentException("Maximum arm rotations over 4096 are banned.")
+    }
+    return OmSubmission(puzzle, metrics.toScore(), author, gif, solution)
 }
 
 fun OmRecord.withCategory(category: OmCategory) = CategoryRecord(this, setOf(category))
-
-infix operator fun Position.plus(other: Position) = Position(this.x + other.x, this.y + other.y)
-data class CubicPosition(val x: Int, val y: Int, val z: Int) {
-
-    fun rotate(times: Int): CubicPosition {
-        val t = Math.floorMod(times, 6)
-        val coords = mutableListOf(x, y, z)
-        if (t % 2 != 0) {
-            coords.replaceAll { -it }
-        }
-        Collections.rotate(coords, t % 3)
-        return CubicPosition(coords[0], coords[1], coords[2])
-    }
-
-    fun toAxial(): Position = Position(x, z)
-}
-
-fun Position.toCubic(): CubicPosition = CubicPosition(x, -x - y, y)
-fun Position.rotate(times: Int) = this.toCubic().rotate(times).toAxial()

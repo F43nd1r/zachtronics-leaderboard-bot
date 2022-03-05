@@ -16,12 +16,6 @@
 
 package com.faendir.zachtronics.bot.om.model
 
-import com.faendir.om.parser.puzzle.PuzzleParser
-import com.faendir.om.parser.puzzle.model.Atom
-import com.faendir.om.parser.solution.model.Position
-import com.faendir.om.parser.solution.model.part.IO
-import com.faendir.om.parser.solution.model.part.IOType
-import com.faendir.om.parser.solution.model.to
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.om.model.OmGroup.CHAPTER_1
 import com.faendir.zachtronics.bot.om.model.OmGroup.CHAPTER_2
@@ -44,13 +38,8 @@ import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2021
 import com.faendir.zachtronics.bot.om.model.OmType.INFINITE
 import com.faendir.zachtronics.bot.om.model.OmType.NORMAL
 import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
-import okio.buffer
-import okio.source
 import org.springframework.util.ResourceUtils
-
-internal val SINGLE = setOf(0 to 0)
-internal val FULL_CIRCLE = setOf(0 to 0, 1 to 0, -1 to 0, 0 to 1, -1 to 1, 0 to -1, 1 to -1)
-
+import java.io.File
 
 @Suppress("unused", "SpellCheckingInspection")
 enum class OmPuzzle(
@@ -202,32 +191,5 @@ enum class OmPuzzle(
     override val supportedCategories: List<OmCategory> = OmCategory.values().filter { it.supportsPuzzle(this) }
     override val link: String = "https://zlbb.faendir.com/puzzles/$id"
 
-    val file by lazy {
-        try {
-            ResourceUtils.getFile("classpath:puzzle/$id.puzzle")
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    val data by lazy {
-        file?.inputStream()?.use { PuzzleParser.parse(it.source().buffer()) }
-    }
-
-    fun getReagentShape(io: IO): Set<Position> {
-        return data?.inputs?.get(io.index)?.atoms?.map { it.second }?.map { it.x.toInt() to it.y.toInt() }?.toSet() ?: SINGLE
-    }
-
-    fun getProductShape(io: IO): Set<Position> {
-        return if (io.type != IOType.INFINITE) {
-            data?.outputs?.get(io.index)?.atoms?.map { it.second }?.map { it.x.toInt() to it.y.toInt() }?.toSet()
-        } else {
-            data?.outputs?.get(io.index)?.atoms?.let { atoms ->
-                val repeatPosition = atoms.first { it.first == Atom.REPEAT }.second
-                val atomPositions = atoms.map { it.second }
-                (0 until 6).flatMap { i -> atomPositions.map { Position(it.x + i * repeatPosition.x, it.y + i * repeatPosition.y) } }.toSet()
-            }
-        } ?: SINGLE
-    }
-
+    val file: File by lazy { ResourceUtils.getFile("classpath:puzzle/$id.puzzle") }
 }

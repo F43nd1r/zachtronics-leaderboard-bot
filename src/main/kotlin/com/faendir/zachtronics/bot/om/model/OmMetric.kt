@@ -30,7 +30,7 @@ sealed class OmMetric(override val displayName: String, val scoreParts: List<OmS
 
     abstract class Basic(identifier: String, scorePart: OmScorePart) : OmMetric(identifier, listOf(scorePart)) {
         override val comparator: Comparator<OmScore> = Comparator.comparing { scorePart.getValue(it)?.toDouble() ?: NOT_FOUND_PLACEHOLDER }
-        override val description: String = scorePart.key.toString()
+        override val description: String = scorePart.key
 
         override fun describe(score: OmScore): String? = null
     }
@@ -38,7 +38,7 @@ sealed class OmMetric(override val displayName: String, val scoreParts: List<OmS
     abstract class Sum(identifier: String, vararg scoreParts: OmScorePart) : OmMetric(identifier, scoreParts.toList()) {
         override val comparator: Comparator<OmScore> =
             Comparator.comparing { score -> scoreParts.sumOf { it.getValue(score)?.toDouble() ?: NOT_FOUND_PLACEHOLDER } }
-        override val description: String = scoreParts.joinToString("+") { it.key.toString() }
+        override val description: String = scoreParts.joinToString("+") { it.key }
         override fun describe(score: OmScore): String? =
             if (scoreParts.all { it.getValue(score) != null }) "$description=${scoreParts.sumOf { it.getValue(score)!!.toInt() }}" else null
     }
@@ -46,7 +46,7 @@ sealed class OmMetric(override val displayName: String, val scoreParts: List<OmS
     abstract class Product(vararg scoreParts: OmScorePart) : OmMetric("X", scoreParts.toList()) {
         override val comparator: Comparator<OmScore> =
             Comparator.comparing { score -> scoreParts.map { it.getValue(score)?.toDouble() ?: NOT_FOUND_PLACEHOLDER }.reduce { a, b -> a * b } }
-        override val description: String = scoreParts.joinToString("·") { it.key.toString() }
+        override val description: String = scoreParts.joinToString("·") { it.key }
         override fun describe(score: OmScore): String? =
             if (scoreParts.all { it.getValue(score) != null }) "$description=${scoreParts.productOf { it.getValue(score)!!.toInt() }}" else null
     }

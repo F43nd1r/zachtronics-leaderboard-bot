@@ -59,7 +59,6 @@ dependencies {
     implementation(libs.jgit)
     implementation(libs.java.curl)
     implementation(libs.jraw)
-    implementation(libs.om.dsl)
     implementation(projects.common)
     implementation(projects.native)
     implementation(libs.jackson.databind)

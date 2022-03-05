@@ -23,8 +23,19 @@ import java.io.File;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class JNISolutionVerifierTest {
+    @Test
+    void getName() throws IOException {
+        String puzzleName = JNISolutionVerifier.getPuzzleNameFromSolution(getClass().getClassLoader().getResource("Face_Powder_Height_1.solution").openStream().readAllBytes());
+        assertEquals("P009", puzzleName);
+    }
+    @Test
+    void getNameOfNonSolutionFile() throws IOException {
+        String puzzleName = JNISolutionVerifier.getPuzzleNameFromSolution(getClass().getClassLoader().getResource("P009.puzzle").openStream().readAllBytes());
+        assertNull(puzzleName);
+    }
 
     @Test
     void getHeight() throws IOException {
