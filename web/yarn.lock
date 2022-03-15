@@ -6594,10 +6594,10 @@ pkg-up@^3.1.0:
   dependencies:
     find-up "^3.0.0"
 
-plotly.js-gl3d-dist-min@2.9.0:
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/plotly.js-gl3d-dist-min/-/plotly.js-gl3d-dist-min-2.9.0.tgz#70a304af1970832be3abbc2da73102de076ca0a8"
-  integrity sha512-Hk3Dim0NcPzCE+1RiE7rFs+Wl6t9EC+YMaOQ3EtFmo1OJegjlhnlQeO569e3YfK98vUxL7oRbY8bERqGt99qyg==
+plotly.js-gl3d-dist-min@2.11.1:
+  version "2.11.1"
+  resolved "https://registry.yarnpkg.com/plotly.js-gl3d-dist-min/-/plotly.js-gl3d-dist-min-2.11.1.tgz#4fbc95951023aa794adf01801dd7b37cfbe9a451"
+  integrity sha512-+BqmScrqX8yihF41OAtNf0juIvY+VP+KKTS9DDNgb6orce4L5ebJXsMO9oEaXGXok8jAo3dHNMYlpnswxG0bkA==
 
 portfinder@^1.0.28:
   version "1.0.28"
