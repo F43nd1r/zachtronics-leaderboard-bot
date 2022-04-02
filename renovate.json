@@ -22,6 +22,10 @@
       ],
       "automerge": true,
       "automergeType": "branch"
+    },
+    {
+      "matchPackagePatterns": ["^org\\.jetbrains\\.kotlin"],
+      "groupName": "kotlin"
     }
   ]
 }
