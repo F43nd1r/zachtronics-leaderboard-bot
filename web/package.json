@@ -29,7 +29,7 @@
     "@types/react-dom": "17.0.14",
     "@types/react-plotly.js": "2.5.0",
     "@types/react-router-hash-link": "2.4.5",
-    "prettier": "2.5.1",
+    "prettier": "2.6.2",
     "source-map-explorer": "2.5.2"
   },
   "scripts": {
