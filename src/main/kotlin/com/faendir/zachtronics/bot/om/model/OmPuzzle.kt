@@ -41,6 +41,7 @@ import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_VIII
 import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2019
 import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2020
 import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2021
+import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2022
 import com.faendir.zachtronics.bot.om.model.OmType.INFINITE
 import com.faendir.zachtronics.bot.om.model.OmType.NORMAL
 import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
@@ -57,7 +58,8 @@ enum class OmPuzzle(
     override val group: OmGroup,
     override val type: OmType,
     override val displayName: String,
-    val id: String
+    val id: String,
+    vararg val altIds: String,
 ) : Puzzle<OmCategory> {
     STABILIZED_WATER(CHAPTER_1, NORMAL, "Stabilized Water", "P007"),
     REFINED_GOLD(CHAPTER_1, NORMAL, "Refined Gold", "P010"),
@@ -197,6 +199,17 @@ enum class OmPuzzle(
     CALM_BEFORE_THE_STORM(TOURNAMENT_2021, INFINITE, "Calm before the Storm", "w2450512434"),
     QUINTESSENTIAL_STABILIZER(TOURNAMENT_2021, NORMAL, "Quintessential Stabilizer", "w2450512626"),
     ELEMENTAL_JEWEL_SETTING(TOURNAMENT_2021, NORMAL, "Elemental Jewel Setting", "w2450512809"),
+
+    FLAKE_SALT(TOURNAMENT_2022, NORMAL, "Flake Salt", "w2788066123", "OM2022_FlakeSalt"),
+    LEAVE_NO_TRACE(TOURNAMENT_2022, NORMAL, "Leave no Trace", "w2788066279", "OM2022_LeaveNoTrace"),
+    RUST_REMOVAL(TOURNAMENT_2022, NORMAL, "Rust Removal", "w2788066771", "OM2022_RustRemoval"),
+    SOOTHING_SALVE(TOURNAMENT_2022, NORMAL, "Soothing Salve", "w2788066865", "OM2022_SoothingSalve"),
+    LUBRICATING_SOLVENTS(TOURNAMENT_2022, NORMAL, "Lubricating Solvents", "w2788066950", "OM2022_LubricatingSolvents"),
+    FILM_CRYSTAL(TOURNAMENT_2022, NORMAL, "Film Crystal", "w2788067038", "OM2022_FilmCrystal"),
+    AETHER_REACTOR(TOURNAMENT_2022, PRODUCTION, "Aether Reactor", "w2788067624", "OM2022_AetherReactor"),
+    FULMINATION(TOURNAMENT_2022, NORMAL, "Fulmination", "w2788067677", "OM2022_Fulmination"),
+    POTENT_PAINKILLERS(TOURNAMENT_2022, NORMAL, "Potent Painkillers", "w2788067760", "OM2022_PotentPainkillers"),
+    RADIO_RECEIVERS(TOURNAMENT_2022, NORMAL, "Radio Receivers", "w2788067896", "OM2022_RadioReceivers"),
     ;
 
     override val supportedCategories: List<OmCategory> = OmCategory.values().filter { it.supportsPuzzle(this) }

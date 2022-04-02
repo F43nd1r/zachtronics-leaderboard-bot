@@ -40,9 +40,11 @@ import com.faendir.zachtronics.bot.om.model.SINGLE
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.utils.ceil
 import okio.buffer
+import okio.sink
 import okio.source
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.util.*
 
 
@@ -136,9 +138,9 @@ private fun OmPuzzle.shape(part: Part): List<Position> {
     }.map { it.rotate(part.rotation) }.map { it + part.position }
 }
 
-fun createSubmission(gif: String?, author: String, bytes: ByteArray): OmSubmission {
+fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSubmission {
     val solution = try {
-        SolutionParser.parse(ByteArrayInputStream(bytes).source().buffer())
+        SolutionParser.parse(ByteArrayInputStream(inputBytes).source().buffer())
     } catch (e: Exception) {
         throw IllegalArgumentException("I could not parse your solution")
     }
@@ -155,9 +157,16 @@ fun createSubmission(gif: String?, author: String, bytes: ByteArray): OmSubmissi
         throw IllegalArgumentException("Duplicated Inputs or Outputs are banned.")
     }
 
-    val puzzle = OmPuzzle.values().find { it.id == solution.puzzle } ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
-    val computed = getMetrics(bytes, puzzle, OmScorePart.WIDTH, OmScorePart.HEIGHT, OmScorePart.RATE)
-    if(computed?.maxArmRotation != null && computed.maxArmRotation >= 4096) {
+    val (puzzle, solutionBytes) = OmPuzzle.values().find { it.id == solution.puzzle }?.let { it to inputBytes }
+        ?: OmPuzzle.values().find { it.altIds.contains(solution.puzzle) }?.let {
+            solution.puzzle = it.id
+            val out = ByteArrayOutputStream()
+            SolutionParser.write(solution, out.sink().buffer())
+            it to out.toByteArray()
+        }
+        ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
+    val computed = getMetrics(solutionBytes, puzzle, OmScorePart.WIDTH, OmScorePart.HEIGHT, OmScorePart.RATE)
+    if (computed?.maxArmRotation != null && computed.maxArmRotation >= 4096) {
         throw IllegalArgumentException("Maximum arm rotation should be below 4096 but was ${computed.maxArmRotation}.")
     }
     val score = OmScore(
@@ -171,7 +180,7 @@ fun createSubmission(gif: String?, author: String, bytes: ByteArray): OmSubmissi
         trackless = solution.isTrackless(),
         overlap = solution.isOverlap(puzzle),
     )
-    return OmSubmission(puzzle, score, author, gif, bytes)
+    return OmSubmission(puzzle, score, author, gif, solutionBytes)
 }
 
 fun OmRecord.withCategory(category: OmCategory) = CategoryRecord(this, setOf(category))
