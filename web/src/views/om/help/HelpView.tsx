@@ -143,6 +143,10 @@ export default function HelpView() {
                             attachment on your last message).
                         </p>
                         <p>
+                            If your gif is too big for discord (&gt; 10MB), first upload it to <a href="https://imgur.com/upload">imgur</a>, then right click the image and select 'copy image
+                            link/address'.
+                        </p>
+                        <p>
                             To view records, use <Code>/om show puzzle:&lt;puzzle name&gt; category:&lt;short category name&gt;</Code>
                         </p>
                         <p>
