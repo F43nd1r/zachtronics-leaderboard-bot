@@ -17,20 +17,20 @@
 import "./index.css"
 import App from "./views/om/App"
 import { lazy, StrictMode, Suspense } from "react"
-import ReactDOM from "react-dom"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import LoadingIndicator from "./components/LoadingIndicator"
 import { PuzzleRoutes } from "./views/om/puzzles/PuzzleView"
 import ScPuzzleVisualizerView from "./views/sc/ScPuzzleVisualizerView"
 import SzPuzzleVisualizerView from "./views/sz/SzPuzzleVisualizerView"
 import AppThemeProvider from "./fragments/AppThemeProvider"
+import { createRoot } from "react-dom/client"
 
 const RecentSubmissionsView = lazy(() => import("./views/om/recent/RecentSubmissionsView"))
 const PuzzleView = lazy(() => import("./views/om/puzzles/PuzzleView"))
 const CategoryView = lazy(() => import("./views/om/categories/CategoryView"))
 const HelpView = lazy(() => import("./views/om/help/HelpView"))
 
-ReactDOM.render(
+createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <AppThemeProvider>
             <Suspense fallback={<LoadingIndicator />}>
@@ -53,5 +53,4 @@ ReactDOM.render(
             </Suspense>
         </AppThemeProvider>
     </StrictMode>,
-    document.getElementById("root"),
 )
