@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Divider, Drawer, IconButton, styled, Toolbar, Typography, useTheme } from "@mui/material"
+import { Divider, IconButton, styled, SwipeableDrawer, Toolbar, Typography, useTheme } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
@@ -92,12 +92,8 @@ export default function App() {
     const colorMode = useContext(AppThemeContext)
     const isNotTinyScreen = useMediaQuery(theme.breakpoints.up("sm"))
     const [open, setOpen] = usePersistedState("sidebarOpen", isNotTinyScreen)
-    const handleDrawerOpen = () => {
-        setOpen(true)
-    }
-    const handleDrawerClose = () => {
-        setOpen(false)
-    }
+    const handleDrawerOpen = () => setOpen(true)
+    const handleDrawerClose = () => setOpen(false)
     return (
         <>
             <AppBar position="fixed" open={open}>
@@ -115,7 +111,7 @@ export default function App() {
                     <SearchBar />
                 </Toolbar>
             </AppBar>
-            <Drawer
+            <SwipeableDrawer
                 sx={{
                     width: drawerWidth,
                     flexShrink: 0,
@@ -129,6 +125,8 @@ export default function App() {
                 variant="persistent"
                 anchor="left"
                 open={open}
+                onOpen={handleDrawerOpen}
+                onClose={handleDrawerClose}
             >
                 <DrawerHeader>
                     <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
@@ -138,7 +136,7 @@ export default function App() {
                 </DrawerHeader>
                 <Divider />
                 <Sidebar />
-            </Drawer>
+            </SwipeableDrawer>
             <Main open={open}>
                 <DrawerHeader />
                 <Outlet />
