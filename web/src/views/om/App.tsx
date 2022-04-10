@@ -91,6 +91,7 @@ export default function App() {
     const theme = useTheme()
     const colorMode = useContext(AppThemeContext)
     const isNotTinyScreen = useMediaQuery(theme.breakpoints.up("sm"))
+    const isAtLeastMediumScreen = useMediaQuery(theme.breakpoints.up("md"))
     const [open, setOpen] = usePersistedState("sidebarOpen", isNotTinyScreen)
     const handleDrawerOpen = () => setOpen(true)
     const handleDrawerClose = () => setOpen(false)
@@ -122,7 +123,7 @@ export default function App() {
                     display: "flex",
                     flexDirection: "column",
                 }}
-                variant="persistent"
+                variant={isAtLeastMediumScreen ? "persistent" : "temporary"}
                 anchor="left"
                 open={open}
                 onOpen={handleDrawerOpen}
