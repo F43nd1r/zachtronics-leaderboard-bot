@@ -20,6 +20,7 @@ import { lazy, StrictMode, Suspense } from "react"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import LoadingIndicator from "./components/LoadingIndicator"
 import { PuzzleRoutes } from "./views/om/puzzles/PuzzleView"
+import IfPuzzleVisualizerView from "./views/if/IfPuzzleVisualizerView"
 import ScPuzzleVisualizerView from "./views/sc/ScPuzzleVisualizerView"
 import SzPuzzleVisualizerView from "./views/sz/SzPuzzleVisualizerView"
 import AppThemeProvider from "./fragments/AppThemeProvider"
@@ -46,6 +47,7 @@ createRoot(document.getElementById("root")!).render(
                             <Route path="categories/:categoryId" element={<CategoryView />} />
                             <Route path="help" element={<HelpView />} />
                         </Route>
+                        <Route path="if/:puzzleId" element={<IfPuzzleVisualizerView />} />
                         <Route path="sc/:puzzleId" element={<ScPuzzleVisualizerView />} />
                         <Route path="sz/:puzzleId" element={<SzPuzzleVisualizerView />} />
                     </Routes>
