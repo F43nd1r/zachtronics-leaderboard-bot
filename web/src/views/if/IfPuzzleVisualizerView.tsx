@@ -24,7 +24,7 @@ import fetchFromApi from "../../utils/fetchFromApi"
 
 export default function IfPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId
-    fetchFromApi<Puzzle>(`/sz/puzzle/${puzzleId}`).then(
+    fetchFromApi<Puzzle>(`/if/puzzle/${puzzleId}`).then(
         (puzzle) => (document.title = `${puzzle.displayName} - Infinifactory Leaderboard`))
 
     return (

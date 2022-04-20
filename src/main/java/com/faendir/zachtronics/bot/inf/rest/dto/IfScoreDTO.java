@@ -18,17 +18,21 @@ package com.faendir.zachtronics.bot.inf.rest.dto;
 
 import com.faendir.zachtronics.bot.inf.model.IfScore;
 import lombok.Value;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
 @Value
 public class IfScoreDTO {
-    int cost;
-    int power;
-    int lines;
+    int cycles;
+    int footprint;
+    int blocks;
+
+    @Accessors(fluent = true)
+    boolean usesGRA;
 
     @NotNull
     public static IfScoreDTO fromScore(@NotNull IfScore score) {
-        return new IfScoreDTO(score.getCycles(), score.getFootprint(), score.getBlocks());
+        return new IfScoreDTO(score.getCycles(), score.getFootprint(), score.getBlocks(), score.usesGRA());
     }
 }
 
