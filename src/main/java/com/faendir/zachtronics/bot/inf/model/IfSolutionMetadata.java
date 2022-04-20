@@ -28,9 +28,9 @@ import java.util.regex.Pattern;
 @Value
 class IfSolutionMetadata {
     /** InputRate.4-3.1 = 1 */
-    private static Pattern inputRatePattern = Pattern.compile("InputRate.(?<id>\\d+-\\d).(?<slot>\\d) = \\d+");
+    private static Pattern inputRatePattern = Pattern.compile("InputRate.(?<id>\\d+-\\db?).(?<slot>\\d) = \\d+");
     /** Solution.4-3.1 = AAAA== */
-    private static Pattern solutionPattern = Pattern.compile("Solution.(?<id>\\d+-\\d).(?<slot>\\d) = [\\w+/]+=*");
+    private static Pattern solutionPattern = Pattern.compile("Solution.(?<id>\\d+-\\db?).(?<slot>\\d) = [\\w+/]+=*");
 
     IfPuzzle puzzle;
 
