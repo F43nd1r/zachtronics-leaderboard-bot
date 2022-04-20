@@ -19,7 +19,7 @@ import { useParams } from "react-router-dom"
 import { Visualizer } from "../../components/visualizer/Visualizer"
 import { VisualizerColor } from "../../utils/VisualizerColor"
 import Puzzle from "../../model/Puzzle"
-import IfScore from "../../model/sz/IfScore"
+import IfScore from "../../model/if/IfScore"
 import fetchFromApi from "../../utils/fetchFromApi"
 
 export default function IfPuzzleVisualizerView() {
