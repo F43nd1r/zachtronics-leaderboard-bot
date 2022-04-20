@@ -324,6 +324,13 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                 }
             }
 
+            // if it's the first in line our new sol steals from the void all the categories it can
+            if (solutions.isEmpty()) {
+                Arrays.stream(ScCategory.values())
+                      .filter(c -> c.supportsScore(candidate.getScore()))
+                      .forEach(candidate.getCategories()::add);
+            }
+
             int index = Collections.binarySearch(solutions, candidate, COMPARATOR);
             if (index < 0) {
                 index = -index - 1;
