@@ -26,8 +26,8 @@ import java.util.function.ToIntFunction;
 @RequiredArgsConstructor
 public enum IfMetric implements Metric {
     CYCLES("C", IfScore::getCycles),
-    FOOTPRINT("P", IfScore::getFootprint),
-    BLOCKS("L", IfScore::getBlocks),
+    FOOTPRINT("F", IfScore::getFootprint),
+    BLOCKS("B", IfScore::getBlocks),
     ANY_FLAG("", null),
     NO_GRA("NG", null);
 
