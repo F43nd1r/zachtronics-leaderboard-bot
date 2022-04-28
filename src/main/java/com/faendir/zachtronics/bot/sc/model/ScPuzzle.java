@@ -83,9 +83,9 @@ public enum ScPuzzle implements Puzzle<ScCategory> {
     organic_1(ScGroup.MAIN, ScType.RESEARCH, "Special Assignment", true),
     organic_2(ScGroup.MAIN, ScType.RESEARCH, "Suspicious Behavior", true),
     organic_3(ScGroup.MAIN, ScType.RESEARCH, "I Told You So", true),
-    organic_5(ScGroup.MAIN, ScType.PRODUCTION_TRIVIAL, "Ω-Pseudoethyne", false),
-    organic_6(ScGroup.MAIN, ScType.PRODUCTION_TRIVIAL, "Σ-Ethylene", true),
-    organic_boss(ScGroup.MAIN, ScType.BOSS, "Freedom of Choice", true),
+    organic_5(ScGroup.MAIN, ScType.PRODUCTION_FIXED, "Ω-Pseudoethyne", false),
+    organic_6(ScGroup.MAIN, ScType.PRODUCTION_FIXED, "Σ-Ethylene", true),
+    organic_boss(ScGroup.MAIN, ScType.BOSS_FIXED, "Freedom of Choice", true),
 
     warp_boss(ScGroup.MAIN, ScType.BOSS_RANDOM, "End of the Line", true),
 

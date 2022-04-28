@@ -84,7 +84,7 @@ public enum ScCategory implements Category {
     }
 
     static class ScTypeSets {
-        static final EnumSet<ScType> RES = EnumSet.of(RESEARCH, PRODUCTION_TRIVIAL);
+        static final EnumSet<ScType> RES = EnumSet.of(RESEARCH, PRODUCTION_FIXED, PRODUCTION_TRIVIAL, BOSS_FIXED);
         static final EnumSet<ScType> PROD = EnumSet.of(PRODUCTION, BOSS);
         static final EnumSet<ScType> ALL = Utils.enumSetUnion(RES, PROD);
 
