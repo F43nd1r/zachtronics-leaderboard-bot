@@ -33,12 +33,15 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
 import org.eclipse.jgit.diff.DiffEntry
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import java.io.File
 import java.time.Instant
 import java.util.*
 import javax.annotation.PostConstruct
+
+private val logger = LoggerFactory.getLogger(OmSolutionRepository::class.java)
 
 @OptIn(ExperimentalSerializationApi::class)
 @Component
@@ -83,8 +86,13 @@ class OmSolutionRepository(
             leaderboardScope.getPuzzleDir(puzzle).takeIf { it.exists() }
                 ?.listFiles()
                 ?.filter { file -> file.extension == "json" }
-                ?.map { file -> file.inputStream().buffered().use { json.decodeFromStream<OmRecord>(it) } }
-                ?.forEach { record -> records.add(record.copy(dataPath = record.dataPath?.let { leaderboardScope.repo.toPath().resolve(it) }), mutableSetOf()) }
+                ?.map { file ->
+                    file.inputStream().buffered().use { stream ->
+                        val record = json.decodeFromStream<OmRecord>(stream)
+                        record.copy(dataPath = record.dataPath?.let { leaderboardScope.repo.toPath().resolve(it) }, origin = file.toPath())
+                    }
+                }
+                ?.forEach { record -> records.add(record, mutableSetOf()) }
             if (records.isNotEmpty()) {
                 for (category in OmCategory.values().filter { it.supportsPuzzle(puzzle) }.toMutableSet()) {
                     records.entries.filter { category.supportsScore(it.key.score) }
@@ -119,7 +127,7 @@ class OmSolutionRepository(
                 }
                 records.add(newRecord, beatenCategories.toMutableSet())
             }
-            val beatenRecords = when(result) {
+            val beatenRecords = when (result) {
                 is SubmitResult.Success -> result.beatenRecords
                 is SubmitResult.Updated -> listOf(result.oldRecord)
                 else -> null
@@ -233,9 +241,8 @@ class OmSolutionRepository(
 
     fun delete(record: OmRecord) {
         leaderboard.acquireWriteAccess().use { leaderboardScope ->
-            val dir = leaderboardScope.getPuzzleDir(record.puzzle)
-            record.dataPath?.toFile()?.let { leaderboardScope.rm(it) }
-            leaderboardScope.rm(File(dir, "${record.score.toFileString()}_${record.puzzle.name}.json"))
+            record.dataPath?.toFile()?.let { leaderboardScope.rm(it) } ?: logger.warn("Deleted record with no solution file")
+            record.origin?.toFile()?.let { leaderboardScope.rm(it) } ?: logger.warn("Deleted record with no meta file")
             leaderboardScope.commitAndPush(null, record.puzzle, record.score, listOf("DELETE"))
             loadData(leaderboardScope)
             pageGenerator.update(leaderboardScope, OmCategory.values().toList(), data)
@@ -285,6 +292,7 @@ class OmSolutionRepository(
             displayLink = displayLink,
             dataLink = createLink(leaderboardScope, puzzle, name),
             dataPath = path,
+            origin = leaderboardFile.toPath()
         )
         leaderboardFile.outputStream().buffered().use { json.encodeToStream(record, it) }
         leaderboardScope.add(leaderboardFile)

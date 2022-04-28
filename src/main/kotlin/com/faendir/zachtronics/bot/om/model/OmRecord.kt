@@ -30,6 +30,8 @@ data class OmRecord(
     override val dataLink: String? = null,
     @Serializable(with = PathSerializer::class)
     override val dataPath: Path?,
+    @Transient
+    val origin: Path? = null,
 ) : Record<OmCategory> {
     @Transient
     override val author: String? = null
