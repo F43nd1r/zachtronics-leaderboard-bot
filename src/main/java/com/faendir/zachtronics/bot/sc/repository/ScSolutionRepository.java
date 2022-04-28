@@ -326,7 +326,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
 
             // if it's the first in line our new sol steals from the void all the categories it can
             if (solutions.isEmpty()) {
-                Arrays.stream(ScCategory.values())
+                puzzle.getSupportedCategories().stream()
                       .filter(c -> c.supportsScore(candidate.getScore()))
                       .forEach(candidate.getCategories()::add);
             }

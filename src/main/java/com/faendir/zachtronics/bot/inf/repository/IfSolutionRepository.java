@@ -224,7 +224,7 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
 
             // if it's the first in line our new sol steals from the void all the categories it can
             if (solutions.isEmpty()) {
-                Arrays.stream(IfCategory.values())
+                puzzle.getSupportedCategories().stream()
                       .filter(c -> c.supportsScore(candidate.getScore()))
                       .forEach(candidate.getCategories()::add);
             }
