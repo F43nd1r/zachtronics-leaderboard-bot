@@ -21,6 +21,6 @@ import discord4j.core.`object`.entity.User
 
 object TrustedLeaderboardPosterRoleSecured : Secured {
     override fun hasExecutionPermission(user: User): Boolean {
-        return (user as? Member)?.roles?.any { it.name == "trusted-leaderboard-poster" }?.block() ?: false
+        return (user as? Member)?.roles?.any { it.name == "leaderboard poster" }?.block() ?: false
     }
 }
