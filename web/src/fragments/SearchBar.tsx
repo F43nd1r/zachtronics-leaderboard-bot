@@ -56,5 +56,5 @@ export default function SearchBar() {
 }
 
 function isPuzzle(test: any): test is Puzzle {
-    return test.hasOwnProperty("group") && typeof test.group !== undefined
+    return test.hasOwnProperty("group") && typeof test.group !== "undefined"
 }
