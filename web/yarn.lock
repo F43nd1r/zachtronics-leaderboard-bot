@@ -6783,10 +6783,10 @@ pkg-up@^3.1.0:
   dependencies:
     find-up "^3.0.0"
 
-plotly.js-gl3d-dist-min@2.12.1:
-  version "2.12.1"
-  resolved "https://registry.yarnpkg.com/plotly.js-gl3d-dist-min/-/plotly.js-gl3d-dist-min-2.12.1.tgz#b7171d835562b5ca477fb3da13029b59293ad1f5"
-  integrity sha512-sJUGn09oHHrJIt40lwifQrwHmyePRJlKdBvjz+QD4e+R7bl84ZyDVlCa306MqeXzFlBYnTOo2KgYIY+9Y8gOJA==
+plotly.js-gl3d-dist-min@2.13.1:
+  version "2.13.1"
+  resolved "https://registry.yarnpkg.com/plotly.js-gl3d-dist-min/-/plotly.js-gl3d-dist-min-2.13.1.tgz#0c77122a5d800681ff3f288c965c826dcbedac10"
+  integrity sha512-ZuJkqpxcK/dY3xQZhRlk/GmaUc9RQgO8F7SWJ7a1EzEyQUnuX5XZi8zCehpw1i2DD5LI5jGUHbgE54QxpErQ6g==
 
 postcss-attribute-case-insensitive@^5.0.1:
   version "5.0.1"
