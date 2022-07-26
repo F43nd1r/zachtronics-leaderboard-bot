@@ -2158,10 +2158,10 @@
   dependencies:
     "@types/d3" "^3"
 
-"@types/plotly.js@2.12.1":
-  version "2.12.1"
-  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.12.1.tgz#112a0b322e19de3d61c4fe0213bccc57e6292022"
-  integrity sha512-Nn8tr4TDYYNaTzX+fA8b2V+OHk1cGPoMpiVFRQmlH3ICcwZOlQCCVogHkfRdYaG5/Rqg8B1Wnr+r6GyaSKlC+Q==
+"@types/plotly.js@2.12.2":
+  version "2.12.2"
+  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.12.2.tgz#9e4c61d3aaf33aee98fc5bdbeffd6cd85271f3f8"
+  integrity sha512-cYJMFl01yZVuyrJcDD5LZzRK0wlizWe4lqoT4x87v2TXISZ7HVioWxEVt9n3OiqHDWqqAGMx8Erj7TJ3PeMTjw==
   dependencies:
     "@types/d3" "^3"
 
