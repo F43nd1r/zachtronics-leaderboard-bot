@@ -33,7 +33,6 @@ docker {
 
 dependencies {
     implementation(libs.spring.boot.web)
-    implementation(libs.java.ffmpeg)
     implementation(libs.kotlinx.json)
     implementation(libs.jackson.kotlin)
 
