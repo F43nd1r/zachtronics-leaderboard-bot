@@ -14,6 +14,7 @@ ENV XVFB_ARGS="${XARGS}"
 
 COPY OpusMagnum ./opusmagnum
 ENV OM_GIFMAKER_OM_INSTALLATION_DIR /opusmagnum
+COPY ["puzzle/", "/root/.local/share/Opus Magnum/NonSteamUser/custom/"]
 
 WORKDIR application
 COPY --from=builder application/dependencies/ ./
