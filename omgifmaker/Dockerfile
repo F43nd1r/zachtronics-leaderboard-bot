@@ -17,8 +17,11 @@ ENV OM_GIFMAKER_OM_INSTALLATION_DIR /opusmagnum
 
 WORKDIR application
 COPY --from=builder application/dependencies/ ./
+RUN true
 COPY --from=builder application/spring-boot-loader/ ./
+RUN true
 COPY --from=builder application/snapshot-dependencies/ ./
+RUN true
 COPY --from=builder application/application/ ./
 
 ENTRYPOINT ["/bin/bash", "/xvfb-startup.sh", "java", "org.springframework.boot.loader.JarLauncher"]

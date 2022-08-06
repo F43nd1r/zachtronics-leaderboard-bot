@@ -20,22 +20,7 @@ The official leaderboard copies managed by the bot are in the wiki page of the g
 ./gradlew build
 ``` 
 2. Run via `docker-compose`:
-```yaml
-version: "3.7"
-
-services:
-  om-discord-bot:
-    build: .
-    container_name: om-discord-bot
-    environment:
-      DISCORD_TOKEN: abc
-      GIT_USERNAME: def
-      GIT_ACCESS_TOKEN: ghi
-      REDDIT_USERNAME: jkl
-      REDDIT_ACCESS_TOKEN: mno
-      REDDIT_CLIENT_ID: pqr
-      REDDIT_PASSWORD: stu
-```
+[docker-compose-example](docker-compose-example.yml)
 Alternatively to `build .` you can use prebuilt `image: f43nd1r/zachtronics-leaderboard-bot:latest`. This makes the gradle build obsolete.
 
 ---
