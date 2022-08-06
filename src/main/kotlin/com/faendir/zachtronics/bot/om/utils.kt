@@ -68,7 +68,7 @@ fun SolvedSolution.getScore(verifier: JNISolutionVerifier) =
                 throw IllegalArgumentException("Stored area value does not match simulation. Run your solution to completion before submitting.")
             }
         },
-        instructions = verifier.getMetricSafe(OmSimMetric.PARSED_INSTRUCTIONS).also {
+        instructions = verifier.getMetricSafe(OmSimMetric.INSTRUCTIONS).also {
             if (it != instructions) throw IllegalArgumentException("Stored instructions value does not match simulation. Run your solution to completion before submitting.")
         },
         height = verifier.getMetricSafe(OmSimMetric.HEIGHT),
