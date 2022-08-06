@@ -15,6 +15,7 @@ jgit = "6.2.0.202206071550-r"
 java-curl = "1.2.2.2"
 jraw = "1.2.0"
 om-dsl = "1.3.1"
+om-parser = "2.1.8"
 querydsl = "5.0.0"
 trove4j = "3.0.3"
 springmockk = "3.1.1"
@@ -29,6 +30,7 @@ gradle-node = "3.4.0"
 guava = "31.1-jre"
 nokee = "0.5.0-930919a0"
 opencsv = "5.6"
+java-ffmpeg = "0.6.2"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -69,6 +71,7 @@ jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin" }
 jackson-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 om-dsl = { module = "com.faendir.om:dsl", version.ref = "om-dsl" }
+om-parser = { module = "com.faendir.om:parser", version.ref = "om-parser" }
 querydsl-jpa = { module = "com.querydsl:querydsl-jpa", version.ref = "querydsl" }
 querydsl-core = { module = "com.querydsl:querydsl-core", version.ref = "querydsl" }
 querydsl-apt = { module = "com.querydsl:querydsl-apt", version.ref = "querydsl" }
@@ -88,4 +91,5 @@ springdoc = { module = "org.springdoc:springdoc-openapi-ui", version.ref = "spri
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 spring-core = { module = "org.springframework:spring-core" }
 opencsv = { module = "com.opencsv:opencsv", version.ref = "opencsv" }
+java-ffmpeg = { module = "net.bramp.ffmpeg:ffmpeg", version.ref = "java-ffmpeg" }
 

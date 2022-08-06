@@ -23,6 +23,7 @@ import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmSubmission
+import com.faendir.zachtronics.bot.om.rest.GifMakerService
 import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
@@ -49,6 +50,7 @@ class OmSolutionRepository(
     @Qualifier("omLeaderboardRepository") private val leaderboard: GitRepository,
     private val pageGenerator: OmRedditWikiGenerator,
     private val omUrlMapper: OmUrlMapper,
+    private val omGifMakerService: GifMakerService,
 ) : SolutionRepository<OmCategory, OmPuzzle, OmSubmission, OmRecord> {
     private val json = Json {
         prettyPrint = true
@@ -112,12 +114,15 @@ class OmSolutionRepository(
     }
 
     override fun submit(submission: OmSubmission): SubmitResult<OmRecord, OmCategory> {
-        if (submission.displayLink == null) throw IllegalArgumentException("Submissions must have a gif")
-        if (submission.displayLink.endsWith(".solution")) throw IllegalArgumentException("You cannot use solution files as gifs.")
+        if (submission.displayLink?.endsWith(".solution") == true) throw IllegalArgumentException("You cannot use solution files as gifs.")
         return leaderboard.acquireWriteAccess().use { leaderboardScope ->
             val records by lazy { data.getValue(submission.puzzle) }
             val newRecord by lazy { submission.createRecord(leaderboardScope) }
             val result = submit(leaderboardScope, submission) { beatenRecord, beatenCategories, shouldRemain ->
+                if (submission.displayLink == null) {
+                    submission.displayLink = omGifMakerService.createGif(submission.data, submission.wantedGifCycles.first, submission.wantedGifCycles.second)
+                        ?: throw IllegalArgumentException("Failed to generate gif for your solution.")
+                }
                 if (beatenRecord != null) {
                     if (shouldRemain) {
                         records.getValue(beatenRecord) -= beatenCategories
@@ -260,11 +265,13 @@ class OmSolutionRepository(
                         } else {
                             null
                         }
+
                         DiffEntry.ChangeType.DELETE -> if (change.oldName!!.endsWith(".json")) {
                             OmRecordChange(OmRecordChangeType.REMOVE, change.oldContent!!.openStream().use { json.decodeFromStream(it) })
                         } else {
                             null
                         }
+
                         else -> null
                     }
                 } catch (e: Exception) {

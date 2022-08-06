@@ -60,5 +60,5 @@ data class SubmitParams(
     val solution: String,
     @Converter(LinkConverter::class)
     @Description("Link to your solution gif/mp4, can be `m1` to scrape it from your last message")
-    val gif: String,
+    val gif: String?,
 )

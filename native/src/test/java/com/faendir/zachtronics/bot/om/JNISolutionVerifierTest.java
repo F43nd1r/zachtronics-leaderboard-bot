@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.om;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,7 +30,7 @@ public class JNISolutionVerifierTest {
         try(JNISolutionVerifier verifier = JNISolutionVerifier.open(
                 getClass().getClassLoader().getResource("P009.puzzle").openStream().readAllBytes(),
                 getClass().getClassLoader().getResource("Face_Powder_Height_1.solution").openStream().readAllBytes())) {
-            int height = verifier.getMetric(JNISolutionVerifier.Metrics.HEIGHT);
+            int height = verifier.getMetric(OmSimMetric.HEIGHT.INSTANCE);
             assertEquals(1, height);
         }
     }

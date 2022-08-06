@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.om.discord
 
+/*
 import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.AutoComplete
 import com.faendir.discord4j.command.annotation.Converter
@@ -139,4 +140,4 @@ data class Reverify(
     @Description("full score of the submission, e.g. 65g/80c/12a/4i/4h/4w/12r")
     val score: String?,
     val overrideExisting: Boolean?,
-)
+)*/

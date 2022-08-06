@@ -17,9 +17,10 @@
 @Suppress("DSL_SCOPE_VIOLATION") // TODO remove when https://youtrack.jetbrains.com/issue/KTIJ-19369 is fixed
 plugins {
     java
+    alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.nokee.jni)
     alias(libs.plugins.nokee.c.language)
-    id(libs.plugins.gradle.lombok.get().pluginId)
+    alias(libs.plugins.gradle.lombok)
 }
 
 group = ""

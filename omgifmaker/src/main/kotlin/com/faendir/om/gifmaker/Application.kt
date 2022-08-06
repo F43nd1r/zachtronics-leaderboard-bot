@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.om.model
+package com.faendir.om.gifmaker
 
-import com.faendir.zachtronics.bot.model.Submission
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.boot.runApplication
 
-data class OmSubmission(
-    override val puzzle: OmPuzzle,
-    override val score: OmScore,
-    override val author: String?,
-    override var displayLink: String?,
-    val wantedGifCycles: Pair<Int, Int>,
-    override val data: ByteArray
-) : Submission<OmCategory, OmPuzzle>
+fun main(args: Array<String>) {
+    runApplication<Application>(*args)
+}
+
+@SpringBootApplication
+@ConfigurationPropertiesScan
+class Application

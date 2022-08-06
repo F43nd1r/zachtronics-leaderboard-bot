@@ -42,10 +42,10 @@ public class JNISolutionVerifier implements Closeable {
         return new JNISolutionVerifier(puzzle, solution);
     }
 
-    public int getMetric(Metrics metric) {
+    public int getMetric(OmSimMetric metric) {
         if (verifier == null) verifier = prepareVerifier(puzzle, solution);
         try {
-            return getMetric(verifier, metric.id);
+            return getMetric(verifier, metric.getId());
         } catch (Throwable t) {
             close();
             throw t;
@@ -60,23 +60,4 @@ public class JNISolutionVerifier implements Closeable {
         }
     }
 
-    public enum Metrics {
-        // see verifier.h
-        CYCLES("cycles"),
-        COST("cost"),
-        AREA("area (approximate)"),
-        INSTRUCTIONS("instructions"),
-        THROUGHPUT_CYCLES("throughput cycles"),
-        THROUGHPUT_OUTPUTS("throughput outputs"),
-        HEIGHT("height"),
-        WIDTH_TIMES_TWO("width*2"),
-        MAX_ARM_ROTATION("maximum absolute arm rotation"),
-        OVERLAP("overlap"),
-        ;
-        private final String id;
-
-        Metrics(String id) {
-            this.id = id;
-        }
-    }
 }
