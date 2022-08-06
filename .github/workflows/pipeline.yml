@@ -48,6 +48,6 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: burrunan/gradle-cache-action@v1
         with:
-          arguments: dockerPush
+          arguments: :dockerPush
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
