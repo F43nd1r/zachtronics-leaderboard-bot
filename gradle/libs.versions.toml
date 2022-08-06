@@ -30,7 +30,6 @@ gradle-node = "3.4.0"
 guava = "31.1-jre"
 nokee = "0.5.0-930919a0"
 opencsv = "5.6"
-java-ffmpeg = "0.6.2"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -91,5 +90,4 @@ springdoc = { module = "org.springdoc:springdoc-openapi-ui", version.ref = "spri
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 spring-core = { module = "org.springframework:spring-core" }
 opencsv = { module = "com.opencsv:opencsv", version.ref = "opencsv" }
-java-ffmpeg = { module = "net.bramp.ffmpeg:ffmpeg", version.ref = "java-ffmpeg" }
 
