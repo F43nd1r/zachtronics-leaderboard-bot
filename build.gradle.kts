@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.java.curl)
     implementation(libs.jraw)
     implementation(libs.om.dsl)
+    implementation(libs.om.parser)
     implementation(projects.common)
     implementation(projects.native)
     implementation(libs.jackson.databind)

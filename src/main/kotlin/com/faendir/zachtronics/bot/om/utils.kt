@@ -102,7 +102,7 @@ fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSub
         ?: OmPuzzle.values().find { it.altIds.contains(solution.puzzle) }?.let {
             solution.puzzle = it.id
             val out = ByteArrayOutputStream()
-            SolutionParser.write(solution, out.sink().buffer())
+            SolutionParser.write(solution, out.sink().buffer(), writeSolved = true)
             it to out.toByteArray()
         }
         ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
