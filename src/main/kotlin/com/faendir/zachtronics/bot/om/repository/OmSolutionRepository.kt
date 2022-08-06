@@ -171,7 +171,7 @@ class OmSolutionRepository(
                     unclaimedCategories -= categories
                     result.add(CategoryRecord(record, categories.toSet()))
                     continue
-                } else if (submission.displayLink != record.displayLink || record.dataLink == null) {
+                } else if (submission.displayLink != record.displayLink || record.displayLink == null || record.dataLink == null) {
                     handleBeatenRecord(record, categories, false)
                     return SubmitResult.Updated(CategoryRecord(record, categories.toSet()))
                 } else {
