@@ -31,7 +31,7 @@ class GifMakerService(restTemplateBuilder: RestTemplateBuilder, private val gifM
 
     fun createGif(solution: ByteArray, start: Int, end: Int): String? {
         try {
-            return restTemplate.postForObject(gifMakerProperties.serverUrl + "/creategif", solution, String::class.java)
+            return restTemplate.postForObject(gifMakerProperties.serverUrl + "/creategif?start=$start&end=$end", solution, String::class.java)
         } catch (e : SocketTimeoutException) {
             throw RuntimeException("Timed out creating a gif for your solution. Please create and upload your own gif.", e)
         }
