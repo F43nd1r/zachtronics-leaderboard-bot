@@ -36,7 +36,9 @@ class GifRecorderService(private val properties: GifMakerProperties) {
         ).start()
         if (process.waitFor(8, TimeUnit.MINUTES)) {
             if (process.exitValue() == 0) {
-                if(out.exists() && out.length() != 0L) {
+                val length = out.length()
+                if(length > 0L) {
+                    logger.info("Generated gif with size $length")
                     return out
                 } else {
                     val output = String(process.inputStream.readAllBytes() + process.errorStream.readAllBytes())
