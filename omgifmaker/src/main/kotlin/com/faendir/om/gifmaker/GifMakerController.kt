@@ -16,7 +16,10 @@
 
 package com.faendir.om.gifmaker
 
+import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
@@ -30,8 +33,17 @@ class GifMakerController(private val gifRecorderService: GifRecorderService, pri
         @RequestBody solution: ByteArray,
         @RequestParam(required = false) start: Int?,
         @RequestParam(required = false) end: Int?
-    ): String? {
-        val gif = gifRecorderService.createGif(solution, start, end) ?: return null
-        return imgurService.upload(gif)
+    ): ResponseEntity<String> {
+        return try {
+            val gif = gifRecorderService.createGif(solution, start, end)
+            ResponseEntity(imgurService.upload(gif), HttpStatus.OK)
+        } catch (e: Exception) {
+            logger.info("Failed to create gif, returning server error", e)
+            ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(GifMakerController::class.java)
     }
 }

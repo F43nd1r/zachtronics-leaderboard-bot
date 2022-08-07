@@ -114,7 +114,8 @@ fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSub
         if ((verifier.getMetricSafe(OmSimMetric.MAXIMUM_ABSOLUTE_ARM_ROTATION) ?: 0) >= 4096) {
             throw IllegalArgumentException("Maximum arm rotations over 4096 are banned.")
         }
-        val gifCycles = verifier.getMetricSafe(OmSimMetric.VISUAL_LOOP_START_CYCLE) ?.let { it to verifier.getMetricSafe(OmSimMetric.VISUAL_LOOP_END_CYCLE)!! } ?: (0 to solution.cycles)
+        val gifCycles = verifier.getMetricSafe(OmSimMetric.VISUAL_LOOP_START_CYCLE)?.let { it to verifier.getMetricSafe(OmSimMetric.VISUAL_LOOP_END_CYCLE)!! }
+            ?: (0 to solution.cycles)
         return OmSubmission(
             puzzle,
             solution.getScore(verifier),

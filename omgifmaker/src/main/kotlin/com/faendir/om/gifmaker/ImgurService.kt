@@ -17,7 +17,6 @@
 package com.faendir.om.gifmaker
 
 import kotlinx.serialization.Serializable
-import org.slf4j.LoggerFactory
 import org.springframework.core.io.FileSystemResource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -34,7 +33,7 @@ class ImgurService(private val gifMakerProperties: GifMakerProperties) {
 
     private val restTemplate = RestTemplate()
 
-    fun upload(file: File): String? {
+    fun upload(file: File): String {
         val headers = HttpHeaders()
         headers.contentType = MediaType.MULTIPART_FORM_DATA
         headers["Authorization"] = "Client-ID ${gifMakerProperties.imgurClientId}"
@@ -49,16 +48,11 @@ class ImgurService(private val gifMakerProperties: GifMakerProperties) {
                 return if (link.endsWith(".")) link + "mp4"
                 else link
             } else {
-                logger.warn("Imgur did not return a link: ${result.body}")
+                throw RuntimeException("Imgur did not return a link: ${result.body}")
             }
         } else {
-            logger.warn("Failed to upload video to imgur: ${result.body}")
+            throw RuntimeException("Failed to upload gif to imgur: ${result.body}")
         }
-        return null
-    }
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(ImgurService::class.java)
     }
 }
 

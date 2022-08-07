@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.om.rest
 
 import com.faendir.zachtronics.bot.config.GifMakerProperties
 import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.net.SocketTimeoutException
 import java.time.Duration
@@ -26,13 +27,15 @@ import java.time.Duration
 class GifMakerService(restTemplateBuilder: RestTemplateBuilder, private val gifMakerProperties: GifMakerProperties) {
 
     private val restTemplate = restTemplateBuilder
-        .setReadTimeout(Duration.ofMinutes(10))
+        .setReadTimeout(Duration.ofMinutes(12))
         .build()
 
     fun createGif(solution: ByteArray, start: Int, end: Int): String? {
         try {
-            return restTemplate.postForObject(gifMakerProperties.serverUrl + "/creategif?start=$start&end=$end", solution, String::class.java)
-        } catch (e : SocketTimeoutException) {
+            val entity = restTemplate.postForEntity(gifMakerProperties.serverUrl + "/creategif?start=$start&end=$end", solution, String::class.java)
+            if (entity.statusCode == HttpStatus.OK) return entity.body
+            else throw RuntimeException(entity.body)
+        } catch (e: SocketTimeoutException) {
             throw RuntimeException("Timed out creating a gif for your solution. Please create and upload your own gif.", e)
         }
     }

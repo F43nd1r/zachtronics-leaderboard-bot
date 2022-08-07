@@ -16,6 +16,7 @@
 
 package com.faendir.om.gifmaker
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit
 @Service
 class GifRecorderService(private val properties: GifMakerProperties) {
 
-    fun createGif(solution: ByteArray, start: Int?, end: Int?): File? {
+    fun createGif(solution: ByteArray, start: Int?, end: Int?): File {
         val file = File.createTempFile("gifmaker-", ".solution")
         file.writeBytes(solution)
         val out = File(file.parent, file.nameWithoutExtension + ".gif")
@@ -32,20 +33,22 @@ class GifRecorderService(private val properties: GifMakerProperties) {
             "out=${out.absolutePath}",
             *listOfNotNull(start?.let { "start=$it" }, end?.let { "end=$it" }).toTypedArray(),
             file.absolutePath
-        )
-            .inheritIO()
-            .start()
-        return if (try {
-                process.waitFor(5, TimeUnit.MINUTES)
-                process.exitValue() == 0
-            } catch (e: InterruptedException) {
-                process.destroyForcibly()
-                false
+        ).start()
+        if (process.waitFor(8, TimeUnit.MINUTES)) {
+            if (process.exitValue() == 0) {
+                return out
+            } else {
+                val output = String(process.inputStream.readAllBytes() + process.errorStream.readAllBytes())
+                logger.warn(output)
+                throw RuntimeException("Game failed to generate gif: ${Regex("FATAL UNHANDLED EXCEPTION: ([^\n]*)").matchEntire(output)?.groupValues?.get(1) ?: output}")
             }
-        ) {
-            out
         } else {
-            null
+            process.destroyForcibly()
+            throw RuntimeException("Timed out waiting for game to generate a gif.")
         }
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(GifRecorderService::class.java)
     }
 }
