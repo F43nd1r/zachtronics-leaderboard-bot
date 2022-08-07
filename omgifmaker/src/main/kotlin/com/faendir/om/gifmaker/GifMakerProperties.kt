@@ -21,5 +21,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties("om.gifmaker")
 class GifMakerProperties {
     lateinit var omInstallationDir: String
-    lateinit var imgurClientId: String
+    lateinit var imgurUsername: String
+    lateinit var imgurPassword: String
 }
