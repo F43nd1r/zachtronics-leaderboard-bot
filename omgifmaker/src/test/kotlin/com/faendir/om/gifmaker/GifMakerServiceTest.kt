@@ -18,8 +18,6 @@ package com.faendir.om.gifmaker
 
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import strikt.api.expectThat
-import strikt.assertions.isNotNull
 
 @Disabled
 class GifMakerServiceTest {
@@ -28,8 +26,6 @@ class GifMakerServiceTest {
 
     @Test
     fun `should generate gif`() {
-        val gif = gifRecorderService.createGif(javaClass.classLoader.getResource("Face_Powder_Height_1.solution").openStream().readAllBytes(), null, null)
-
-        expectThat(gif).isNotNull()
+        gifRecorderService.createGif(javaClass.classLoader.getResource("Face_Powder_Height_1.solution").openStream().readAllBytes(), null, null)
     }
 }

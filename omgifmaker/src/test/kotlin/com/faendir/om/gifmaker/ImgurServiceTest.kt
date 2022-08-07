@@ -18,8 +18,6 @@ package com.faendir.om.gifmaker
 
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import strikt.api.expectThat
-import strikt.assertions.isNotNull
 import java.io.File
 
 @Disabled
@@ -31,7 +29,6 @@ internal class ImgurServiceTest {
     fun upload() {
         val link = imgurService.upload(File(javaClass.classLoader.getResource("Face_Powder_Height_1.gif").file))
 
-        expectThat(link).isNotNull()
         println(link)
     }
 }
