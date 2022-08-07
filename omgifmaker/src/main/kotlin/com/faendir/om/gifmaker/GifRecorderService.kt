@@ -36,7 +36,12 @@ class GifRecorderService(private val properties: GifMakerProperties) {
         ).start()
         if (process.waitFor(8, TimeUnit.MINUTES)) {
             if (process.exitValue() == 0) {
-                return out
+                if(out.exists() && out.length() != 0L) {
+                    return out
+                } else {
+                    val output = String(process.inputStream.readAllBytes() + process.errorStream.readAllBytes())
+                    throw RuntimeException("Game exited but gif was not generated: $output")
+                }
             } else {
                 val output = String(process.inputStream.readAllBytes() + process.errorStream.readAllBytes())
                 logger.warn(output)
