@@ -38,7 +38,6 @@ class GifMakerController(private val gifRecorderService: GifRecorderService, pri
             val gif = gifRecorderService.createGif(solution, start, end)
             ResponseEntity(imgurService.upload(gif), HttpStatus.OK)
         } catch (e: Exception) {
-            logger.info("Failed to create gif, returning server error", e)
             ResponseEntity(e.message, HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }

@@ -20,6 +20,7 @@ import com.faendir.zachtronics.bot.config.GifMakerProperties
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.client.DefaultResponseErrorHandler
 import java.net.SocketTimeoutException
 import java.time.Duration
 
@@ -27,6 +28,9 @@ import java.time.Duration
 class GifMakerService(restTemplateBuilder: RestTemplateBuilder, private val gifMakerProperties: GifMakerProperties) {
 
     private val restTemplate = restTemplateBuilder
+        .errorHandler(object : DefaultResponseErrorHandler() {
+            override fun hasError(statusCode: HttpStatus): Boolean = false
+        })
         .setReadTimeout(Duration.ofMinutes(12))
         .build()
 

@@ -17,6 +17,7 @@
 package com.faendir.om.gifmaker
 
 import kotlinx.serialization.Serializable
+import org.slf4j.LoggerFactory
 import org.springframework.core.io.FileSystemResource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -25,6 +26,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.util.LinkedMultiValueMap
+import org.springframework.web.client.HttpStatusCodeException
 import org.springframework.web.client.RestTemplate
 import java.io.File
 
@@ -41,18 +43,27 @@ class ImgurService(private val gifMakerProperties: GifMakerProperties) {
         val body = LinkedMultiValueMap<String, Any>()
         body.add("image", FileSystemResource(file))
 
-        val result = restTemplate.exchange("https://api.imgur.com/3/upload", HttpMethod.POST, HttpEntity(body, headers), Response::class.java)
-        if (result.statusCode == HttpStatus.OK) {
-            val link = result.body?.data?.link
-            if (link != null) {
-                return if (link.endsWith(".")) link + "mp4"
-                else link
+        try {
+            val result = restTemplate.exchange("https://api.imgur.com/3/upload", HttpMethod.POST, HttpEntity(body, headers), Response::class.java)
+            if (result.statusCode == HttpStatus.OK) {
+                val link = result.body?.data?.link
+                if (link != null) {
+                    return if (link.endsWith(".")) link + "mp4"
+                    else link
+                } else {
+                    throw RuntimeException("Imgur did not return a link: ${result.body}")
+                }
             } else {
-                throw RuntimeException("Imgur did not return a link: ${result.body}")
+                throw RuntimeException("Failed to upload gif to imgur: ${result.body}")
             }
-        } else {
-            throw RuntimeException("Failed to upload gif to imgur: ${result.body}")
+        } catch (e: HttpStatusCodeException) {
+            logger.warn("Imgur returned error.\nHeaders:\n${e.responseHeaders?.toList()?.joinToString { "${it.first}=${it.second.joinToString()}" }}\n", e)
+            throw RuntimeException("Imgur returned error: ${e.message}")
         }
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(ImgurService::class.java)
     }
 }
 
