@@ -23,7 +23,7 @@ import java.io.File
 @Disabled
 internal class ImgurServiceTest {
 
-    private val imgurService = ImgurService(GifMakerProperties().apply { imgurClientId = "" })
+    private val imgurService = ImgurService(GifMakerProperties().apply { imgurUsername = ""; imgurPassword = "" })
 
     @Test
     fun upload() {
