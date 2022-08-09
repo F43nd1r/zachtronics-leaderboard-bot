@@ -157,7 +157,7 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
                         duration: 500,
                         easing: "cubic-in-out",
                     },
-                    uirevision: "true",
+                    uirevision: JSON.stringify(props.filter) + JSON.stringify(props.configuration),
                 }}
                 config={{
                     displaylogo: false,
