@@ -114,15 +114,20 @@ class OmSolutionRepository(
     }
 
     override fun submit(submission: OmSubmission): SubmitResult<OmRecord, OmCategory> {
+        if (submission.displayLink == null) {
+            val dryRunResult = submitDryRun(submission)
+            if (dryRunResult is SubmitResult.Success || dryRunResult is SubmitResult.Updated) {
+                submission.displayLink = omGifMakerService.createGif(submission.data, submission.wantedGifCycles.first, submission.wantedGifCycles.second)
+                    ?: throw IllegalArgumentException("Failed to generate gif for your solution.")
+            } else {
+                return dryRunResult
+            }
+        }
         if (submission.displayLink?.endsWith(".solution") == true) throw IllegalArgumentException("You cannot use solution files as gifs.")
         return leaderboard.acquireWriteAccess().use { leaderboardScope ->
             val records by lazy { data.getValue(submission.puzzle) }
             val newRecord by lazy { submission.createRecord(leaderboardScope) }
             val result = submit(leaderboardScope, submission) { beatenRecord, beatenCategories, shouldRemain ->
-                if (submission.displayLink == null) {
-                    submission.displayLink = omGifMakerService.createGif(submission.data, submission.wantedGifCycles.first, submission.wantedGifCycles.second)
-                        ?: throw IllegalArgumentException("Failed to generate gif for your solution.")
-                }
                 if (beatenRecord != null) {
                     if (shouldRemain) {
                         records.getValue(beatenRecord) -= beatenCategories
