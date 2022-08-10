@@ -25,6 +25,7 @@ fun dummyOmSubmission(
     score: OmScore = OmScore(),
     author: String? = null,
     displayLink: String = "https://no.link",
+    displayData: ByteArray? = null,
     wantedGifCycles: Pair<Int, Int> = 0 to 1,
     data: ByteArray = ByteArray(0)
-) = OmSubmission(puzzle, score, author, displayLink, wantedGifCycles, data)
+) = OmSubmission(puzzle, score, author, displayLink, displayData, wantedGifCycles, data)
