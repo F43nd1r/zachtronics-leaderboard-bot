@@ -49,7 +49,7 @@ class OmSubmitCommand(override val repository: OmSolutionRepository) : AbstractS
         } catch (e: Exception) {
             throw IllegalArgumentException("Could not load your solution file")
         }
-        return createSubmission(parameters.gif, event.user().username, bytes)
+        return createSubmission(parameters.gif, null, event.user().username, bytes)
     }
 }
 

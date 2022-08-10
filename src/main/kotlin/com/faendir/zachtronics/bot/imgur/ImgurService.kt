@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.faendir.om.gifmaker
+package com.faendir.zachtronics.bot.imgur
 
+import com.faendir.zachtronics.bot.config.ImgurProperties
 import kotlinx.serialization.Serializable
 import org.slf4j.LoggerFactory
+import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.FileSystemResource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -31,7 +33,7 @@ import org.springframework.web.client.RestTemplate
 import java.io.File
 
 @Service
-class ImgurService(private val gifMakerProperties: GifMakerProperties) {
+class ImgurService(private val imgurProperties: ImgurProperties) {
 
     private val restTemplate = RestTemplate()
 
@@ -41,8 +43,8 @@ class ImgurService(private val gifMakerProperties: GifMakerProperties) {
         headers["User-Agent"] = "Mozilla/5.0 (X11; Linux x86_64; rv:103.0) Gecko/20100101 Firefox/103.0"
 
         val body = LinkedMultiValueMap<String, Any>()
-        body.add("username", gifMakerProperties.imgurUsername)
-        body.add("password", gifMakerProperties.imgurPassword)
+        body.add("username", imgurProperties.username)
+        body.add("password", imgurProperties.password)
         body.add("remember", "remember")
         body.add("submit", "")
         val response = restTemplate.exchange("https://imgur.com/signin", HttpMethod.POST, HttpEntity(body, headers), String::class.java)
@@ -55,13 +57,13 @@ class ImgurService(private val gifMakerProperties: GifMakerProperties) {
             ?: throw RuntimeException("Imgur login failed")
     }
 
-    fun upload(file: File): String {
+    fun upload(gif: ByteArray): String {
         val headers = HttpHeaders()
         headers.contentType = MediaType.MULTIPART_FORM_DATA
         headers["User-Agent"] = "Mozilla/5.0 (X11; Linux x86_64; rv:103.0) Gecko/20100101 Firefox/103.0"
         headers["Authorization"] = "Bearer ${login()}"
         val body = LinkedMultiValueMap<String, Any>()
-        body.add("image", FileSystemResource(file))
+        body.add("image", ByteArrayResource(gif))
 
         try {
             val result = restTemplate.exchange("https://api.imgur.com/3/image", HttpMethod.POST, HttpEntity(body, headers), Response::class.java)

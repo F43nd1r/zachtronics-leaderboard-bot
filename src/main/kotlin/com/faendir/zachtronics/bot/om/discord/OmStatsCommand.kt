@@ -90,7 +90,7 @@ class OmStatsCommand(private val repository: OmSolutionRepository) : AbstractSub
         } catch (e: Exception) {
             throw IllegalArgumentException("Could not load your solution file")
         }
-        return createSubmission(null, event.user().username, bytes)
+        return createSubmission(null, null, event.user().username, bytes)
     }
 }
 

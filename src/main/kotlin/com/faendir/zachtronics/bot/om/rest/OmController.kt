@@ -94,8 +94,9 @@ class OmController(private val repository: OmSolutionRepository, private val dis
 
     @PostMapping(path = ["/submit"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun submit(@ModelAttribute submissionDTO: OmSubmissionDTO): SubmitResultType {
-        if (!isValidLink(submissionDTO.gif)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid gif")
-        val submission = createSubmission(submissionDTO.gif, submissionDTO.author, submissionDTO.solution.bytes)
+        if (submissionDTO.gif != null  && !isValidLink(submissionDTO.gif)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid gif")
+        if(submissionDTO.gif == null && submissionDTO.gifData == null) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "no gif")
+        val submission = createSubmission(submissionDTO.gif, submissionDTO.gifData?.bytes, submissionDTO.author, submissionDTO.solution.bytes)
         return when (val result = repository.submit(submission)) {
             is SubmitResult.Success -> {
                 val beatenCategories: List<OmCategory> = result.beatenRecords.flatMap { it.categories }

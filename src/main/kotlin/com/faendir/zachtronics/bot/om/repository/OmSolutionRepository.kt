@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.om.repository
 
 import com.faendir.zachtronics.bot.git.GitRepository
+import com.faendir.zachtronics.bot.imgur.ImgurService
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
@@ -51,6 +52,7 @@ class OmSolutionRepository(
     private val pageGenerator: OmRedditWikiGenerator,
     private val omUrlMapper: OmUrlMapper,
     private val omGifMakerService: GifMakerService,
+    private val imgurService: ImgurService,
 ) : SolutionRepository<OmCategory, OmPuzzle, OmSubmission, OmRecord> {
     private val json = Json {
         prettyPrint = true
@@ -117,13 +119,17 @@ class OmSolutionRepository(
         if (submission.displayLink == null) {
             val dryRunResult = submitDryRun(submission)
             if (dryRunResult is SubmitResult.Success || dryRunResult is SubmitResult.Updated) {
-                submission.displayLink = omGifMakerService.createGif(submission.data, submission.wantedGifCycles.first, submission.wantedGifCycles.second)
-                    ?: throw IllegalArgumentException("Failed to generate gif for your solution.")
+                if (submission.displayData == null) {
+                    submission.displayData = omGifMakerService.createGif(submission.data, submission.wantedGifCycles.first, submission.wantedGifCycles.second)
+                        ?: throw IllegalArgumentException("Failed to generate gif for your solution.")
+                }
+                submission.displayLink = imgurService.upload(submission.displayData!!)
             } else {
                 return dryRunResult
             }
+        } else if (submission.displayLink?.endsWith(".solution") == true) {
+            throw IllegalArgumentException("You cannot use solution files as gifs.")
         }
-        if (submission.displayLink?.endsWith(".solution") == true) throw IllegalArgumentException("You cannot use solution files as gifs.")
         return leaderboard.acquireWriteAccess().use { leaderboardScope ->
             val records by lazy { data.getValue(submission.puzzle) }
             val newRecord by lazy { submission.createRecord(leaderboardScope) }

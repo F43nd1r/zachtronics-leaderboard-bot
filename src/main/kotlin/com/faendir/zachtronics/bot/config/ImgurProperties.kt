@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package com.faendir.om.gifmaker
+package com.faendir.zachtronics.bot.config
 
-import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.Test
-import java.io.File
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.context.annotation.Configuration
 
-@Disabled
-internal class ImgurServiceTest {
-
-    private val imgurService = ImgurService(GifMakerProperties().apply { imgurUsername = ""; imgurPassword = "" })
-
-    @Test
-    fun upload() {
-        val link = imgurService.upload(File(javaClass.classLoader.getResource("Face_Powder_Height_1.gif").file))
-
-        println(link)
-    }
+@Configuration
+@ConfigurationProperties("imgur")
+class ImgurProperties {
+    lateinit var username: String
+    lateinit var password: String
 }

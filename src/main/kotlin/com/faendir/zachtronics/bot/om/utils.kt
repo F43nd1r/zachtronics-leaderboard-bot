@@ -80,7 +80,7 @@ fun SolvedSolution.getScore(verifier: JNISolutionVerifier) =
         overlap = verifier.getMetricSafe(OmSimMetric.OVERLAP) != 0
     )
 
-fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSubmission {
+fun createSubmission(gif: String?, gifData: ByteArray?, author: String, inputBytes: ByteArray): OmSubmission {
     val solution = try {
         SolutionParser.parse(ByteArrayInputStream(inputBytes).source().buffer())
     } catch (e: Exception) {
@@ -121,6 +121,7 @@ fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSub
             solution.getScore(verifier),
             author,
             gif,
+            gifData,
             gifCycles,
             solutionBytes
         )

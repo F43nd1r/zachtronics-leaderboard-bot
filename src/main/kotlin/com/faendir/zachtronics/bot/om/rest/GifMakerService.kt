@@ -31,11 +31,11 @@ class GifMakerService(restTemplateBuilder: RestTemplateBuilder, private val gifM
         .setReadTimeout(Duration.ofMinutes(12))
         .build()
 
-    fun createGif(solution: ByteArray, start: Int, end: Int): String? {
+    fun createGif(solution: ByteArray, start: Int, end: Int): ByteArray? {
         try {
-            val entity = restTemplate.postForEntity(gifMakerProperties.serverUrl + "/creategif?start=$start&end=$end", solution, String::class.java)
+            val entity = restTemplate.postForEntity(gifMakerProperties.serverUrl + "/creategif?start=$start&end=$end", solution, ByteArray::class.java)
             if (entity.statusCode == HttpStatus.OK) return entity.body
-            else throw RuntimeException(entity.body)
+            else throw RuntimeException(entity.body.contentToString())
         } catch (e: SocketTimeoutException) {
             throw RuntimeException("Timed out creating a gif for your solution. Please create and upload your own gif.", e)
         } catch (e: HttpStatusCodeException) {

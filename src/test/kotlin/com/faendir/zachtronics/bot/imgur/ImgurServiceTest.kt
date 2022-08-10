@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,22 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.om.rest.dto
+package com.faendir.zachtronics.bot.imgur
 
-import org.springframework.web.multipart.MultipartFile
+import com.faendir.zachtronics.bot.config.ImgurProperties
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import java.io.File
 
-data class OmSubmissionDTO(val gif: String?, val gifData: MultipartFile?, val author: String, val solution: MultipartFile)
+@Disabled
+internal class ImgurServiceTest {
+
+    private val imgurService = ImgurService(ImgurProperties().apply { username = ""; password = "" })
+
+    @Test
+    fun upload() {
+        val link = imgurService.upload(javaClass.classLoader.getResource("Face_Powder_Height_1.gif").readBytes())
+
+        println(link)
+    }
+}
