@@ -16,7 +16,7 @@
 
 package com.faendir.zachtronics.bot.om.discord
 
-/*
+
 import com.faendir.discord4j.command.annotation.ApplicationCommand
 import com.faendir.discord4j.command.annotation.AutoComplete
 import com.faendir.discord4j.command.annotation.Converter
@@ -28,7 +28,7 @@ import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.JNISolutionVerifier
 import com.faendir.zachtronics.bot.om.OmQualifier
-import com.faendir.zachtronics.bot.om.getMetrics
+import com.faendir.zachtronics.bot.om.OmSimMetric
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
@@ -37,6 +37,7 @@ import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
+import com.faendir.zachtronics.bot.utils.ceil
 import com.faendir.zachtronics.bot.utils.orEmpty
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.discordjson.json.ApplicationCommandOptionData
@@ -59,10 +60,6 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Abstract
         val errors = mutableListOf<String>()
         for (puzzle in puzzles) {
             val puzzleFile = puzzle.file
-            if (puzzleFile == null) {
-                errors.add("No puzzle file for ${puzzle.displayName}")
-                continue
-            }
 
             val records = repository.findCategoryHolders(puzzle, true)
                 .filter { (record, _) -> parameters.score == null || record.score.toDisplayString().equals(parameters.score, ignoreCase = true) }
@@ -71,9 +68,29 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Abstract
                     errors.add("No solution file for ${record.toDisplayString(DisplayContext.discord())}")
                     continue
                 }
+
+                fun JNISolutionVerifier.getMetricSafe(metric: OmSimMetric) = try {
+                    getMetric(metric)
+                } catch (e: Exception) {
+                    errors.add("Failed to get ${metric::class.java.simpleName} for ${record.toDisplayString(DisplayContext.discord())}: ${e.message}");
+                    null
+                }
+
                 if (overrideExisting || parts.any { it.getValue(record.score) == null }) {
                     val computed = JNISolutionVerifier.open(puzzleFile.readBytes(), record.dataPath.readBytes())
-                        .use { it.getMetrics(parts) { e, part -> errors.add("Failed to get ${part.displayName} for ${record.toDisplayString(DisplayContext.discord())}: ${e.message}") } }
+                        .use { verifier ->
+                            listOf(
+                                OmScorePart.COST to verifier.getMetricSafe(OmSimMetric.COST),
+                                OmScorePart.CYCLES to verifier.getMetricSafe(OmSimMetric.CYCLES),
+                                OmScorePart.AREA to verifier.getMetricSafe(OmSimMetric.AREA_APPROXIMATE),
+                                OmScorePart.INSTRUCTIONS to verifier.getMetricSafe(OmSimMetric.INSTRUCTIONS),
+                                OmScorePart.HEIGHT to verifier.getMetricSafe(OmSimMetric.HEIGHT),
+                                OmScorePart.WIDTH to verifier.getMetricSafe(OmSimMetric.WIDTH_TIMES_TWO)?.let { it.toDouble() / 2 },
+                                OmScorePart.RATE to verifier.getMetricSafe(OmSimMetric.THROUGHPUT_CYCLES)?.let {
+                                    (it.toDouble() / (verifier.getMetricSafe(OmSimMetric.THROUGHPUT_OUTPUTS) ?: 0)).ceil(precision = 2)
+                                },
+                            ).filter { it.second != null }.toMap()
+                        }
                     if (computed.size < parts.size) {
                         errors.add(
                             "Wanted ${parts.joinToString { it.displayName }}, but got ${computed.keys.joinToString { it.displayName }} for ${
@@ -140,4 +157,4 @@ data class Reverify(
     @Description("full score of the submission, e.g. 65g/80c/12a/4i/4h/4w/12r")
     val score: String?,
     val overrideExisting: Boolean?,
-)*/
+)

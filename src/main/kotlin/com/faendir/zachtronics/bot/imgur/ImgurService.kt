@@ -37,6 +37,8 @@ class ImgurService(private val imgurProperties: ImgurProperties) {
 
     private val restTemplate = RestTemplate()
 
+    private var token: String? = null
+
     private fun login(): String {
         val headers = HttpHeaders()
         headers.contentType = MediaType.MULTIPART_FORM_DATA
@@ -51,9 +53,7 @@ class ImgurService(private val imgurProperties: ImgurProperties) {
 
         return response.headers["set-cookie"]
             ?.find { it.startsWith("accesstoken") }
-            ?.let {cookie ->
-                Regex("accesstoken=([^;]*);.*").matchEntire(cookie)?.groupValues?.get(1)
-            }
+            ?.let { cookie -> Regex("accesstoken=([^;]*);.*").matchEntire(cookie)?.groupValues?.get(1) }
             ?: throw RuntimeException("Imgur login failed")
     }
 
@@ -65,22 +65,40 @@ class ImgurService(private val imgurProperties: ImgurProperties) {
         val body = LinkedMultiValueMap<String, Any>()
         body.add("image", ByteArrayResource(gif))
 
-        try {
-            val result = restTemplate.exchange("https://api.imgur.com/3/image", HttpMethod.POST, HttpEntity(body, headers), Response::class.java)
-            if (result.statusCode == HttpStatus.OK) {
-                val link = result.body?.data?.link
-                if (link != null) {
-                    return if (link.endsWith(".")) link + "mp4"
-                    else link
-                } else {
-                    throw RuntimeException("Imgur did not return a link: ${result.body}")
+        if (token != null) {
+            try {
+                return doUpload(body, headers)
+            } catch (e: HttpStatusCodeException) {
+                if (e.statusCode != HttpStatus.UNAUTHORIZED) {
+                    logger.warn(
+                        "Imgur returned error.\nHeaders:\n${e.responseHeaders?.toList()?.joinToString { "${it.first}=${it.second.joinToString()}" }}\n",
+                        e
+                    )
+                    throw RuntimeException("Imgur returned error: ${e.message}")
                 }
-            } else {
-                throw RuntimeException("Failed to upload gif to imgur: ${result.body}")
             }
+        }
+        token = login()
+        try {
+            return doUpload(body, headers)
         } catch (e: HttpStatusCodeException) {
             logger.warn("Imgur returned error.\nHeaders:\n${e.responseHeaders?.toList()?.joinToString { "${it.first}=${it.second.joinToString()}" }}\n", e)
             throw RuntimeException("Imgur returned error: ${e.message}")
+        }
+    }
+
+    private fun doUpload(body: LinkedMultiValueMap<String, Any>, headers: HttpHeaders): String {
+        val result = restTemplate.exchange("https://api.imgur.com/3/image", HttpMethod.POST, HttpEntity(body, headers), Response::class.java)
+        return if (result.statusCode == HttpStatus.OK) {
+            val link = result.body?.data?.link
+            if (link != null) {
+                if (link.endsWith(".")) link + "mp4"
+                else link
+            } else {
+                throw RuntimeException("Imgur did not return a link: ${result.body}")
+            }
+        } else {
+            throw RuntimeException("Failed to upload gif to imgur: ${result.body}")
         }
     }
 
