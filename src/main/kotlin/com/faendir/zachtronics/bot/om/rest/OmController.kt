@@ -41,6 +41,7 @@ import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.filterIsInstance
 import com.faendir.zachtronics.bot.utils.isValidLink
 import com.faendir.zachtronics.bot.utils.orEmpty
+import discord4j.common.util.Snowflake
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.channel.MessageChannel
 import org.springframework.format.annotation.DateTimeFormat
@@ -53,6 +54,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
+import reactor.core.publisher.Mono
 import java.time.Instant
 
 @RestController
@@ -94,15 +96,15 @@ class OmController(private val repository: OmSolutionRepository, private val dis
 
     @PostMapping(path = ["/submit"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun submit(@ModelAttribute submissionDTO: OmSubmissionDTO): SubmitResultType {
-        if (submissionDTO.gif != null  && !isValidLink(submissionDTO.gif)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid gif")
-        if(submissionDTO.gif == null && submissionDTO.gifData == null) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "no gif")
+        if (submissionDTO.gif != null && !isValidLink(submissionDTO.gif)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid gif")
+        if (submissionDTO.gif == null && submissionDTO.gifData == null) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "no gif")
         val submission = createSubmission(submissionDTO.gif, submissionDTO.gifData?.bytes, submissionDTO.author, submissionDTO.solution.bytes)
         return when (val result = repository.submit(submission)) {
             is SubmitResult.Success -> {
                 val beatenCategories: List<OmCategory> = result.beatenRecords.flatMap { it.categories }
                 val categoryString = beatenCategories.takeIf { it.isNotEmpty() }?.joinToString { it.displayName } ?: "Pareto"
                 val score = submission.score.toDisplayString(DisplayContext(StringFormat.DISCORD, beatenCategories))
-                sendDiscordMessage(
+                (if (beatenCategories.isEmpty()) Channel.PARETO else Channel.RECORD).sendDiscordMessage(
                     SafeEmbedMessageBuilder()
                         .title("API submission: *${submission.puzzle.displayName}* $categoryString")
                         .color(Colors.SUCCESS)
@@ -112,7 +114,18 @@ class OmController(private val repository: OmSolutionRepository, private val dis
                 )
                 SubmitResultType.SUCCESS
             }
-            is SubmitResult.Updated -> SubmitResultType.SUCCESS
+
+            is SubmitResult.Updated -> {
+                Channel.UPDATE.sendDiscordMessage(
+                    SafeEmbedMessageBuilder()
+                        .title("API gif update: *${submission.puzzle.displayName}*")
+                        .color(Colors.SUCCESS)
+                        .description("`${submission.score}`${submission.author.orEmpty(prefix = " updated by ")}")
+                        .link(submission.displayLink)
+                )
+                SubmitResultType.SUCCESS
+            }
+
             is SubmitResult.Failure -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, result.message)
             is SubmitResult.NothingBeaten -> SubmitResultType.NOTHING_BEATEN
             is SubmitResult.AlreadyPresent -> SubmitResultType.ALREADY_PRESENT
@@ -124,14 +137,22 @@ class OmController(private val repository: OmSolutionRepository, private val dis
         return repository.computeChangesSince(since).map { it.toDTO() }
     }
 
-    private fun sendDiscordMessage(message: SafeEmbedMessageBuilder) {
+    private fun Channel.sendDiscordMessage(message: SafeEmbedMessageBuilder) {
         discordClient.guilds
-            .flatMap { it.channels }
-            .filter { it.name == "opus-magnum" }
+            .flatMap { it.getChannelById(id).onErrorResume { Mono.empty() } }
             .filterIsInstance<MessageChannel>()
             .flatMap { message.send(it) }
             .subscribe()
     }
+}
+
+enum class Channel(idLong: Long) {
+    RECORD(370367639073062922),
+    PARETO(909638277756243978),
+    UPDATE(1006543549346611251),
+    ;
+
+    val id = Snowflake.of(idLong)
 }
 
 private fun findPuzzle(puzzleId: String) =
