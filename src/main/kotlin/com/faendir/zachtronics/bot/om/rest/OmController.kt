@@ -120,7 +120,7 @@ class OmController(private val repository: OmSolutionRepository, private val dis
                     SafeEmbedMessageBuilder()
                         .title("API gif update: *${submission.puzzle.displayName}*")
                         .color(Colors.SUCCESS)
-                        .description("`${submission.score}`${submission.author.orEmpty(prefix = " updated by ")}")
+                        .description("`${submission.score.toDisplayString(DisplayContext.discord())}`${submission.author.orEmpty(prefix = " updated by ")}")
                         .link(submission.displayLink)
                 )
                 SubmitResultType.SUCCESS
