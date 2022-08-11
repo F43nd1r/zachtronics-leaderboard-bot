@@ -51,7 +51,7 @@ fun Solution.isTrackless(): Boolean = parts.none { it is Track }
 fun JNISolutionVerifier.getMetricSafe(metric: OmSimMetric) = try {
     getMetric(metric)
 } catch (e: Exception) {
-    logger.info("Verifier threw exception for $metric", e);
+    logger.info("Verifier threw exception for $metric: ${e.message}")
     null
 }
 

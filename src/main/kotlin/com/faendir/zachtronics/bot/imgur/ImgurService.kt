@@ -20,7 +20,6 @@ import com.faendir.zachtronics.bot.config.ImgurProperties
 import kotlinx.serialization.Serializable
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
-import org.springframework.core.io.FileSystemResource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -30,7 +29,6 @@ import org.springframework.stereotype.Service
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.HttpStatusCodeException
 import org.springframework.web.client.RestTemplate
-import java.io.File
 
 @Service
 class ImgurService(private val imgurProperties: ImgurProperties) {
@@ -42,7 +40,6 @@ class ImgurService(private val imgurProperties: ImgurProperties) {
     private fun login(): String {
         val headers = HttpHeaders()
         headers.contentType = MediaType.MULTIPART_FORM_DATA
-        headers["User-Agent"] = "Mozilla/5.0 (X11; Linux x86_64; rv:103.0) Gecko/20100101 Firefox/103.0"
 
         val body = LinkedMultiValueMap<String, Any>()
         body.add("username", imgurProperties.username)
@@ -60,7 +57,6 @@ class ImgurService(private val imgurProperties: ImgurProperties) {
     fun upload(gif: ByteArray): String {
         val headers = HttpHeaders()
         headers.contentType = MediaType.MULTIPART_FORM_DATA
-        headers["User-Agent"] = "Mozilla/5.0 (X11; Linux x86_64; rv:103.0) Gecko/20100101 Firefox/103.0"
         headers["Authorization"] = "Bearer ${login()}"
         val body = LinkedMultiValueMap<String, Any>()
         body.add("image", ByteArrayResource(gif))

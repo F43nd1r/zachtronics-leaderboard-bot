@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.imgur
 import com.faendir.zachtronics.bot.config.ImgurProperties
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import java.io.File
 
 @Disabled
 internal class ImgurServiceTest {
