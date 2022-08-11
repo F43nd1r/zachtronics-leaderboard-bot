@@ -29,8 +29,12 @@ function isYoutube(gif: string): boolean {
     return gif.includes("youtu.be") || gif.includes("youtube.com")
 }
 
+function isImgur(gif: string): boolean {
+    return gif.includes("imgur")
+}
+
 function getVideoType(gif: string): "video" | "iframe" | "img" {
-    if (gif.endsWith(".mp4") || gif.endsWith(".webm")) {
+    if (gif.endsWith(".mp4") || gif.endsWith(".webm") || isImgur(gif)) {
         return "video"
     } else if (isYoutube(gif)) {
         return "iframe"
@@ -42,6 +46,8 @@ function getVideoType(gif: string): "video" | "iframe" | "img" {
 function getVideoUrl(gif: string) {
     if (isYoutube(gif)) {
         return gif.replace(/.+\/(\w+)(?:\\?.+)?$/, "https://youtube.com/embed/$1")
+    } else if (isImgur(gif)) {
+        return gif.replace(/.+\/(\w+)(\..*)?/, "https://i.imgur.com/$1.mp4")
     } else {
         return gif
     }
