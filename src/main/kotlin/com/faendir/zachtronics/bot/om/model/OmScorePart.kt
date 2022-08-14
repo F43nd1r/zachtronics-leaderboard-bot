@@ -17,6 +17,8 @@
 package com.faendir.zachtronics.bot.om.model
 
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.*
 
 enum class OmScorePart(val key: Char, val displayName: String, val getValue: (OmScore) -> Number?) {
     COST('g', "Cost", OmScore::cost),
@@ -31,7 +33,7 @@ enum class OmScorePart(val key: Char, val displayName: String, val getValue: (Om
     fun format(score: OmScore) = getValue(score)?.let { numberFormat.format(it) }?.plus(key)
 
     companion object {
-        private val numberFormat = DecimalFormat("0.###")
+        private val numberFormat = DecimalFormat("0.###", DecimalFormatSymbols(Locale.ENGLISH))
 
 
         fun parse(string: String): Pair<OmScorePart, Double>? {
