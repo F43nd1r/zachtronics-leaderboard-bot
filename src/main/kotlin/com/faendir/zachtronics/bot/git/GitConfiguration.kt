@@ -25,6 +25,9 @@ import org.springframework.context.annotation.Profile
 @Profile("!test")
 class GitConfiguration(private val gitProperties: GitProperties) {
 
+    @Bean("fpRepository")
+    fun fpRepository() = GitRepository(gitProperties, "forbidden-path-leaderboard", "https://github.com/lastcallbbs-community-developers/forbidden-path-leaderboard.git")
+
     @Bean("ifRepository")
     fun ifRepository() = GitRepository(gitProperties, "infinifactory-leaderboard", "https://github.com/12345ieee/infinifactory-leaderboard.git")
 
