@@ -33,7 +33,7 @@ public class FpScore implements Score<FpCategory> {
     int frames;
     int waste;
 
-    /** rr(cr)/ff/w */
+    /** rr/cr/ff/w */
     @NotNull
     @Override
     public String toDisplayString(@NotNull DisplayContext<FpCategory> context) {
@@ -46,14 +46,14 @@ public class FpScore implements Score<FpCategory> {
                               .orElse(0b000);
         }
 
-        return String.format(FpCategory.FORMAT_STRINGS[formatId], rules, conditionalRules, separator, frames, separator, waste);
+        return String.format(FpCategory.FORMAT_STRINGS[formatId], rules, separator, conditionalRules, separator, frames, separator, waste);
     }
 
-    /** rr(cr)/ff/w */
+    /** rr/cr/ff/w */
     private static final Pattern REGEX_SCORE = Pattern.compile(
             "\\**(?<rules>\\d+)\\**\\((?<conditionalRules>\\d+)\\)\\**/\\**(?<frames>\\d+)\\**/\\**(?<waste>\\d+)\\**");
 
-    /** <tt>rr(cr)/ff/w</tt>, tolerates extra <tt>*</tt> */
+    /** <tt>rr/cr/ff/w</tt>, tolerates extra <tt>*</tt> */
     @Nullable
     public static FpScore parseScore(@NotNull String string) {
         Matcher m = REGEX_SCORE.matcher(string);

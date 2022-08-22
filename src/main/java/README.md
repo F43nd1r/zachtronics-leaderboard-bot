@@ -19,7 +19,7 @@ Edit:
 * `repository/*`
 * `rest/dto/*`
 
-Add `lombok.copyableannotations += com.faendir.zachtronics.bot.sz.FpQualifier` to `/lombok.config`
+Add `lombok.copyableannotations += com.faendir.zachtronics.bot.fp.FpQualifier` to `/lombok.config`
 
 ### Git
 
