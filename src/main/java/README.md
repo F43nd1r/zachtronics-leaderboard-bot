@@ -25,6 +25,8 @@ Add `lombok.copyableannotations += com.faendir.zachtronics.bot.fp.FpQualifier` t
 
 Create git repo in game org.
 
+Add README
+
 Add the push webhook:
 * Payload URL: https://zlbb.faendir.com/push
 * Content type: `application/json`

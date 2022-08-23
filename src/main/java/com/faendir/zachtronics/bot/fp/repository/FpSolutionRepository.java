@@ -163,20 +163,20 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
     }
 
     @NotNull
-    static String makeFilename(@NotNull String puzzleId, @NotNull FpScore score) {
-        return puzzleId + "-" + score.toDisplayString(DisplayContext.fileName()) + ".txt";
+    static String makeScoreFilename(@NotNull FpScore score) {
+        return score.toDisplayString(DisplayContext.fileName()) + ".txt";
     }
 
     @NotNull
     @Override
     protected String makeArchiveLink(@NotNull FpPuzzle puzzle, @NotNull FpScore score) {
-        return makeArchiveLink(puzzle, makeFilename(puzzle.name(), score));
+        return makeArchiveLink(puzzle, makeScoreFilename(score));
     }
 
     @Override
     @NotNull
     protected Path makeArchivePath(@NotNull Path puzzlePath, FpScore score) {
-        return puzzlePath.resolve(makeFilename(puzzlePath.getFileName().toString(), score));
+        return puzzlePath.resolve(makeScoreFilename(score));
     }
 
     /** Sorting order of the solutions index */
@@ -258,7 +258,7 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
             }
             solutions.add(index, candidate);
 
-            String filename = makeFilename(submission.getPuzzle().name(), candidate.getScore());
+            String filename = makeScoreFilename(candidate.getScore());
             Path solutionPath = puzzlePath.resolve(filename);
             String data = submission.getData().replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
             Files.writeString(solutionPath, data, StandardOpenOption.CREATE_NEW);
