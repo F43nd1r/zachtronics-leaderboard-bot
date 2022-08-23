@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.fp.validator;
 import com.faendir.zachtronics.bot.fp.model.FpPuzzle;
 import com.faendir.zachtronics.bot.fp.model.FpScore;
 import com.faendir.zachtronics.bot.fp.model.FpSubmission;
+import com.faendir.zachtronics.bot.fp.model.FpType;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,8 +57,8 @@ public class XBPGHSim {
                                 .orElseThrow();
 
         // score
-        int waste = result.isStable() ? result.getNumWaste() : 13;
-        FpScore score = new FpScore(result.getNumRules(), result.getNumRulesConditional(), result.getNumFrames(), waste);
+        int frames = result.isStable() ? result.getNumFrames() : 13;
+        FpScore score = new FpScore(result.getNumRules(), result.getNumRulesConditional(), frames, result.getNumWaste());
 
         // build submission
         FpSubmission submission = new FpSubmission(puzzle, score, author, null, result.getSolution());
@@ -65,6 +66,10 @@ public class XBPGHSim {
         // check correctness
         if (!result.isCorrect())
             return new ValidationResult.Invalid<>(submission, "Solution is not correct");
+
+        // ensure level is tracked
+        if (puzzle.getType() == FpType.EDITOR)
+            return new ValidationResult.Invalid<>(submission, "Editor levels are not supported");
 
         return new ValidationResult.Valid<>(submission);
     }

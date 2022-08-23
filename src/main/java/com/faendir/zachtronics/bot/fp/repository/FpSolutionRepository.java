@@ -209,11 +209,13 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
                     return new SubmitResult.NothingBeaten<>(Collections.singletonList(categoryRecord));
                 }
                 else if (r < 0) {
-                    // allow same-score solution changes only if you are the original author
+                    // allow same-score changes if you bring an image or you are the original author and don't regress the image state
                     if (candidate.getScore().equals(solution.getScore()) &&
-                        !candidate.getAuthor().equals(solution.getAuthor())) {
+                        candidate.getDisplayLink() == null &&
+                        !(candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null)) {
                         return new SubmitResult.AlreadyPresent<>();
                     }
+
                     // remove beaten score and get categories
                     candidate.getCategories().addAll(solution.getCategories());
                     Files.delete(makeArchivePath(puzzlePath, solution.getScore()));
