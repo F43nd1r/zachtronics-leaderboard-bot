@@ -159,7 +159,7 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
     @Override
     @NotNull
     protected Path relativePuzzlePath(@NotNull FpPuzzle puzzle) {
-        return Paths.get(puzzle.getGroup().getRepoFolder()).resolve(puzzle.name());
+        return Paths.get(puzzle.getGroup().name()).resolve(puzzle.name());
     }
 
     @NotNull

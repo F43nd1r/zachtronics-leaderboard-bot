@@ -23,9 +23,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum FpGroup implements Group {
-    NORMAL_CAMPAIGN("Normal Campaign", "normal_campaign"),
-    ADDITIONAL_CAMPAIGN("Additional Campaign", "additional_campaign");
+    NORMAL_CAMPAIGN("Normal Campaign"),
+    ADDITIONAL_CAMPAIGN("Additional Campaign");
 
     private final String displayName;
-    private final String repoFolder;
 }
