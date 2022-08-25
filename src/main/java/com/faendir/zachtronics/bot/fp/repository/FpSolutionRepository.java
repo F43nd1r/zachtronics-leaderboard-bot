@@ -40,7 +40,7 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.faendir.zachtronics.bot.fp.model.FpCategory.RCRF;
+import static com.faendir.zachtronics.bot.fp.model.FpCategory.RCF;
 
 @Component
 @RequiredArgsConstructor
@@ -56,7 +56,7 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
     @Getter
     final Function<String[], FpSolution> solUnmarshaller = FpSolution::unmarshal;
     @Getter
-    private final Comparator<FpSolution> archiveComparator = Comparator.comparing(FpSolution::getScore, RCRF.getScoreComparator());
+    private final Comparator<FpSolution> archiveComparator = Comparator.comparing(FpSolution::getScore, RCF.getScoreComparator());
 
     @NotNull
     @Override

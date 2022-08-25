@@ -31,18 +31,18 @@ import static com.faendir.zachtronics.bot.fp.model.FpType.STANDARD;
 
 @Getter
 public enum FpCategory implements CategoryJava<FpCategory, FpScore, FpMetric, FpType> {
-    RCRF("RCRF", List.of(RULES, CONDITIONAL_RULES, FRAMES), 0b100),
-    RFCR("RFCR", List.of(RULES, FRAMES, CONDITIONAL_RULES), 0b100),
+    RCF("RCF", List.of(RULES, CONDITIONAL_RULES, FRAMES), 0b100),
+    RFC("RFC", List.of(RULES, FRAMES, CONDITIONAL_RULES), 0b100),
 
-    CRRF("CRRF", List.of(CONDITIONAL_RULES, RULES, FRAMES), 0b010),
-    CRFR("CRFR", List.of(CONDITIONAL_RULES, FRAMES, RULES), 0b010),
+    CRF("CRF", List.of(CONDITIONAL_RULES, RULES, FRAMES), 0b010),
+    CFR("CFR", List.of(CONDITIONAL_RULES, FRAMES, RULES), 0b010),
 
-    FRCR("FRCR", List.of(FRAMES, RULES, CONDITIONAL_RULES), 0b001),
-    FCRR("FCRR", List.of(FRAMES, CONDITIONAL_RULES, RULES), 0b001);
+    FRC("FRC", List.of(FRAMES, RULES, CONDITIONAL_RULES), 0b001),
+    FCR("FCR", List.of(FRAMES, CONDITIONAL_RULES, RULES), 0b001);
 
-    /** contains <tt>%dR%s%dCR%s%dF%s%dW</tt> plus a bunch of <tt>*</tt> most likely */
-    static final String[] FORMAT_STRINGS = {"%dR%s%dCR%s%dF%s%dW", "%dR%s%dCR%s**%d**F%s%dW",
-                                            "%dR%s**%d**CR%s%dF%s%dW", null, "**%d**R%s%dCR%s%dF%s%dW"};
+    /** contains <tt>%dR%s%dC%s%dF%s%dW</tt> plus a bunch of <tt>*</tt> most likely */
+    static final String[] FORMAT_STRINGS = {"%dR%s%dC%s%dF%s%dW", "%dR%s%dC%s**%d**F%s%dW",
+                                            "%dR%s**%d**C%s%dF%s%dW", null, "**%d**R%s%dC%s%dF%s%dW"};
 
     private final String displayName;
     @Accessors(fluent = true)

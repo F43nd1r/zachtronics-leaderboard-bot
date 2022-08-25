@@ -45,7 +45,7 @@ public class FpScore implements Score<FpCategory> {
 
     /** rr/cr/ff/w */
     private static final Pattern REGEX_SCORE = Pattern.compile(
-            "\\**(?<rules>\\d+)\\**R/\\**(?<conditionalRules>\\d+)\\**CR/\\**(?<frames>\\d+)\\**F/\\**(?<waste>\\d+)\\**W");
+            "\\**(?<rules>\\d+)\\**R/\\**(?<conditionalRules>\\d+)\\**C/\\**(?<frames>\\d+)\\**F/\\**(?<waste>\\d+)\\**W");
 
     /** <tt>rr/cr/ff/w</tt>, tolerates extra <tt>*</tt> */
     @Nullable
