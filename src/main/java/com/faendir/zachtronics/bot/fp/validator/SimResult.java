@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
  <pre>{
  "level_name": "4-3",
  "level_id": 12,
+ "slot_id": 0,
  "solution": "eNqtjl0KgEAIhGc0todY6P5X7BClbNLgcwOKfv4wlwMnAGKJVd+hLI6IrWBN5wtt9FNtpv5j2zTLpCCcwAV4Tkf3xQZtxyfij0atPoboBXc=",
  "is_correct": true,
  "num_rules": 10,
@@ -40,6 +41,7 @@ import org.jetbrains.annotations.NotNull;
 public class SimResult {
     @NotNull String levelName;
     int levelId;
+    int slotId;
     /** present only if <tt>--include-solution</tt> is given */
     @NotNull String solution;
     boolean isCorrect;

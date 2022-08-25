@@ -43,7 +43,10 @@ public class XBPGHSim {
      */
     @NotNull
     public static Collection<ValidationResult<FpSubmission>> validateMultiExport(@NotNull String data, @NotNull String author) {
-        return Arrays.stream(validate(data))
+        SimResult[] results = validate(data);
+        if (results.length == 0)
+            throw new XBPGHSimException("No valid solution provided");
+        return Arrays.stream(results)
                      .map(r -> validationResultFrom(r, author))
                      .collect(Collectors.toCollection(LinkedHashSet::new));
     }
@@ -63,13 +66,13 @@ public class XBPGHSim {
         // build submission
         FpSubmission submission = new FpSubmission(puzzle, score, author, null, result.getSolution());
 
-        // check correctness
-        if (!result.isCorrect())
-            return new ValidationResult.Invalid<>(submission, "Solution is not correct");
-
         // ensure level is tracked
         if (puzzle.getType() == FpType.EDITOR)
             return new ValidationResult.Invalid<>(submission, "Editor levels are not supported");
+
+        // check correctness
+        if (!result.isCorrect())
+            return new ValidationResult.Invalid<>(submission, "Solution is not correct");
 
         return new ValidationResult.Valid<>(submission);
     }

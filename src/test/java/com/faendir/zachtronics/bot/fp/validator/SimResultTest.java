@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.fp.validator;
 
 import com.faendir.zachtronics.bot.BotTest;
+import com.faendir.zachtronics.bot.fp.model.FpPuzzle;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
@@ -31,8 +32,8 @@ class SimResultTest {
         String data = "Toronto.Solution.1.2 = eNp7zczAIMDAwMDIAAEgmvE/EDCgC6IwYGxkDooCkBHIgkwcDAjAyDAoOGB3QQUAl6EJHw==";
 
         SimResult result = validateSingle(data);
-        SimResult expected = new SimResult("1-1", 1,
-                                           "eNp7zczAIMDAwMDIAAEgmvE/EDCgC6IwYGxkDooCkBHIgkwcDAjAyDAoOGB3QQUAl6EJHw==",
+        SimResult expected = new SimResult(FpPuzzle.NORMAL_1_1.getDisplayName(), 1, 2,
+                                           data.replace(".2", ".0"), // slot normalization
                                            true, 5, 0, 8, true, 0, false);
         assertEquals(expected, result);
     }
