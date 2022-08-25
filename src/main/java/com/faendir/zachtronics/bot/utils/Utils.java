@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 
 package com.faendir.zachtronics.bot.utils;
 
+import com.faendir.zachtronics.bot.model.CategoryJava;
+import com.faendir.zachtronics.bot.model.DisplayContext;
+import com.faendir.zachtronics.bot.model.StringFormat;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -66,5 +69,16 @@ public final class Utils {
         EnumSet<T> res = EnumSet.copyOf(s1);
         res.addAll(s2);
         return res;
+    }
+
+    public static <Cat extends CategoryJava<?, ?, ?, ?>> int getScoreFormatId(@NotNull DisplayContext<Cat> context) {
+        int formatId = 0b000;
+        if (context.getFormat() == StringFormat.REDDIT && context.getCategories() != null) {
+            formatId = context.getCategories().stream()
+                              .map(Cat::getScoreFormatId)
+                              .reduce((a, b) -> a & b)
+                              .orElse(0b000);
+        }
+        return formatId;
     }
 }

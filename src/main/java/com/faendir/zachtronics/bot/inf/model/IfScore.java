@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.inf.model;
 
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Score;
-import com.faendir.zachtronics.bot.model.StringFormat;
+import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
@@ -41,13 +41,7 @@ public class IfScore implements Score<IfCategory> {
     @Override
     public String toDisplayString(@NotNull DisplayContext<IfCategory> context) {
         String separator = context.getSeparator();
-        int formatId = 0b000;
-        if (context.getFormat() == StringFormat.REDDIT && context.getCategories() != null) {
-            formatId = context.getCategories().stream()
-                              .map(IfCategory::getScoreFormatId)
-                              .reduce((a, b) -> a & b)
-                              .orElse(0b000);
-        }
+        int formatId = Utils.getScoreFormatId(context);
 
         return String.format(IfCategory.FORMAT_STRINGS[formatId], cycles, separator, footprint, separator, blocks, sepFlags(separator));
     }

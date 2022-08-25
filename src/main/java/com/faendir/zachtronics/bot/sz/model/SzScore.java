@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.sz.model;
 
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Score;
-import com.faendir.zachtronics.bot.model.StringFormat;
+import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,13 +37,7 @@ public class SzScore implements Score<SzCategory> {
     @Override
     public String toDisplayString(@NotNull DisplayContext<SzCategory> context) {
         String separator = context.getSeparator();
-        int formatId = 0b000;
-        if (context.getFormat() == StringFormat.REDDIT && context.getCategories() != null) {
-            formatId = context.getCategories().stream()
-                              .map(SzCategory::getScoreFormatId)
-                              .reduce((a, b) -> a & b)
-                              .orElse(0b000);
-        }
+        int formatId = Utils.getScoreFormatId(context);
 
         return String.format(SzCategory.FORMAT_STRINGS[formatId], cost, separator, power, separator, lines);
     }

@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.fp.model;
 
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Score;
-import com.faendir.zachtronics.bot.model.StringFormat;
+import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,13 +38,7 @@ public class FpScore implements Score<FpCategory> {
     @Override
     public String toDisplayString(@NotNull DisplayContext<FpCategory> context) {
         String separator = context.getSeparator();
-        int formatId = 0b000;
-        if (context.getFormat() == StringFormat.REDDIT && context.getCategories() != null) {
-            formatId = context.getCategories().stream()
-                              .map(FpCategory::getScoreFormatId)
-                              .reduce((a, b) -> a & b)
-                              .orElse(0b000);
-        }
+        int formatId = Utils.getScoreFormatId(context);
 
         return String.format(FpCategory.FORMAT_STRINGS[formatId], rules, separator, conditionalRules, separator, frames, separator, waste);
     }
