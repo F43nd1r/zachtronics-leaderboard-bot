@@ -16,9 +16,9 @@
 
 package com.faendir.zachtronics.bot.sz.model;
 
-import com.faendir.zachtronics.bot.model.Category;
-import com.faendir.zachtronics.bot.model.Metric;
+import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -30,7 +30,7 @@ import static com.faendir.zachtronics.bot.sz.model.SzMetric.*;
 import static com.faendir.zachtronics.bot.sz.model.SzType.STANDARD;
 
 @Getter
-public enum SzCategory implements Category {
+public enum SzCategory implements CategoryJava<SzCategory, SzScore, SzMetric, SzType> {
     CP("CP", List.of(COST, POWER, LINES), 0b100),
     CL("CL", List.of(COST, LINES, POWER), 0b100),
 
@@ -44,23 +44,20 @@ public enum SzCategory implements Category {
     static final String[] FORMAT_STRINGS = {"%d%s%d%s%d", "%d%s%d%s**%d**", "%d%s**%d**%s%d", null, "**%d**%s%d%s%d"};
 
     private final String displayName;
-    private final List<Metric> metrics;
+    @Accessors(fluent = true)
+    private final List<SzMetric> metrics;
     private final Comparator<SzScore> scoreComparator;
     private final Set<SzType> supportedTypes = Collections.singleton(STANDARD);
     private final int scoreFormatId;
 
-    @SuppressWarnings("unchecked")
     SzCategory(String displayName, @NotNull List<SzMetric> metrics, int scoreFormatId) {
         this.displayName = displayName;
-        this.metrics = (List<Metric>)(List<?>) metrics;
-        this.scoreComparator = metrics.stream()
-                                      .map(SzMetric::getExtract)
-                                      .map(Comparator::comparingInt)
-                                      .reduce(Comparator::thenComparing)
-                                      .orElseThrow();
+        this.metrics = metrics;
+        this.scoreComparator = makeCategoryComparator(metrics);
         this.scoreFormatId = scoreFormatId;
     }
 
+    @Override
     public boolean supportsScore(@NotNull SzScore score) {
         return true;
     }

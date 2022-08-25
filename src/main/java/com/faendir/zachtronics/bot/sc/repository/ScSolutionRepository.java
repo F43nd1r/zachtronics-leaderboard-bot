@@ -22,7 +22,6 @@ import com.faendir.zachtronics.bot.model.StringFormat;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
-import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.sc.model.*;
 import com.faendir.zachtronics.bot.utils.Markdown;
@@ -34,11 +33,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -57,12 +53,20 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     @Qualifier("scArchiveRepository")
     private final GitRepository gitRepo;
     @Getter
-    Function<String[], ScSolution> solUnmarshaller = ScSolution::unmarshal;
+    private final Class<ScCategory> categoryClass = ScCategory.class;
+    @Getter
+    final Function<String[], ScSolution> solUnmarshaller = ScSolution::unmarshal;
+    @Getter
+    private final Comparator<ScSolution> archiveComparator =
+            Comparator.comparing(ScSolution::getScore, ScCategory.C.getScoreComparator()
+                                                                   .thenComparing(ScScore::isBugged)
+                                                                   .thenComparing(ScScore::isPrecognitive))
+                      .thenComparing(s -> s.getDisplayLink() == null);
 
     @NotNull
     @Override
     public SubmitResult<ScRecord, ScCategory> submit(@NotNull ScSubmission submission) {
-        try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
+        try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
             BiConsumer<ScSubmission, Collection<ScCategory>> successCallback = (sub, wonCategories) -> {
                 access.push();
                 if (!wonCategories.isEmpty()) {
@@ -222,6 +226,52 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     }
 
     @Override
+    protected ScSolution makeCandidateSolution(@NotNull ScSubmission submission) {
+        return new ScSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink(), false);
+    }
+
+    @Override
+    protected int dominanceCompare(@NotNull ScScore s1, @NotNull ScScore s2) {
+        int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
+        int r2 = Integer.compare(s1.getReactors(), s2.getReactors());
+        int r3 = Integer.compare(s1.getSymbols(), s2.getSymbols());
+        int r4 = Boolean.compare(s1.isBugged(), s2.isBugged());
+        int r5 = Boolean.compare(s1.isPrecognitive(), s2.isPrecognitive());
+
+        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0 && r5 <= 0) {
+            // s1 dominates
+            return -1;
+        }
+        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0 && r5 >= 0) {
+            // s2 dominates
+            return 1;
+        }
+        else {
+            // equal is already captured by the 1st check, this is for "not comparable"
+            return 0;
+        }
+    }
+
+    @Override
+    protected boolean alreadyPresent(@NotNull ScSolution candidate, @NotNull ScSolution solution) {
+        return candidate.getScore().equals(solution.getScore()) &&
+               candidate.getDisplayLink() == null &&
+               !(candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
+    }
+
+    @Override
+    protected void removeOrReplaceFromIndex(@NotNull ScSolution candidate, @NotNull ScSolution solution,
+                                            @NotNull ListIterator<ScSolution> it) {
+        if (candidate.getDisplayLink() == null && solution.getDisplayLink() != null) {
+            // we beat the solution, but we can't replace the video, we keep the solution entry as a video-only
+            it.set(solution.withVideoOnly(true)); // empty categories
+        }
+        else {
+            it.remove();
+        }
+    }
+
+    @Override
     @NotNull
     protected Path relativePuzzlePath(@NotNull ScPuzzle puzzle) {
         return Paths.get(puzzle.getGroup().name(), puzzle.name());
@@ -243,144 +293,4 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     protected Path makeArchivePath(@NotNull Path puzzlePath, ScScore score) {
         return puzzlePath.resolve(makeScoreFilename(score));
     }
-
-    /** Sorting order of the solutions index */
-    private static final Comparator<ScSolution> COMPARATOR =
-            Comparator.comparing(ScSolution::getScore, ScCategory.C.getScoreComparator()
-                                                                   .thenComparing(ScScore::isBugged)
-                                                                   .thenComparing(ScScore::isPrecognitive))
-                      .thenComparing(s -> s.getDisplayLink() == null);
-
-    /**
-     * @param solutions the list is modified with the updated state
-     */
-    @Override
-    @NotNull
-    protected SubmitResult<ScRecord, ScCategory> archiveOne(@NotNull GitRepository.ReadWriteAccess access,
-                                                            @NotNull List<ScSolution> solutions,
-                                                            @NotNull ScSubmission submission) {
-        ScPuzzle puzzle = submission.getPuzzle();
-        Path puzzlePath = getPuzzlePath(access, puzzle);
-
-        List<CategoryRecord<ScRecord, ScCategory>> beatenCategoryRecords = new ArrayList<>();
-        ScSolution candidate = new ScSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink(), false);
-
-        try {
-            for (ListIterator<ScSolution> it = solutions.listIterator(); it.hasNext(); ) {
-                ScSolution solution = it.next();
-                int r = dominanceCompare(candidate.getScore(), solution.getScore());
-                if (r > 0) {
-                    // TODO actually return all of the beating sols
-                    CategoryRecord<ScRecord, ScCategory> categoryRecord =
-                            solution.extendToCategoryRecord(puzzle,
-                                                            makeArchiveLink(puzzle, solution.getScore()),
-                                                            makeArchivePath(puzzlePath, solution.getScore()));
-                    return new SubmitResult.NothingBeaten<>(Collections.singletonList(categoryRecord));
-                }
-                else if (r < 0) {
-                    // allow same-score changes if you bring a video or you are the original author and don't regress the video state
-                    if (candidate.getScore().equals(solution.getScore()) &&
-                        candidate.getDisplayLink() == null &&
-                        !(candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null)) {
-                        return new SubmitResult.AlreadyPresent<>();
-                    }
-
-                    // remove beaten score and get categories
-                    candidate.getCategories().addAll(solution.getCategories());
-                    if (!solution.isVideoOnly()) // video-only sols have no data
-                        Files.delete(makeArchivePath(puzzlePath, solution.getScore()));
-                    beatenCategoryRecords.add(solution.extendToCategoryRecord(puzzle, null, null)); // the beaten record has no data anymore
-
-                    if (candidate.getDisplayLink() == null && solution.getDisplayLink() != null) {
-                        // we beat the solution, but we can't replace the video, we keep the solution entry as a video-only
-                        it.set(solution.withVideoOnly(true)); // empty categories
-                    }
-                    else {
-                        it.remove();
-                    }
-                }
-            }
-
-            // the new record may have gained categories of records it didn't pareto-beat, do the transfers
-            for (ScSolution solution: solutions) {
-                EnumSet<ScCategory> lostCategories = EnumSet.noneOf(ScCategory.class);
-                for (ScCategory category : solution.getCategories()) {
-                    if (category.supportsScore(candidate.getScore()) &&
-                        category.getScoreComparator().compare(candidate.getScore(), solution.getScore()) < 0) {
-                        lostCategories.add(category);
-                    }
-                }
-                if (!lostCategories.isEmpty()) {
-                    // add a CR holding the lost categories, then correct the solutions
-                    CategoryRecord<ScRecord, ScCategory> beatenCR = new CategoryRecord<>(
-                            solution.extendToRecord(puzzle,
-                                                    makeArchiveLink(puzzle, solution.getScore()),
-                                                    makeArchivePath(puzzlePath, solution.getScore())),
-                            lostCategories);
-                    beatenCategoryRecords.add(beatenCR);
-
-                    solution.getCategories().removeAll(lostCategories);
-                    candidate.getCategories().addAll(lostCategories);
-                }
-            }
-
-            // if it's the first in line our new sol steals from the void all the categories it can
-            if (solutions.isEmpty()) {
-                puzzle.getSupportedCategories().stream()
-                      .filter(c -> c.supportsScore(candidate.getScore()))
-                      .forEach(candidate.getCategories()::add);
-            }
-
-            int index = Collections.binarySearch(solutions, candidate, COMPARATOR);
-            if (index < 0) {
-                index = -index - 1;
-            }
-            solutions.add(index, candidate);
-
-            String filename = makeScoreFilename(candidate.getScore());
-            Path solutionPath = puzzlePath.resolve(filename);
-            String data = submission.getData().replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
-            Files.writeString(solutionPath, data, StandardOpenOption.CREATE_NEW);
-
-            marshalSolutions(solutions, puzzlePath);
-        }
-        catch (IOException e) {
-            // failures could happen after we dirtied the repo, so we call reset&clean on the puzzle dir
-            access.resetAndClean(puzzlePath.toFile());
-            return new SubmitResult.Failure<>(e.toString());
-        }
-
-        if (access.status().isClean()) {
-            // the same exact sol was already archived,
-            return new SubmitResult.AlreadyPresent<>();
-        }
-
-        String result = commit(access, submission, puzzlePath);
-        return new SubmitResult.Success<>(result, beatenCategoryRecords);
-    }
-
-    /**
-     * If equal, sol1 dominates
-     */
-    private static int dominanceCompare(@NotNull ScScore s1, @NotNull ScScore s2) {
-        int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
-        int r2 = Integer.compare(s1.getReactors(), s2.getReactors());
-        int r3 = Integer.compare(s1.getSymbols(), s2.getSymbols());
-        int r4 = Boolean.compare(s1.isBugged(), s2.isBugged());
-        int r5 = Boolean.compare(s1.isPrecognitive(), s2.isPrecognitive());
-
-        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0 && r5 <= 0) {
-            // sol1 dominates
-            return -1;
-        }
-        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0 && r5 >= 0) {
-            // sol2 dominates
-            return 1;
-        }
-        else {
-            // equal is already captured by the 1st check, this is for "not comparable"
-            return 0;
-        }
-    }
-
 }

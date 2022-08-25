@@ -16,9 +16,9 @@
 
 package com.faendir.zachtronics.bot.fp.model;
 
-import com.faendir.zachtronics.bot.model.Category;
-import com.faendir.zachtronics.bot.model.Metric;
+import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -30,7 +30,7 @@ import static com.faendir.zachtronics.bot.fp.model.FpMetric.*;
 import static com.faendir.zachtronics.bot.fp.model.FpType.STANDARD;
 
 @Getter
-public enum FpCategory implements Category {
+public enum FpCategory implements CategoryJava<FpCategory, FpScore, FpMetric, FpType> {
     RCRF("RCRF", List.of(RULES, CONDITIONAL_RULES, FRAMES), 0b100),
     RFCR("RFCR", List.of(RULES, FRAMES, CONDITIONAL_RULES), 0b100),
 
@@ -45,23 +45,20 @@ public enum FpCategory implements Category {
                                             "%dR%s**%d**CR%s%dF%s%dW", null, "**%d**R%s%dCR%s%dF%s%dW"};
 
     private final String displayName;
-    private final List<Metric> metrics;
+    @Accessors(fluent = true)
+    private final List<FpMetric> metrics;
     private final Comparator<FpScore> scoreComparator;
     private final Set<FpType> supportedTypes = Collections.singleton(STANDARD);
     private final int scoreFormatId;
 
-    @SuppressWarnings("unchecked")
     FpCategory(String displayName, @NotNull List<FpMetric> metrics, int scoreFormatId) {
         this.displayName = displayName;
-        this.metrics = (List<Metric>)(List<?>) metrics;
-        this.scoreComparator = metrics.stream()
-                                      .map(FpMetric::getExtract)
-                                      .map(Comparator::comparingInt)
-                                      .reduce(Comparator::thenComparing)
-                                      .orElseThrow();
+        this.metrics = metrics;
+        this.scoreComparator = makeCategoryComparator(metrics);
         this.scoreFormatId = scoreFormatId;
     }
 
+    @Override
     public boolean supportsScore(@NotNull FpScore score) {
         return true;
     }

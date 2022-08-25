@@ -16,19 +16,22 @@
 
 package com.faendir.zachtronics.bot.sc.model;
 
-import com.faendir.zachtronics.bot.model.Category;
-import com.faendir.zachtronics.bot.model.Metric;
+import com.faendir.zachtronics.bot.model.CategoryJava;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.faendir.zachtronics.bot.sc.model.ScMetric.*;
 import static com.faendir.zachtronics.bot.sc.model.ScType.*;
 
 @Getter
-public enum ScCategory implements Category {
+public enum ScCategory implements CategoryJava<ScCategory, ScScore, ScMetric, ScType> {
     C("C", List.of(CYCLES, REACTORS, SYMBOLS, ANY_FLAG), ScTypeSets.ALL, 0b100),
     CNB("CNB", List.of(CYCLES, REACTORS, SYMBOLS, NO_BUGS), ScTypeSets.ALL, 0b100),
     CNP("CNP", List.of(CYCLES, REACTORS, SYMBOLS, NO_PRECOG), ScTypeSets.ALL, 0b100),
@@ -56,29 +59,25 @@ public enum ScCategory implements Category {
                                             "**%s**%s**%d**%s%d%s", "**%s**%s**%d**%s**%d**%s"};
 
     private final String displayName;
-    private final List<Metric> metrics;
+    @Accessors(fluent = true)
+    private final List<ScMetric> metrics;
     private final Comparator<ScScore> scoreComparator;
     private final Set<ScType> supportedTypes;
     private final boolean bugFree;
     private final boolean precogFree;
     private final int scoreFormatId;
 
-    @SuppressWarnings("unchecked")
     ScCategory(String displayName, @NotNull List<ScMetric> metrics, Set<ScType> supportedTypes, int scoreFormatId) {
         this.displayName = displayName;
-        this.metrics = (List<Metric>)(List<?>) metrics;
-        this.scoreComparator = metrics.stream()
-                                      .map(ScMetric::getExtract)
-                                      .filter(Objects::nonNull)
-                                      .map(Comparator::comparingInt)
-                                      .reduce(Comparator::thenComparing)
-                                      .orElseThrow();
+        this.metrics = metrics;
+        this.scoreComparator = makeCategoryComparator(metrics);
         this.supportedTypes = supportedTypes;
         this.bugFree = metrics.contains(NO_BUGS) || metrics.contains(NO_FLAGS);
         this.precogFree = metrics.contains(NO_PRECOG) || metrics.contains(NO_FLAGS);
         this.scoreFormatId = scoreFormatId;
     }
 
+    @Override
     public boolean supportsScore(@NotNull ScScore score) {
         return !(score.isBugged() && bugFree) && !(score.isPrecognitive() && precogFree);
     }

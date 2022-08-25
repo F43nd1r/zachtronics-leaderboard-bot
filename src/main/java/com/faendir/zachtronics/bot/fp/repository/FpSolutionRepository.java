@@ -23,7 +23,6 @@ import com.faendir.zachtronics.bot.model.StringFormat;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
-import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.utils.Markdown;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
@@ -34,11 +33,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -56,7 +52,11 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
     @Qualifier("fpRepository")
     private final GitRepository gitRepo;
     @Getter
-    Function<String[], FpSolution> solUnmarshaller = FpSolution::unmarshal;
+    private final Class<FpCategory> categoryClass = FpCategory.class;
+    @Getter
+    final Function<String[], FpSolution> solUnmarshaller = FpSolution::unmarshal;
+    @Getter
+    private final Comparator<FpSolution> archiveComparator = Comparator.comparing(FpSolution::getScore, RCRF.getScoreComparator());
 
     @NotNull
     @Override
@@ -157,6 +157,40 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
     }
 
     @Override
+    protected FpSolution makeCandidateSolution(@NotNull FpSubmission submission) {
+        return new FpSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
+    }
+
+    @Override
+    protected int dominanceCompare(@NotNull FpScore s1, @NotNull FpScore s2) {
+        int r1 = Integer.compare(s1.getRules(), s2.getRules());
+        int r2 = Integer.compare(s1.getConditionalRules(), s2.getConditionalRules());
+        int r3 = Integer.compare(s1.getFrames(), s2.getFrames());
+        // waste is a special boy, the metric has no direction, so different waste = uncomparable
+        int r4 = Integer.compare(s1.getWaste(), s2.getWaste());
+
+        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 == 0) {
+            // s1 dominates
+            return -1;
+        }
+        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 == 0) {
+            // s2 dominates
+            return 1;
+        }
+        else {
+            // equal is already captured by the 1st check, this is for "not comparable"
+            return 0;
+        }
+    }
+
+    @Override
+    protected boolean alreadyPresent(@NotNull FpSolution candidate, @NotNull FpSolution solution) {
+        return candidate.getScore().equals(solution.getScore()) &&
+               candidate.getDisplayLink() == null &&
+               !(candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
+    }
+
+    @Override
     @NotNull
     protected Path relativePuzzlePath(@NotNull FpPuzzle puzzle) {
         return Paths.get(puzzle.getGroup().name()).resolve(puzzle.name());
@@ -177,130 +211,5 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
     @NotNull
     protected Path makeArchivePath(@NotNull Path puzzlePath, FpScore score) {
         return puzzlePath.resolve(makeScoreFilename(score));
-    }
-
-    /** Sorting order of the solutions index */
-    private static final Comparator<FpSolution> COMPARATOR = Comparator.comparing(FpSolution::getScore, RCRF.getScoreComparator());
-
-    /**
-     * @param solutions the list is modified with the updated state
-     */
-    @Override
-    @NotNull
-    protected SubmitResult<FpRecord, FpCategory> archiveOne(@NotNull GitRepository.ReadWriteAccess access,
-                                                            @NotNull List<FpSolution> solutions,
-                                                            @NotNull FpSubmission submission) {
-        FpPuzzle puzzle = submission.getPuzzle();
-        Path puzzlePath = getPuzzlePath(access, puzzle);
-
-        List<CategoryRecord<FpRecord, FpCategory>> beatenCategoryRecords = new ArrayList<>();
-        FpSolution candidate = new FpSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
-
-        try {
-            for (ListIterator<FpSolution> it = solutions.listIterator(); it.hasNext(); ) {
-                FpSolution solution = it.next();
-                int r = dominanceCompare(candidate.getScore(), solution.getScore());
-                if (r > 0) {
-                    // TODO actually return all of the beating sols
-                    CategoryRecord<FpRecord, FpCategory> categoryRecord =
-                            solution.extendToCategoryRecord(puzzle,
-                                                            makeArchiveLink(puzzle, solution.getScore()),
-                                                            makeArchivePath(puzzlePath, solution.getScore()));
-                    return new SubmitResult.NothingBeaten<>(Collections.singletonList(categoryRecord));
-                }
-                else if (r < 0) {
-                    // allow same-score changes if you bring an image or you are the original author and don't regress the image state
-                    if (candidate.getScore().equals(solution.getScore()) &&
-                        candidate.getDisplayLink() == null &&
-                        !(candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null)) {
-                        return new SubmitResult.AlreadyPresent<>();
-                    }
-
-                    // remove beaten score and get categories
-                    candidate.getCategories().addAll(solution.getCategories());
-                    Files.delete(makeArchivePath(puzzlePath, solution.getScore()));
-                    beatenCategoryRecords.add(solution.extendToCategoryRecord(puzzle, null, null)); // the beaten record has no data anymore
-                    it.remove();
-                }
-            }
-
-            // the new record may have gained categories of records it didn't pareto-beat, do the transfers
-            for (FpSolution solution: solutions) {
-                EnumSet<FpCategory> lostCategories = EnumSet.noneOf(FpCategory.class);
-                for (FpCategory category : solution.getCategories()) {
-                    if (category.supportsScore(candidate.getScore()) &&
-                        category.getScoreComparator().compare(candidate.getScore(), solution.getScore()) < 0) {
-                        lostCategories.add(category);
-                    }
-                }
-                if (!lostCategories.isEmpty()) {
-                    // add a CR holding the lost categories, then correct the solutions
-                    CategoryRecord<FpRecord, FpCategory> beatenCR = new CategoryRecord<>(
-                            solution.extendToRecord(puzzle,
-                                                    makeArchiveLink(puzzle, solution.getScore()),
-                                                    makeArchivePath(puzzlePath, solution.getScore())),
-                            lostCategories);
-                    beatenCategoryRecords.add(beatenCR);
-
-                    solution.getCategories().removeAll(lostCategories);
-                    candidate.getCategories().addAll(lostCategories);
-                }
-            }
-
-            // if it's the first in line our new sol steals from the void all the categories it can
-            if (solutions.isEmpty()) {
-                puzzle.getSupportedCategories().stream()
-                      .filter(c -> c.supportsScore(candidate.getScore()))
-                      .forEach(candidate.getCategories()::add);
-            }
-
-            int index = Collections.binarySearch(solutions, candidate, COMPARATOR);
-            if (index < 0) {
-                index = -index - 1;
-            }
-            solutions.add(index, candidate);
-
-            String filename = makeScoreFilename(candidate.getScore());
-            Path solutionPath = puzzlePath.resolve(filename);
-            String data = submission.getData().replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
-            Files.writeString(solutionPath, data, StandardOpenOption.CREATE_NEW);
-
-            marshalSolutions(solutions, puzzlePath);
-        }
-        catch (IOException e) {
-            // failures could happen after we dirtied the repo, so we call reset&clean on the puzzle dir
-            access.resetAndClean(puzzlePath.toFile());
-            return new SubmitResult.Failure<>(e.toString());
-        }
-
-        if (access.status().isClean()) {
-            // the same exact sol was already archived,
-            return new SubmitResult.AlreadyPresent<>();
-        }
-
-        String result = commit(access, submission, puzzlePath);
-        return new SubmitResult.Success<>(result, beatenCategoryRecords);
-    }
-
-    /** If equal, s1 dominates */
-    private static int dominanceCompare(@NotNull FpScore s1, @NotNull FpScore s2) {
-        int r1 = Integer.compare(s1.getRules(), s2.getRules());
-        int r2 = Integer.compare(s1.getConditionalRules(), s2.getConditionalRules());
-        int r3 = Integer.compare(s1.getFrames(), s2.getFrames());
-        // waste is a special boy, the metric has no direction, so different waste = uncomparable
-        int r4 = Integer.compare(s1.getWaste(), s2.getWaste());
-
-        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 == 0) {
-            // s1 dominates
-            return -1;
-        }
-        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 == 0) {
-            // s2 dominates
-            return 1;
-        }
-        else {
-            // equal is already captured by the 1st check, this is for "not comparable"
-            return 0;
-        }
     }
 }

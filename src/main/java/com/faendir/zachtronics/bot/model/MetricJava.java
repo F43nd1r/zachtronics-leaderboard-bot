@@ -14,22 +14,10 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.fp.model;
-
-import com.faendir.zachtronics.bot.model.MetricJava;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+package com.faendir.zachtronics.bot.model;
 
 import java.util.function.ToIntFunction;
 
-@Getter
-@RequiredArgsConstructor
-public enum FpMetric implements MetricJava<FpScore> {
-    RULES("R", FpScore::getRules),
-    CONDITIONAL_RULES("CR", FpScore::getConditionalRules),
-    FRAMES("F", FpScore::getFrames),
-    WASTE("W", FpScore::getWaste);
-
-    private final String displayName;
-    private final ToIntFunction<FpScore> extract;
+public interface MetricJava<S> extends Metric {
+    ToIntFunction<S> getExtract();
 }

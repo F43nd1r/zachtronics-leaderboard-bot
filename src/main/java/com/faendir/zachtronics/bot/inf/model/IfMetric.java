@@ -16,7 +16,7 @@
 
 package com.faendir.zachtronics.bot.inf.model;
 
-import com.faendir.zachtronics.bot.model.Metric;
+import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +24,7 @@ import java.util.function.ToIntFunction;
 
 @Getter
 @RequiredArgsConstructor
-public enum IfMetric implements Metric {
+public enum IfMetric implements MetricJava<IfScore> {
     CYCLES("C", IfScore::getCycles),
     FOOTPRINT("F", IfScore::getFootprint),
     BLOCKS("B", IfScore::getBlocks),

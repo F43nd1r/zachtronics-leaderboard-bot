@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.faendir.zachtronics.bot.sz.model;
 
-import com.faendir.zachtronics.bot.model.Metric;
+import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +24,7 @@ import java.util.function.ToIntFunction;
 
 @Getter
 @RequiredArgsConstructor
-public enum SzMetric implements Metric {
+public enum SzMetric implements MetricJava<SzScore> {
     COST("C", SzScore::getCost),
     POWER("P", SzScore::getPower),
     LINES("L", SzScore::getLines);

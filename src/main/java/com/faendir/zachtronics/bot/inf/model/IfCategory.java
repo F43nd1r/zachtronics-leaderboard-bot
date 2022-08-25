@@ -16,18 +16,21 @@
 
 package com.faendir.zachtronics.bot.inf.model;
 
-import com.faendir.zachtronics.bot.model.Category;
-import com.faendir.zachtronics.bot.model.Metric;
+import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 import static com.faendir.zachtronics.bot.inf.model.IfMetric.*;
 import static com.faendir.zachtronics.bot.inf.model.IfType.STANDARD;
 
 @Getter
-public enum IfCategory implements Category {
+public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric, IfType> {
     C("C", List.of(CYCLES, FOOTPRINT, BLOCKS, ANY_FLAG), 0b100),
     CNG("CNG", List.of(CYCLES, FOOTPRINT, BLOCKS, NO_GRA), 0b100),
 
@@ -39,24 +42,20 @@ public enum IfCategory implements Category {
     static final String[] FORMAT_STRINGS = {"%d%s%d%s%d%s", "%d%s%d%s**%d**%s", "%d%s**%d**%s%d%s", null, "**%d**%s%d%s%d%s"};
 
     private final String displayName;
-    private final List<Metric> metrics;
+    @Accessors(fluent = true)
+    private final List<IfMetric> metrics;
     private final Comparator<IfScore> scoreComparator;
     private final Set<IfType> supportedTypes = Collections.singleton(STANDARD);
     private final int scoreFormatId;
 
-    @SuppressWarnings("unchecked")
     IfCategory(String displayName, @NotNull List<IfMetric> metrics, int scoreFormatId) {
         this.displayName = displayName;
-        this.metrics = (List<Metric>)(List<?>) metrics;
-        this.scoreComparator = metrics.stream()
-                                      .map(IfMetric::getExtract)
-                                      .filter(Objects::nonNull)
-                                      .map(Comparator::comparingInt)
-                                      .reduce(Comparator::thenComparing)
-                                      .orElseThrow();
+        this.metrics = metrics;
+        this.scoreComparator = makeCategoryComparator(metrics);
         this.scoreFormatId = scoreFormatId;
     }
 
+    @Override
     public boolean supportsScore(@NotNull IfScore score) {
         return !(this == CNG && score.usesGRA());
     }

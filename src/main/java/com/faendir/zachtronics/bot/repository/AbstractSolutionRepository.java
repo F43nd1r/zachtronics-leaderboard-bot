@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,22 +32,22 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public abstract class AbstractSolutionRepository<C extends Enum<C> & Category, P extends Puzzle<C>, S extends Score<C>,
+public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJava<C, S, ?, ?>, P extends Puzzle<C>, S extends Score<C>,
                                                  Sub extends Submission<C, P>, R extends Record<C>, Sol extends Solution<C, P, S, R>>
         implements SolutionRepository<C, P, Sub, R> {
 
     protected abstract GitRepository getGitRepo();
+    protected abstract Class<C> getCategoryClass();
     protected abstract Function<String[], Sol> getSolUnmarshaller();
+    /** Sorting order of the solutions index */
+    protected abstract Comparator<Sol> getArchiveComparator();
 
     @NotNull
     @Override
@@ -105,7 +105,109 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & Category, P
         return submitResult;
     }
 
-    protected abstract SubmitResult<R,C> archiveOne(GitRepository.ReadWriteAccess access, List<Sol> solutions, Sub submission);
+    protected abstract Sol makeCandidateSolution(@NotNull Sub submission);
+    /** If equal, s1 dominates */
+    protected abstract int dominanceCompare(@NotNull S s1, @NotNull S s2);
+    /** Allow same-score changes if you bring a display link or you are the original author and don't regress the display link state */
+    protected abstract boolean alreadyPresent(@NotNull Sol candidate, @NotNull Sol solution);
+
+    protected void removeOrReplaceFromIndex(@NotNull Sol candidate, @NotNull Sol solution, @NotNull ListIterator<Sol> it) {
+        it.remove();
+    }
+
+    /**
+     * @param solutions the list is modified with the updated state
+     */
+    protected SubmitResult<R, C> archiveOne(@NotNull GitRepository.ReadWriteAccess access,
+                                            @NotNull List<Sol> solutions,
+                                            @NotNull Sub submission) {
+        P puzzle = submission.getPuzzle();
+        Path puzzlePath = getPuzzlePath(access, puzzle);
+
+        List<CategoryRecord<R, C>> beatenCategoryRecords = new ArrayList<>();
+        Sol candidate = makeCandidateSolution(submission);
+
+        try {
+            for (ListIterator<Sol> it = solutions.listIterator(); it.hasNext(); ) {
+                Sol solution = it.next();
+                int r = dominanceCompare(candidate.getScore(), solution.getScore());
+                if (r > 0) {
+                    // TODO actually return all of the beating sols
+                    CategoryRecord<R, C> categoryRecord =
+                            solution.extendToCategoryRecord(puzzle,
+                                                            makeArchiveLink(puzzle, solution.getScore()),
+                                                            makeArchivePath(puzzlePath, solution.getScore()));
+                    return new SubmitResult.NothingBeaten<>(Collections.singletonList(categoryRecord));
+                }
+                else if (r < 0) {
+                    if (alreadyPresent(candidate, solution)) {
+                        return new SubmitResult.AlreadyPresent<>();
+                    }
+
+                    // remove beaten score and get categories
+                    candidate.getCategories().addAll(solution.getCategories());
+                    Files.deleteIfExists(makeArchivePath(puzzlePath, solution.getScore()));
+                    beatenCategoryRecords.add(solution.extendToCategoryRecord(puzzle, null, null)); // the beaten record has no data anymore
+                    removeOrReplaceFromIndex(candidate, solution, it);
+                }
+            }
+
+            // the new record may have gained categories of records it didn't pareto-beat, do the transfers
+            for (Sol solution: solutions) {
+                EnumSet<C> lostCategories = EnumSet.noneOf(getCategoryClass());
+                for (C category : solution.getCategories()) {
+                    if (category.supportsScore(candidate.getScore()) &&
+                        category.getScoreComparator().compare(candidate.getScore(), solution.getScore()) < 0) {
+                        lostCategories.add(category);
+                    }
+                }
+                if (!lostCategories.isEmpty()) {
+                    // add a CR holding the lost categories, then correct the solutions
+                    CategoryRecord<R, C> beatenCR = new CategoryRecord<>(
+                            solution.extendToRecord(puzzle,
+                                                    makeArchiveLink(puzzle, solution.getScore()),
+                                                    makeArchivePath(puzzlePath, solution.getScore())),
+                            lostCategories);
+                    beatenCategoryRecords.add(beatenCR);
+
+                    solution.getCategories().removeAll(lostCategories);
+                    candidate.getCategories().addAll(lostCategories);
+                }
+            }
+
+            // if it's the first in line our new sol steals from the void all the categories it can
+            if (solutions.isEmpty()) {
+                puzzle.getSupportedCategories().stream()
+                      .filter(c -> c.supportsScore(candidate.getScore()))
+                      .forEach(candidate.getCategories()::add);
+            }
+
+            int index = Collections.binarySearch(solutions, candidate, getArchiveComparator());
+            if (index < 0) {
+                index = -index - 1;
+            }
+            solutions.add(index, candidate);
+
+            Path solutionPath = makeArchivePath(puzzlePath, candidate.getScore());
+            String data = ((String)submission.getData()).replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
+            Files.writeString(solutionPath, data, StandardOpenOption.CREATE_NEW);
+
+            marshalSolutions(solutions, puzzlePath);
+        }
+        catch (IOException e) {
+            // failures could happen after we dirtied the repo, so we call reset&clean on the puzzle dir
+            access.resetAndClean(puzzlePath.toFile());
+            return new SubmitResult.Failure<>(e.toString());
+        }
+
+        if (access.status().isClean()) {
+            // the same exact sol was already archived,
+            return new SubmitResult.AlreadyPresent<>();
+        }
+
+        String result = commit(access, submission, puzzlePath);
+        return new SubmitResult.Success<>(result, beatenCategoryRecords);
+    }
 
     @NotNull
     protected String commit(@NotNull GitRepository.ReadWriteAccess access, @NotNull Sub submission, @NotNull Path puzzlePath) {
