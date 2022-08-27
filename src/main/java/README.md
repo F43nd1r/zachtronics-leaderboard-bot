@@ -23,9 +23,9 @@ Add `lombok.copyableannotations += com.faendir.zachtronics.bot.fp.FpQualifier` t
 
 ### Git
 
-Create git repo in game org.
+#### GitHub
 
-Add README
+Create git repo in game org.
 
 Add the push webhook:
 * Payload URL: https://zlbb.faendir.com/push
@@ -34,11 +34,24 @@ Add the push webhook:
 
 Give `F43nd1r` Write permissions if he's not an admin of the particular org.
 
+#### Project
+
 Add to the `GitConfiguration` class.
 
 Add skeleton to `test/resources`, and add to the `TestConfiguration` class for tests
 
+#### Repo
+
+Add README
+
+After levels are filled, run:
+`find . -name 'solutions.psv' -execdir ln -s solutions.psv README.txt \;`
+
 ### FE
+
+Add route to `web/src/index.tsx`
+Add score class to `web/src/model/<game>`
+Add view to `web/src/views/<game>`
 
 ### Reddit
 
