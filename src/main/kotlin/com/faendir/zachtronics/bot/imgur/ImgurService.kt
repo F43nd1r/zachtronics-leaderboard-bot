@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.imgur
 
 import com.faendir.zachtronics.bot.config.ImgurProperties
+import com.fasterxml.jackson.databind.JsonNode
 import kotlinx.serialization.Serializable
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
@@ -42,16 +43,13 @@ class ImgurService(private val imgurProperties: ImgurProperties) {
         headers.contentType = MediaType.MULTIPART_FORM_DATA
 
         val body = LinkedMultiValueMap<String, Any>()
-        body.add("username", imgurProperties.username)
-        body.add("password", imgurProperties.password)
-        body.add("remember", "remember")
-        body.add("submit", "")
-        val response = restTemplate.exchange("https://imgur.com/signin", HttpMethod.POST, HttpEntity(body, headers), String::class.java)
+        body.add("refresh_token", imgurProperties.refreshToken)
+        body.add("client_id", imgurProperties.clientId)
+        body.add("client_secret", imgurProperties.clientSecret)
+        body.add("grant_type", "refresh_token")
+        val response = restTemplate.exchange("https://api.imgur.com/oauth2/token", HttpMethod.POST, HttpEntity(body, headers), JsonNode::class.java)
 
-        return response.headers["set-cookie"]
-            ?.find { it.startsWith("accesstoken") }
-            ?.let { cookie -> Regex("accesstoken=([^;]*);.*").matchEntire(cookie)?.groupValues?.get(1) }
-            ?: throw RuntimeException("Imgur login failed")
+        return response.body?.get("access_token")?.asText() ?: throw RuntimeException("Imgur login failed")
     }
 
     fun upload(gif: ByteArray): String {

@@ -23,7 +23,11 @@ import org.junit.jupiter.api.Test
 @Disabled
 internal class ImgurServiceTest {
 
-    private val imgurService = ImgurService(ImgurProperties().apply { username = ""; password = "" })
+    private val imgurService = ImgurService(ImgurProperties().apply {
+        refreshToken = ""
+        clientId = ""
+        clientSecret = ""
+    })
 
     @Test
     fun upload() {

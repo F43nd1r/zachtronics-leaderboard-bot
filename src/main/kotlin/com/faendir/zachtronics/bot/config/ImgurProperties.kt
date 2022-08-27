@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 @ConfigurationProperties("imgur")
 class ImgurProperties {
-    lateinit var username: String
-    lateinit var password: String
+    lateinit var refreshToken: String
+    lateinit var clientId: String
+    lateinit var clientSecret: String
 }
