@@ -31,6 +31,7 @@ import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmSubmission
+import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.utils.ceil
 import okio.buffer
@@ -115,7 +116,7 @@ fun createSubmission(gif: String?, gifData: ByteArray?, author: String, inputByt
             throw IllegalArgumentException("Maximum arm rotations over 4096 are banned.")
         }
         val gifCycles = verifier.getMetricSafe(OmSimMetric.VISUAL_LOOP_START_CYCLE)?.let { it to verifier.getMetricSafe(OmSimMetric.VISUAL_LOOP_END_CYCLE)!! }
-            ?: (0 to solution.cycles)
+            ?: (0 to if (puzzle.type == OmType.INFINITE && verifier.errorCycle > solution.cycles + 1) solution.cycles + 1 else solution.cycles)
         return OmSubmission(
             puzzle,
             solution.getScore(verifier),

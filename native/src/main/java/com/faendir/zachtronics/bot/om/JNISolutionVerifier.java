@@ -32,11 +32,15 @@ public class JNISolutionVerifier implements Closeable {
     private final byte[] solution;
     private Long verifier = null;
 
+    private Integer errorCycle = null;
+
     private static native long prepareVerifier(byte[] puzzle, byte[] solution);
 
     private static native void closeVerifier(long verifier);
 
     private static native int getMetric(long verifier, String name);
+
+    private static native int getErrorCycle(long verifier);
 
     public static JNISolutionVerifier open(byte[] puzzle, byte[] solution) {
         return new JNISolutionVerifier(puzzle, solution);
@@ -45,10 +49,21 @@ public class JNISolutionVerifier implements Closeable {
     public int getMetric(OmSimMetric metric) {
         if (verifier == null) verifier = prepareVerifier(puzzle, solution);
         try {
-            return getMetric(verifier, metric.getId());
+            int result = getMetric(verifier, metric.getId());
+            errorCycle = null;
+            return result;
         } catch (Throwable t) {
+            errorCycle = getErrorCycle(verifier);
             close();
             throw t;
+        }
+    }
+
+    public int getErrorCycle() {
+        if (errorCycle != null) {
+            return errorCycle;
+        } else {
+            throw new IllegalStateException("Tried to get error cycle but there was no error state");
         }
     }
 

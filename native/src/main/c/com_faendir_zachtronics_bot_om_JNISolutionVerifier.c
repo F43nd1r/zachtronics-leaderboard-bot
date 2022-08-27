@@ -39,3 +39,12 @@ JNIEXPORT jint JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_g
     }
     return result;
 }
+
+JNIEXPORT jint JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_getErrorCycle
+    (JNIEnv *env, jclass cls, jlong jVerifier) {
+    (void)env;
+    (void)cls;
+
+    void *verifier = (void*) jVerifier;
+    return verifier_error_cycle(verifier);
+}
