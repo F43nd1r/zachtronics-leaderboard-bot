@@ -40,7 +40,7 @@ export function applyFilter<MODIFIER_ID extends string, METRIC_ID extends string
             (!filter.modifiers || iterate(filter.modifiers).every(([modifierId, value]) => value === undefined || value === modifiers[modifierId].get(record.score))) &&
             !filteredMetrics.some(({ metric, max }) => {
                 const value = metric.get(record.score)
-                return max && (!value || value > max)
+                return max !== undefined && (value === undefined || value > max)
             }),
     )
     return filteredRecords.filter((record: RecordDTO<SCORE>) => !filter.showOnlyFrontier || !filteredRecords.some((r) => isStrictlyBetterInMetrics(r, record, activeMetrics)))

@@ -136,7 +136,7 @@ interface FilterSliderProps {
 const numberFormat = d3.format(".3~f")
 
 function FilterSlider(props: FilterSliderProps) {
-    const values = [...new Set(props.values)].map((value) => value ?? Infinity).sort((a, b) => a - b)
+    const values = [...new Set(props.values)].map((value) => (value !== undefined ? value : Infinity)).sort((a, b) => a - b)
     return (
         <Box
             sx={{
@@ -148,13 +148,13 @@ function FilterSlider(props: FilterSliderProps) {
             <Typography id={`filter-slider-${props.label}`}>{props.label}</Typography>
             <Slider
                 aria-labelledby={`filter-slider-${props.label}`}
-                valueLabelFormat={(index) => (values[index] ? numberFormat(values[index]) : "∞")}
+                valueLabelFormat={(index) => (values[index] !== undefined ? numberFormat(values[index]) : "∞")}
                 valueLabelDisplay={"on"}
-                value={props.value ? values.indexOf(props.value) : values.length - 1}
+                value={props.value !== undefined ? values.indexOf(props.value) : values.length - 1}
                 onChange={(event, i) => {
                     const index = i as number
                     const value = values[index]
-                    if (value) {
+                    if (value !== undefined) {
                         if (!props.setValue(value !== Infinity && value !== values[values.length - 1] ? value : undefined)) {
                             event.preventDefault()
                         }
