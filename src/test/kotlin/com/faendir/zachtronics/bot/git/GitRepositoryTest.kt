@@ -20,6 +20,7 @@ import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.createGitRepositoryFrom
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Clock
 import org.eclipse.jgit.diff.DiffEntry
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -61,7 +62,7 @@ class GitRepositoryTest {
                 access.add(file1)
                 access.commitAndPush("file1")
                 delay(1000)
-                val timestamp = Instant.now()
+                val timestamp = Clock.System.now()
                 delay(1000)
                 val file2 = File(access.repo, "file2")
                 file2.writeText("file2")
@@ -80,7 +81,7 @@ class GitRepositoryTest {
     fun `should return new content for added`() {
         gitRepository.acquireWriteAccess().use { access ->
             runBlocking {
-                val timestamp = Instant.now()
+                val timestamp = Clock.System.now()
                 delay(1000)
                 val file = File(access.repo, "file")
                 file.writeText("file")
@@ -105,7 +106,7 @@ class GitRepositoryTest {
                 access.add(file)
                 access.commitAndPush("file")
                 delay(1000)
-                val timestamp = Instant.now()
+                val timestamp = Clock.System.now()
                 delay(1000)
                 access.rm(file)
                 access.commitAndPush("remove file")
@@ -123,7 +124,7 @@ class GitRepositoryTest {
     @Test
     fun `should return empty if repo has no commits`() {
         gitRepository.acquireReadAccess().use { access ->
-            expectThat(access.changesSince(Instant.now())).isEmpty()
+            expectThat(access.changesSince(Clock.System.now())).isEmpty()
         }
     }
 
