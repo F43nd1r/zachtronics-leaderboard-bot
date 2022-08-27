@@ -34,7 +34,6 @@ import ApiResource from "../../../utils/ApiResource"
 import RecordGrid from "../../../components/RecordGrid"
 import { usePersistedState } from "../../../utils/usePersistedState"
 import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material"
-import OmRecordChange from "../../../model/om/OmRecordChange"
 import { OmRecord } from "../../../model/om/OmRecord"
 
 enum SinceLast {
