@@ -50,6 +50,7 @@ allprojects {
 
 dependencies {
     implementation(libs.kotlinx.json)
+    implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.coroutines.reactor)
     implementation(libs.spring.boot.web)
     implementation(libs.mysqlConnector)

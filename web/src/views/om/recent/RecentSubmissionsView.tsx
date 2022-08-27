@@ -35,6 +35,7 @@ import RecordGrid from "../../../components/RecordGrid"
 import { usePersistedState } from "../../../utils/usePersistedState"
 import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material"
 import OmRecordChange from "../../../model/om/OmRecordChange"
+import { OmRecord } from "../../../model/om/OmRecord"
 
 enum SinceLast {
     DAY = 1000 * 60 * 60 * 24,
@@ -76,15 +77,9 @@ export default function RecentSubmissionsView() {
                     </MenuItem>
                 </Select>
             </FormControl>
-            <ApiResource<OmRecordChange[]>
-                url={`/om/records/changes/${dateSince.toISOString()}`}
-                element={(changes) => (
-                    <RecordGrid
-                        records={changes.filter((change) => change.type === "ADD").map((change) => change.record)}
-                        getTitle={(record) => record.puzzle.displayName}
-                        getScore={(record) => record.fullFormattedScore ?? "None"}
-                    />
-                )}
+            <ApiResource<OmRecord[]>
+                url={`/om/records/new/${dateSince.toISOString()}`}
+                element={(changes) => <RecordGrid records={changes.reverse()} getTitle={(record) => record.puzzle.displayName} getScore={(record) => record.fullFormattedScore ?? "None"} />}
             />
         </Box>
     )

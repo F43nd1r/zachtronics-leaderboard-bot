@@ -30,6 +30,8 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.add
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -39,7 +41,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import java.io.File
-import java.time.Instant
 import java.util.*
 import javax.annotation.PostConstruct
 
@@ -310,7 +311,8 @@ class OmSolutionRepository(
             displayLink = displayLink,
             dataLink = createLink(leaderboardScope, puzzle, name),
             dataPath = path,
-            origin = leaderboardFile.toPath()
+            origin = leaderboardFile.toPath(),
+            lastModified = Clock.System.now()
         )
         leaderboardFile.outputStream().buffered().use { json.encodeToStream(record, it) }
         leaderboardScope.add(leaderboardFile)
@@ -347,6 +349,9 @@ class OmSolutionRepository(
         return data.entries.filter { category.supportsPuzzle(it.key) }
             .associate { it.key to it.value.entries.find { (_, categories) -> categories.contains(category) }?.key }
     }
+
+    val records: List<CategoryRecord<OmRecord, OmCategory>>
+        get() = data.values.flatMap { it.entries }.map { CategoryRecord(it.key, it.value) }
 }
 
 enum class OmRecordChangeType {

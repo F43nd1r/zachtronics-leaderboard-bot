@@ -20,6 +20,8 @@ import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Score
 import com.google.common.util.concurrent.CycleDetectingLockFactory
+import kotlinx.datetime.Instant
+import kotlinx.datetime.toJavaInstant
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.ResetCommand
 import org.eclipse.jgit.api.Status
@@ -38,7 +40,6 @@ import org.slf4j.LoggerFactory
 import java.io.Closeable
 import java.io.File
 import java.nio.file.Files
-import java.time.Instant
 import java.util.*
 import java.util.concurrent.locks.Lock
 import javax.annotation.PreDestroy
@@ -132,7 +133,7 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
                 val latestCommit = walk.parseCommit(git.repository.resolve(Constants.HEAD))
                 walk.markStart(latestCommit)
                 walk.sort(RevSort.COMMIT_TIME_DESC)
-                walk.revFilter = CommitTimeRevFilter.after(Date.from(instant))
+                walk.revFilter = CommitTimeRevFilter.after(Date.from(instant.toJavaInstant()))
                 val firstCommit = walk.lastOrNull() ?: return@use emptyList()
                 val beforeCommit: RevCommit? = git.repository.resolve(firstCommit.name + "^")?.let { walk.parseCommit(it) }
                 DiffFormatter(null).use { diffFormatter ->

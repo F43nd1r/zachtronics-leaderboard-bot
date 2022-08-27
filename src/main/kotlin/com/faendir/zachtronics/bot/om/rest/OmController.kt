@@ -44,6 +44,8 @@ import com.faendir.zachtronics.bot.utils.orEmpty
 import discord4j.common.util.Snowflake
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.channel.MessageChannel
+import kotlinx.datetime.Instant
+import kotlinx.datetime.toKotlinInstant
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -55,7 +57,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Mono
-import java.time.Instant
 
 @RestController
 @RequestMapping("/om")
@@ -133,8 +134,15 @@ class OmController(private val repository: OmSolutionRepository, private val dis
     }
 
     @GetMapping(path = ["/records/changes/{since}"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getRecordChanges(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: Instant): List<OmRecordChangeDTO> {
-        return repository.computeChangesSince(since).map { it.toDTO() }
+    fun getRecordChanges(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: java.time.Instant): List<OmRecordChangeDTO> {
+        return repository.computeChangesSince(since.toKotlinInstant()).map { it.toDTO() }
+    }
+
+
+    @GetMapping(path = ["/records/new/{since}"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getNewRecords(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: java.time.Instant): List<OmRecordDTO> {
+        val kSince = since.toKotlinInstant()
+        return repository.records.filter { it.record.lastModified != null && it.record.lastModified >= kSince }.sortedBy { it.record.lastModified }.map { it.toDTO() }
     }
 
     private fun Channel.sendDiscordMessage(message: SafeEmbedMessageBuilder) {

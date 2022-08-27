@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.utils.PathSerializer
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.nio.file.Path
@@ -32,6 +33,7 @@ data class OmRecord(
     override val dataPath: Path?,
     @Transient
     val origin: Path? = null,
+    val lastModified: Instant? = null,
 ) : Record<OmCategory> {
     @Transient
     override val author: String? = null

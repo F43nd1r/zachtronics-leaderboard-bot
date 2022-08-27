@@ -19,13 +19,16 @@ package com.faendir.zachtronics.bot.cleanup
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
+import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import org.eclipse.jgit.api.Git
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.File
+import java.util.stream.Stream
 
 /**
  * these fixes assume the opus magnum leaderboard repository is a sibling to this repository
@@ -38,22 +41,24 @@ class OpusLeaderboardFixer {
         allowSpecialFloatingPointValues = true
     }
 
+    private fun getAllRecordFiles(root: File): Stream<File> = root.listFiles()!!
+        .filter { it.isDirectory && it.name.contains("_") }
+        .flatMap {
+            println("Enter Directory ${it.name}")
+            it.listFiles()!!.toList()
+        }
+        .filter { it.isDirectory }
+        .flatMap {
+            println("Enter Directory ${it.name}")
+            it.listFiles()!!.toList()
+        }
+        .parallelStream()
+        .filter { !it.isDirectory && it.extension == "json" }
+
     @Test
     fun `fix file names`() {
         val root = File("../om-leaderboard")
-        root.listFiles()!!
-            .filter { it.isDirectory && it.name.contains("_") }
-            .flatMap {
-                println("Enter Directory ${it.name}")
-                it.listFiles()!!.toList()
-            }
-            .filter { it.isDirectory }
-            .flatMap {
-                println("Enter Directory ${it.name}")
-                it.listFiles()!!.toList()
-            }
-            .parallelStream()
-            .filter { !it.isDirectory && it.extension == "json" }
+        getAllRecordFiles(root)
             .forEach { file ->
                 println("${file.name} is being processed")
                 try {
@@ -100,24 +105,12 @@ class OpusLeaderboardFixer {
         val exec = Runtime.getRuntime().exec("git rev-parse --short HEAD", null, root)
         exec.waitFor()
         val commitHash = exec.inputStream.bufferedReader().readText().trim()
-        root.listFiles()!!
-            .filter { it.isDirectory && it.name.contains("_") }
-            .flatMap {
-                println("Enter Directory ${it.name}")
-                it.listFiles()!!.toList()
-            }
-            .filter { it.isDirectory }
-            .flatMap {
-                println("Enter Directory ${it.name}")
-                it.listFiles()!!.toList()
-            }
-            .parallelStream()
-            .filter { !it.isDirectory && it.extension == "json" }
+        getAllRecordFiles(root)
             .forEach { file ->
                 println("${file.name} is being processed")
                 try {
                     val record = file.inputStream().buffered().use { stream -> json.decodeFromStream<OmRecord>(stream) }
-                    if(record.dataPath != null) {
+                    if (record.dataPath != null) {
                         val wantedFileName = "${record.score.toDisplayString(DisplayContext.fileName())}_${record.puzzle.name}"
                         file.writeText(json.encodeToString(record.copy(dataLink = mapper.createShortUrl(commitHash, record.puzzle, wantedFileName))))
                     }
@@ -125,6 +118,28 @@ class OpusLeaderboardFixer {
                     if ("MIRACULOUS" !in e.message!!) {
                         println("warn: Failed to process ${file.name}: ${e.message}")
                     }
+                }
+            }
+    }
+
+    @Test
+    fun `fix last modified`() {
+        val root = File("../om-leaderboard")
+        val git = Git.open(root)
+        getAllRecordFiles(root)
+            .forEach { file ->
+                println("${file.name} is being processed")
+                try {
+                    val record = file.inputStream().buffered().use { stream -> json.decodeFromStream<OmRecord>(stream) }
+                    file.writeText(
+                        json.encodeToString(
+                            record.copy(
+                                lastModified = git.log().addPath(file.relativeTo(root).path).call()
+                                    .firstOrNull()?.commitTime?.let { Instant.fromEpochSeconds(it.toLong()) })
+                        )
+                    )
+                } catch (e: Exception) {
+                    println("warn: Failed to process ${file.name}: ${e.message}")
                 }
             }
     }
