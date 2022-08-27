@@ -42,7 +42,7 @@ export default function FpPuzzleVisualizerView() {
         >
             <Visualizer<string, string, FpScore>
                 url={`/fp/puzzle/${puzzleId}/records?includeFrontier=true`}
-                config={{ key: "visualizerConfigFp", default: { mode: "3D", x: "r", y: "c", z: "f" } }}
+                config={{ key: "visualizerConfigFp", default: { mode: "3D", x: "f", y: "r", z: "c" } }}
                 filter={{ key: `visualizerFilterFp-${puzzleId}`, default: {} }}
                 metrics={{
                     r: { name: "Rules", get: (score) => score?.rules },
