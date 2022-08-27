@@ -75,7 +75,7 @@ public enum FpPuzzle implements Puzzle<FpCategory> {
         this.supportedCategories = Arrays.stream(FpCategory.values())
                                          .filter(c -> c.getSupportedTypes().contains(type))
                                          .toList();
-        this.link = "https://zlbb.faendir.com/fp/" + id;
+        this.link = "https://zlbb.faendir.com/fp/" + name();
     }
 
     @NotNull
