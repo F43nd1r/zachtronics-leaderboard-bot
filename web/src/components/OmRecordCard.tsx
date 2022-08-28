@@ -25,50 +25,43 @@ export default function OmRecordCard(props: RecordCardProps<OmRecord>) {
         <RecordCard
             {...props}
             additionalActions={
-                <Button size="small" variant="outlined" color="primary" disabled={!props.record.solution}>
-                    <a
-                        href={omCloneUrl}
-                        target={"_blank"}
-                        rel={"noreferrer"}
-                        onClick={function (event) {
-                            event.preventDefault()
-                            const w = window.open(omCloneUrl)
-                            let solution: Uint8Array
-                            let puzzle: Uint8Array
-                            let ready = false
+                props.record.solution && !props.record.score?.overlap && (props.record.puzzle as any).type !== "PRODUCTION" ? (
+                    <Button size="small" variant="outlined" color="primary">
+                        <a
+                            href={omCloneUrl}
+                            target={"_blank"}
+                            rel={"noreferrer"}
+                            onClick={async function (event) {
+                                event.preventDefault()
+                                const w = window.open(omCloneUrl)
 
-                            function loadPreview() {
-                                w!.postMessage({ command: "load", puzzle, solution }, "*")
-                            }
-
-                            window.addEventListener("message", (e) => {
-                                if (e.origin !== new URL(omCloneUrl).origin) return
-                                if (solution && puzzle) loadPreview()
-                                else ready = true
-                            })
-                            fetch(props.record.solution!, { headers: { "Access-Control-Allow-Origin": "*" } })
-                                .then((response) => {
-                                    console.log(response.status)
-                                    return response.arrayBuffer()
-                                })
-                                .then((solutionData) => {
-                                    solution = new Uint8Array(solutionData)
-                                    fetchFromApiRaw(`/om/puzzle/${props.record.puzzle.id}/file`)
-                                        .then((response) => response.arrayBuffer())
-                                        .then((puzzleData) => {
-                                            puzzle = new Uint8Array(puzzleData)
-                                            if (ready) loadPreview()
-                                        })
-                                })
-                        }}
-                        style={{
-                            color: "inherit",
-                            textDecoration: "none",
-                        }}
-                    >
-                        Preview
-                    </a>
-                </Button>
+                                if (w) {
+                                    const [solution, puzzle] = await Promise.all([
+                                        fetchFromApiRaw(`/om/puzzle/${props.record.puzzle.id}/record/${props.record.id}/file`)
+                                            .then((response) => response.arrayBuffer())
+                                            .then((buffer) => new Uint8Array(buffer)),
+                                        fetchFromApiRaw(`/om/puzzle/${props.record.puzzle.id}/file`)
+                                            .then((response) => response.arrayBuffer())
+                                            .then((buffer) => new Uint8Array(buffer)),
+                                        new Promise((resolve) => {
+                                            window.addEventListener("message", (e) => {
+                                                if (e.origin !== new URL(omCloneUrl).origin) return
+                                                resolve(true)
+                                            })
+                                        }),
+                                    ])
+                                    w.postMessage({ command: "load", puzzle, solution }, "*")
+                                }
+                            }}
+                            style={{
+                                color: "inherit",
+                                textDecoration: "none",
+                            }}
+                        >
+                            Preview
+                        </a>
+                    </Button>
+                ) : undefined
             }
         />
     )

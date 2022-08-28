@@ -19,6 +19,7 @@ import OmScore from "./OmScore"
 import Puzzle from "../Puzzle"
 
 export interface OmRecord extends RecordDTO<OmScore> {
+    id: string
     puzzle: Puzzle
     smartFormattedScore?: string
 }

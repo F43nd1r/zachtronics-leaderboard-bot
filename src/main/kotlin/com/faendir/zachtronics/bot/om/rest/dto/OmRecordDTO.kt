@@ -25,10 +25,12 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.rest.dto.RecordDTO
 import com.faendir.zachtronics.bot.utils.smartFormat
 import com.faendir.zachtronics.bot.utils.toMetricsTree
-import kotlinx.datetime.Instant
 import kotlinx.datetime.toJavaInstant
 
+val OmRecord.id get() = score.toDisplayString(DisplayContext.fileName())
+
 data class OmRecordDTO(
+    val id: String?,
     val puzzle: OmPuzzleDTO,
     override val score: OmScoreDTO?,
     val smartFormattedScore: String?,
@@ -44,6 +46,7 @@ data class OmRecordDTO(
 
 fun CategoryRecord<OmRecord, OmCategory>.toDTO() =
     OmRecordDTO(
+        id = record.id,
         puzzle = record.puzzle.toDTO(),
         score = record.score.toDTO(),
         smartFormattedScore = record.score.toDisplayString(DisplayContext(StringFormat.PLAIN_TEXT, categories)),
@@ -57,6 +60,7 @@ fun CategoryRecord<OmRecord, OmCategory>.toDTO() =
 
 fun OmRecord.toDTO() =
     OmRecordDTO(
+        id = id,
         puzzle = puzzle.toDTO(),
         score = score.toDTO(),
         smartFormattedScore = null,
@@ -69,6 +73,7 @@ fun OmRecord.toDTO() =
     )
 
 fun emptyRecord(puzzle: OmPuzzle) = OmRecordDTO(
+    id = null,
     puzzle = puzzle.toDTO(),
     score = null,
     smartFormattedScore = null,

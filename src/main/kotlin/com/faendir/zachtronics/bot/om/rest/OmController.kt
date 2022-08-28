@@ -31,6 +31,7 @@ import com.faendir.zachtronics.bot.om.rest.dto.OmRecordChangeDTO
 import com.faendir.zachtronics.bot.om.rest.dto.OmRecordDTO
 import com.faendir.zachtronics.bot.om.rest.dto.OmSubmissionDTO
 import com.faendir.zachtronics.bot.om.rest.dto.emptyRecord
+import com.faendir.zachtronics.bot.om.rest.dto.id
 import com.faendir.zachtronics.bot.om.rest.dto.toDTO
 import com.faendir.zachtronics.bot.om.withCategory
 import com.faendir.zachtronics.bot.repository.SubmitResult
@@ -57,6 +58,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import reactor.core.publisher.Mono
+import kotlin.io.path.readBytes
 
 @RestController
 @RequestMapping("/om")
@@ -97,6 +99,13 @@ class OmController(private val repository: OmSolutionRepository, private val dis
         val category = findCategory(categoryId)
         return repository.find(puzzle, category)?.withCategory(category)?.toDTO()
     }
+
+    @GetMapping("puzzle/{puzzleId}/record/{recordId}/file")
+    fun getRecordFile(@PathVariable puzzleId: String, @PathVariable recordId: String): ByteArray =
+        repository.findCategoryHolders(findPuzzle(puzzleId), includeFrontier = true)
+            .find { recordId == it.record.id }
+            ?.record?.dataPath?.readBytes()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Record $recordId not found.")
 
     @PostMapping(path = ["/submit"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun submit(@ModelAttribute submissionDTO: OmSubmissionDTO): SubmitResultType {
@@ -145,7 +154,8 @@ class OmController(private val repository: OmSolutionRepository, private val dis
     @GetMapping(path = ["/records/new/{since}"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getNewRecords(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: java.time.Instant): List<OmRecordDTO> {
         val kSince = since.toKotlinInstant()
-        return repository.records.filter { it.record.lastModified != null && it.record.lastModified >= kSince }.sortedBy { it.record.lastModified }.map { it.toDTO() }
+        return repository.records.filter { it.record.lastModified != null && it.record.lastModified >= kSince }.sortedBy { it.record.lastModified }
+            .map { it.toDTO() }
     }
 
     private fun Channel.sendDiscordMessage(message: SafeEmbedMessageBuilder) {
