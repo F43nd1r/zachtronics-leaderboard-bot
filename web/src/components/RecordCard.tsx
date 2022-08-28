@@ -46,7 +46,15 @@ function getVideoType(gif: string): "video" | "iframe" | "img" {
 
 function getVideoUrl(gif: string) {
     if (isYoutube(gif)) {
-        return gif.replace(/.+\/(\w+)(?:\\?.+)?$/, "https://youtube.com/embed/$1")
+        var url = new URL(gif)
+        var id = url.pathname.substring(1)
+        if (id == 'watch')
+            id = url.searchParams.get('v')!
+        
+        var result = `https://youtube.com/embed/${id}?playlist=${id}&autoplay=1&loop=1`
+        if (url.searchParams.has('t'))
+            result += '&start=' + url.searchParams.get('t')
+        return result
     } else if (isImgur(gif)) {
         return gif.replace(/.+\/(\w+)(\..*)?/, "https://i.imgur.com/$1.mp4")
     } else {
