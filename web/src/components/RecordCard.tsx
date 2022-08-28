@@ -48,7 +48,7 @@ function getVideoUrl(gif: string) {
     if (isYoutube(gif)) {
         var url = new URL(gif)
         var id = url.pathname.substring(1)
-        if (id == 'watch')
+        if (id === 'watch')
             id = url.searchParams.get('v')!
         
         var result = `https://youtube.com/embed/${id}?playlist=${id}&autoplay=1&loop=1`
