@@ -15,21 +15,21 @@
  */
 
 import { Grid } from "@mui/material"
-import RecordDTO from "../model/RecordDTO"
-import RecordCard from "./RecordCard"
+import OmRecordCard from "./OmRecordCard"
+import { OmRecord } from "../model/om/OmRecord"
 
-interface RecordGridProps<RECORD extends RecordDTO<any>> {
-    records: RECORD[]
-    getTitle: (record: RECORD) => string
-    getScore: (record: RECORD) => string
+interface RecordGridProps {
+    records: OmRecord[]
+    getTitle: (record: OmRecord) => string
+    getScore: (record: OmRecord) => string
 }
 
-export default function RecordGrid<RECORD extends RecordDTO<any>>(props: RecordGridProps<RECORD>) {
+export default function OmRecordGrid(props: RecordGridProps) {
     return (
         <Grid container spacing={3}>
             {props.records.map((record, index) => (
                 <Grid item xs key={index}>
-                    <RecordCard record={record} title={props.getTitle(record)} score={props.getScore(record)} />
+                    <OmRecordCard record={record} title={props.getTitle(record)} score={props.getScore(record)} />
                 </Grid>
             ))}
         </Grid>

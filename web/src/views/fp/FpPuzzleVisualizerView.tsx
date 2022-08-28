@@ -21,11 +21,14 @@ import { VisualizerColor } from "../../utils/VisualizerColor"
 import Puzzle from "../../model/Puzzle"
 import FpScore from "../../model/fp/FpScore"
 import fetchFromApi from "../../utils/fetchFromApi"
+import { useState } from "react"
+import RecordDTO from "../../model/RecordDTO"
+import { RecordModal } from "../../components/RecordModal"
 
 export default function FpPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId
-    fetchFromApi<Puzzle>(`/fp/puzzle/${puzzleId}`).then(
-        (puzzle) => (document.title = `${puzzle.displayName} - X'BPGH: The Forbidden Path Leaderboard`))
+    fetchFromApi<Puzzle>(`/fp/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - X'BPGH: The Forbidden Path Leaderboard`))
+    const [activeRecords, setActiveRecords] = useState<RecordDTO<FpScore>[] | undefined>(undefined)
 
     return (
         <Box
@@ -52,7 +55,9 @@ export default function FpPuzzleVisualizerView() {
                 }}
                 modifiers={{}}
                 defaultColor={VisualizerColor.DEFAULT}
+                onClick={setActiveRecords}
             />
+            <RecordModal records={activeRecords} setRecords={setActiveRecords} />
         </Box>
     )
 }

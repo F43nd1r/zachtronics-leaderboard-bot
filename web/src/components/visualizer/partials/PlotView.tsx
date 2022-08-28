@@ -15,7 +15,7 @@
  */
 
 import { useTheme } from "@mui/material"
-import { ComponentType, useState } from "react"
+import { ComponentType } from "react"
 import RecordDTO, { isStrictlyBetterInMetrics } from "../../../model/RecordDTO"
 import { Axis, PlotData } from "plotly.js"
 import { PlotParams } from "react-plotly.js"
@@ -23,31 +23,37 @@ import createPlotlyComponent from "react-plotly.js/factory"
 import Plotly from "plotly.js-gl3d-dist-min"
 import Metric from "../../../model/Metric"
 import { Configuration } from "../../../model/Configuration"
-import { RecordModal } from "../../RecordModal"
 import { SizeMe, SizeMeProps } from "react-sizeme"
 import { applyFilter, Filter } from "../../../model/Filter"
 import Modifier from "../../../model/Modifier"
 import iterate from "../../../utils/iterate"
 
-export interface PlotViewProps<MODIFIER_ID extends string, METRIC_ID extends string, SCORE> {
+export interface PlotViewProps<MODIFIER_ID extends string, METRIC_ID extends string, SCORE, RECORD extends RecordDTO<SCORE>> {
     metrics: Record<METRIC_ID, Metric<SCORE>>
     modifiers: Record<MODIFIER_ID, Modifier<SCORE>>
     defaultColor: string
-    records: RecordDTO<SCORE>[]
+    records: RECORD[]
     configuration: Configuration<METRIC_ID>
     filter: Filter<MODIFIER_ID, METRIC_ID>
+    onClick: (records: RECORD[]) => void
 }
 
 const Plot: ComponentType<PlotParams> = createPlotlyComponent(Plotly)
 
-function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string, SCORE>(props: PlotViewProps<MODIFIER_ID, METRIC_ID, SCORE> & SizeMeProps) {
-    const [activeRecords, setActiveRecords] = useState<RecordDTO<SCORE>[] | undefined>(undefined)
-
-    const configuration = props.configuration
-    const records = applyFilter(props.metrics, props.modifiers, props.filter, configuration, props.records)
-    const x = props.metrics[configuration.x]
-    const y = props.metrics[configuration.y]
-    const z = props.metrics[configuration.z]
+function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string, SCORE, RECORD extends RecordDTO<SCORE>>({
+    configuration,
+    metrics,
+    modifiers,
+    defaultColor,
+    size,
+    records: recordsIn,
+    filter,
+    onClick,
+}: PlotViewProps<MODIFIER_ID, METRIC_ID, SCORE, RECORD> & SizeMeProps) {
+    const records = applyFilter(metrics, modifiers, filter, configuration, recordsIn)
+    const x = metrics[configuration.x]
+    const y = metrics[configuration.y]
+    const z = metrics[configuration.z]
     const getPointString = (record: RecordDTO<SCORE>): string =>
         JSON.stringify({
             x: x.get(record.score) ?? 0,
@@ -57,7 +63,7 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
     const recordMap = records.reduce((acc, record) => {
         const point = getPointString(record)
         return { ...acc, [point]: [...(acc[point] ?? []), record] }
-    }, {} as Record<string, RecordDTO<SCORE>[]>)
+    }, {} as Record<string, RECORD[]>)
 
     const theme = useTheme()
     const gridColor = theme.palette.mode === "light" ? theme.palette.grey["200"] : theme.palette.grey["800"]
@@ -72,10 +78,10 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
     }
 
     const getColor = (record: RecordDTO<SCORE>) => {
-        const modifier = iterate(props.modifiers)
+        const modifier = iterate(modifiers)
             .map(([_, modifier]) => modifier)
             .find((modifier) => modifier.get(record.score))
-        return modifier ? modifier.color : props.defaultColor
+        return modifier ? modifier.color : defaultColor
     }
     const getMarkerColors = (...metrics: Metric<SCORE>[]) => records.map((record) => (records.some((r) => isStrictlyBetterInMetrics(r, record, metrics)) ? "#000000" : getColor(record)))
 
@@ -139,8 +145,8 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
                 ]}
                 layout={{
                     autosize: false,
-                    width: props.size.width ?? undefined,
-                    height: props.size.height ?? undefined,
+                    width: size.width ?? undefined,
+                    height: size.height ?? undefined,
                     paper_bgcolor: "transparent",
                     plot_bgcolor: "transparent",
                     xaxis: makeAxis(x),
@@ -157,7 +163,7 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
                         duration: 500,
                         easing: "cubic-in-out",
                     },
-                    uirevision: JSON.stringify(props.filter) + JSON.stringify(props.configuration),
+                    uirevision: JSON.stringify(filter) + JSON.stringify(configuration),
                 }}
                 config={{
                     displaylogo: false,
@@ -171,15 +177,14 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
                 }}
                 useResizeHandler={true}
                 onClick={(event) => {
-                    setActiveRecords(recordMap[getPointString(records[event.points[0].pointNumber])])
+                    onClick(recordMap[getPointString(records[event.points[0].pointNumber])])
                 }}
             />
-            <RecordModal records={activeRecords} setRecords={setActiveRecords} />
         </>
     )
 }
 
-export default function PlotView<MODIFIER_ID extends string, METRIC_ID extends string, SCORE>(props: PlotViewProps<MODIFIER_ID, METRIC_ID, SCORE>) {
+export default function PlotView<MODIFIER_ID extends string, METRIC_ID extends string, SCORE, RECORD extends RecordDTO<SCORE>>(props: PlotViewProps<MODIFIER_ID, METRIC_ID, SCORE, RECORD>) {
     return (
         <SizeMe monitorHeight={true} monitorWidth={true}>
             {({ size }) => <SizeAwarePlotView size={size} {...props} />}

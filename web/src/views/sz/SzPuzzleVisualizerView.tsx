@@ -21,11 +21,14 @@ import { VisualizerColor } from "../../utils/VisualizerColor"
 import Puzzle from "../../model/Puzzle"
 import SzScore from "../../model/sz/SzScore"
 import fetchFromApi from "../../utils/fetchFromApi"
+import { RecordModal } from "../../components/RecordModal"
+import { useState } from "react"
+import RecordDTO from "../../model/RecordDTO"
 
 export default function SzPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId
-    fetchFromApi<Puzzle>(`/sz/puzzle/${puzzleId}`).then(
-        (puzzle) => (document.title = `${puzzle.displayName} - Shenzhen I/O Leaderboard`))
+    fetchFromApi<Puzzle>(`/sz/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - Shenzhen I/O Leaderboard`))
+    const [activeRecords, setActiveRecords] = useState<RecordDTO<SzScore>[] | undefined>(undefined)
 
     return (
         <Box
@@ -51,7 +54,9 @@ export default function SzPuzzleVisualizerView() {
                 }}
                 modifiers={{}}
                 defaultColor={VisualizerColor.DEFAULT}
+                onClick={setActiveRecords}
             />
+            <RecordModal records={activeRecords} setRecords={setActiveRecords} />
         </Box>
     )
 }

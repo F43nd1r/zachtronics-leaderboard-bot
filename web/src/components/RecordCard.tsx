@@ -19,10 +19,11 @@ import { SentimentVeryDissatisfied } from "@mui/icons-material"
 import RecordDTO from "../model/RecordDTO"
 import { ReactNode } from "react"
 
-interface RecordCardProps {
-    record: RecordDTO<any>
+export interface RecordCardProps<RECORD extends RecordDTO<any> = RecordDTO<any>> {
+    record: RECORD
     title: string
     score: ReactNode
+    additionalActions?: ReactNode
 }
 
 function isYoutube(gif: string): boolean {
@@ -65,6 +66,8 @@ export default function RecordCard(props: RecordCardProps) {
             {props.record.gif ? (
                 <CardActionArea
                     href={props.record.gif ?? ""}
+                    target={"_blank"}
+                    rel={"noreferrer"}
                     sx={{
                         width: "fit-content",
                         marginLeft: "auto",
@@ -125,6 +128,7 @@ export default function RecordCard(props: RecordCardProps) {
                         Download
                     </a>
                 </Button>
+                {props.additionalActions}
             </CardActions>
         </Card>
     )

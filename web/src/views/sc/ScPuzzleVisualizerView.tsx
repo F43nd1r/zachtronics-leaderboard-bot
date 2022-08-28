@@ -21,11 +21,14 @@ import { VisualizerColor } from "../../utils/VisualizerColor"
 import Puzzle from "../../model/Puzzle"
 import ScScore from "../../model/sc/ScScore"
 import fetchFromApi from "../../utils/fetchFromApi"
+import { useState } from "react"
+import RecordDTO from "../../model/RecordDTO"
+import { RecordModal } from "../../components/RecordModal"
 
 export default function ScPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId
-    fetchFromApi<Puzzle>(`/sc/puzzle/${puzzleId}`).then(
-        (puzzle) => (document.title = `${puzzle.displayName} - SpaceChem Leaderboard`))
+    fetchFromApi<Puzzle>(`/sc/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - SpaceChem Leaderboard`))
+    const [activeRecords, setActiveRecords] = useState<RecordDTO<ScScore>[] | undefined>(undefined)
 
     return (
         <Box
@@ -68,7 +71,9 @@ export default function ScPuzzleVisualizerView() {
                     },
                 }}
                 defaultColor={VisualizerColor.DEFAULT}
+                onClick={setActiveRecords}
             />
+            <RecordModal records={activeRecords} setRecords={setActiveRecords} />
         </Box>
     )
 }

@@ -31,7 +31,7 @@
  */
 import { useMemo } from "react"
 import ApiResource from "../../../utils/ApiResource"
-import RecordGrid from "../../../components/RecordGrid"
+import OmRecordGrid from "../../../components/OmRecordGrid"
 import { usePersistedState } from "../../../utils/usePersistedState"
 import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material"
 import { OmRecord } from "../../../model/om/OmRecord"
@@ -78,7 +78,7 @@ export default function RecentSubmissionsView() {
             </FormControl>
             <ApiResource<OmRecord[]>
                 url={`/om/records/new/${dateSince.toISOString()}`}
-                element={(changes) => <RecordGrid records={changes.reverse()} getTitle={(record) => record.puzzle.displayName} getScore={(record) => record.fullFormattedScore ?? "None"} />}
+                element={(changes) => <OmRecordGrid records={changes.reverse()} getTitle={(record) => record.puzzle.displayName} getScore={(record) => record.fullFormattedScore ?? "None"} />}
             />
         </Box>
     )

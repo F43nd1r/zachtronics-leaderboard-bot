@@ -27,7 +27,7 @@ import Modifier from "../../model/Modifier"
 import { LegendView } from "./partials/LegendView"
 import { usePersistedUrlState } from "../../utils/usePersistedUrlState"
 
-export interface VisualizerProps<MODIFIER_ID extends string, METRIC_ID extends string, SCORE> {
+export interface VisualizerProps<MODIFIER_ID extends string, METRIC_ID extends string, SCORE, RECORD extends RecordDTO<SCORE>> {
     url: string
     config: {
         key: string
@@ -40,11 +40,20 @@ export interface VisualizerProps<MODIFIER_ID extends string, METRIC_ID extends s
     metrics: Record<METRIC_ID, Metric<SCORE>>
     modifiers: Record<MODIFIER_ID, Modifier<SCORE>>
     defaultColor: string
+    onClick: (records: RECORD[]) => void
 }
 
-export function Visualizer<MODIFIER_ID extends string, METRIC_ID extends string, SCORE>(props: VisualizerProps<MODIFIER_ID, METRIC_ID, SCORE>) {
-    const [configuration, setConfiguration] = usePersistedUrlState(props.config.key, props.config.default)
-    const [filter, setFilter] = usePersistedUrlState(props.filter.key, props.filter.default)
+export function Visualizer<MODIFIER_ID extends string, METRIC_ID extends string, SCORE, RECORD extends RecordDTO<SCORE> = RecordDTO<SCORE>>({
+    config,
+    defaultColor,
+    filter: filterConfig,
+    metrics,
+    modifiers,
+    onClick,
+    url,
+}: VisualizerProps<MODIFIER_ID, METRIC_ID, SCORE, RECORD>) {
+    const [configuration, setConfiguration] = usePersistedUrlState(config.key, config.default)
+    const [filter, setFilter] = usePersistedUrlState(filterConfig.key, filterConfig.default)
 
     return (
         <Box
@@ -59,8 +68,8 @@ export function Visualizer<MODIFIER_ID extends string, METRIC_ID extends string,
                 },
             })}
         >
-            <ApiResource<RecordDTO<SCORE>[]>
-                url={props.url}
+            <ApiResource<RECORD[]>
+                url={url}
                 element={(records) => (
                     <>
                         <Stack
@@ -74,23 +83,23 @@ export function Visualizer<MODIFIER_ID extends string, METRIC_ID extends string,
                                 },
                             })}
                         >
-                            <ConfigurationView metrics={props.metrics} configuration={configuration} setConfiguration={setConfiguration} />
+                            <ConfigurationView metrics={metrics} configuration={configuration} setConfiguration={setConfiguration} />
                             <FilterView
-                                metrics={props.metrics}
-                                modifiers={props.modifiers}
+                                metrics={metrics}
+                                modifiers={modifiers}
                                 records={records}
                                 filter={filter}
                                 setFilter={(filter) => {
-                                    if (applyFilter(props.metrics, props.modifiers, filter, configuration, records).length) {
+                                    if (applyFilter(metrics, modifiers, filter, configuration, records).length) {
                                         setFilter(filter)
                                         return true
                                     }
                                     return false
                                 }}
                             />
-                            <LegendView modifiers={props.modifiers} defaultColor={props.defaultColor} />
+                            <LegendView modifiers={modifiers} defaultColor={defaultColor} />
                         </Stack>
-                        <PlotView metrics={props.metrics} modifiers={props.modifiers} defaultColor={props.defaultColor} records={records} configuration={configuration} filter={filter} />
+                        <PlotView metrics={metrics} modifiers={modifiers} defaultColor={defaultColor} records={records} configuration={configuration} filter={filter} onClick={onClick} />
                     </>
                 )}
             />

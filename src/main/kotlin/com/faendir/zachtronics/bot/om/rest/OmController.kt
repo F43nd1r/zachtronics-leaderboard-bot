@@ -69,6 +69,9 @@ class OmController(private val repository: OmSolutionRepository, private val dis
 
     override fun getPuzzle(puzzleId: String): OmPuzzleDTO = findPuzzle(puzzleId).toDTO()
 
+    @GetMapping("/puzzle/{puzzleId}/file")
+    fun getPuzzleFile(@PathVariable puzzleId: String): ByteArray = findPuzzle(puzzleId).file.readBytes()
+
     override fun listPuzzlesByGroup(groupId: String): List<OmPuzzleDTO> {
         val group = findGroup(groupId)
         return OmPuzzle.values().filter { it.group == group }.map { it.toDTO() }

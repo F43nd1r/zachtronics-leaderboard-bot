@@ -26,22 +26,22 @@ export interface Filter<MODIFIER_ID extends string, METRIC_ID extends string> {
     max?: Record<METRIC_ID, number | undefined>
 }
 
-export function applyFilter<MODIFIER_ID extends string, METRIC_ID extends string, SCORE>(
+export function applyFilter<MODIFIER_ID extends string, METRIC_ID extends string, SCORE, RECORD extends RecordDTO<SCORE>>(
     metrics: Record<METRIC_ID, Metric<SCORE>>,
     modifiers: Record<MODIFIER_ID, Modifier<SCORE>>,
     filter: Filter<MODIFIER_ID, METRIC_ID>,
     configuration: Configuration<METRIC_ID>,
-    records: RecordDTO<SCORE>[],
-): RecordDTO<SCORE>[] {
+    records: RECORD[],
+): RECORD[] {
     const filteredMetrics = filter.max ? iterate(filter.max).map(([key, max]) => ({ metric: metrics[key], max: max })) : []
     const activeMetrics = (configuration.mode === "2D" ? [configuration.x, configuration.y] : [configuration.x, configuration.y, configuration.z]).map((id) => metrics[id])
     const filteredRecords = records.filter(
-        (record: RecordDTO<SCORE>) =>
+        (record: RECORD) =>
             (!filter.modifiers || iterate(filter.modifiers).every(([modifierId, value]) => value === undefined || value === modifiers[modifierId].get(record.score))) &&
             !filteredMetrics.some(({ metric, max }) => {
                 const value = metric.get(record.score)
                 return max !== undefined && (value === undefined || value > max)
             }),
     )
-    return filteredRecords.filter((record: RecordDTO<SCORE>) => !filter.showOnlyFrontier || !filteredRecords.some((r) => isStrictlyBetterInMetrics(r, record, activeMetrics)))
+    return filteredRecords.filter((record: RECORD) => !filter.showOnlyFrontier || !filteredRecords.some((r) => isStrictlyBetterInMetrics(r, record, activeMetrics)))
 }

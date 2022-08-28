@@ -25,7 +25,7 @@ import LoadingIndicator from "../../../components/LoadingIndicator"
 
 const PuzzleRecordsView = lazy(() => import("./records/PuzzleRecordsView"))
 const PuzzleFrontierView = lazy(() => import("./frontier/PuzzleFrontierView"))
-const PuzzleVisualizerView = lazy(() => import("./visualizer/PuzzleVisualizerView"))
+const PuzzleVisualizerView = lazy(() => import("./visualizer/OmPuzzleVisualizerView"))
 
 interface RouteDefinition {
     pathSegment: string

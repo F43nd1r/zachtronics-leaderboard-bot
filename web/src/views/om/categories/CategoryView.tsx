@@ -15,7 +15,7 @@
  */
 
 import { useParams } from "react-router-dom"
-import RecordGrid from "../../../components/RecordGrid"
+import OmRecordGrid from "../../../components/OmRecordGrid"
 import ApiResource from "../../../utils/ApiResource"
 import fetchFromApi from "../../../utils/fetchFromApi"
 import { useEffect } from "react"
@@ -32,9 +32,9 @@ export default function CategoryView() {
 
     return (
         <ApiResource<OmRecord[]>
-            url={`/om/category/${useParams().categoryId}/records`}
+            url={`/om/category/${categoryId}/records`}
             element={(records) => (
-                <RecordGrid records={records} getTitle={(record) => record.puzzle.displayName} getScore={(record) => record.smartFormattedScore ?? record.fullFormattedScore ?? "None"} />
+                <OmRecordGrid records={records} getTitle={(record) => record.puzzle.displayName} getScore={(record) => record.smartFormattedScore ?? record.fullFormattedScore ?? "None"} />
             )}
         />
     )

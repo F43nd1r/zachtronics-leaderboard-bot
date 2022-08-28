@@ -15,11 +15,15 @@
  */
 
 export default function fetchFromApi<T>(url: string): Promise<T> {
-    return fetch(`${window.location.protocol}//${window.location.host}${url}`).then((response) => {
+    return fetchFromApiRaw(url).then((response) => {
         if (response.ok) {
             return response.json()
         } else {
             return Promise.reject(response.status)
         }
     })
+}
+
+export function fetchFromApiRaw(url: string): Promise<Response> {
+    return fetch(`${window.location.protocol}//${window.location.host}${url}`)
 }
