@@ -18,7 +18,7 @@ import RecordDTO from "../../../model/RecordDTO"
 import { SxProps } from "@mui/system"
 import { Theme } from "@mui/material/styles"
 import { Box, Slider, Stack, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material"
-import { Filter } from "../../../model/Filter"
+import { Filter, FilterRange } from "../../../model/Filter"
 import FieldSet from "../../FieldSet"
 import Metric from "../../../model/Metric"
 import Modifier from "../../../model/Modifier"
@@ -72,12 +72,12 @@ export function FilterView<MODIFIER_ID extends string, METRIC_ID extends string,
                 {iterate(props.metrics).map(([metricId, metric]) => (
                     <FilterSlider
                         key={metricId}
-                        value={props.filter.max?.[metricId]}
+                        value={props.filter.range?.[metricId]}
                         setValue={(value) =>
                             props.setFilter({
                                 ...props.filter,
-                                max: {
-                                    ...(props.filter.max ?? ({} as Record<METRIC_ID, Metric<SCORE>>)),
+                                range: {
+                                    ...(props.filter.range ?? ({} as Record<METRIC_ID, Metric<SCORE>>)),
                                     [metricId]: value,
                                 },
                             })
@@ -127,8 +127,8 @@ function FilterButtonGroup(props: FilterButtonGroupProps) {
 }
 
 interface FilterSliderProps {
-    value?: number
-    setValue: (filter: number | undefined) => boolean
+    value?: FilterRange
+    setValue: (filter: FilterRange | undefined) => boolean
     values: (number | undefined)[]
     label: string
 }
@@ -149,13 +149,16 @@ function FilterSlider(props: FilterSliderProps) {
             <Slider
                 aria-labelledby={`filter-slider-${props.label}`}
                 valueLabelFormat={(index) => (values[index] !== undefined ? numberFormat(values[index]) : "∞")}
-                valueLabelDisplay={"on"}
-                value={props.value !== undefined ? values.indexOf(props.value) : values.length - 1}
-                onChange={(event, i) => {
-                    const index = i as number
-                    const value = values[index]
-                    if (value !== undefined) {
-                        if (!props.setValue(value !== Infinity && value !== values[values.length - 1] ? value : undefined)) {
+                valueLabelDisplay={"auto"}
+                value={[props.value?.min ? values.indexOf(props.value.min) : 0, props.value?.max ? values.indexOf(props.value.max) : values.length - 1]}
+                onChange={(event, v) => {
+                    const [minIndex, maxIndex] = v as number[]
+                    let min: number | undefined = values[minIndex]
+                    let max: number | undefined = values[maxIndex]
+                    if (min !== undefined || max !== undefined) {
+                        if (min === values[0]) min = undefined
+                        if (max === Infinity || max === values[values.length - 1]) max = undefined
+                        if (!props.setValue(min !== undefined || max !== undefined ? { min, max } : undefined)) {
                             event.preventDefault()
                         }
                     }

@@ -20,10 +20,15 @@ import { Configuration } from "./Configuration"
 import iterate from "../utils/iterate"
 import Modifier from "./Modifier"
 
+export interface FilterRange {
+    min: number | undefined
+    max: number | undefined
+}
+
 export interface Filter<MODIFIER_ID extends string, METRIC_ID extends string> {
     modifiers?: Record<MODIFIER_ID, boolean | undefined>
     showOnlyFrontier?: boolean
-    max?: Record<METRIC_ID, number | undefined>
+    range?: Record<METRIC_ID, FilterRange>
 }
 
 export function applyFilter<MODIFIER_ID extends string, METRIC_ID extends string, SCORE, RECORD extends RecordDTO<SCORE>>(
@@ -33,14 +38,14 @@ export function applyFilter<MODIFIER_ID extends string, METRIC_ID extends string
     configuration: Configuration<METRIC_ID>,
     records: RECORD[],
 ): RECORD[] {
-    const filteredMetrics = filter.max ? iterate(filter.max).map(([key, max]) => ({ metric: metrics[key], max: max })) : []
+    const filteredMetrics = filter.range ? iterate(filter.range).map(([key, range]) => ({ metric: metrics[key], ...range })) : []
     const activeMetrics = (configuration.mode === "2D" ? [configuration.x, configuration.y] : [configuration.x, configuration.y, configuration.z]).map((id) => metrics[id])
     const filteredRecords = records.filter(
         (record: RECORD) =>
             (!filter.modifiers || iterate(filter.modifiers).every(([modifierId, value]) => value === undefined || value === modifiers[modifierId].get(record.score))) &&
-            !filteredMetrics.some(({ metric, max }) => {
+            !filteredMetrics.some(({ metric, min, max }) => {
                 const value = metric.get(record.score)
-                return max !== undefined && (value === undefined || value > max)
+                return (max !== undefined && (value === undefined || value > max)) || (min !== undefined && (value === undefined || value < min))
             }),
     )
     return filteredRecords.filter((record: RECORD) => !filter.showOnlyFrontier || !filteredRecords.some((r) => isStrictlyBetterInMetrics(r, record, activeMetrics)))
