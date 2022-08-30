@@ -29,7 +29,7 @@ junit = "5.9.0"
 springdoc = "1.6.11"
 gradle-node = "3.4.0"
 guava = "31.1-jre"
-nokee = "0.5.0-930919a0"
+nokee = "0.5.0-74867535"
 opencsv = "5.6"
 
 [plugins]
