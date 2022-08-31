@@ -136,7 +136,7 @@ interface FilterSliderProps {
 const numberFormat = d3.format(".3~f")
 
 function FilterSlider(props: FilterSliderProps) {
-    const values = [...new Set(props.values)].map((value) => (value !== undefined ? value : Infinity)).sort((a, b) => a - b)
+    const values = [...new Set(props.values)].map((value) => (value !== undefined && value !== null ? value : Infinity)).sort((a, b) => a - b)
     return (
         <Box
             sx={{

@@ -42,10 +42,14 @@ export function applyFilter<MODIFIER_ID extends string, METRIC_ID extends string
     const activeMetrics = (configuration.mode === "2D" ? [configuration.x, configuration.y] : [configuration.x, configuration.y, configuration.z]).map((id) => metrics[id])
     const filteredRecords = records.filter(
         (record: RECORD) =>
+            activeMetrics.every((metric) => {
+                const value = metric.get(record.score)
+                return value !== undefined && value !== null
+            }) &&
             (!filter.modifiers || iterate(filter.modifiers).every(([modifierId, value]) => value === undefined || value === modifiers[modifierId].get(record.score))) &&
             !filteredMetrics.some(({ metric, min, max }) => {
                 const value = metric.get(record.score)
-                return (max !== undefined && (value === undefined || value > max)) || (min !== undefined && (value === undefined || value < min))
+                return (max !== undefined && (value === undefined || value === null || value > max)) || (min !== undefined && (value === undefined || value === null || value < min))
             }),
     )
     return filteredRecords.filter((record: RECORD) => !filter.showOnlyFrontier || !filteredRecords.some((r) => isStrictlyBetterInMetrics(r, record, activeMetrics)))
