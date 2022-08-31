@@ -84,18 +84,14 @@ class SafeEmbedMessageBuilder : SafeMessageBuilder {
         current.image(image)
     }
 
-    private val imgurMp4 = Regex("""https?://i\.imgur\.com/(?<id>.*)\.mp4""")
-    private val morstechMp4 = Regex("""https?://files\.mors\.technology/(?<id>.*)\.mp4""")
+    private val rewritableMp4 = Regex("""https?://(?<host>i\.imgur\.com|files\.mors\.technology)/(?<id>.*)\.mp4""")
     private val allowedImageTypes = setOf("gif", "png", "jpg")
 
     fun link(link: String?) = apply {
         if (link != null) {
-            val imgurmatch = imgurMp4.matchEntire(link)
-            val morsmatch = morstechMp4.matchEntire(link)
-            if(imgurmatch != null) {
-                image("https://i.imgur.com/${imgurmatch.groups["id"]!!.value}.gif")
-            } else if (morsmatch != null) {
-                image("https://files.mors.technology/${morsmatch.groups["id"]!!.value}.gif")
+            val match = rewritableMp4.matchEntire(link)
+            if(match != null) {
+                image("https://${match.groups["host"]!!.value}/${match.groups["id"]!!.value}.gif")
             } else if (allowedImageTypes.contains(link.substringAfterLast(".", ""))) {
                 image(link)
             } else {
