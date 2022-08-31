@@ -98,6 +98,7 @@ class OmSolutionRepository(
                     }
                 }
                 ?.forEach { record -> records.add(record, mutableSetOf()) }
+            records.keys.removeIf { record -> records.keys.any { it.score.isStrictlyBetterThan(record.score) } }
             if (records.isNotEmpty()) {
                 for (category in OmCategory.values().filter { it.supportsPuzzle(puzzle) }.toMutableSet()) {
                     records.entries.filter { category.supportsScore(it.key.score) }
