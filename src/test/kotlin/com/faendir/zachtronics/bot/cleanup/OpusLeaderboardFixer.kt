@@ -111,8 +111,7 @@ class OpusLeaderboardFixer {
                 try {
                     val record = file.inputStream().buffered().use { stream -> json.decodeFromStream<OmRecord>(stream) }
                     if (record.dataPath != null) {
-                        val wantedFileName = "${record.score.toDisplayString(DisplayContext.fileName())}_${record.puzzle.name}"
-                        file.writeText(json.encodeToString(record.copy(dataLink = mapper.createShortUrl(commitHash, record.puzzle, wantedFileName))))
+                        file.writeText(json.encodeToString(record.copy(dataLink = mapper.createShortUrl(commitHash, record.puzzle, record.score))))
                     }
                 } catch (e: Exception) {
                     if ("MIRACULOUS" !in e.message!!) {

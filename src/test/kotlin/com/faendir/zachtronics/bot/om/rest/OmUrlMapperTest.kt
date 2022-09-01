@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.om.rest
 
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.model.OmScore
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
@@ -25,14 +26,20 @@ internal class OmUrlMapperTest {
     private val urlMapper = OmUrlMapper()
 
     @Test
-    fun `should map short to long url correctly`() {
+    fun `should map old short to long url correctly`() {
         expectThat(urlMapper.map("d5524ee/P103/2265g-47c-1694a-516i-59h-34.5w-1r_ELECTRUM_SEPARATION"))
             .isEqualTo("https://raw.githubusercontent.com/f43nd1r/om-leaderboard/d5524ee/JOURNAL_VIII/ELECTRUM_SEPARATION/2265g-47c-1694a-516i-59h-34.5w-1r_ELECTRUM_SEPARATION.solution")
     }
 
     @Test
-    fun createShortUrl() {
-        expectThat(urlMapper.createShortUrl("d5524ee", OmPuzzle.ELECTRUM_SEPARATION, "2265g-47c-1694a-516i-59h-34.5w-1r_ELECTRUM_SEPARATION"))
-            .isEqualTo("https://zlbb.faendir.com/l/om/d5524ee/P103/2265g-47c-1694a-516i-59h-34.5w-1r_ELECTRUM_SEPARATION")
+    fun `should map new short to long url correctly`() {
+        expectThat(urlMapper.map("d5524ee/P103/2265g-47c-1694a-516i-59h-34.5w-1r"))
+            .isEqualTo("https://raw.githubusercontent.com/f43nd1r/om-leaderboard/d5524ee/JOURNAL_VIII/ELECTRUM_SEPARATION/2265g-47c-1694a-516i-59h-34.5w-1r_ELECTRUM_SEPARATION.solution")
+    }
+
+    @Test
+    fun `should create short url`() {
+        expectThat(urlMapper.createShortUrl("d5524ee", OmPuzzle.ELECTRUM_SEPARATION, OmScore(2265, 47, 1694, 516, 59,34.5, 1.0)))
+            .isEqualTo("https://zlbb.faendir.com/l/om/d5524ee/P103/2265g-47c-1694a-516i-59h-34.5w-1r")
     }
 }
