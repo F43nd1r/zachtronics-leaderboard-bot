@@ -16,7 +16,9 @@
 
 package com.faendir.zachtronics.bot.om.rest
 
+import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.rest.UrlMapper
 import org.springframework.stereotype.Component
 
@@ -27,10 +29,11 @@ class OmUrlMapper : UrlMapper {
     override fun map(shortUrl: String): String? {
         val segments = shortUrl.split("/").filter { it.isNotBlank() }
         if (segments.size != 3) return null
-        val (commit, puzzleId, fileName) = segments
+        val (commit, puzzleId, record) = segments
         val puzzle = OmPuzzle.values().find { it.id.equals(puzzleId, ignoreCase = true) } ?: return null
+        val fileName = if(record.endsWith(puzzle.name)) record else "${record}_${puzzle.name}"
         return "https://raw.githubusercontent.com/f43nd1r/om-leaderboard/${commit}/${puzzle.group.name}/${puzzle.name}/${fileName}.solution"
     }
 
-    fun createShortUrl(commitId: String, puzzle: OmPuzzle, name: String): String = buildUrl("$commitId/${puzzle.id}/$name")
+    fun createShortUrl(commitId: String, puzzle: OmPuzzle, score: OmScore): String = buildUrl("$commitId/${puzzle.id}/${score.toDisplayString(DisplayContext.fileName())}")
 }

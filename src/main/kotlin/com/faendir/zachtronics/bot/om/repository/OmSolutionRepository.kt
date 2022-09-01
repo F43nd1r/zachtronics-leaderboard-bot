@@ -246,7 +246,7 @@ class OmSolutionRepository(
                 val newRecord = record.copy(
                     score = newScore,
                     dataPath = newPath,
-                    dataLink = createLink(leaderboardScope, puzzle, newName)
+                    dataLink = createLink(leaderboardScope, puzzle, newScore)
                 )
                 leaderboardFile.outputStream().buffered().use { json.encodeToStream(newRecord, it) }
                 leaderboardScope.add(leaderboardFile)
@@ -310,7 +310,7 @@ class OmSolutionRepository(
             puzzle = puzzle,
             score = score,
             displayLink = displayLink,
-            dataLink = createLink(leaderboardScope, puzzle, name),
+            dataLink = createLink(leaderboardScope, puzzle, score),
             dataPath = path,
             origin = leaderboardFile.toPath(),
             lastModified = Clock.System.now()
@@ -321,8 +321,8 @@ class OmSolutionRepository(
         return record.copy(dataPath = archiveFile.toPath())
     }
 
-    private fun createLink(leaderboardScope: GitRepository.ReadAccess, puzzle: OmPuzzle, name: String) =
-        omUrlMapper.createShortUrl(leaderboardScope.shortCurrentHash(), puzzle, name)
+    private fun createLink(leaderboardScope: GitRepository.ReadAccess, puzzle: OmPuzzle, score: OmScore) =
+        omUrlMapper.createShortUrl(leaderboardScope.shortCurrentHash(), puzzle, score)
 
     private fun OmRecord.remove(leaderboardScope: GitRepository.ReadWriteAccess) {
         dataPath?.let { dataPath -> leaderboardScope.rm(dataPath.toFile()) }

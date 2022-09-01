@@ -32,12 +32,14 @@ import javax.servlet.http.HttpServletRequest
 class ShortUrlController(urlMappers: List<UrlMapper>) {
     private val mappers = urlMappers.associateBy { it.pathId }
 
-    @GetMapping(path = ["/{mapperId}/**"])
-    fun proxyUrl(@PathVariable mapperId: String, request: HttpServletRequest): ResponseEntity<Unit> {
-        val path = (request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE) as String).removePrefix("/l/$mapperId/")
+    @GetMapping(path = ["/{mapperId}/{*path}"])
+    fun proxyUrl(@PathVariable mapperId: String, @PathVariable path: String): ResponseEntity<Unit> {
         val mapper = mappers[mapperId] ?: return ResponseEntity.badRequest().build()
         val longUrl = mapper.map(path) ?: return ResponseEntity.notFound().build()
-        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).header("Location", longUrl).build()
+        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+            .header("Location", longUrl)
+            .header("X-Robots-Tag", "noindex, nofollow")
+            .build()
     }
 }
 
