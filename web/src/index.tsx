@@ -20,21 +20,22 @@ import { lazy, StrictMode, Suspense } from "react"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import LoadingIndicator from "./components/LoadingIndicator"
 import { PuzzleRoutes } from "./views/om/puzzles/PuzzleView"
-import FpPuzzleVisualizerView from "./views/fp/FpPuzzleVisualizerView"
-import IfPuzzleVisualizerView from "./views/if/IfPuzzleVisualizerView"
-import ScPuzzleVisualizerView from "./views/sc/ScPuzzleVisualizerView"
-import SzPuzzleVisualizerView from "./views/sz/SzPuzzleVisualizerView"
-import AppThemeProvider from "./fragments/AppThemeProvider"
+import AppSettingsProvider from "./fragments/AppSettingsProvider"
 import { createRoot } from "react-dom/client"
 
 const RecentSubmissionsView = lazy(() => import("./views/om/recent/RecentSubmissionsView"))
 const PuzzleView = lazy(() => import("./views/om/puzzles/PuzzleView"))
 const CategoryView = lazy(() => import("./views/om/categories/CategoryView"))
+const SettingsView = lazy(() => import("./views/om/settings/SettingsView"))
 const HelpView = lazy(() => import("./views/om/help/HelpView"))
+const FpPuzzleVisualizerView = lazy(() => import("./views/fp/FpPuzzleVisualizerView"))
+const IfPuzzleVisualizerView = lazy(() => import("./views/if/IfPuzzleVisualizerView"))
+const ScPuzzleVisualizerView = lazy(() => import("./views/sc/ScPuzzleVisualizerView"))
+const SzPuzzleVisualizerView = lazy(() => import("./views/sz/SzPuzzleVisualizerView"))
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
-        <AppThemeProvider>
+        <AppSettingsProvider>
             <Suspense fallback={<LoadingIndicator />}>
                 <BrowserRouter>
                     <Routes>
@@ -46,6 +47,7 @@ createRoot(document.getElementById("root")!).render(
                                 ))}
                             </Route>
                             <Route path="categories/:categoryId" element={<CategoryView />} />
+                            <Route path="settings" element={<SettingsView />} />
                             <Route path="help" element={<HelpView />} />
                         </Route>
                         <Route path="fp/:puzzleId" element={<FpPuzzleVisualizerView />} />
@@ -55,6 +57,6 @@ createRoot(document.getElementById("root")!).render(
                     </Routes>
                 </BrowserRouter>
             </Suspense>
-        </AppThemeProvider>
+        </AppSettingsProvider>
     </StrictMode>,
 )

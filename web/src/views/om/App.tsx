@@ -19,15 +19,12 @@ import MenuIcon from "@mui/icons-material/Menu"
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { useContext } from "react"
-import Brightness4Icon from "@mui/icons-material/Brightness4"
-import Brightness7Icon from "@mui/icons-material/Brightness7"
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar"
 import Sidebar from "../../fragments/Sidebar"
-import { Outlet } from "react-router-dom"
+import { Link, Outlet } from "react-router-dom"
 import { usePersistedState } from "../../utils/usePersistedState"
 import SearchBar from "../../fragments/SearchBar"
-import { AppThemeContext } from "../../fragments/AppThemeProvider"
+import { Settings } from "@mui/icons-material"
 
 const drawerWidth = 300
 
@@ -89,7 +86,6 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
 
 export default function App() {
     const theme = useTheme()
-    const colorMode = useContext(AppThemeContext)
     const isNotTinyScreen = useMediaQuery(theme.breakpoints.up("sm"))
     const isAtLeastMediumScreen = useMediaQuery(theme.breakpoints.up("md"))
     const [open, setOpen] = usePersistedState("sidebarOpen", isNotTinyScreen)
@@ -130,9 +126,11 @@ export default function App() {
                 onClose={handleDrawerClose}
             >
                 <DrawerHeader>
-                    <IconButton sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} color="inherit">
-                        {theme.palette.mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
-                    </IconButton>
+                    <UnstyledLink to="settings">
+                        <IconButton sx={{ ml: 1 }} color="inherit">
+                            <Settings />
+                        </IconButton>
+                    </UnstyledLink>
                     <IconButton onClick={handleDrawerClose}>{theme.direction === "ltr" ? <ChevronLeftIcon /> : <ChevronRightIcon />}</IconButton>
                 </DrawerHeader>
                 <Divider />
@@ -145,3 +143,7 @@ export default function App() {
         </>
     )
 }
+
+const UnstyledLink = styled(Link, {})`
+    color: inherit;
+`

@@ -15,31 +15,50 @@
  */
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { usePersistedState } from "../utils/usePersistedState"
-import { createContext, ReactNode, useMemo } from "react"
+import { createContext, ReactNode, useContext, useMemo } from "react"
 import { createTheme, ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
 
-export const AppThemeContext = createContext({
-    toggleColorMode: () => {},
+interface AppSettings {
+    colorMode: "light" | "dark"
+    setColorMode: (value: "light" | "dark") => void
+    autoPlay: boolean
+    setAutoPlay: (value: boolean) => void
+    showControls: boolean
+    setShowControls: (value: boolean) => void
+}
+
+export const AppSettingsContext = createContext<AppSettings>({
+    colorMode: "dark",
+    setColorMode: () => {},
+    autoPlay: true,
+    setAutoPlay: () => {},
+    showControls: false,
+    setShowControls: () => {},
 })
 
-export default function AppThemeProvider(props: { children?: ReactNode | undefined }) {
+export default function AppSettingsProvider(props: { children?: ReactNode | undefined }) {
     const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
-    const [mode, setMode] = usePersistedState("colorMode", prefersDarkMode ? "light" : "dark")
-    const colorMode = useMemo(
+    const [colorMode, setColorMode] = usePersistedState("colorMode", prefersDarkMode ? "light" : "dark")
+    const [autoPlay, setAutoPlay] = usePersistedState<boolean>("autoPlay", true)
+    const [showControls, setShowControls] = usePersistedState<boolean>("showControls", false)
+    const context = useMemo<AppSettings>(
         () => ({
-            toggleColorMode: () => {
-                setMode((prevMode) => (prevMode === "light" ? "dark" : "light"))
-            },
+            colorMode,
+            setColorMode,
+            autoPlay,
+            setAutoPlay,
+            showControls,
+            setShowControls,
         }),
-        [setMode],
+        [autoPlay, colorMode, setAutoPlay, setColorMode, setShowControls, showControls],
     )
 
     const theme = useMemo(
         () =>
             createTheme({
                 palette: {
-                    mode,
+                    mode: colorMode,
                 },
                 breakpoints: {
                     values: {
@@ -53,17 +72,23 @@ export default function AppThemeProvider(props: { children?: ReactNode | undefin
                     },
                 },
             }),
-        [mode],
+        [colorMode],
     )
 
     return (
-        <AppThemeContext.Provider value={colorMode}>
+        <AppSettingsContext.Provider value={context}>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 {props.children}
             </ThemeProvider>
-        </AppThemeContext.Provider>
+        </AppSettingsContext.Provider>
     )
+}
+
+export const useAppSettings = () => {
+    const appSettings = useContext(AppSettingsContext)
+    if (appSettings == null) throw Error("App Settings context required")
+    return appSettings
 }
 
 declare module "@mui/material/styles" {
