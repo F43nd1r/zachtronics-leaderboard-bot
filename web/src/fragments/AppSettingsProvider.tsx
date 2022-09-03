@@ -19,7 +19,7 @@ import { createContext, ReactNode, useContext, useMemo } from "react"
 import { createTheme, ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
 
-interface AppSettings {
+export interface AppSettings {
     colorMode: "light" | "dark"
     setColorMode: (value: "light" | "dark") => void
     autoPlay: boolean

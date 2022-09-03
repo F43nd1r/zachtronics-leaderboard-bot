@@ -18,7 +18,7 @@ import { Box, Button, Card, CardActionArea, CardActions, CardContent, CardHeader
 import { SentimentVeryDissatisfied } from "@mui/icons-material"
 import RecordDTO from "../model/RecordDTO"
 import { ReactNode } from "react"
-import { useAppSettings } from "../fragments/AppSettingsProvider"
+import { AppSettings, useAppSettings } from "../fragments/AppSettingsProvider"
 
 export interface RecordCardProps<RECORD extends RecordDTO<any> = RecordDTO<any>> {
     record: RECORD
@@ -45,13 +45,13 @@ function getVideoType(gif: string): "video" | "iframe" | "img" {
     }
 }
 
-function getVideoUrl(gif: string) {
+function getVideoUrl(gif: string, appSettings: AppSettings) {
     if (isYoutube(gif)) {
         const url = new URL(gif)
         let id = url.pathname.substring(1)
         if (id === "watch") id = url.searchParams.get("v")!
 
-        let result = `https://youtube.com/embed/${id}?playlist=${id}&autoplay=1&loop=1`
+        let result = `https://youtube.com/embed/${id}?playlist=${id}&autoplay=${appSettings.autoPlay ? 1 : 0}&loop=1&controls=${appSettings.showControls ? 1 : 0}`
         if (url.searchParams.has("t")) result += "&start=" + url.searchParams.get("t")
         return result
     } else if (isImgur(gif)) {
@@ -88,7 +88,7 @@ export default function RecordCard(props: RecordCardProps) {
                         controls={appSettings.showControls}
                         loop
                         muted
-                        src={getVideoUrl(props.record.gif)}
+                        src={getVideoUrl(props.record.gif, appSettings)}
                         alt="Media not loading"
                         style={{
                             height: "min(70vh, 360px)",
