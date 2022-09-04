@@ -17,7 +17,7 @@
 import RecordDTO from "../../../model/RecordDTO"
 import { SxProps } from "@mui/system"
 import { Theme } from "@mui/material/styles"
-import { Box, Slider, Stack, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material"
+import { Box, Button, Slider, Stack, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material"
 import { Filter, FilterRange } from "../../../model/Filter"
 import FieldSet from "../../FieldSet"
 import Metric from "../../../model/Metric"
@@ -86,9 +86,16 @@ export function FilterView<MODIFIER_ID extends string, METRIC_ID extends string,
                         label={metric.name}
                     />
                 ))}
+                <Button size="small" variant="outlined" color="primary" disabled={isEmpty(props.filter)} onClick={() => props.setFilter({})}>
+                    Reset
+                </Button>
             </Stack>
         </FieldSet>
     )
+}
+
+function isEmpty(obj: Object): boolean {
+    return Object.entries(obj).every(([, value]) => value === undefined || (typeof value === "object" && isEmpty(value)))
 }
 
 interface FilterButtonGroupProps {
