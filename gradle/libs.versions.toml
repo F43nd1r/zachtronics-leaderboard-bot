@@ -1,15 +1,14 @@
 [versions]
-kotlin = "1.6.21"
-ksp = "1.6.21-1.0.5"
+kotlin = "1.7.10"
 spring-boot = "2.7.3"
 spring-dependencyManagement = "1.0.13.RELEASE"
 spring-cloud = "3.1.4"
 gradle-docker = "0.34.0"
 gradle-lombok = "6.5.1"
 gradle-gitProperties = "2.4.1"
-kotlinx-json = "1.3.3"
+kotlinx-json = "1.4.0"
 kotlinx-datetime = "0.4.0"
-kotlinx-coroutines = "1.6.2"
+kotlinx-coroutines = "1.6.4"
 discord4j = "3.3.0-SNAPSHOT"
 reactor-kotlin = "1.1.7"
 jgit = "6.3.0.202209071007-r"
@@ -17,14 +16,9 @@ java-curl = "1.2.2.2"
 jraw = "1.2.0"
 om-dsl = "1.3.1"
 om-parser = "2.1.9"
-querydsl = "5.0.0"
 trove4j = "3.0.3"
 springmockk = "3.1.1"
 strikt = "0.34.1"
-kotlinPoet = "1.12.0"
-kotlinBard = "0.4.1"
-kaseChange = "1.3.0"
-kotlinCompileTesting = "1.4.9"
 junit = "5.9.0"
 springdoc = "1.6.11"
 gradle-node = "3.4.0"
@@ -48,15 +42,12 @@ spring-dependencyManagement = { id = "io.spring.dependency-management", version.
 gradle-docker = { id = "com.palantir.docker", version.ref = "gradle-docker" }
 gradle-lombok = { id = "io.freefair.lombok", version.ref = "gradle-lombok" }
 gradle-gitProperties = { id = "com.gorylenko.gradle-git-properties", version.ref = "gradle-gitProperties" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 gradle-node = { id = "com.github.node-gradle.node", version.ref = "gradle-node" }
 
 [libraries]
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-json" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "kotlinx-coroutines" }
-kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
-kotlin-scriptingCompiler = { module = "org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable", version.ref = "kotlin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
 spring-boot-web = { module = "org.springframework.boot:spring-boot-starter-web" }
 spring-boot-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
@@ -73,20 +64,11 @@ jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin"
 jackson-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 om-dsl = { module = "com.faendir.om:dsl", version.ref = "om-dsl" }
 om-parser = { module = "com.faendir.om:parser", version.ref = "om-parser" }
-querydsl-jpa = { module = "com.querydsl:querydsl-jpa", version.ref = "querydsl" }
-querydsl-core = { module = "com.querydsl:querydsl-core", version.ref = "querydsl" }
-querydsl-apt = { module = "com.querydsl:querydsl-apt", version.ref = "querydsl" }
-querydsl-kotlinCodegen = { module = "com.querydsl:querydsl-kotlin-codegen", version.ref = "querydsl" }
 spring-boot-configurationProcessor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
 spring-boot-test = { module = "org.springframework.boot:spring-boot-starter-test" }
 trove4j = { module = "net.sf.trove4j:trove4j", version.ref = "trove4j" }
 springmockk = { module = "com.ninja-squad:springmockk", version.ref = "springmockk" }
 strikt = { module = "io.strikt:strikt-core", version.ref = "strikt" }
-ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
-kotlinPoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinPoet" }
-kotlinBard = { module = "com.faendir:kotlinbard", version.ref = "kotlinBard" }
-kotlinCompileTesting = { module = "com.github.tschuchortdev:kotlin-compile-testing-ksp", version.ref = "kotlinCompileTesting" }
-kaseChange = { module = "net.pearx.kasechange:kasechange-jvm", version.ref = "kaseChange" }
 junit = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
 springdoc = { module = "org.springdoc:springdoc-openapi-ui", version.ref = "springdoc" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }

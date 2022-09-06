@@ -16,11 +16,10 @@
 
 package com.faendir.zachtronics.bot.sc.discord;
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand;
-import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.discord4j.command.annotation.Description;
-import com.faendir.zachtronics.bot.discord.LinkConverter;
 import com.faendir.zachtronics.bot.discord.command.AbstractMultiSubmitCommand;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
+import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
@@ -28,24 +27,43 @@ import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScSubmission;
 import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
+import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 @ScQualifier
-public class ScSubmitCommand extends AbstractMultiSubmitCommand<ScSubmitCommand.SubmitData, ScCategory, ScPuzzle, ScSubmission, ScRecord> {
-    @Delegate
-    private final ScSubmitCommand_SubmitDataParser parser = ScSubmitCommand_SubmitDataParser.INSTANCE;
+public class ScSubmitCommand extends AbstractMultiSubmitCommand<ScCategory, ScPuzzle, ScSubmission, ScRecord> {
+    private final CommandOption<String, String> exportOption = OptionHelpersKt.linkOptionBuilder("export")
+            .description("Link or `m1` to scrape it from your last message. Start the solution name with `/B?P?` to set flags")
+            .required()
+            .build();
+    private final CommandOption<String, String> authorOption = CommandOptionBuilder.string("author")
+            .description("Name to appear on the Reddit leaderboard")
+            .build();
+    private final CommandOption<String, String> videoOption = OptionHelpersKt.linkOptionBuilder("video")
+            .description("Link to your video of the solution, can be `m1` to scrape it from your last message")
+            .build();
+    private final CommandOption<Boolean, Boolean> bypassValidationOption = CommandOptionBuilder.bool("bypass-validation")
+            .description("Skips running SChem on the solutions. Admin-only")
+            .convert((event, bypass) -> {
+                if (bypass != null && bypass && !ScSecured.WIKI_ADMINS_ONLY.hasExecutionPermission(event, UtilsKt.user(event))) {
+                    throw new IllegalArgumentException("Only a wiki admin can use this parameter");
+                }
+                return bypass;
+            })
+            .build();
+    @Getter
+    private final List<CommandOption<?, ?>> options = List.of(exportOption, authorOption, videoOption, bypassValidationOption);
     @Getter
     private final Secured secured = ScSecured.INSTANCE;
     @Getter
@@ -53,53 +71,29 @@ public class ScSubmitCommand extends AbstractMultiSubmitCommand<ScSubmitCommand.
 
     @NotNull
     @Override
-    public Collection<ValidationResult<ScSubmission>> parseSubmissions(@NotNull ScSubmitCommand.SubmitData parameters) {
-        if (parameters.getExport().equals(parameters.video))
+    public Collection<ValidationResult<ScSubmission>> parseSubmissions(@NotNull ChatInputInteractionEvent event) {
+        String export = exportOption.get(event);
+        String video = videoOption.get(event);
+        String author = authorOption.get(event);
+        Boolean bypassValidationIn = bypassValidationOption.get(event);
+        if (export.equals(video))
             throw new IllegalArgumentException("Export link and video link cannot be the same link");
 
-        boolean bypassValidation = parameters.bypassValidation != null && parameters.bypassValidation;
-        Collection<ValidationResult<ScSubmission>> results = ScSubmission.fromExportLink(parameters.export, bypassValidation,
-                                                                                         parameters.author);
-        if (parameters.video != null) {
+        boolean bypassValidation = bypassValidationIn != null && bypassValidationIn;
+        Collection<ValidationResult<ScSubmission>> results = ScSubmission.fromExportLink(export, bypassValidation, author);
+        if (video != null) {
             if (results.size() != 1)
                 throw new IllegalArgumentException("Only one solution can be paired with a video");
 
             ValidationResult<ScSubmission> result = results.iterator().next();
             if (result instanceof ValidationResult.Valid<ScSubmission>) {
                 ScSubmission submission = result.getSubmission();
-                ScSubmission videoSubmission = submission.withDisplayLink(parameters.video);
+                ScSubmission videoSubmission = submission.withDisplayLink(video);
                 return Collections.singleton(new ValidationResult.Valid<>(videoSubmission));
-            }
-            else {
+            } else {
                 throw new IllegalArgumentException(result.getMessage());
             }
-        }
-        else
+        } else
             return results;
-    }
-
-    @ApplicationCommand(name = "submit", description = "Submit and archive any number of solutions", subCommand = true)
-    @Value
-    public static class SubmitData {
-        @NotNull String export;
-        @Nullable String author;
-        @Nullable String video;
-        @Nullable Boolean bypassValidation;
-
-        public SubmitData(@Description("Link or `m1` to scrape it from your last message. " +
-                                       "Start the solution name with `/B?P?` to set flags")
-                          @NotNull @Converter(LinkConverter.class) String export,
-                          @Description("Name to appear on the Reddit leaderboard")
-                          @Nullable String author,
-                          @Description("Link to your video of the solution, can be `m1` to scrape it from your last message")
-                          @Nullable @Converter(LinkConverter.class) String video,
-                          @Description("Skips running SChem on the solutions. Admin-only")
-                          @Nullable @Converter(value = ScAdminOnlyBooleanConverter.class, input = Boolean.class)
-                                  Boolean bypassValidation) {
-            this.export = export;
-            this.bypassValidation = bypassValidation;
-            this.author = author;
-            this.video = video;
-        }
     }
 }

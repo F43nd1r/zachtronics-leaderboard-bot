@@ -25,15 +25,21 @@ import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.repository.CategoryRecord
+import discord4j.common.util.Snowflake
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.core.`object`.entity.User
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.`object`.entity.Message
+import discord4j.core.`object`.reaction.ReactionEmoji
 import discord4j.core.spec.EmbedCreateFields
 import discord4j.core.spec.EmbedCreateSpec
 import discord4j.core.spec.InteractionReplyEditMono
+import reactor.core.publisher.Flux
 import java.io.Closeable
 import java.net.HttpURLConnection
 import java.net.URL
+import java.time.Instant
 import kotlin.math.pow
 
 inline fun <T, R> Collection<T>.ifNotEmpty(block: (Collection<T>) -> R): R? = takeIf { it.isNotEmpty() }?.let(block)

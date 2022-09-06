@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,17 +28,16 @@ import com.faendir.zachtronics.bot.utils.Markdown
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafePlainMessageBuilder
-import com.faendir.zachtronics.bot.utils.clear
-import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
-import discord4j.core.spec.MessageCreateFields
-import reactor.core.publisher.Mono
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 
-abstract class AbstractShowCommand<T, C : Category, P : Puzzle<C>, R : Record<C>> : AbstractSubCommand<T>() {
+abstract class AbstractShowCommand<C : Category, P : Puzzle<C>, R : Record<C>> : Command.BasicLeaf() {
+    override val name = "show"
+    override val description = "Show a record"
     override val secured = NotSecured
     abstract val repository: SolutionRepository<C, P, *, R>
 
-    override fun handleEvent(event: DeferrableInteractionEvent, parameters: T): SafeMessageBuilder {
-        val (puzzle, category) = findPuzzleAndCategory(parameters)
+    override fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder {
+        val (puzzle, category) = findPuzzleAndCategory(event)
         val record = repository.find(puzzle, category)
         return if (record != null) {
             val lines = mutableListOf(
@@ -63,5 +62,5 @@ abstract class AbstractShowCommand<T, C : Category, P : Puzzle<C>, R : Record<C>
         }
     }
 
-    abstract fun findPuzzleAndCategory(parameters: T): Pair<P, C>
+    abstract fun findPuzzleAndCategory(event: ChatInputInteractionEvent): Pair<P, C>
 }

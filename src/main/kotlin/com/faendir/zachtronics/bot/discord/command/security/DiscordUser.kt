@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.discord.command.security
 
+import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.core.`object`.entity.User
 
 enum class DiscordUser(val id: Long) {
@@ -34,5 +35,5 @@ enum class DiscordUser(val id: Long) {
 class DiscordUserSecured(users: Collection<DiscordUser>) : Secured {
     private val ids = users.map { it.id }.toSet()
 
-    override fun hasExecutionPermission(user: User): Boolean = ids.contains(user.id.asLong())
+    override fun hasExecutionPermission(event: InteractionCreateEvent, user: User): Boolean = ids.contains(user.id.asLong())
 }

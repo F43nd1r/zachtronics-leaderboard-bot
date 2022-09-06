@@ -16,58 +16,48 @@
 
 package com.faendir.zachtronics.bot.inf.discord;
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand;
-import com.faendir.discord4j.command.annotation.AutoComplete;
-import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractShowCommand;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
+import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.inf.IfQualifier;
 import com.faendir.zachtronics.bot.inf.model.IfCategory;
 import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
 import com.faendir.zachtronics.bot.inf.model.IfRecord;
 import com.faendir.zachtronics.bot.inf.repository.IfSolutionRepository;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import kotlin.Pair;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Component
 @IfQualifier
-public class IfShowCommand extends AbstractShowCommand<IfShowCommand.ShowData, IfCategory, IfPuzzle, IfRecord> {
-    @Delegate
-    private final IfShowCommand_ShowDataParser parser = IfShowCommand_ShowDataParser.INSTANCE;
+public class IfShowCommand extends AbstractShowCommand<IfCategory, IfPuzzle, IfRecord> {
+    private final CommandOption<String, IfPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", IfPuzzle.class, IfPuzzle::getDisplayName)
+            .description("Puzzle name. Can be shortened or abbreviated. E.g. `Gne ch`, `TBB`")
+            .required()
+            .build();
+    private final CommandOption<String, IfCategory> categoryOption = OptionHelpersKt.enumOptionBuilder("category", IfCategory.class, IfCategory::getDisplayName)
+            .description("Category. E.g. `CNG`, `F`")
+            .required()
+            .build();
+    @Getter
+    private final List<CommandOption<?, ?>> options = List.of(puzzleOption, categoryOption);
     @Getter
     private final IfSolutionRepository repository;
 
     @NotNull
     @Override
-    public Pair<IfPuzzle, IfCategory> findPuzzleAndCategory(@NotNull ShowData parameters) {
-        IfPuzzle puzzle = parameters.puzzle;
-        IfCategory category = parameters.category;
-        if (!parameters.puzzle.getSupportedCategories().contains(category))
+    public Pair<IfPuzzle, IfCategory> findPuzzleAndCategory(@NotNull ChatInputInteractionEvent event) {
+        IfPuzzle puzzle = puzzleOption.get(event);
+        IfCategory category = categoryOption.get(event);
+        if (!puzzle.getSupportedCategories().contains(category))
             throw new IllegalArgumentException(
                     "Category " + category.getDisplayName() + " does not support " + puzzle.getDisplayName());
         return new Pair<>(puzzle, category);
-    }
-
-    @ApplicationCommand(name = "show", subCommand = true)
-    @Value
-    public static class ShowData {
-        @NonNull IfPuzzle puzzle;
-        @NonNull IfCategory category;
-
-        public ShowData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `Gne ch`, `TBB`")
-                        @AutoComplete(IfPuzzleAutoCompletionProvider.class)
-                        @Converter(IfPuzzleConverter.class) @NonNull IfPuzzle puzzle,
-                        @Description("Category. E.g. `CNG`, `F`")
-                        @NonNull IfCategory category) {
-            this.puzzle = puzzle;
-            this.category = category;
-        }
     }
 }

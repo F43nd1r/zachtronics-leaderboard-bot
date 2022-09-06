@@ -20,7 +20,6 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 @Suppress("DSL_SCOPE_VIOLATION") // TODO remove when https://youtrack.jetbrains.com/issue/KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.plugin.serialization)
     alias(libs.plugins.kotlin.plugin.lombok)
     alias(libs.plugins.kotlin.plugin.spring)
@@ -71,8 +70,6 @@ dependencies {
     implementation(libs.guava)
     implementation(libs.opencsv)
 
-    ksp(projects.processor)
-
     testImplementation(libs.spring.boot.test)
     testImplementation(libs.trove4j)
     testImplementation(libs.springmockk)
@@ -109,35 +106,12 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-sourceSets {
-    main {
-        java {
-            srcDir(file("$buildDir/generated/ksp/main/kotlin"))
-        }
-    }
-    test {
-        java {
-            srcDir(file("$buildDir/generated/ksp/test/kotlin"))
-        }
-    }
-}
-
 tasks.getByName<Jar>("jar") {
     enabled = false
 }
 
 kotlinLombok {
     lombokConfigurationFile(file("lombok.config"))
-}
-
-afterEvaluate {
-    // shut up gradle
-    tasks.named("generateEffectiveLombokConfig") {
-        dependsOn(tasks.named("kspKotlin"))
-    }
-    tasks.named("generateTestEffectiveLombokConfig") {
-        dependsOn(tasks.named("kspTestKotlin"))
-    }
 }
 
 node {

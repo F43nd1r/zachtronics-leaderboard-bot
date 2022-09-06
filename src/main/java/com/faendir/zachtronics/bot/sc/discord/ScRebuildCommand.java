@@ -16,28 +16,31 @@
 
 package com.faendir.zachtronics.bot.sc.discord;
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand;
-import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractRebuildCommand;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
+import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 @ScQualifier
-public class ScRebuildCommand extends AbstractRebuildCommand<ScRebuildCommand.RebuildData, ScPuzzle> {
-    @Delegate
-    private final ScRebuildCommand_RebuildDataParser parser = ScRebuildCommand_RebuildDataParser.INSTANCE;
+public class ScRebuildCommand extends AbstractRebuildCommand<ScPuzzle> {
+    private final CommandOption<String, ScPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", ScPuzzle.class, ScPuzzle::getDisplayName)
+            .description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
+            .required()
+            .build();
+    @Getter
+    private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
     @Getter
     private final Secured secured = ScSecured.WIKI_ADMINS_ONLY;
     @Getter
@@ -45,18 +48,7 @@ public class ScRebuildCommand extends AbstractRebuildCommand<ScRebuildCommand.Re
 
     @NotNull
     @Override
-    protected ScPuzzle findPuzzle(@NotNull RebuildData parameters) {
-        return parameters.puzzle;
-    }
-
-    @ApplicationCommand(name = "rebuild", description = "Rebuilds wiki section", subCommand = true)
-    @Value
-    public static class RebuildData {
-        @NotNull ScPuzzle puzzle;
-
-        public RebuildData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
-                           @Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle) {
-            this.puzzle = puzzle;
-        }
+    protected ScPuzzle findPuzzle(@NotNull ChatInputInteractionEvent event) {
+        return puzzleOption.get(event);
     }
 }

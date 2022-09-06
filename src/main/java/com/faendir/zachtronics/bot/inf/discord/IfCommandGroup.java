@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package com.faendir.discord4j.command.parser
+package com.faendir.zachtronics.bot.inf.discord;
 
-import com.google.devtools.ksp.processing.SymbolProcessor
-import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
-import com.google.devtools.ksp.processing.SymbolProcessorProvider
+import com.faendir.zachtronics.bot.discord.command.Command;
+import com.faendir.zachtronics.bot.inf.IfQualifier;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
-class ProcessorProvider : SymbolProcessorProvider {
-    override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
-        return Processor(environment.codeGenerator, environment.logger)
-    }
+import java.util.List;
+
+@Component
+@RequiredArgsConstructor
+public class IfCommandGroup extends Command.Group {
+    @Getter
+    private final String name = "if";
+    @Getter
+    @IfQualifier
+    private final List<Command.Leaf> commands;
 }

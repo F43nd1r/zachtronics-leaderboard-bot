@@ -16,30 +16,26 @@
 
 package com.faendir.zachtronics.bot.testutils
 
-import com.faendir.discord4j.command.parse.CombinedParseResult
-import com.faendir.zachtronics.bot.discord.command.GameCommand
+import com.faendir.zachtronics.bot.discord.command.Command
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUser
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafePlainMessageBuilder
 import discord4j.core.GatewayDiscordClient
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.core.`object`.command.ApplicationCommandInteractionOption
 import discord4j.core.`object`.command.ApplicationCommandInteractionOptionValue
 import discord4j.core.`object`.command.ApplicationCommandOption
 import discord4j.core.`object`.entity.Member
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.core.spec.EmbedCreateFields
 import discord4j.core.spec.EmbedCreateSpec
-import discord4j.core.spec.InteractionFollowupCreateSpec
-import discord4j.core.spec.InteractionReplyEditSpec
 import discord4j.discordjson.possible.Possible
 import io.mockk.every
 import io.mockk.mockk
 import java.io.Serializable
 import java.util.*
 
-@Suppress("ReactiveStreamsUnusedPublisher", "UNCHECKED_CAST")
-fun mockGameCommandRun(gameCommand: GameCommand, subCommandName: String, args: Map<String, Serializable>): String {
+fun mockGameCommandRun(gameCommand: Command.Group, subCommandName: String, args: Map<String, Serializable>): String {
     val gatewayDiscordClient = mockk<GatewayDiscordClient>(relaxed = true)
 
     val subCommandOption = mockk<ApplicationCommandInteractionOption>()
@@ -55,12 +51,8 @@ fun mockGameCommandRun(gameCommand: GameCommand, subCommandName: String, args: M
     every { interactionEvent.interaction.user } returns ieee
     every { interactionEvent.interaction.member } returns Optional.of(ieee)
 
-    val parseResult = gameCommand.parse(interactionEvent)
-    if (parseResult !is CombinedParseResult.Success) return parseResult.toString()
 
-    val (subCommand, parameters) = parseResult.value as GameCommand.SubCommandWithParameters<Any>
-
-    val messageBuilder = subCommand.handleEvent(interactionEvent, parameters)
+    val messageBuilder = (gameCommand.commands.find { it.name == subCommandName } as Command.BasicLeaf).handleEvent(interactionEvent)
 
     val result = when(messageBuilder) {
         is SafePlainMessageBuilder -> listOf(messageBuilder.getContent()) + messageBuilder.getFiles().map { it.name() }

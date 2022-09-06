@@ -16,75 +16,42 @@
 
 package com.faendir.zachtronics.bot.om.discord
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand
-import com.faendir.discord4j.command.annotation.AutoComplete
-import com.faendir.discord4j.command.annotation.Converter
-import com.faendir.discord4j.command.annotation.Description
-import com.faendir.discord4j.command.parse.CombinedParseResult
 import com.faendir.zachtronics.bot.discord.command.AbstractShowCommand
+import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.om.omPuzzleOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
-import discord4j.core.event.domain.interaction.ChatInputAutoCompleteEvent
+import com.faendir.zachtronics.bot.utils.fuzzyMatch
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import org.springframework.stereotype.Component
 
 @Component
 @OmQualifier
 class OmShowCommand(override val repository: OmSolutionRepository) :
-    AbstractShowCommand<Pair<OmPuzzle, OmCategory>, OmCategory, OmPuzzle, OmRecord>() {
+    AbstractShowCommand<OmCategory, OmPuzzle, OmRecord>() {
+
+    private val puzzleOption = omPuzzleOptionBuilder().required().build()
+    private val categoryOption = CommandOptionBuilder.string("category")
+        .description("Category. E.g. `GC`, `sum`")
+        .required()
+        .autoComplete { partial -> OmCategory.entries.fuzzyMatch(partial) { displayName }.map { it.displayName }.distinct().associateWith { it } }
+        .build()
+    override val options = listOf(puzzleOption, categoryOption)
 
     private fun findCategoryCandidates(category: String): List<OmCategory> {
         return OmCategory.values().filter { it.displayName.startsWith(category, ignoreCase = true) }.takeIf { it.isNotEmpty() }
             ?: throw IllegalArgumentException("$category is not a tracked category.")
     }
 
-    override fun buildData() = ShowParser.buildData()
-
-    override fun autoComplete(event: ChatInputAutoCompleteEvent) = ShowParser.autoComplete(event)
-
-    override fun map(parameters: Map<String, Any?>): Pair<OmPuzzle, OmCategory>? {
-        return ShowParser.map(parameters)?.toPuzzleCategoryPair()
-    }
-
-    override fun parse(event: ChatInputInteractionEvent): CombinedParseResult<Pair<OmPuzzle, OmCategory>> {
-        return when (val parseResult = ShowParser.parse(event)) {
-            is CombinedParseResult.Failure -> parseResult.typed()
-            is CombinedParseResult.Ambiguous -> try {
-                parseResult.partialResult["category"]?.let { findCategoryCandidates(it.toString()) }
-                parseResult.typed()
-            } catch (e: IllegalArgumentException) {
-                CombinedParseResult.Failure(listOf(e.message!!))
-            }
-            is CombinedParseResult.Success -> try {
-                CombinedParseResult.Success(parseResult.value.toPuzzleCategoryPair())
-            } catch (e: IllegalArgumentException) {
-                CombinedParseResult.Failure(listOf(e.message!!))
-            }
-        }
-    }
-
-    private fun Show.toPuzzleCategoryPair(): Pair<OmPuzzle, OmCategory> {
-        val puzzle = puzzle
-        val categories = findCategoryCandidates(category)
+    override fun findPuzzleAndCategory(event: ChatInputInteractionEvent): Pair<OmPuzzle, OmCategory> {
+        val puzzle = puzzleOption.get(event)
+        val categories = findCategoryCandidates(categoryOption.get(event))
         val filtered = categories.filter { it.supportsPuzzle(puzzle) }.takeIf { it.isNotEmpty() }
             ?: throw IllegalArgumentException("Category ${categories.first().displayName} does not support ${puzzle.displayName}")
         return puzzle to filtered.first()
     }
-
-    override fun findPuzzleAndCategory(parameters: Pair<OmPuzzle, OmCategory>) = parameters
 }
-
-@ApplicationCommand(description = "Show a record", subCommand = true)
-data class Show(
-    @Description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")
-    @Converter(OmPuzzleConverter::class)
-    @AutoComplete(OmPuzzleAutoCompletionProvider::class)
-    val puzzle: OmPuzzle,
-    @Description("Category. E.g. `GC`, `sum`")
-    @AutoComplete(OmCategoryAutoCompletionProvider::class)
-    val category: String
-)
 

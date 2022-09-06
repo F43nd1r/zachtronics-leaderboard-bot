@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,50 +16,38 @@
 
 package com.faendir.zachtronics.bot.sc.discord;
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand;
-import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractListCommand;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
+import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
-import kotlin.Pair;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Component
 @ScQualifier
-public class ScListCommand extends AbstractListCommand<ScListCommand.ListData, ScCategory, ScPuzzle, ScRecord> {
-    @Delegate
-    private final ScListCommand_ListDataParser parser = ScListCommand_ListDataParser.INSTANCE;
+public class ScListCommand extends AbstractListCommand<ScCategory, ScPuzzle, ScRecord> {
+    private final CommandOption<String, ScPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", ScPuzzle.class, ScPuzzle::getDisplayName)
+            .description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
+            .required()
+            .build();
+    @Getter
+    private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
     @Getter
     private final ScSolutionRepository repository;
 
     @NotNull
     @Override
-    public ScPuzzle findPuzzle(@NotNull ListData parameters) {
-        return parameters.puzzle;
-    }
-
-    @ApplicationCommand(name = "list", description = "List records", subCommand = true)
-    @Value
-    public static class ListData {
-        @NonNull ScPuzzle puzzle;
-
-        public ListData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
-                        @Converter(ScPuzzleConverter.class) @NonNull ScPuzzle puzzle) {
-            this.puzzle = puzzle;
-        }
+    public ScPuzzle findPuzzle(@NotNull ChatInputInteractionEvent event) {
+        return puzzleOption.get(event);
     }
 }

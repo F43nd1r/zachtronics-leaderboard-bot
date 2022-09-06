@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ScCommandTest {
 
     @Autowired
-    private ScCommand scCommand;
+    private ScCommandGroup scCommand;
 
     @Test
     public void testShow() {

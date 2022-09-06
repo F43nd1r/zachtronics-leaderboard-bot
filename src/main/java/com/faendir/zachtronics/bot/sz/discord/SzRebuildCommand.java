@@ -16,29 +16,31 @@
 
 package com.faendir.zachtronics.bot.sz.discord;
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand;
-import com.faendir.discord4j.command.annotation.AutoComplete;
-import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractRebuildCommand;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
+import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.repository.SzSolutionRepository;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 @SzQualifier
-public class SzRebuildCommand extends AbstractRebuildCommand<SzRebuildCommand.RebuildData, SzPuzzle> {
-    @Delegate
-    private final SzRebuildCommand_RebuildDataParser parser = SzRebuildCommand_RebuildDataParser.INSTANCE;
+public class SzRebuildCommand extends AbstractRebuildCommand<SzPuzzle> {
+    private final CommandOption<String, SzPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", SzPuzzle.class, SzPuzzle::getDisplayName)
+            .description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
+            .required()
+            .build();
+    @Getter
+    private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
     @Getter
     private final Secured secured = SzSecured.ADMINS_ONLY;
     @Getter
@@ -46,19 +48,7 @@ public class SzRebuildCommand extends AbstractRebuildCommand<SzRebuildCommand.Re
 
     @NotNull
     @Override
-    protected SzPuzzle findPuzzle(@NotNull RebuildData parameters) {
-        return parameters.puzzle;
-    }
-
-    @ApplicationCommand(name = "rebuild", description = "Rebuilds wiki section", subCommand = true)
-    @Value
-    public static class RebuildData {
-        @NotNull SzPuzzle puzzle;
-
-        public RebuildData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
-                           @AutoComplete(SzPuzzleAutoCompletionProvider.class)
-                           @Converter(SzPuzzleConverter.class) @NonNull SzPuzzle puzzle) {
-            this.puzzle = puzzle;
-        }
+    protected SzPuzzle findPuzzle(@NotNull ChatInputInteractionEvent event) {
+        return puzzleOption.get(event);
     }
 }

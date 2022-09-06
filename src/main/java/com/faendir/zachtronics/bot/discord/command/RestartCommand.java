@@ -16,19 +16,17 @@
 
 package com.faendir.zachtronics.bot.discord.command;
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand;
-import com.faendir.discord4j.command.annotation.Description;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUser;
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.git.GitRepository;
-import discord4j.core.event.domain.interaction.DeferrableInteractionEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -39,21 +37,29 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class RestartCommand implements TopLevelCommand<RestartCommand.RestartData> {
-    @Delegate
-    private final RestartCommand_RestartDataParser parser = RestartCommand_RestartDataParser.INSTANCE;
+public class RestartCommand extends Command.Single {
     @Getter
     private final Secured secured = new DiscordUserSecured(DiscordUser.BOT_OWNERS);
     @Getter
-    private final String commandName = "restart";
+    private final String name = "restart";
+    @Getter
+    private final String description = "Stops the bot, which will restart with the latest image";
 
     private final ApplicationContext applicationContext;
     private final List<GitRepository> repositories;
 
+    private final CommandOption<Boolean, Boolean> sudoOption = CommandOptionBuilder.bool("sudo")
+            .description("Restarts immediately without waiting process termination")
+            .build();
+
+    @Getter
+    private final List<CommandOption<?,?>> options = List.of(sudoOption);
+
     @NotNull
     @Override
-    public Mono<Void> handle(@NotNull DeferrableInteractionEvent event, @NotNull RestartData parameters) {
-        if (parameters.sudo == null || !parameters.sudo) {
+    public Mono<Void> handle(@NotNull ChatInputInteractionEvent event) {
+        Boolean sudo = sudoOption.get(event);
+        if (sudo == null || !sudo) {
             // acquire and hold all the repo write locks, which ensures no write operations are concurrently running
             repositories.parallelStream().forEach(GitRepository::acquireWriteAccess);
         }
@@ -65,14 +71,5 @@ public class RestartCommand implements TopLevelCommand<RestartCommand.RestartDat
             System.exit(0);
             return null;
         }));
-    }
-
-    @ApplicationCommand(name = "restart", description = "Stops the bot, which will restart with the latest image")
-    public static class RestartData {
-        @Nullable Boolean sudo;
-
-        public RestartData(@Description("Restarts immediately without waiting process termination") Boolean sudo) {
-            this.sudo = sudo;
-        }
     }
 }

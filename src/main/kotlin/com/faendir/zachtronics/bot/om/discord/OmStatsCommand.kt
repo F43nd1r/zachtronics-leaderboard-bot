@@ -16,19 +16,16 @@
 
 package com.faendir.zachtronics.bot.om.discord
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand
-import com.faendir.discord4j.command.annotation.Converter
-import com.faendir.discord4j.command.annotation.Description
-import com.faendir.discord4j.command.parse.ApplicationCommandParser
 import com.faendir.zachtronics.bot.discord.Colors
-import com.faendir.zachtronics.bot.discord.LinkConverter
-import com.faendir.zachtronics.bot.discord.command.AbstractSubCommand
+import com.faendir.zachtronics.bot.discord.command.Command
+import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.createSubmission
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmSubmission
+import com.faendir.zachtronics.bot.om.omSolutionOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
@@ -39,18 +36,22 @@ import com.faendir.zachtronics.bot.utils.smartFormat
 import com.faendir.zachtronics.bot.utils.toMetricsTree
 import com.faendir.zachtronics.bot.utils.user
 import com.roxstudio.utils.CUrl
-import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
-import discord4j.discordjson.json.ApplicationCommandOptionData
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import org.springframework.stereotype.Component
 
 @Component
 @OmQualifier
-class OmStatsCommand(private val repository: OmSolutionRepository) : AbstractSubCommand<StatsParams>(),
-    ApplicationCommandParser<StatsParams, ApplicationCommandOptionData> by StatsParamsParser {
+class OmStatsCommand(private val repository: OmSolutionRepository) : Command.BasicLeaf() {
+    override val name = "stats"
+    override val description = "Get information about a solution"
+
+    private val solutionOption = omSolutionOptionBuilder().required().build()
+    override val options = listOf(solutionOption)
+
     override val secured = NotSecured
 
-    override fun handleEvent(event: DeferrableInteractionEvent, parameters: StatsParams): SafeMessageBuilder {
-        val submission = parseSubmission(event, parameters)
+    override fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder {
+        val submission = parseSubmission(event)
         when (val result = repository.submitDryRun(submission)) {
             is SubmitResult.Success -> {
                 val beatenCategories: List<OmCategory> = result.beatenRecords.flatMap { it.categories }
@@ -69,34 +70,30 @@ class OmStatsCommand(private val repository: OmSolutionRepository) : AbstractSub
                     )
                     .embedCategoryRecords(result.beatenRecords, submission.puzzle.supportedCategories)
             }
+
             is SubmitResult.AlreadyPresent, is SubmitResult.Updated ->
                 return SafeEmbedMessageBuilder()
                     .title("Stats: *${submission.puzzle.displayName}*")
                     .color(Colors.UNCHANGED)
                     .description("`${submission.score.toDisplayString(DisplayContext.discord())}` was already submitted.")
+
             is SubmitResult.NothingBeaten ->
                 return SafeEmbedMessageBuilder()
                     .title("Stats: *${submission.puzzle.displayName}*")
                     .color(Colors.UNCHANGED)
                     .description("`${submission.score.toDisplayString(DisplayContext.discord())}` is beaten by:")
                     .embedCategoryRecords(result.records, submission.puzzle.supportedCategories)
+
             is SubmitResult.Failure -> throw IllegalArgumentException(result.message)
         }
     }
 
-    fun parseSubmission(event: DeferrableInteractionEvent, parameters: StatsParams): OmSubmission {
+    fun parseSubmission(event: ChatInputInteractionEvent): OmSubmission {
         val bytes = try {
-            CUrl(parameters.solution).exec()
+            CUrl(solutionOption.get(event).url).exec()
         } catch (e: Exception) {
             throw IllegalArgumentException("Could not load your solution file")
         }
         return createSubmission(null, null, event.user().username, bytes)
     }
 }
-
-@ApplicationCommand(name = "stats", description = "Get information about a solution", subCommand = true)
-data class StatsParams(
-    @Converter(LinkConverter::class)
-    @Description("Link to your solution file, can be `m1` to scrape it from your last message")
-    val solution: String,
-)

@@ -29,13 +29,14 @@ import com.faendir.zachtronics.bot.utils.orEmpty
 import com.faendir.zachtronics.bot.utils.smartFormat
 import com.faendir.zachtronics.bot.utils.toMetricsTree
 import com.faendir.zachtronics.bot.validation.ValidationResult
-import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 
-abstract class AbstractMultiSubmitCommand<T, C : Category, P : Puzzle<C>, S : Submission<C, P>, R : Record<C>> :
-    AbstractSubmitCommand<T, C, P, S, R>() {
+abstract class AbstractMultiSubmitCommand<C : Category, P : Puzzle<C>, S : Submission<C, P>, R : Record<C>> :
+    AbstractSubmitCommand<C, P, S, R>() {
+    override val description = "Submit any number of solutions"
 
-    override fun handleEvent(event: DeferrableInteractionEvent, parameters: T): SafeMessageBuilder {
-        val validationResults = parseSubmissions(parameters)
+    override fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder {
+        val validationResults = parseSubmissions(event)
         return if (validationResults.size == 1) {
             when (val result = validationResults.first()) {
                 is ValidationResult.Valid -> submitToRepository(result.submission)
@@ -83,9 +84,9 @@ abstract class AbstractMultiSubmitCommand<T, C : Category, P : Puzzle<C>, S : Su
         return embed
     }
 
-    abstract fun parseSubmissions(parameters: T): Collection<ValidationResult<S>>
+    abstract fun parseSubmissions(event: ChatInputInteractionEvent): Collection<ValidationResult<S>>
 
-    final override fun parseSubmission(event: DeferrableInteractionEvent, parameters: T): S {
+    final override fun parseSubmission(event: ChatInputInteractionEvent): S {
         throw NotImplementedError("Unneeded")
     }
 }

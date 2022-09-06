@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,16 @@ import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
-import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 
-abstract class AbstractListCommand<T, C : Category, P : Puzzle<C>, R : Record<C>> : AbstractSubCommand<T>() {
+abstract class AbstractListCommand<C : Category, P : Puzzle<C>, R : Record<C>> : Command.BasicLeaf() {
+    override val name = "list"
+    override val description = "List records"
     override val secured = NotSecured
     abstract val repository: SolutionRepository<C, P, *, R>
 
-    override fun handleEvent(event: DeferrableInteractionEvent, parameters: T): SafeMessageBuilder {
-        val puzzle = findPuzzle(parameters)
+    override fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder {
+        val puzzle = findPuzzle(event)
         val records = repository.findCategoryHolders(puzzle, includeFrontier = false)
         return SafeEmbedMessageBuilder()
             .title("*${puzzle.displayName}*")
@@ -47,5 +49,5 @@ abstract class AbstractListCommand<T, C : Category, P : Puzzle<C>, R : Record<C>
             }
     }
 
-    abstract fun findPuzzle(parameters: T): P
+    abstract fun findPuzzle(event: ChatInputInteractionEvent): P
 }

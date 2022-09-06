@@ -17,12 +17,9 @@
 package com.faendir.zachtronics.bot.om.discord
 
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand
-import com.faendir.discord4j.command.annotation.AutoComplete
-import com.faendir.discord4j.command.annotation.Converter
-import com.faendir.discord4j.command.annotation.Description
-import com.faendir.discord4j.command.parse.ApplicationCommandParser
-import com.faendir.zachtronics.bot.discord.command.AbstractSubCommand
+import com.faendir.zachtronics.bot.discord.command.Command
+import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
+import com.faendir.zachtronics.bot.discord.command.option.enumOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUser
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured
 import com.faendir.zachtronics.bot.model.DisplayContext
@@ -34,35 +31,49 @@ import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmScorePart
 import com.faendir.zachtronics.bot.om.model.OmType
+import com.faendir.zachtronics.bot.om.omPuzzleOptionBuilder
+import com.faendir.zachtronics.bot.om.omScoreOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.ceil
 import com.faendir.zachtronics.bot.utils.orEmpty
-import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
-import discord4j.discordjson.json.ApplicationCommandOptionData
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import org.springframework.stereotype.Component
 import kotlin.io.path.readBytes
 
 @Component
 @OmQualifier
-class OmReverifyCommand(private val repository: OmSolutionRepository) : AbstractSubCommand<Reverify>(),
-    ApplicationCommandParser<Reverify, ApplicationCommandOptionData> by ReverifyParser {
+class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.BasicLeaf() {
+    override val name = "reverify"
+    override val description: String = "Recompute metrics based on filters"
+
+    private val typeOption = enumOptionBuilder<OmType>("type") { displayName }.build()
+    private val puzzleOption = omPuzzleOptionBuilder().build()
+    private val partOption = enumOptionBuilder<OmScorePart>("part") { displayName }.build()
+    private val scoreOption = omScoreOptionBuilder().build()
+    private val overrideExistingOption = CommandOptionBuilder.boolean("override-existing").build()
+    override val options = listOf(typeOption, puzzleOption, partOption, scoreOption, overrideExistingOption)
+
     override val secured = DiscordUserSecured(DiscordUser.BOT_OWNERS)
 
-    override fun handleEvent(event: DeferrableInteractionEvent, parameters: Reverify): SafeMessageBuilder {
-        val puzzles = (parameters.puzzle?.let { listOf(it) } ?: OmPuzzle.values().toList()).filter {
-            parameters.type == null || parameters.type == it.type
+    override fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder {
+        val puzzleIn = puzzleOption.get(event)
+        val type = typeOption.get(event)
+        val part = partOption.get(event)
+        val score = scoreOption.get(event)
+        val overrideExisting = overrideExistingOption.get(event) == true
+        val puzzles = (puzzleIn?.let { listOf(it) } ?: OmPuzzle.values().toList()).filter {
+            type == null || type == it.type
         }
-        val parts = parameters.part?.let { listOf(it) } ?: OmScorePart.values().toList()
-        val overrideExisting = parameters.overrideExisting == true
+        val parts = part?.let { listOf(it) } ?: OmScorePart.values().toList()
         val overrideRecords = mutableListOf<Pair<OmRecord, OmScore>>()
         val errors = mutableListOf<String>()
         for (puzzle in puzzles) {
             val puzzleFile = puzzle.file
 
             val records = repository.findCategoryHolders(puzzle, true)
-                .filter { (record, _) -> parameters.score == null || record.score.toDisplayString().equals(parameters.score, ignoreCase = true) }
+                .filter { (record, _) -> score == null || record.score.toDisplayString().equals(score, ignoreCase = true) }
             for ((record, _) in records) {
                 if (record.dataPath == null) {
                     errors.add("No solution file for ${record.toDisplayString(DisplayContext.discord())}")
@@ -72,7 +83,7 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Abstract
                 fun JNISolutionVerifier.getMetricSafe(metric: OmSimMetric) = try {
                     getMetric(metric)
                 } catch (e: Exception) {
-                    errors.add("Failed to get ${metric::class.java.simpleName} for ${record.toDisplayString(DisplayContext.discord())}: ${e.message}");
+                    errors.add("Failed to get ${metric::class.java.simpleName} for ${record.toDisplayString(DisplayContext.discord())}: ${e.message}")
                     null
                 }
 
@@ -137,24 +148,11 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Abstract
         return SafeEmbedMessageBuilder()
             .title(
                 "Reverify" +
-                        parameters.type?.displayName.orEmpty(" ") +
-                        parameters.puzzle?.displayName.orEmpty(" ") +
-                        parameters.part?.displayName.orEmpty(" ") +
-                        if (parameters.overrideExisting == true) " overriding existing values!" else ""
+                        type?.displayName.orEmpty(" ") +
+                        puzzleIn?.displayName.orEmpty(" ") +
+                        part?.displayName.orEmpty(" ") +
+                        if (overrideExisting) " overriding existing values!" else ""
             )
             .description("**Modified Records:** ${overrideRecords.size}\n\n**Errors:**\n${errors.joinToString("\n")}")
     }
 }
-
-@ApplicationCommand(name = "reverify", description = "Recompute metrics based on filters", subCommand = true)
-data class Reverify(
-    val type: OmType?,
-    @Converter(OmPuzzleConverter::class)
-    @AutoComplete(OmPuzzleAutoCompletionProvider::class)
-    val puzzle: OmPuzzle?,
-    val part: OmScorePart?,
-    @Converter(OmScoreCleaner::class)
-    @Description("full score of the submission, e.g. 65g/80c/12a/4i/4h/4w/12r")
-    val score: String?,
-    val overrideExisting: Boolean?,
-)

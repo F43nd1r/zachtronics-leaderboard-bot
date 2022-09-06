@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.sc.discord;
+package com.faendir.zachtronics.bot.sz.discord;
 
-import com.faendir.zachtronics.bot.discord.command.GameCommand;
-import com.faendir.zachtronics.bot.discord.command.SubCommand;
-import com.faendir.zachtronics.bot.sc.ScQualifier;
+import com.faendir.zachtronics.bot.discord.command.Command;
+import com.faendir.zachtronics.bot.sz.SzQualifier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -27,13 +26,10 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class ScCommand implements GameCommand {
+public class SzCommandGroup extends Command.Group {
     @Getter
-    private final String displayName = "SpaceChem";
+    private final String name = "sz";
     @Getter
-    private final String commandName = "sc";
-    @Getter
-    @ScQualifier
-    private final List<SubCommand<?>> subCommands;
-
+    @SzQualifier
+    private final List<Leaf> commands;
 }

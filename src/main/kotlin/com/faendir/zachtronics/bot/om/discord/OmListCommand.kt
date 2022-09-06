@@ -16,33 +16,23 @@
 
 package com.faendir.zachtronics.bot.om.discord
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand
-import com.faendir.discord4j.command.annotation.AutoComplete
-import com.faendir.discord4j.command.annotation.Converter
-import com.faendir.discord4j.command.annotation.Description
-import com.faendir.discord4j.command.parse.ApplicationCommandParser
 import com.faendir.zachtronics.bot.discord.command.AbstractListCommand
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.om.omPuzzleOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
-import discord4j.discordjson.json.ApplicationCommandOptionData
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import org.springframework.stereotype.Component
 
 @Component
 @OmQualifier
-class OmListCommand(override val repository: OmSolutionRepository) :
-    AbstractListCommand<ListCommand, OmCategory, OmPuzzle, OmRecord>(),
-    ApplicationCommandParser<ListCommand, ApplicationCommandOptionData> by ListCommandParser {
-    override fun findPuzzle(parameters: ListCommand): OmPuzzle = parameters.puzzle
-}
+class OmListCommand(override val repository: OmSolutionRepository) : AbstractListCommand<OmCategory, OmPuzzle, OmRecord>() {
+    private val puzzleOption = omPuzzleOptionBuilder().required().build()
+    override val options = listOf(puzzleOption)
 
-@ApplicationCommand(name = "list", description = "List records", subCommand = true)
-data class ListCommand(
-    @Description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")
-    @Converter(OmPuzzleConverter::class)
-    @AutoComplete(OmPuzzleAutoCompletionProvider::class)
-    val puzzle: OmPuzzle
-)
+
+    override fun findPuzzle(event: ChatInputInteractionEvent): OmPuzzle = puzzleOption.get(event)
+}
 

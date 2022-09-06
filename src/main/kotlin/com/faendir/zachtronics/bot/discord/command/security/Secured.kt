@@ -16,11 +16,13 @@
 
 package com.faendir.zachtronics.bot.discord.command.security
 
+import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.core.`object`.entity.User
 
 fun interface Secured {
-    fun hasExecutionPermission(user: User): Boolean
+    fun hasExecutionPermission(event: InteractionCreateEvent, user: User): Boolean
 }
 
-infix fun Secured.or(alternative: Secured) = Secured { user: User -> this.hasExecutionPermission(user) || alternative.hasExecutionPermission(user) }
+infix fun Secured.or(alternative: Secured) =
+    Secured { event, user -> this.hasExecutionPermission(event, user) || alternative.hasExecutionPermission(event, user) }
 

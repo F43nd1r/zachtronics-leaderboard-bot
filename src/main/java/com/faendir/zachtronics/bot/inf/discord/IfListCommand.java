@@ -16,48 +16,38 @@
 
 package com.faendir.zachtronics.bot.inf.discord;
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand;
-import com.faendir.discord4j.command.annotation.AutoComplete;
-import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractListCommand;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
+import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.inf.IfQualifier;
 import com.faendir.zachtronics.bot.inf.model.IfCategory;
 import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
 import com.faendir.zachtronics.bot.inf.model.IfRecord;
 import com.faendir.zachtronics.bot.inf.repository.IfSolutionRepository;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Component
 @IfQualifier
-public class IfListCommand extends AbstractListCommand<IfListCommand.ListData, IfCategory, IfPuzzle, IfRecord> {
-    @Delegate
-    private final IfListCommand_ListDataParser parser = IfListCommand_ListDataParser.INSTANCE;
+public class IfListCommand extends AbstractListCommand<IfCategory, IfPuzzle, IfRecord> {
+    private final CommandOption<String, IfPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", IfPuzzle.class, IfPuzzle::getDisplayName)
+            .description("Puzzle name. Can be shortened or abbreviated. E.g. `Gne ch`, `TBB`")
+            .required()
+            .build();
+    @Getter
+    private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
     @Getter
     private final IfSolutionRepository repository;
 
     @NotNull
     @Override
-    public IfPuzzle findPuzzle(@NotNull ListData parameters) {
-        return parameters.puzzle;
-    }
-
-    @ApplicationCommand(name = "list", subCommand = true)
-    @Value
-    public static class ListData {
-        @NonNull IfPuzzle puzzle;
-
-        public ListData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `Gne ch`, `TBB`")
-                        @AutoComplete(IfPuzzleAutoCompletionProvider.class)
-                        @Converter(IfPuzzleConverter.class) @NonNull IfPuzzle puzzle) {
-            this.puzzle = puzzle;
-        }
+    public IfPuzzle findPuzzle(@NotNull ChatInputInteractionEvent event) {
+        return puzzleOption.get(event);
     }
 }

@@ -16,11 +16,12 @@
 
 package com.faendir.zachtronics.bot.discord.command.security
 
+import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.core.`object`.entity.Member
 import discord4j.core.`object`.entity.User
 
 object TrustedLeaderboardPosterRoleSecured : Secured {
-    override fun hasExecutionPermission(user: User): Boolean {
+    override fun hasExecutionPermission(event: InteractionCreateEvent, user: User): Boolean {
         return (user as? Member)?.roles?.any { it.name == "leaderboard poster" }?.block() ?: false
     }
 }

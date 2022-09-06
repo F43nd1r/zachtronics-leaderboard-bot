@@ -16,32 +16,21 @@
 
 package com.faendir.zachtronics.bot.om.discord
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand
-import com.faendir.discord4j.command.annotation.AutoComplete
-import com.faendir.discord4j.command.annotation.Converter
-import com.faendir.discord4j.command.annotation.Description
-import com.faendir.discord4j.command.parse.ApplicationCommandParser
 import com.faendir.zachtronics.bot.discord.command.AbstractFrontierCommand
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.om.omPuzzleOptionBuilder
 import com.faendir.zachtronics.bot.repository.SolutionRepository
-import discord4j.discordjson.json.ApplicationCommandOptionData
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import org.springframework.stereotype.Component
 
 @OmQualifier
 @Component
 class OmFrontierCommand(override val repository: SolutionRepository<OmCategory, OmPuzzle, *, OmRecord>) :
-    AbstractFrontierCommand<FrontierCommand, OmCategory, OmPuzzle, OmRecord>(),
-    ApplicationCommandParser<FrontierCommand, ApplicationCommandOptionData> by FrontierCommandParser {
-    override fun findPuzzle(parameters: FrontierCommand): OmPuzzle = parameters.puzzle
+    AbstractFrontierCommand< OmCategory, OmPuzzle, OmRecord>() {
+    private val puzzleOption = omPuzzleOptionBuilder().required().build()
+    override val options = listOf(puzzleOption)
+    override fun findPuzzle(event: ChatInputInteractionEvent) = puzzleOption.get(event)
 }
-
-@ApplicationCommand(name = "frontier", description = "Displays the whole pareto frontier", subCommand = true)
-data class FrontierCommand(
-    @Description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")
-    @Converter(OmPuzzleConverter::class)
-    @AutoComplete(OmPuzzleAutoCompletionProvider::class)
-    val puzzle: OmPuzzle
-)

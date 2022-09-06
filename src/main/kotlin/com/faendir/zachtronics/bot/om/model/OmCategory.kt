@@ -113,4 +113,8 @@ enum class OmCategory(
 
     fun supportsScore(score: OmScore) =
         requiredParts.all { it.getValue(score) != null } && (metrics.contains(OVERLAP) || !score.overlap) && (!metrics.contains(TRACKLESS_INSTRUCTION) || score.trackless)
+
+    companion object {
+        val entries = values().toList()
+    }
 }

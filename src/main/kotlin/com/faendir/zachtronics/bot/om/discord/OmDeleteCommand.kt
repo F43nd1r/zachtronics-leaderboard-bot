@@ -16,35 +16,38 @@
 
 package com.faendir.zachtronics.bot.om.discord
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand
-import com.faendir.discord4j.command.annotation.AutoComplete
-import com.faendir.discord4j.command.annotation.Converter
-import com.faendir.discord4j.command.annotation.Description
-import com.faendir.discord4j.command.parse.ApplicationCommandParser
 import com.faendir.zachtronics.bot.discord.Colors
-import com.faendir.zachtronics.bot.discord.command.AbstractSubCommand
+import com.faendir.zachtronics.bot.discord.command.Command
+import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUser
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.OmQualifier
-import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.omPuzzleOptionBuilder
+import com.faendir.zachtronics.bot.om.omScoreOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
-import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
-import discord4j.discordjson.json.ApplicationCommandOptionData
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import org.springframework.stereotype.Component
 
 @Component
 @OmQualifier
-class OmDeleteCommand(private val repository: OmSolutionRepository) : AbstractSubCommand<Delete>(),
-    ApplicationCommandParser<Delete, ApplicationCommandOptionData> by DeleteParser {
+class OmDeleteCommand(private val repository: OmSolutionRepository) : Command.BasicLeaf() {
+    override val name = "delete"
+    override val description = "Remove a submission"
     override val secured = DiscordUserSecured(DiscordUser.BOT_OWNERS)
 
-    override fun handleEvent(event: DeferrableInteractionEvent, parameters: Delete): SafeMessageBuilder {
-        val record = repository.findCategoryHolders(parameters.puzzle, true)
-            .find { (record, _) -> record.score.toDisplayString().equals(parameters.score, ignoreCase = true) }?.record
-            ?: throw IllegalArgumentException("Could not find a record for `${parameters.score}`")
+    private val puzzleOption = omPuzzleOptionBuilder().required().build()
+    private val scoreOption = omScoreOptionBuilder().required().build()
+    override val options = listOf(puzzleOption, scoreOption)
+
+    override fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder {
+        val puzzle = puzzleOption.get(event)
+        val score = scoreOption.get(event)
+        val record = repository.findCategoryHolders(puzzle, true)
+            .find { (record, _) -> record.score.toDisplayString().equals(score, ignoreCase = true) }?.record
+            ?: throw IllegalArgumentException("Could not find a record for `${score}`")
 
         repository.delete(record)
         return SafeEmbedMessageBuilder()
@@ -53,13 +56,3 @@ class OmDeleteCommand(private val repository: OmSolutionRepository) : AbstractSu
             .description(record.toDisplayString(DisplayContext.discord()))
     }
 }
-
-@ApplicationCommand(name = "delete", description = "Remove a submission", subCommand = true)
-data class Delete(
-    @Converter(OmPuzzleConverter::class)
-    @AutoComplete(OmPuzzleAutoCompletionProvider::class)
-    val puzzle: OmPuzzle,
-    @Converter(OmScoreCleaner::class)
-    @Description("full score of the submission, e.g. 65g/80c/12a/4i/4h/4w/12r")
-    val score: String,
-)

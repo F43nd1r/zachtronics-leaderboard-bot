@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.discord.command
+package com.faendir.zachtronics.bot.fp.discord;
 
-import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
-import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
-import reactor.core.publisher.Mono
+import com.faendir.zachtronics.bot.discord.command.Command;
+import com.faendir.zachtronics.bot.fp.FpQualifier;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
-abstract class AbstractSubCommand<T> : SubCommand<T> {
-    override val data by lazy {
-        buildData()
-    }
+import java.util.List;
+
+@Component
+@RequiredArgsConstructor
+public class FpCommandGroup extends Command.Group {
+    @Getter
+    private final String name = "fp";
+    @Getter
+    @FpQualifier
+    private final List<Command.Leaf> commands;
 }

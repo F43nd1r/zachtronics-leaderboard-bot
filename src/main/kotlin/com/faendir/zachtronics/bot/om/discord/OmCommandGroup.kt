@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.discord.command
+package com.faendir.zachtronics.bot.om.discord
 
-import com.faendir.discord4j.command.parse.ApplicationCommandParser
-import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
-import discord4j.discordjson.json.ApplicationCommandRequest
-import reactor.core.publisher.Mono
+import com.faendir.zachtronics.bot.discord.command.Command
+import com.faendir.zachtronics.bot.om.OmQualifier
+import org.springframework.stereotype.Component
 
-/**
- * @param T dataclass holding the parsed command parameters
- */
-interface TopLevelCommand<T> : ApplicationCommandParser<T, ApplicationCommandRequest>, Command<T> {
-    val commandName: String
-        get() = request.name()
-
-    val request: ApplicationCommandRequest
-        get() = buildData()
+@Component
+class OmCommandGroup(@OmQualifier override val commands: List<Command.Leaf>) : Command.Group() {
+    override val name = "om"
 }

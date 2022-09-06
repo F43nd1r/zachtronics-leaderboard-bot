@@ -26,6 +26,8 @@ import com.faendir.om.parser.solution.model.part.Glyph
 import com.faendir.om.parser.solution.model.part.GlyphType
 import com.faendir.om.parser.solution.model.part.IO
 import com.faendir.om.parser.solution.model.part.Track
+import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
+import com.faendir.zachtronics.bot.discord.command.option.enumOptionBuilder
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
@@ -34,6 +36,7 @@ import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.utils.ceil
+import com.faendir.zachtronics.bot.utils.fuzzyMatch
 import okio.buffer
 import okio.sink
 import okio.source
@@ -149,3 +152,12 @@ data class CubicPosition(val x: Int, val y: Int, val z: Int) {
 
 fun Position.toCubic(): CubicPosition = CubicPosition(x, -x - y, y)
 fun Position.rotate(times: Int) = this.toCubic().rotate(times).toAxial()
+
+fun omPuzzleOptionBuilder() = enumOptionBuilder<OmPuzzle>("puzzle") { displayName }
+    .description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")
+
+fun omScoreOptionBuilder() = CommandOptionBuilder.string("score")
+    .description("full score of the submission, e.g. 65g/80c/12a/4i/4h/4w/12r")
+    .convert { it?.replace("[\\s\u200B]".toRegex(), "") }
+
+fun omSolutionOptionBuilder() = CommandOptionBuilder.attachment("solution").description("Your solution file")

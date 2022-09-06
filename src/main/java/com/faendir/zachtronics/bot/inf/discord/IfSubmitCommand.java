@@ -16,21 +16,21 @@
 
 package com.faendir.zachtronics.bot.inf.discord;
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand;
-import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.discord4j.command.annotation.Description;
-import com.faendir.zachtronics.bot.discord.LinkConverter;
-import com.faendir.zachtronics.bot.discord.ListConverter;
 import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
+import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.inf.IfQualifier;
-import com.faendir.zachtronics.bot.inf.model.*;
+import com.faendir.zachtronics.bot.inf.model.IfCategory;
+import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
+import com.faendir.zachtronics.bot.inf.model.IfRecord;
+import com.faendir.zachtronics.bot.inf.model.IfScore;
+import com.faendir.zachtronics.bot.inf.model.IfSubmission;
 import com.faendir.zachtronics.bot.inf.repository.IfSolutionRepository;
-import discord4j.core.event.domain.interaction.DeferrableInteractionEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -39,9 +39,28 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 @IfQualifier
-public class IfSubmitCommand extends AbstractSubmitCommand<IfSubmitCommand.SubmitData, IfCategory, IfPuzzle, IfSubmission, IfRecord> {
-    @Delegate
-    private final IfSubmitCommand_SubmitDataParser parser = IfSubmitCommand_SubmitDataParser.INSTANCE;
+public class IfSubmitCommand extends AbstractSubmitCommand<IfCategory, IfPuzzle, IfSubmission, IfRecord> {
+    private final CommandOption<String, String> solutionOption = OptionHelpersKt.linkOptionBuilder("solution")
+            .description("Link or `m1` to scrape it from your last message.")
+            .required()
+            .build();
+    private final CommandOption<String, IfScore> scoreOption = CommandOptionBuilder.string("score")
+            .description("Score of the solution in CCC/FF/BB[/G] format")
+            .required()
+            .convert((event, score) -> IfScore.parseScore(score))
+            .build();
+    private final CommandOption<String, String> authorOption = CommandOptionBuilder.string("author")
+            .description("Name to appear on the Reddit leaderboard")
+            .required()
+            .build();
+    private static final String SEPARATOR = ",";
+    private final CommandOption<String, List<String>> videosOption = OptionHelpersKt.linkOptionBuilder("videos")
+            .description("Link(s) to the video(s) of the solution, accepts multiple separated by `,`")
+            .required()
+            .convert((event, links) -> List.of(links.split(SEPARATOR)))
+            .build();
+    @Getter
+    private final List<CommandOption<?, ?>> options = List.of(solutionOption, scoreOption, authorOption, videosOption);
     @Getter
     private final Secured secured = IfSecured.INSTANCE;
     @Getter
@@ -49,30 +68,7 @@ public class IfSubmitCommand extends AbstractSubmitCommand<IfSubmitCommand.Submi
 
     @NotNull
     @Override
-    public IfSubmission parseSubmission(@NotNull DeferrableInteractionEvent event, @NotNull IfSubmitCommand.SubmitData parameters) {
-        return IfSubmission.fromLink(parameters.getSolution(), parameters.getAuthor(), parameters.getScore(), parameters.getVideos());
-    }
-
-    @ApplicationCommand(name = "submit", description = "Submit a solution", subCommand = true)
-    @Value
-    public static class SubmitData {
-        @NotNull String solution;
-        @NotNull IfScore score;
-        @NotNull String author;
-        @NotNull List<String> videos;
-
-        public SubmitData(@Description("Link or `m1` to scrape it from your last message.")
-                          @NotNull @Converter(LinkConverter.class) String solution,
-                          @Description("Score of the solution in CCC/FF/BB[/G] format")
-                          @NotNull @Converter(IfScoreConverter.class) IfScore score,
-                          @Description("Name to appear on the Reddit leaderboard")
-                          @NotNull String author,
-                          @Description("Link(s) to the video(s) of the solution, accepts multiple separated by `,`")
-                          @NotNull @Converter(ListConverter.class) List<String> videos) {
-            this.solution = solution;
-            this.score = score;
-            this.author = author;
-            this.videos = videos;
-        }
+    public IfSubmission parseSubmission(@NotNull ChatInputInteractionEvent event) {
+        return IfSubmission.fromLink(solutionOption.get(event), authorOption.get(event), scoreOption.get(event), videosOption.get(event));
     }
 }

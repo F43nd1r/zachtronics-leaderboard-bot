@@ -31,13 +31,16 @@ import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.orEmpty
 import com.faendir.zachtronics.bot.utils.smartFormat
 import com.faendir.zachtronics.bot.utils.toMetricsTree
-import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 
-abstract class AbstractSubmitCommand<T, C : Category, P : Puzzle<C>, S : Submission<C, P>, R : Record<C>> : AbstractSubCommand<T>() {
+abstract class AbstractSubmitCommand<C : Category, P : Puzzle<C>, S : Submission<C, P>, R : Record<C>> : Command.BasicLeaf() {
+    override val name = "submit"
+    override val description = "Submit a solution"
+
     protected abstract val repository: SolutionRepository<C, P, S, R>
 
-    override fun handleEvent(event: DeferrableInteractionEvent, parameters: T): SafeMessageBuilder {
-        val submission = parseSubmission(event, parameters)
+    override fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder {
+        val submission = parseSubmission(event)
         return submitToRepository(submission)
     }
 
@@ -90,5 +93,5 @@ abstract class AbstractSubmitCommand<T, C : Category, P : Puzzle<C>, S : Submiss
         }
     }
 
-    abstract fun parseSubmission(event: DeferrableInteractionEvent, parameters: T): S
+    abstract fun parseSubmission(event: ChatInputInteractionEvent): S
 }

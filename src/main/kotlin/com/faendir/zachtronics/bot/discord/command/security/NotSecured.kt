@@ -16,8 +16,9 @@
 
 package com.faendir.zachtronics.bot.discord.command.security
 
+import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.core.`object`.entity.User
 
 object NotSecured : Secured {
-    override fun hasExecutionPermission(user: User) = true
+    override fun hasExecutionPermission(event: InteractionCreateEvent, user: User) = true
 }

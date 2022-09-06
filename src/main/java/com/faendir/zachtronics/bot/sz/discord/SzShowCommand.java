@@ -16,58 +16,48 @@
 
 package com.faendir.zachtronics.bot.sz.discord;
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand;
-import com.faendir.discord4j.command.annotation.AutoComplete;
-import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractShowCommand;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
+import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.sz.repository.SzSolutionRepository;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import kotlin.Pair;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Component
 @SzQualifier
-public class SzShowCommand extends AbstractShowCommand<SzShowCommand.ShowData, SzCategory, SzPuzzle, SzRecord> {
-    @Delegate
-    private final SzShowCommand_ShowDataParser parser = SzShowCommand_ShowDataParser.INSTANCE;
+public class SzShowCommand extends AbstractShowCommand<SzCategory, SzPuzzle, SzRecord> {
+    private final CommandOption<String, SzPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", SzPuzzle.class, SzPuzzle::getDisplayName)
+            .description("Puzzle name. Can be shortened or abbreviated. E.g. `fake surv`, `HD`")
+            .required()
+            .build();
+    private final CommandOption<String, SzCategory> categoryOption = OptionHelpersKt.enumOptionBuilder("category", SzCategory.class, SzCategory::getDisplayName)
+            .description("Category. E.g. `CP`, `LC`")
+            .required()
+            .build();
+    @Getter
+    private final List<CommandOption<?, ?>> options = List.of(puzzleOption, categoryOption);
     @Getter
     private final SzSolutionRepository repository;
 
     @NotNull
     @Override
-    public Pair<SzPuzzle, SzCategory> findPuzzleAndCategory(@NotNull ShowData parameters) {
-        SzPuzzle puzzle = parameters.puzzle;
-        SzCategory category = parameters.category;
-        if (!parameters.puzzle.getSupportedCategories().contains(category))
+    public Pair<SzPuzzle, SzCategory> findPuzzleAndCategory(@NotNull ChatInputInteractionEvent event) {
+        SzPuzzle puzzle = puzzleOption.get(event);
+        SzCategory category = categoryOption.get(event);
+        if (!puzzle.getSupportedCategories().contains(category))
             throw new IllegalArgumentException(
                     "Category " + category.getDisplayName() + " does not support " + puzzle.getDisplayName());
         return new Pair<>(puzzle, category);
-    }
-
-    @ApplicationCommand(name = "show", subCommand = true)
-    @Value
-    public static class ShowData {
-        @NonNull SzPuzzle puzzle;
-        @NonNull SzCategory category;
-
-        public ShowData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `fake surv`, `HD`")
-                        @AutoComplete(SzPuzzleAutoCompletionProvider.class)
-                        @Converter(SzPuzzleConverter.class) @NonNull SzPuzzle puzzle,
-                        @Description("Category. E.g. `CP`, `LC`")
-                        @NonNull SzCategory category) {
-            this.puzzle = puzzle;
-            this.category = category;
-        }
     }
 }

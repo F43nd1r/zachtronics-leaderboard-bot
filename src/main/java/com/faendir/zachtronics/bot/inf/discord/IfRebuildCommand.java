@@ -16,29 +16,31 @@
 
 package com.faendir.zachtronics.bot.inf.discord;
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand;
-import com.faendir.discord4j.command.annotation.AutoComplete;
-import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractRebuildCommand;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
+import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.inf.IfQualifier;
 import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
 import com.faendir.zachtronics.bot.inf.repository.IfSolutionRepository;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 @IfQualifier
-public class IfRebuildCommand extends AbstractRebuildCommand<IfRebuildCommand.RebuildData, IfPuzzle> {
-    @Delegate
-    private final IfRebuildCommand_RebuildDataParser parser = IfRebuildCommand_RebuildDataParser.INSTANCE;
+public class IfRebuildCommand extends AbstractRebuildCommand<IfPuzzle> {
+    private final CommandOption<String, IfPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", IfPuzzle.class, IfPuzzle::getDisplayName)
+            .description("Puzzle name. Can be shortened or abbreviated. E.g. `Gne ch`, `TBB`")
+            .required()
+            .build();
+    @Getter
+    private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
     @Getter
     private final Secured secured = IfSecured.ADMINS_ONLY;
     @Getter
@@ -46,19 +48,7 @@ public class IfRebuildCommand extends AbstractRebuildCommand<IfRebuildCommand.Re
 
     @NotNull
     @Override
-    protected IfPuzzle findPuzzle(@NotNull RebuildData parameters) {
-        return parameters.puzzle;
-    }
-
-    @ApplicationCommand(name = "rebuild", description = "Rebuilds wiki section", subCommand = true)
-    @Value
-    public static class RebuildData {
-        @NotNull IfPuzzle puzzle;
-
-        public RebuildData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `Gne ch`, `TBB`")
-                           @AutoComplete(IfPuzzleAutoCompletionProvider.class)
-                           @Converter(IfPuzzleConverter.class) @NonNull IfPuzzle puzzle) {
-            this.puzzle = puzzle;
-        }
+    protected IfPuzzle findPuzzle(@NotNull ChatInputInteractionEvent event) {
+        return puzzleOption.get(event);
     }
 }

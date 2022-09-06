@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,10 @@
 
 package com.faendir.zachtronics.bot.sz.discord;
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand;
-import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.discord4j.command.annotation.Description;
-import com.faendir.zachtronics.bot.discord.LinkConverter;
 import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
+import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
@@ -28,20 +27,28 @@ import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.sz.model.SzSubmission;
 import com.faendir.zachtronics.bot.sz.repository.SzSolutionRepository;
-import discord4j.core.event.domain.interaction.DeferrableInteractionEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Component
 @SzQualifier
-public class SzSubmitCommand extends AbstractSubmitCommand<SzSubmitCommand.SubmitData, SzCategory, SzPuzzle, SzSubmission, SzRecord> {
-    @Delegate
-    private final SzSubmitCommand_SubmitDataParser parser = SzSubmitCommand_SubmitDataParser.INSTANCE;
+public class SzSubmitCommand extends AbstractSubmitCommand<SzCategory, SzPuzzle, SzSubmission, SzRecord> {
+    private final CommandOption<String, String> solutionOption = OptionHelpersKt.linkOptionBuilder("solution")
+            .description("Link to the solution file, can be `m1` to scrape it from your last message")
+            .required()
+            .build();
+    private final CommandOption<String, String> authorOption = CommandOptionBuilder.string("author")
+            .description("Name to appear on the Reddit leaderboard")
+            .required()
+            .build();
+    @Getter
+    private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption);
     @Getter
     private final Secured secured = SzSecured.INSTANCE;
     @Getter
@@ -49,21 +56,7 @@ public class SzSubmitCommand extends AbstractSubmitCommand<SzSubmitCommand.Submi
 
     @NotNull
     @Override
-    public SzSubmission parseSubmission(@NotNull DeferrableInteractionEvent event, @NotNull SzSubmitCommand.SubmitData parameters) {
-        return SzSubmission.fromLink(parameters.getSolution(), parameters.getAuthor());
-    }
-
-    @ApplicationCommand(name = "submit", subCommand = true)
-    @Value
-    public static class SubmitData {
-        @NotNull String solution;
-        @NotNull String author;
-
-        public SubmitData(@Description("Link to the solution file, can be `m1` to scrape it from your last message")
-                          @NotNull @Converter(LinkConverter.class) String solution,
-                          @NotNull @Description("Name to appear on the Reddit leaderboard") String author) {
-            this.solution = solution;
-            this.author = author;
-        }
+    public SzSubmission parseSubmission(@NotNull ChatInputInteractionEvent event) {
+        return SzSubmission.fromLink(solutionOption.get(event), authorOption.get(event));
     }
 }

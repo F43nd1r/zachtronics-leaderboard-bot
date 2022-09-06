@@ -21,16 +21,22 @@ import com.faendir.zachtronics.bot.model.Puzzle;
 import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder;
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder;
-import discord4j.core.event.domain.interaction.DeferrableInteractionEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class AbstractRebuildCommand<T, P extends Puzzle<?>> extends AbstractSubCommand<T> {
+public abstract class AbstractRebuildCommand<P extends Puzzle<?>> extends Command.BasicLeaf {
+    @Getter
+    private final String name = "rebuild";
+    @Getter
+    private final String description = "Rebuilds wiki section";
+
     protected abstract AbstractSolutionRepository<?, P, ?, ?, ?, ?> getRepository();
 
     @NotNull
     @Override
-    public SafeMessageBuilder handleEvent(@NotNull DeferrableInteractionEvent event, @NotNull T parameters) {
-        P puzzle = findPuzzle(parameters);
+    public SafeMessageBuilder handleEvent(@NotNull ChatInputInteractionEvent event) {
+        P puzzle = findPuzzle(event);
         String updateMessage = "Rebuilt wiki section of " + puzzle.getDisplayName();
         getRepository().rebuildRedditLeaderboard(puzzle, updateMessage);
         return new SafeEmbedMessageBuilder()
@@ -39,5 +45,5 @@ public abstract class AbstractRebuildCommand<T, P extends Puzzle<?>> extends Abs
     }
 
     @NotNull
-    protected abstract P findPuzzle(@NotNull T parameters);
+    protected abstract P findPuzzle(@NotNull ChatInputInteractionEvent event);
 }

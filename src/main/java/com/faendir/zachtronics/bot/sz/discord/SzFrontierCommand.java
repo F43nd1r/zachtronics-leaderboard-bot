@@ -16,48 +16,38 @@
 
 package com.faendir.zachtronics.bot.sz.discord;
 
-import com.faendir.discord4j.command.annotation.ApplicationCommand;
-import com.faendir.discord4j.command.annotation.AutoComplete;
-import com.faendir.discord4j.command.annotation.Converter;
-import com.faendir.discord4j.command.annotation.Description;
 import com.faendir.zachtronics.bot.discord.command.AbstractFrontierCommand;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
+import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.sz.repository.SzSolutionRepository;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
-import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Component
 @SzQualifier
-public class SzFrontierCommand extends AbstractFrontierCommand<SzFrontierCommand.FrontierData, SzCategory, SzPuzzle, SzRecord> {
-    @Delegate
-    private final SzFrontierCommand_FrontierDataParser parser = SzFrontierCommand_FrontierDataParser.INSTANCE;
+public class SzFrontierCommand extends AbstractFrontierCommand<SzCategory, SzPuzzle, SzRecord> {
+    private final CommandOption<String, SzPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", SzPuzzle.class, SzPuzzle::getDisplayName)
+            .description("Puzzle name. Can be shortened or abbreviated. E.g. `fake surv`, `HD`")
+            .required()
+            .build();
+    @Getter
+    private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
     @Getter
     private final SzSolutionRepository repository;
 
     @NotNull
     @Override
-    public SzPuzzle findPuzzle(@NotNull FrontierData parameters) {
-        return parameters.puzzle;
-    }
-
-    @ApplicationCommand(name = "frontier", description = "Displays the whole pareto frontier", subCommand = true)
-    @Value
-    public static class FrontierData {
-        @NonNull SzPuzzle puzzle;
-
-        public FrontierData(@Description("Puzzle name. Can be shortened or abbreviated. E.g. `fake surv`, `HD`")
-                            @AutoComplete(SzPuzzleAutoCompletionProvider.class)
-                            @Converter(SzPuzzleConverter.class) @NonNull SzPuzzle puzzle) {
-            this.puzzle = puzzle;
-        }
+    public SzPuzzle findPuzzle(@NotNull ChatInputInteractionEvent event) {
+        return puzzleOption.get(event);
     }
 }

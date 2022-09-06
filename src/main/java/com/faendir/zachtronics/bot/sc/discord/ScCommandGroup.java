@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.inf.discord;
+package com.faendir.zachtronics.bot.sc.discord;
 
-import com.faendir.zachtronics.bot.discord.command.GameCommand;
-import com.faendir.zachtronics.bot.discord.command.SubCommand;
-import com.faendir.zachtronics.bot.inf.IfQualifier;
+import com.faendir.zachtronics.bot.discord.command.Command;
+import com.faendir.zachtronics.bot.sc.ScQualifier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -27,12 +26,11 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class IfCommand implements GameCommand {
+public class ScCommandGroup extends Command.Group {
     @Getter
-    private final String displayName = "Infinifactory";
+    private final String name = "sc";
     @Getter
-    private final String commandName = "if";
-    @Getter
-    @IfQualifier
-    private final List<SubCommand<?>> subCommands;
+    @ScQualifier
+    private final List<Leaf> commands;
+
 }
