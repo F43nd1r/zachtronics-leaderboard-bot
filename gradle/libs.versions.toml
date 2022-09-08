@@ -30,7 +30,7 @@ springdoc = "1.6.11"
 gradle-node = "3.4.0"
 guava = "31.1-jre"
 nokee = "0.5.0-930919a0"
-opencsv = "5.6"
+opencsv = "5.7.0"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
