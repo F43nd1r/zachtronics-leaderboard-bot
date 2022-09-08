@@ -134,25 +134,6 @@ fun createSubmission(gif: String?, gifData: ByteArray?, author: String, inputByt
 
 fun OmRecord.withCategory(category: OmCategory) = CategoryRecord(this, setOf(category))
 
-infix operator fun Position.plus(other: Position) = Position(this.x + other.x, this.y + other.y)
-data class CubicPosition(val x: Int, val y: Int, val z: Int) {
-
-    fun rotate(times: Int): CubicPosition {
-        val t = Math.floorMod(times, 6)
-        val coords = mutableListOf(x, y, z)
-        if (t % 2 != 0) {
-            coords.replaceAll { -it }
-        }
-        Collections.rotate(coords, t % 3)
-        return CubicPosition(coords[0], coords[1], coords[2])
-    }
-
-    fun toAxial(): Position = Position(x, z)
-}
-
-fun Position.toCubic(): CubicPosition = CubicPosition(x, -x - y, y)
-fun Position.rotate(times: Int) = this.toCubic().rotate(times).toAxial()
-
 fun omPuzzleOptionBuilder() = enumOptionBuilder<OmPuzzle>("puzzle") { displayName }
     .description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")
 

@@ -30,16 +30,6 @@ import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.math.pow
 
-inline fun <T, R> Collection<T>.ifNotEmpty(block: (Collection<T>) -> R): R? = takeIf { it.isNotEmpty() }?.let(block)
-
-inline fun <reified T> Iterable<*>.findInstance(): T? = filterIsInstance<T>().firstOrNull()
-
-inline fun <reified T> Iterable<*>.findInstance(block: (T) -> Unit) = findInstance<T>()?.let(block)
-
-fun <T : Map.Entry<K, V>, K, V> Iterable<T>.toMap() = associate { it.key to it.value }
-
-fun <T> Iterable<T>.plusIf(condition: Boolean, element: T): List<T> = if (condition) plus(element) else toList()
-
 private val wordSeparator = Regex("[\\s-/,:]+")
 
 fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> {
@@ -155,8 +145,6 @@ inline fun <T : Closeable?, U : Closeable?, R> Pair<T, U>.use(block: (T, U) -> R
 }
 
 fun String?.orEmpty(prefix: String = "", suffix: String = "") = this?.let { prefix + it + suffix } ?: ""
-
-fun String.ensurePrefix(prefix: String) = if (startsWith(prefix)) this else prefix + this
 
 fun <T> Iterable<T>.productOf(selector: (T) -> Int) = fold(1) { acc, t -> acc * selector(t) }
 

@@ -61,7 +61,6 @@ dependencies {
     implementation(libs.jraw)
     implementation(libs.om.dsl)
     implementation(libs.om.parser)
-    implementation(projects.common)
     implementation(projects.native)
     implementation(libs.jackson.databind)
     implementation(libs.jackson.kotlin)
