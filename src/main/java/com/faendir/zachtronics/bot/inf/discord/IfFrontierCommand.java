@@ -36,18 +36,11 @@ import java.util.List;
 @Component
 @IfQualifier
 public class IfFrontierCommand extends AbstractFrontierCommand<IfCategory, IfPuzzle, IfRecord> {
+    @Getter
     private final CommandOption<String, IfPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", IfPuzzle.class, IfPuzzle::getDisplayName)
             .description("Puzzle name. Can be shortened or abbreviated. E.g. `Gne ch`, `TBB`")
             .required()
             .build();
     @Getter
-    private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
-    @Getter
     private final IfSolutionRepository repository;
-
-    @NotNull
-    @Override
-    public IfPuzzle findPuzzle(@NotNull ChatInputInteractionEvent event) {
-        return puzzleOption.get(event);
-    }
 }

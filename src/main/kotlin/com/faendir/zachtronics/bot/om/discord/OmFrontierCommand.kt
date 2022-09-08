@@ -24,13 +24,12 @@ import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.omPuzzleOptionBuilder
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
+import lombok.Getter
 import org.springframework.stereotype.Component
 
 @OmQualifier
 @Component
 class OmFrontierCommand(override val repository: SolutionRepository<OmCategory, OmPuzzle, *, OmRecord>) :
-    AbstractFrontierCommand< OmCategory, OmPuzzle, OmRecord>() {
-    private val puzzleOption = omPuzzleOptionBuilder().required().build()
-    override val options = listOf(puzzleOption)
-    override fun findPuzzle(event: ChatInputInteractionEvent) = puzzleOption.get(event)
+    AbstractFrontierCommand<OmCategory, OmPuzzle, OmRecord>() {
+    override val puzzleOption = omPuzzleOptionBuilder().required().build()
 }

@@ -36,18 +36,11 @@ import java.util.List;
 @Component
 @ScQualifier
 public class ScFrontierCommand extends AbstractFrontierCommand<ScCategory, ScPuzzle, ScRecord> {
+    @Getter
     private final CommandOption<String, ScPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", ScPuzzle.class, ScPuzzle::getDisplayName)
             .description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
             .required()
             .build();
     @Getter
-    private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
-    @Getter
     private final ScSolutionRepository repository;
-
-    @NotNull
-    @Override
-    public ScPuzzle findPuzzle(@NotNull ChatInputInteractionEvent event) {
-        return puzzleOption.get(event);
-    }
 }

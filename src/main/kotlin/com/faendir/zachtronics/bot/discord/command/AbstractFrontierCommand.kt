@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.zachtronics.bot.discord.Colors
+import com.faendir.zachtronics.bot.discord.command.option.CommandOption
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
@@ -31,10 +32,13 @@ abstract class AbstractFrontierCommand<C : Category, P : Puzzle<C>, R : Record<C
     override val name = "frontier"
     override val description = "Displays the whole pareto frontier"
     override val secured = NotSecured
+    protected abstract val puzzleOption: CommandOption<String, P>
+    override val options: List<CommandOption<*, *>>
+        get() = listOf(puzzleOption)
     abstract val repository: SolutionRepository<C, P, *, R>
 
     override fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder {
-        val puzzle = findPuzzle(event)
+        val puzzle = puzzleOption.get(event)
         val records = repository.findCategoryHolders(puzzle, includeFrontier = true)
         return SafeEmbedMessageBuilder()
             .title("*${puzzle.displayName}*")
@@ -42,6 +46,4 @@ abstract class AbstractFrontierCommand<C : Category, P : Puzzle<C>, R : Record<C
             .color(Colors.READ)
             .embedRecords(records, puzzle.supportedCategories)
     }
-
-    abstract fun findPuzzle(event: ChatInputInteractionEvent): P
 }

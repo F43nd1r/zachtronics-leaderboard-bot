@@ -24,30 +24,19 @@ import com.faendir.zachtronics.bot.fp.model.FpCategory;
 import com.faendir.zachtronics.bot.fp.model.FpPuzzle;
 import com.faendir.zachtronics.bot.fp.model.FpRecord;
 import com.faendir.zachtronics.bot.fp.repository.FpSolutionRepository;
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Component
 @FpQualifier
 public class FpListCommand extends AbstractListCommand<FpCategory, FpPuzzle, FpRecord> {
+    @Getter
     private final CommandOption<String, FpPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", FpPuzzle.class, FpPuzzle::getDisplayName)
             .description("Puzzle name. Can be shortened or abbreviated. E.g. `fake surv`, `HD`")
             .required()
             .build();
     @Getter
-    private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
-    @Getter
     private final FpSolutionRepository repository;
-
-    @NotNull
-    @Override
-    public FpPuzzle findPuzzle(@NotNull ChatInputInteractionEvent event) {
-        return puzzleOption.get(event);
-    }
 }

@@ -36,18 +36,11 @@ import java.util.List;
 @Component
 @SzQualifier
 public class SzFrontierCommand extends AbstractFrontierCommand<SzCategory, SzPuzzle, SzRecord> {
+    @Getter
     private final CommandOption<String, SzPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", SzPuzzle.class, SzPuzzle::getDisplayName)
             .description("Puzzle name. Can be shortened or abbreviated. E.g. `fake surv`, `HD`")
             .required()
             .build();
     @Getter
-    private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
-    @Getter
     private final SzSolutionRepository repository;
-
-    @NotNull
-    @Override
-    public SzPuzzle findPuzzle(@NotNull ChatInputInteractionEvent event) {
-        return puzzleOption.get(event);
-    }
 }

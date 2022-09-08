@@ -36,18 +36,11 @@ import java.util.List;
 @Component
 @FpQualifier
 public class FpFrontierCommand extends AbstractFrontierCommand<FpCategory, FpPuzzle, FpRecord> {
+    @Getter
     private final CommandOption<String, FpPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", FpPuzzle.class, FpPuzzle::getDisplayName)
             .description("Puzzle name. Can be shortened or abbreviated. E.g. `fake surv`, `HD`")
             .required()
             .build();
     @Getter
-    private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
-    @Getter
     private final FpSolutionRepository repository;
-
-    @NotNull
-    @Override
-    public FpPuzzle findPuzzle(@NotNull ChatInputInteractionEvent event) {
-        return puzzleOption.get(event);
-    }
 }

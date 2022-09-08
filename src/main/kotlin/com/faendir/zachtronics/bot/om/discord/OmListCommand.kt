@@ -29,10 +29,6 @@ import org.springframework.stereotype.Component
 @Component
 @OmQualifier
 class OmListCommand(override val repository: OmSolutionRepository) : AbstractListCommand<OmCategory, OmPuzzle, OmRecord>() {
-    private val puzzleOption = omPuzzleOptionBuilder().required().build()
-    override val options = listOf(puzzleOption)
-
-
-    override fun findPuzzle(event: ChatInputInteractionEvent): OmPuzzle = puzzleOption.get(event)
+    override val puzzleOption = omPuzzleOptionBuilder().required().build()
 }
 

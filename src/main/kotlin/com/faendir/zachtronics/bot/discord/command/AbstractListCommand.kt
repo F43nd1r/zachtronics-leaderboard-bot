@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.zachtronics.bot.discord.Colors
+import com.faendir.zachtronics.bot.discord.command.option.CommandOption
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
@@ -31,10 +32,13 @@ abstract class AbstractListCommand<C : Category, P : Puzzle<C>, R : Record<C>> :
     override val name = "list"
     override val description = "List records"
     override val secured = NotSecured
+    protected abstract val puzzleOption: CommandOption<String, P>
+    override val options: List<CommandOption<*, *>>
+        get() = listOf(puzzleOption)
     abstract val repository: SolutionRepository<C, P, *, R>
 
     override fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder {
-        val puzzle = findPuzzle(event)
+        val puzzle = puzzleOption.get(event)
         val records = repository.findCategoryHolders(puzzle, includeFrontier = false)
         return SafeEmbedMessageBuilder()
             .title("*${puzzle.displayName}*")
@@ -48,6 +52,4 @@ abstract class AbstractListCommand<C : Category, P : Puzzle<C>, R : Record<C>> :
                 }
             }
     }
-
-    abstract fun findPuzzle(event: ChatInputInteractionEvent): P
 }
