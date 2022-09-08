@@ -19,6 +19,7 @@ import { SentimentVeryDissatisfied } from "@mui/icons-material"
 import RecordDTO from "../model/RecordDTO"
 import { ReactNode } from "react"
 import { AppSettings, useAppSettings } from "../fragments/AppSettingsProvider"
+import { useInView } from "react-intersection-observer"
 
 export interface RecordCardProps<RECORD extends RecordDTO<any> = RecordDTO<any>> {
     record: RECORD
@@ -73,8 +74,10 @@ function getVideoUrl(gif: string, appSettings: AppSettings) {
 
 export default function RecordCard(props: RecordCardProps) {
     const appSettings = useAppSettings()
+    const { ref, inView } = useInView({ rootMargin: "100%" })
     return (
         <Card
+            ref={ref}
             sx={{
                 minWidth: "min(90vw, 460px)",
                 maxWidth: "100%",
@@ -98,7 +101,9 @@ export default function RecordCard(props: RecordCardProps) {
                         controls={appSettings.showControls}
                         loop
                         muted
-                        src={getVideoUrl(props.record.gif, appSettings)}
+                        loading="lazy"
+                        playsInline
+                        src={inView ? getVideoUrl(props.record.gif, appSettings) : undefined}
                         alt="Media not loading"
                         style={{
                             height: "min(70vh, 360px)",
