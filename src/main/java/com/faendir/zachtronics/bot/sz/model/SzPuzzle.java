@@ -16,11 +16,8 @@
 
 package com.faendir.zachtronics.bot.sz.model;
 
-import com.faendir.discord4j.command.parse.SingleParseResult;
 import com.faendir.zachtronics.bot.model.Puzzle;
-import com.faendir.zachtronics.bot.utils.UtilsKt;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -93,8 +90,4 @@ public enum SzPuzzle implements Puzzle<SzCategory> {
         this.link = "https://zlbb.faendir.com/sz/" + id;
     }
 
-    @NotNull
-    public static SingleParseResult<SzPuzzle> parsePuzzle(@NotNull String name) {
-        return UtilsKt.getSingleMatchingPuzzle(SzPuzzle.values(), name);
-    }
 }

@@ -56,7 +56,7 @@ public class ScSolutionMetadata {
 
         if (puzzle == null) {
             String puzzleStr = decode(m.group("puzzle"));
-            puzzle = ScPuzzle.parsePuzzle(puzzleStr).orElseThrow();
+            puzzle = ScPuzzle.findUniqueMatchingPuzzle(puzzleStr);
         }
 
         String author = decode(m.group("author"));

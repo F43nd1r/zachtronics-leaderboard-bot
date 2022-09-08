@@ -31,7 +31,7 @@ class ScPuzzleTest {
                                          published_13_2, published_51_2 // Breakdown
         );
         for (ScPuzzle puzzle : puzzles) {
-            assertEquals(puzzle, ScPuzzle.parsePuzzle(puzzle.getDisplayName()).orElseThrow());
+            assertEquals(puzzle, ScPuzzle.findUniqueMatchingPuzzle(puzzle.getDisplayName()));
         }
     }
 }

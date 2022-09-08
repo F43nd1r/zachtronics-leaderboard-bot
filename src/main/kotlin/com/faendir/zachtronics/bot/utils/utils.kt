@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,18 @@
 
 package com.faendir.zachtronics.bot.utils
 
-import com.faendir.discord4j.command.parse.SingleParseResult
 import com.faendir.zachtronics.bot.discord.Colors
-import com.faendir.zachtronics.bot.model.Category
-import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.model.Metric
-import com.faendir.zachtronics.bot.model.Puzzle
-import com.faendir.zachtronics.bot.model.Record
-import com.faendir.zachtronics.bot.model.StringFormat
+import com.faendir.zachtronics.bot.model.*
 import com.faendir.zachtronics.bot.repository.CategoryRecord
-import discord4j.common.util.Snowflake
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.core.`object`.entity.User
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
-import discord4j.core.`object`.entity.Message
-import discord4j.core.`object`.reaction.ReactionEmoji
+import discord4j.core.`object`.entity.User
 import discord4j.core.spec.EmbedCreateFields
 import discord4j.core.spec.EmbedCreateSpec
 import discord4j.core.spec.InteractionReplyEditMono
-import reactor.core.publisher.Flux
 import java.io.Closeable
 import java.net.HttpURLConnection
 import java.net.URL
-import java.time.Instant
 import kotlin.math.pow
 
 inline fun <T, R> Collection<T>.ifNotEmpty(block: (Collection<T>) -> R): R? = takeIf { it.isNotEmpty() }?.let(block)
@@ -53,16 +41,6 @@ fun <T : Map.Entry<K, V>, K, V> Iterable<T>.toMap() = associate { it.key to it.v
 fun <T> Iterable<T>.plusIf(condition: Boolean, element: T): List<T> = if (condition) plus(element) else toList()
 
 private val wordSeparator = Regex("[\\s-/,:]+")
-
-fun <P : Puzzle<*>> Array<P>.getSingleMatchingPuzzle(name: String): SingleParseResult<P> {
-    val matches = toList().fuzzyMatch(name.trim()) { displayName }
-    return when (val size = matches.size) {
-        0 -> SingleParseResult.Failure("I did not recognize the puzzle \"$name\".")
-        1 -> SingleParseResult.Success(matches.first())
-        in 2..25 -> SingleParseResult.Ambiguous(matches) { it.displayName }
-        else -> SingleParseResult.Failure("your request for \"$name\" was not precise enough. $size matches.")
-    }
-}
 
 fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> {
     return search.takeIf { it.isEmpty() }?.let { emptyList() }

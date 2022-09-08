@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.sc.repository;
 
-import com.faendir.discord4j.command.parse.SingleParseResult;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
@@ -265,11 +264,12 @@ class SolRepoManualTest {
             puzzle = ScPuzzle.valueOf(levelCode);
         }
         else {
-            SingleParseResult<ScPuzzle> puzzleParseResult = ScPuzzle.parsePuzzle(levelName);
-            if (puzzleParseResult instanceof SingleParseResult.Ambiguous) {
-                puzzleParseResult = ScPuzzle.parsePuzzle(levelName + " (" + fields[2] + ")");
+            try {
+                puzzle = ScPuzzle.findUniqueMatchingPuzzle(levelName);
             }
-            puzzle = puzzleParseResult.orElseThrow();
+            catch (IllegalStateException e) {
+                puzzle = ScPuzzle.findUniqueMatchingPuzzle(levelName + " (" + fields[2] + ")");
+            }
         }
 
         ScScore score = new ScScore(Integer.parseInt(fields[5]), Integer.parseInt(fields[4]), Integer.parseInt(fields[6]), false, false);

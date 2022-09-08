@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.sc.validator;
 
-import com.faendir.discord4j.command.parse.SingleParseResult;
 import com.faendir.zachtronics.bot.sc.model.*;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -30,6 +29,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
@@ -77,13 +77,19 @@ public class SChem {
         assert result.getExport() != null;
 
         // puzzle
-        SingleParseResult<ScPuzzle> puzzleParseResult = ScPuzzle.parsePuzzle(result.getLevelName());
-        if (puzzleParseResult instanceof SingleParseResult.Ambiguous && result.getResnetId() != null) {
-            puzzleParseResult = ScPuzzle.parsePuzzle(result.getLevelName() +
-                                                     Arrays.stream(result.getResnetId()).mapToObj(Integer::toString)
-                                                           .collect(Collectors.joining("-", " (", ")")));
+        ScPuzzle puzzle;
+        List<ScPuzzle> possiblePuzzles = ScPuzzle.findMatchingPuzzles(result.getLevelName());
+        switch (possiblePuzzles.size()) {
+            case 1 -> puzzle = possiblePuzzles.get(0);
+            case 2 -> {  // resnet levels with the same name
+                assert result.getResnetId() != null;
+                String longName = result.getLevelName() + Arrays.stream(result.getResnetId())
+                                                                .mapToObj(Integer::toString)
+                                                                .collect(Collectors.joining("-", " (", ")"));
+                puzzle = ScPuzzle.findUniqueMatchingPuzzle(longName);
+            }
+            default -> throw new IllegalStateException("I did not recognize the puzzle \"" + result.getLevelName() + "\".");
         }
-        ScPuzzle puzzle = puzzleParseResult.orElseThrow();
 
         // author
         if (author == null)

@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.sc.model;
 
-import com.faendir.discord4j.command.parse.SingleParseResult;
 import com.faendir.zachtronics.bot.model.Puzzle;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
 import lombok.Getter;
@@ -424,8 +423,19 @@ public enum ScPuzzle implements Puzzle<ScCategory> {
     }
 
     @NotNull
-    public static SingleParseResult<ScPuzzle> parsePuzzle(@NotNull String name) {
-        return UtilsKt.getSingleMatchingPuzzle(ScPuzzle.values(), name);
+    public static List<ScPuzzle> findMatchingPuzzles(@NotNull String name) {
+        return UtilsKt.fuzzyMatch(Arrays.stream(ScPuzzle.values()).toList(), name.trim(), ScPuzzle::getDisplayName);
+    }
+
+    @NotNull
+    public static ScPuzzle findUniqueMatchingPuzzle(@NotNull String name) {
+        List<ScPuzzle> puzzles = findMatchingPuzzles(name);
+        return switch (puzzles.size()) {
+            case 0 -> throw new IllegalStateException("I did not recognize the puzzle \"" + name + "\".");
+            case 1 -> puzzles.get(0);
+            default -> throw new IllegalStateException(
+                    "your request for \"" + name + "\" was not precise enough. " + puzzles.size() + " matches" + ".");
+        };
     }
 
     @NotNull
