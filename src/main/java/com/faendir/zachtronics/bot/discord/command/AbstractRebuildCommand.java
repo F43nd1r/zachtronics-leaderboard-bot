@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.discord.command;
 
 import com.faendir.zachtronics.bot.discord.Colors;
+import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
 import com.faendir.zachtronics.bot.model.Puzzle;
 import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder;
@@ -36,7 +37,7 @@ public abstract class AbstractRebuildCommand<P extends Puzzle<?>> extends Comman
     @NotNull
     @Override
     public SafeMessageBuilder handleEvent(@NotNull ChatInputInteractionEvent event) {
-        P puzzle = findPuzzle(event);
+        P puzzle = getPuzzleOption().get(event);
         String updateMessage = "Rebuilt wiki section of " + puzzle.getDisplayName();
         getRepository().rebuildRedditLeaderboard(puzzle, updateMessage);
         return new SafeEmbedMessageBuilder()
@@ -45,5 +46,5 @@ public abstract class AbstractRebuildCommand<P extends Puzzle<?>> extends Comman
     }
 
     @NotNull
-    protected abstract P findPuzzle(@NotNull ChatInputInteractionEvent event);
+    protected abstract CommandOption<String, P> getPuzzleOption();
 }

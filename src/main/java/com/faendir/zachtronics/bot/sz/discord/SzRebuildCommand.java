@@ -23,10 +23,8 @@ import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.repository.SzSolutionRepository;
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -35,6 +33,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @SzQualifier
 public class SzRebuildCommand extends AbstractRebuildCommand<SzPuzzle> {
+    @Getter
     private final CommandOption<String, SzPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", SzPuzzle.class, SzPuzzle::getDisplayName)
             .description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
             .required()
@@ -45,10 +44,4 @@ public class SzRebuildCommand extends AbstractRebuildCommand<SzPuzzle> {
     private final Secured secured = SzSecured.ADMINS_ONLY;
     @Getter
     private final SzSolutionRepository repository;
-
-    @NotNull
-    @Override
-    protected SzPuzzle findPuzzle(@NotNull ChatInputInteractionEvent event) {
-        return puzzleOption.get(event);
-    }
 }

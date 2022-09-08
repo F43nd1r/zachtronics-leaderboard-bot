@@ -23,10 +23,8 @@ import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.fp.FpQualifier;
 import com.faendir.zachtronics.bot.fp.model.FpPuzzle;
 import com.faendir.zachtronics.bot.fp.repository.FpSolutionRepository;
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -35,6 +33,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @FpQualifier
 public class FpRebuildCommand extends AbstractRebuildCommand<FpPuzzle> {
+    @Getter
     private final CommandOption<String, FpPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", FpPuzzle.class, FpPuzzle::getDisplayName)
             .description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
             .required()
@@ -45,10 +44,4 @@ public class FpRebuildCommand extends AbstractRebuildCommand<FpPuzzle> {
     private final Secured secured = FpSecured.ADMINS_ONLY;
     @Getter
     private final FpSolutionRepository repository;
-
-    @NotNull
-    @Override
-    protected FpPuzzle findPuzzle(@NotNull ChatInputInteractionEvent event) {
-        return puzzleOption.get(event);
-    }
 }

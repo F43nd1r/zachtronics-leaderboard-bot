@@ -23,10 +23,8 @@ import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.inf.IfQualifier;
 import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
 import com.faendir.zachtronics.bot.inf.repository.IfSolutionRepository;
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -35,6 +33,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @IfQualifier
 public class IfRebuildCommand extends AbstractRebuildCommand<IfPuzzle> {
+    @Getter
     private final CommandOption<String, IfPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", IfPuzzle.class, IfPuzzle::getDisplayName)
             .description("Puzzle name. Can be shortened or abbreviated. E.g. `Gne ch`, `TBB`")
             .required()
@@ -45,10 +44,4 @@ public class IfRebuildCommand extends AbstractRebuildCommand<IfPuzzle> {
     private final Secured secured = IfSecured.ADMINS_ONLY;
     @Getter
     private final IfSolutionRepository repository;
-
-    @NotNull
-    @Override
-    protected IfPuzzle findPuzzle(@NotNull ChatInputInteractionEvent event) {
-        return puzzleOption.get(event);
-    }
 }
