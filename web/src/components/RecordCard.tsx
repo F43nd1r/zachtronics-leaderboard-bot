@@ -35,8 +35,16 @@ function isImgur(gif: string): boolean {
     return gif.includes("imgur")
 }
 
+function isMorsTech(gif: string): boolean {
+    return gif.includes("mors.technology")
+}
+
+function hasMP4(gif: string): boolean {
+    return isImgur(gif) || isMorsTech(gif)
+}
+
 function getVideoType(gif: string): "video" | "iframe" | "img" {
-    if (gif.endsWith(".mp4") || gif.endsWith(".webm") || isImgur(gif)) {
+    if (gif.endsWith(".mp4") || gif.endsWith(".webm") || hasMP4(gif)) {
         return "video"
     } else if (isYoutube(gif)) {
         return "iframe"
@@ -56,6 +64,8 @@ function getVideoUrl(gif: string, appSettings: AppSettings) {
         return result
     } else if (isImgur(gif)) {
         return gif.replace(/.+\/(\w+)(\..*)?/, "https://i.imgur.com/$1.mp4")
+    } else if (isMorsTech(gif)) {
+        return gif.replace(/.+mors\.technology\/(.+)(\..*)/, "https://files.mors.technology/$1.mp4")
     } else {
         return gif
     }
