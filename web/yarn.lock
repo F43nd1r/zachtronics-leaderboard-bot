@@ -1711,7 +1711,7 @@
     csstype "^3.1.0"
     prop-types "^15.8.1"
 
-"@mui/styles@^5.10.3":
+"@mui/styles@5.10.3":
   version "5.10.3"
   resolved "https://registry.yarnpkg.com/@mui/styles/-/styles-5.10.3.tgz#47d3016bcad0df5989a6a6fd3496dbaeee792f07"
   integrity sha512-I9BYAKENJ6Ot+UEqsU+D2o5jVSeHAme+ZcPzBataTNmpjd7yrmdPeJgAyzju21KtSucBb283gvggcFqxLH1lOQ==
@@ -7752,7 +7752,7 @@ react-is@^18.0.0, react-is@^18.2.0:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-18.2.0.tgz#199431eeaaa2e09f86427efbb4f1473edb47609b"
   integrity sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==
 
-react-mui-dropzone@^4.0.6:
+react-mui-dropzone@4.0.6:
   version "4.0.6"
   resolved "https://registry.yarnpkg.com/react-mui-dropzone/-/react-mui-dropzone-4.0.6.tgz#9e98337daed53638a5ea4b0606f98ac1f5e245f0"
   integrity sha512-1rRlI+1wVydoL1tFx5LXt7k/CSXKmWYFn7bm5TUqiq/WnBnE8VI+tShSqqG7yJwSbvncpZXAn9Lnjgrcvxvy8Q==
