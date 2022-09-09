@@ -24,7 +24,7 @@ import Sidebar from "../../fragments/Sidebar"
 import { Link, Outlet } from "react-router-dom"
 import { usePersistedState } from "../../utils/usePersistedState"
 import SearchBar from "../../fragments/SearchBar"
-import { Settings } from "@mui/icons-material"
+import { Settings, Upload } from "@mui/icons-material"
 
 const drawerWidth = 300
 
@@ -126,11 +126,18 @@ export default function App() {
                 onClose={handleDrawerClose}
             >
                 <DrawerHeader>
-                    <UnstyledLink to="settings">
-                        <IconButton sx={{ ml: 1 }} color="inherit">
-                            <Settings />
-                        </IconButton>
-                    </UnstyledLink>
+                    <div>
+                        <UnstyledLink to="settings">
+                            <IconButton sx={{ ml: 1 }} color="inherit">
+                                <Settings />
+                            </IconButton>
+                        </UnstyledLink>
+                        <UnstyledLink to={"upload"} aria-label="upload">
+                            <IconButton sx={{ ml: 1 }} color="inherit">
+                                <Upload />
+                            </IconButton>
+                        </UnstyledLink>
+                    </div>
                     <IconButton onClick={handleDrawerClose}>{theme.direction === "ltr" ? <ChevronLeftIcon /> : <ChevronRightIcon />}</IconButton>
                 </DrawerHeader>
                 <Divider />

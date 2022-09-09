@@ -24,6 +24,6 @@ export default function fetchFromApi<T>(url: string): Promise<T> {
     })
 }
 
-export function fetchFromApiRaw(url: string): Promise<Response> {
-    return fetch(`${window.location.protocol}//${window.location.host}${url}`)
+export function fetchFromApiRaw(url: string, requestInit?: RequestInit): Promise<Response> {
+    return fetch(`${window.location.protocol}//${window.location.host}${url}`, requestInit)
 }
