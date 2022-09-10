@@ -17,15 +17,18 @@
 package com.faendir.zachtronics.bot.sc.repository;
 
 import com.faendir.zachtronics.bot.BotTest;
+import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
-import com.faendir.zachtronics.bot.sc.model.ScCategory;
-import com.faendir.zachtronics.bot.sc.model.ScRecord;
-import com.faendir.zachtronics.bot.sc.model.ScScore;
-import com.faendir.zachtronics.bot.sc.model.ScSubmission;
+import com.faendir.zachtronics.bot.sc.model.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.EnumSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 @BotTest
@@ -73,6 +76,19 @@ public class SolRepoSubmitTest {
 
         data = "SOLUTION:A Most Unfortunate Malfunction,BadGuy,50-1-50\nsome more stuff...";
         assertInstanceOf(SubmitResult.NothingBeaten.class, doSubmitData(data)); // just give up, man
+    }
+
+    @Test
+    public void testSubmitNewCategories() {
+        // we start with a 100/100/100 that holds no categories
+        ScScore score = new ScScore(50, 50, 50, false, false);
+        SubmitResult.Success<ScRecord, ScCategory> result = (SubmitResult.Success<ScRecord, ScCategory>) doSubmitScore(score);
+        Set<ScCategory> wonCategories = result.getBeatenRecords().stream()
+                                              .map(CategoryRecord::getCategories)
+                                              .flatMap(Set::stream)
+                                              .collect(Collectors.toCollection(() -> EnumSet.noneOf(ScCategory.class)));
+        Set<ScCategory> supportedCategories = EnumSet.copyOf(ScPuzzle.bonding_boss.getSupportedCategories());
+        assertEquals(supportedCategories, wonCategories);
     }
 
     @Test

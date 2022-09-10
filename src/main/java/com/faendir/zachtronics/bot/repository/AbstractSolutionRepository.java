@@ -153,9 +153,12 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
             }
 
             // the new record may have gained categories of records it didn't pareto-beat, do the transfers
+            // while we're here, keep track of totally missing categories, we'll assign them to the new sol
+            EnumSet<C> missingCategories = EnumSet.copyOf(puzzle.getSupportedCategories());
             for (Sol solution: solutions) {
                 EnumSet<C> lostCategories = EnumSet.noneOf(getCategoryClass());
                 for (C category : solution.getCategories()) {
+                    missingCategories.remove(category);
                     if (category.supportsScore(candidate.getScore()) &&
                         category.getScoreComparator().compare(candidate.getScore(), solution.getScore()) < 0) {
                         lostCategories.add(category);
@@ -175,11 +178,10 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
                 }
             }
 
-            // if it's the first in line our new sol steals from the void all the categories it can
-            if (solutions.isEmpty()) {
-                puzzle.getSupportedCategories().stream()
-                      .filter(c -> c.supportsScore(candidate.getScore()))
-                      .forEach(candidate.getCategories()::add);
+            // add in completely missing categories
+            if (!missingCategories.isEmpty()) {
+                beatenCategoryRecords.add(new CategoryRecord<R, C>(null, missingCategories));
+                candidate.getCategories().addAll(missingCategories);
             }
 
             int index = Collections.binarySearch(solutions, candidate, getArchiveComparator());
