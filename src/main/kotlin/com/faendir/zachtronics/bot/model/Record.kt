@@ -39,7 +39,7 @@ interface Record<C : Category> {
     fun toDisplayString(context: DisplayContext<C>): String {
         return when (context.format) {
             StringFormat.DISCORD, StringFormat.REDDIT -> Markdown.fileLinkOrEmpty(dataLink) +
-                    Markdown.linkOrText(score.toDisplayString(context) + author.orEmpty(prefix = " "), displayLink)
+                    Markdown.linkOrText(score.toDisplayString(context), displayLink) + author.orEmpty(prefix = " by ")
             else -> score.toDisplayString(context) + author.orEmpty(prefix = " by ") + displayLink.orEmpty(prefix = " ")
         }
     }
