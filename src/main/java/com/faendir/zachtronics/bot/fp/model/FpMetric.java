@@ -28,7 +28,8 @@ public enum FpMetric implements MetricJava<FpScore> {
     RULES("R", FpScore::getRules),
     CONDITIONAL_RULES("C", FpScore::getConditionalRules),
     FRAMES("F", FpScore::getFrames),
-    WASTE("W", FpScore::getWaste);
+    WASTE("W", FpScore::getWaste),
+    MOST_WASTE("W", s -> -s.getWaste());
 
     private final String displayName;
     private final ToIntFunction<FpScore> extract;

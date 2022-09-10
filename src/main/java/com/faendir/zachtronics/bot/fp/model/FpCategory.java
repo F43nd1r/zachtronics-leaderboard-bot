@@ -31,18 +31,26 @@ import static com.faendir.zachtronics.bot.fp.model.FpType.STANDARD;
 
 @Getter
 public enum FpCategory implements CategoryJava<FpCategory, FpScore, FpMetric, FpType> {
-    RCF("RCF", List.of(RULES, CONDITIONAL_RULES, FRAMES), 0b100),
-    RFC("RFC", List.of(RULES, FRAMES, CONDITIONAL_RULES), 0b100),
+    RCF("RCF", List.of(RULES, CONDITIONAL_RULES, FRAMES, WASTE), 0b1000),
+    RFC("RFC", List.of(RULES, FRAMES, CONDITIONAL_RULES, WASTE), 0b1000),
 
-    CRF("CRF", List.of(CONDITIONAL_RULES, RULES, FRAMES), 0b010),
-    CFR("CFR", List.of(CONDITIONAL_RULES, FRAMES, RULES), 0b010),
+    CRF("CRF", List.of(CONDITIONAL_RULES, RULES, FRAMES, WASTE), 0b0100),
+    CFR("CFR", List.of(CONDITIONAL_RULES, FRAMES, RULES, WASTE), 0b0100),
 
-    FRC("FRC", List.of(FRAMES, RULES, CONDITIONAL_RULES), 0b001),
-    FCR("FCR", List.of(FRAMES, CONDITIONAL_RULES, RULES), 0b001);
+    FRC("FRC", List.of(FRAMES, RULES, CONDITIONAL_RULES, WASTE), 0b0010),
+    FCR("FCR", List.of(FRAMES, CONDITIONAL_RULES, RULES, WASTE), 0b0010),
+
+    WRCF("WRCF", List.of(WASTE, RULES, CONDITIONAL_RULES, FRAMES), 0b0001),
+    wRCF("wRCF", List.of(MOST_WASTE, RULES, CONDITIONAL_RULES, FRAMES), 0b0001),
+    WFRC("WFRC", List.of(WASTE, FRAMES, RULES, CONDITIONAL_RULES), 0b0001),
+    wFRC("wFRC", List.of(MOST_WASTE, FRAMES, RULES, CONDITIONAL_RULES), 0b0001);
 
     /** contains <tt>%dR%s%dC%s%dF%s%dW</tt> plus a bunch of <tt>*</tt> most likely */
-    static final String[] FORMAT_STRINGS = {"%dR%s%dC%s%dF%s%dW", "%dR%s%dC%s**%d**F%s%dW",
-                                            "%dR%s**%d**C%s%dF%s%dW", null, "**%d**R%s%dC%s%dF%s%dW"};
+    static final String[] FORMAT_STRINGS = {"%dR%s%dC%s%dF%s%dW",
+                                            "%dR%s%dC%s%dF%s**%d**W",
+                                            "%dR%s%dC%s**%d**F%s%dW", null,
+                                            "%dR%s**%d**C%s%dF%s%dW", null, null, null,
+                                            "**%d**R%s%dC%s%dF%s%dW"};
 
     private final String displayName;
     @Accessors(fluent = true)
