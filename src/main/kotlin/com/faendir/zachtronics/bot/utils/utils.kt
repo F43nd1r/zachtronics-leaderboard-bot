@@ -166,4 +166,4 @@ fun Double.ceil(precision: Int): Double {
 }
 
 val Message.url
-    get() = "https://discord.com/channels/${guildId.map { it.asString() }.orElse("@me")}/${channelId.asString()}/${id.asString()}"
+    get() = "https://discord.com/channels/${guild.map { it.id.asString() }.block() ?: "@me"}/${channelId.asString()}/${id.asString()}"

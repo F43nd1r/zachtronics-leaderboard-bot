@@ -23,6 +23,7 @@ import discord4j.common.util.Snowflake
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.reaction.ReactionEmoji
 import reactor.core.publisher.Flux
+import reactor.kotlin.core.publisher.toFlux
 import java.time.Instant
 
 inline fun <reified T : Enum<T>> enumOptionBuilder(name: String, noinline displayName: T.() -> String) = enumOptionBuilder(name, T::class.java, displayName)
@@ -53,8 +54,13 @@ fun <T : Enum<T>> enumOptionBuilder(name: String, type: Class<T>, displayName: T
 fun linkOptionBuilder(name: String) = CommandOptionBuilder.string(name)
     .convert { link ->
         link?.let { l ->
-            findLink(l.trim(), interaction.channel.flatMapMany { it.getMessagesBefore(it.lastMessageId.orElseGet { Snowflake.of(Instant.now()) }) }
-                .filter { it.author.isPresent && it.author.get() == interaction.user })
+            findLink(
+                l.trim(),
+                interaction.channel.flatMapMany { channel ->
+                    val lastMessageId = channel.lastMessageId.orElseGet { Snowflake.of(Instant.now()) }
+                    channel.lastMessage.toFlux().concatWith(channel.getMessagesBefore(lastMessageId).filter { it.id.asLong() != lastMessageId.asLong() })
+                }
+                    .filter { it.author.isPresent && it.author.get() == interaction.user })
         }
     }
 
