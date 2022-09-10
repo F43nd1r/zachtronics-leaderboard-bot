@@ -176,9 +176,8 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
                         .title("New Submission: *${record.puzzle.displayName}* Pareto")
                         .color(Colors.SUCCESS)
                         .description(
-                            "`${record.toDisplayString(DisplayContext(StringFormat.DISCORD, beatenCategories))}`"
-                                    + record.author.orEmpty(prefix = " by ")
-                                    + (" was included in the pareto frontier.")
+                            record.toDisplayString(DisplayContext(StringFormat.DISCORD, beatenCategories))
+                                    + " was included in the pareto frontier."
                                     + (if (submitResult.beatenRecords.isNotEmpty()) "\nPreviously:" else "")
                         )
                         .embedCategoryRecords(submitResult.beatenRecords, record.puzzle.supportedCategories)
@@ -190,8 +189,7 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
                         .title("New Submission: *${record.puzzle.displayName}* ${beatenCategories.smartFormat(record.puzzle.supportedCategories.toMetricsTree())}")
                         .color(Colors.SUCCESS)
                         .description(
-                            "`${record.toDisplayString(DisplayContext(StringFormat.DISCORD, beatenCategories))}`"
-                                    + record.author.orEmpty(prefix = " by ")
+                            record.toDisplayString(DisplayContext(StringFormat.DISCORD, beatenCategories))
                                     + (if (submitResult.beatenRecords.isNotEmpty()) "\nPreviously:" else "")
                         )
                         .embedCategoryRecords(submitResult.beatenRecords, record.puzzle.supportedCategories)
@@ -212,9 +210,7 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
                     )
                     .color(Colors.SUCCESS)
                     .description(
-                        "`${record.score.toDisplayString(DisplayContext(StringFormat.DISCORD, submitResult.oldRecord.categories))}`"
-                                + (" was updated.")
-                                + ("\nPreviously:")
+                        "${record.toDisplayString(DisplayContext(StringFormat.DISCORD, submitResult.oldRecord.categories))} was updated.\nPreviously:"
                     )
                     .embedCategoryRecords(listOf(submitResult.oldRecord), puzzle.supportedCategories)
                     .link(record.displayLink), Channel.UPDATE

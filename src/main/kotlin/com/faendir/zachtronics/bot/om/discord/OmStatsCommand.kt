@@ -44,6 +44,7 @@ import org.springframework.stereotype.Component
 class OmStatsCommand(private val repository: OmSolutionRepository) : Command.BasicLeaf() {
     override val name = "stats"
     override val description = "Get information about a solution"
+    override val ephemeral: Boolean = true
 
     private val solutionOption = omSolutionOptionBuilder().required().build()
     override val options = listOf(solutionOption)
