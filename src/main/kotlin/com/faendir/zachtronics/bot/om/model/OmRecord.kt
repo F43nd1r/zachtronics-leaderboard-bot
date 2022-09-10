@@ -34,7 +34,7 @@ data class OmRecord(
     @Transient
     val origin: Path? = null,
     val lastModified: Instant? = null,
-) : Record<OmCategory> {
     @Transient
     override val author: String? = null
+) : Record<OmCategory> {
 }

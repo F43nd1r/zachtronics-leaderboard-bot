@@ -160,8 +160,8 @@ class OmSolutionRepository(
                 hash = leaderboardScope.currentHash()
             }
             when(result) {
-                is SubmitResult.Success -> result.copy(record = newRecord)
-                is SubmitResult.Updated -> result.copy(record = newRecord)
+                is SubmitResult.Success -> result.copy(record = newRecord.copy(author = submission.author))
+                is SubmitResult.Updated -> result.copy(record = newRecord.copy(author = submission.author))
                 else -> result
             }
         }
