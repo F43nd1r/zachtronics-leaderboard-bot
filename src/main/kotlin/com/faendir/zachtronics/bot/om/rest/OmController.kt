@@ -16,13 +16,11 @@
 
 package com.faendir.zachtronics.bot.om.rest
 
-import com.faendir.zachtronics.bot.discord.Colors
-import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.om.createSubmission
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmGroup
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.notifyOf
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.om.rest.dto.OmCategoryDTO
 import com.faendir.zachtronics.bot.om.rest.dto.OmGroupDTO
@@ -37,15 +35,12 @@ import com.faendir.zachtronics.bot.om.withCategory
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.rest.GameRestController
 import com.faendir.zachtronics.bot.rest.dto.SubmitResultType
-import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
-import com.faendir.zachtronics.bot.utils.embedCategoryRecords
-import com.faendir.zachtronics.bot.utils.filterIsInstance
 import com.faendir.zachtronics.bot.utils.isValidLink
-import com.faendir.zachtronics.bot.utils.orEmpty
-import discord4j.common.util.Snowflake
 import discord4j.core.GatewayDiscordClient
-import discord4j.core.`object`.entity.channel.MessageChannel
-import kotlinx.datetime.Instant
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.datetime.toKotlinInstant
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
@@ -57,13 +52,19 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
-import reactor.core.publisher.Mono
+import javax.annotation.PreDestroy
 import kotlin.io.path.readBytes
 
 @RestController
 @RequestMapping("/om")
 class OmController(private val repository: OmSolutionRepository, private val discordClient: GatewayDiscordClient) :
     GameRestController<OmGroupDTO, OmPuzzleDTO, OmCategoryDTO, OmRecordDTO> {
+    private val discordScope = CoroutineScope(Dispatchers.Default)
+
+    @PreDestroy
+    fun shutdown() {
+        discordScope.cancel()
+    }
 
     override val groups: List<OmGroupDTO> = OmGroup.values().map { it.toDTO() }
 
@@ -112,33 +113,10 @@ class OmController(private val repository: OmSolutionRepository, private val dis
         if (submissionDTO.gif != null && !isValidLink(submissionDTO.gif)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid gif")
         if (submissionDTO.gif == null && submissionDTO.gifData == null) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "no gif")
         val submission = createSubmission(submissionDTO.gif, submissionDTO.gifData?.bytes, submissionDTO.author, submissionDTO.solution.bytes)
-        return when (val result = repository.submit(submission)) {
-            is SubmitResult.Success -> {
-                val beatenCategories: List<OmCategory> = result.beatenRecords.flatMap { it.categories }
-                val categoryString = beatenCategories.takeIf { it.isNotEmpty() }?.joinToString { it.displayName } ?: "Pareto"
-                val score = submission.score.toDisplayString(DisplayContext(StringFormat.DISCORD, beatenCategories))
-                (if (beatenCategories.isEmpty()) Channel.PARETO else Channel.RECORD).sendDiscordMessage(
-                    SafeEmbedMessageBuilder()
-                        .title("API submission: *${submission.puzzle.displayName}* $categoryString")
-                        .color(Colors.SUCCESS)
-                        .description("`$score`${submission.author.orEmpty(prefix = " by ")}${if (beatenCategories.isNotEmpty()) "\npreviously:" else " was included in the pareto frontier"}")
-                        .embedCategoryRecords(result.beatenRecords, submission.puzzle.supportedCategories)
-                        .link(submission.displayLink)
-                )
-                SubmitResultType.SUCCESS
-            }
-
-            is SubmitResult.Updated -> {
-                Channel.UPDATE.sendDiscordMessage(
-                    SafeEmbedMessageBuilder()
-                        .title("API gif update: *${submission.puzzle.displayName}*")
-                        .color(Colors.SUCCESS)
-                        .description("`${submission.score.toDisplayString(DisplayContext.discord())}`${submission.author.orEmpty(prefix = " updated by ")}")
-                        .link(submission.displayLink)
-                )
-                SubmitResultType.SUCCESS
-            }
-
+        val result = repository.submit(submission)
+        discordScope.launch { discordClient.notifyOf(result) }
+        return when (result) {
+            is SubmitResult.Success,is SubmitResult.Updated  -> SubmitResultType.SUCCESS
             is SubmitResult.Failure -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, result.message)
             is SubmitResult.NothingBeaten -> SubmitResultType.NOTHING_BEATEN
             is SubmitResult.AlreadyPresent -> SubmitResultType.ALREADY_PRESENT
@@ -157,23 +135,6 @@ class OmController(private val repository: OmSolutionRepository, private val dis
         return repository.records.filter { it.record.lastModified != null && it.record.lastModified >= kSince }.sortedBy { it.record.lastModified }
             .map { it.toDTO() }
     }
-
-    private fun Channel.sendDiscordMessage(message: SafeEmbedMessageBuilder) {
-        discordClient.guilds
-            .flatMap { it.getChannelById(id).onErrorResume { Mono.empty() } }
-            .filterIsInstance<MessageChannel>()
-            .flatMap { message.send(it) }
-            .subscribe()
-    }
-}
-
-enum class Channel(idLong: Long) {
-    RECORD(370367639073062922),
-    PARETO(909638277756243978),
-    UPDATE(1006543549346611251),
-    ;
-
-    val id = Snowflake.of(idLong)
 }
 
 private fun findPuzzle(puzzleId: String) =

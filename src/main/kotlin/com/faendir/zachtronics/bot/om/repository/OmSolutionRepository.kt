@@ -159,7 +159,11 @@ class OmSolutionRepository(
                     beatenRecords.flatMap { it.categories }.map { it.toString() })
                 hash = leaderboardScope.currentHash()
             }
-            result
+            when(result) {
+                is SubmitResult.Success -> result.copy(record = newRecord)
+                is SubmitResult.Updated -> result.copy(record = newRecord)
+                else -> result
+            }
         }
     }
 
@@ -186,7 +190,7 @@ class OmSolutionRepository(
                     continue
                 } else if (submission.displayLink != record.displayLink || record.displayLink == null || record.dataLink == null) {
                     handleBeatenRecord(record, categories, false)
-                    return SubmitResult.Updated(CategoryRecord(record, categories.toSet()))
+                    return SubmitResult.Updated(null, CategoryRecord(record, categories.toSet()))
                 } else {
                     return SubmitResult.AlreadyPresent()
                 }
@@ -221,7 +225,7 @@ class OmSolutionRepository(
         if (unclaimedCategories.isNotEmpty()) {
             result.add(CategoryRecord(null, unclaimedCategories))
         }
-        return SubmitResult.Success(null, result)
+        return SubmitResult.Success(null, null, result)
     }
 
     fun overrideScores(overrides: List<Pair<OmRecord, OmScore>>) {

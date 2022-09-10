@@ -26,8 +26,11 @@ import com.faendir.om.parser.solution.model.part.Glyph
 import com.faendir.om.parser.solution.model.part.GlyphType
 import com.faendir.om.parser.solution.model.part.IO
 import com.faendir.om.parser.solution.model.part.Track
+import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.option.enumOptionBuilder
+import com.faendir.zachtronics.bot.model.DisplayContext
+import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
@@ -35,12 +38,31 @@ import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.repository.CategoryRecord
+import com.faendir.zachtronics.bot.repository.SubmitResult
+import com.faendir.zachtronics.bot.rest.dto.SubmitResultType
+import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.ceil
+import com.faendir.zachtronics.bot.utils.embedCategoryRecords
+import com.faendir.zachtronics.bot.utils.filterIsInstance
 import com.faendir.zachtronics.bot.utils.fuzzyMatch
+import com.faendir.zachtronics.bot.utils.orEmpty
+import com.faendir.zachtronics.bot.utils.smartFormat
+import com.faendir.zachtronics.bot.utils.toMetricsTree
+import discord4j.common.util.Snowflake
+import discord4j.core.DiscordClient
+import discord4j.core.GatewayDiscordClient
+import discord4j.core.`object`.entity.Message
+import discord4j.core.`object`.entity.channel.MessageChannel
+import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import okio.buffer
 import okio.sink
 import okio.source
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
+import org.springframework.web.server.ResponseStatusException
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -142,3 +164,84 @@ fun omScoreOptionBuilder() = CommandOptionBuilder.string("score")
     .convert { it?.replace("[\\s\u200B]".toRegex(), "") }
 
 fun omSolutionOptionBuilder() = CommandOptionBuilder.attachment("solution").description("Your solution file")
+
+suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, OmCategory>): List<Message> {
+    return when (submitResult) {
+        is SubmitResult.Success -> {
+            val record = submitResult.record!!
+            val beatenCategories: List<OmCategory> = submitResult.beatenRecords.flatMap { it.categories }
+            if (beatenCategories.isEmpty()) {
+                sendDiscordMessage(
+                    SafeEmbedMessageBuilder()
+                        .title("New Submission: *${record.puzzle.displayName}* Pareto")
+                        .color(Colors.SUCCESS)
+                        .description(
+                            "`${record.toDisplayString(DisplayContext(StringFormat.DISCORD, beatenCategories))}`"
+                                    + record.author.orEmpty(prefix = " by ")
+                                    + (" was included in the pareto frontier.")
+                                    + (if (submitResult.beatenRecords.isNotEmpty()) "\nPreviously:" else "")
+                        )
+                        .embedCategoryRecords(submitResult.beatenRecords, record.puzzle.supportedCategories)
+                        .link(record.displayLink), Channel.PARETO
+                )
+            } else {
+                sendDiscordMessage(
+                    SafeEmbedMessageBuilder()
+                        .title("New Submission: *${record.puzzle.displayName}* ${beatenCategories.smartFormat(record.puzzle.supportedCategories.toMetricsTree())}")
+                        .color(Colors.SUCCESS)
+                        .description(
+                            "`${record.toDisplayString(DisplayContext(StringFormat.DISCORD, beatenCategories))}`"
+                                    + record.author.orEmpty(prefix = " by ")
+                                    + (if (submitResult.beatenRecords.isNotEmpty()) "\nPreviously:" else "")
+                        )
+                        .embedCategoryRecords(submitResult.beatenRecords, record.puzzle.supportedCategories)
+                        .link(record.displayLink), Channel.RECORD
+                )
+            }
+        }
+
+        is SubmitResult.Updated -> {
+            val record = submitResult.record!!
+            val puzzle = record.puzzle
+            sendDiscordMessage(
+                SafeEmbedMessageBuilder()
+                    .title(
+                        "Updated: *${puzzle.displayName}* ${
+                            submitResult.oldRecord.categories.takeIf { it.isNotEmpty() }?.smartFormat(puzzle.supportedCategories.toMetricsTree()) ?: "Pareto"
+                        }"
+                    )
+                    .color(Colors.SUCCESS)
+                    .description(
+                        "`${record.score.toDisplayString(DisplayContext(StringFormat.DISCORD, submitResult.oldRecord.categories))}`"
+                                + (" was updated.")
+                                + ("\nPreviously:")
+                    )
+                    .embedCategoryRecords(listOf(submitResult.oldRecord), puzzle.supportedCategories)
+                    .link(record.displayLink), Channel.UPDATE
+            )
+        }
+
+        else -> emptyList()
+    }
+}
+
+private suspend fun GatewayDiscordClient.sendDiscordMessage(message: SafeEmbedMessageBuilder, channel: Channel): List<Message> {
+    return guilds
+        .flatMap { it.getChannelById(channel.id).onErrorResume { Mono.empty() } }
+        .filterIsInstance<MessageChannel>()
+        .flatMap { message.send(it) }
+        .collectList()
+        .awaitSingleOrNull()
+        ?.flatten()
+        ?: emptyList()
+}
+
+
+enum class Channel(idLong: Long) {
+    RECORD(370367639073062922),
+    PARETO(909638277756243978),
+    UPDATE(1006543549346611251),
+    ;
+
+    val id = Snowflake.of(idLong)
+}

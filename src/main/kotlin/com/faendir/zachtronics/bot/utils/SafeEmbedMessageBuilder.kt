@@ -19,9 +19,11 @@ package com.faendir.zachtronics.bot.utils
 import com.google.common.annotations.VisibleForTesting
 import discord4j.core.`object`.entity.channel.MessageChannel
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
+import discord4j.core.`object`.entity.Message
 import discord4j.core.spec.EmbedCreateFields
 import discord4j.core.spec.EmbedCreateSpec
 import discord4j.rest.util.Color
+import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import reactor.core.publisher.Mono
@@ -42,6 +44,7 @@ class SafeEmbedMessageBuilder : SafeMessageBuilder {
     fun url(url: String) = apply {
         current.url(url)
     }
+
     fun description(description: String) = apply {
         val safeDescription = description.truncateWithEllipsis(EmbedLimits.DESCRIPTION).ifEmptyZeroWidthSpace()
         increaseTotal(safeDescription.length)
@@ -90,7 +93,7 @@ class SafeEmbedMessageBuilder : SafeMessageBuilder {
     fun link(link: String?) = apply {
         if (link != null) {
             val match = rewritableMp4.matchEntire(link)
-            if(match != null) {
+            if (match != null) {
                 image("https://${match.groups["host"]!!.value}/${match.groups["id"]!!.value}.gif")
             } else if (allowedImageTypes.contains(link.substringAfterLast(".", ""))) {
                 image(link)
@@ -134,11 +137,9 @@ class SafeEmbedMessageBuilder : SafeMessageBuilder {
         }
     }.then()
 
-    fun send(channel: MessageChannel): Mono<Void> = mono {
-        for (embed in getEmbeds()) {
-            channel.createMessage().withEmbeds(embed).awaitSingleOrNull()
-        }
-    }.then()
+    fun send(channel: MessageChannel): Mono<List<Message>> = mono {
+        getEmbeds().map { embed -> channel.createMessage().withEmbeds(embed).awaitSingle() }
+    }
 
     @VisibleForTesting
     internal fun getEmbeds(): List<List<EmbedCreateSpec>> {

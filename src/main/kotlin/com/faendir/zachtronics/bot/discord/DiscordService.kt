@@ -64,8 +64,8 @@ class DiscordService(
                 .onErrorResume { Mono.empty() }
         }.subscribe()
         discordClient.subscribeEvent<ChatInputInteractionEvent> { event ->
-            event.deferReply().awaitSingleOrNull()
             val command = findCommand(event.commandName)
+            event.deferReply().withEphemeral(command.ephemeral(event)).awaitSingleOrNull()
             if (!command.secured.hasExecutionPermission(event, event.user())) {
                 throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
             }

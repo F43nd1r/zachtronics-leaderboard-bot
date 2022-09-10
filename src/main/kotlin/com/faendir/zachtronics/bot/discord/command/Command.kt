@@ -33,8 +33,21 @@ sealed interface Command {
     val name: String
     val secured: Secured
 
+    /**
+     * this method has to run in less than 3 seconds.
+     * Don't do network calls or disk reads here!
+     */
+    fun ephemeral(event: ChatInputInteractionEvent): Boolean
+
+    /**
+     * this method has to run in less than 15 minutes if it wants to respond to the given event.
+     */
     fun handle(event: ChatInputInteractionEvent): Mono<Void>
 
+    /**
+     * this method has to run in less than 3 seconds.
+     * Don't do network calls or disk reads here!
+     */
     fun autoComplete(event: ChatInputAutoCompleteEvent): List<ApplicationCommandOptionChoiceData>?
 
     interface TopLevel : Command {
@@ -43,7 +56,10 @@ sealed interface Command {
 
     abstract class Leaf : Command {
         open val description: String? = null
+        open val ephemeral: Boolean = false
         abstract val options: List<CommandOption<*, *>>
+
+        override fun ephemeral(event: ChatInputInteractionEvent) = ephemeral
 
         fun buildOptions(): List<ApplicationCommandOptionData> = options.map { it.build() }
 
@@ -55,9 +71,7 @@ sealed interface Command {
     }
 
     abstract class BasicLeaf : Leaf() {
-        override fun handle(event: ChatInputInteractionEvent): Mono<Void> {
-            return handleEvent(event).send(event)
-        }
+        override fun handle(event: ChatInputInteractionEvent) = handleEvent(event).send(event)
 
         abstract fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder
     }
@@ -70,11 +84,13 @@ sealed interface Command {
             return commands.first { it.name == name }
         }
 
-        override val secured: Secured = Secured { event, user ->
+        override val secured = Secured { event, user ->
             findCommand(event).secured.hasExecutionPermission(event, user)
         }
 
-        override fun buildRequest(): ApplicationCommandRequest = ApplicationCommandRequest.builder()
+        override fun ephemeral(event: ChatInputInteractionEvent) = findCommand(event).ephemeral(event)
+
+        override fun buildRequest() = ApplicationCommandRequest.builder()
             .name(name)
             .description(name)
             .addAllOptions(commands.map {
@@ -86,15 +102,13 @@ sealed interface Command {
                     .build()
             }).build()
 
-        override fun handle(event: ChatInputInteractionEvent): Mono<Void> = findCommand(event).handle(event)
+        override fun handle(event: ChatInputInteractionEvent) = findCommand(event).handle(event)
 
-        override fun autoComplete(event: ChatInputAutoCompleteEvent): List<ApplicationCommandOptionChoiceData>? {
-            return findCommand(event).autoComplete(event)
-        }
+        override fun autoComplete(event: ChatInputAutoCompleteEvent) = findCommand(event).autoComplete(event)
     }
 
     abstract class Single : Leaf(), TopLevel {
-        override fun buildRequest(): ApplicationCommandRequest = ApplicationCommandRequest.builder()
+        override fun buildRequest() = ApplicationCommandRequest.builder()
             .name(name)
             .description(description ?: name)
             .addAllOptions(buildOptions())

@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.discord.command.option
 
 import com.faendir.zachtronics.bot.utils.fuzzyMatch
 import com.faendir.zachtronics.bot.utils.isValidLink
+import com.faendir.zachtronics.bot.utils.url
 import discord4j.common.util.Snowflake
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.reaction.ReactionEmoji
@@ -65,11 +66,7 @@ private fun findLink(input: String, messages: Flux<Message>): String {
         val attachment = match.groups["attachment"]?.value?.toInt()
         val message = messages.elementAt(num - 1).block()!!
         message.attachments.getOrNull(attachment?.minus(1) ?: 0)?.url?.also { message.addReaction(ReactionEmoji.unicode("\uD83D\uDC4D"/* 👍 */)).block() }
-            ?: throw IllegalArgumentException(
-                "https://discord.com/channels/${
-                    message.guild.block()?.id?.asLong()?.toString() ?: "@me"
-                }/${message.channelId.asLong()}/${message.id.asLong()} had no attachments"
-            )
+            ?: throw IllegalArgumentException("${message.url} had no attachments")
     } ?: input
 
     if (!isValidLink(link)) {

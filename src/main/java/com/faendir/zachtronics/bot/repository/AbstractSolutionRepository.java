@@ -206,7 +206,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         }
 
         String result = commit(access, submission, puzzlePath);
-        return new SubmitResult.Success<>(result, beatenCategoryRecords);
+        return new SubmitResult.Success<>(result, null, beatenCategoryRecords);
     }
 
     @NotNull

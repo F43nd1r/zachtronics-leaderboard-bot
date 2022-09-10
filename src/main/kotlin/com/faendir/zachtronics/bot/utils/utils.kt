@@ -21,6 +21,7 @@ import com.faendir.zachtronics.bot.model.*
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.entity.User
 import discord4j.core.spec.EmbedCreateFields
 import discord4j.core.spec.EmbedCreateSpec
@@ -163,3 +164,6 @@ fun Double.ceil(precision: Int): Double {
     val factor = 10.0.pow(precision)
     return kotlin.math.ceil(this * factor) / factor
 }
+
+val Message.url
+    get() = "https://discord.com/channels/${guildId.map { it.asString() }.orElse("@me")}/${channelId.asString()}/${id.asString()}"

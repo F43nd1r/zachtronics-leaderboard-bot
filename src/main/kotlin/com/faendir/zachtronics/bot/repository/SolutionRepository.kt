@@ -36,11 +36,11 @@ interface SolutionRepository<C : Category, P : Puzzle<C>, S : Submission<C, P>, 
 }
 
 sealed class SubmitResult<R: Record<C>, C: Category> {
-    class Success<R: Record<C>, C: Category>(val message: String?, val beatenRecords: Collection<CategoryRecord<R?, C>>) : SubmitResult<R, C>()
-    class Updated<R: Record<C>, C: Category>(val oldRecord: CategoryRecord<R, C>) : SubmitResult<R, C>()
+    data class Success<R: Record<C>, C: Category>(val message: String?, val record: R?, val beatenRecords: Collection<CategoryRecord<R?, C>>) : SubmitResult<R, C>()
+    data class Updated<R: Record<C>, C: Category>(val record: R?, val oldRecord: CategoryRecord<R, C>) : SubmitResult<R, C>()
     class AlreadyPresent<R: Record<C>, C: Category> : SubmitResult<R, C>()
-    class NothingBeaten<R: Record<C>, C: Category>(val records: Collection<CategoryRecord<R, C>>) : SubmitResult<R, C>()
-    class Failure<R: Record<C>, C: Category>(val message: String): SubmitResult<R, C>()
+    data class NothingBeaten<R: Record<C>, C: Category>(val records: Collection<CategoryRecord<R, C>>) : SubmitResult<R, C>()
+    data class Failure<R: Record<C>, C: Category>(val message: String): SubmitResult<R, C>()
 }
 
 data class CategoryRecord<R: Record<C>?, C: Category>(val record: R, val categories: Set<C>)

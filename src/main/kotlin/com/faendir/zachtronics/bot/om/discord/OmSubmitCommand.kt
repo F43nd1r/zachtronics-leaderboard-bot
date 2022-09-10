@@ -16,34 +16,87 @@
 
 package com.faendir.zachtronics.bot.om.discord
 
-import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand
+import com.faendir.zachtronics.bot.discord.Colors
+import com.faendir.zachtronics.bot.discord.command.Command
 import com.faendir.zachtronics.bot.discord.command.option.linkOptionBuilder
+import com.faendir.zachtronics.bot.discord.command.security.NotSecured
 import com.faendir.zachtronics.bot.discord.command.security.Secured
-import com.faendir.zachtronics.bot.discord.command.security.TrustedLeaderboardPosterRoleSecured
+import com.faendir.zachtronics.bot.model.DisplayContext
+import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.createSubmission
 import com.faendir.zachtronics.bot.om.model.OmCategory
-import com.faendir.zachtronics.bot.om.model.OmPuzzle
-import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmSubmission
+import com.faendir.zachtronics.bot.om.notifyOf
 import com.faendir.zachtronics.bot.om.omSolutionOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
+import com.faendir.zachtronics.bot.repository.SubmitResult
+import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
+import com.faendir.zachtronics.bot.utils.embedCategoryRecords
+import com.faendir.zachtronics.bot.utils.orEmpty
+import com.faendir.zachtronics.bot.utils.smartFormat
+import com.faendir.zachtronics.bot.utils.toMetricsTree
+import com.faendir.zachtronics.bot.utils.url
 import com.faendir.zachtronics.bot.utils.user
 import com.roxstudio.utils.CUrl
+import discord4j.core.GatewayDiscordClient
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
+import kotlinx.coroutines.reactor.awaitSingleOrNull
+import kotlinx.coroutines.reactor.mono
 import org.springframework.stereotype.Component
+import reactor.core.publisher.Mono
 
 @Component
 @OmQualifier
-class OmSubmitCommand(override val repository: OmSolutionRepository) : AbstractSubmitCommand<OmCategory, OmPuzzle, OmSubmission, OmRecord>() {
+class OmSubmitCommand(private val repository: OmSolutionRepository, private val discordClient: GatewayDiscordClient) : Command.Leaf() {
+    override val name = "submit"
+    override val description = "Submit a solution"
+    override val ephemeral = true
     private val solutionOption = omSolutionOptionBuilder().required().build()
     private val gifOption = linkOptionBuilder("gif")
         .description("Link to your solution gif/mp4, can be `m1` to scrape it from your last message")
         .build()
     override val options = listOf(solutionOption, gifOption)
-    override val secured: Secured = TrustedLeaderboardPosterRoleSecured
+    override val secured: Secured = NotSecured
+    override fun handle(event: ChatInputInteractionEvent) = mono {
+        val submission = parseSubmission(event)
+        submitToRepository(submission).send(event).awaitSingleOrNull()
+    }
 
-    override fun parseSubmission(event: ChatInputInteractionEvent): OmSubmission {
+    protected suspend fun submitToRepository(submission: OmSubmission): SafeEmbedMessageBuilder {
+        val result = repository.submit(submission)
+        val messages = discordClient.notifyOf(result)
+        return when (result) {
+            is SubmitResult.Success -> SafeEmbedMessageBuilder()
+               .title("Successfully submitted!")
+               .color(Colors.SUCCESS)
+               .description("I have posted about your solution ${messages.firstOrNull()?.url?.let { "[here]($it)" } ?: "nowhere :thinking:"}")
+
+            is SubmitResult.Updated ->
+                SafeEmbedMessageBuilder()
+                    .title("Successfully Updated!")
+                    .color(Colors.SUCCESS)
+                    .description("I have posted about your solution ${messages.firstOrNull()?.url?.let { "[here]($it)" } ?: "nowhere :thinking:"}")
+
+            is SubmitResult.AlreadyPresent ->
+                SafeEmbedMessageBuilder()
+                    .title("Already present: *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.discord())}`")
+                    .color(Colors.UNCHANGED)
+                    .description("No action was taken.")
+
+            is SubmitResult.NothingBeaten ->
+                SafeEmbedMessageBuilder()
+                    .title("No Scores beaten by *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.discord())}`")
+                    .color(Colors.UNCHANGED)
+                    .description("Beaten by:")
+                    .embedCategoryRecords(result.records, submission.puzzle.supportedCategories)
+
+            is SubmitResult.Failure -> throw IllegalArgumentException(result.message)
+        }
+    }
+
+    fun parseSubmission(event: ChatInputInteractionEvent): OmSubmission {
         val gif = gifOption.get(event)
         val bytes = try {
             CUrl(solutionOption.get(event).url).exec()
