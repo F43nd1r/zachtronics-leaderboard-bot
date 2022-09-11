@@ -17,9 +17,7 @@
 package com.faendir.zachtronics.bot.fp.repository;
 
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.fp.model.FpPuzzle;
-import com.faendir.zachtronics.bot.fp.model.FpRecord;
-import com.faendir.zachtronics.bot.fp.model.FpSubmission;
+import com.faendir.zachtronics.bot.fp.model.*;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.utils.LambdaUtils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
@@ -33,7 +31,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @BotTest
 @Disabled("Massive tests only for manual testing or migrations")
@@ -83,5 +83,41 @@ class FpManualTest {
                 Files.writeString(path, newData, StandardOpenOption.TRUNCATE_EXISTING);
             }
         }
+    }
+
+    @Test
+    public void rebuildAllWiki() {
+        for (FpPuzzle puzzle: FpPuzzle.values()) {
+            if (puzzle.getType() != FpType.STANDARD)
+                continue;
+            repository.rebuildRedditLeaderboard(puzzle, "");
+            System.out.println("Done " + puzzle.getDisplayName());
+        }
+
+        String page = repository.getRedditService().getWikiPage(repository.getSubreddit(), repository.getWikiPageName())
+                                .replaceAll("file:/tmp/fp-leaderboard[0-9]+/",
+                                            "https://raw.githubusercontent.com/lastcallbbs-community-developers/forbidden-path-leaderboard/master");
+        System.out.println(page);
+    }
+
+    @Test
+    public void createWiki() {
+        StringBuilder page = new StringBuilder();
+        for (FpGroup group: FpGroup.values()) {
+            String header = String.format("""
+                                          ### %s
+
+                                          | Name | Rules | Conditional Rules | Frames
+                                          | ---  | ---  | --- | ---
+                                          """, group.getDisplayName());
+            page.append(header);
+            String groupTable = Arrays.stream(FpPuzzle.values())
+                                      .filter(p -> p.getGroup() == group)
+                                      .filter(p -> p.getType() == FpType.STANDARD)
+                                      .map(p -> String.format("| [%s](%s) | | | \n", p.getDisplayName(), p.getLink()))
+                                      .collect(Collectors.joining("|\n"));
+            page.append(groupTable).append('\n');
+        }
+        System.out.println(page);
     }
 }

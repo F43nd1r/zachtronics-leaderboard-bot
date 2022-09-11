@@ -24,13 +24,9 @@ import com.faendir.zachtronics.bot.fp.model.FpCategory;
 import com.faendir.zachtronics.bot.fp.model.FpPuzzle;
 import com.faendir.zachtronics.bot.fp.model.FpRecord;
 import com.faendir.zachtronics.bot.fp.repository.FpSolutionRepository;
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Component
@@ -38,7 +34,7 @@ import java.util.List;
 public class FpFrontierCommand extends AbstractFrontierCommand<FpCategory, FpPuzzle, FpRecord> {
     @Getter
     private final CommandOption<String, FpPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", FpPuzzle.class, FpPuzzle::getDisplayName)
-            .description("Puzzle name. Can be shortened or abbreviated. E.g. `fake surv`, `HD`")
+            .description("Puzzle name. Can be shortened or abbreviated. E.g. `1-1`, `add 2-3`")
             .required()
             .build();
     @Getter

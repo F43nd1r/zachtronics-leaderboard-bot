@@ -19,12 +19,10 @@ package com.faendir.zachtronics.bot.inf.repository;
 import com.faendir.zachtronics.bot.git.GitRepository;
 import com.faendir.zachtronics.bot.inf.model.*;
 import com.faendir.zachtronics.bot.model.DisplayContext;
-import com.faendir.zachtronics.bot.model.StringFormat;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
-import com.faendir.zachtronics.bot.utils.Markdown;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -34,28 +32,26 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
 import java.util.function.Function;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static com.faendir.zachtronics.bot.inf.model.IfCategory.*;
 
 
 @Component
 @RequiredArgsConstructor
+@Getter(AccessLevel.PROTECTED)
 public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory, IfPuzzle, IfScore, IfSubmission, IfRecord, IfSolution> {
-    private static final IfCategory[][] CATEGORIES = {{C, CNG}, {F}, {B}}; // TODO
-
+    private final IfCategory[][] wikiCategories = {{C, CNG}, {F}, {B}}; // TODO
     private final RedditService redditService;
-    @Getter(AccessLevel.PROTECTED)
+    private final Subreddit subreddit = Subreddit.INFINIFACTORY;
+    private final String wikiPageName = "index";
+
     @Qualifier("ifRepository")
     private final GitRepository gitRepo;
-    @Getter
     private final Class<IfCategory> categoryClass = IfCategory.class;
-    @Getter
     final Function<String[], IfSolution> solUnmarshaller = IfSolution::unmarshal;
-    @Getter
     private final Comparator<IfSolution> archiveComparator = Comparator.comparing(IfSolution::getScore, C.getScoreComparator());
 
     @NotNull
@@ -68,69 +64,7 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
 
     @Override
     protected void writeToRedditLeaderboard(IfPuzzle puzzle, Path puzzlePath, @NotNull List<IfSolution> solutions, String updateMessage) {
-        if (true) // TODO
-            return;
-        Map<IfCategory, IfRecord> recordMap = new EnumMap<>(IfCategory.class);
-        for (IfSolution solution: solutions) {
-            IfRecord record = solution.extendToRecord(puzzle,
-                                                      makeArchiveLink(puzzle, solution.getScore()),
-                                                      makeArchivePath(puzzlePath, solution.getScore()));
-            for (IfCategory category : solution.getCategories()) {
-                recordMap.put(category, record);
-            }
-        }
-
-        List<String> lines = Pattern.compile("\\r?\\n")
-                                    .splitAsStream(redditService.getWikiPage(Subreddit.INFINIFACTORY, "index"))
-                                    .collect(Collectors.toList()); // mutable list
-        Pattern puzzleRegex = Pattern.compile("^\\| \\[" + Pattern.quote(puzzle.getDisplayName()));
-
-        ListIterator<String> it = lines.listIterator();
-
-        // | [Puzzle](https://zlbb) | [(**c**/pp/l)](https://cp.txt) | [(c/**pp**/l)](https://pc.txt) | [(c/pp/**l**)](https://lc.txt)
-        // |                        | [(**c**/pp/l)](https://cl.txt) |                                | [(c/pp/**l**)](https://lp.txt)
-        while (it.hasNext()) {
-            String line = it.next();
-            if (puzzleRegex.matcher(line).find()) {
-                it.remove();
-                break;
-            }
-        }
-
-        while (it.hasNext()) {
-            String line = it.next();
-            if (line.equals("|") || line.isBlank()) {
-                it.previous();
-                break;
-            } else {
-                it.remove();
-            }
-        }
-
-        for (int rowIdx = 0; rowIdx < 2; rowIdx++) {
-            StringBuilder row = new StringBuilder("| ");
-            if (rowIdx == 0)
-                row.append(Markdown.linkOrText(puzzle.getDisplayName(), puzzle.getLink()));
-
-            IfCategory[] blockCategories = CATEGORIES[rowIdx];
-
-            boolean usefulLine = false;
-            for (int i = 0; i < 3; i++) {
-                IfCategory thisCategory = blockCategories[i];
-                row.append(" | ");
-                IfRecord thisRecord = recordMap.get(thisCategory);
-                if (rowIdx == 0 || thisRecord != recordMap.get(CATEGORIES[0][i])) {
-                    DisplayContext<IfCategory> displayContext = new DisplayContext<>(StringFormat.REDDIT, thisCategory);
-                    String cell = thisRecord.toDisplayString(displayContext);
-                    row.append(cell);
-                    usefulLine = true;
-                }
-            }
-            if (usefulLine)
-                it.add(row.toString());
-        }
-
-        redditService.updateWikiPage(Subreddit.INFINIFACTORY, "index", String.join("\n", lines), updateMessage);
+        // TODO
     }
 
     @Override

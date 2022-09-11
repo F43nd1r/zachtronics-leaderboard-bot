@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 public class FpListCommand extends AbstractListCommand<FpCategory, FpPuzzle, FpRecord> {
     @Getter
     private final CommandOption<String, FpPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", FpPuzzle.class, FpPuzzle::getDisplayName)
-            .description("Puzzle name. Can be shortened or abbreviated. E.g. `fake surv`, `HD`")
+            .description("Puzzle name. Can be shortened or abbreviated. E.g. `1-1`, `add 2-3`")
             .required()
             .build();
     @Getter

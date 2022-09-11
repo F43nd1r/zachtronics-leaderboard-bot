@@ -14,7 +14,7 @@ find fp -type f | xargs rpl '\.sz' '.fp' {}
 ```
 
 Edit:
-* `discord/FpCommand`
+* `discord/FpCommandGroup`
 * `model/*`
 * `repository/*`
 * `rest/dto/*`
@@ -44,15 +44,20 @@ Add skeleton to `test/resources`, and add to the `TestConfiguration` class for t
 
 Add README
 
-After levels are filled, run:
+After levels are filled, run:  
 `find . -name 'solutions.psv' -execdir ln -s solutions.psv README.txt \;`
 
 ### FE
 
-Add route to `web/src/index.tsx`
-Add score class to `web/src/model/<game>`
-Add view to `web/src/views/<game>`
+* Add route to `web/src/index.tsx`
+* Add score class to `web/src/model/<game>`
+* Add view to `web/src/views/<game>`
 
 ### Reddit
 
-Take hold of the subreddit wiki
+* Take hold of the subreddit wiki, map it in `Subreddit.kt`  
+* Create the wiki page on reddit
+* Create `test/src/resources/reddit/<subreddit>/wiki/<page>.md`
+* Copy the prefix from an existing lb, tweak as desired
+* Generate an empty table via `createWiki` test method
+* Test, then paste the content on the reddit page

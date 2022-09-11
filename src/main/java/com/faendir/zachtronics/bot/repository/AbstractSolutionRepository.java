@@ -19,6 +19,9 @@ package com.faendir.zachtronics.bot.repository;
 import com.faendir.zachtronics.bot.git.GitRepository;
 import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.model.*;
+import com.faendir.zachtronics.bot.reddit.RedditService;
+import com.faendir.zachtronics.bot.reddit.Subreddit;
+import com.faendir.zachtronics.bot.utils.Markdown;
 import com.opencsv.*;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -35,6 +38,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -42,6 +46,11 @@ import java.util.stream.StreamSupport;
 public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJava<C, S, ?, ?>, P extends Puzzle<C>, S extends Score<C>,
                                                  Sub extends Submission<C, P>, R extends Record<C>, Sol extends Solution<C, P, S, R>>
         implements SolutionRepository<C, P, Sub, R> {
+
+    protected abstract RedditService getRedditService();
+    protected abstract Subreddit getSubreddit();
+    protected abstract String getWikiPageName();
+    protected abstract C[][] getWikiCategories();
 
     protected abstract GitRepository getGitRepo();
     protected abstract Class<C> getCategoryClass();
@@ -266,7 +275,70 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         }
     }
 
-    protected abstract void writeToRedditLeaderboard(P puzzle, Path puzzlePath, @NotNull List<Sol> solutions, String updateMessage);
+    protected void writeToRedditLeaderboard(P puzzle, Path puzzlePath, @NotNull List<Sol> solutions, String updateMessage) {
+        Map<C, R> recordMap = new EnumMap<>(getCategoryClass());
+        for (Sol solution: solutions) {
+            R record = solution.extendToRecord(puzzle,
+                                               makeArchiveLink(puzzle, solution.getScore()),
+                                               makeArchivePath(puzzlePath, solution.getScore()));
+            for (C category : solution.getCategories()) {
+                recordMap.put(category, record);
+            }
+        }
+
+        List<String> lines = Pattern.compile("\\r?\\n")
+                                    .splitAsStream(getRedditService().getWikiPage(getSubreddit(), getWikiPageName()))
+                                    .collect(Collectors.toList()); // mutable list
+        Pattern puzzleRegex = Pattern.compile("^\\| \\[" + Pattern.quote(puzzle.getDisplayName()));
+
+        ListIterator<String> it = lines.listIterator();
+
+        // | [Puzzle](https://zlbb) | [(**c**/pp/l)](https://cp.txt) | [(c/**pp**/l)](https://pc.txt) | [(c/pp/**l**)](https://lc.txt)
+        // |                        | [(**c**/pp/l)](https://cl.txt) |                                | [(c/pp/**l**)](https://lp.txt)
+        while (it.hasNext()) {
+            String line = it.next();
+            if (puzzleRegex.matcher(line).find()) {
+                it.remove();
+                break;
+            }
+        }
+
+        while (it.hasNext()) {
+            String line = it.next();
+            if (line.equals("|") || line.isBlank()) {
+                it.previous();
+                break;
+            } else {
+                it.remove();
+            }
+        }
+
+        C[][] categories = getWikiCategories();
+        for (int rowIdx = 0; rowIdx < categories.length; rowIdx++) {
+            StringBuilder row = new StringBuilder("| ");
+            if (rowIdx == 0)
+                row.append(Markdown.linkOrText(puzzle.getDisplayName(), puzzle.getLink()));
+
+            C[] blockCategories = categories[rowIdx];
+
+            boolean usefulLine = false;
+            for (int i = 0; i < blockCategories.length; i++) {
+                C thisCategory = blockCategories[i];
+                row.append(" | ");
+                R thisRecord = recordMap.get(thisCategory);
+                if (rowIdx == 0 || thisRecord != recordMap.get(categories[0][i])) {
+                    DisplayContext<C> displayContext = new DisplayContext<>(StringFormat.REDDIT, thisCategory);
+                    String cell = thisRecord.toDisplayString(displayContext);
+                    row.append(cell);
+                    usefulLine = true;
+                }
+            }
+            if (usefulLine)
+                it.add(row.toString());
+        }
+
+        getRedditService().updateWikiPage(getSubreddit(), getWikiPageName(), String.join("\n", lines), updateMessage);
+    }
 
     @NotNull
     protected Path getPuzzlePath(@NotNull GitRepository.ReadAccess access, P puzzle) {

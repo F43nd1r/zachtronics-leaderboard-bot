@@ -44,19 +44,18 @@ import static com.faendir.zachtronics.bot.sc.model.ScCategory.*;
 
 @Component
 @RequiredArgsConstructor
+@Getter(AccessLevel.PROTECTED)
 public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory, ScPuzzle, ScScore, ScSubmission, ScRecord, ScSolution> {
-    private static final ScCategory[][] CATEGORIES = {{ C,  CNB,  CNP,  CNBP}, { S,  SNB,  SNP,  SNBP},
-                                                      {RC, RCNB, RCNP, RCNBP}, {RS, RSNB, RSNP, RSNBP}};
-
+    private final ScCategory[][] wikiCategories = {{ C,  CNB,  CNP,  CNBP}, { S,  SNB,  SNP,  SNBP},
+                                                   {RC, RCNB, RCNP, RCNBP}, {RS, RSNB, RSNP, RSNBP}};
     private final RedditService redditService;
-    @Getter(AccessLevel.PROTECTED)
+    private final Subreddit subreddit = Subreddit.SPACECHEM;
+    private final String wikiPageName = null;
+
     @Qualifier("scArchiveRepository")
     private final GitRepository gitRepo;
-    @Getter
     private final Class<ScCategory> categoryClass = ScCategory.class;
-    @Getter
     final Function<String[], ScSolution> solUnmarshaller = ScSolution::unmarshal;
-    @Getter
     private final Comparator<ScSolution> archiveComparator =
             Comparator.comparing(ScSolution::getScore, ScCategory.C.getScoreComparator()
                                                                    .thenComparing(ScScore::isBugged)
@@ -133,7 +132,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
             }
         }
 
-        String[] lines = redditService.getWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
+        String[] lines = redditService.getWikiPage(subreddit, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
         Pattern puzzleRegex = Pattern.compile("^\\| \\[" + Pattern.quote(puzzle.getDisplayName()));
 
         int rowIdx = 0;
@@ -156,7 +155,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                 row.append(Markdown.linkOrText(rowTitle, puzzle.getLink()));
 
                 for (int block = 0; block < 2; block++) {
-                    ScCategory[] blockCategories = CATEGORIES[2 * rowIdx + block];
+                    ScCategory[] blockCategories = wikiCategories[2 * rowIdx + block];
                     ScRecord[] blockRecords = Arrays.stream(blockCategories)
                                                     .map(recordMap::get)
                                                     .toArray(ScRecord[]::new);
@@ -191,8 +190,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
             }
         }
 
-        redditService.updateWikiPage(Subreddit.SPACECHEM, puzzle.getGroup().getWikiPage(), String.join("\n", lines),
-                                     updateMessage);
+        redditService.updateWikiPage(subreddit, puzzle.getGroup().getWikiPage(), String.join("\n", lines), updateMessage);
     }
 
     @NotNull

@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.reddit
 
 enum class Subreddit(val id: String) {
     INFINIFACTORY("infinifactory"),
+    LASTCALLBBS("lastcallbbs"),
     OPUS_MAGNUM("opus_magnum"),
     SHENZHEN_IO("shenzhenIO"),
     SPACECHEM("spacechem"),

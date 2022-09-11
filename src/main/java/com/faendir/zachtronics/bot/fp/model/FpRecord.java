@@ -16,7 +16,9 @@
 
 package com.faendir.zachtronics.bot.fp.model;
 
+import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Record;
+import com.faendir.zachtronics.bot.utils.Markdown;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,4 +32,11 @@ public class FpRecord implements Record<FpCategory> {
     String displayLink;
     String dataLink;
     Path dataPath;
+
+    @NotNull
+    @Override
+    public String toDisplayString(@NotNull DisplayContext<FpCategory> context) {
+        return Markdown.fileLinkOrEmpty(dataLink) +
+               Markdown.linkOrText(score.toDisplayString(context) + " " + author, displayLink);
+    }
 }
