@@ -126,7 +126,6 @@ class SolRepoManualTest {
     @Test
     public void tagNewCategories() throws IOException {
         Path repoPath = Paths.get("../spacechem/archive");
-        List<ScCategory> categories = List.of(ScCategory.values());
         List<ScPuzzle> puzzles = List.of(ScPuzzle.values());
 
         for (ScPuzzle puzzle : puzzles) {
@@ -134,9 +133,9 @@ class SolRepoManualTest {
             List<ScSolution> solutions = repository.unmarshalSolutions(puzzlePath);
             if (solutions.isEmpty())
                 continue;
-            for (ScCategory category : categories) {
-                if (!puzzle.getSupportedCategories().contains(category))
-                    continue;
+
+            solutions.stream().map(ScSolution::getCategories).forEach(Set::clear);
+            for (ScCategory category : puzzle.getSupportedCategories()) {
                 solutions.stream()
                          .filter(s -> category.supportsScore(s.getScore()))
                          .min(Comparator.comparing(ScSolution::getScore, category.getScoreComparator()))

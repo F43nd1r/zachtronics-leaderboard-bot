@@ -32,7 +32,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @BotTest
@@ -119,5 +121,29 @@ class FpManualTest {
             page.append(groupTable).append('\n');
         }
         System.out.println(page);
+    }
+
+    @Test
+    public void tagNewCategories() throws IOException {
+        Path repoPath = Paths.get("../bbs/forbidden-path-leaderboard");
+        List<FpPuzzle> puzzles = List.of(FpPuzzle.values());
+
+        for (FpPuzzle puzzle : puzzles) {
+            Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
+            List<FpSolution> solutions = repository.unmarshalSolutions(puzzlePath);
+            if (solutions.isEmpty())
+                continue;
+
+            solutions.stream().map(FpSolution::getCategories).forEach(Set::clear);
+            for (FpCategory category : puzzle.getSupportedCategories()) {
+                solutions.stream()
+                         .filter(s -> category.supportsScore(s.getScore()))
+                         .min(Comparator.comparing(FpSolution::getScore, category.getScoreComparator()))
+                         .orElseThrow()
+                         .getCategories()
+                         .add(category);
+            }
+            repository.marshalSolutions(solutions, puzzlePath);
+        }
     }
 }

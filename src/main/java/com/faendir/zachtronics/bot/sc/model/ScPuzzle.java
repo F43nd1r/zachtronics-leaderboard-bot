@@ -334,7 +334,7 @@ public enum ScPuzzle implements Puzzle<ScCategory> {
     published_80_3(ScGroup.RESEARCHNET8, ScType.RESEARCH, "Memories", true),
     published_81_1(ScGroup.RESEARCHNET8, ScType.PRODUCTION, "Tumbler", true),
     published_81_2(ScGroup.RESEARCHNET8, ScType.PRODUCTION, "Molecular Key Carving", true),
-    published_81_3(ScGroup.RESEARCHNET8, ScType.RESEARCH, "Sensitive Explosives I", true),
+    published_81_3(ScGroup.RESEARCHNET8, ScType.PRODUCTION, "Sensitive Explosives I", true),
     published_82_1(ScGroup.RESEARCHNET8, ScType.RESEARCH, "Waste Gas", true),
     published_82_2(ScGroup.RESEARCHNET8, ScType.PRODUCTION, "Ethane Scrubbing", false),
     published_82_3(ScGroup.RESEARCHNET8, ScType.PRODUCTION, "Melanophlogite Clathrates", false),
