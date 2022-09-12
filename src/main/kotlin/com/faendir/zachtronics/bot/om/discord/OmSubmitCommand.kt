@@ -22,21 +22,15 @@ import com.faendir.zachtronics.bot.discord.command.option.linkOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured
 import com.faendir.zachtronics.bot.discord.command.security.Secured
 import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.createSubmission
-import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.notifyOf
 import com.faendir.zachtronics.bot.om.omSolutionOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
-import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
-import com.faendir.zachtronics.bot.utils.orEmpty
-import com.faendir.zachtronics.bot.utils.smartFormat
-import com.faendir.zachtronics.bot.utils.toMetricsTree
 import com.faendir.zachtronics.bot.utils.url
 import com.faendir.zachtronics.bot.utils.user
 import com.roxstudio.utils.CUrl
@@ -45,7 +39,6 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import org.springframework.stereotype.Component
-import reactor.core.publisher.Mono
 
 @Component
 @OmQualifier

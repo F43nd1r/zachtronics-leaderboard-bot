@@ -107,6 +107,7 @@ export default function UploadView() {
                         setFiles(files.filter((file) => file !== removeFile))
                     }}
                     filesLimit={2}
+                    maxFileSize={104857600}
                     dropzoneText="Drop your solution and gif here"
                     showPreviews={true}
                     showPreviewsInDropzone={false}
