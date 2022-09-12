@@ -42,9 +42,12 @@ import java.util.List;
 @Component
 @FpQualifier
 public class FpSubmitCommand extends AbstractMultiSubmitCommand<FpCategory, FpPuzzle, FpSubmission, FpRecord> {
-    private final CommandOption<String, String> solutionOption = OptionHelpersKt.linkOptionBuilder("solution")
-            .description("Link to the solution file, can be `m1` to scrape it from your last message")
+    private static final String SOLUTION_PREFIX = "Toronto.Solution.";
+
+    private final CommandOption<String, String> solutionOption = CommandOptionBuilder.string("solution")
+            .description("Link to the solution file, can be `m1` to scrape it from your last message or single solution text")
             .required()
+            .convert((event, link) -> link.startsWith(SOLUTION_PREFIX) ? link : OptionHelpersKt.resolveLink(event, link))
             .build();
     private final CommandOption<String, String> authorOption = CommandOptionBuilder.string("author")
             .description("Name to appear on the Reddit leaderboard")
@@ -69,7 +72,9 @@ public class FpSubmitCommand extends AbstractMultiSubmitCommand<FpCategory, FpPu
         if (solution.equals(image))
             throw new IllegalArgumentException("Solution link and image link cannot be the same link");
 
-        Collection<ValidationResult<FpSubmission>> results = FpSubmission.fromLink(solution, author);
+        Collection<ValidationResult<FpSubmission>> results = solution.startsWith(SOLUTION_PREFIX) ?
+                                                             FpSubmission.fromData(solution, author) :
+                                                             FpSubmission.fromLink(solution, author);
         if (image != null) {
             if (results.size() != 1)
                 throw new IllegalArgumentException("Only one solution can be paired with an image");

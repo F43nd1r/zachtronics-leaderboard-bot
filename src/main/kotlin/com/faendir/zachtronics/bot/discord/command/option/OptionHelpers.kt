@@ -20,6 +20,7 @@ import com.faendir.zachtronics.bot.utils.fuzzyMatch
 import com.faendir.zachtronics.bot.utils.isValidLink
 import com.faendir.zachtronics.bot.utils.url
 import discord4j.common.util.Snowflake
+import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.reaction.ReactionEmoji
 import reactor.core.publisher.Flux
@@ -52,17 +53,20 @@ fun <T : Enum<T>> enumOptionBuilder(name: String, type: Class<T>, displayName: T
 }
 
 fun linkOptionBuilder(name: String) = CommandOptionBuilder.string(name)
-    .convert { link ->
-        link?.let { l ->
-            findLink(
-                l.trim(),
-                interaction.channel.flatMapMany { channel ->
-                    val lastMessageId = channel.lastMessageId.orElseGet { Snowflake.of(Instant.now()) }
-                    channel.lastMessage.toFlux().concatWith(channel.getMessagesBefore(lastMessageId).filter { it.id.asLong() != lastMessageId.asLong() })
-                }
-                    .filter { it.author.isPresent && it.author.get() == interaction.user })
-        }
+    .convert { link -> resolveLink(link) }
+
+fun InteractionCreateEvent.resolveLink(link: String?): String? {
+    return link?.let { l ->
+        findLink(
+            l.trim(),
+            interaction.channel.flatMapMany { channel ->
+                val lastMessageId = channel.lastMessageId.orElseGet { Snowflake.of(Instant.now()) }
+                channel.lastMessage.toFlux().concatWith(
+                    channel.getMessagesBefore(lastMessageId).filter { it.id.asLong() != lastMessageId.asLong() })
+            }
+                .filter { it.author.isPresent && it.author.get() == interaction.user })
     }
+}
 
 
 private val linkRegex = Regex("m(?<message>\\d{1,2})(\\.(?<attachment>\\d{1,2}))?")
