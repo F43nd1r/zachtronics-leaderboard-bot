@@ -150,6 +150,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
                 }
                 else if (r < 0) {
                     if (alreadyPresent(candidate, solution)) {
+                        // TODO handle SubmitResult.Updated
                         return new SubmitResult.AlreadyPresent<>();
                     }
 
@@ -164,6 +165,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
             // the new record may have gained categories of records it didn't pareto-beat, do the transfers
             // while we're here, keep track of totally missing categories, we'll assign them to the new sol
             EnumSet<C> missingCategories = EnumSet.copyOf(puzzle.getSupportedCategories());
+            missingCategories.removeAll(candidate.getCategories());
             for (Sol solution: solutions) {
                 EnumSet<C> lostCategories = EnumSet.noneOf(getCategoryClass());
                 for (C category : solution.getCategories()) {
@@ -189,7 +191,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
 
             // add in completely missing categories
             if (!missingCategories.isEmpty()) {
-                beatenCategoryRecords.add(new CategoryRecord<R, C>(null, missingCategories));
+                beatenCategoryRecords.add(new CategoryRecord<>(null, missingCategories));
                 candidate.getCategories().addAll(missingCategories);
             }
 

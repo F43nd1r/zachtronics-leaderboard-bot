@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public interface CategoryJava<C extends Enum<?> & Category, S extends Score<C>, M extends MetricJava<S>, T extends Type> extends Category {
+public interface CategoryJava<C extends Enum<C> & Category, S extends Score<C>, M extends MetricJava<S>, T extends Type> extends Category {
     @NotNull
     @Override
     @SuppressWarnings("unchecked")

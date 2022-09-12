@@ -18,6 +18,6 @@ package com.faendir.zachtronics.bot.model;
 
 import java.util.function.ToIntFunction;
 
-public interface MetricJava<S> extends Metric {
+public interface MetricJava<S extends Score<?>> extends Metric {
     ToIntFunction<S> getExtract();
 }
