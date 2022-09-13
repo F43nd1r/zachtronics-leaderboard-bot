@@ -34,7 +34,7 @@ import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.om.omPuzzleOptionBuilder
 import com.faendir.zachtronics.bot.om.omScoreOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
-import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.ceil
 import com.faendir.zachtronics.bot.utils.orEmpty
@@ -145,7 +145,7 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.
         if (overrideRecords.isNotEmpty()) {
             repository.overrideScores(overrideRecords)
         }
-        return SafeEmbedMessageBuilder()
+        return MultiMessageSafeEmbedMessageBuilder()
             .title(
                 "Reverify" +
                         type?.displayName.orEmpty(" ") +

@@ -23,7 +23,7 @@ import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.Submission
 import com.faendir.zachtronics.bot.repository.SubmitResult
-import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.orEmpty
 import com.faendir.zachtronics.bot.utils.smartFormat
@@ -45,7 +45,7 @@ abstract class AbstractMultiSubmitCommand<C : Category, P : Puzzle<C>, S : Submi
         } else submitAll(validationResults)
     }
 
-    private fun submitAll(validationResults: Collection<ValidationResult<S>>): SafeEmbedMessageBuilder {
+    private fun submitAll(validationResults: Collection<ValidationResult<S>>): MultiMessageSafeEmbedMessageBuilder {
         val submissionResults = repository.submitAll(validationResults)
 
         val successes = submissionResults.count { it is SubmitResult.Success }
@@ -55,7 +55,7 @@ abstract class AbstractMultiSubmitCommand<C : Category, P : Puzzle<C>, S : Submi
             else -> "Failure: no solutions added" to Colors.FAILURE
         }
 
-        val embed = SafeEmbedMessageBuilder().title(title).color(color)
+        val embed = MultiMessageSafeEmbedMessageBuilder().title(title).color(color)
         for ((validationResult, submitResult) in validationResults.zip(submissionResults)) {
             val name = when (validationResult) {
                 is ValidationResult.Unparseable -> "*Failed*"

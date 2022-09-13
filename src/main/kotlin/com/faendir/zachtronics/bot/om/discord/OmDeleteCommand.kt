@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.om.discord
 
 import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.discord.command.Command
-import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUser
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured
 import com.faendir.zachtronics.bot.model.DisplayContext
@@ -26,7 +25,7 @@ import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.omPuzzleOptionBuilder
 import com.faendir.zachtronics.bot.om.omScoreOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
-import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import org.springframework.stereotype.Component
@@ -50,7 +49,7 @@ class OmDeleteCommand(private val repository: OmSolutionRepository) : Command.Ba
             ?: throw IllegalArgumentException("Could not find a record for `${score}`")
 
         repository.delete(record)
-        return SafeEmbedMessageBuilder()
+        return MultiMessageSafeEmbedMessageBuilder()
             .title("Success: Removed")
             .color(Colors.SUCCESS)
             .description(record.toDisplayString(DisplayContext.discord()))

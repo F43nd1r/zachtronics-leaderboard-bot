@@ -17,7 +17,6 @@
 package com.faendir.zachtronics.bot.om
 
 import com.faendir.om.parser.solution.SolutionParser
-import com.faendir.om.parser.solution.model.Position
 import com.faendir.om.parser.solution.model.Solution
 import com.faendir.om.parser.solution.model.SolvedSolution
 import com.faendir.om.parser.solution.model.part.Arm
@@ -39,33 +38,24 @@ import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SubmitResult
-import com.faendir.zachtronics.bot.rest.dto.SubmitResultType
-import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.ceil
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.filterIsInstance
-import com.faendir.zachtronics.bot.utils.fuzzyMatch
-import com.faendir.zachtronics.bot.utils.orEmpty
 import com.faendir.zachtronics.bot.utils.smartFormat
 import com.faendir.zachtronics.bot.utils.toMetricsTree
 import discord4j.common.util.Snowflake
-import discord4j.core.DiscordClient
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.entity.channel.MessageChannel
-import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import okio.buffer
 import okio.sink
 import okio.source
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
-import org.springframework.web.server.ResponseStatusException
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
@@ -172,7 +162,7 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
             val beatenCategories: List<OmCategory> = submitResult.beatenRecords.flatMap { it.categories }
             if (beatenCategories.isEmpty()) {
                 sendDiscordMessage(
-                    SafeEmbedMessageBuilder()
+                    MultiMessageSafeEmbedMessageBuilder()
                         .title("New Submission: *${record.puzzle.displayName}* Pareto")
                         .color(Colors.SUCCESS)
                         .description(
@@ -185,7 +175,7 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
                 )
             } else {
                 sendDiscordMessage(
-                    SafeEmbedMessageBuilder()
+                    MultiMessageSafeEmbedMessageBuilder()
                         .title("New Submission: *${record.puzzle.displayName}* ${beatenCategories.smartFormat(record.puzzle.supportedCategories.toMetricsTree())}")
                         .color(Colors.SUCCESS)
                         .description(
@@ -202,7 +192,7 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
             val record = submitResult.record!!
             val puzzle = record.puzzle
             sendDiscordMessage(
-                SafeEmbedMessageBuilder()
+                MultiMessageSafeEmbedMessageBuilder()
                     .title(
                         "Updated: *${puzzle.displayName}* ${
                             submitResult.oldRecord.categories.takeIf { it.isNotEmpty() }?.smartFormat(puzzle.supportedCategories.toMetricsTree()) ?: "Pareto"
@@ -221,7 +211,7 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
     }
 }
 
-private suspend fun GatewayDiscordClient.sendDiscordMessage(message: SafeEmbedMessageBuilder, channel: Channel): List<Message> {
+private suspend fun GatewayDiscordClient.sendDiscordMessage(message: MultiMessageSafeEmbedMessageBuilder, channel: Channel): List<Message> {
     return guilds
         .flatMap { it.getChannelById(channel.id).onErrorResume { Mono.empty() } }
         .filterIsInstance<MessageChannel>()

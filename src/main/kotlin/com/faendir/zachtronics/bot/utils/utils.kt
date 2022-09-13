@@ -70,10 +70,10 @@ fun Collection<Category>.smartFormat(reference: TreeRoot<Pair<Metric, Category?>
 }
 
 @Suppress("UNCHECKED_CAST")
-fun <R : Record<C>?, C : Category> SafeEmbedMessageBuilder.embedCategoryRecords(
+fun <B: SafeEmbedMessageBuilder<B>, R : Record<C>?, C : Category> B.embedCategoryRecords(
     records: Iterable<CategoryRecord<R, C>>,
     supportedCategories: List<C> = emptyList()
-): SafeEmbedMessageBuilder {
+): B {
     return embedRecords(
         records = records.map { cr -> cr.copy(categories = cr.categories.sortedBy { it as? Comparable<Any> }.toCollection(LinkedHashSet())) }
             .sortedWith(
@@ -87,11 +87,11 @@ fun <R : Record<C>?, C : Category> SafeEmbedMessageBuilder.embedCategoryRecords(
     )
 }
 
-fun <R : Record<C>?, C : Category> SafeEmbedMessageBuilder.embedRecords(
+fun <B: SafeEmbedMessageBuilder<B>, R : Record<C>?, C : Category> B.embedRecords(
     records: Iterable<CategoryRecord<R, C>>,
     supportedCategories: List<C> = emptyList(),
     formatCategorySpecific: Boolean = false
-): SafeEmbedMessageBuilder {
+): B {
     val reference = supportedCategories.toMetricsTree()
     return this.addFields(
         records.map { (record, categories) ->

@@ -17,20 +17,22 @@
 package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.zachtronics.bot.discord.Colors
+import com.faendir.zachtronics.bot.discord.DiscordActionCache
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.repository.SolutionRepository
-import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.PaginatedSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
-import com.faendir.zachtronics.bot.utils.embedCategoryRecords
+import com.faendir.zachtronics.bot.utils.embedRecords
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 
-abstract class AbstractListCommand<C : Category, P : Puzzle<C>, R : Record<C>> : Command.BasicLeaf() {
-    override val name = "list"
-    override val description = "List records"
+abstract class AbstractPaginatedFrontierCommand<C : Category, P : Puzzle<C>, R : Record<C>>(private val discordActionCache: DiscordActionCache) :
+    Command.BasicLeaf() {
+    override val name = "frontier"
+    override val description = "Displays the whole pareto frontier"
     override val secured = NotSecured
     protected abstract val puzzleOption: CommandOption<String, P>
     override val options: List<CommandOption<*, *>>
@@ -39,17 +41,11 @@ abstract class AbstractListCommand<C : Category, P : Puzzle<C>, R : Record<C>> :
 
     override fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder {
         val puzzle = puzzleOption.get(event)
-        val records = repository.findCategoryHolders(puzzle, includeFrontier = false)
-        return MultiMessageSafeEmbedMessageBuilder()
+        val records = repository.findCategoryHolders(puzzle, includeFrontier = true)
+        return PaginatedSafeEmbedMessageBuilder(discordActionCache)
             .title("*${puzzle.displayName}*")
             .apply { puzzle.link?.let { url(it) } }
             .color(Colors.READ)
-            .embedCategoryRecords(records, puzzle.supportedCategories)
-            .apply {
-                val missing = puzzle.supportedCategories - records.flatMap { it.categories }.toSet()
-                if (missing.isNotEmpty()) {
-                    addField(missing.joinToString(", ") { it.displayName }, "None")
-                }
-            }
+            .embedRecords(records, puzzle.supportedCategories)
     }
 }

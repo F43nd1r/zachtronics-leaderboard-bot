@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.event.domain.interaction.ChatInputAutoCompleteEvent
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
+import discord4j.core.event.domain.interaction.ComponentInteractionEvent
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.event.domain.message.MessageCreateEvent
 import discord4j.core.`object`.entity.channel.Channel
@@ -49,6 +50,7 @@ class DiscordService(
     private val gitProperties: GitProperties,
     private val restartEndpoint: RestartEndpoint,
     private val objectMapper: ObjectMapper,
+    private val discordActionCache: DiscordActionCache,
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(DiscordService::class.java)
@@ -91,6 +93,11 @@ class DiscordService(
                         channel.createMessage(messages.random()).awaitSingleOrNull()
                     }
                 }
+            }
+        }.subscribe()
+        discordClient.on(ComponentInteractionEvent::class.java) { event ->
+            mono {
+                discordActionCache.trigger(event)
             }
         }.subscribe()
         logger.info("Connected to discord with version ${gitProperties.shortCommitId}")

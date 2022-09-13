@@ -20,7 +20,7 @@ import com.faendir.zachtronics.bot.discord.Colors;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
 import com.faendir.zachtronics.bot.model.Puzzle;
 import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
-import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder;
+import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder;
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
@@ -40,7 +40,7 @@ public abstract class AbstractRebuildCommand<P extends Puzzle<?>> extends Comman
         P puzzle = getPuzzleOption().get(event);
         String updateMessage = "Rebuilt wiki section of " + puzzle.getDisplayName();
         getRepository().rebuildRedditLeaderboard(puzzle, updateMessage);
-        return new SafeEmbedMessageBuilder()
+        return new MultiMessageSafeEmbedMessageBuilder()
                 .title(updateMessage)
                 .color(Colors.SUCCESS);
     }

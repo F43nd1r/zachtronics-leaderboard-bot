@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.om.discord
 
 import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.discord.command.Command
-import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.OmQualifier
@@ -28,7 +27,7 @@ import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.omSolutionOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
-import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.orEmpty
@@ -56,7 +55,7 @@ class OmStatsCommand(private val repository: OmSolutionRepository) : Command.Bas
         when (val result = repository.submitDryRun(submission)) {
             is SubmitResult.Success -> {
                 val beatenCategories: List<OmCategory> = result.beatenRecords.flatMap { it.categories }
-                return SafeEmbedMessageBuilder()
+                return MultiMessageSafeEmbedMessageBuilder()
                     .title("Stats: *${submission.puzzle.displayName}*")
                     .color(Colors.SUCCESS)
                     .description(
@@ -73,13 +72,13 @@ class OmStatsCommand(private val repository: OmSolutionRepository) : Command.Bas
             }
 
             is SubmitResult.AlreadyPresent, is SubmitResult.Updated ->
-                return SafeEmbedMessageBuilder()
+                return MultiMessageSafeEmbedMessageBuilder()
                     .title("Stats: *${submission.puzzle.displayName}*")
                     .color(Colors.UNCHANGED)
                     .description("`${submission.score.toDisplayString(DisplayContext.discord())}` was already submitted.")
 
             is SubmitResult.NothingBeaten ->
-                return SafeEmbedMessageBuilder()
+                return MultiMessageSafeEmbedMessageBuilder()
                     .title("Stats: *${submission.puzzle.displayName}*")
                     .color(Colors.UNCHANGED)
                     .description("`${submission.score.toDisplayString(DisplayContext.discord())}` is beaten by:")

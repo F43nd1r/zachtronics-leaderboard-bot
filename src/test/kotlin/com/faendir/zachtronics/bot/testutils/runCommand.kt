@@ -19,7 +19,7 @@ package com.faendir.zachtronics.bot.testutils
 import com.faendir.zachtronics.bot.discord.command.Command
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUser
 import com.faendir.zachtronics.bot.model.StringFormat
-import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafePlainMessageBuilder
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
@@ -56,7 +56,7 @@ fun mockGameCommandRun(gameCommand: Command.Group, subCommandName: String, args:
 
     val result = when(messageBuilder) {
         is SafePlainMessageBuilder -> listOf(messageBuilder.getContent()) + messageBuilder.getFiles().map { it.name() }
-        is SafeEmbedMessageBuilder -> messageBuilder.getEmbeds().flatten().flatMap { it.collectStrings() }
+        is MultiMessageSafeEmbedMessageBuilder -> messageBuilder.getEmbeds().flatten().flatMap { it.collectStrings() }
             else -> emptyList()
     }.filterNotNull().joinToString("\n") { it.replace(StringFormat.DISCORD.separator, "/") }
     println(result)

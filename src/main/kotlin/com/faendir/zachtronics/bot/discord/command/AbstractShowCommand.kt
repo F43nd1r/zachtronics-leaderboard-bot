@@ -25,7 +25,7 @@ import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.utils.Markdown
-import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafePlainMessageBuilder
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
@@ -55,7 +55,7 @@ abstract class AbstractShowCommand<C : Category, P : Puzzle<C>, R : Record<C>> :
                 .content(lines.joinToString("\n"))
                 .files(record.attachments())
         } else {
-            SafeEmbedMessageBuilder()
+            MultiMessageSafeEmbedMessageBuilder()
                 .title("No score")
                 .description("sorry, there is no score for ${puzzle.displayName} ${category.displayName}.")
                 .color(Colors.UNCHANGED)

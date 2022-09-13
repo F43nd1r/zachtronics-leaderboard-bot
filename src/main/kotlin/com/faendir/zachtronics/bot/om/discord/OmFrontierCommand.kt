@@ -16,7 +16,10 @@
 
 package com.faendir.zachtronics.bot.om.discord
 
+import com.faendir.zachtronics.bot.discord.DiscordActionCache
 import com.faendir.zachtronics.bot.discord.command.AbstractFrontierCommand
+import com.faendir.zachtronics.bot.discord.command.AbstractPaginatedFrontierCommand
+import com.faendir.zachtronics.bot.discord.command.AbstractPaginatedListCommand
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
@@ -29,7 +32,7 @@ import org.springframework.stereotype.Component
 
 @OmQualifier
 @Component
-class OmFrontierCommand(override val repository: SolutionRepository<OmCategory, OmPuzzle, *, OmRecord>) :
-    AbstractFrontierCommand<OmCategory, OmPuzzle, OmRecord>() {
+class OmFrontierCommand(override val repository: SolutionRepository<OmCategory, OmPuzzle, *, OmRecord>, discordActionCache: DiscordActionCache) :
+    AbstractPaginatedFrontierCommand<OmCategory, OmPuzzle, OmRecord>(discordActionCache) {
     override val puzzleOption = omPuzzleOptionBuilder().required().build()
 }

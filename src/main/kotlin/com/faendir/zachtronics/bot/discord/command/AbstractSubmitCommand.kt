@@ -25,7 +25,7 @@ import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.model.Submission
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
-import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.orEmpty
@@ -44,11 +44,11 @@ abstract class AbstractSubmitCommand<C : Category, P : Puzzle<C>, S : Submission
         return submitToRepository(submission)
     }
 
-    protected fun submitToRepository(submission: S): SafeEmbedMessageBuilder {
+    protected fun submitToRepository(submission: S): MultiMessageSafeEmbedMessageBuilder {
         when (val result = repository.submit(submission)) {
             is SubmitResult.Success -> {
                 val beatenCategories: List<C> = result.beatenRecords.flatMap { it.categories }
-                return SafeEmbedMessageBuilder()
+                return MultiMessageSafeEmbedMessageBuilder()
                     .title(
                         "Success: *${submission.puzzle.displayName}* ${
                             beatenCategories.takeIf { it.isNotEmpty() }?.smartFormat(submission.puzzle.supportedCategories.toMetricsTree()) ?: "Pareto"
@@ -66,7 +66,7 @@ abstract class AbstractSubmitCommand<C : Category, P : Puzzle<C>, S : Submission
                     .link(submission.displayLink)
             }
             is SubmitResult.Updated ->
-                return SafeEmbedMessageBuilder()
+                return MultiMessageSafeEmbedMessageBuilder()
                     .title("Updated: *${submission.puzzle.displayName}* ${
                         result.oldRecord.categories.takeIf { it.isNotEmpty() }?.smartFormat(submission.puzzle.supportedCategories.toMetricsTree()) ?: "Pareto"
                     }")
@@ -79,12 +79,12 @@ abstract class AbstractSubmitCommand<C : Category, P : Puzzle<C>, S : Submission
                     .embedCategoryRecords(listOf(result.oldRecord), submission.puzzle.supportedCategories)
                     .link(submission.displayLink)
             is SubmitResult.AlreadyPresent ->
-                return SafeEmbedMessageBuilder()
+                return MultiMessageSafeEmbedMessageBuilder()
                     .title("Already present: *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.discord())}`")
                     .color(Colors.UNCHANGED)
                     .description("No action was taken.")
             is SubmitResult.NothingBeaten ->
-                return SafeEmbedMessageBuilder()
+                return MultiMessageSafeEmbedMessageBuilder()
                     .title("No Scores beaten by *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.discord())}`")
                     .color(Colors.UNCHANGED)
                     .description("Beaten by:")

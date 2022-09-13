@@ -29,7 +29,7 @@ import com.faendir.zachtronics.bot.om.notifyOf
 import com.faendir.zachtronics.bot.om.omSolutionOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
-import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.url
 import com.faendir.zachtronics.bot.utils.user
@@ -57,29 +57,29 @@ class OmSubmitCommand(private val repository: OmSolutionRepository, private val 
         submitToRepository(submission).send(event).awaitSingleOrNull()
     }
 
-    protected suspend fun submitToRepository(submission: OmSubmission): SafeEmbedMessageBuilder {
+    protected suspend fun submitToRepository(submission: OmSubmission): MultiMessageSafeEmbedMessageBuilder {
         val result = repository.submit(submission)
         val messages = discordClient.notifyOf(result)
         return when (result) {
-            is SubmitResult.Success -> SafeEmbedMessageBuilder()
+            is SubmitResult.Success -> MultiMessageSafeEmbedMessageBuilder()
                .title("Successfully submitted!")
                .color(Colors.SUCCESS)
                .description("I have posted about your solution ${messages.firstOrNull()?.url?.let { "[here]($it)" } ?: "nowhere :thinking:"}")
 
             is SubmitResult.Updated ->
-                SafeEmbedMessageBuilder()
+                MultiMessageSafeEmbedMessageBuilder()
                     .title("Successfully Updated!")
                     .color(Colors.SUCCESS)
                     .description("I have posted about your solution ${messages.firstOrNull()?.url?.let { "[here]($it)" } ?: "nowhere :thinking:"}")
 
             is SubmitResult.AlreadyPresent ->
-                SafeEmbedMessageBuilder()
+                MultiMessageSafeEmbedMessageBuilder()
                     .title("Already present: *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.discord())}`")
                     .color(Colors.UNCHANGED)
                     .description("No action was taken.")
 
             is SubmitResult.NothingBeaten ->
-                SafeEmbedMessageBuilder()
+                MultiMessageSafeEmbedMessageBuilder()
                     .title("No Scores beaten by *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.discord())}`")
                     .color(Colors.UNCHANGED)
                     .description("Beaten by:")

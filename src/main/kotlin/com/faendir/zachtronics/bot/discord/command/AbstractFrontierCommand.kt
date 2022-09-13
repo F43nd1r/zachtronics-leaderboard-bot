@@ -23,7 +23,7 @@ import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.repository.SolutionRepository
-import com.faendir.zachtronics.bot.utils.SafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedRecords
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
@@ -40,7 +40,7 @@ abstract class AbstractFrontierCommand<C : Category, P : Puzzle<C>, R : Record<C
     override fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder {
         val puzzle = puzzleOption.get(event)
         val records = repository.findCategoryHolders(puzzle, includeFrontier = true)
-        return SafeEmbedMessageBuilder()
+        return MultiMessageSafeEmbedMessageBuilder()
             .title("*${puzzle.displayName}*")
             .apply { puzzle.link?.let { url(it) } }
             .color(Colors.READ)
