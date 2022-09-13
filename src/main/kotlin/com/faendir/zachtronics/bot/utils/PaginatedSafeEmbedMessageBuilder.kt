@@ -91,7 +91,7 @@ class PaginatedSafeEmbedMessageBuilder(private val discordActionCache: DiscordAc
         val result = mutableListOf<List<EmbedCreateFields.Field>>()
         var current = mutableListOf<EmbedCreateFields.Field>()
         for ((field, size) in fields) {
-            if (currentAvailableSize - size < 0) {
+            if (currentAvailableSize - size < 0 || current.size >= EmbedLimits.FIELDS) {
                 result.add(current)
                 current = mutableListOf()
                 currentAvailableSize = availableSize
