@@ -37,6 +37,11 @@ import java.nio.file.Files
 @TestConfiguration
 class TestConfiguration(private val gitProperties: GitProperties) {
 
+    @Bean("cwRepository")
+    fun cwRepository(): GitRepository {
+        return createTestGitRepository("repositories/cw-leaderboard")
+    }
+
     @Bean("fpRepository")
     fun fpRepository(): GitRepository {
         return createTestGitRepository("repositories/fp-leaderboard")

@@ -4,22 +4,22 @@
 
 ### JVM
 
-Using `fp` as an example
+Using `fp` -> `cw` as an example
 ```shell
 cd src/main/java/com/faendir/zachtronics/bot/
-cp -r sz fp
-find fp -name 'Sz*' | xargs file-rename 's/Sz/Fp/' {}
-find fp -type f | xargs rpl 'Sz' 'Fp' {}
-find fp -type f | xargs rpl '\.sz' '.fp' {}
+cp -r fp cw
+find cw -name 'Fp*' | xargs file-rename 's/Fp/Cw/' {}
+find cw -type f | xargs rpl 'Fp' 'Cw' {}
+find cw -type f | xargs rpl '\.fp' '.cw' {}
 ```
 
 Edit:
-* `discord/FpCommandGroup`
+* `discord/CwCommandGroup`
 * `model/*`
 * `repository/*`
 * `rest/dto/*`
 
-Add `lombok.copyableannotations += com.faendir.zachtronics.bot.fp.FpQualifier` to `/lombok.config`
+Add `lombok.copyableannotations += com.faendir.zachtronics.bot.cw.CwQualifier` to `/lombok.config`
 
 ### Git
 
@@ -36,9 +36,9 @@ Give `F43nd1r` Write permissions if he's not an admin of the particular org.
 
 #### Project
 
-Add to the `GitConfiguration` class.
-
-Add skeleton to `test/resources`, and add to the `TestConfiguration` class for tests
+* Add to the `GitConfiguration` class.
+* Add skeleton to `test/resources`, and add to the `TestConfiguration` class for tests.
+* Create a submit test that exercises the sim
 
 #### Repo
 
@@ -46,6 +46,10 @@ Add README
 
 After levels are filled, run:  
 `find . -name 'solutions.psv' -execdir ln -s solutions.psv README.txt \;`
+
+### Docker
+
+Add simulator (if any) to `/Dockerfile`
 
 ### FE
 
