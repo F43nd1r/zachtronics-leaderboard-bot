@@ -47,10 +47,10 @@ public enum FpCategory implements CategoryJava<FpCategory, FpScore, FpMetric, Fp
 
     /** contains <tt>%dR%s%dC%s%dF%s%dW</tt> plus a bunch of <tt>*</tt> most likely */
     static final String[] FORMAT_STRINGS = {"%dR%s%dC%s%dF%s%dW",
-                                            "%dR%s%dC%s%dF%s**%d**W",
-                                            "%dR%s%dC%s**%d**F%s%dW", null,
-                                            "%dR%s**%d**C%s%dF%s%dW", null, null, null,
-                                            "**%d**R%s%dC%s%dF%s%dW"};
+                                            "%dR%s%dC%s%dF%s**%dW**",
+                                            "%dR%s%dC%s**%dF**%s%dW", null,
+                                            "%dR%s**%dC**%s%dF%s%dW", null, null, null,
+                                            "**%dR**%s%dC%s%dF%s%dW"};
 
     private final String displayName;
     @Accessors(fluent = true)

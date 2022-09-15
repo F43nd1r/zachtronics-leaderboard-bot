@@ -35,8 +35,8 @@ public enum CwCategory implements CategoryJava<CwCategory, CwScore, CwMetric, Cw
 
     /** contains <tt>HxW/FF</tt> plus a bunch of <tt>*</tt> most likely */
     static final String[] FORMAT_STRINGS = {"%dx%d%s%dF",
-                                            "**%dx%d**%s%dF",
-                                            "%dx%d%s**%dF**"};
+                                            "%dx%d%s**%dF**",
+                                            "**%dx%d**%s%dF"};
 
     private final String displayName;
     @Accessors(fluent = true)
