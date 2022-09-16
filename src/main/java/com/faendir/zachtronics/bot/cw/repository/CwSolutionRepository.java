@@ -51,7 +51,7 @@ public class CwSolutionRepository extends AbstractSolutionRepository<CwCategory,
     private final Subreddit subreddit = Subreddit.LASTCALLBBS;
     private final String wikiPageName = "chipwizard";
 
-    @Qualifier("fpRepository")
+    @Qualifier("cwRepository")
     private final GitRepository gitRepo;
     private final Class<CwCategory> categoryClass = CwCategory.class;
     final Function<String[], CwSolution> solUnmarshaller = CwSolution::unmarshal;
