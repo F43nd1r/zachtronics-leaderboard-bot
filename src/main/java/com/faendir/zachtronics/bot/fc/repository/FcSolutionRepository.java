@@ -102,7 +102,7 @@ public class FcSolutionRepository extends AbstractSolutionRepository<FcCategory,
 
     @NotNull
     static String makeFilename(@NotNull String puzzleName, @NotNull FcScore score) {
-        return puzzleName + "-" + score.toDisplayString(DisplayContext.fileName()) + ".txt";
+        return puzzleName + "-" + score.toDisplayString(DisplayContext.fileName()) + ".solution";
     }
 
     @NotNull
