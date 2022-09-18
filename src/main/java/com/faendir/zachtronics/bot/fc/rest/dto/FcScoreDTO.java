@@ -22,10 +22,10 @@ import org.jetbrains.annotations.NotNull;
 
 @Value
 public class FcScoreDTO {
-    int rules;
-    int conditionalRules;
-    int frames;
-    int waste;
+    int cost;
+    int time;
+    int sumTimes;
+    int wires;
 
     @NotNull
     public static FcScoreDTO fromScore(@NotNull FcScore score) {
