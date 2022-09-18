@@ -202,8 +202,10 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
             solutions.add(index, candidate);
 
             Path solutionPath = makeArchivePath(puzzlePath, candidate.getScore());
-            String data = ((String)submission.getData()).replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
-            Files.writeString(solutionPath, data, StandardOpenOption.CREATE_NEW);
+            if (submission.getData() instanceof String data)
+                Files.writeString(solutionPath, data, StandardOpenOption.CREATE_NEW);
+            else
+                Files.write(solutionPath, (byte[]) submission.getData(), StandardOpenOption.CREATE_NEW);
 
             marshalSolutions(solutions, puzzlePath);
         }

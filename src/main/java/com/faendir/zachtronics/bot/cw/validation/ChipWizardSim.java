@@ -63,8 +63,11 @@ public class ChipWizardSim {
         // score
         CwScore score = new CwScore(result.getSiliconWidth(), result.getSiliconHeight(), result.getFootprint());
 
+        // data
+        String data = result.getSolution().replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
+
         // build submission
-        CwSubmission submission = new CwSubmission(puzzle, score, author, null, result.getSolution());
+        CwSubmission submission = new CwSubmission(puzzle, score, author, null, data);
 
         // check correctness
         if (!result.isCorrect())

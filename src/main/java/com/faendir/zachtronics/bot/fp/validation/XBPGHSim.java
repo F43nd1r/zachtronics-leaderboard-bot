@@ -64,8 +64,11 @@ public class XBPGHSim {
         int frames = result.isStable() ? result.getNumFrames() : 13;
         FpScore score = new FpScore(result.getNumRules(), result.getNumRulesConditional(), frames, result.getNumWaste());
 
+        // data
+        String data = result.getSolution().replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
+
         // build submission
-        FpSubmission submission = new FpSubmission(puzzle, score, author, null, result.getSolution());
+        FpSubmission submission = new FpSubmission(puzzle, score, author, null, data);
 
         // ensure level is tracked
         if (puzzle.getType() == FpType.EDITOR)

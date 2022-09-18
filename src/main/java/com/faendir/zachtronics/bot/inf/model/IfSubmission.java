@@ -52,7 +52,6 @@ public class IfSubmission implements Submission<IfCategory, IfPuzzle> {
     public static IfSubmission fromLink(@NotNull String link, String author, @NotNull IfScore score,
                                         @NotNull List<String> displayLinks) {
         String data = Utils.downloadSolutionFile(link);
-        IfSolutionMetadata metadata = IfSolutionMetadata.fromData(data);
-        return metadata.extendToSubmission(author, score, displayLinks, data);
+        return fromData(author, score, displayLinks, data);
     }
 }

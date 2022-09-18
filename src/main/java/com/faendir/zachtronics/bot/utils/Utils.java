@@ -64,6 +64,7 @@ public final class Utils {
     public static String downloadSolutionFile(@NotNull String link) {
         byte[] rawContent = downloadSolutionFileBytes(link);
         String content = new String(rawContent).replace("\r\n", "\n");
+        content = content.replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
         if (content.length() > 0 && content.charAt(0) == '\uFEFF') // remove BOM
             content = content.substring(1);
         return content;

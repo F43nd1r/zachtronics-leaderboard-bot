@@ -112,9 +112,12 @@ public class SChem {
         ScScore score = new ScScore(result.getCycles(), result.getReactors(), result.getSymbols(), declaresBugged,
                                     declaresPrecog);
 
+        // data
+        String export = result.getExport().replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
+
         // build submission
         ScSubmission submission = new ScSolutionMetadata(puzzle, author, score, result.getSolutionName())
-                                     .extendToSubmission(null, result.getExport());
+                                     .extendToSubmission(null, export);
 
         if (!bypassValidation) {
             if (result.getError() != null)
