@@ -6,10 +6,11 @@ Currently included:
  - [Opus Magnum](https://www.zachtronics.com/opus-magnum/)
  - [SpaceChem](https://www.zachtronics.com/spacechem/)
  - [Shenzhen I/O](https://www.zachtronics.com/shenzhen-io/)
+ - [Last Call BBS](https://www.zachtronics.com/last-call-bbs/)
  
 ## Use
 The bot runs in the [unofficial Zachtronics Discord Server](https://discord.gg/98QNzdJ), usable from slash commands.  
-The Opus Magnum graphical leaderboard and API is hosted at https://zlbb.faendir.com/ .  
+The graphical leaderboard, frontier visualizer and API is hosted at https://zlbb.faendir.com/ .  
 The official leaderboard copies managed by the bot are in the wiki page of the game subreddits.
 
 ## Build
