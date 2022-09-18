@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.fp.validator;
+package com.faendir.zachtronics.bot.fp.validation;
 
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.fp.model.FpPuzzle;
@@ -25,20 +25,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @BotTest
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses XBPGHSim")
-class SimResultTest {
+class FpSimResultTest {
 
     @Test
     void validateGood() {
         String data = "Toronto.Solution.1.2 = eNp7zczAIMDAwMDIAAEgmvE/EDCgC6IwYGxkDooCkBHIgkwcDAjAyDAoOGB3QQUAl6EJHw==";
 
-        SimResult result = validateSingle(data);
-        SimResult expected = new SimResult(FpPuzzle.NORMAL_1_1.getDisplayName(), 1, 2,
-                                           data.replace(".2", ".0"), // slot normalization
-                                           true, 5, 0, 8, true, 0, false);
+        FpSimResult result = validateSingle(data);
+        FpSimResult expected = new FpSimResult(FpPuzzle.NORMAL_1_1.getDisplayName(), 1, 2,
+                                               data.replace(".2", ".0"), // slot normalization
+                                               true, 5, 0, 8, true, 0, false);
         assertEquals(expected, result);
     }
 
-    private static SimResult validateSingle(String data) {
+    private static FpSimResult validateSingle(String data) {
         return XBPGHSim.validate(data)[0];
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.cw.validator;
+package com.faendir.zachtronics.bot.cw.validation;
 
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.cw.model.CwPuzzle;
@@ -25,21 +25,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @BotTest
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses ChipWizardSim")
-class SimResultTest {
+class CwSimResultTest {
 
     @Test
     void validateGood() {
         String data = "Volgograd.Solution.12.2 = eNp7xczAIMrCwKjGwMQKwqKMDCyMrAwMIAwCxkwcQMzFgAxAcqI8DIzqXBwY6hWAWBFVOQNMnpEXiQ1SDwAWiwMH";
 
-        SimResult result = validateSingle(data);
-        SimResult expected = new SimResult(CwPuzzle.PUZZLE_1_7.getDisplayName(), 12, 2, data.replace(".2", ".0"), // slot normalization
-                                           true, false,
-                                           19, 2, 5, 4, 7, 0, 6, 0, 3, 3,
-                                           9, 12, 37, 4, 3, 12, 21);
+        CwSimResult result = validateSingle(data);
+        CwSimResult expected = new CwSimResult(CwPuzzle.PUZZLE_1_7.getDisplayName(), 12, 2, data.replace(".2", ".0"), // slot normalization
+                                               true, false,
+                                               19, 2, 5, 4, 7, 0, 6, 0, 3, 3,
+                                               9, 12, 37, 4, 3, 12, 21);
         assertEquals(expected, result);
     }
 
-    private static SimResult validateSingle(String data) {
+    private static CwSimResult validateSingle(String data) {
         return ChipWizardSim.validate(data)[0];
     }
 }

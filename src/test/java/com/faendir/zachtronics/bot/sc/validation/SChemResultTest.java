@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.sc.validator;
+package com.faendir.zachtronics.bot.sc.validation;
 
-import com.faendir.zachtronics.bot.Application;
 import com.faendir.zachtronics.bot.BotTest;
+import com.faendir.zachtronics.bot.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
@@ -76,7 +76,7 @@ class SChemResultTest {
     @Test
     void validateUnparseable() {
         String export = "SOL:Completely unparseable";
-        assertThrows(SChemException.class, () -> validateSingle(export));
+        assertThrows(ValidationException.class, () -> validateSingle(export));
     }
 
     @Test

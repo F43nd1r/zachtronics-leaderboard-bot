@@ -16,7 +16,7 @@
 
 package com.faendir.zachtronics.bot.cw.model;
 
-import com.faendir.zachtronics.bot.cw.validator.ChipWizardSim;
+import com.faendir.zachtronics.bot.cw.validation.ChipWizardSim;
 import com.faendir.zachtronics.bot.model.Submission;
 import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;

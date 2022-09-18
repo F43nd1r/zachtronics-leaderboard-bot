@@ -22,7 +22,7 @@ import com.faendir.zachtronics.bot.rest.dto.SubmitResultTypeKt;
 import com.faendir.zachtronics.bot.sc.model.*;
 import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
 import com.faendir.zachtronics.bot.sc.rest.dto.*;
-import com.faendir.zachtronics.bot.sc.validator.SChem;
+import com.faendir.zachtronics.bot.sc.validation.SChem;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Getter;

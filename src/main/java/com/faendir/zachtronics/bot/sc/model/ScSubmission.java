@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.Submission;
-import com.faendir.zachtronics.bot.sc.validator.SChem;
+import com.faendir.zachtronics.bot.sc.validation.SChem;
 import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Value;

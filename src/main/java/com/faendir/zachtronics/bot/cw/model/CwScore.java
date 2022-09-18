@@ -49,7 +49,7 @@ public class CwScore implements Score<CwCategory> {
 
     /** WxH/FF */
     private static final Pattern REGEX_SCORE = Pattern.compile(
-            "\\**(?<width>\\d+)x(?<height>\\d+)\\**/\\**(?<footprint>\\d+)\\**F");
+            "\\**(?<width>\\d)x(?<height>\\d)\\**/\\**(?<footprint>\\d+)\\**F");
 
     /** <tt>WxH/FF</tt>, tolerates extra <tt>*</tt> */
     @Nullable

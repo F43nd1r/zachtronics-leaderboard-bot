@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.cw.validator;
+package com.faendir.zachtronics.bot.cw.validation;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -50,7 +50,7 @@ import org.jetbrains.annotations.NotNull;
  */
 @Value
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class SimResult {
+public class CwSimResult {
     @NotNull String levelName;
     int levelId;
     int slotId;

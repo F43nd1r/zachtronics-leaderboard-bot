@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.fp.validator;
+package com.faendir.zachtronics.bot.fp.validation;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -38,7 +38,7 @@ import org.jetbrains.annotations.NotNull;
  */
 @Value
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class SimResult {
+public class FpSimResult {
     @NotNull String levelName;
     int levelId;
     int slotId;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.sc.validator;
+package com.faendir.zachtronics.bot.sc.validation;
 
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSubmission;
+import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ class ValidationResultTest {
     @Test
     public void importError() {
         String export1 = "Invalid";
-        assertThrows(SChemException.class, () -> validateSingle(export1));
+        assertThrows(ValidationException.class, () -> validateSingle(export1));
 
         String export = "SOLUTION:Of Pancakes and Spaceships,12345ieee,115-1-6,unparseable\nInvalid";
         assertInstanceOf(ValidationResult.Unparseable.class, validateSingle(export));

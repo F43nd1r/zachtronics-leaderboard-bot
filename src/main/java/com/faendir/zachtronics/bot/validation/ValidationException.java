@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.cw.validator;
+package com.faendir.zachtronics.bot.validation;
 
-class ChipWizardSimException extends RuntimeException {
-    ChipWizardSimException(String message) {
+public class ValidationException extends RuntimeException {
+    public ValidationException(String message) {
         super(message);
     }
 
-    ChipWizardSimException(String message, Throwable cause) {
+    public ValidationException(String message, Throwable cause) {
         super(message, cause);
     }
 }

@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.sc.validator;
+package com.faendir.zachtronics.bot.sc.validation;
 
 import com.faendir.zachtronics.bot.sc.model.*;
+import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -60,9 +61,8 @@ public class SChem {
     }
 
     @NotNull
-    static ValidationResult<ScSubmission> validationResultFrom(@NotNull SChemResult result, boolean bypassValidation,
-                                                               String author)
-            throws SChemException {
+    static ValidationResult<ScSubmission> validationResultFrom(@NotNull SChemResult result, boolean bypassValidation, String author)
+    throws ValidationException {
 
         if (result.getLevelName() == null || result.getAuthor() == null) {
             assert result.getError() != null;
@@ -155,10 +155,10 @@ public class SChem {
      * @param export the (possibly multi) export string
      * @param onlyImport if <tt>true</tt> we only check the solution(s) imports, not that they runs
      * @return results, arrays of size 1 are correctly generated
-     * @throws SChemException if there is a communication error, solution errors are handled in the onject
+     * @throws ValidationException if there is a communication error, solution errors are handled in the onject
      */
     @NotNull
-    static SChemResult[] validate(@NotNull String export, boolean onlyImport) throws SChemException {
+    static SChemResult[] validate(@NotNull String export, boolean onlyImport) throws ValidationException {
         ProcessBuilder builder = new ProcessBuilder();
         String runFlag = onlyImport ? "--no-run" : "--check-precog";
         builder.command("python3", "-m", "schem", "--json", "--export", runFlag);
@@ -171,16 +171,16 @@ public class SChem {
             byte[] result = process.getInputStream().readAllBytes();
             int exitCode = process.waitFor();
             if (exitCode != 0) {
-                throw new SChemException(new String(process.getErrorStream().readAllBytes()));
+                throw new ValidationException(new String(process.getErrorStream().readAllBytes()));
             }
             return objectMapper.readValue(result, SChemResult[].class);
 
         } catch (JsonProcessingException e) {
-            throw new SChemException("Error in reading back results", e);
+            throw new ValidationException("Error in reading back results", e);
         } catch (IOException e) {
-            throw new SChemException("Error in communicating with the SChem executable", e);
+            throw new ValidationException("Error in communicating with the SChem executable", e);
         } catch (InterruptedException e) {
-            throw new SChemException("Thread was killed while waiting for SChem", e);
+            throw new ValidationException("Thread was killed while waiting for SChem", e);
         }
     }
 }

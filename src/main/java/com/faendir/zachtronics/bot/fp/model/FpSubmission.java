@@ -16,7 +16,7 @@
 
 package com.faendir.zachtronics.bot.fp.model;
 
-import com.faendir.zachtronics.bot.fp.validator.XBPGHSim;
+import com.faendir.zachtronics.bot.fp.validation.XBPGHSim;
 import com.faendir.zachtronics.bot.model.Submission;
 import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
