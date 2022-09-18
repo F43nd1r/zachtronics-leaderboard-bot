@@ -42,6 +42,11 @@ class TestConfiguration(private val gitProperties: GitProperties) {
         return createTestGitRepository("repositories/cw-leaderboard")
     }
 
+    @Bean("fcRepository")
+    fun fcRepository(): GitRepository {
+        return createTestGitRepository("repositories/fc-leaderboard")
+    }
+
     @Bean("fpRepository")
     fun fpRepository(): GitRepository {
         return createTestGitRepository("repositories/fp-leaderboard")

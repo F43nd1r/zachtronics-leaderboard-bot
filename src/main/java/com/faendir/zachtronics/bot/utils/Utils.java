@@ -50,18 +50,23 @@ public final class Utils {
     }
 
     @NotNull
-    public static String downloadSolutionFile(@NotNull String link) {
-        String export;
+    public static byte[] downloadSolutionFileBytes(@NotNull String link) {
         try (InputStream is = new URL(Utils.rawContentURL(link)).openStream()) {
-            export = new String(is.readAllBytes()).replace("\r\n", "\n");
-            if (export.length() > 0 && export.charAt(0) == '\uFEFF') // remove BOM
-                export = export.substring(1);
+            return is.readAllBytes();
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Could not parse your link");
         } catch (IOException e) {
             throw new IllegalArgumentException("Could not read your solution");
         }
-        return export;
+    }
+
+    @NotNull
+    public static String downloadSolutionFile(@NotNull String link) {
+        byte[] rawContent = downloadSolutionFileBytes(link);
+        String content = new String(rawContent).replace("\r\n", "\n");
+        if (content.length() > 0 && content.charAt(0) == '\uFEFF') // remove BOM
+            content = content.substring(1);
+        return content;
     }
 
     @NotNull

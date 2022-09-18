@@ -28,6 +28,9 @@ class GitConfiguration(private val gitProperties: GitProperties) {
     @Bean("cwRepository")
     fun cwRepository() = GitRepository(gitProperties, "chipwizard-leaderboard", "https://github.com/lastcallbbs-community-developers/chipwizard-leaderboard.git")
 
+    @Bean("fcRepository")
+    fun fcRepository() = GitRepository(gitProperties, "foodcourt-leaderboard", "https://github.com/lastcallbbs-community-developers/foodcourt-leaderboard.git")
+
     @Bean("fpRepository")
     fun fpRepository() = GitRepository(gitProperties, "forbidden-path-leaderboard", "https://github.com/lastcallbbs-community-developers/forbidden-path-leaderboard.git")
 

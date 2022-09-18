@@ -11,6 +11,7 @@ cp -r fp cw
 find cw -name 'Fp*' | xargs file-rename 's/Fp/Cw/' {}
 find cw -type f | xargs rpl 'Fp' 'Cw' {}
 find cw -type f | xargs rpl '\.fp' '.cw' {}
+find cw -type f | xargs rpl '/fp' '/cw' {}
 ```
 
 Edit:
@@ -59,9 +60,9 @@ Add simulator (if any) to `/Dockerfile`
 
 ### Reddit
 
-* Take hold of the subreddit wiki, map it in `Subreddit.kt`  
-* Create the wiki page on reddit
+* Take hold of the subreddit wiki, map it in `Subreddit.kt`
 * Create `test/src/resources/reddit/<subreddit>/wiki/<page>.md`
 * Copy the prefix from an existing lb, tweak as desired
 * Generate an empty table via `createWiki` test method
+* Create the wiki page on reddit
 * Test, then paste the content on the reddit page
