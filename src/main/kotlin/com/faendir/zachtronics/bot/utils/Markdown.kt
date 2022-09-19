@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package com.faendir.zachtronics.bot.utils
 
 object Markdown {
+    @JvmStatic
+    @JvmOverloads
     fun link(text: String, link: String, embed: Boolean = true) = "[$text](${if (embed) link else "<$link>"})"
 
     @JvmStatic

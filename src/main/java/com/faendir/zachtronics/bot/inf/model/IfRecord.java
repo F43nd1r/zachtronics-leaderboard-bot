@@ -16,7 +16,9 @@
 
 package com.faendir.zachtronics.bot.inf.model;
 
+import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Record;
+import com.faendir.zachtronics.bot.utils.Markdown;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,5 +39,18 @@ public class IfRecord implements Record<IfCategory> {
     @Override
     public String getDisplayLink() {
         return displayLinks.isEmpty() ? null : displayLinks.get(0);
+    }
+
+    @NotNull
+    @Override
+    public String toDisplayString(@NotNull DisplayContext<IfCategory> context) {
+        String result = Markdown.fileLinkOrEmpty(dataLink) +
+                        Markdown.linkOrText(score.toDisplayString(context) + " " + author, getDisplayLink());
+        if (displayLinks.size() > 1) {
+            for (int i = 1; i < displayLinks.size(); i++) {
+                result += " " + Markdown.link("^[" + (i + 1) + "]", displayLinks.get(i));
+            }
+        }
+        return result;
     }
 }
