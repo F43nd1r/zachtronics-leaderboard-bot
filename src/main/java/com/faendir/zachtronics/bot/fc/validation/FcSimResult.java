@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.fc.validation;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -28,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
  "level_name": "The Commissary",
  "level_slug": "the-commissary",
  "solution_name": "New Solution 1",
- "filename": "the-commissary-1.solution",
+ "filename": "the-commissary-1.solution", // null for stdin
  "marked_solved": true,
  "is_correct": true,
  "cost": 186,
@@ -63,7 +62,8 @@ public class FcSimResult {
     @Nullable String levelSlug;
     @Nullable String solutionName;
 
-    @NotNull String filename;
+    /** <tt>null</tt> for stdin */
+    @Nullable String filename;
     boolean markedSolved;
     boolean isCorrect;
 

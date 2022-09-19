@@ -38,7 +38,7 @@ class FcSimResultTest {
 
         FcSimResult result = validateSingle(data);
         FcSimResult expected = new FcSimResult(TWO_TWELVE.getNumber(), TWO_TWELVE.getDisplayName(), TWO_TWELVE.getInternalName(),
-                                               "New Solution 1", "stdin",
+                                               "New Solution 1", null,
                                                true, true,
                                                65, 8, 16, 4,
                                                null, null);
