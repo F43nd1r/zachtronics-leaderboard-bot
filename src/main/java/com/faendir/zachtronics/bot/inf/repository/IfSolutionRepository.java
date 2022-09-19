@@ -33,7 +33,6 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
-import java.util.List;
 import java.util.function.Function;
 
 import static com.faendir.zachtronics.bot.inf.model.IfCategory.*;
@@ -43,7 +42,8 @@ import static com.faendir.zachtronics.bot.inf.model.IfCategory.*;
 @RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)
 public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory, IfPuzzle, IfScore, IfSubmission, IfRecord, IfSolution> {
-    private final IfCategory[][] wikiCategories = {{C, CNG}, {F}, {B}}; // TODO
+    private final IfCategory[][] wikiCategories = {{CF, CFNG, FC, BC},
+                                                   {CB, CBNG, FB, BF}};
     private final RedditService redditService;
     private final Subreddit subreddit = Subreddit.INFINIFACTORY;
     private final String wikiPageName = "index";
@@ -52,7 +52,7 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
     private final GitRepository gitRepo;
     private final Class<IfCategory> categoryClass = IfCategory.class;
     final Function<String[], IfSolution> solUnmarshaller = IfSolution::unmarshal;
-    private final Comparator<IfSolution> archiveComparator = Comparator.comparing(IfSolution::getScore, C.getScoreComparator());
+    private final Comparator<IfSolution> archiveComparator = Comparator.comparing(IfSolution::getScore, CF.getScoreComparator());
 
     @NotNull
     @Override
@@ -60,11 +60,6 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
         try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
             return submitOne(access, submission, (s, c) -> access.push());
         }
-    }
-
-    @Override
-    protected void writeToRedditLeaderboard(IfPuzzle puzzle, Path puzzlePath, @NotNull List<IfSolution> solutions, String updateMessage) {
-        // TODO
     }
 
     @Override

@@ -20,6 +20,7 @@ import lombok.Value;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -28,9 +29,9 @@ import java.util.regex.Pattern;
 @Value
 class IfSolutionMetadata {
     /** InputRate.4-3.1 = 1 */
-    private static Pattern inputRatePattern = Pattern.compile("InputRate.(?<id>\\d+-\\db?).(?<slot>\\d) = \\d+");
+    private static final Pattern INPUT_RATE_PATTERN = Pattern.compile("InputRate.(?<id>\\d+-\\db?).(?<slot>\\d) = \\d+");
     /** Solution.4-3.1 = AAAA== */
-    private static Pattern solutionPattern = Pattern.compile("Solution.(?<id>\\d+-\\db?).(?<slot>\\d) = [\\w+/]+=*");
+    private static final Pattern SOLUTION_PATTERN = Pattern.compile("Solution.(?<id>\\d+-\\db?).(?<slot>\\d) = [\\w+/]+=*");
 
     IfPuzzle puzzle;
 
@@ -39,16 +40,16 @@ class IfSolutionMetadata {
     public static IfSolutionMetadata fromData(@NotNull String data) {
         Iterator<String> it = Pattern.compile("\r?\n").splitAsStream(data).dropWhile(String::isBlank).iterator();
         String inputRateLine = it.next();
-        Matcher m = inputRatePattern.matcher(inputRateLine);
+        Matcher m = INPUT_RATE_PATTERN.matcher(inputRateLine);
         if (!m.matches())
             throw new IllegalArgumentException("Invalid solution file, first line: \"" + inputRateLine + "\"");
 
         String id = m.group("id");
         String slot = m.group("slot");
-        IfPuzzle puzzle = IfPuzzle.valueOf("LEVEL_" + id.replace('-', '_'));
+        IfPuzzle puzzle = Arrays.stream(IfPuzzle.values()).filter(p -> p.getId().equals(id)).findFirst().orElseThrow();
 
         String solutionLine = it.next();
-        m = solutionPattern.matcher(solutionLine);
+        m = SOLUTION_PATTERN.matcher(solutionLine);
         if (!m.matches())
             throw new IllegalArgumentException("Invalid solution file, solution line: \"" + solutionLine + "\"");
 
@@ -60,6 +61,7 @@ class IfSolutionMetadata {
 
     public IfSubmission extendToSubmission(@NotNull String author, @NotNull IfScore score,
                                            @NotNull List<String> displayLinks, @NotNull String data) {
+        data = data.replaceAll("\\." + puzzle.getId() + "\\.\\d", "." + puzzle.getId() + ".0"); // slot normaliztion
         return new IfSubmission(puzzle, score, author, displayLinks, data);
     }
 }

@@ -42,8 +42,8 @@ public class IfSubmission implements Submission<IfCategory, IfPuzzle> {
      * @throws IllegalArgumentException if we can't correctly parse metadata
      */
     @NotNull
-    public static IfSubmission fromData(@NotNull String author, @NotNull IfScore score,
-                                        @NotNull List<String> displayLinks, @NotNull String data) throws IllegalArgumentException {
+    public static IfSubmission fromData(@NotNull String data, @NotNull String author, @NotNull IfScore score,
+                                        @NotNull List<String> displayLinks) throws IllegalArgumentException {
         IfSolutionMetadata metadata = IfSolutionMetadata.fromData(data);
         return metadata.extendToSubmission(author, score, displayLinks, data);
     }
@@ -52,6 +52,6 @@ public class IfSubmission implements Submission<IfCategory, IfPuzzle> {
     public static IfSubmission fromLink(@NotNull String link, String author, @NotNull IfScore score,
                                         @NotNull List<String> displayLinks) {
         String data = Utils.downloadSolutionFile(link);
-        return fromData(author, score, displayLinks, data);
+        return fromData(data, author, score, displayLinks);
     }
 }

@@ -22,11 +22,7 @@ import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
 import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.inf.IfQualifier;
-import com.faendir.zachtronics.bot.inf.model.IfCategory;
-import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
-import com.faendir.zachtronics.bot.inf.model.IfRecord;
-import com.faendir.zachtronics.bot.inf.model.IfScore;
-import com.faendir.zachtronics.bot.inf.model.IfSubmission;
+import com.faendir.zachtronics.bot.inf.model.*;
 import com.faendir.zachtronics.bot.inf.repository.IfSolutionRepository;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
@@ -56,7 +52,6 @@ public class IfSubmitCommand extends AbstractSubmitCommand<IfCategory, IfPuzzle,
     private static final String SEPARATOR = ",";
     private final CommandOption<String, List<String>> videosOption = OptionHelpersKt.linkOptionBuilder("videos")
             .description("Link(s) to the video(s) of the solution, accepts multiple separated by `,`")
-            .required()
             .convert((event, links) -> List.of(links.split(SEPARATOR)))
             .build();
     @Getter

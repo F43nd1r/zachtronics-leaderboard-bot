@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.inf.model;
 import com.faendir.zachtronics.bot.model.Puzzle;
 import lombok.Getter;
 
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -29,24 +30,24 @@ public enum IfPuzzle implements Puzzle<IfCategory> {
     LEVEL_1_4("1-4", IfGroup.ZONE_1, IfType.STANDARD, "Training Routine 4"),
     LEVEL_1_5("1-5", IfGroup.ZONE_1, IfType.STANDARD, "Training Routine 5"),
     LEVEL_2_1("2-1", IfGroup.ZONE_2, IfType.STANDARD, "Munitions Refill Type 2"),
-    LEVEL_2_2b("2-2b", IfGroup.ZONE_2, IfType.STANDARD, "Munitions Refill Type 6"),
-    LEVEL_2_3("2-3", IfGroup.ZONE_2, IfType.STANDARD, "Shuttle Propulsion Units"),
-    LEVEL_2_4("2-4", IfGroup.ZONE_2, IfType.STANDARD, "Wave Detection Array"),
+    LEVEL_2_2("2-2b", IfGroup.ZONE_2, IfType.STANDARD, "Munitions Refill Type 6"),
+    LEVEL_2_3("2-4", IfGroup.ZONE_2, IfType.STANDARD, "Shuttle Propulsion Units"),
+    LEVEL_2_4("2-3", IfGroup.ZONE_2, IfType.STANDARD, "Wave Detection Array"),
     LEVEL_2_5("2-5", IfGroup.ZONE_2, IfType.STANDARD, "Guided Javelin Type 1"),
-    LEVEL_3_1b("3-1b", IfGroup.ZONE_3, IfType.STANDARD, "Optical Sensor Array Type 2"),
+    LEVEL_3_1("3-1b", IfGroup.ZONE_3, IfType.STANDARD, "Optical Sensor Array Type 2"),
     LEVEL_3_2("3-2", IfGroup.ZONE_3, IfType.STANDARD, "Landing Alignment Lights"),
     LEVEL_3_3("3-3", IfGroup.ZONE_3, IfType.STANDARD, "Optical Sensor Array Type 4"),
-    LEVEL_3_4b("3-4b", IfGroup.ZONE_3, IfType.STANDARD, "Small Excavator"),
-    LEVEL_3_5b("3-5b", IfGroup.ZONE_3, IfType.STANDARD, "Cargo Uplifter"),
+    LEVEL_3_4("3-5b", IfGroup.ZONE_3, IfType.STANDARD, "Small Excavator"),
+    LEVEL_3_5("3-4b", IfGroup.ZONE_3, IfType.STANDARD, "Cargo Uplifter"),
     LEVEL_4_1("4-1", IfGroup.ZONE_4, IfType.STANDARD, "Terminal Display Reclamation"),
-    LEVEL_4_2("4-2", IfGroup.ZONE_4, IfType.STANDARD, "Shuttle Maintenance"),
-    LEVEL_4_3("4-3", IfGroup.ZONE_4, IfType.STANDARD, "Oversight Terminal Model 6"),
+    LEVEL_4_2("4-3", IfGroup.ZONE_4, IfType.STANDARD, "Shuttle Maintenance"),
+    LEVEL_4_3("4-2", IfGroup.ZONE_4, IfType.STANDARD, "Oversight Terminal Model 6"),
     LEVEL_4_4("4-4", IfGroup.ZONE_4, IfType.STANDARD, "Drone Maintenance"),
     LEVEL_4_5("4-5", IfGroup.ZONE_4, IfType.STANDARD, "Furnished Studio Apartment"),
     LEVEL_5_1("5-1", IfGroup.ZONE_5, IfType.STANDARD, "Guided Javelin Type 2"),
-    LEVEL_5_2("5-2", IfGroup.ZONE_5, IfType.STANDARD, "Gneiss Chair"),
-    LEVEL_5_3("5-3", IfGroup.ZONE_5, IfType.STANDARD, "Relay Satellite"),
-    LEVEL_5_4b("5-4b", IfGroup.ZONE_5, IfType.STANDARD, "Terrestrial Surveyor"),
+    LEVEL_5_2("5-3", IfGroup.ZONE_5, IfType.STANDARD, "Gneiss Chair"),
+    LEVEL_5_3("5-4b", IfGroup.ZONE_5, IfType.STANDARD, "Relay Satellite"),
+    LEVEL_5_4("5-2b", IfGroup.ZONE_5, IfType.STANDARD, "Terrestrial Surveyor"),
     LEVEL_5_5("5-5", IfGroup.ZONE_5, IfType.STANDARD, "Anti-Javelin Point Defense"),
 
     LEVEL_6_1("6-1", IfGroup.ZONE_6, IfType.STANDARD, "Meat Product Type 57"),
@@ -93,7 +94,7 @@ public enum IfPuzzle implements Puzzle<IfCategory> {
         this.group = group;
         this.type = type;
         this.displayName = displayName;
-        this.supportedCategories = List.of(IfCategory.values());
+        this.supportedCategories = type == IfType.BOSS ? Collections.emptyList() : List.of(IfCategory.values());
         this.link = "https://zlbb.faendir.com/if/" + id;
     }
 
