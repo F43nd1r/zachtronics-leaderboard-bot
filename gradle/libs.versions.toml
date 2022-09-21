@@ -1,7 +1,7 @@
 [versions]
 kotlin = "1.7.10"
 spring-boot = "2.7.3"
-spring-dependencyManagement = "1.0.13.RELEASE"
+spring-dependencyManagement = "1.0.14.RELEASE"
 spring-cloud = "3.1.4"
 gradle-docker = "0.34.0"
 gradle-lombok = "6.5.1"
