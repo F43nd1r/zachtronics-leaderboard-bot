@@ -19,14 +19,11 @@ package com.faendir.zachtronics.bot.sc.validation;
 import com.faendir.zachtronics.bot.sc.model.*;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.faendir.zachtronics.bot.validation.ValidationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -36,9 +33,6 @@ import java.util.stream.Collectors;
 
 /** Wrapper for a schem package installed on the system */
 public class SChem {
-
-    private static final ObjectMapper objectMapper = new ObjectMapper().configure(
-            DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
 
     /**
      * validates a possibly multi SpaceChem export
@@ -162,28 +156,8 @@ public class SChem {
      */
     @NotNull
     static SChemResult[] validate(@NotNull String export, boolean onlyImport) throws ValidationException {
-        ProcessBuilder builder = new ProcessBuilder();
         String runFlag = onlyImport ? "--no-run" : "--check-precog";
-        builder.command("python3", "-m", "schem", "--json", "--export", runFlag);
-
-        try {
-            Process process = builder.start();
-            process.getOutputStream().write(export.getBytes());
-            process.getOutputStream().close();
-
-            byte[] result = process.getInputStream().readAllBytes();
-            int exitCode = process.waitFor();
-            if (exitCode != 0) {
-                throw new ValidationException(new String(process.getErrorStream().readAllBytes()));
-            }
-            return objectMapper.readValue(result, SChemResult[].class);
-
-        } catch (JsonProcessingException e) {
-            throw new ValidationException("Error in reading back results", e);
-        } catch (IOException e) {
-            throw new ValidationException("Error in communicating with the SChem executable", e);
-        } catch (InterruptedException e) {
-            throw new ValidationException("Thread was killed while waiting for SChem", e);
-        }
+        String[] command = {"python3", "-m", "schem", "--json", "--export", runFlag};
+        return ValidationUtils.callValidator(SChemResult[].class, export.getBytes(), command);
     }
 }

@@ -23,6 +23,7 @@ import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
+import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,10 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Function;
 
 import static com.faendir.zachtronics.bot.fc.model.FcCategory.*;
@@ -58,6 +62,28 @@ public class FcSolutionRepository extends AbstractSolutionRepository<FcCategory,
     public SubmitResult<FcRecord, FcCategory> submit(@NotNull FcSubmission submission) {
         try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
             return submitOne(access, submission, (s, c) -> access.push());
+        }
+    }
+
+    @NotNull
+    @Override
+    public List<SubmitResult<FcRecord, FcCategory>> submitAll(
+            @NotNull Collection<? extends ValidationResult<FcSubmission>> validationResults) {
+        try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
+            List<SubmitResult<FcRecord, FcCategory>> submitResults = new ArrayList<>();
+
+            for (ValidationResult<FcSubmission> validationResult : validationResults) {
+                if (validationResult instanceof ValidationResult.Valid<FcSubmission>) {
+                    FcSubmission submission = validationResult.getSubmission();
+                    submitResults.add(submitOne(access, submission, (sub, wonCategories) -> {}));
+                }
+                else {
+                    submitResults.add(new SubmitResult.Failure<>(validationResult.getMessage()));
+                }
+            }
+
+            access.push();
+            return submitResults;
         }
     }
 

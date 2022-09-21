@@ -23,6 +23,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Base64;
 
 import static com.faendir.zachtronics.bot.fc.model.FcPuzzle.TWO_TWELVE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,7 +42,7 @@ class FcSimResultTest {
                                                "New Solution 1", null,
                                                true, true,
                                                65, 8, 16, 4,
-                                               null, null);
+                                               new String(Base64.getEncoder().encode(data)), null, null);
         assertEquals(expected, result);
     }
 

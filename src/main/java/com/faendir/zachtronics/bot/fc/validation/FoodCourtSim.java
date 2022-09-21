@@ -21,33 +21,34 @@ import com.faendir.zachtronics.bot.fc.model.FcScore;
 import com.faendir.zachtronics.bot.fc.model.FcSubmission;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.faendir.zachtronics.bot.validation.ValidationUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
 
 /** Wrapper for a foodcourt-sim module installed on the system */
 public class FoodCourtSim {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-
     /**
-     * validates a FC data file
+     * validates a possibly multi FC data file
      * @param data content to check
-     * @param author author to use
+     * @param author author to override all imports
      */
     @NotNull
-    public static ValidationResult<FcSubmission> validateExport(@NotNull byte[] data, @NotNull String author) {
+    public static Collection<ValidationResult<FcSubmission>> validateMultiExport(@NotNull byte[] data, @NotNull String author) {
         FcSimResult[] results = validate(data);
         if (results.length == 0)
             throw new ValidationException("No valid solution provided");
-        return validationResultFrom(data, results[0], author);
-    }
+        return Arrays.stream(results)
+                     .map(r -> validationResultFrom(r, author))
+                     .collect(Collectors.toCollection(LinkedHashSet::new));    }
 
     @NotNull
-    static ValidationResult<FcSubmission> validationResultFrom(byte[] data, @NotNull FcSimResult result, @NotNull String author)
+    static ValidationResult<FcSubmission> validationResultFrom(@NotNull FcSimResult result, @NotNull String author)
     throws ValidationException {
         // check the solution was parseable
         if (result.getErrorMessage() != null) {
@@ -63,6 +64,9 @@ public class FoodCourtSim {
 
         // score
         FcScore score = new FcScore(result.getMaxTime(), result.getCost(), result.getTotalTime(), result.getNumWires());
+
+        // data
+        byte[] data = Base64.getDecoder().decode(result.getSolution());
 
         // build submission
         FcSubmission submission = new FcSubmission(puzzle, score, author, null, data);
@@ -82,27 +86,7 @@ public class FoodCourtSim {
      */
     @NotNull
     static FcSimResult[] validate(@NotNull byte[] data) throws ValidationException {
-        ProcessBuilder builder = new ProcessBuilder();
-        builder.command("python3", "-m", "foodcourt_sim", "simulate", "--json", "/dev/stdin");
-
-        try {
-            Process process = builder.start();
-            process.getOutputStream().write(data);
-            process.getOutputStream().close();
-
-            byte[] result = process.getInputStream().readAllBytes();
-            int exitCode = process.waitFor();
-            if (exitCode != 0) {
-                throw new ValidationException(new String(process.getErrorStream().readAllBytes()));
-            }
-            return objectMapper.readValue(result, FcSimResult[].class);
-
-        } catch (JsonProcessingException e) {
-            throw new ValidationException("Error in reading back results", e);
-        } catch (IOException e) {
-            throw new ValidationException("Error in communicating with the foodcourt_sim executable", e);
-        } catch (InterruptedException e) {
-            throw new ValidationException("Thread was killed while waiting for foodcourt_sim", e);
-        }
+        String[] command = {"python3", "-m", "foodcourt_sim", "simulate", "--json", "--include-solution", "-"};
+        return ValidationUtils.callValidator(FcSimResult[].class, data, command);
     }
 }

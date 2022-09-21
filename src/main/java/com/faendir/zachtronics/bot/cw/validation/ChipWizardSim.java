@@ -21,11 +21,9 @@ import com.faendir.zachtronics.bot.cw.model.CwScore;
 import com.faendir.zachtronics.bot.cw.model.CwSubmission;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.faendir.zachtronics.bot.validation.ValidationUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -33,8 +31,6 @@ import java.util.stream.Collectors;
 
 /** Wrapper for a chipwizard-sim module installed on the system */
 public class ChipWizardSim {
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * validates a possibly multi FP data file
@@ -84,27 +80,7 @@ public class ChipWizardSim {
      */
     @NotNull
     static CwSimResult[] validate(@NotNull String data) throws ValidationException {
-        ProcessBuilder builder = new ProcessBuilder();
-        builder.command("python3", "-m", "chipwizard_sim", "validate_all", "--json", "--include-solution", "-");
-
-        try {
-            Process process = builder.start();
-            process.getOutputStream().write(data.getBytes());
-            process.getOutputStream().close();
-
-            byte[] result = process.getInputStream().readAllBytes();
-            int exitCode = process.waitFor();
-            if (exitCode != 0) {
-                throw new ValidationException(new String(process.getErrorStream().readAllBytes()));
-            }
-            return objectMapper.readValue(result, CwSimResult[].class);
-
-        } catch (JsonProcessingException e) {
-            throw new ValidationException("Error in reading back results", e);
-        } catch (IOException e) {
-            throw new ValidationException("Error in communicating with the chipwizard_sim executable", e);
-        } catch (InterruptedException e) {
-            throw new ValidationException("Thread was killed while waiting for chipwizard_sim", e);
-        }
+        String[] command = {"python3", "-m", "chipwizard_sim", "validate_all", "--json", "--include-solution", "-"};
+        return ValidationUtils.callValidator(CwSimResult[].class, data.getBytes(), command);
     }
 }

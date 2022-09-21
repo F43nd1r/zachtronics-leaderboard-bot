@@ -16,7 +16,7 @@
 
 package com.faendir.zachtronics.bot.fc.discord;
 
-import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand;
+import com.faendir.zachtronics.bot.discord.command.AbstractMultiSubmitCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
 import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
@@ -34,12 +34,14 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Component
 @FcQualifier
-public class FcSubmitCommand extends AbstractSubmitCommand<FcCategory, FcPuzzle, FcSubmission, FcRecord> {
+public class FcSubmitCommand extends AbstractMultiSubmitCommand<FcCategory, FcPuzzle, FcSubmission, FcRecord> {
     private final CommandOption<String, String> solutionOption = OptionHelpersKt.linkOptionBuilder("solution")
             .description("Link to the solution file, can be `m1` to scrape it from your last message or single solution text")
             .required()
@@ -60,24 +62,27 @@ public class FcSubmitCommand extends AbstractSubmitCommand<FcCategory, FcPuzzle,
 
     @NotNull
     @Override
-    public FcSubmission parseSubmission(@NotNull ChatInputInteractionEvent event) {
+    public Collection<ValidationResult<FcSubmission>> parseSubmissions(@NotNull ChatInputInteractionEvent event) {
         String solution = solutionOption.get(event);
         String author = authorOption.get(event);
         String image = imageOption.get(event);
         if (solution.equals(image))
             throw new IllegalArgumentException("Solution link and image link cannot be the same link");
 
-        ValidationResult<FcSubmission> result = FcSubmission.fromLink(solution, author);
-        if (result instanceof ValidationResult.Valid<FcSubmission>) {
-            FcSubmission submission = result.getSubmission();
-            if (image != null) {
-                return submission.withDisplayLink(image);
+        Collection<ValidationResult<FcSubmission>> results = FcSubmission.fromLink(solution, author);
+        if (image != null) {
+            if (results.size() != 1)
+                throw new IllegalArgumentException("Only one solution can be paired with an image");
+
+            ValidationResult<FcSubmission> result = results.iterator().next();
+            if (result instanceof ValidationResult.Valid<FcSubmission>) {
+                FcSubmission submission = result.getSubmission();
+                FcSubmission imageSubmission = submission.withDisplayLink(image);
+                return Collections.singleton(new ValidationResult.Valid<>(imageSubmission));
+            } else {
+                throw new IllegalArgumentException(result.getMessage());
             }
-            else
-                return submission;
-        }
-        else {
-            throw new IllegalArgumentException(result.getMessage());
-        }
+        } else
+            return results;
     }
 }

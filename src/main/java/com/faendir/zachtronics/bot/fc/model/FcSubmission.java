@@ -24,6 +24,8 @@ import lombok.Value;
 import lombok.With;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+
 @Value
 public class FcSubmission implements Submission<FcCategory, FcPuzzle> {
     @NotNull FcPuzzle puzzle;
@@ -33,12 +35,12 @@ public class FcSubmission implements Submission<FcCategory, FcPuzzle> {
     @NotNull byte[] data;
 
     @NotNull
-    public static ValidationResult<FcSubmission> fromData(@NotNull byte[] data, String author) {
-        return FoodCourtSim.validateExport(data, author);
+    public static Collection<ValidationResult<FcSubmission>> fromData(@NotNull byte[] data, String author) {
+        return FoodCourtSim.validateMultiExport(data, author);
     }
 
     @NotNull
-    public static ValidationResult<FcSubmission> fromLink(@NotNull String link, String author) {
+    public static Collection<ValidationResult<FcSubmission>> fromLink(@NotNull String link, String author) {
         byte[] data = Utils.downloadSolutionFileBytes(link);
         return fromData(data, author);
     }

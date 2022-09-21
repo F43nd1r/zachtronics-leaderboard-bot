@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
  "max_time": 14,
  "total_time": 68,
  "num_wires": 47
+ "solution": "9QMAA..."
  }</pre> or
  <pre>{
  "level_number": 21,
@@ -72,6 +73,9 @@ public class FcSimResult {
     int maxTime;
     int totalTime;
     int numWires;
+
+    /** present iff <tt>--include-solution</tt> is given, base64 encoded */
+    @Nullable String solution;
 
     /** present iff the solution is invalid or unparseable */
     @Nullable String errorType;
