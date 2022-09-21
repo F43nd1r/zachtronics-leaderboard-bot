@@ -43,12 +43,12 @@ public enum FcCategory implements CategoryJava<FcCategory, FcScore, FcMetric, Fc
     WTC("WTC", List.of(WIRES, TIME, COST, SUM_TIMES), 0b0001),
     WCT("WCT", List.of(WIRES, COST, TIME, SUM_TIMES), 0b0001);
 
-    /** contains <tt>%dT%s%dC%s%dS%s%dW</tt> plus a bunch of <tt>*</tt> most likely */
-    static final String[] FORMAT_STRINGS = {"%dT%s%dC%s%dS%s%dW",
-                                            "%dT%s%dC%s%dS%s**%dW**",
-                                            "%dT%s%dC%s**%dS**%s%dW", null,
-                                            "%dT%s**%dC**%s%dS%s%dW", null, null, null,
-                                            "**%dT**%s%dC%s%dS%s%dW"};
+    /** contains <tt>%dT%s%dk%s%dS%s%dW</tt> plus a bunch of <tt>*</tt> most likely */
+    static final String[] FORMAT_STRINGS = {"%dT%s%dk%s%dS%s%dW",
+                                            "%dT%s%dk%s%dS%s**%dW**",
+                                            "%dT%s%dk%s**%dS**%s%dW", null,
+                                            "%dT%s**%dk**%s%dS%s%dW", null, null, null,
+                                            "**%dT**%s%dk%s%dS%s%dW"};
 
     private final String displayName;
     @Accessors(fluent = true)

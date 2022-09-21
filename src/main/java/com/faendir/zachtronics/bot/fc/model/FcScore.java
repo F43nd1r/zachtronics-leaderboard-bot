@@ -33,7 +33,7 @@ public class FcScore implements Score<FcCategory> {
     int sumTimes;
     int wires;
 
-    /** tT/cC/sS/wW */
+    /** tT/ck/sS/wW */
     @NotNull
     @Override
     public String toDisplayString(@NotNull DisplayContext<FcCategory> context) {
@@ -43,11 +43,11 @@ public class FcScore implements Score<FcCategory> {
         return String.format(FcCategory.FORMAT_STRINGS[formatId], time, separator, cost, separator, sumTimes, separator, wires);
     }
 
-    /** tT/cC/sS/wW */
+    /** tT/ck/sS/wW */
     private static final Pattern REGEX_SCORE = Pattern.compile(
-            "\\**(?<time>\\d+)\\**T/\\**(?<cost>\\d+)\\**C/\\**(?<sumTimes>\\d+)\\**S/\\**(?<wires>\\d+)\\**W");
+            "\\**(?<time>\\d+)\\**T/\\**(?<cost>\\d+)\\**k/\\**(?<sumTimes>\\d+)\\**S/\\**(?<wires>\\d+)\\**W");
 
-    /** <tt>tT/cC/sS/wW</tt>, tolerates extra <tt>*</tt> */
+    /** <tt>tT/ck/sS/wW</tt>, tolerates extra <tt>*</tt> */
     @Nullable
     public static FcScore parseScore(@NotNull String string) {
         Matcher m = REGEX_SCORE.matcher(string);

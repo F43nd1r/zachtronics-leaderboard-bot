@@ -36,11 +36,11 @@ public class FcCommandTest {
 
     @Test
     @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses FoodCourtSim")
-    public void testSubmitText() {
+    public void testSubmitOne() {
         Map<String, String> args = Map.of("solution", "https://cdn.discordapp.com/attachments/993498489717805076/1020989449531817984/2twelve-1.solution",
                                           "author", "testMan");
         String result = runCommand("submit", args);
-        assertTrue(result.contains("2Twelve") && result.contains("8T/65C/16S/4W"));
+        assertTrue(result.contains("2Twelve") && result.contains("8T/65k/16S/4W"));
     }
 
     @NotNull
