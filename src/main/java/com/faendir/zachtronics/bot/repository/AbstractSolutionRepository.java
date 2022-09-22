@@ -330,7 +330,10 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
                 C thisCategory = blockCategories[i];
                 row.append(" | ");
                 R thisRecord = recordMap.get(thisCategory);
-                if (rowIdx == 0 || thisRecord != recordMap.get(categories[0][i])) {
+                if (thisRecord == null) {
+                    row.append('X'); // nonexisting category for level
+                }
+                else if (rowIdx == 0 || thisRecord != recordMap.get(categories[0][i])) {
                     DisplayContext<C> displayContext = new DisplayContext<>(StringFormat.REDDIT, thisCategory);
                     String cell = thisRecord.toDisplayString(displayContext);
                     row.append(cell);

@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum FpType implements Type {
+    TUTORIAL("tutorial"), // has no conditional rules nor waste
     STANDARD("standard"),
     EDITOR("editor");
 

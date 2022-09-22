@@ -90,7 +90,7 @@ class FpManualTest {
     @Test
     public void rebuildAllWiki() {
         for (FpPuzzle puzzle: FpPuzzle.values()) {
-            if (puzzle.getType() != FpType.STANDARD)
+            if (puzzle.getType() == FpType.EDITOR)
                 continue;
             repository.rebuildRedditLeaderboard(puzzle, "");
             System.out.println("Done " + puzzle.getDisplayName());
@@ -115,7 +115,7 @@ class FpManualTest {
             page.append(header);
             String groupTable = Arrays.stream(FpPuzzle.values())
                                       .filter(p -> p.getGroup() == group)
-                                      .filter(p -> p.getType() == FpType.STANDARD)
+                                      .filter(p -> p.getType() != FpType.EDITOR)
                                       .map(p -> String.format("| [%s](%s) | | | \n", p.getDisplayName(), p.getLink()))
                                       .collect(Collectors.joining("|\n"));
             page.append(groupTable).append('\n');

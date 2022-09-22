@@ -24,10 +24,10 @@ import java.util.List;
 
 @Getter
 public enum FpPuzzle implements Puzzle<FpCategory> {
-    NORMAL_1_1(1, FpGroup.NORMAL_CAMPAIGN, FpType.STANDARD, "1-1"),
-    NORMAL_1_2(2, FpGroup.NORMAL_CAMPAIGN, FpType.STANDARD, "1-2"),
-    NORMAL_1_3(3, FpGroup.NORMAL_CAMPAIGN, FpType.STANDARD, "1-3"),
-    NORMAL_2_1(4, FpGroup.NORMAL_CAMPAIGN, FpType.STANDARD, "2-1"),
+    NORMAL_1_1(1, FpGroup.NORMAL_CAMPAIGN, FpType.TUTORIAL, "1-1"),
+    NORMAL_1_2(2, FpGroup.NORMAL_CAMPAIGN, FpType.TUTORIAL, "1-2"),
+    NORMAL_1_3(3, FpGroup.NORMAL_CAMPAIGN, FpType.TUTORIAL, "1-3"),
+    NORMAL_2_1(4, FpGroup.NORMAL_CAMPAIGN, FpType.TUTORIAL, "2-1"),
     NORMAL_2_2(5, FpGroup.NORMAL_CAMPAIGN, FpType.STANDARD, "2-2"),
     NORMAL_2_3(6, FpGroup.NORMAL_CAMPAIGN, FpType.STANDARD, "2-3"),
     NORMAL_3_1(7, FpGroup.NORMAL_CAMPAIGN, FpType.STANDARD, "3-1"),

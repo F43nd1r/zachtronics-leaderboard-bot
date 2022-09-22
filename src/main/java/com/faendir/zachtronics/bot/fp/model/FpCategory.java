@@ -21,29 +21,30 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
 import static com.faendir.zachtronics.bot.fp.model.FpMetric.*;
 import static com.faendir.zachtronics.bot.fp.model.FpType.STANDARD;
+import static com.faendir.zachtronics.bot.fp.model.FpType.TUTORIAL;
 
 @Getter
 public enum FpCategory implements CategoryJava<FpCategory, FpScore, FpMetric, FpType> {
-    RCF("RCF", List.of(RULES, CONDITIONAL_RULES, FRAMES, WASTE), 0b1000),
-    RFC("RFC", List.of(RULES, FRAMES, CONDITIONAL_RULES, WASTE), 0b1000),
+    RCF("RCF", List.of(RULES, CONDITIONAL_RULES, FRAMES, WASTE), EnumSet.of(TUTORIAL, STANDARD), 0b1000),
+    RFC("RFC", List.of(RULES, FRAMES, CONDITIONAL_RULES, WASTE), EnumSet.of(TUTORIAL, STANDARD), 0b1000),
 
-    CRF("CRF", List.of(CONDITIONAL_RULES, RULES, FRAMES, WASTE), 0b0100),
-    CFR("CFR", List.of(CONDITIONAL_RULES, FRAMES, RULES, WASTE), 0b0100),
+    CRF("CRF", List.of(CONDITIONAL_RULES, RULES, FRAMES, WASTE), EnumSet.of(STANDARD), 0b0100),
+    CFR("CFR", List.of(CONDITIONAL_RULES, FRAMES, RULES, WASTE), EnumSet.of(STANDARD), 0b0100),
 
-    FRC("FRC", List.of(FRAMES, RULES, CONDITIONAL_RULES, WASTE), 0b0010),
-    FCR("FCR", List.of(FRAMES, CONDITIONAL_RULES, RULES, WASTE), 0b0010),
+    FRC("FRC", List.of(FRAMES, RULES, CONDITIONAL_RULES, WASTE), EnumSet.of(TUTORIAL, STANDARD), 0b0010),
+    FCR("FCR", List.of(FRAMES, CONDITIONAL_RULES, RULES, WASTE), EnumSet.of(TUTORIAL, STANDARD), 0b0010),
 
-    WRCF("WRCF", List.of(WASTE, RULES, CONDITIONAL_RULES, FRAMES), 0b0001),
-    wRCF("wRCF", List.of(MOST_WASTE, RULES, CONDITIONAL_RULES, FRAMES), 0b0001),
-    WFRC("WFRC", List.of(WASTE, FRAMES, RULES, CONDITIONAL_RULES), 0b0001),
-    wFRC("wFRC", List.of(MOST_WASTE, FRAMES, RULES, CONDITIONAL_RULES), 0b0001);
+    WRCF("WRCF", List.of(WASTE, RULES, CONDITIONAL_RULES, FRAMES), EnumSet.of(STANDARD), 0b0001),
+    wRCF("wRCF", List.of(MOST_WASTE, RULES, CONDITIONAL_RULES, FRAMES), EnumSet.of(STANDARD), 0b0001),
+    WFRC("WFRC", List.of(WASTE, FRAMES, RULES, CONDITIONAL_RULES), EnumSet.of(STANDARD), 0b0001),
+    wFRC("wFRC", List.of(MOST_WASTE, FRAMES, RULES, CONDITIONAL_RULES), EnumSet.of(STANDARD), 0b0001);
 
     /** contains <tt>%dR%s%dC%s%dF%s%dW</tt> plus a bunch of <tt>*</tt> most likely */
     static final String[] FORMAT_STRINGS = {"%dR%s%dC%s%dF%s%dW",
@@ -56,13 +57,14 @@ public enum FpCategory implements CategoryJava<FpCategory, FpScore, FpMetric, Fp
     @Accessors(fluent = true)
     private final List<FpMetric> metrics;
     private final Comparator<FpScore> scoreComparator;
-    private final Set<FpType> supportedTypes = Collections.singleton(STANDARD);
+    private final Set<FpType> supportedTypes;
     private final int scoreFormatId;
 
-    FpCategory(String displayName, @NotNull List<FpMetric> metrics, int scoreFormatId) {
+    FpCategory(String displayName, @NotNull List<FpMetric> metrics, @NotNull Set<FpType> supportedTypes, int scoreFormatId) {
         this.displayName = displayName;
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
+        this.supportedTypes = supportedTypes;
         this.scoreFormatId = scoreFormatId;
     }
 
