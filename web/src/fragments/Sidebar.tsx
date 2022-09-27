@@ -27,13 +27,14 @@ import Category from "../model/Category"
 import { Link, useMatch } from "react-router-dom"
 import ApiResource from "../utils/ApiResource"
 
-function Groups() {
+function Campaign() {
     const match = useMatch("/puzzles/*")
-
+    const CampaignChapters = ["CHAPTER_1", "CHAPTER_2", "CHAPTER_3", "CHAPTER_4",
+                              "CHAPTER_5", "CHAPTER_PRODUCTION"]
     return (
         <List>
             <ExpandableListItem
-                title={"Puzzles"}
+                title={"Campaign Puzzles"}
                 icon={<Extension />}
                 content={ApiResource<Puzzle[]>({
                     url: "/om/puzzles",
@@ -47,7 +48,80 @@ function Groups() {
                                         return acc
                                     }, new Map())
                                     .entries(),
-                            ].map(([group, puzzles]) => (
+                            ].filter(([group, _]) => (CampaignChapters.includes(group)))
+                            .map(([group, puzzles]) => (
+                                <Puzzles group={puzzles[0].group} puzzles={puzzles} key={group} sx={{ pl: 4 }} />
+                            ))}
+                        </>
+                    ),
+                })}
+                open={match !== null}
+            />
+        </List>
+    )
+}
+
+function Journal() {
+    const match = useMatch("/puzzles/*")
+    const JournalChapters = ["JOURNAL_I", "JOURNAL_II", "JOURNAL_III", "JOURNAL_IV",
+                             "JOURNAL_V", "JOURNAL_VI", "JOURNAL_VII", "JOURNAL_VIII",
+                             "JOURNAL_IX"]
+    return (
+        <List>
+            <ExpandableListItem
+                title={"Journal Puzzles"}
+                icon={<Extension />}
+                content={ApiResource<Puzzle[]>({
+                    url: "/om/puzzles",
+                    element: (puzzles) => (
+                        <>
+                            {[
+                                ...puzzles
+                                    .reduce<Map<string, Puzzle[]>>((acc, puzzle) => {
+                                        if (!acc.has(puzzle.group.id)) acc.set(puzzle.group.id, [puzzle])
+                                        else acc.get(puzzle.group.id)!.push(puzzle)
+                                        return acc
+                                    }, new Map())
+                                    .entries(),
+                            ].filter(([group, _]) => (JournalChapters.includes(group)))
+                            .map(([group, puzzles]) => (
+                                <Puzzles group={puzzles[0].group} puzzles={puzzles} key={group} sx={{ pl: 4 }} />
+                            ))}
+                        </>
+                    ),
+                })}
+                open={match !== null}
+            />
+        </List>
+    )
+}
+
+function Community() {
+    const match = useMatch("/puzzles/*")
+    const CampaignChapters = ["CHAPTER_1", "CHAPTER_2", "CHAPTER_3", "CHAPTER_4",
+                              "CHAPTER_5", "CHAPTER_PRODUCTION"]
+    const JournalChapters = ["JOURNAL_I", "JOURNAL_II", "JOURNAL_III", "JOURNAL_IV",
+                             "JOURNAL_V", "JOURNAL_VI", "JOURNAL_VII", "JOURNAL_VIII",
+                             "JOURNAL_IX"]
+    return (
+        <List>
+            <ExpandableListItem
+                title={"Community Puzzles"}
+                icon={<Extension />}
+                content={ApiResource<Puzzle[]>({
+                    url: "/om/puzzles",
+                    element: (puzzles) => (
+                        <>
+                            {[
+                                ...puzzles
+                                    .reduce<Map<string, Puzzle[]>>((acc, puzzle) => {
+                                        if (!acc.has(puzzle.group.id)) acc.set(puzzle.group.id, [puzzle])
+                                        else acc.get(puzzle.group.id)!.push(puzzle)
+                                        return acc
+                                    }, new Map())
+                                    .entries(),
+                            ].filter(([group, _]) => (!CampaignChapters.includes(group) && !JournalChapters.includes(group)))
+                            .map(([group, puzzles]) => (
                                 <Puzzles group={puzzles[0].group} puzzles={puzzles} key={group} sx={{ pl: 4 }} />
                             ))}
                         </>
@@ -121,7 +195,9 @@ export default function Sidebar() {
     // noinspection HtmlUnknownTarget
     return (
         <>
-            <Groups />
+            <Campaign />
+            <Journal />
+            <Community />
             <Divider />
             <Categories />
             <Box sx={{ flexGrow: 1 }} />
