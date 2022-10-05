@@ -46,7 +46,7 @@ import static com.faendir.zachtronics.bot.cw.model.CwCategory.SIZE;
 @RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)
 public class CwSolutionRepository extends AbstractSolutionRepository<CwCategory, CwPuzzle, CwScore, CwSubmission, CwRecord, CwSolution> {
-    private final CwCategory[][] wikiCategories = {{SIZE, FOOTPRINT}};
+    private final CwCategory[][] wikiCategories = {{SIZE}, {FOOTPRINT}};
     private final RedditService redditService;
     private final Subreddit subreddit = Subreddit.LASTCALLBBS;
     private final String wikiPageName = "chipwizard";

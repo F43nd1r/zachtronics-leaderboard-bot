@@ -41,8 +41,7 @@ import static com.faendir.zachtronics.bot.sz.model.SzCategory.*;
 @RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)
 public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory, SzPuzzle, SzScore, SzSubmission, SzRecord, SzSolution> {
-    private final SzCategory[][] wikiCategories = {{CP, PC, LC},
-                                                   {CL, PL, LP}};
+    private final SzCategory[][] wikiCategories = {{CP, CL}, {PC, PL}, {LC, LP}};
     private final RedditService redditService;
     private final Subreddit subreddit = Subreddit.SHENZHEN_IO;
     private final String wikiPageName = "index";

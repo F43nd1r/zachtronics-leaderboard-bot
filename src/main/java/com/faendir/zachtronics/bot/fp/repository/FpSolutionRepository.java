@@ -45,8 +45,7 @@ import static com.faendir.zachtronics.bot.fp.model.FpCategory.*;
 @RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)
 public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory, FpPuzzle, FpScore, FpSubmission, FpRecord, FpSolution> {
-    private final FpCategory[][] wikiCategories = {{RCF, CRF, FRC, wRCF},
-                                                   {RFC, CFR, FCR, wFRC}};
+    private final FpCategory[][] wikiCategories = {{RCF, RFC}, {CRF, CFR}, {FRC, FCR}, {wRCF, wFRC}};
     private final RedditService redditService;
     private final Subreddit subreddit = Subreddit.LASTCALLBBS;
     private final String wikiPageName = "forbidden-path";

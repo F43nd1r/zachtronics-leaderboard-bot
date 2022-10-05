@@ -42,8 +42,7 @@ import static com.faendir.zachtronics.bot.inf.model.IfCategory.*;
 @RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)
 public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory, IfPuzzle, IfScore, IfSubmission, IfRecord, IfSolution> {
-    private final IfCategory[][] wikiCategories = {{CF, CFNG, FC, BC},
-                                                   {CB, CBNG, FB, BF}};
+    private final IfCategory[][] wikiCategories = {{CF, CB}, {CFNG, CBNG}, {FC, FB}, {BC, BF}};
     private final RedditService redditService;
     private final Subreddit subreddit = Subreddit.INFINIFACTORY;
     private final String wikiPageName = "index";

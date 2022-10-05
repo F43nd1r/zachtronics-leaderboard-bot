@@ -45,8 +45,10 @@ import static com.faendir.zachtronics.bot.fc.model.FcCategory.*;
 @RequiredArgsConstructor
 @Getter(AccessLevel.PROTECTED)
 public class FcSolutionRepository extends AbstractSolutionRepository<FcCategory, FcPuzzle, FcScore, FcSubmission, FcRecord, FcSolution> {
-    private final FcCategory[][] wikiCategories = {{TCS, CTS, STC, WTC},
-                                                   {TSW, CWT, SWC, WCT}};
+    private final FcCategory[][] wikiCategories = {{TCS, TSW, TWC},
+                                                   {CTS, CSW, CWT},
+                                                   {STC, SCW, SWT},
+                                                   {WTC, WCS, WST}};
     private final RedditService redditService;
     private final Subreddit subreddit = Subreddit.LASTCALLBBS;
     private final String wikiPageName = "foodcourt";

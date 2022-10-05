@@ -9,6 +9,8 @@ so a level may have at most 2 lines in the table.
 Solutions are either attributed to the original author, or attributed to `Community` if many people obtained it
 independently early in the game release period or many people collaborated on it.
 
+The 📄 icons are links to the solution files, which can be opened in-game.
+
 #### Submitting a New Solution
 
 To submit a solution you need to get the corresponding solution string in the save folder.

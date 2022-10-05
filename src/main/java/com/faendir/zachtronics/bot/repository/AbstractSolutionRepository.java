@@ -50,6 +50,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
     protected abstract RedditService getRedditService();
     protected abstract Subreddit getSubreddit();
     protected abstract String getWikiPageName();
+    /** For each column, every category in order of appearance */
     protected abstract C[][] getWikiCategories();
 
     protected abstract GitRepository getGitRepo();
@@ -279,21 +280,11 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         }
     }
 
-    protected void writeToRedditLeaderboard(P puzzle, Path puzzlePath, @NotNull List<Sol> solutions, String updateMessage) {
-        Map<C, R> recordMap = new EnumMap<>(getCategoryClass());
-        for (Sol solution: solutions) {
-            R record = solution.extendToRecord(puzzle,
-                                               makeArchiveLink(puzzle, solution.getScore()),
-                                               makeArchivePath(puzzlePath, solution.getScore()));
-            for (C category : solution.getCategories()) {
-                recordMap.put(category, record);
-            }
-        }
-
+    protected void writeToRedditLeaderboard(@NotNull P puzzle, Path puzzlePath, @NotNull List<Sol> solutions, String updateMessage) {
         List<String> lines = Pattern.compile("\\r?\\n")
                                     .splitAsStream(getRedditService().getWikiPage(getSubreddit(), getWikiPageName()))
                                     .collect(Collectors.toList()); // mutable list
-        Pattern puzzleRegex = Pattern.compile("^\\| \\[" + Pattern.quote(puzzle.getDisplayName()));
+        Pattern puzzleRegex = Pattern.compile("^\\| \\[" + Pattern.quote(puzzle.getDisplayName()) + "]");
 
         ListIterator<String> it = lines.listIterator();
 
@@ -317,31 +308,50 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
             }
         }
 
-        C[][] categories = getWikiCategories();
-        for (int rowIdx = 0; rowIdx < categories.length; rowIdx++) {
-            StringBuilder row = new StringBuilder("| ");
-            if (rowIdx == 0)
-                row.append(Markdown.linkOrText(puzzle.getDisplayName(), puzzle.getLink()));
-
-            C[] blockCategories = categories[rowIdx];
-
-            boolean usefulLine = false;
-            for (int i = 0; i < blockCategories.length; i++) {
-                C thisCategory = blockCategories[i];
-                row.append(" | ");
-                R thisRecord = recordMap.get(thisCategory);
-                if (thisRecord == null) {
-                    row.append('X'); // nonexisting category for level
-                }
-                else if (rowIdx == 0 || thisRecord != recordMap.get(categories[0][i])) {
-                    DisplayContext<C> displayContext = new DisplayContext<>(StringFormat.REDDIT, thisCategory);
-                    String cell = thisRecord.toDisplayString(displayContext);
-                    row.append(cell);
-                    usefulLine = true;
-                }
+        Map<C, R> recordMap = new EnumMap<>(getCategoryClass());
+        for (Sol solution: solutions) {
+            R record = solution.extendToRecord(puzzle,
+                                               makeArchiveLink(puzzle, solution.getScore()),
+                                               makeArchivePath(puzzlePath, solution.getScore()));
+            for (C category : solution.getCategories()) {
+                recordMap.put(category, record);
             }
-            if (usefulLine)
-                it.add(row.toString());
+        }
+        List<List<R>> recordsByColumn = Arrays.stream(getWikiCategories())
+                                              .map(a -> Arrays.stream(a)
+                                                              .map(recordMap::get)
+                                                              .filter(Objects::nonNull)
+                                                              .distinct()
+                                                              .toList())
+                                              .toList();
+
+        int rowNum = Math.max(1, recordsByColumn.stream().mapToInt(List::size).max().orElseThrow());
+        for (int rowIdx = 0; rowIdx < rowNum; rowIdx++) {
+            StringJoiner row = new StringJoiner(" | ", "| ", "");
+            if (rowIdx == 0)
+                row.add(Markdown.linkOrText(puzzle.getDisplayName(), puzzle.getLink()));
+            else
+                row.add("");
+
+            for (int colIdx = 0; colIdx < recordsByColumn.size(); colIdx++) {
+                C representativeCategory = getWikiCategories()[colIdx][0];
+                if (!puzzle.getSupportedCategories().contains(representativeCategory)) {
+                    row.add("X");
+                    continue;
+                }
+
+                List<R> columnRecords = recordsByColumn.get(colIdx);
+                if (rowIdx >= columnRecords.size()) { // we've already printed all the records of this column (if any)
+                    row.add("");
+                    continue;
+                }
+
+                R thisRecord = columnRecords.get(rowIdx);
+                DisplayContext<C> displayContext = new DisplayContext<>(StringFormat.REDDIT, representativeCategory);
+                String cell = thisRecord.toDisplayString(displayContext);
+                row.add(cell);
+            }
+            it.add(row.toString());
         }
 
         getRedditService().updateWikiPage(getSubreddit(), getWikiPageName(), String.join("\n", lines), updateMessage);

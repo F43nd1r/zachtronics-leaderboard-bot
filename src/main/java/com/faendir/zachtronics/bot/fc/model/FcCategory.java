@@ -33,15 +33,19 @@ import static com.faendir.zachtronics.bot.fc.model.FcType.STANDARD;
 public enum FcCategory implements CategoryJava<FcCategory, FcScore, FcMetric, FcType> {
     TCS("TCS", List.of(TIME, COST, SUM_TIMES, WIRES), 0b1000),
     TSW("TSW", List.of(TIME, SUM_TIMES, WIRES, COST), 0b1000),
+    TWC("TWC", List.of(TIME, WIRES, COST, SUM_TIMES), 0b1000),
 
     CTS("CTS", List.of(COST, TIME, SUM_TIMES, WIRES), 0b0100),
+    CSW("CSW", List.of(COST, SUM_TIMES, WIRES, TIME), 0b0100),
     CWT("CWT", List.of(COST, WIRES, TIME, SUM_TIMES), 0b0100),
 
     STC("STC", List.of(SUM_TIMES, TIME, COST, WIRES), 0b0010),
-    SWC("SWC", List.of(SUM_TIMES, WIRES, COST, TIME), 0b0010),
+    SCW("SCW", List.of(SUM_TIMES, COST, WIRES, TIME), 0b0010),
+    SWT("SWT", List.of(SUM_TIMES, WIRES, TIME, COST), 0b0010),
 
     WTC("WTC", List.of(WIRES, TIME, COST, SUM_TIMES), 0b0001),
-    WCT("WCT", List.of(WIRES, COST, TIME, SUM_TIMES), 0b0001);
+    WCS("WCS", List.of(WIRES, COST, SUM_TIMES, TIME), 0b0001),
+    WST("WST", List.of(WIRES, SUM_TIMES, TIME, COST), 0b0001);
 
     /** contains <tt>%dT%s%dk%s%dS%s%dW</tt> plus a bunch of <tt>*</tt> most likely */
     static final String[] FORMAT_STRINGS = {"%dT%s%dk%s%dS%s%dW",
