@@ -20,20 +20,61 @@ import lombok.Value;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * A solution file is of the form:
+ * <pre>
+ * InputRate.1-1.1 = 1
+ * Solution.1-1.1 = AwAAAAAAAAA=
+ * </pre>
+ *
+ * the solution is a base64 encoded string with the following representation (all integers are little endian)
+ *
+ * <pre>
+ * Save
+ * {
+ *     int32 Version
+ *     int32 BlockCount
+ *     Block[] Blocks
+ * }
+ *
+ * Block
+ * {
+ *     int16 Type
+ *     int16 PositionX
+ *     int16 PositionY
+ *     int16 PositionZ
+ *     uint8 Facing
+ *     uint8 ToggleState
+ *     uint8 DecalCount
+ *     Decal[] Decals
+ * }
+ *
+ * Decal
+ * {
+ *     uint8 Facing
+ *     int16 Type
+ * }
+ * </pre>
+ */
 @Value
 class IfSolutionMetadata {
     /** InputRate.4-3.1 = 1 */
     private static final Pattern INPUT_RATE_PATTERN = Pattern.compile("InputRate.(?<id>\\d+-\\db?).(?<slot>\\d) = \\d+");
     /** Solution.4-3.1 = AAAA== */
-    private static final Pattern SOLUTION_PATTERN = Pattern.compile("Solution.(?<id>\\d+-\\db?).(?<slot>\\d) = [\\w+/]+=*");
+    private static final Pattern SOLUTION_PATTERN = Pattern.compile(
+            "Solution.(?<id>\\d+-\\db?).(?<slot>\\d) = (?<solution>[A-Za-z0-9+/]+={0,2})");
 
     IfPuzzle puzzle;
+    int blocks;
 
     @NotNull
     @Contract("_ -> new")
@@ -56,12 +97,21 @@ class IfSolutionMetadata {
         if (!m.group("id").equals(id) || !m.group("slot").equals(slot))
             throw new IllegalArgumentException("Incoherent solution lines");
 
-        return new IfSolutionMetadata(puzzle);
+        byte[] solution = Base64.getDecoder().decode(m.group("solution"));
+        ByteBuffer buffer = ByteBuffer.wrap(solution).order(ByteOrder.LITTLE_ENDIAN);
+        int version = buffer.getInt();
+        if (version != 3)
+            throw new IllegalStateException("Version is not 3");
+        int blocks = buffer.getInt();
+
+        return new IfSolutionMetadata(puzzle, blocks);
     }
 
     public IfSubmission extendToSubmission(@NotNull String author, @NotNull IfScore score,
                                            @NotNull List<String> displayLinks, @NotNull String data) {
-        data = data.replaceAll("\\." + puzzle.getId() + "\\.\\d", "." + puzzle.getId() + ".0"); // slot normaliztion
+        if (blocks != score.getBlocks())
+            throw new IllegalStateException("Solution has " + blocks + " blocks, score has " + score.getBlocks());
+        data = data.replaceAll("\\." + puzzle.getId() + "\\.\\d", "." + puzzle.getId() + ".0"); // slot normalization
         return new IfSubmission(puzzle, score, author, displayLinks, data);
     }
 }
