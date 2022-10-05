@@ -73,12 +73,12 @@ public class IfScore implements Score<IfCategory> {
     }
 
     /**
-     * @return <tt>""</tt> or <tt>"/B"</tt> or <tt>"/P"</tt> or <tt>"/BP"</tt>
+     * @return <tt>""</tt> or <tt>"/G"</tt>
      */
     @NotNull
     public static String sepFlags(String separator, boolean usesGRA) {
         if (usesGRA)
-            return separator + "B";
+            return separator + "G";
         else
             return "";
     }

@@ -24,7 +24,9 @@ import com.faendir.zachtronics.bot.repository.Solution;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -41,7 +43,7 @@ public class IfSolution implements Solution<IfCategory, IfPuzzle, IfScore, IfRec
 
     @Override
     public IfRecord extendToRecord(IfPuzzle puzzle, String dataLink, Path dataPath) {
-        if (dataPath != null)
+        if (dataPath != null && Files.exists(dataPath))
             return new IfRecord(puzzle, score, author, displayLinks, dataLink, dataPath);
         else
             return new IfRecord(puzzle, score, author, displayLinks, null, null);
@@ -52,10 +54,12 @@ public class IfSolution implements Solution<IfCategory, IfPuzzle, IfScore, IfRec
         assert fields.length == 4;
         IfScore score = Objects.requireNonNull(IfScore.parseScore(fields[0]));
         String author = fields[1];
-        String displayLinks = fields[2];
+        String displayLinksStr = fields[2];
         String categories = fields[3];
 
-        IfSolution solution = new IfSolution(score, author, List.of(displayLinks.split(",")));
+        List<String> displayLinks = displayLinksStr == null ? Collections.emptyList()
+                                                            : List.of(displayLinksStr.split(","));
+        IfSolution solution = new IfSolution(score, author, displayLinks);
         if (categories != null)
             Pattern.compile(",").splitAsStream(categories).map(IfCategory::valueOf).forEach(solution.categories::add);
         return solution;

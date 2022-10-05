@@ -96,7 +96,7 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
     @Override
     @NotNull
     protected Path relativePuzzlePath(@NotNull IfPuzzle puzzle) {
-        return Paths.get(puzzle.getId());
+        return Paths.get(puzzle.getGroup().name(), puzzle.getId());
     }
 
     @NotNull
