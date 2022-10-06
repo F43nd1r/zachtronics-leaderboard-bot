@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.inf.model;
 
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Record;
+import com.faendir.zachtronics.bot.model.StringFormat;
 import com.faendir.zachtronics.bot.utils.Markdown;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +49,8 @@ public class IfRecord implements Record<IfCategory> {
                         Markdown.linkOrText(score.toDisplayString(context) + " " + author, getDisplayLink());
         if (displayLinks.size() > 1) {
             for (int i = 1; i < displayLinks.size(); i++) {
-                result += " " + Markdown.link("^[" + (i + 1) + "]", displayLinks.get(i));
+                String text = (context.getFormat() == StringFormat.REDDIT ?  "^" : "") + "[" + (i + 1) + "]";
+                result += " " + Markdown.link(text, displayLinks.get(i));
             }
         }
         return result;
