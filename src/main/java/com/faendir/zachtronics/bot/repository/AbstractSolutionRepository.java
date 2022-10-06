@@ -329,7 +329,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         for (int rowIdx = 0; rowIdx < rowNum; rowIdx++) {
             StringJoiner row = new StringJoiner(" | ", "| ", "");
             if (rowIdx == 0)
-                row.add(Markdown.linkOrText(puzzle.getDisplayName(), puzzle.getLink()));
+                row.add(Markdown.link(puzzle.getDisplayName(), puzzle.getLink()));
             else
                 row.add("");
 

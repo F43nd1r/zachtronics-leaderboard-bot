@@ -54,6 +54,7 @@ abstract class AbstractSubmitCommand<C : Category, P : Puzzle<C>, S : Submission
                             beatenCategories.takeIf { it.isNotEmpty() }?.smartFormat(submission.puzzle.supportedCategories.toMetricsTree()) ?: "Pareto"
                         }"
                     )
+                    .url(submission.puzzle.link)
                     .color(Colors.SUCCESS)
                     .description(
                         "`${submission.score.toDisplayString(DisplayContext(StringFormat.DISCORD, beatenCategories))}`"
@@ -70,6 +71,7 @@ abstract class AbstractSubmitCommand<C : Category, P : Puzzle<C>, S : Submission
                     .title("Updated: *${submission.puzzle.displayName}* ${
                         result.oldRecord.categories.takeIf { it.isNotEmpty() }?.smartFormat(submission.puzzle.supportedCategories.toMetricsTree()) ?: "Pareto"
                     }")
+                    .url(submission.puzzle.link)
                     .color(Colors.SUCCESS)
                     .description(
                         "`${submission.score.toDisplayString(DisplayContext(StringFormat.DISCORD, result.oldRecord.categories))}`"
@@ -81,11 +83,13 @@ abstract class AbstractSubmitCommand<C : Category, P : Puzzle<C>, S : Submission
             is SubmitResult.AlreadyPresent ->
                 return MultiMessageSafeEmbedMessageBuilder()
                     .title("Already present: *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.discord())}`")
+                    .url(submission.puzzle.link)
                     .color(Colors.UNCHANGED)
                     .description("No action was taken.")
             is SubmitResult.NothingBeaten ->
                 return MultiMessageSafeEmbedMessageBuilder()
                     .title("No Scores beaten by *${submission.puzzle.displayName}* `${submission.score.toDisplayString(DisplayContext.discord())}`")
+                    .url(submission.puzzle.link)
                     .color(Colors.UNCHANGED)
                     .description("Beaten by:")
                     .embedCategoryRecords(result.records, submission.puzzle.supportedCategories)

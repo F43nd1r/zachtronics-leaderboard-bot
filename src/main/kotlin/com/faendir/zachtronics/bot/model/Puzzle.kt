@@ -23,5 +23,5 @@ interface Puzzle<C : Category> {
 
     val supportedCategories: List<C>
 
-    val link: String?
+    val link: String
 }

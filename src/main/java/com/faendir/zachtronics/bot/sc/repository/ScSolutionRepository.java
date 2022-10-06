@@ -152,7 +152,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                     minReactors = recordMap.get(ScCategory.RC).getScore().getReactors();
                     rowTitle += " - " + minReactors + " Reactor" + (minReactors == 1 ? "" : "s");
                 }
-                row.append(Markdown.linkOrText(rowTitle, puzzle.getLink()));
+                row.append(Markdown.link(rowTitle, puzzle.getLink()));
 
                 for (int block = 0; block < 2; block++) {
                     ScCategory[] blockCategories = wikiCategories[2 * rowIdx + block];
