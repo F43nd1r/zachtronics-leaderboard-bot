@@ -47,7 +47,7 @@ public enum IfPuzzle implements Puzzle<IfCategory> {
     LEVEL_5_1("5-1", IfGroup.ZONE_5, IfType.STANDARD, "Guided Javelin Type 2"),
     LEVEL_5_2("5-3", IfGroup.ZONE_5, IfType.STANDARD, "Gneiss Chair"),
     LEVEL_5_3("5-4b", IfGroup.ZONE_5, IfType.STANDARD, "Relay Satellite"),
-    LEVEL_5_4("5-2b", IfGroup.ZONE_5, IfType.STANDARD, "Terrestrial Surveyor"),
+    LEVEL_5_4("5-2b", IfGroup.ZONE_5, IfType.STANDARD, "Terrestrial Surveyor (5-4)"),
     LEVEL_5_5("5-5", IfGroup.ZONE_5, IfType.STANDARD, "Anti-Javelin Point Defense"),
 
     LEVEL_6_1("6-1", IfGroup.ZONE_6, IfType.STANDARD, "Meat Product Type 57"),
@@ -59,7 +59,7 @@ public enum IfPuzzle implements Puzzle<IfCategory> {
     LEVEL_7_2("7-2", IfGroup.ZONE_7, IfType.STANDARD, "Teleporter Experiment 2"),
     LEVEL_7_3("7-3", IfGroup.ZONE_7, IfType.STANDARD, "Teleporter Experiment 3"),
     LEVEL_7_4("7-4", IfGroup.ZONE_7, IfType.STANDARD, "Teleporter Experiment 4"),
-    LEVEL_7_5("7-5", IfGroup.ZONE_7, IfType.STANDARD, "Terrestrial Surveyor"),
+    LEVEL_7_5("7-5", IfGroup.ZONE_7, IfType.STANDARD, "Terrestrial Surveyor (7-5)"),
     LEVEL_7_6("7-6", IfGroup.ZONE_7, IfType.STANDARD, "Anti-Javelin Satellite"),
     LEVEL_7_7("7-7", IfGroup.ZONE_7, IfType.STANDARD, "The Big Blowout"),
     LEVEL_8_1("8-1", IfGroup.ZONE_8, IfType.STANDARD, "Hull Panels"),

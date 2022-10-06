@@ -219,7 +219,19 @@ class IfRedditMigrationTest {
         System.out.println("Done");
     }
 
-    private static IfPuzzle findPuzzle(String levelName) {
+    private static boolean terrestrialSurveySeen = false;
+    private static IfPuzzle findPuzzle(@NotNull String levelName) {
+        if (levelName.equals("Terrestrial Surveyor")) { // same name, 2 levels
+            if (!terrestrialSurveySeen) {
+                terrestrialSurveySeen = true;
+                return IfPuzzle.LEVEL_5_4;
+            }
+            else {
+                terrestrialSurveySeen = false;
+                return IfPuzzle.LEVEL_7_5;
+            }
+        }
+
         List<IfPuzzle> candidates = UtilsKt.fuzzyMatch(Arrays.asList(IfPuzzle.values()), levelName, IfPuzzle::getDisplayName);
         if (candidates.size() == 1)
             return candidates.get(0);

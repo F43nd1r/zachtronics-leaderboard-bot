@@ -107,7 +107,7 @@ The files can be copied directly into the game's save folder and opened in-game.
 |
 | [Relay Satellite](https://zlbb.faendir.com/if/5-4b) | [**56**/9999/9999/G grindmastaflash](http://i.imgur.com/eeCa73Q.gifv) [^[2]](http://i.imgur.com/KpF3WGg.gifv) [^[3]](http://i.imgur.com/A7o5WYr.gifv) [^[4]](http://i.imgur.com/y2gCOZd.gifv) | [**66**/9999/9999 rikswift123](https://www.reddit.com/r/infinifactory/comments/losn7s/53_relay_satellite_in_66_cyles_no_gras/) | 9999/**50**/9999/G Community | [9999/9999/**6**/G Community](http://i.imgur.com/ESYf22n.gifv)
 |
-| [Terrestrial Surveyor](https://zlbb.faendir.com/if/7-5) |  |  |  |
+| [Terrestrial Surveyor (5-4)](https://zlbb.faendir.com/if/5-2b) | [**82**/9999/9999 ToughThought](http://i.imgur.com/LPWo9Gp.gifv) [^[2]](http://i.imgur.com/uO3Iqce.gifv) | [**82**/9999/9999 ToughThought](http://i.imgur.com/LPWo9Gp.gifv) [^[2]](http://i.imgur.com/uO3Iqce.gifv) | 9999/**61**/9999/G Bidji29 | [9999/9999/**21**/G caeonosphere](http://i.imgur.com/XmwTOAN.gifv)
 |
 | [Anti-Javelin Point Defense](https://zlbb.faendir.com/if/5-5) | [**48**/9999/9999/G gtw123](https://youtu.be/exaLS7Synkg) | [**56**/9999/9999 gtw123](http://imgur.com/a/XZcZ7) | 9999/**75**/9999/G Xavr0k | [9999/9999/**8**/G Community](http://i.imgur.com/sB73TPi.gifv)
 
@@ -137,7 +137,7 @@ The files can be copied directly into the game's save folder and opened in-game.
 |
 | [Teleporter Experiment 4](https://zlbb.faendir.com/if/7-4) | [**95**/9999/9999/G ToughThought](http://i.imgur.com/GxXAh2e.gifv) [^[2]](http://i.imgur.com/r57tA0v.gifv) | [**104**/9999/9999 gtw123](http://imgur.com/a/Ycy2T) | 9999/**51**/9999/G myugaru | [9999/9999/**7**/G Entity_](http://imgur.com/a/BXjIN)
 |
-| [Terrestrial Surveyor](https://zlbb.faendir.com/if/7-5) | | | |
+| [Terrestrial Surveyor (7-5)](https://zlbb.faendir.com/if/7-5) | [**116**/9999/9999/G gtw123](http://imgur.com/a/uTVO1) | [**133**/9999/9999 gtw123](http://imgur.com/a/ss3S0) | [9999/**86**/9999/G SirDredgery](/snxeow) | [9999/9999/**18**/G SolidJim](http://imgur.com/a/RWqpy)
 |
 | [Anti-Javelin Satellite](https://zlbb.faendir.com/if/7-6) | [**165**/9999/9999/G gtw123](http://imgur.com/a/3lsW2) | [**177**/9999/9999 gtw123](http://imgur.com/a/7TiuW) | [9999/**95**/9999/G Community](/snxeow) | [9999/9999/**23**/G Community](https://youtu.be/5yBKi1uyBak)
 |
