@@ -34,7 +34,7 @@ class FcSimResultTest {
 
     @Test
     void validateGood() throws IOException {
-        ClassPathResource resource = new ClassPathResource("repositories/fc-leaderboard/CAMPAIGN/TWO_TWELVE/2twelve-8T-65C-16S-4W.solution");
+        ClassPathResource resource = new ClassPathResource("repositories/fc-leaderboard/CAMPAIGN/TWO_TWELVE/2twelve-8T-65k-16S-4W.solution");
         byte[] data = Files.readAllBytes(resource.getFile().toPath());
 
         FcSimResult result = validateSingle(data);
