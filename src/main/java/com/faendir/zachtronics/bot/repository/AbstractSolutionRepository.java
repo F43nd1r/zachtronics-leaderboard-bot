@@ -192,6 +192,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
 
             // add in completely missing categories
             if (!missingCategories.isEmpty()) {
+                missingCategories.removeIf(c -> !c.supportsScore(candidate.getScore()));
                 beatenCategoryRecords.add(new CategoryRecord<>(null, missingCategories));
                 candidate.getCategories().addAll(missingCategories);
             }
