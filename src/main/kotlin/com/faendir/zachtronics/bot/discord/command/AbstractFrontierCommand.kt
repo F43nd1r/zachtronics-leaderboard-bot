@@ -42,7 +42,7 @@ abstract class AbstractFrontierCommand<C : Category, P : Puzzle<C>, R : Record<C
         val records = repository.findCategoryHolders(puzzle, includeFrontier = true)
         return MultiMessageSafeEmbedMessageBuilder()
             .title("*${puzzle.displayName}*")
-            .apply { puzzle.link?.let { url(it) } }
+            .url(puzzle.link)
             .color(Colors.READ)
             .embedRecords(records, puzzle.supportedCategories)
     }

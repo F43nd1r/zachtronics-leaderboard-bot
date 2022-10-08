@@ -44,7 +44,7 @@ abstract class AbstractPaginatedListCommand<C : Category, P : Puzzle<C>, R : Rec
         val records = repository.findCategoryHolders(puzzle, includeFrontier = false)
         return PaginatedSafeEmbedMessageBuilder(discordActionCache)
             .title("*${puzzle.displayName}*")
-            .apply { puzzle.link?.let { url(it) } }
+            .url(puzzle.link)
             .color(Colors.READ)
             .embedCategoryRecords(records, puzzle.supportedCategories)
             .apply {
