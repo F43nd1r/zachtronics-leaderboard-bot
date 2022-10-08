@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.sc.model;
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Getter;
-import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
@@ -59,7 +58,6 @@ public enum ScCategory implements CategoryJava<ScCategory, ScScore, ScMetric, Sc
                                             "**%s**%s**%d**%s%d%s", "**%s**%s**%d**%s**%d**%s"};
 
     private final String displayName;
-    @Accessors(fluent = true)
     private final List<ScMetric> metrics;
     private final Comparator<ScScore> scoreComparator;
     private final Set<ScType> supportedTypes;

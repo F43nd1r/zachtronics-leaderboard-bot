@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.inf.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -46,7 +45,6 @@ public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric, If
     static final String[] FORMAT_STRINGS = {"%d%s%d%s%d%s", "%d%s%d%s**%d**%s", "%d%s**%d**%s%d%s", null, "**%d**%s%d%s%d%s"};
 
     private final String displayName;
-    @Accessors(fluent = true)
     private final List<IfMetric> metrics;
     private final Comparator<IfScore> scoreComparator;
     private final Set<IfType> supportedTypes = Collections.singleton(STANDARD);

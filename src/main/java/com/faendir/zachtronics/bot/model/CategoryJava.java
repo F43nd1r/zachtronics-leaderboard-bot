@@ -24,15 +24,6 @@ import java.util.Objects;
 import java.util.Set;
 
 public interface CategoryJava<C extends Enum<C> & Category, S extends Score<C>, M extends MetricJava<S>, T extends Type> extends Category {
-    @NotNull
-    @Override
-    @SuppressWarnings("unchecked")
-    default List<Metric> getMetrics() {
-        return (List<Metric>) (List<?>) metrics();
-    }
-
-    /** Typed metrics, java-kotlin can't talk to each other how they should */
-    @NotNull List<M> metrics();
     @NotNull Comparator<S> getScoreComparator();
     @NotNull Set<T> getSupportedTypes();
     int getScoreFormatId();

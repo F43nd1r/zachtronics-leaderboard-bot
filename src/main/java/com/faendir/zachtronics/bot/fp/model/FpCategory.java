@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.fp.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
@@ -54,7 +53,6 @@ public enum FpCategory implements CategoryJava<FpCategory, FpScore, FpMetric, Fp
                                             "**%dR**%s%dC%s%dF%s%dW"};
 
     private final String displayName;
-    @Accessors(fluent = true)
     private final List<FpMetric> metrics;
     private final Comparator<FpScore> scoreComparator;
     private final Set<FpType> supportedTypes;

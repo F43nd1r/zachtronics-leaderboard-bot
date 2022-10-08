@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.fc.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -55,7 +54,6 @@ public enum FcCategory implements CategoryJava<FcCategory, FcScore, FcMetric, Fc
                                             "**%dT**%s%dk%s%dS%s%dW"};
 
     private final String displayName;
-    @Accessors(fluent = true)
     private final List<FcMetric> metrics;
     private final Comparator<FcScore> scoreComparator;
     private final Set<FcType> supportedTypes = Collections.singleton(STANDARD);

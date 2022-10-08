@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.sz.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -44,7 +43,6 @@ public enum SzCategory implements CategoryJava<SzCategory, SzScore, SzMetric, Sz
     static final String[] FORMAT_STRINGS = {"%d%s%d%s%d", "%d%s%d%s**%d**", "%d%s**%d**%s%d", null, "**%d**%s%d%s%d"};
 
     private final String displayName;
-    @Accessors(fluent = true)
     private final List<SzMetric> metrics;
     private final Comparator<SzScore> scoreComparator;
     private final Set<SzType> supportedTypes = Collections.singleton(STANDARD);
