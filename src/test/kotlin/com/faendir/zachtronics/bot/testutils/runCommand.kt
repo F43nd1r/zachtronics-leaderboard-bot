@@ -80,7 +80,7 @@ private fun mockOption(name: String, value: Serializable): ApplicationCommandInt
         is Int -> ApplicationCommandOption.Type.INTEGER
         else -> ApplicationCommandOption.Type.STRING
     }
-    val optionValue = ApplicationCommandInteractionOptionValue(mockk(), null, type.value, value.toString())
+    val optionValue = ApplicationCommandInteractionOptionValue(mockk(), null, type.value, value.toString(), null)
     val option = mockk<ApplicationCommandInteractionOption>()
     every { option.type } returns type
     every { option.name } returns name
