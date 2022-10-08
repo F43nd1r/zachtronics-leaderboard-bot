@@ -151,15 +151,15 @@ The files can be copied directly into the game's save folder and opened in-game.
 |
 | [Central Axis Support](https://zlbb.faendir.com/if/8-2) | [**67**/9999/9999/G andy75381](http://imgur.com/ScIwxMv) [^[2]](http://imgur.com/ALJ5zss) [^[3]](http://imgur.com/h2suQqc) | [**73**/9999/9999 gtw123](http://imgur.com/a/deIT6) | 9999/**82**/9999/G myugaru | [9999/9999/**8**/G Community](https://i.imgur.com/QzvDJbK.gifv)
 |
-| [Docking Clamp](https://zlbb.faendir.com/if/8-3) | [**163**/9999/9999/G andy75381](http://imgur.com/vPUHYoP) | [**173**/9999/9999 DarkMatter_Zombie](https://www.reddit.com/r/infinifactory/comments/9izago/83_docking_clamp_173_cycles_no_gras/) | 9999/**74**/9999/G myugaru | [9999/9999/**8**/G NohatCoder](http://i.imgur.com/GQtb0WT.gifv)
+| [Docking Clamp](https://zlbb.faendir.com/if/8-6) | [**163**/9999/9999/G andy75381](http://imgur.com/vPUHYoP) | [**173**/9999/9999 DarkMatter_Zombie](https://www.reddit.com/r/infinifactory/comments/9izago/83_docking_clamp_173_cycles_no_gras/) | 9999/**74**/9999/G myugaru | [9999/9999/**8**/G NohatCoder](http://i.imgur.com/GQtb0WT.gifv)
 |
 | [Structural Frame](https://zlbb.faendir.com/if/8-4) | [**161**/9999/9999/G andy75381](http://imgur.com/NpKH4Dv) [^[2]](http://imgur.com/tulBOne) [^[3]](http://imgur.com/39adWP6) | [**172**/9999/9999 andy75381](http://imgur.com/jL6ftDl) | 9999/**66**/9999/G myugaru | [9999/9999/**7**/G Community](https://i.imgur.com/uDlFBnt.gifv)
 |
 | [Anti-Javelin Battery](https://zlbb.faendir.com/if/8-5) | [**39**/9999/9999/G gtw123](http://youtu.be/PwUYY0bWVw8) | [**43**/9999/9999 gtw123](http://imgur.com/a/cu98X) | 9999/**89**/9999/G myugaru | [9999/9999/**15**/G wl](http://i.imgur.com/2ScbTDd.gifv)
 |
-| [Mag-Tube Corridor](https://zlbb.faendir.com/if/8-6) | [**251**/9999/9999 grindmastaflash](http://i.imgur.com/SzAkFDP.gifv) [^[2]](http://i.imgur.com/KG9eqGz.gifv) [^[3]](http://i.imgur.com/v04aARL.gifv) | [**251**/9999/9999 grindmastaflash](http://i.imgur.com/SzAkFDP.gifv) [^[2]](http://i.imgur.com/KG9eqGz.gifv) [^[3]](http://i.imgur.com/v04aARL.gifv) | 9999/**97**/9999/G Tiavor | [9999/9999/**23**/G caeonosphere](http://i.imgur.com/LOQgjYW.gifv)
+| [Mag-Tube Corridor](https://zlbb.faendir.com/if/8-7) | [**251**/9999/9999 grindmastaflash](http://i.imgur.com/SzAkFDP.gifv) [^[2]](http://i.imgur.com/KG9eqGz.gifv) [^[3]](http://i.imgur.com/v04aARL.gifv) | [**251**/9999/9999 grindmastaflash](http://i.imgur.com/SzAkFDP.gifv) [^[2]](http://i.imgur.com/KG9eqGz.gifv) [^[3]](http://i.imgur.com/v04aARL.gifv) | 9999/**97**/9999/G Tiavor | [9999/9999/**23**/G caeonosphere](http://i.imgur.com/LOQgjYW.gifv)
 |
-| [Solar Cell Array](https://zlbb.faendir.com/if/8-7) | [**75**/9999/9999/G gtw123](https://youtu.be/-sRyeUq1Hvg) | [**126**/9999/9999 gtw123](https://imgur.com/a/ULARhQI) | 9999/**64**/9999/G Xavr0k | [9999/9999/**13**/G JeremyG](http://i.imgur.com/kOz3Lkg.gifv)
+| [Solar Cell Array](https://zlbb.faendir.com/if/8-3) | [**75**/9999/9999/G gtw123](https://youtu.be/-sRyeUq1Hvg) | [**126**/9999/9999 gtw123](https://imgur.com/a/ULARhQI) | 9999/**64**/9999/G Xavr0k | [9999/9999/**13**/G JeremyG](http://i.imgur.com/kOz3Lkg.gifv)
 
 ### Atropos Station
 
@@ -167,25 +167,25 @@ The files can be copied directly into the game's save folder and opened in-game.
 | ---  | ---  | --- | --- | ---
 | [Landing Alignment Guide](https://zlbb.faendir.com/if/9-1) | [**64**/9999/9999/G gtw123](http://i.imgur.com/TzPCXfa.gifv) | [**66**/9999/9999 gtw123](http://imgur.com/a/9lsUw) | 9999/**55**/9999/G Xavr0k | [9999/9999/**4**/G JeremyG](http://jeremyg.nl/c/914-1.gif)
 |
-| [Control Console](https://zlbb.faendir.com/if/9-2) | [**45**/9999/9999/G DarkMatter_Zombie](https://www.reddit.com/r/infinifactory/comments/eewo07/92_control_console_45_cycles_gras/) | [**88**/9999/9999 DarkMatter_Zombie](https://youtu.be/caEqdtYlQvE) | [9999/**98**/9999/G Community](https://www.youtube.com/watch?v=fwvr0u1voeg) | [9999/9999/**15**/G wl](http://i.imgur.com/B3EEzhO.gifv)
+| [Control Console](https://zlbb.faendir.com/if/9-6) | [**45**/9999/9999/G DarkMatter_Zombie](https://www.reddit.com/r/infinifactory/comments/eewo07/92_control_console_45_cycles_gras/) | [**88**/9999/9999 DarkMatter_Zombie](https://youtu.be/caEqdtYlQvE) | [9999/**98**/9999/G Community](https://www.youtube.com/watch?v=fwvr0u1voeg) | [9999/9999/**15**/G wl](http://i.imgur.com/B3EEzhO.gifv)
 |
-| [Laser Calibration Target](https://zlbb.faendir.com/if/9-3) | [**115**/9999/9999/G DarkMatter_Zombie](https://www.reddit.com/r/infinifactory/comments/eqzqpi/93_laser_calibration_target_115_cycles_gras/) | [**119**/9999/9999 DarkMatter_Zombie](https://www.reddit.com/r/infinifactory/comments/eqzq1s/93_laser_calibration_target_119_cycles_no_gras/) | 9999/**55**/9999/G Xavr0k | [9999/9999/**4**/G NohatCoder](http://i.imgur.com/cDzRnNO.gifv)
+| [Laser Calibration Target](https://zlbb.faendir.com/if/9-4) | [**115**/9999/9999/G DarkMatter_Zombie](https://www.reddit.com/r/infinifactory/comments/eqzqpi/93_laser_calibration_target_115_cycles_gras/) | [**119**/9999/9999 DarkMatter_Zombie](https://www.reddit.com/r/infinifactory/comments/eqzq1s/93_laser_calibration_target_119_cycles_no_gras/) | 9999/**55**/9999/G Xavr0k | [9999/9999/**4**/G NohatCoder](http://i.imgur.com/cDzRnNO.gifv)
 |
-| [Life Support System](https://zlbb.faendir.com/if/9-4) | [**39**/9999/9999/G gtw123](http://imgur.com/a/qodsp) | [**51**/9999/9999 gtw123](http://imgur.com/a/hciSp) | 9999/**89**/9999/G Xavr0k | [9999/9999/**8**/G Community](https://i.imgur.com/eGMJKPJ.gifv)
+| [Life Support System](https://zlbb.faendir.com/if/9-3) | [**39**/9999/9999/G gtw123](http://imgur.com/a/qodsp) | [**51**/9999/9999 gtw123](http://imgur.com/a/hciSp) | 9999/**89**/9999/G Xavr0k | [9999/9999/**8**/G Community](https://i.imgur.com/eGMJKPJ.gifv)
 |
-| [Space Buoy](https://zlbb.faendir.com/if/9-5) | [**86**/9999/9999/G gtw123](http://imgur.com/a/mQgOe) | [**97**/9999/9999 gtw123](http://imgur.com/a/7Y8c7) | [9999/**78**/9999/G Community](https://imgur.com/a/MStMtCK) | [9999/9999/**14**/G Community](https://i.redd.it/zqef2u9xqrr21.png)
+| [Space Buoy](https://zlbb.faendir.com/if/9-2) | [**86**/9999/9999/G gtw123](http://imgur.com/a/mQgOe) | [**97**/9999/9999 gtw123](http://imgur.com/a/7Y8c7) | [9999/**78**/9999/G Community](https://imgur.com/a/MStMtCK) | [9999/9999/**14**/G Community](https://i.redd.it/zqef2u9xqrr21.png)
 |
-| [Resistance Shuttles](https://zlbb.faendir.com/if/9-6) | [**95**/9999/9999/G gtw123](http://imgur.com/a/iTA1X) | [**97**/9999/9999 gtw123](http://imgur.com/a/VwXst) | [9999/**138**/9999/G Community](https://www.youtube.com/watch?v=WYM9BnvVIbg) | [9999/9999/**50**/G Community](https://youtu.be/ih6kwGz4v3c)
+| [Resistance Shuttles](https://zlbb.faendir.com/if/9-7) | [**95**/9999/9999/G gtw123](http://imgur.com/a/iTA1X) | [**97**/9999/9999 gtw123](http://imgur.com/a/VwXst) | [9999/**138**/9999/G Community](https://www.youtube.com/watch?v=WYM9BnvVIbg) | [9999/9999/**50**/G Community](https://youtu.be/ih6kwGz4v3c)
 
 ### The Homeward Fleet
 
 | Name | Cycles | Cycles (No GRAs) | Footprint | Blocks
 | ---  | ---  | --- | --- | ---
-| [Navigation Computer](https://zlbb.faendir.com/if/10-1) | [**84**/9999/9999/G DarkMatter_Zombie](https://youtu.be/AaQdrTw3pug) | [**87**/9999/9999 DarkMatter_Zombie](https://youtu.be/D0Z-s70qwr8) | [9999/**158**/9999/G Community](https://imgur.com/a/h6n4SUn) | [9999/9999/**25**/G OracleofEpirus](http://i.imgur.com/xkiPeLl.gifv)
+| [Navigation Computer](https://zlbb.faendir.com/if/10-2) | [**84**/9999/9999/G DarkMatter_Zombie](https://youtu.be/AaQdrTw3pug) | [**87**/9999/9999 DarkMatter_Zombie](https://youtu.be/D0Z-s70qwr8) | [9999/**158**/9999/G Community](https://imgur.com/a/h6n4SUn) | [9999/9999/**25**/G OracleofEpirus](http://i.imgur.com/xkiPeLl.gifv)
 |
-| [Fusion Reactor](https://zlbb.faendir.com/if/10-2) | [**498**/9999/9999/G gtw123](https://youtu.be/AZloBE1Sv1Y) | [**503**/9999/9999 gtw123](https://www.youtube.com/watch?v=BSHR0w1sveQ) | 9999/**120**/9999/G SirDredgery | [9999/9999/**54**/G Community](https://gfycat.com/ImmediateSpectacularAnteater)
+| [Fusion Reactor](https://zlbb.faendir.com/if/10-3) | [**498**/9999/9999/G gtw123](https://youtu.be/AZloBE1Sv1Y) | [**503**/9999/9999 gtw123](https://www.youtube.com/watch?v=BSHR0w1sveQ) | 9999/**120**/9999/G SirDredgery | [9999/9999/**54**/G Community](https://gfycat.com/ImmediateSpectacularAnteater)
 |
-| [Crew Quarters](https://zlbb.faendir.com/if/10-3) | [**145**/9999/9999/G DarkMatter_Zombie](https://www.reddit.com/r/infinifactory/comments/gu4g47/103_crew_quarters_145_cycles_gras/) | [**155**/9999/9999 DarkMatter_Zombie](https://youtu.be/CGv78i9sewg) | [9999/**250**/9999/G Community](https://imgur.com/a/WMB2FMs) | [9999/9999/**45**/G Community](https://youtu.be/uv4teRMoQ0k)
+| [Crew Quarters](https://zlbb.faendir.com/if/10-1) | [**145**/9999/9999/G DarkMatter_Zombie](https://www.reddit.com/r/infinifactory/comments/gu4g47/103_crew_quarters_145_cycles_gras/) | [**155**/9999/9999 DarkMatter_Zombie](https://youtu.be/CGv78i9sewg) | [9999/**250**/9999/G Community](https://imgur.com/a/WMB2FMs) | [9999/9999/**45**/G Community](https://youtu.be/uv4teRMoQ0k)
 |
 | [Plasma Engine](https://zlbb.faendir.com/if/10-4) | [**619**/9999/9999 gtw123](https://www.youtube.com/watch?v=PrgZu5pfFPI&feature=youtu.be) | [**619**/9999/9999 gtw123](https://www.youtube.com/watch?v=PrgZu5pfFPI&feature=youtu.be) | 9999/**273**/9999/G SirDredgery | [9999/9999/**49**/G OracleofEpirus](http://i.imgur.com/CXizOfM.jpg)
 |
