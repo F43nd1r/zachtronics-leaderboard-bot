@@ -41,7 +41,7 @@ data class CommandOption<T, R>(
     val required: Boolean,
     val choices: Map<String, T & Any>?,
     private val autoComplete: ((partial: T & Any) -> Map<String, T & Any>)?,
-    private val getValue: InteractionCreateEvent.(ApplicationCommandInteractionOptionValue) -> T,
+    private val getValue: (ApplicationCommandInteractionOptionValue) -> T,
     private val convert: InteractionCreateEvent.(T) -> R,
 ) {
 
@@ -49,13 +49,13 @@ data class CommandOption<T, R>(
     fun get(event: ChatInputInteractionEvent): R =
         event.leafOptions.find { it.name == name }?.value
             ?.run { if (required) orElseThrow() else orElse(null) }
-            ?.let { event.getValue(it) }
+            ?.let { getValue(it) }
             ?.let { event.convert(it) } as R
 
     fun autoComplete(event: ChatInputAutoCompleteEvent): List<ApplicationCommandOptionChoiceData>? {
         if (autoComplete == null) return null
         val value = event.focusedOption.value.orElse(null) ?: return null
-        val parsedValue = event.getValue(value) ?: return null
+        val parsedValue = getValue(value) ?: return null
         return autoComplete.invoke(parsedValue).map { (name, value) -> ApplicationCommandOptionChoiceData.builder().name(name).value(value).build() }
     }
 
@@ -85,7 +85,7 @@ private val ChatInputInteractionEvent.leafOptions: List<ApplicationCommandIntera
 class CommandOptionBuilder<T, R> private constructor(
     private val type: ApplicationCommandOption.Type,
     private val name: String,
-    private val getValue: InteractionCreateEvent.(ApplicationCommandInteractionOptionValue) -> T,
+    private val getValue: (ApplicationCommandInteractionOptionValue) -> T,
     private var convert: InteractionCreateEvent.(T) -> R,
 ) {
     private var required: Boolean = false
@@ -145,8 +145,7 @@ class CommandOptionBuilder<T, R> private constructor(
             CommandOptionBuilder<Snowflake?, Snowflake?>(ApplicationCommandOption.Type.MENTIONABLE, name, { it.asSnowflake() }, { it })
 
         @JvmStatic
-        fun attachment(name: String) = CommandOptionBuilder<Attachment?, Attachment?>(ApplicationCommandOption.Type.ATTACHMENT, name, {
-            interaction.commandInteraction.orElseThrow().resolved.orElseThrow().getAttachment(Snowflake.of(it.raw)).orElseThrow()!!
-        }, { it })
+        fun attachment(name: String) =
+            CommandOptionBuilder<Attachment?, Attachment?>(ApplicationCommandOption.Type.ATTACHMENT, name, { it.asAttachment() }, { it })
     }
 }
