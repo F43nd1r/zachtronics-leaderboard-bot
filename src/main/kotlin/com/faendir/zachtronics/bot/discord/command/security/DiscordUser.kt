@@ -16,14 +16,21 @@
 
 package com.faendir.zachtronics.bot.discord.command.security
 
+import com.faendir.zachtronics.bot.utils.asReaction
+import discord4j.common.util.Snowflake
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.`object`.entity.Guild
 import discord4j.core.`object`.entity.User
+import discord4j.core.`object`.reaction.ReactionEmoji
 
-enum class DiscordUser(val id: Long) {
-    F43ND1R(288766560938622976L),
-    IEEE12345(295868901042946048L), // aka 12345IEEE
-    TT(516462621382410260L),
-    ZIG(185983061190508544L),
+enum class DiscordUser(val id: Long, val getSpecialEmoji: (Guild?) -> ReactionEmoji? = { null }) {
+    F43ND1R(288766560938622976, { ReactionEmoji.unicode("\uD83C\uDDEB") }),
+    IEEE12345(295868901042946048), // aka 12345IEEE
+    TT(516462621382410260),
+    ZIG(185983061190508544),
+    OMGITSABIST(223019983557361664, { guild -> guild?.getGuildEmojiById(Snowflake.of(1030311764182704138L))?.block()?.asReaction() }),
+    TULARE(219319015649181698, { ReactionEmoji.unicode("\uD83C\uDF52") }),
+    REGULAR_HUMANOID(297954865223696384, { ReactionEmoji.unicode("\uD83D\uDC0C") })
     ;
 
     companion object {
@@ -37,3 +44,5 @@ class DiscordUserSecured(users: Collection<DiscordUser>) : Secured {
 
     override fun hasExecutionPermission(event: InteractionCreateEvent, user: User): Boolean = ids.contains(user.id.asLong())
 }
+
+fun User.asDiscordUser() = DiscordUser.values().find { it.id == this.id.asLong() }

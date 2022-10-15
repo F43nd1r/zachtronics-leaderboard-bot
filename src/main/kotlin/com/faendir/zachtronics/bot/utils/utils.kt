@@ -21,8 +21,10 @@ import com.faendir.zachtronics.bot.model.*
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.`object`.entity.GuildEmoji
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.entity.User
+import discord4j.core.`object`.reaction.ReactionEmoji
 import discord4j.core.spec.EmbedCreateFields
 import discord4j.core.spec.EmbedCreateSpec
 import discord4j.core.spec.InteractionReplyEditMono
@@ -167,3 +169,5 @@ fun Double.ceil(precision: Int): Double {
 
 val Message.url
     get() = "https://discord.com/channels/${guild.map { it.id.asString() }.block() ?: "@me"}/${channelId.asString()}/${id.asString()}"
+
+fun GuildEmoji.asReaction() = ReactionEmoji.custom(this)
