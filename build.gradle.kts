@@ -28,7 +28,7 @@ plugins {
     alias(libs.plugins.gradle.docker)
     alias(libs.plugins.gradle.lombok)
     alias(libs.plugins.gradle.gitProperties)
-    alias(libs.plugins.gradle.node)
+    alias(libs.plugins.gradle.frontend)
 }
 
 allprojects {
@@ -85,9 +85,11 @@ tasks.withType<Test> {
         override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
 
         override fun afterSuite(suite: TestDescriptor, result: TestResult) {
-            if(suite.parent == null) {
-                println("Test results: ${result.resultType} (${result.testCount} tests,${result.successfulTestCount} successes, ${result.failedTestCount} " +
-                        "failures, ${result.skippedTestCount} skipped)")
+            if (suite.parent == null) {
+                println(
+                    "Test results: ${result.resultType} (${result.testCount} tests,${result.successfulTestCount} successes, ${result.failedTestCount} " +
+                            "failures, ${result.skippedTestCount} skipped)"
+                )
             }
         }
     })
@@ -113,25 +115,19 @@ kotlinLombok {
     lombokConfigurationFile(file("lombok.config"))
 }
 
-node {
-    download.set(Runtime.getRuntime().exec("node -v").waitFor() != 0)
-    workDir.set(file("${project.buildDir}/nodejs"))
-    yarnWorkDir.set(file("${project.buildDir}/yarn"))
-    nodeProjectDir.set(file("web"))
-}
-
-val buildWebApp = tasks.register<com.github.gradle.node.yarn.task.YarnTask>("yarnBuild") {
-    group = "yarn"
-    args.set(listOf("run", "build"))
-    inputs.dir("web/src")
-    outputs.dir("web/build")
-    dependsOn("yarn")
+frontend {
+    nodeVersion.set("16.18.0")
+    nodeInstallDirectory.set(file("${project.buildDir}/nodejs"))
+    yarnEnabled.set(true)
+    yarnVersion.set(Regex("yarn-(.*).cjs").find(file("web/.yarnrc.yml").readText())!!.groupValues[1])
+    packageJsonDirectory.set(file("web"))
+    assembleScript.set("build")
 }
 
 val copyWebApp = tasks.register<Copy>("copyWebApp") {
     from("web/build")
     into("${project.buildDir}/resources/main/static/")
-    dependsOn(buildWebApp)
+    dependsOn(tasks.assembleFrontend)
 }
 
 tasks.processResources.configure {
