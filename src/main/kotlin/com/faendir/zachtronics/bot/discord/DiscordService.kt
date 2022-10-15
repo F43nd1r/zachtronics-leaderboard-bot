@@ -84,17 +84,6 @@ class DiscordService(
                 logger.debug("Autocompleted ${event.commandName} by ${event.interaction.user.username}")
             }
         }.subscribe()
-        discordClient.on(MessageCreateEvent::class.java) { event ->
-            mono {
-                val messages = discordProperties.randomMessages
-                if(messages != null) {
-                    val channel = event.message.channel.awaitSingleOrNull()
-                    if (channel?.type == Channel.Type.DM && event.message.author.orElse(null)?.isBot == false && Random.nextInt(10) == 0) {
-                        channel.createMessage(messages.random()).awaitSingleOrNull()
-                    }
-                }
-            }
-        }.subscribe()
         discordClient.on(ComponentInteractionEvent::class.java) { event ->
             mono {
                 discordActionCache.trigger(event)

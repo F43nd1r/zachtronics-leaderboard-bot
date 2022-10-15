@@ -23,5 +23,4 @@ import org.springframework.context.annotation.Configuration
 @ConfigurationProperties(prefix = "discord")
 class DiscordProperties {
     lateinit var token: String
-    var randomMessages: List<String>? = null
 }
