@@ -62,7 +62,7 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
 
     @Override
     protected SzSolution makeCandidateSolution(@NotNull SzSubmission submission) {
-        return new SzSolution(submission.getScore(), submission.getAuthor());
+        return new SzSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
     }
 
     @Override
@@ -88,7 +88,8 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
     @Override
     protected boolean alreadyPresent(@NotNull SzSolution candidate, @NotNull SzSolution solution) {
         return candidate.getScore().equals(solution.getScore()) &&
-               !candidate.getAuthor().equals(solution.getAuthor());
+               candidate.getDisplayLink() == null &&
+               !(candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
     
     @Override

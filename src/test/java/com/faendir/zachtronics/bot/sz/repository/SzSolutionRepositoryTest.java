@@ -73,6 +73,6 @@ public class SzSolutionRepositoryTest {
 
     @NotNull
     private SubmitResult<SzRecord, SzCategory> doSubmit(String content) {
-        return repository.submit(SzSubmission.fromData(content, "someguy"));
+        return repository.submit(SzSubmission.fromData(content, "someguy", null));
     }
 }

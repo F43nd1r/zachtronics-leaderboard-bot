@@ -17,7 +17,6 @@
 package com.faendir.zachtronics.bot.sz.repository;
 
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
@@ -29,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -55,7 +53,8 @@ public class SzManualTest {
                                                    .map(CategoryRecord::getRecord)
                                                    ::iterator;
             for (SzRecord r : records) {
-                SzSubmission submission = new SzSubmission(p, r.getScore(), r.getAuthor(), Files.readString(r.getDataPath()));
+                SzSubmission submission = new SzSubmission(p, r.getScore(), r.getAuthor(), r.getDisplayLink(),
+                                                           Files.readString(r.getDataPath()));
                 repository.submit(submission);
             }
 
@@ -100,7 +99,7 @@ public class SzManualTest {
                 String data = Files.readString(path).replace("\r\n", "\n");
                 SzSubmission submission;
                 try {
-                    submission = SzSubmission.fromData(data, author);
+                    submission = SzSubmission.fromData(data, author, null);
                 }
                 catch (IllegalArgumentException e) {
                     if (e.getMessage().equals("Solution must be solved"))
@@ -156,34 +155,6 @@ public class SzManualTest {
                     writer.writeNext(csvRecord, false);
                 }
             }
-        }
-    }
-
-    @Test
-    public void renameSolutionFiles() throws IOException {
-        Path repoPath = Paths.get("../shenzhenIO/leaderboard");
-
-        for (SzPuzzle puzzle : SzPuzzle.values()) {
-            if (puzzle.getType() != SzType.STANDARD)
-                continue;
-            Path puzzlePath = repoPath.resolve(puzzle.getGroup().getRepoFolder()).resolve(puzzle.getId());
-            Files.list(puzzlePath)
-                 .filter(p -> p.getFileName().toString().endsWith(".txt"))
-                 .forEach(p -> {
-                     try {
-                         String data = Files.readString(p);
-                         String filename = puzzle.getId() + "-" +
-                                           SzSubmission.fromData(data, "").getScore().toDisplayString(DisplayContext.fileName()) + ".txt";
-                         Path destPath = p.resolveSibling(filename);
-                         if (!Files.exists(destPath))
-                             Files.move(p, destPath);
-                         else
-                             Files.delete(p);
-                     }
-                     catch (IOException e) {
-                         throw new UncheckedIOException(e);
-                     }
-                 });
         }
     }
 }

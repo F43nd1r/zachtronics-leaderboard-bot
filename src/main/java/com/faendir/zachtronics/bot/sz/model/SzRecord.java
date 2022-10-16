@@ -19,44 +19,24 @@ package com.faendir.zachtronics.bot.sz.model;
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.utils.Markdown;
-import kotlin.Pair;
-import lombok.SneakyThrows;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
 
 @Value
 public class SzRecord implements Record<SzCategory> {
     @NotNull SzPuzzle puzzle;
     @NotNull SzScore score;
     @NotNull String author;
+    String displayLink;
     String dataLink;
     Path dataPath;
-
-    @Override
-    public String getDisplayLink() {
-        return null;
-    }
 
     @NotNull
     @Override
     public String toDisplayString(@NotNull DisplayContext<SzCategory> context) {
         String scoreAuthor = "(" + score.toDisplayString(context) + ")" + " " + author;
-        return Markdown.linkOrText(scoreAuthor, dataLink);
-    }
-
-    @SneakyThrows
-    @NotNull
-    @Override
-    public List<Pair<String, InputStream>> attachments() {
-        if (dataPath != null)
-            return Collections.singletonList(new Pair<>(dataPath.getFileName().toString(), Files.newInputStream(dataPath)));
-        else
-            return Collections.emptyList();
+        return Markdown.fileLinkOrEmpty(dataLink) + Markdown.linkOrText(scoreAuthor, displayLink);
     }
 }

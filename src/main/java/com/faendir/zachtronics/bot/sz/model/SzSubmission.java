@@ -27,26 +27,21 @@ public class SzSubmission implements Submission<SzCategory, SzPuzzle> {
     @NotNull SzPuzzle puzzle;
     @NotNull SzScore score;
     @NotNull String author;
+    @Nullable String displayLink;
     @NotNull String data;
-
-    @Nullable
-    @Override
-    public String getDisplayLink() {
-        return null;
-    }
 
     /**
      * @throws IllegalArgumentException if we can't correctly parse metadata
      */
     @NotNull
-    public static SzSubmission fromData(@NotNull String data, @NotNull String author) throws IllegalArgumentException {
+    public static SzSubmission fromData(@NotNull String data, @NotNull String author, String displayLink) throws IllegalArgumentException {
         SzSolutionMetadata metadata = SzSolutionMetadata.fromData(data);
-        return metadata.extendToSubmission(author, data);
+        return metadata.extendToSubmission(author, displayLink, data);
     }
 
     @NotNull
-    public static SzSubmission fromLink(@NotNull String link, String author) {
+    public static SzSubmission fromLink(@NotNull String link, String author, String displayLink) {
         String data = Utils.downloadSolutionFile(link);
-        return fromData(data, author);
+        return fromData(data, author, displayLink);
     }
 }

@@ -47,8 +47,11 @@ public class SzSubmitCommand extends AbstractSubmitCommand<SzCategory, SzPuzzle,
             .description("Name to appear on the Reddit leaderboard")
             .required()
             .build();
+    private final CommandOption<String, String> imageOption = OptionHelpersKt.linkOptionBuilder("image")
+            .description("Link to your image of the solution, can be `m1` to scrape it from your last message")
+            .build();
     @Getter
-    private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption);
+    private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, imageOption);
     @Getter
     private final Secured secured = SzSecured.INSTANCE;
     @Getter
@@ -57,6 +60,6 @@ public class SzSubmitCommand extends AbstractSubmitCommand<SzCategory, SzPuzzle,
     @NotNull
     @Override
     public SzSubmission parseSubmission(@NotNull ChatInputInteractionEvent event) {
-        return SzSubmission.fromLink(solutionOption.get(event), authorOption.get(event));
+        return SzSubmission.fromLink(solutionOption.get(event), authorOption.get(event), imageOption.get(event));
     }
 }

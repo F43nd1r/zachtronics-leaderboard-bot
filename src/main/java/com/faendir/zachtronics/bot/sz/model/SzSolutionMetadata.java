@@ -59,9 +59,9 @@ class SzSolutionMetadata {
         return new SzSolutionMetadata(title, puzzle, score);
     }
 
-    public SzSubmission extendToSubmission(@NotNull String author, @NotNull String data) {
+    public SzSubmission extendToSubmission(@NotNull String author, String displayLink, @NotNull String data) {
         // TODO push the author at the end of the title
         data = data.replaceFirst("^\n*\\[name] .*", "[name] " + title);
-        return new SzSubmission(puzzle, score, author, data);
+        return new SzSubmission(puzzle, score, author, displayLink, data);
     }
 }

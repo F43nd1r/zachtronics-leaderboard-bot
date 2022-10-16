@@ -30,7 +30,7 @@ class SzSubmissionTest {
                       <!DOCTYPE html>
                       <html lang="en" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
                       """;
-        assertThrows(IllegalArgumentException.class, () -> SzSubmission.fromData(data, "837951602"));
+        assertThrows(IllegalArgumentException.class, () -> SzSubmission.fromData(data, "837951602", null));
     }
 
     @Test
@@ -44,9 +44,10 @@ class SzSubmissionTest {
                 """;
         for (String title : new String[]{"title (Copy)", "title (Copy) (Copy)"}) {
             String content = baseContent.replace("TITLE", title);
-            SzSubmission result = SzSubmission.fromData(content, "12345ieee");
+            SzSubmission result = SzSubmission.fromData(content, "12345ieee", "image.link");
             SzSubmission expected = new SzSubmission(SzPuzzle.Sz000, new SzScore(6, 57, 8),
-                                                     "12345ieee", content.replace(" (Copy)", ""));
+                                                     "12345ieee", "image.link",
+                                                     content.replace(" (Copy)", ""));
             assertEquals(expected, result);
         }
     }

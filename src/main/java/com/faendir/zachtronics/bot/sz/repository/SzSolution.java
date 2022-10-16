@@ -34,25 +34,27 @@ import java.util.stream.Collectors;
 public class SzSolution implements Solution<SzCategory, SzPuzzle, SzScore, SzRecord> {
     @NotNull SzScore score;
     @NotNull String author;
+    String displayLink;
     /** empty if it holds no categories */
     EnumSet<SzCategory> categories = EnumSet.noneOf(SzCategory.class);
 
     @Override
     public SzRecord extendToRecord(SzPuzzle puzzle, String dataLink, Path dataPath) {
         if (dataPath != null)
-            return new SzRecord(puzzle, score, author, dataLink, dataPath);
+            return new SzRecord(puzzle, score, author, displayLink, dataLink, dataPath);
         else
-            return new SzRecord(puzzle, score, author, null, null);
+            return new SzRecord(puzzle, score, author, displayLink, null, null);
     }
 
     @NotNull
     public static SzSolution unmarshal(@NotNull String[] fields) {
-        assert fields.length == 3;
+        assert fields.length == 4;
         SzScore score = Objects.requireNonNull(SzScore.parseScore(fields[0]));
         String author = fields[1];
-        String categories = fields[2];
+        String displayLink = fields[2];
+        String categories = fields[3];
 
-        SzSolution solution = new SzSolution(score, author);
+        SzSolution solution = new SzSolution(score, author, displayLink);
         if (categories != null)
             Pattern.compile(",").splitAsStream(categories).map(SzCategory::valueOf).forEach(solution.categories::add);
         return solution;
@@ -64,6 +66,7 @@ public class SzSolution implements Solution<SzCategory, SzPuzzle, SzScore, SzRec
         return new String[]{
                 score.toDisplayString(),
                 author,
+                displayLink,
                 categories.stream()
                           .map(SzCategory::name)
                           .collect(Collectors.joining(","))
