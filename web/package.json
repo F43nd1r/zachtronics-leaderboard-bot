@@ -34,11 +34,13 @@
         "@types/react-plotly.js": "2.5.2",
         "@types/react-router-hash-link": "2.4.5",
         "prettier": "2.7.1",
+        "rimraf": "^3.0.2",
         "source-map-explorer": "2.5.3"
     },
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
+        "clean": "rimraf build",
         "eject": "react-scripts eject",
         "analyze": "source-map-explorer 'build/static/js/*.js'"
     },

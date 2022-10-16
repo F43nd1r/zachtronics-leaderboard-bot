@@ -87,7 +87,7 @@ tasks.withType<Test> {
         override fun afterSuite(suite: TestDescriptor, result: TestResult) {
             if (suite.parent == null) {
                 println(
-                    "Test results: ${result.resultType} (${result.testCount} tests,${result.successfulTestCount} successes, ${result.failedTestCount} " +
+                    "Test results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} " +
                             "failures, ${result.skippedTestCount} skipped)"
                 )
             }
@@ -116,12 +116,53 @@ kotlinLombok {
 }
 
 frontend {
-    nodeVersion.set("16.18.0")
+    nodeVersion.set(libs.versions.nodejs)
     nodeInstallDirectory.set(file("${project.buildDir}/nodejs"))
     yarnEnabled.set(true)
-    yarnVersion.set(Regex("yarn-(.*).cjs").find(file("web/.yarnrc.yml").readText())!!.groupValues[1])
+    yarnVersion.set(libs.versions.yarn)
     packageJsonDirectory.set(file("web"))
     assembleScript.set("build")
+    cleanScript.set("clean")
+}
+
+tasks.installNode {
+    inputs.property("nodejsVersion", libs.versions.nodejs)
+    outputs.dir("${project.buildDir}/nodejs")
+}
+
+tasks.installYarnGlobally {
+    onlyIf { !file("${project.buildDir}/nodejs/lib/node_modules/yarn").exists() }
+}
+
+tasks.enableYarnBerry {
+    enabled = false
+}
+
+tasks.installYarn {
+    inputs.property("yarnVersion", libs.versions.yarn)
+    outputs.dir("web/.yarn/releases")
+}
+
+tasks.installFrontend {
+    inputs.apply {
+        file("web/package.json")
+        file("web/.yarnrc.yml")
+    }
+    outputs.apply {
+        dir("web/node_modules")
+        file("web/yarn.lock")
+    }
+}
+
+tasks.assembleFrontend {
+    inputs.apply {
+        dir("web/src")
+        dir("web/public")
+        file("web/package.json")
+        file("web/yarn.lock")
+        file("web/.yarnrc.yml")
+    }
+    outputs.dir("web/build")
 }
 
 val copyWebApp = tasks.register<Copy>("copyWebApp") {
