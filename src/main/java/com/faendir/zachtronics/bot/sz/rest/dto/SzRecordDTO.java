@@ -33,7 +33,7 @@ public class SzRecordDTO implements RecordDTO<SzScoreDTO> {
     @NotNull SzScoreDTO score;
     @NotNull String fullFormattedScore;
     @NotNull String author;
-    @Nullable String gif = null;
+    @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
 
@@ -45,6 +45,7 @@ public class SzRecordDTO implements RecordDTO<SzScoreDTO> {
                 SzScoreDTO.fromScore(record.getScore()),
                 record.getScore().toDisplayString(DisplayContext.plainText()),
                 record.getAuthor(),
+                record.getDisplayLink(),
                 record.getDataLink(),
                 UtilsKt.smartFormat(categories, UtilsKt.toMetricsTree(record.getPuzzle().getSupportedCategories()))
         );
@@ -55,6 +56,7 @@ public class SzRecordDTO implements RecordDTO<SzScoreDTO> {
         return new SzRecordDTO(SzScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
                                record.getAuthor(),
+                               record.getDisplayLink(),
                                record.getDataLink(),
                                null);
     }
