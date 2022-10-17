@@ -16,14 +16,12 @@
 
 package com.faendir.zachtronics.bot.inf.model;
 
+import com.faendir.zachtronics.bot.inf.validation.IfSave;
 import lombok.Value;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -36,34 +34,7 @@ import java.util.regex.Pattern;
  * Solution.1-1.1 = AwAAAAAAAAA=
  * </pre>
  *
- * the solution is a base64 encoded string with the following representation (all integers are little endian)
- *
- * <pre>
- * Save
- * {
- *     int32 Version
- *     int32 BlockCount
- *     Block[] Blocks
- * }
- *
- * Block
- * {
- *     int16 Type
- *     int16 PositionX
- *     int16 PositionY
- *     int16 PositionZ
- *     uint8 Facing
- *     uint8 ToggleState
- *     uint8 DecalCount
- *     Decal[] Decals
- * }
- *
- * Decal
- * {
- *     uint8 Facing
- *     int16 Type
- * }
- * </pre>
+ * the solution is a base64 encoded string represented by {@link IfSave}
  */
 @Value
 class IfSolutionMetadata {
@@ -97,12 +68,8 @@ class IfSolutionMetadata {
         if (!m.group("id").equals(id) || !m.group("slot").equals(slot))
             throw new IllegalArgumentException("Incoherent solution lines");
 
-        byte[] solution = Base64.getDecoder().decode(m.group("solution"));
-        ByteBuffer buffer = ByteBuffer.wrap(solution).order(ByteOrder.LITTLE_ENDIAN);
-        int version = buffer.getInt();
-        if (version != 3)
-            throw new IllegalStateException("Version is not 3");
-        int blocks = buffer.getInt();
+        String solution = m.group("solution");
+        int blocks = IfSave.unmarshal(solution).blockScore();
 
         return new IfSolutionMetadata(puzzle, blocks);
     }
