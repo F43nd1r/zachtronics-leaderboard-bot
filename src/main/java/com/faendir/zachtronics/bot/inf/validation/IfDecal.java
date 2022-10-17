@@ -35,7 +35,7 @@ class IfDecal {
     byte facing;
     short type;
 
-    public static IfDecal unmarshal(@NotNull ByteBuffer byteBuffer) {
+    static IfDecal unmarshal(@NotNull ByteBuffer byteBuffer) {
         return new IfDecal(byteBuffer.get(), byteBuffer.getShort());
     }
 }

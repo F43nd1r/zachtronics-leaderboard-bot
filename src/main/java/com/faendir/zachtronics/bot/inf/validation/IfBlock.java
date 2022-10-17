@@ -46,7 +46,7 @@ class IfBlock {
     byte toggleState;
     @NotNull IfDecal[] decals;
 
-    public static IfBlock unmarshal(@NotNull ByteBuffer byteBuffer) {
+    static IfBlock unmarshal(@NotNull ByteBuffer byteBuffer) {
         short type = byteBuffer.getShort();
         short positionX = byteBuffer.getShort();
         short positionY = byteBuffer.getShort();

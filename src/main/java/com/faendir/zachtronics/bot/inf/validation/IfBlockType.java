@@ -18,5 +18,6 @@ package com.faendir.zachtronics.bot.inf.validation;
 
 class IfBlockType {
     static final short PLATFORM = 18;
+
     private IfBlockType() {}
 }

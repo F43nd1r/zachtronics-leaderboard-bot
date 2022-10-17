@@ -44,7 +44,8 @@ public class IfScore implements Score<IfCategory> {
         String separator = context.getSeparator();
         int formatId = Utils.getScoreFormatId(context);
 
-        return String.format(IfCategory.FORMAT_STRINGS[formatId], cycles, separator, footprint, separator, blocks, sepFlags(separator));
+        return String.format(IfCategory.FORMAT_STRINGS[formatId], cycles, separator, footprint, separator, blocks, sepFlags(separator))
+                     .replace("9999", "?"); // TODO dreadful hack for unknown values encoded as 9999 in the backend
     }
 
     /** ccc/ff/bb[/GF] */

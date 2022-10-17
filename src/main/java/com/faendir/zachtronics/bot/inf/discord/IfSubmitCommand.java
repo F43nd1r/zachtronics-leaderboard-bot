@@ -41,7 +41,7 @@ public class IfSubmitCommand extends AbstractSubmitCommand<IfCategory, IfPuzzle,
             .required()
             .build();
     private final CommandOption<String, IfScore> scoreOption = CommandOptionBuilder.string("score")
-            .description("Score of the solution in CCC/FF/BB[/G] format")
+            .description("Score of the solution in ccc/fff/bbb[/GF] format")
             .required()
             .convert((event, score) -> IfScore.parseScore(score))
             .build();

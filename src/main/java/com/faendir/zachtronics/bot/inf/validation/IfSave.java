@@ -59,10 +59,14 @@ public class IfSave {
     int version;
     @NotNull IfBlock[] blocks;
 
+    @NotNull
     public static IfSave unmarshal(String solution) {
         byte[] bytes = Base64.getDecoder().decode(solution);
         ByteBuffer byteBuffer = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
+        return unmarshal(byteBuffer);
+    }
 
+    static IfSave unmarshal(@NotNull ByteBuffer byteBuffer) {
         int version = byteBuffer.getInt();
         if (version != 3)
             throw new IllegalStateException("Version is not 3");
