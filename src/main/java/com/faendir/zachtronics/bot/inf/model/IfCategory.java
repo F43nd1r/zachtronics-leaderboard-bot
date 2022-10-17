@@ -38,8 +38,10 @@ public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric, If
     FC("FC", List.of(FOOTPRINT, CYCLES, BLOCKS), 0b010),
     FB("FB", List.of(FOOTPRINT, BLOCKS, CYCLES), 0b010),
 
-    BC("BC", List.of(BLOCKS, CYCLES, FOOTPRINT), 0b001),
-    BF("BF", List.of(BLOCKS, FOOTPRINT, CYCLES), 0b001);
+    BC("BC", List.of(BLOCKS, CYCLES, FOOTPRINT, ANY_FLAG), 0b001),
+    BF("BF", List.of(BLOCKS, FOOTPRINT, CYCLES, ANY_FLAG), 0b001),
+    BCI("BCI", List.of(BLOCKS, CYCLES, FOOTPRINT, INFINITE), 0b001),
+    BFI("BFI", List.of(BLOCKS, FOOTPRINT, CYCLES, INFINITE), 0b001);
 
     /** contains <tt>%d%s%d%s%d%s</tt> plus a bunch of <tt>*</tt> most likely */
     static final String[] FORMAT_STRINGS = {"%d%s%d%s%d%s", "%d%s%d%s**%d**%s", "%d%s**%d**%s%d%s", null, "**%d**%s%d%s%d%s"};
@@ -59,6 +61,7 @@ public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric, If
 
     @Override
     public boolean supportsScore(@NotNull IfScore score) {
-        return !(this.metrics.contains(NO_GRA) && score.usesGRA());
+        return !(this.metrics.contains(NO_GRA) && score.usesGRA()) &&
+               !(this.metrics.contains(INFINITE) && score.isFinite());
     }
 }

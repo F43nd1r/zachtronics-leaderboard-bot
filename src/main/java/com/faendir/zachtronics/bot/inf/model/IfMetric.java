@@ -29,7 +29,8 @@ public enum IfMetric implements MetricJava<IfScore> {
     FOOTPRINT("F", IfScore::getFootprint),
     BLOCKS("B", IfScore::getBlocks),
     ANY_FLAG("", null),
-    NO_GRA("NG", null);
+    NO_GRA("NG", null),
+    INFINITE("I", null);
 
     private final String displayName;
     private final ToIntFunction<IfScore> extract;

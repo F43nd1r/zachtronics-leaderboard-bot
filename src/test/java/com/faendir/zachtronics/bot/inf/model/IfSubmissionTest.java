@@ -31,7 +31,7 @@ class IfSubmissionTest {
                 Solution.1-1.1 = AwAAAAAAAAA=
                 """;
         String author = "12345ieee";
-        IfScore score = new IfScore(1, 1, 0, false);
+        IfScore score = new IfScore(1, 1, 0, false, false);
         IfSubmission result = IfSubmission.fromData(content, author, score, Collections.emptyList());
         IfSubmission expected = new IfSubmission(IfPuzzle.LEVEL_1_1, score, author, Collections.emptyList(),
                                                  content.replace("1-1.1", "1-1.0"));
