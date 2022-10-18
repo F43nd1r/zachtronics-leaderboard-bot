@@ -45,13 +45,13 @@ public class IfScore implements Score<IfCategory> {
         int formatId = Utils.getScoreFormatId(context);
 
         return String.format(IfCategory.FORMAT_STRINGS[formatId], cycles, separator, footprint, separator, blocks, sepFlags(separator))
-                     .replace("9999", "?"); // TODO dreadful hack for unknown values encoded as 9999 in the backend
+                     .replace(Integer.toString(Integer.MAX_VALUE), "?");
     }
 
     /** ccc/ff/bb[/GF] */
-    private static final Pattern REGEX_SCORE = Pattern.compile("\\**(?<cycles>\\d+)\\**[/-]" +
-                                                               "\\**(?<footprint>\\d+)\\**[/-]" +
-                                                               "\\**(?<blocks>\\d+)\\**" +
+    private static final Pattern REGEX_SCORE = Pattern.compile("\\**(?<cycles>\\d+|\\?)\\**[/-]" +
+                                                               "\\**(?<footprint>\\d+|\\?)\\**[/-]" +
+                                                               "\\**(?<blocks>\\d+|\\?)\\**" +
                                                                "(?:[/-](?<GRAflag>[gG])?(?<Fflag>[fF])?)?");
 
     /** <tt>ccc/ff/bb[/GF]</tt>, tolerates extra <tt>*</tt> */
@@ -61,12 +61,17 @@ public class IfScore implements Score<IfCategory> {
         return m.matches() ? parseScore(m) : null;
     }
 
+    /** Unknown value encoded as {@link Integer#MAX_VALUE} */
+    private static int parseValue(@NotNull String value) {
+        return value.equals("?") ? Integer.MAX_VALUE : Integer.parseInt(value);
+    }
+
     /** we assume m matches */
     @NotNull
     public static IfScore parseScore(@NotNull Matcher m) {
-        int cycles = Integer.parseInt(m.group("cycles"));
-        int footprint = Integer.parseInt(m.group("footprint"));
-        int blocks = Integer.parseInt(m.group("blocks"));
+        int cycles = parseValue(m.group("cycles"));
+        int footprint = parseValue(m.group("footprint"));
+        int blocks = parseValue(m.group("blocks"));
         return new IfScore(cycles, footprint, blocks, m.group("GRAflag") != null, m.group("Fflag") != null);
     }
 
