@@ -45,7 +45,7 @@ class IfSolutionMetadata {
             "Solution.(?<id>\\d+-\\db?).(?<slot>\\d) = (?<solution>[A-Za-z0-9+/]+={0,2})");
 
     IfPuzzle puzzle;
-    int blocks;
+    IfSave save;
 
     @NotNull
     @Contract("_ -> new")
@@ -68,16 +68,19 @@ class IfSolutionMetadata {
         if (!m.group("id").equals(id) || !m.group("slot").equals(slot))
             throw new IllegalArgumentException("Incoherent solution lines");
 
-        String solution = m.group("solution");
-        int blocks = IfSave.unmarshal(solution).blockScore();
-
-        return new IfSolutionMetadata(puzzle, blocks);
+        IfSave save = IfSave.unmarshal(m.group("solution"));
+        return new IfSolutionMetadata(puzzle, save);
     }
 
     public IfSubmission extendToSubmission(@NotNull String author, @NotNull IfScore score,
                                            @NotNull List<String> displayLinks, @NotNull String data) {
-        if (blocks != score.getBlocks())
-            throw new IllegalStateException("Solution has " + blocks + " blocks, score has " + score.getBlocks());
+        int blockScore = save.blockScore();
+        if (blockScore != score.getBlocks())
+            throw new IllegalStateException("Solution has " + blockScore + " blocks, score has " + score.getBlocks());
+        int footprintBound = save.footprintLowerBound();
+        if (footprintBound > score.getFootprint())
+            throw new IllegalStateException("Solution has at least " + footprintBound + " footprint, score has " + score.getFootprint());
+
         data = data.replaceAll("\\." + puzzle.getId() + "\\.\\d", "." + puzzle.getId() + ".0"); // slot normalization
         return new IfSubmission(puzzle, score, author, displayLinks, data);
     }

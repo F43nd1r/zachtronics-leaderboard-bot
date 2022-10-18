@@ -78,10 +78,19 @@ public class IfSave {
             blocks[i] = IfBlock.unmarshal(byteBuffer);
         }
 
+        if (byteBuffer.hasRemaining())
+            throw new IllegalStateException("Remaining data: " + byteBuffer.remaining() + " bytes");
+
         return new IfSave(version, blocks);
     }
 
     public int blockScore() {
         return (int) Arrays.stream(blocks).filter(b -> b.getType() != IfBlockType.PLATFORM).count();
+    }
+
+    public int footprintLowerBound() {
+        return (int) Arrays.stream(blocks)
+                           .map(b -> b.getPositionX() << 16 | b.getPositionY())
+                           .distinct().count();
     }
 }

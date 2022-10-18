@@ -17,15 +17,14 @@
 package com.faendir.zachtronics.bot.inf.repository;
 
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.inf.model.IfCategory;
-import com.faendir.zachtronics.bot.inf.model.IfGroup;
-import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
-import com.faendir.zachtronics.bot.inf.model.IfType;
+import com.faendir.zachtronics.bot.inf.model.*;
+import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -41,6 +40,26 @@ class IfManualTest {
     @Autowired
     private IfSolutionRepository repository;
 
+    @Test
+    public void testFullIO() throws IOException {
+        for (IfPuzzle p : IfPuzzle.values()) {
+
+            Iterable<IfRecord> records = repository.findCategoryHolders(p, true).stream()
+                                                   .map(CategoryRecord::getRecord)
+                    ::iterator;
+            for (IfRecord r : records) {
+                if (r.getDataPath() != null) {
+                    IfSubmission submission = new IfSubmission(p, r.getScore(), r.getAuthor(), r.getDisplayLinks(),
+                                                               Files.readString(r.getDataPath()));
+                    repository.submit(submission);
+                }
+            }
+
+            System.out.println("Done " + p.getDisplayName());
+        }
+        System.out.println("Done");
+    }
+    
     @Test
     public void rebuildAllWiki() {
         for (IfPuzzle puzzle: IfPuzzle.values()) {
