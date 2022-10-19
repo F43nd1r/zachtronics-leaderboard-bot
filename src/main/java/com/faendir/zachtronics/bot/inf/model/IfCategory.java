@@ -40,8 +40,8 @@ public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric, If
 
     BC("BC", List.of(BLOCKS, CYCLES, FOOTPRINT, ANY_FLAG), 0b001),
     BF("BF", List.of(BLOCKS, FOOTPRINT, CYCLES, ANY_FLAG), 0b001),
-    BCI("BCI", List.of(BLOCKS, CYCLES, FOOTPRINT, INFINITE), 0b001),
-    BFI("BFI", List.of(BLOCKS, FOOTPRINT, CYCLES, INFINITE), 0b001);
+    BIC("BIC", List.of(BLOCKS, INFINITE, CYCLES, FOOTPRINT), 0b001),
+    BIF("BIF", List.of(BLOCKS, INFINITE, FOOTPRINT, CYCLES), 0b001);
 
     /** contains <tt>%d%s%d%s%d%s</tt> plus a bunch of <tt>*</tt> most likely */
     static final String[] FORMAT_STRINGS = {"%d%s%d%s%d%s", "%d%s%d%s**%d**%s", "%d%s**%d**%s%d%s", null, "**%d**%s%d%s%d%s"};
