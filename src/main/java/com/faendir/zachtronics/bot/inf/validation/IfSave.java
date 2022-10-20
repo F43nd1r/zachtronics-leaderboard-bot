@@ -90,7 +90,7 @@ public class IfSave {
 
     public int footprintLowerBound() {
         return (int) Arrays.stream(blocks)
-                           .map(b -> b.getPositionX() << 16 | b.getPositionY())
+                           .map(b -> (b.getPositionX() << 16) | (b.getPositionZ() & 0xFFFF))
                            .distinct().count();
     }
 }
