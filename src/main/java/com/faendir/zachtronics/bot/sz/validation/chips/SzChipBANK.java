@@ -35,14 +35,14 @@ import static com.faendir.zachtronics.bot.sz.validation.SzValidator.getInt;
  */
 @Value
 class SzChipBANK implements SzChip {
-    static SzChipType type = SzChipType.BANK;
-    static int cost = 2;
+    private static final SzChipType type = SzChipType.BANK;
+    private static final int cost = 2;
 
     int x;
     int y;
     @NotNull String rom;
 
-    public static SzChipBANK unmarshal(@NotNull Map<String, String> chipMap) {
+    static SzChipBANK unmarshal(@NotNull Map<String, String> chipMap) {
         return new SzChipBANK(getInt(chipMap, "x"),
                               getInt(chipMap, "y"),
                               chipMap.get("rom"));

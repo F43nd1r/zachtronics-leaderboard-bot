@@ -35,13 +35,13 @@ import static com.faendir.zachtronics.bot.sz.validation.SzValidator.getInt;
  */
 @Value
 class SzChipRAM implements SzChip {
-    static SzChipType type = SzChipType.RAM;
-    static int cost = 2;
+    private static final SzChipType type = SzChipType.RAM;
+    private static final int cost = 2;
 
     int x;
     int y;
 
-    public static SzChipRAM unmarshal(@NotNull Map<String, String> chipMap) {
+    static SzChipRAM unmarshal(@NotNull Map<String, String> chipMap) {
         return new SzChipRAM(getInt(chipMap, "x"),
                              getInt(chipMap, "y"));
     }

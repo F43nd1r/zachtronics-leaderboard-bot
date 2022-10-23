@@ -36,13 +36,13 @@ import static com.faendir.zachtronics.bot.sz.validation.SzValidator.getInt;
  */
 @Value
 class SzChipOther implements SzChip {
-    static SzChipType type = SzChipType.OTHER;
-    static int cost = 0;
+    private static final SzChipType type = SzChipType.OTHER;
+    private static final int cost = 0;
 
     int x;
     int y;
 
-    public static SzChipOther unmarshal(@NotNull Map<String, String> chipMap) {
+    static SzChipOther unmarshal(@NotNull Map<String, String> chipMap) {
         return new SzChipOther(getInt(chipMap, "x"),
                                getInt(chipMap, "y"));
     }

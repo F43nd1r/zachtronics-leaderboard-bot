@@ -37,14 +37,14 @@ import static com.faendir.zachtronics.bot.sz.validation.SzValidator.getInt;
  */
 @Value
 class SzChipBinGate implements SzChip {
-    static int cost = 1;
+    private static final int cost = 1;
 
     @NotNull SzChipType type;
     int x;
     int y;
     boolean rotated;
 
-    public static SzChipBinGate unmarshal(SzChipType type, @NotNull Map<String, String> chipMap) {
+    static SzChipBinGate unmarshal(SzChipType type, @NotNull Map<String, String> chipMap) {
         return new SzChipBinGate(type,
                                  getInt(chipMap, "x"),
                                  getInt(chipMap, "y"),

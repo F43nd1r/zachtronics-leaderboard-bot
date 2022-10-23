@@ -37,14 +37,14 @@ import static com.faendir.zachtronics.bot.sz.validation.SzValidator.getInt;
  */
 @Value
 class SzChipDX3 implements SzChip {
-    static SzChipType type = SzChipType.DX3;
-    static int cost = 1;
+    private static final SzChipType type = SzChipType.DX3;
+    private static final int cost = 1;
 
     int x;
     int y;
     boolean rotated;
 
-    public static SzChipDX3 unmarshal(@NotNull Map<String, String> chipMap) {
+    static SzChipDX3 unmarshal(@NotNull Map<String, String> chipMap) {
         return new SzChipDX3(getInt(chipMap, "x"),
                              getInt(chipMap, "y"),
                              getBoolean(chipMap, "rotated"));

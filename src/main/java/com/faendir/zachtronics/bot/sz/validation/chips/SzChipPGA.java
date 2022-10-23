@@ -37,15 +37,15 @@ import static com.faendir.zachtronics.bot.sz.validation.SzValidator.getInt;
  */
 @Value
 class SzChipPGA implements SzChip {
-    static SzChipType type = SzChipType.PGA;
-    static int cost = 5;
+    private static final SzChipType type = SzChipType.PGA;
+    private static final int cost = 5;
 
     int x;
     int y;
     boolean arraySwitch;
     @NotNull String arrayData;
 
-    public static SzChipPGA unmarshal(@NotNull Map<String, String> chipMap) {
+    static SzChipPGA unmarshal(@NotNull Map<String, String> chipMap) {
         return new SzChipPGA(getInt(chipMap, "x"),
                              getInt(chipMap, "y"),
                              getBoolean(chipMap, "array-switch"),

@@ -38,14 +38,14 @@ import static com.faendir.zachtronics.bot.sz.validation.SzValidator.getInt;
  */
 @Value
 class SzChipUC6 implements SzChipUC {
-    static SzChipType type = SzChipType.UC6;
-    static int cost = 5;
+    private static final SzChipType type = SzChipType.UC6;
+    private static final int cost = 5;
 
     int x;
     int y;
     @NotNull List<SzCodeLine> lines;
 
-    public static SzChipUC6 unmarshal(@NotNull Map<String, String> chipMap) {
+    static SzChipUC6 unmarshal(@NotNull Map<String, String> chipMap) {
         return new SzChipUC6(getInt(chipMap, "x"),
                              getInt(chipMap, "y"),
                              SzChipUC.readLines(chipMap, 14));
