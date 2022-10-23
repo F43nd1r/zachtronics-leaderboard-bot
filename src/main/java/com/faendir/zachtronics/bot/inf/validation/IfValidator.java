@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.inf.model;
+package com.faendir.zachtronics.bot.inf.validation;
 
-import com.faendir.zachtronics.bot.inf.validation.IfSave;
+import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
+import com.faendir.zachtronics.bot.inf.model.IfScore;
+import com.faendir.zachtronics.bot.inf.model.IfSubmission;
 import lombok.Value;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -37,19 +38,16 @@ import java.util.regex.Pattern;
  * the solution is a base64 encoded string represented by {@link IfSave}
  */
 @Value
-class IfSolutionMetadata {
+public
+class IfValidator {
     /** InputRate.4-3.1 = 1 */
     private static final Pattern INPUT_RATE_PATTERN = Pattern.compile("InputRate.(?<id>\\d+-\\db?).(?<slot>\\d) = \\d+");
     /** Solution.4-3.1 = AAAA== */
     private static final Pattern SOLUTION_PATTERN = Pattern.compile(
             "Solution.(?<id>\\d+-\\db?).(?<slot>\\d) = (?<solution>[A-Za-z0-9+/]+={0,2})");
 
-    IfPuzzle puzzle;
-    IfSave save;
-
-    @NotNull
-    @Contract("_ -> new")
-    public static IfSolutionMetadata fromData(@NotNull String data) {
+    public static IfSubmission validate(@NotNull String data, @NotNull String author, @NotNull IfScore score,
+                                        @NotNull List<String> displayLinks) {
         Iterator<String> it = Pattern.compile("\r?\n").splitAsStream(data).dropWhile(String::isBlank).iterator();
         String inputRateLine = it.next();
         Matcher m = INPUT_RATE_PATTERN.matcher(inputRateLine);
@@ -69,11 +67,7 @@ class IfSolutionMetadata {
             throw new IllegalArgumentException("Incoherent solution lines");
 
         IfSave save = IfSave.unmarshal(m.group("solution"));
-        return new IfSolutionMetadata(puzzle, save);
-    }
 
-    public IfSubmission extendToSubmission(@NotNull String author, @NotNull IfScore score,
-                                           @NotNull List<String> displayLinks, @NotNull String data) {
         int blockScore = save.blockScore();
         if (blockScore != score.getBlocks())
             throw new IllegalStateException("Solution has " + blockScore + " blocks, score has " + score.getBlocks());

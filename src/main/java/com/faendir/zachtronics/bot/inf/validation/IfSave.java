@@ -55,7 +55,7 @@ import java.util.Base64;
  * </pre>
  */
 @Value
-public class IfSave {
+class IfSave {
     int version;
     @NotNull IfBlock[] blocks;
 

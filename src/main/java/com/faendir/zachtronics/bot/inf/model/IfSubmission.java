@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.inf.model;
 
+import com.faendir.zachtronics.bot.inf.validation.IfValidator;
 import com.faendir.zachtronics.bot.model.Submission;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
@@ -44,8 +45,7 @@ public class IfSubmission implements Submission<IfCategory, IfPuzzle> {
     @NotNull
     public static IfSubmission fromData(@NotNull String data, @NotNull String author, @NotNull IfScore score,
                                         @NotNull List<String> displayLinks) throws IllegalArgumentException {
-        IfSolutionMetadata metadata = IfSolutionMetadata.fromData(data);
-        return metadata.extendToSubmission(author, score, displayLinks, data);
+        return IfValidator.validate(data, author, score, displayLinks);
     }
 
     @NotNull

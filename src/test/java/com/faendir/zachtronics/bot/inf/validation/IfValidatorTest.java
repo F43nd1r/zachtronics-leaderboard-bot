@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.inf.model;
+package com.faendir.zachtronics.bot.inf.validation;
 
+import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
+import com.faendir.zachtronics.bot.inf.model.IfScore;
+import com.faendir.zachtronics.bot.inf.model.IfSubmission;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class IfSubmissionTest {
+class IfValidatorTest {
 
     @Test
     public void testFromData() {
@@ -32,7 +35,7 @@ class IfSubmissionTest {
                 """;
         String author = "12345ieee";
         IfScore score = new IfScore(1, 1, 0, false, false);
-        IfSubmission result = IfSubmission.fromData(content, author, score, Collections.emptyList());
+        IfSubmission result = IfValidator.validate(content, author, score, Collections.emptyList());
         IfSubmission expected = new IfSubmission(IfPuzzle.LEVEL_1_1, score, author, Collections.emptyList(),
                                                  content.replace("1-1.1", "1-1.0"));
         assertEquals(expected, result);
