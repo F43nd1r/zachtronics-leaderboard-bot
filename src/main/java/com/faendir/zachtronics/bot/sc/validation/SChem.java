@@ -16,7 +16,10 @@
 
 package com.faendir.zachtronics.bot.sc.validation;
 
-import com.faendir.zachtronics.bot.sc.model.*;
+import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
+import com.faendir.zachtronics.bot.sc.model.ScScore;
+import com.faendir.zachtronics.bot.sc.model.ScSubmission;
+import com.faendir.zachtronics.bot.sc.model.ScType;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.faendir.zachtronics.bot.validation.ValidationUtils;
@@ -94,7 +97,7 @@ public class SChem {
         boolean declaresBugged = false;
         boolean declaresPrecog = false;
         if (result.getSolutionName() != null) {
-            Matcher m = ScSolutionMetadata.SOLUTION_NAME_REGEX.matcher(result.getSolutionName());
+            Matcher m = ScMetadataReader.SOLUTION_NAME_REGEX.matcher(result.getSolutionName());
             if (!m.matches()) {
                 return new ValidationResult.Unparseable<>(
                         "Invalid solution name: \"" + result.getSolutionName() + "\"");
@@ -110,8 +113,7 @@ public class SChem {
         String export = result.getExport().replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
 
         // build submission
-        ScSubmission submission = new ScSolutionMetadata(puzzle, author, score, result.getSolutionName())
-                                     .extendToSubmission(null, export);
+        ScSubmission submission = ScMetadataReader.createSubmission(puzzle, author, score, result.getSolutionName(), null, export);
 
         if (!bypassValidation) {
             if (result.getError() != null)

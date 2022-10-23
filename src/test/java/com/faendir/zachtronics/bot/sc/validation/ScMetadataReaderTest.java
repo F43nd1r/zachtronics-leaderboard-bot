@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.sc.model;
+package com.faendir.zachtronics.bot.sc.validation;
 
 import com.faendir.zachtronics.bot.BotTest;
+import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
+import com.faendir.zachtronics.bot.sc.model.ScScore;
+import com.faendir.zachtronics.bot.sc.model.ScSubmission;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @BotTest
-class ScSubmissionTest {
+class ScMetadataReaderTest {
 
     @Test
     public void testCopyBad() {
         for (String name : new String[]{"name (copy)", "'comma, comma (copy)'"}) {
             String content = "SOLUTION:Of Pancakes and Spaceships,12345ieee,50-50-50," + name;
-            ScSubmission result = ScSubmission.fromDataNoValidation(content, null, null);
+            ScSubmission result = ScMetadataReader.fromHeader(content, null, "vi.deo");
             ScSubmission expected = new ScSubmission(ScPuzzle.research_example_1, new ScScore(50, 50, 50, false, false),
-                                                     "12345ieee", null, content.replace(" (copy)", ""));
+                                                     "12345ieee", "vi.deo", content.replace(" (copy)", ""));
             assertEquals(expected, result);
         }
     }

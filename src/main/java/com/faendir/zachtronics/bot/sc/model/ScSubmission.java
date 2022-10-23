@@ -18,7 +18,9 @@ package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.Submission;
 import com.faendir.zachtronics.bot.sc.validation.SChem;
+import com.faendir.zachtronics.bot.sc.validation.ScMetadataReader;
 import com.faendir.zachtronics.bot.utils.Utils;
+import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Value;
 import lombok.With;
@@ -37,20 +39,24 @@ public class ScSubmission implements Submission<ScCategory, ScPuzzle> {
     @NotNull String data;
 
     /**
-     * @throws IllegalArgumentException if we can't correctly parse metadata
+     * @throws ValidationException if we can't correctly parse metadata
      */
     @NotNull
     public static ScSubmission fromDataNoValidation(@NotNull String data, @Nullable ScPuzzle puzzle, @Nullable String displayLink)
-    throws IllegalArgumentException {
-        ScSolutionMetadata metadata = ScSolutionMetadata.fromHeader(data, puzzle);
-        return metadata.extendToSubmission(displayLink, data);
+    throws ValidationException {
+        return ScMetadataReader.fromHeader(data, puzzle, displayLink);
+    }
+
+    @NotNull
+    public static Collection<ValidationResult<ScSubmission>> fromData(@NotNull String export, boolean bypassValidation,
+                                                                      String author) {
+        return SChem.validateMultiExport(export, bypassValidation, author);
     }
 
     @NotNull
     public static Collection<ValidationResult<ScSubmission>> fromExportLink(@NotNull String exportLink, boolean bypassValidation,
                                                                             String author) {
         String export = Utils.downloadSolutionFile(exportLink);
-        return SChem.validateMultiExport(export, bypassValidation, author);
+        return fromData(export, bypassValidation, author);
     }
-
 }

@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.sc.model;
+package com.faendir.zachtronics.bot.sc.validation;
 
+import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
+import com.faendir.zachtronics.bot.sc.model.ScScore;
+import com.faendir.zachtronics.bot.sc.model.ScSubmission;
+import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,15 +28,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** Collects the metadata info of a CE export, which are stored in its header, like:<br>
- * <tt>SOLUTION:No Employment Record Found,12345ieee,1284-1-16,Unnamed Solution</tt> */
+ * <tt>SOLUTION:No Employment Record Found,12345ieee,1284-1-16,Unnamed Solution</tt>
+ */
 @Value
-public class ScSolutionMetadata {
-    @NotNull ScPuzzle puzzle;
-    @NotNull String author;
-    @NotNull ScScore score;
-    /** Contains flags at start if any */
-    String description;
-
+public class ScMetadataReader {
     public static final Pattern SOLUTION_NAME_REGEX = Pattern.compile(
             "'?(?:[/-](?<Bflag>[bB])?(?<Pflag>[pP])?(?:$| ))?.*'?");
 
@@ -43,15 +42,18 @@ public class ScSolutionMetadata {
             "(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)" +
             "(?:,(?<description>" + SOLUTION_NAME_REGEX + "))?$", Pattern.MULTILINE);
 
+    private ScMetadataReader() {};
+    
     /**
-     * @param header can also be the whole export, the first <tt>SOLUTION:</tt> match will dictate the line
-     * @throws IllegalArgumentException if we can't correctly parse metadata
+     * @param data is the whole export, the first <tt>SOLUTION:</tt> match will dictate the metadata line
+     * @throws ValidationException if we can't correctly parse metadata
      */
     @NotNull
-    public static ScSolutionMetadata fromHeader(@NotNull String header, @Nullable ScPuzzle puzzle) throws IllegalArgumentException {
-        Matcher m = SOLUTION_HEADER.matcher(header);
+    public static ScSubmission fromHeader(@NotNull String data, @Nullable ScPuzzle puzzle, String displayLink)
+    throws ValidationException {
+        Matcher m = SOLUTION_HEADER.matcher(data);
         if (!m.find()) {
-            throw new IllegalArgumentException("Invalid header");
+            throw new ValidationException("Invalid header");
         }
 
         if (puzzle == null) {
@@ -63,12 +65,26 @@ public class ScSolutionMetadata {
 
         ScScore score = ScScore.parseScore(m);
         if (score.getCycles() == 0) {
-            throw new IllegalArgumentException("Invalid score");
+            throw new ValidationException("Invalid score");
         }
 
         String description = decode(m.group("description"));
+        return createSubmission(puzzle, author, score, description, displayLink, data);
+    }
 
-        return new ScSolutionMetadata(puzzle, author, score, description);
+    @NotNull
+    public static ScSubmission createSubmission(@NotNull ScPuzzle puzzle, String author, ScScore score, String description,
+                                                String displayLink, String data) {
+        String commaDescr = "";
+        if (description != null) {
+            commaDescr = "," + encode(normalizeDescription(description));
+        }
+        String header = String.format("SOLUTION:%s,%s,%d-%d-%d%s",
+                                      encode(puzzle.getExportName()), encode(author),
+                                      score.getCycles(), score.getReactors(), score.getSymbols(), commaDescr);
+
+        data = SOLUTION_HEADER.matcher(data).replaceFirst(header); // normalization
+        return new ScSubmission(puzzle, score, author, displayLink, data);
     }
 
     private static String decode(String field) {
@@ -99,20 +115,4 @@ public class ScSolutionMetadata {
         }
         return descr;
     }
-
-    private String toHeader() {
-        String commaDescr = "";
-        if (description != null) {
-            commaDescr = "," + encode(normalizeDescription(description));
-        }
-        return String.format("SOLUTION:%s,%s,%d-%d-%d%s",
-                             encode(puzzle.getExportName()), encode(author),
-                             score.getCycles(), score.getReactors(), score.getSymbols(), commaDescr);
-    }
-
-    public ScSubmission extendToSubmission(String displayLink, @NotNull String data) {
-        data = SOLUTION_HEADER.matcher(data).replaceFirst(this.toHeader()); // normalization
-        return new ScSubmission(puzzle, score, author, displayLink, data);
-    }
-
 }
