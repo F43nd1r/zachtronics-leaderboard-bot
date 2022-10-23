@@ -25,7 +25,10 @@ import com.faendir.zachtronics.bot.sz.model.SzSubmission;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,14 +52,10 @@ public class SzSolutionRepositoryTest {
     }
 
     @Test
-    public void testSubmit() {
-        String content = """
-                [name] Top solution Cost
-                [puzzle] Sz000
-                [production-cost] 600
-                [power-usage] 57
-                [lines-of-code] 8
-                """;
+    public void testSubmit() throws IOException {
+        ClassPathResource resource = new ClassPathResource(
+                "repositories/sz-leaderboard/first_campaign/fake-surveillance-camera/fake-surveillance-camera-6-57-8.txt");
+        String content = Files.readString(resource.getFile().toPath());
 
         assertInstanceOf(SubmitResult.AlreadyPresent.class, doSubmit(content)); // identical score
 

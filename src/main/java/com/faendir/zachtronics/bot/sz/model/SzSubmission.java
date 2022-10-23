@@ -17,7 +17,9 @@
 package com.faendir.zachtronics.bot.sz.model;
 
 import com.faendir.zachtronics.bot.model.Submission;
+import com.faendir.zachtronics.bot.sz.validation.SzValidator;
 import com.faendir.zachtronics.bot.utils.Utils;
+import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,12 +33,11 @@ public class SzSubmission implements Submission<SzCategory, SzPuzzle> {
     @NotNull String data;
 
     /**
-     * @throws IllegalArgumentException if we can't correctly parse metadata
+     * @throws ValidationException if we can't correctly parse metadata
      */
     @NotNull
-    public static SzSubmission fromData(@NotNull String data, @NotNull String author, String displayLink) throws IllegalArgumentException {
-        SzSolutionMetadata metadata = SzSolutionMetadata.fromData(data);
-        return metadata.extendToSubmission(author, displayLink, data);
+    public static SzSubmission fromData(@NotNull String data, @NotNull String author, String displayLink) throws ValidationException {
+        return SzValidator.validate(data, author, displayLink);
     }
 
     @NotNull

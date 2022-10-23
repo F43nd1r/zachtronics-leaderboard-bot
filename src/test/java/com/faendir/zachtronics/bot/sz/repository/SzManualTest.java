@@ -21,6 +21,7 @@ import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.sz.model.*;
+import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
 import org.junit.jupiter.api.Disabled;
@@ -92,18 +93,20 @@ public class SzManualTest {
             if (puzzle.getType() != SzType.STANDARD)
                 continue;
 
-            Iterable<Path> paths = Files.list(savesPath)
-                                        .filter(p -> p.getFileName().toString().startsWith(puzzle.getId()))
-                                        ::iterator;
+            Iterable<Path> paths = Files.newDirectoryStream(savesPath, puzzle.getId() + "*");
+
             for (Path path : paths) {
                 String data = Files.readString(path).replace("\r\n", "\n");
                 SzSubmission submission;
                 try {
                     submission = SzSubmission.fromData(data, author, null);
                 }
-                catch (IllegalArgumentException e) {
-                    if (e.getMessage().equals("Solution must be solved"))
-                        continue;
+                catch (Exception e) {
+                    if (e instanceof ValidationException) {
+                        String message = e.getMessage();
+                        if (message.equals("Solution must be solved") || message.matches("Declared (?:cost|lines): .+"))
+                            continue;
+                    }
                     System.err.println(path);
                     throw e;
                 }
@@ -114,8 +117,7 @@ public class SzManualTest {
 
         /*
         git restore --source=HEAD --staged --worktree -- src/test/resources/repositories/sz-leaderboard/
-        rsync -a --delete $(ls -1dt /tmp/sz-leaderboard* | head -n1)/* ../shenzhenIO/leaderboard/
-        git -C ../shenzhenIO/leaderboard/ checkout -- *[a-z]/*[a-z]/README.txt
+        rsync -a --delete --exclude=README.txt $(ls -1dt /tmp/sz-leaderboard* | head -n1)/* ../shenzhenIO/leaderboard/
          */
 
         System.out.println("Done");

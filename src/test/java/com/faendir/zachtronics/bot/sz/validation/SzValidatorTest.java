@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.sz.model;
+package com.faendir.zachtronics.bot.sz.validation;
 
+import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
+import com.faendir.zachtronics.bot.sz.model.SzScore;
+import com.faendir.zachtronics.bot.sz.model.SzSubmission;
+import com.faendir.zachtronics.bot.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class SzSubmissionTest {
+class SzValidatorTest {
 
     @Test
     void testBadData() {
@@ -30,7 +34,7 @@ class SzSubmissionTest {
                       <!DOCTYPE html>
                       <html lang="en" data-color-mode="auto" data-light-theme="light" data-dark-theme="dark">
                       """;
-        assertThrows(IllegalArgumentException.class, () -> SzSubmission.fromData(data, "837951602", null));
+        assertThrows(ValidationException.class, () -> SzValidator.validate(data, "837951602", null));
     }
 
     @Test
@@ -38,14 +42,30 @@ class SzSubmissionTest {
         String baseContent = """
                 [name] TITLE
                 [puzzle] Sz000
-                [production-cost] 600
-                [power-usage] 57
-                [lines-of-code] 8
+                [production-cost] 0
+                [power-usage] 100
+                [lines-of-code] 0
+                
+                [traces]\s
+                ......................
+                ......................
+                ......................
+                ......................
+                ......................
+                ......................
+                ......................
+                ......................
+                ......................
+                ......................
+                ......................
+                ......................
+                ......................
+                ......................
                 """;
         for (String title : new String[]{"title (Copy)", "title (Copy) (Copy)"}) {
             String content = baseContent.replace("TITLE", title);
-            SzSubmission result = SzSubmission.fromData(content, "12345ieee", "image.link");
-            SzSubmission expected = new SzSubmission(SzPuzzle.Sz000, new SzScore(6, 57, 8),
+            SzSubmission result = SzValidator.validate(content, "12345ieee", "image.link");
+            SzSubmission expected = new SzSubmission(SzPuzzle.Sz000, new SzScore(0, 100, 0),
                                                      "12345ieee", "image.link",
                                                      content.replace(" (Copy)", ""));
             assertEquals(expected, result);
