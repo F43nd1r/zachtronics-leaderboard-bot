@@ -133,7 +133,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         }
 
         String[] lines = redditService.getWikiPage(subreddit, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
-        Pattern puzzleRegex = Pattern.compile("^\\| \\[" + Pattern.quote(puzzle.getDisplayName()));
+        Pattern puzzleRegex = Pattern.compile("^\\| \\[" + Pattern.quote(puzzle.getDisplayName()) + "(?: - |])");
 
         int rowIdx = 0;
 
@@ -146,13 +146,23 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                 int halfSize = (prevElems.length - 2) / 2;
 
                 StringBuilder row = new StringBuilder("| ");
-                int minReactors = Integer.MAX_VALUE;
-                String rowTitle = puzzle.getDisplayName();
-                if (rowIdx == 1) {
-                    minReactors = recordMap.get(ScCategory.RC).getScore().getReactors();
-                    rowTitle += " - " + minReactors + " Reactor" + (minReactors == 1 ? "" : "s");
+                int minReactors;
+                String text;
+                String link;
+                if (rowIdx == 0) {
+                    minReactors = Integer.MAX_VALUE;
+                    text = puzzle.getDisplayName();
+                    link = puzzle.getLink();
                 }
-                row.append(Markdown.link(rowTitle, puzzle.getLink()));
+                else {
+                    minReactors = recordMap.get(ScCategory.RC).getScore().getReactors();
+                    text = puzzle.getDisplayName() + " - " + minReactors + " Reactor" + (minReactors == 1 ? "" : "s");
+
+                    int maxReactorsShown = recordMap.get(ScCategory.RCNB).getScore().getReactors();
+                    String filter = String.format("visualizerFilterSc-%s.range.r.max=%d", puzzle.name(), maxReactorsShown);
+                    link = puzzle.getLink() + "?visualizerConfigSc.mode=2D&" + filter;
+                }
+                row.append(Markdown.link(text, link));
 
                 for (int block = 0; block < 2; block++) {
                     ScCategory[] blockCategories = wikiCategories[2 * rowIdx + block];

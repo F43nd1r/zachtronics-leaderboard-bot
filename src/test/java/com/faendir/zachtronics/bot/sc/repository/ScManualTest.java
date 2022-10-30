@@ -46,7 +46,7 @@ import static java.util.stream.Collectors.groupingBy;
 
 @BotTest
 @Disabled("Massive tests only for manual testing or migrations")
-class SolRepoManualTest {
+class ScManualTest {
 
     @Autowired
     private ScSolutionRepository repository;
@@ -60,8 +60,7 @@ class SolRepoManualTest {
                     repository.findCategoryHolders(p, true)
                               .stream()
                               .map(CategoryRecord::getRecord)
-                              .filter(r -> r.getDataPath() != null)
-                              .map(SolRepoManualTest::recordToSubmissions)
+                              .map(ScManualTest::recordToSubmissions)
                               .<ValidationResult<ScSubmission>>map(ValidationResult.Valid::new)
                               .toList();
 
@@ -180,7 +179,7 @@ class SolRepoManualTest {
                                                                                         .withSkipLines(1)
                                                                                         .build();
         Map<ScPuzzle, List<ScSubmission>> solnetSubmissions = StreamSupport.stream(reader.spliterator(), false)
-                                                                           .map(SolRepoManualTest::fromSolnetData)
+                                                                           .map(ScManualTest::fromSolnetData)
                                                                            .filter(s -> s.getDisplayLink() != null)
                                                                            .collect(groupingBy(ScSubmission::getPuzzle));
 
