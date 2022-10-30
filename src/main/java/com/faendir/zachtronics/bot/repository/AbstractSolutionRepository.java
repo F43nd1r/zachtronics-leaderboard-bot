@@ -63,7 +63,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
     @Override
     public List<CategoryRecord<R, C>> findCategoryHolders(@NotNull P puzzle, boolean includeFrontier) {
         try (GitRepository.ReadAccess access = getGitRepo().acquireReadAccess()) {
-            Path puzzlePath = access.getRepo().toPath().resolve(relativePuzzlePath(puzzle));
+            Path puzzlePath = getPuzzlePath(access, puzzle);
 
             List<Sol> solutions = unmarshalSolutions(puzzlePath);
 
@@ -79,6 +79,14 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
             return result;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        }
+    }
+
+    @NotNull
+    @Override
+    public SubmitResult<R, C> submit(@NotNull Sub submission) {
+        try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
+            return submitOne(access, submission, (s, c) -> access.push());
         }
     }
 

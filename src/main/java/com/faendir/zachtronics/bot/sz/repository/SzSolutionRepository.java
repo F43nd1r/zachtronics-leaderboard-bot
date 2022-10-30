@@ -21,7 +21,6 @@ import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
-import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.sz.model.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -51,14 +50,6 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
     private final Class<SzCategory> categoryClass = SzCategory.class;
     final Function<String[], SzSolution> solUnmarshaller = SzSolution::unmarshal;
     private final Comparator<SzSolution> archiveComparator = Comparator.comparing(SzSolution::getScore, SzCategory.CP.getScoreComparator());
-
-    @NotNull
-    @Override
-    public SubmitResult<SzRecord, SzCategory> submit(@NotNull SzSubmission submission) {
-        try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
-            return submitOne(access, submission, (s, c) -> access.push());
-        }
-    }
 
     @Override
     protected SzSolution makeCandidateSolution(@NotNull SzSubmission submission) {

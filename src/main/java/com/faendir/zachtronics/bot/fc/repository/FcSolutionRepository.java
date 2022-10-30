@@ -61,14 +61,6 @@ public class FcSolutionRepository extends AbstractSolutionRepository<FcCategory,
 
     @NotNull
     @Override
-    public SubmitResult<FcRecord, FcCategory> submit(@NotNull FcSubmission submission) {
-        try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
-            return submitOne(access, submission, (s, c) -> access.push());
-        }
-    }
-
-    @NotNull
-    @Override
     public List<SubmitResult<FcRecord, FcCategory>> submitAll(
             @NotNull Collection<? extends ValidationResult<FcSubmission>> validationResults) {
         try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {

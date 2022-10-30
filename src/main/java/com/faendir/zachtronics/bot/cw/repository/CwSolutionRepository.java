@@ -59,14 +59,6 @@ public class CwSolutionRepository extends AbstractSolutionRepository<CwCategory,
 
     @NotNull
     @Override
-    public SubmitResult<CwRecord, CwCategory> submit(@NotNull CwSubmission submission) {
-        try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
-            return submitOne(access, submission, (s, c) -> access.push());
-        }
-    }
-
-    @NotNull
-    @Override
     public List<SubmitResult<CwRecord, CwCategory>> submitAll(
             @NotNull Collection<? extends ValidationResult<CwSubmission>> validationResults) {
         try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {

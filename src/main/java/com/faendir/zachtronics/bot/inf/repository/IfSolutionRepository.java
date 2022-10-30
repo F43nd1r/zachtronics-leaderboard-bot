@@ -22,7 +22,6 @@ import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
-import com.faendir.zachtronics.bot.repository.SubmitResult;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -54,14 +53,6 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
     private final Class<IfCategory> categoryClass = IfCategory.class;
     final Function<String[], IfSolution> solUnmarshaller = IfSolution::unmarshal;
     private final Comparator<IfSolution> archiveComparator = Comparator.comparing(IfSolution::getScore, CF.getScoreComparator());
-
-    @NotNull
-    @Override
-    public SubmitResult<IfRecord, IfCategory> submit(@NotNull IfSubmission submission) {
-        try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
-            return submitOne(access, submission, (s, c) -> access.push());
-        }
-    }
 
     @Override
     protected IfSolution makeCandidateSolution(@NotNull IfSubmission submission) {

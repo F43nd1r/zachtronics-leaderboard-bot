@@ -58,14 +58,6 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
 
     @NotNull
     @Override
-    public SubmitResult<FpRecord, FpCategory> submit(@NotNull FpSubmission submission) {
-        try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
-            return submitOne(access, submission, (s, c) -> access.push());
-        }
-    }
-
-    @NotNull
-    @Override
     public List<SubmitResult<FpRecord, FpCategory>> submitAll(
             @NotNull Collection<? extends ValidationResult<FpSubmission>> validationResults) {
         try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
