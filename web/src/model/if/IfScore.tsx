@@ -18,4 +18,5 @@ export default interface IfScore {
     footprint: number
     blocks: number
     usesGRA: boolean
+    finite: boolean
 }

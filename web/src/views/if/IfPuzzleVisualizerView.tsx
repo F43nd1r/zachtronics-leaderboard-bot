@@ -61,6 +61,14 @@ export default function IfPuzzleVisualizerView() {
                         option1: "Uses GRA",
                         option2: "No GRA",
                     },
+                    finite: {
+                        get: (score) => score?.finite,
+                        name: "finite",
+                        color: VisualizerColor.MOD2,
+                        legendOrder: 1,
+                        option1: "Finite",
+                        option2: "Infinite",
+                    },
                 }}
                 defaultColor={VisualizerColor.DEFAULT}
                 onClick={setActiveRecords}

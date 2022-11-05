@@ -29,10 +29,11 @@ public class IfScoreDTO {
 
     @Accessors(fluent = true)
     boolean usesGRA;
+    boolean finite;
 
     @NotNull
     public static IfScoreDTO fromScore(@NotNull IfScore score) {
-        return new IfScoreDTO(score.getCycles(), score.getFootprint(), score.getBlocks(), score.usesGRA());
+        return new IfScoreDTO(score.getCycles(), score.getFootprint(), score.getBlocks(), score.usesGRA(), score.isFinite());
     }
 }
 
