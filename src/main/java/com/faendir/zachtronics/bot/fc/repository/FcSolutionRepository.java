@@ -56,7 +56,7 @@ public class FcSolutionRepository extends AbstractSolutionRepository<FcCategory,
     @Qualifier("fcRepository")
     private final GitRepository gitRepo;
     private final Class<FcCategory> categoryClass = FcCategory.class;
-    final Function<String[], FcSolution> solUnmarshaller = FcSolution::unmarshal;
+    private final Function<String[], FcSolution> solUnmarshaller = FcSolution::unmarshal;
     private final Comparator<FcSolution> archiveComparator = Comparator.comparing(FcSolution::getScore, TCS.getScoreComparator());
 
     @NotNull

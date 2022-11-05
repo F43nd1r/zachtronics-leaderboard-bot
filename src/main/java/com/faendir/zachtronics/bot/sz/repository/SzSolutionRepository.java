@@ -48,7 +48,7 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
     @Qualifier("szRepository")
     private final GitRepository gitRepo;
     private final Class<SzCategory> categoryClass = SzCategory.class;
-    final Function<String[], SzSolution> solUnmarshaller = SzSolution::unmarshal;
+    private final Function<String[], SzSolution> solUnmarshaller = SzSolution::unmarshal;
     private final Comparator<SzSolution> archiveComparator = Comparator.comparing(SzSolution::getScore, SzCategory.CP.getScoreComparator());
 
     @Override

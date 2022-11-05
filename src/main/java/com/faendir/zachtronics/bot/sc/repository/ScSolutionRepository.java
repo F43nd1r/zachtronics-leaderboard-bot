@@ -55,12 +55,11 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     @Qualifier("scArchiveRepository")
     private final GitRepository gitRepo;
     private final Class<ScCategory> categoryClass = ScCategory.class;
-    final Function<String[], ScSolution> solUnmarshaller = ScSolution::unmarshal;
+    private final Function<String[], ScSolution> solUnmarshaller = ScSolution::unmarshal;
     private final Comparator<ScSolution> archiveComparator =
             Comparator.comparing(ScSolution::getScore, ScCategory.C.getScoreComparator()
                                                                    .thenComparing(ScScore::isBugged)
-                                                                   .thenComparing(ScScore::isPrecognitive))
-                      .thenComparing(s -> s.getDisplayLink() == null);
+                                                                   .thenComparing(ScScore::isPrecognitive));
 
     @NotNull
     @Override

@@ -54,7 +54,7 @@ public class CwSolutionRepository extends AbstractSolutionRepository<CwCategory,
     @Qualifier("cwRepository")
     private final GitRepository gitRepo;
     private final Class<CwCategory> categoryClass = CwCategory.class;
-    final Function<String[], CwSolution> solUnmarshaller = CwSolution::unmarshal;
+    private final Function<String[], CwSolution> solUnmarshaller = CwSolution::unmarshal;
     private final Comparator<CwSolution> archiveComparator = Comparator.comparing(CwSolution::getScore, SIZE.getScoreComparator());
 
     @NotNull

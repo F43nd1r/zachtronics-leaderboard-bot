@@ -51,8 +51,9 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
     @Qualifier("ifRepository")
     private final GitRepository gitRepo;
     private final Class<IfCategory> categoryClass = IfCategory.class;
-    final Function<String[], IfSolution> solUnmarshaller = IfSolution::unmarshal;
-    private final Comparator<IfSolution> archiveComparator = Comparator.comparing(IfSolution::getScore, CF.getScoreComparator());
+    private final Function<String[], IfSolution> solUnmarshaller = IfSolution::unmarshal;
+    private final Comparator<IfSolution> archiveComparator =
+            Comparator.comparing(IfSolution::getScore, CF.getScoreComparator().thenComparing(IfScore::usesGRA));
 
     @Override
     protected IfSolution makeCandidateSolution(@NotNull IfSubmission submission) {
@@ -65,11 +66,12 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
         int r2 = Integer.compare(s1.getFootprint(), s2.getFootprint());
         int r3 = Integer.compare(s1.getBlocks(), s2.getBlocks());
         int r4 = Boolean.compare(s1.usesGRA(), s2.usesGRA());
-        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0) {
+        int r5 = Boolean.compare(s1.isFinite(), s2.isFinite());
+        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0 && r5 <= 0) {
             // s1 dominates
             return -1;
         }
-        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0) {
+        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0 && r5 >= 0) {
             // s2 dominates
             return 1;
         }

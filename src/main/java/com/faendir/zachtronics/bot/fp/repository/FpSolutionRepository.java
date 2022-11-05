@@ -53,7 +53,7 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
     @Qualifier("fpRepository")
     private final GitRepository gitRepo;
     private final Class<FpCategory> categoryClass = FpCategory.class;
-    final Function<String[], FpSolution> solUnmarshaller = FpSolution::unmarshal;
+    private final Function<String[], FpSolution> solUnmarshaller = FpSolution::unmarshal;
     private final Comparator<FpSolution> archiveComparator = Comparator.comparing(FpSolution::getScore, RCF.getScoreComparator());
 
     @NotNull
