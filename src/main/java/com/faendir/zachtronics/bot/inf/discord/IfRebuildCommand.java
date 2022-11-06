@@ -41,7 +41,7 @@ public class IfRebuildCommand extends AbstractRebuildCommand<IfPuzzle> {
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
     @Getter
-    private final Secured secured = IfSecured.ADMINS_ONLY;
+    private final Secured secured = IfSecured.WIKI_ADMINS_ONLY;
     @Getter
     private final IfSolutionRepository repository;
 }

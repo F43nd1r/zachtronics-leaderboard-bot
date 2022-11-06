@@ -21,8 +21,8 @@ import com.faendir.zachtronics.bot.discord.command.security.*;
 import java.util.Set;
 
 public class IfSecured {
-    public static final DiscordUserSecured ADMINS_ONLY = new DiscordUserSecured(Set.of(DiscordUser.IEEE12345));
-    public static final Secured INSTANCE = SecuredKt.or(ADMINS_ONLY, TrustedLeaderboardPosterRoleSecured.INSTANCE);
+    public static final DiscordUserSecured WIKI_ADMINS_ONLY = new DiscordUserSecured(Set.of(DiscordUser.IEEE12345, DiscordUser.A_SNOWBALL));
+    public static final Secured INSTANCE = SecuredKt.or(WIKI_ADMINS_ONLY, TrustedLeaderboardPosterRoleSecured.INSTANCE);
 
     private IfSecured() {}
 }

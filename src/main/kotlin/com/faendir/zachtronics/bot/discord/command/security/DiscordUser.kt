@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,8 @@ enum class DiscordUser(val id: Long, val getSpecialEmoji: (Guild?) -> ReactionEm
     ZIG(185983061190508544),
     OMGITSABIST(223019983557361664, { guild -> guild?.getGuildEmojiById(Snowflake.of(1030311764182704138L))?.block()?.asReaction() }),
     TULARE(219319015649181698, { ReactionEmoji.unicode("\uD83C\uDF52") }),
-    REGULAR_HUMANOID(297954865223696384, { ReactionEmoji.unicode("\uD83D\uDC0C") })
+    REGULAR_HUMANOID(297954865223696384, { ReactionEmoji.unicode("\uD83D\uDC0C") }),
+    A_SNOWBALL(136186716334587904),
     ;
 
     companion object {
