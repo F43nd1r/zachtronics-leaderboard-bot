@@ -30,16 +30,16 @@ import static com.faendir.zachtronics.bot.inf.model.IfType.STANDARD;
 
 @Getter
 public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric, IfType> {
-    CF("CFB", List.of(CYCLES, FOOTPRINT, BLOCKS, ANY_FLAG), 0b100),
-    CB("CBF", List.of(CYCLES, BLOCKS, FOOTPRINT, ANY_FLAG), 0b100),
-    CFNG("CFBNG", List.of(CYCLES, FOOTPRINT, BLOCKS, NO_GRA), 0b100),
-    CBNG("CFBNG", List.of(CYCLES, BLOCKS, FOOTPRINT, NO_GRA), 0b100),
+    CF("CF", List.of(CYCLES, FOOTPRINT, BLOCKS), 0b100),
+    CB("CB", List.of(CYCLES, BLOCKS, FOOTPRINT), 0b100),
+    CFNG("CFNG", List.of(CYCLES, NO_GRA, FOOTPRINT, BLOCKS), 0b100),
+    CBNG("CBNG", List.of(CYCLES, NO_GRA, BLOCKS, FOOTPRINT), 0b100),
 
     FC("FC", List.of(FOOTPRINT, CYCLES, BLOCKS), 0b010),
     FB("FB", List.of(FOOTPRINT, BLOCKS, CYCLES), 0b010),
 
-    BC("BC", List.of(BLOCKS, CYCLES, FOOTPRINT, ANY_FLAG), 0b001),
-    BF("BF", List.of(BLOCKS, FOOTPRINT, CYCLES, ANY_FLAG), 0b001),
+    BC("BC", List.of(BLOCKS, CYCLES, FOOTPRINT), 0b001),
+    BF("BF", List.of(BLOCKS, FOOTPRINT, CYCLES), 0b001),
     BIC("BIC", List.of(BLOCKS, INFINITE, CYCLES, FOOTPRINT), 0b001),
     BIF("BIF", List.of(BLOCKS, INFINITE, FOOTPRINT, CYCLES), 0b001);
 
