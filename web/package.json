@@ -11,7 +11,7 @@
         "@mui/material": "5.10.13",
         "@mui/styles": "5.10.10",
         "d3-format": "3.1.0",
-        "deep-object-diff": "1.1.7",
+        "deep-object-diff": "1.1.9",
         "plotly.js-gl3d-dist-min": "2.16.2",
         "react": "18.2.0",
         "react-dom": "18.2.0",
