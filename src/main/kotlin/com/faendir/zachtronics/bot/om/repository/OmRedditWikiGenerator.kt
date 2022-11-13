@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2022
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,10 +45,8 @@ import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_G
 import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_GP
 import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_I
 import com.faendir.zachtronics.bot.om.model.OmGroup
-import com.faendir.zachtronics.bot.om.model.OmMetric
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
-import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
 import com.faendir.zachtronics.bot.reddit.RedditService
@@ -101,14 +99,9 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
                 }.distinct().joinToString("/")
                 table += "Name|Cost|Cycles|${thirdCategory}|Sum\n:-|:-|:-|:-|:-\n"
                 for (puzzle in puzzles) {
-                    val entry = data[puzzle] ?: emptyMap()
-                    val frontierCategory = if (puzzle.type == PRODUCTION) GCP else GC
-                    table += "[**${puzzle.displayName}**](##Frontier: ${
-                        entry.keys.frontierOf(frontierCategory.metrics).joinToString(" ") {
-                            it.score.toDisplayString(DisplayContext(StringFormat.REDDIT, frontierCategory))
-                        }
-                    }##)"
+                    table += "[**${puzzle.displayName}**](${puzzle.link})"
 
+                    val entry = data[puzzle] ?: emptyMap()
                     val costScores = filterRecords(entry, costCategories)
                     val cycleScores = filterRecords(entry, cycleCategories)
                     val areaInstructionScores = filterRecords(entry, areaInstructionCategories)
@@ -132,15 +125,4 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
         }
     }
 
-}
-
-private fun Collection<OmRecord>.frontierOf(metrics: List<OmMetric>): List<OmRecord> {
-    val nonOverlapRecords = filterNot { it.score.overlap }
-    return nonOverlapRecords.filter { record -> nonOverlapRecords.none { it.score.isStrictlyBetterInMetricsThan(record.score, metrics) } }
-
-}
-
-fun OmScore.isStrictlyBetterInMetricsThan(other: OmScore, metrics: List<OmMetric>): Boolean {
-    val compares = metrics.map { it.comparator.compare(this, other) }
-    return compares.none { it > 0 } && compares.any { it < 0 }
 }
