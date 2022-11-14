@@ -55,7 +55,7 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.
     private val overrideExistingOption = CommandOptionBuilder.boolean("override-existing").build()
     override val options = listOf(typeOption, puzzleOption, partOption, scoreOption, overrideExistingOption)
 
-    override val secured = DiscordUserSecured(DiscordUser.BOT_OWNERS)
+    override val secured = DiscordUserSecured(DiscordUser.OM_LB_ADMINS)
 
     override fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder {
         val puzzleIn = puzzleOption.get(event)

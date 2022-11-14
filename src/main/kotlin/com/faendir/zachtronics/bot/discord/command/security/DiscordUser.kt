@@ -31,12 +31,14 @@ enum class DiscordUser(val id: Long, val getSpecialEmoji: (Guild?) -> ReactionEm
     OMGITSABIST(223019983557361664, { guild -> guild?.getGuildEmojiById(Snowflake.of(1030311764182704138L))?.block()?.asReaction() }),
     TULARE(219319015649181698, { ReactionEmoji.unicode("\uD83C\uDF52") }),
     REGULAR_HUMANOID(297954865223696384, { ReactionEmoji.unicode("\uD83D\uDC0C") }),
+    SYX(206689051028357121),
     A_SNOWBALL(136186716334587904),
     ;
 
     companion object {
         @JvmField
         val BOT_OWNERS = setOf(F43ND1R, IEEE12345)
+        val OM_LB_ADMINS = BOT_OWNERS + SYX;
     }
 }
 

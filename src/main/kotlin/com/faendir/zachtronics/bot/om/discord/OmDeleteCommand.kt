@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component
 class OmDeleteCommand(private val repository: OmSolutionRepository) : Command.BasicLeaf() {
     override val name = "delete"
     override val description = "Remove a submission"
-    override val secured = DiscordUserSecured(DiscordUser.BOT_OWNERS)
+    override val secured = DiscordUserSecured(DiscordUser.OM_LB_ADMINS)
 
     private val puzzleOption = omPuzzleOptionBuilder().required().build()
     private val scoreOption = omScoreOptionBuilder().required().build()
