@@ -50,7 +50,8 @@ class OmDeleteCommand(private val repository: OmSolutionRepository) : Command.Ba
 
         repository.delete(record)
         return MultiMessageSafeEmbedMessageBuilder()
-            .title("Success: Removed")
+            .title("Success: Removed from ${puzzle.displayName}")
+            .url(puzzle.link)
             .color(Colors.SUCCESS)
             .description(record.toDisplayString(DisplayContext.discord()))
     }
