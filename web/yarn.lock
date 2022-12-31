@@ -3270,13 +3270,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jest@npm:29.1.2":
-  version: 29.1.2
-  resolution: "@types/jest@npm:29.1.2"
+"@types/jest@npm:29.2.5":
+  version: 29.2.5
+  resolution: "@types/jest@npm:29.2.5"
   dependencies:
     expect: ^29.0.0
     pretty-format: ^29.0.0
-  checksum: a6761b5ac132c641740886f9c0714607255ebffb6add5989f51ea9e392fc3c5cd474e7590f12b003d5b67ce177dfbc8d3d60d0baa335c48c50deeee6b755a473
+  checksum: d668470f00ec4cb8b8457f1fd90f7358fad8f22d74b85006dad6be522d6b9bf10f49f597e88d1d1a518d211c1b65be32a1f27f0e49ce0658d110a9206b8ea310
   languageName: node
   linkType: hard
 
@@ -13788,7 +13788,7 @@ __metadata:
     "@mui/material": 5.10.17
     "@mui/styles": 5.10.16
     "@types/d3-format": 3.0.1
-    "@types/jest": 29.1.2
+    "@types/jest": 29.2.5
     "@types/node": 18.0.0
     "@types/plotly.js": 2.12.11
     "@types/react": 18.0.26
