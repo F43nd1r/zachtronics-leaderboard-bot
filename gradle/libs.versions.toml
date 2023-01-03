@@ -2,7 +2,7 @@
 kotlin = "1.7.22"
 spring-boot = "2.7.7"
 spring-dependencyManagement = "1.1.0"
-spring-cloud = "3.1.5"
+spring-cloud = "4.0.0"
 gradle-docker = "0.34.0"
 gradle-lombok = "6.5.1"
 gradle-gitProperties = "2.4.1"
