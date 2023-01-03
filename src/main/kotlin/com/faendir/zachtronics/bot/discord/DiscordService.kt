@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,11 @@ import discord4j.core.event.domain.interaction.ChatInputAutoCompleteEvent
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.core.event.domain.interaction.ComponentInteractionEvent
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
-import discord4j.core.event.domain.message.MessageCreateEvent
-import discord4j.core.`object`.entity.channel.Channel
 import discord4j.core.`object`.presence.ClientActivity
 import discord4j.core.`object`.presence.ClientPresence
 import discord4j.rest.http.client.ClientException
+import jakarta.annotation.PostConstruct
+import jakarta.annotation.PreDestroy
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import org.slf4j.LoggerFactory
@@ -38,9 +38,6 @@ import org.springframework.boot.info.GitProperties
 import org.springframework.cloud.context.restart.RestartEndpoint
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import javax.annotation.PostConstruct
-import javax.annotation.PreDestroy
-import kotlin.random.Random
 
 @Service
 class DiscordService(

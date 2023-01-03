@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.add
+import jakarta.annotation.PostConstruct
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -42,7 +43,6 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import java.io.File
 import java.util.*
-import javax.annotation.PostConstruct
 
 private val logger = LoggerFactory.getLogger(OmSolutionRepository::class.java)
 

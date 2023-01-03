@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Score
 import com.google.common.util.concurrent.CycleDetectingLockFactory
+import jakarta.annotation.PreDestroy
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toJavaInstant
 import org.eclipse.jgit.api.Git
@@ -42,7 +43,6 @@ import java.io.File
 import java.nio.file.Files
 import java.util.*
 import java.util.concurrent.locks.Lock
-import javax.annotation.PreDestroy
 
 open class GitRepository(private val gitProperties: GitProperties, val name: String, val url: String) {
     companion object {

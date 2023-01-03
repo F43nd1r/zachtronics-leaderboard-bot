@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package com.faendir.zachtronics.bot.testutils
 
 import com.faendir.zachtronics.bot.reddit.RedditService
 import com.faendir.zachtronics.bot.reddit.Subreddit
+import jakarta.annotation.PreDestroy
 import java.io.File
-import javax.annotation.PreDestroy
 
 open class TestRedditService(private val directory: File) : RedditService {
     override fun getWikiPage(subreddit: Subreddit, page: String): String {

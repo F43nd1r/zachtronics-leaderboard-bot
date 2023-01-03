@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,21 +38,21 @@ class GithubWebhookControllerTest {
     fun `should throw 401 on missing signature`() {
         expectThrows<ResponseStatusException> {
             githubWebhookController.reportPush("", "", "")
-        }.get { status }.isEqualTo(HttpStatus.UNAUTHORIZED)
+        }.get { statusCode }.isEqualTo(HttpStatus.UNAUTHORIZED)
     }
 
     @Test
     fun `should throw 401 on bad signature`() {
         expectThrows<ResponseStatusException> {
             githubWebhookController.reportPush("", "sha256=wrong", "")
-        }.get { status }.isEqualTo(HttpStatus.UNAUTHORIZED)
+        }.get { statusCode }.isEqualTo(HttpStatus.UNAUTHORIZED)
     }
 
     @Test
     fun `should throw 404 on unknown event type`() {
         expectThrows<ResponseStatusException> {
             githubWebhookController.reportPush("", "sha256=${hashFunction.hashString("", Charsets.UTF_8)}", "unknown-event")
-        }.get { status }.isEqualTo(HttpStatus.BAD_REQUEST)
+        }.get { statusCode }.isEqualTo(HttpStatus.BAD_REQUEST)
     }
 
     @Test

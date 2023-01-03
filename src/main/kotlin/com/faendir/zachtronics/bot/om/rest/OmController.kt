@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import com.faendir.zachtronics.bot.rest.GameRestController
 import com.faendir.zachtronics.bot.rest.dto.SubmitResultType
 import com.faendir.zachtronics.bot.utils.isValidLink
 import discord4j.core.GatewayDiscordClient
+import jakarta.annotation.PreDestroy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -52,7 +53,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
-import javax.annotation.PreDestroy
 import kotlin.io.path.readBytes
 
 @RestController
