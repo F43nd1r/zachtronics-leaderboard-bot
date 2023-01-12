@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import static com.faendir.zachtronics.bot.inf.model.IfMetric.*;
 import static com.faendir.zachtronics.bot.inf.model.IfType.STANDARD;
 
 @Getter
-public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric, IfType> {
+public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric> {
     CF("CF", List.of(CYCLES, FOOTPRINT, BLOCKS), 0b100),
     CB("CB", List.of(CYCLES, BLOCKS, FOOTPRINT), 0b100),
     CFNG("CFNG", List.of(CYCLES, NO_GRA, FOOTPRINT, BLOCKS), 0b100),

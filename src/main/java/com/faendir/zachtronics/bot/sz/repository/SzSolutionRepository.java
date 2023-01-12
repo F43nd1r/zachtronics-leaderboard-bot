@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
     }
 
     @Override
-    protected int dominanceCompare(@NotNull SzScore s1, @NotNull SzScore s2) {
+    protected int frontierCompare(@NotNull SzScore s1, @NotNull SzScore s2) {
         int r1 = Integer.compare(s1.getCost(), s2.getCost());
         int r2 = Integer.compare(s1.getPower(), s2.getPower());
         int r3 = Integer.compare(s1.getLines(), s2.getLines());

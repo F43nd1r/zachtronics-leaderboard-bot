@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import static com.faendir.zachtronics.bot.fc.model.FcMetric.*;
 import static com.faendir.zachtronics.bot.fc.model.FcType.STANDARD;
 
 @Getter
-public enum FcCategory implements CategoryJava<FcCategory, FcScore, FcMetric, FcType> {
+public enum FcCategory implements CategoryJava<FcCategory, FcScore, FcMetric> {
     TCS("TCS", List.of(TIME, COST, SUM_TIMES, WIRES), 0b1000),
     TSW("TSW", List.of(TIME, SUM_TIMES, WIRES, COST), 0b1000),
     TWC("TWC", List.of(TIME, WIRES, COST, SUM_TIMES), 0b1000),

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,7 @@ import org.springframework.stereotype.Component
 import java.io.File
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
+import java.util.*
 
 @Component
 class OmRedditWikiGenerator(private val reddit: RedditService) {
@@ -70,8 +71,8 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
     private val areaInstructionCategories = listOf(AG, AC, AX, IG, IC, IX)
     private val sumCategories = listOf(SUM_G, SUM_GP, SUM_C, SUM_CP, SUM_A, SUM_I)
 
-    private fun filterRecords(records: Map<OmRecord, Set<OmCategory>>, filter: List<OmCategory>): MutableList<Pair<OmRecord, List<OmCategory>>> {
-        return records.map { (record, categories) -> Pair(record, categories.filter { filter.contains(it) }.sorted()) }
+    private fun filterRecords(records: Collection<OmMemoryRecord>, filter: List<OmCategory>): MutableList<Pair<OmRecord, List<OmCategory>>> {
+        return records.map { mr -> Pair(mr.record, mr.categories.filter { filter.contains(it) }.sorted()) }
             .filter { it.second.isNotEmpty() }
             .sortedBy { (_, categories) -> categories.first() }
             .toMutableList()
@@ -83,7 +84,7 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
         return "${Markdown.linkOrText(score, first.displayLink)}${if (second.any { it.name.contains("X") }) "*" else ""}"
     }
 
-    fun update(readAccess: GitRepository.ReadAccess, categories: List<OmCategory>, data: Map<OmPuzzle, Map<OmRecord, Set<OmCategory>>>) {
+    internal fun update(readAccess: GitRepository.ReadAccess, categories: List<OmCategory>, data: Map<OmPuzzle, SortedSet<OmMemoryRecord>>) {
         if (categories.any { this.categories.contains(it) }) {
             val prefix = File(readAccess.repo, "reddit/prefix.md").readText()
             val suffix = File(readAccess.repo, "reddit/suffix.md").readText()
@@ -101,7 +102,7 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
                 for (puzzle in puzzles) {
                     table += "[**${puzzle.displayName}**](${puzzle.link})"
 
-                    val entry = data[puzzle] ?: emptyMap()
+                    val entry = data[puzzle] ?: emptySet()
                     val costScores = filterRecords(entry, costCategories)
                     val cycleScores = filterRecords(entry, cycleCategories)
                     val areaInstructionScores = filterRecords(entry, areaInstructionCategories)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,9 +109,7 @@ enum class OmPuzzle(
     SILVER_CAUSTIC(JOURNAL_I, NORMAL, "Silver Caustic", "P057"),
     LAMBENT_II_IX(JOURNAL_I, NORMAL, "Lambent II/IX", "P058"),
 
-    EXPLORER_S_SALVE(
-        JOURNAL_II, NORMAL, "Explorer's Salve", "P059"
-    ),
+    EXPLORER_S_SALVE(JOURNAL_II, NORMAL, "Explorer's Salve", "P059"),
     PRESERVATIVE_SALT(JOURNAL_II, NORMAL, "Preservative Salt", "P060"),
     SAILCLOTH_THREAD(JOURNAL_II, INFINITE, "Sailcloth Thread", "P061"),
     BUOYANT_CABLE(JOURNAL_II, INFINITE, "Buoyant Cable", "P062"),
@@ -131,12 +129,8 @@ enum class OmPuzzle(
     GENERAL_ANAESTHETIC(JOURNAL_V, NORMAL, "General Anaesthetic", "P086"),
     WAKEFULNESS_POTION(JOURNAL_V, NORMAL, "Wakefulness Potion", "P088"),
     SUTURE_THREAD(JOURNAL_V, INFINITE, "Suture Thread", "P085"),
-    BLOOD_STANCHING_POWDER(
-        JOURNAL_V, NORMAL, "Blood-Stanching Powder", "P087"
-    ),
-    TONIC_OF_HYDRATION(
-        JOURNAL_V, NORMAL, "Tonic of Hydration", "P089"
-    ),
+    BLOOD_STANCHING_POWDER(JOURNAL_V, NORMAL, "Blood-Stanching Powder", "P087"),
+    TONIC_OF_HYDRATION(JOURNAL_V, NORMAL, "Tonic of Hydration", "P089"),
 
     HEXSTABILIZED_SALT(JOURNAL_VI, PRODUCTION, "Hexstabilized Salt", "P091b"),
     LUSTRE(JOURNAL_VI, PRODUCTION, "Lustre", "P090"),

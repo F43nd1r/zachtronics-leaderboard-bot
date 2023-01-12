@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ package com.faendir.zachtronics.bot.om.repository
 import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.createGitRepositoryFrom
 import com.faendir.zachtronics.bot.git.GitRepository
+import com.faendir.zachtronics.bot.om.dummyOmScore
 import com.faendir.zachtronics.bot.om.dummyOmSubmission
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
-import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.testutils.TestGitRepository
 import com.google.common.io.Files
@@ -73,7 +73,7 @@ class OmSolutionRepositoryTest {
     fun `submit without previous record`() {
         expectThat(repository.findCategoryHolders(OmPuzzle.STABILIZED_WATER, true)).isEmpty()
 
-        val score = OmScore(cost = 10, cycles = 20, area = 30)
+        val score = dummyOmScore.copy(cost = 10, cycles = 20, area = 30)
         val result = repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score))
 
         expectThat(result).isA<SubmitResult.Success<OmRecord, OmCategory>>().get { beatenRecords }.hasSize(1)
@@ -87,9 +87,9 @@ class OmSolutionRepositoryTest {
 
     @Test
     fun `submit beating previous record`() {
-        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, OmScore(cost = 10, cycles = 20, area = 30)))
+        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cost = 10, cycles = 20, area = 30)))
 
-        val score = OmScore(cost = 5, cycles = 5, area = 5)
+        val score = dummyOmScore.copy(cost = 5, cycles = 5, area = 5)
 
         val result = repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score))
 
@@ -102,9 +102,9 @@ class OmSolutionRepositoryTest {
 
     @Test
     fun `submit overlap record`() {
-        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, OmScore(cost = 10, cycles = 20, area = 30)))
+        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cost = 10, cycles = 20, area = 30)))
 
-        val score = OmScore(cost = 5, cycles = 5, area = 5, overlap = true)
+        val score = dummyOmScore.copy(cost = 5, cycles = 5, area = 5, overlap = true)
 
         val result = repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score))
 
@@ -117,10 +117,10 @@ class OmSolutionRepositoryTest {
 
     @Test
     fun `submit worse`() {
-        val score = OmScore(cost = 10, cycles = 20, area = 30)
+        val score = dummyOmScore.copy(cost = 10, cycles = 20, area = 30)
         repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score))
 
-        val result = repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, OmScore(cost = 50, cycles = 50, area = 50)))
+        val result = repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cost = 50, cycles = 50, area = 50)))
 
         expectThat(result).isA<SubmitResult.NothingBeaten<OmRecord, OmCategory>>()
         expectThat(repository.findCategoryHolders(OmPuzzle.STABILIZED_WATER, true)) {
@@ -131,7 +131,7 @@ class OmSolutionRepositoryTest {
 
     @Test
     fun `submit same`() {
-        val score = OmScore(cost = 10, cycles = 20, area = 30)
+        val score = dummyOmScore.copy(cost = 10, cycles = 20, area = 30)
         repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score))
 
         val result = repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score))
@@ -145,7 +145,7 @@ class OmSolutionRepositoryTest {
 
     @Test
     fun `submit new gif`() {
-        val score = OmScore(cost = 10, cycles = 20, area = 30)
+        val score = dummyOmScore.copy(cost = 10, cycles = 20, area = 30)
         repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score, displayLink = "https://bad.gif"))
 
         val gif = "https://better.gif"
@@ -160,10 +160,10 @@ class OmSolutionRepositoryTest {
 
     @Test
     fun `submit pareto record`() {
-        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, OmScore(cost = 10, cycles = 20, area = 30)))
-        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, OmScore(cost = 30, cycles = 20, area = 10)))
+        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cost = 10, cycles = 20, area = 30)))
+        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cost = 30, cycles = 20, area = 10)))
 
-        val score = OmScore(cost = 25, cycles = 25, area = 25)
+        val score = dummyOmScore.copy(cost = 25, cycles = 25, area = 25)
 
         val result = repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score))
 
@@ -180,11 +180,11 @@ class OmSolutionRepositoryTest {
 
     @Test
     fun `data survives reload`() {
-        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, OmScore(cost = 10, cycles = 20, area = 30), displayLink = "https://some.gif"))
-        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, OmScore(cost = 30, cycles = 22, area = 10)))
-        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, OmScore(cost = 25, cycles = 25, area = 25)))
-        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, OmScore(cost = 5, cycles = 5, area = 5, overlap = true)))
-        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, OmScore(cost = 50, cycles = 50, area = 15, trackless = true)))
+        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cost = 10, cycles = 20, area = 30), displayLink = "https://some.gif"))
+        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cost = 30, cycles = 22, area = 10)))
+        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cost = 25, cycles = 25, area = 25)))
+        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cost = 5, cycles = 5, area = 5, overlap = true)))
+        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cost = 50, cycles = 50, area = 15, trackless = true)))
 
         val data = repository.findCategoryHolders(OmPuzzle.STABILIZED_WATER, true)
 

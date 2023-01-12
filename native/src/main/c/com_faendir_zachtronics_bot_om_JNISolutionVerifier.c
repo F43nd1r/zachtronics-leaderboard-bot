@@ -34,7 +34,7 @@ JNIEXPORT jint JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_g
     int result = verifier_evaluate_metric(verifier, metric);
     const char *error = verifier_error(verifier);
     if (error) {
-        (*env)->ThrowNew(env, (*env)->FindClass(env, "java/lang/Exception"), error);
+        (*env)->ThrowNew(env, (*env)->FindClass(env, "com/faendir/zachtronics/bot/om/OmSimException"), error);
         result = INT_MAX;
     }
     return result;
@@ -47,4 +47,13 @@ JNIEXPORT jint JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_g
 
     void *verifier = (void*) jVerifier;
     return verifier_error_cycle(verifier);
+}
+
+JNIEXPORT void JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_clearError
+    (JNIEnv *env, jclass cls, jlong jVerifier) {
+    (void)env;
+    (void)cls;
+
+    void *verifier = (void*) jVerifier;
+    verifier_error_clear(verifier);
 }

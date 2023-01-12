@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.om.rest
 
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmScore
+import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
@@ -39,7 +40,8 @@ internal class OmUrlMapperTest {
 
     @Test
     fun `should create short url`() {
-        expectThat(urlMapper.createShortUrl("d5524ee", OmPuzzle.ELECTRUM_SEPARATION, OmScore(2265, 47, 1694, 516, 59,34.5, 1.0)))
-            .isEqualTo("https://zlbb.faendir.com/l/om/d5524ee/P103/2265g-47c-1694a-516i-59h-34.5w-1r")
+        expectThat(urlMapper.createShortUrl("d5524ee", OmPuzzle.ELECTRUM_SEPARATION,
+            OmScore(2265, 516, false, false, 47, 1694, 59, 34.5, 1.0, 1800.toInfinInt(), 60.toInfinInt(), 35.0)))
+            .isEqualTo("https://zlbb.faendir.com/l/om/d5524ee/P103/2265g-516i-47c-1694a-59h-34.5w-1r-1800a-60h-35w")
     }
 }

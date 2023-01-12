@@ -20,16 +20,18 @@ import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.imgur.ImgurService
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.model.OmCategory
+import com.faendir.zachtronics.bot.om.model.OmMetric
+import com.faendir.zachtronics.bot.om.model.OmMetrics
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
+import com.faendir.zachtronics.bot.om.model.OmScoreManifold
 import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.rest.GifMakerService
 import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
-import com.faendir.zachtronics.bot.utils.add
 import jakarta.annotation.PostConstruct
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -38,13 +40,10 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
 import org.eclipse.jgit.diff.DiffEntry
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import java.io.File
 import java.util.*
-
-private val logger = LoggerFactory.getLogger(OmSolutionRepository::class.java)
 
 @OptIn(ExperimentalSerializationApi::class)
 @Component
@@ -59,21 +58,11 @@ class OmSolutionRepository(
         prettyPrint = true
         allowSpecialFloatingPointValues = true
     }
-    private val recordOrder = Comparator
-        .comparing<OmRecord, Int> {
-            when {
-                it.score.overlap -> 1
-                it.score.trackless -> 0
-                else -> 0
-            }
-        }
-        .thenComparingInt { it.score.cost ?: Int.MAX_VALUE }
-        .thenComparingInt { it.score.cycles ?: Int.MAX_VALUE }
-        .thenComparingInt { it.score.area ?: Int.MAX_VALUE }
-        .thenComparingInt { it.score.instructions ?: Int.MAX_VALUE }
-        .thenComparingInt { it.score.height ?: Int.MAX_VALUE }
-        .thenComparingDouble { it.score.width ?: Double.MAX_VALUE }
-    private lateinit var data: Map<OmPuzzle, SortedMap<OmRecord, MutableSet<OmCategory>>>
+    private val memoryRecordOrder = Comparator.comparing({ r: OmMemoryRecord -> r.record.score },
+        (listOf(OmMetric.OVERLAP) + OmMetrics.VALUE) // overlap scores last, trackless in the mix
+            .map { it.comparator }
+            .reduce(Comparator<OmScore>::thenComparing))
+    private lateinit var data: Map<OmPuzzle, SortedSet<OmMemoryRecord>>
     private var hash: String? = null
 
     @PostConstruct
@@ -85,25 +74,37 @@ class OmSolutionRepository(
     }
 
     private fun loadData(leaderboardScope: GitRepository.ReadAccess) {
-        data = OmPuzzle.values().associateWith { sortedMapOf(recordOrder) }
-        for (puzzle in OmPuzzle.values()) {
-            val records = data.getValue(puzzle)
+        data = OmPuzzle.values().associateWith { sortedSetOf(memoryRecordOrder) }
+        for ((puzzle, memoryRecords) in data.entries) {
+            // fill map
             leaderboardScope.getPuzzleDir(puzzle).takeIf { it.exists() }
-                ?.listFiles()
-                ?.filter { file -> file.extension == "json" }
+                ?.listFiles { file -> file.extension == "json" }
                 ?.map { file ->
-                    file.inputStream().buffered().use { stream ->
-                        val record = json.decodeFromStream<OmRecord>(stream)
-                        record.copy(dataPath = record.dataPath?.let { leaderboardScope.repo.toPath().resolve(it) }, origin = file.toPath())
-                    }
+                    file.inputStream().buffered().use { json.decodeFromStream<OmRecord>(it) }
                 }
-                ?.forEach { record -> records.add(record, mutableSetOf()) }
-            records.keys.removeIf { record -> records.keys.any { it.score.isStrictlyBetterThan(record.score) } }
-            if (records.isNotEmpty()) {
-                for (category in OmCategory.values().filter { it.supportsPuzzle(puzzle) }.toMutableSet()) {
-                    records.entries.filter { category.supportsScore(it.key.score) }
-                        .reduceOrNull { a, b -> if (category.scoreComparator.compare(a.key.score, b.key.score) <= 0) a else b }
-                        ?.value?.add(category)
+                ?.map { it.toMemoryRecord(leaderboardScope.repo.toPath()) }
+                ?.forEach(memoryRecords::add)
+
+            // fill valid manifolds
+            for (mRecord in memoryRecords) {
+                manifolds@ for (manifold in OmScoreManifold.values()) {
+                    for (otherMRecord in memoryRecords) {
+                        val compares = manifold.frontierCompare(mRecord.record.score, otherMRecord.record.score)
+                        if (compares.all { it >= 0 } && compares.any { it > 0 })
+                            continue@manifolds
+                    }
+                    mRecord.frontierManifolds.add(manifold)
+                }
+            }
+
+            // fill cats
+            if (memoryRecords.isNotEmpty()) {
+                for (category in OmCategory.values().filter { it.supportsPuzzle(puzzle) }) {
+                    memoryRecords
+                        .filter { category.supportsScore(it.record.score) }
+                        .minWithOrNull(Comparator.comparing({ it.record.score }, category.scoreComparator))
+                        ?.categories
+                        ?.add(category)
                 }
             }
         }
@@ -134,16 +135,19 @@ class OmSolutionRepository(
         }
         return leaderboard.acquireWriteAccess().use { leaderboardScope ->
             val records by lazy { data.getValue(submission.puzzle) }
-            val newRecord by lazy { submission.createRecord(leaderboardScope) }
-            val result = submit(leaderboardScope, submission) { beatenRecord, beatenCategories, shouldRemain ->
-                if (beatenRecord != null) {
-                    if (shouldRemain) {
-                        records.getValue(beatenRecord) -= beatenCategories
+            val newMRecord by lazy { submission.createMRecord(leaderboardScope) }
+            val result = submit(leaderboardScope, submission) { beatenMRecord, beatenCategories, lostManifolds ->
+                if (beatenMRecord != null) {
+                    beatenMRecord.frontierManifolds -= lostManifolds
+                    if (beatenMRecord.frontierManifolds.isNotEmpty()) {
+                        beatenMRecord.categories -= beatenCategories
                     } else {
-                        beatenRecord.remove(leaderboardScope)
+                        beatenMRecord.remove(leaderboardScope)
                     }
                 }
-                records.add(newRecord, beatenCategories.toMutableSet())
+                newMRecord.frontierManifolds += lostManifolds
+                newMRecord.categories += beatenCategories
+                records.add(newMRecord)
             }
             val beatenRecords = when (result) {
                 is SubmitResult.Success -> result.beatenRecords
@@ -159,11 +163,7 @@ class OmSolutionRepository(
                     beatenRecords.flatMap { it.categories }.map { it.toString() })
                 hash = leaderboardScope.currentHash()
             }
-            when(result) {
-                is SubmitResult.Success -> result.copy(record = newRecord.copy(author = submission.author))
-                is SubmitResult.Updated -> result.copy(record = newRecord.copy(author = submission.author))
-                else -> result
-            }
+            return@use result
         }
     }
 
@@ -174,58 +174,72 @@ class OmSolutionRepository(
     private fun submit(
         leaderboardScope: GitRepository.ReadAccess,
         submission: OmSubmission,
-        handleBeatenRecord: (beatenRecord: OmRecord?, beatenCategories: Set<OmCategory>, shouldRemain: Boolean) -> Unit
+        handleBeatenRecord: (beatenMRecord: OmMemoryRecord?, beatenCategories: Set<OmCategory>, lostManifolds: Set<OmScoreManifold>) -> Unit
     ): SubmitResult<OmRecord, OmCategory> {
         loadDataIfNecessary(leaderboardScope)
-        val records = data.getValue(submission.puzzle)
+        val mRecords = data.getValue(submission.puzzle)
         val unclaimedCategories = OmCategory.values().filter { it.supportsPuzzle(submission.puzzle) && it.supportsScore(submission.score) }.toMutableSet()
-        val result = mutableListOf<CategoryRecord<OmRecord?, OmCategory>>()
-        for ((record, categories) in records.toMap()) {
-            if (submission.score == record.score || submission.score.isSupersetOf(record.score)) {
+        val possibleManifolds = submission.score.manifolds.toMutableSet()
+        val beatingWitnesses = mutableMapOf<OmScoreManifold, CategoryRecord<OmRecord, OmCategory>>()
+        val beatenCR = mutableListOf<CategoryRecord<OmRecord?, OmCategory>>()
+        for (mRecord in mRecords.toSet()) {
+            val record = mRecord.record
+            val categories = mRecord.categories
+            if (submission.score == record.score) {
                 @Suppress("LiftReturnOrAssignment")
-                if (submission.score.isSupersetOf(record.score)) {
-                    handleBeatenRecord(record, categories, false)
-                    unclaimedCategories -= categories
-                    result.add(CategoryRecord(record, categories.toSet()))
-                    continue
-                } else if (submission.displayLink != record.displayLink || record.displayLink == null || record.dataLink == null) {
-                    handleBeatenRecord(record, categories, false)
-                    return SubmitResult.Updated(null, CategoryRecord(record, categories.toSet()))
+                if (submission.displayLink != record.displayLink || record.displayLink == null) {
+                    handleBeatenRecord(mRecord, categories, mRecord.frontierManifolds)
+                    return SubmitResult.Updated(null, CategoryRecord(record, categories))
                 } else {
                     return SubmitResult.AlreadyPresent()
                 }
             }
-            if (record.score.isStrictlyBetterThan(submission.score)) {
-                return SubmitResult.NothingBeaten(records.filter { it.key.score.isStrictlyBetterThan(submission.score) }
-                    .map { CategoryRecord(it.key, it.value) })
-            }
-            if (categories.isEmpty()) {
-                if (submission.score.isStrictlyBetterThan(record.score)) {
-                    handleBeatenRecord(record, emptySet(), false)
-                    result.add(CategoryRecord(record, emptySet()))
-                }
-            } else {
-                unclaimedCategories -= categories
-                val beatenCategories = categories.filter { category ->
-                    category.supportsScore(submission.score) && category.scoreComparator.compare(submission.score, record.score).let {
-                        it < 0 || it == 0 && submission.displayLink != record.displayLink
+            for (manifold in possibleManifolds.intersect(mRecord.frontierManifolds)) {
+                val compares: List<Int> = manifold.frontierCompare(submission.score, record.score)
+                if (compares.all { it >= 0 }) { // candidate loses or is identical
+                    if (compares.all { it == 0 }) { // subscores identical
+                        /* If we let this case go below, we allow overlapping-domino edit wars
+                         * where 2 solves that are both paretos in manifold 1 but identical in manifold 2
+                         * can keep beating each other.
+                         * Therefore we leave the manifold as valid, but we add a beating witness
+                         * If a submission's possible manifolds all have a beating witness, the submission is rejected.
+                         * This isn't symmetrical, as the incoming solution is at a disadvantage wrt
+                         * the ones in the leaderboard, but finding a minimal graph covering is out of my abilities.
+                         */
                     }
-                }.toSet()
-                if (beatenCategories.isNotEmpty()) {
-                    handleBeatenRecord(
-                        record,
-                        beatenCategories,
-                        categories.size != beatenCategories.size || !submission.score.isStrictlyBetterThan(record.score)
-                    )
-                    result.add(CategoryRecord(record, beatenCategories))
+                    else {
+                        possibleManifolds.remove(manifold)
+                    }
+                    beatingWitnesses[manifold] = CategoryRecord(record, categories)
+                    if (beatingWitnesses.keys.containsAll(possibleManifolds))
+                        return SubmitResult.NothingBeaten(beatingWitnesses.values)
+                }
+                else { // candidate goes in
+                    unclaimedCategories -= categories
+                    val beatenCategories = categories.filter { category ->
+                        category.supportsScore(submission.score) && category.scoreComparator.compare(
+                            submission.score,
+                            record.score
+                        ).let {
+                            it < 0 || it == 0 && submission.displayLink != record.displayLink
+                        }
+                    }.toSet()
+
+                    val strictlyBetter = compares.all { it <= 0 } // exactly equal is taken by the branch above
+                    if (strictlyBetter || beatenCategories.isNotEmpty()) {
+                        val lostManifolds = if (strictlyBetter) setOf(manifold) else emptySet()
+                        handleBeatenRecord(mRecord, beatenCategories, lostManifolds)
+                        beatenCR.add(CategoryRecord(record, beatenCategories))
+                    }
                 }
             }
         }
-        handleBeatenRecord(null, unclaimedCategories, false)
+
+        handleBeatenRecord(null, unclaimedCategories, possibleManifolds)
         if (unclaimedCategories.isNotEmpty()) {
-            result.add(CategoryRecord(null, unclaimedCategories))
+            beatenCR.add(CategoryRecord(null, unclaimedCategories))
         }
-        return SubmitResult.Success(null, null, result)
+        return SubmitResult.Success(null, null, beatenCR)
     }
 
     fun overrideScores(overrides: List<Pair<OmRecord, OmScore>>) {
@@ -233,8 +247,8 @@ class OmSolutionRepository(
             for ((record, newScore) in overrides) {
                 val puzzle = record.puzzle
                 val dir = leaderboardScope.getPuzzleDir(puzzle)
-                val oldFile = record.dataPath?.toFile() ?: continue
-                val newFile = File(dir, "${newScore.toFileString()}_${puzzle.name}.solution")
+                val oldFile = record.dataPath.toFile()
+                val newFile = File(dir, "${fileStemOf(puzzle, newScore)}.solution")
                 oldFile.renameTo(newFile)
                 leaderboardScope.rm(oldFile)
                 leaderboardScope.add(newFile)
@@ -243,10 +257,10 @@ class OmSolutionRepository(
             for ((record, newScore) in overrides) {
                 val puzzle = record.puzzle
                 val dir = leaderboardScope.getPuzzleDir(puzzle)
-                leaderboardScope.rm(File(dir, "${record.score.toFileString()}_${puzzle.name}.json"))
-                val newName = "${newScore.toFileString()}_${puzzle.name}"
+                leaderboardScope.rm(File(dir, "${record.toFileStem()}.json"))
+                val newName = fileStemOf(puzzle, newScore)
                 val leaderboardFile = File(dir, "$newName.json")
-                val newPath = File(dir, "$newName.solution").takeIf { it.exists() }?.relativeTo(leaderboardScope.repo)?.toPath()
+                val newPath = File(dir, "$newName.solution").relativeTo(leaderboardScope.repo).toPath()
                 val newRecord = record.copy(
                     score = newScore,
                     dataPath = newPath,
@@ -263,8 +277,9 @@ class OmSolutionRepository(
 
     fun delete(record: OmRecord) {
         leaderboard.acquireWriteAccess().use { leaderboardScope ->
-            record.dataPath?.toFile()?.let { leaderboardScope.rm(it) } ?: logger.warn("Deleted record with no solution file")
-            record.origin?.toFile()?.let { leaderboardScope.rm(it) } ?: logger.warn("Deleted record with no meta file")
+            val dir = leaderboardScope.getPuzzleDir(record.puzzle)
+            leaderboardScope.rm(record.dataPath.toFile())
+            leaderboardScope.rm(File(dir, "${record.toFileStem()}.json"))
             leaderboardScope.commitAndPush(null, record.puzzle, record.score, listOf("DELETE"))
             loadData(leaderboardScope)
             pageGenerator.update(leaderboardScope, OmCategory.values().toList(), data)
@@ -299,15 +314,15 @@ class OmSolutionRepository(
     }
 
 
-    private fun OmSubmission.createRecord(leaderboardScope: GitRepository.ReadWriteAccess): OmRecord {
-        val name = "${score.toFileString()}_${puzzle.name}"
+    private fun OmSubmission.createMRecord(leaderboardScope: GitRepository.ReadWriteAccess): OmMemoryRecord {
+        val name = fileStemOf(puzzle, score)
         val dir = leaderboardScope.getPuzzleDir(puzzle)
         dir.mkdirs()
-        val archiveFile = File(dir, "$name.solution")
-        archiveFile.writeBytes(data)
-        leaderboardScope.add(archiveFile)
+        val solutionFile = File(dir, "$name.solution")
+        solutionFile.writeBytes(data)
+        leaderboardScope.add(solutionFile)
         leaderboardScope.commit(author, puzzle, score, listOf("Solution"))
-        val path = archiveFile.relativeTo(leaderboardScope.repo).toPath()
+        val path = solutionFile.relativeTo(leaderboardScope.repo).toPath()
 
         val leaderboardFile = File(dir, "$name.json")
         val record = OmRecord(
@@ -316,47 +331,50 @@ class OmSolutionRepository(
             displayLink = displayLink,
             dataLink = createLink(leaderboardScope, puzzle, score),
             dataPath = path,
-            origin = leaderboardFile.toPath(),
-            lastModified = Clock.System.now()
+            lastModified = Clock.System.now(),
+            author = author
         )
         leaderboardFile.outputStream().buffered().use { json.encodeToStream(record, it) }
         leaderboardScope.add(leaderboardFile)
 
-        return record.copy(dataPath = archiveFile.toPath())
+        return record.toMemoryRecord(leaderboardScope.repo.toPath())
     }
 
     private fun createLink(leaderboardScope: GitRepository.ReadAccess, puzzle: OmPuzzle, score: OmScore) =
         omUrlMapper.createShortUrl(leaderboardScope.shortCurrentHash(), puzzle, score)
 
-    private fun OmRecord.remove(leaderboardScope: GitRepository.ReadWriteAccess) {
-        dataPath?.let { dataPath -> leaderboardScope.rm(dataPath.toFile()) }
-        leaderboardScope.rm(File(leaderboardScope.getPuzzleDir(puzzle), "${score.toFileString()}_${puzzle.name}.json"))
-        data[puzzle]?.remove(this)
+    private fun OmMemoryRecord.remove(leaderboardScope: GitRepository.ReadWriteAccess) {
+        leaderboardScope.rm(solutionPath.toFile())
+        leaderboardScope.rm(solutionPath.resolveSibling("${record.toFileStem()}.json").toFile())
+        data[record.puzzle]?.remove(this)
     }
 
     private fun GitRepository.ReadAccess.getPuzzleDir(puzzle: OmPuzzle): File = File(repo, "${puzzle.group.name}/${puzzle.name}")
 
-    private fun OmScore.toFileString() = toDisplayString(DisplayContext.fileName())
+    private fun fileStemOf(puzzle: OmPuzzle, score: OmScore) = "${score.toDisplayString(DisplayContext.fileName())}_${puzzle.name}"
+    private fun OmRecord.toFileStem() = fileStemOf(puzzle, score)
 
     override fun find(puzzle: OmPuzzle, category: OmCategory): OmRecord? {
         leaderboard.acquireReadAccess().use { l -> loadDataIfNecessary(l) }
-        return data[puzzle]?.entries?.find { (_, categories) -> categories.contains(category) }?.key
+        return data[puzzle]?.find { category in it.categories }?.record
     }
 
     override fun findCategoryHolders(puzzle: OmPuzzle, includeFrontier: Boolean): List<CategoryRecord<OmRecord, OmCategory>> {
         leaderboard.acquireReadAccess().use { l -> loadDataIfNecessary(l) }
-        return data[puzzle]?.entries?.filter { (_, categories) -> includeFrontier || categories.isNotEmpty() }
-            ?.map { (record, categories) -> CategoryRecord(record, categories) } ?: emptyList()
+        return data[puzzle]
+            ?.filter { includeFrontier || it.categories.isNotEmpty() }
+            ?.map(OmMemoryRecord::toCategoryRecord)
+            ?: emptyList()
     }
 
     fun findAll(category: OmCategory): Map<OmPuzzle, OmRecord?> {
         leaderboard.acquireReadAccess().use { l -> loadDataIfNecessary(l) }
         return data.entries.filter { category.supportsPuzzle(it.key) }
-            .associate { it.key to it.value.entries.find { (_, categories) -> categories.contains(category) }?.key }
+            .associate { it.key to it.value.find { mr -> category in mr.categories }?.record }
     }
 
     val records: List<CategoryRecord<OmRecord, OmCategory>>
-        get() = data.values.flatMap { it.entries }.map { CategoryRecord(it.key, it.value) }
+        get() = data.values.flatten().map(OmMemoryRecord::toCategoryRecord)
 }
 
 enum class OmRecordChangeType {

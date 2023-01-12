@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,12 @@
 package com.faendir.zachtronics.bot.om
 
 import com.faendir.om.parser.solution.SolutionParser
-import com.faendir.om.parser.solution.model.Solution
 import com.faendir.om.parser.solution.model.SolvedSolution
 import com.faendir.om.parser.solution.model.part.Arm
 import com.faendir.om.parser.solution.model.part.ArmType
 import com.faendir.om.parser.solution.model.part.Glyph
 import com.faendir.om.parser.solution.model.part.GlyphType
 import com.faendir.om.parser.solution.model.part.IO
-import com.faendir.om.parser.solution.model.part.Track
 import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.option.enumOptionBuilder
@@ -38,6 +36,8 @@ import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SubmitResult
+import com.faendir.zachtronics.bot.utils.InfinInt
+import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
 import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.ceil
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
@@ -56,45 +56,58 @@ import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import kotlin.math.max
-import kotlin.math.min
 
 
 private val logger = LoggerFactory.getLogger("OM Utils")
 
-fun Solution.isTrackless(): Boolean = parts.none { it is Track }
-
 fun JNISolutionVerifier.getMetricSafe(metric: OmSimMetric) = try {
     getMetric(metric)
-} catch (e: Exception) {
-    logger.info("Verifier threw exception for $metric: ${e.message}")
+} catch (e: OmSimException) {
+    logger.info("Verifier threw exception for `${metric.id}`: ${e.message}")
     null
 }
 
-fun SolvedSolution.getScore(verifier: JNISolutionVerifier) =
-    OmScore(
-        cost = verifier.getMetricSafe(OmSimMetric.COST).also {
-            if (it != cost) throw IllegalArgumentException("Stored cost value does not match simulation. Run your solution to completion before submitting.")
+fun JNISolutionVerifier.getScore(): OmScore {
+    // null or 0 THROUGHPUT_OUTPUTS means the solution doesn't output infinite products, hence cannot have a rate
+    // infinity rate is reserved for sublinear solutions, which don't really exist and aren't supported by omsim
+    val rate: Double? = getMetricSafe(OmSimMetric.THROUGHPUT_OUTPUTS)?.takeIf { it != 0 }?.let {
+        (getMetric(OmSimMetric.THROUGHPUT_CYCLES).toDouble() / it).ceil(precision = 2)
+    }
+
+    return OmScore(
+        cost = getMetric(OmSimMetric.COST).also {
+            if (it != getMetric(OmSimMetric.PARSED_COST))
+                throw IllegalArgumentException("Stored cost value does not match simulation. Run your solution to completion before submitting.")
         },
-        cycles = verifier.getMetricSafe(OmSimMetric.CYCLES).also {
-            if (it != cycles) throw IllegalArgumentException("Stored cycles value does not match simulation. Run your solution to completion before submitting.")
+        instructions = getMetric(OmSimMetric.INSTRUCTIONS).also {
+            if (it != getMetric(OmSimMetric.PARSED_INSTRUCTIONS))
+                throw IllegalArgumentException("Stored instructions value does not match simulation. Run your solution to completion before submitting.")
         },
-        area = verifier.getMetricSafe(OmSimMetric.AREA_APPROXIMATE).also {
-            if (it == null || min(it, area).toDouble() / max(it, area) < 0.95) {
+
+        overlap = getMetric(OmSimMetric.OVERLAP) != 0,
+        trackless = getMetric(OmSimMetric.NUMBER_OF_TRACK_SEGMENTS) == 0,
+
+        cycles = getMetric(OmSimMetric.CYCLES).also {
+            if (it != getMetric(OmSimMetric.PARSED_CYCLES))
+                throw IllegalArgumentException("Stored cycles value does not match simulation. Run your solution to completion before submitting.")
+        },
+        area = getMetric(OmSimMetric.AREA).also {
+            if (it != getMetric(OmSimMetric.PARSED_AREA))
                 throw IllegalArgumentException("Stored area value does not match simulation. Run your solution to completion before submitting.")
-            }
         },
-        instructions = verifier.getMetricSafe(OmSimMetric.INSTRUCTIONS).also {
-            if (it != instructions) throw IllegalArgumentException("Stored instructions value does not match simulation. Run your solution to completion before submitting.")
-        },
-        height = verifier.getMetricSafe(OmSimMetric.HEIGHT),
-        width = verifier.getMetricSafe(OmSimMetric.WIDTH_TIMES_TWO)?.let { it.toDouble() / 2 },
-        rate = verifier.getMetricSafe(OmSimMetric.THROUGHPUT_CYCLES)?.let {
-            (it.toDouble() / (verifier.getMetricSafe(OmSimMetric.THROUGHPUT_OUTPUTS) ?: 0)).ceil(precision = 2)
-        },
-        trackless = isTrackless(),
-        overlap = verifier.getMetricSafe(OmSimMetric.OVERLAP) != 0
+        height = getMetric(OmSimMetric.HEIGHT),
+        width = getMetric(OmSimMetric.WIDTH_TIMES_TWO).toDouble() / 2,
+
+        rate = rate,
+        areaINF = if (rate == null) null
+        else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.AREA))?.toInfinInt() ?: InfinInt.INFINITY,
+        heightINF = if (rate == null) null
+        else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.HEIGHT))?.toInfinInt() ?: InfinInt.INFINITY,
+        widthINF = if (rate == null) null
+        else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.WIDTH_TIMES_TWO))?.toDouble()?.div(2)
+            ?: Double.POSITIVE_INFINITY,
     )
+}
 
 fun createSubmission(gif: String?, gifData: ByteArray?, author: String, inputBytes: ByteArray): OmSubmission {
     val solution = try {
@@ -130,11 +143,11 @@ fun createSubmission(gif: String?, gifData: ByteArray?, author: String, inputByt
         if ((verifier.getMetricSafe(OmSimMetric.MAXIMUM_ABSOLUTE_ARM_ROTATION) ?: 0) >= 4096) {
             throw IllegalArgumentException("Maximum arm rotations over 4096 are banned.")
         }
-        val gifCycles = verifier.getMetricSafe(OmSimMetric.VISUAL_LOOP_START_CYCLE)?.let { it to verifier.getMetricSafe(OmSimMetric.VISUAL_LOOP_END_CYCLE)!! }
+        val gifCycles = verifier.getMetricSafe(OmSimMetric.VISUAL_LOOP_START_CYCLE)?.let { it to verifier.getMetric(OmSimMetric.VISUAL_LOOP_END_CYCLE) }
             ?: (0 to if (puzzle.type == OmType.INFINITE && verifier.errorCycle > solution.cycles + 1) solution.cycles + 1 else solution.cycles)
         return OmSubmission(
             puzzle,
-            solution.getScore(verifier),
+            verifier.getScore(),
             author,
             gif,
             gifData,
@@ -150,8 +163,8 @@ fun omPuzzleOptionBuilder() = enumOptionBuilder<OmPuzzle>("puzzle") { displayNam
     .description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")
 
 fun omScoreOptionBuilder() = CommandOptionBuilder.string("score")
-    .description("full score of the submission, e.g. 65g/80c/12a/4i/4h/4w/12r")
-    .convert { it?.replace("[\\s\u200B]".toRegex(), "") }
+    .description("full score of the submission, e.g. 100g/35c/9a/12i/2h/3w/T/L@V 100g/6r/9a/12i/2h/3w/T@INF")
+    .convert { it?.replace("""[\s\u200B]""".toRegex(), "") }
 
 fun omSolutionOptionBuilder() = CommandOptionBuilder.attachment("solution").description("Your solution file")
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,13 +28,11 @@ data class OmRecord(
     override val puzzle: OmPuzzle,
     override val score: OmScore,
     override val displayLink: String?,
-    override val dataLink: String? = null,
+    override val dataLink: String,
+    /** relative path to repo root */
     @Serializable(with = PathSerializer::class)
-    override val dataPath: Path?,
-    @Transient
-    val origin: Path? = null,
+    override val dataPath: Path,
     val lastModified: Instant? = null,
     @Transient
     override val author: String? = null
-) : Record<OmCategory> {
-}
+) : Record<OmCategory>

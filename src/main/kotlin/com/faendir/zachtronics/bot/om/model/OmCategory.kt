@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,22 +17,7 @@
 package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.Category
-import com.faendir.zachtronics.bot.om.model.OmMetric.AREA
-import com.faendir.zachtronics.bot.om.model.OmMetric.COST
-import com.faendir.zachtronics.bot.om.model.OmMetric.CYCLES
-import com.faendir.zachtronics.bot.om.model.OmMetric.INSTRUCTIONS
-import com.faendir.zachtronics.bot.om.model.OmMetric.OVERLAP
-import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_AI
-import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_CA
-import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_CI
-import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_GA
-import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_GC
-import com.faendir.zachtronics.bot.om.model.OmMetric.PRODUCT_GI
-import com.faendir.zachtronics.bot.om.model.OmMetric.RATE
-import com.faendir.zachtronics.bot.om.model.OmMetric.SUM3A
-import com.faendir.zachtronics.bot.om.model.OmMetric.SUM3I
-import com.faendir.zachtronics.bot.om.model.OmMetric.SUM4
-import com.faendir.zachtronics.bot.om.model.OmMetric.TRACKLESS_INSTRUCTION
+import com.faendir.zachtronics.bot.om.model.OmMetric.*
 import com.faendir.zachtronics.bot.om.model.OmType.INFINITE
 import com.faendir.zachtronics.bot.om.model.OmType.NORMAL
 import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
@@ -42,7 +27,7 @@ private val NORMAL_TYPES = setOf(NORMAL, INFINITE)
 private val PRODUCTION_TYPES = setOf(PRODUCTION)
 
 enum class OmCategory(
-    val supportedTypes: Set<OmType> = OmType.values().toSet(),
+    override val supportedTypes: Set<OmType> = OmType.values().toSet(),
     vararg metricsVararg: OmMetric,
     override val displayName: String = metricsVararg.take(if (metricsVararg.first() is OmMetric.Modifier) 3 else 2).joinToString("") { it.displayName }
 ) : Category {
@@ -101,18 +86,23 @@ enum class OmCategory(
     TIC(NORMAL_TYPES, TRACKLESS_INSTRUCTION, CYCLES, PRODUCT_GA),
     TIA(NORMAL_TYPES, TRACKLESS_INSTRUCTION, AREA, PRODUCT_GC),
 
-    RG(NORMAL_TYPES, RATE, COST, PRODUCT_AI),
-    RI(NORMAL_TYPES, RATE, INSTRUCTIONS, PRODUCT_GA),
+    RG(NORMAL_TYPES, RATE, COST, PRODUCT_AI_INF),
+    RA(NORMAL_TYPES, RATE, AREA_INF, PRODUCT_GI),
+    RI(NORMAL_TYPES, RATE, INSTRUCTIONS, PRODUCT_GA_INF),
     ;
 
     override val metrics: List<OmMetric> = metricsVararg.toList()
-    val requiredParts: List<OmScorePart> = metrics.flatMap { it.scoreParts }.distinct()
-    val scoreComparator: Comparator<OmScore> = metrics.map { it.comparator }.reduce { acc, comparator -> acc.thenComparing(comparator) }
+    val requiredParts: Set<ScorePart<*>> = metrics.flatMapTo(HashSet()) { it.scoreParts }
+    val associatedManifold = OmScoreManifold.values().first { it.scoreParts.containsAll(requiredParts) }
+    val scoreComparator: Comparator<OmScore> =
+        metrics.filter { it !is Modifier }.map(OmMetric::comparator).reduce(Comparator<OmScore>::thenComparing)
 
     fun supportsPuzzle(puzzle: OmPuzzle) = supportedTypes.contains(puzzle.type)
 
     fun supportsScore(score: OmScore) =
-        requiredParts.all { it.getValue(score) != null } && (metrics.contains(OVERLAP) || !score.overlap) && (!metrics.contains(TRACKLESS_INSTRUCTION) || score.trackless)
+        (requiredParts.contains(OVERLAP) || !score.overlap) &&
+                (!requiredParts.contains(TRACKLESS) || score.trackless) &&
+                (!(requiredParts.contains(LOOPING) || associatedManifold == OmScoreManifold.INFINITY) || score.looping)
 
     companion object {
         val entries = values().toList()

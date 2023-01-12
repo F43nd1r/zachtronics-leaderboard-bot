@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import discord4j.core.spec.InteractionReplyEditMono
 import java.io.Closeable
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.*
 import kotlin.math.pow
 
 private val wordSeparator = Regex("[\\s-/,:]+")
@@ -149,7 +150,7 @@ inline fun <T : Closeable?, U : Closeable?, R> Pair<T, U>.use(block: (T, U) -> R
 
 fun String?.orEmpty(prefix: String = "", suffix: String = "") = this?.let { prefix + it + suffix } ?: ""
 
-fun <T> Iterable<T>.productOf(selector: (T) -> Int) = fold(1) { acc, t -> acc * selector(t) }
+inline fun <reified T: Enum<T>> newEnumSet(): EnumSet<T> = EnumSet.noneOf(T::class.java)
 
 fun isValidLink(string: String): Boolean {
     return try {

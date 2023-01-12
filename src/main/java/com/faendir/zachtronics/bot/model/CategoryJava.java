@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
-public interface CategoryJava<C extends Enum<C> & Category, S extends Score<C>, M extends MetricJava<S>, T extends Type> extends Category {
+public interface CategoryJava<C extends Enum<C> & Category, S extends Score<C>, M extends MetricJava<S>> extends Category {
     @NotNull Comparator<S> getScoreComparator();
-    @NotNull Set<T> getSupportedTypes();
     int getScoreFormatId();
 
     boolean supportsScore(@NotNull S score);

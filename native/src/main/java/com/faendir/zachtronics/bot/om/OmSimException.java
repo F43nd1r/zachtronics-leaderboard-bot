@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.om.model
+package com.faendir.zachtronics.bot.om;
 
-import com.faendir.zachtronics.bot.model.Submission
-
-data class OmSubmission(
-    override val puzzle: OmPuzzle,
-    override val score: OmScore,
-    override val author: String?,
-    override var displayLink: String?,
-    var displayData: ByteArray?,
-    val wantedGifCycles: Pair<Int, Int>,
-    override val data: ByteArray
-) : Submission<OmCategory, OmPuzzle>
+public class OmSimException extends RuntimeException {
+    public OmSimException(String message) {
+        super(message);
+    }
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
     }
 
     @Override
-    protected int dominanceCompare(@NotNull FpScore s1, @NotNull FpScore s2) {
+    protected int frontierCompare(@NotNull FpScore s1, @NotNull FpScore s2) {
         int r1 = Integer.compare(s1.getRules(), s2.getRules());
         int r2 = Integer.compare(s1.getConditionalRules(), s2.getConditionalRules());
         int r3 = Integer.compare(s1.getFrames(), s2.getFrames());

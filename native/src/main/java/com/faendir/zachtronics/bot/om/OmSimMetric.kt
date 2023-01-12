@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,10 @@ sealed class OmSimMetric(val id: String) {
     object PARSED_INSTRUCTIONS : OmSimMetric("parsed instructions")
     object CYCLES : OmSimMetric("cycles")
     object COST : OmSimMetric("cost")
-    object AREA_APPROXIMATE : OmSimMetric("area (approximate)")
+    object AREA : OmSimMetric("area")
     object INSTRUCTIONS : OmSimMetric("instructions")
     class INSTRUCTIONS_WITH_HOTKEY(hotkey: String) : OmSimMetric("instructions with hotkey $hotkey")
+    object EXECUTED_INSTRUCTIONS : OmSimMetric("executed instructions")
     object INSTRUCTION_TAPE_PERIOD : OmSimMetric("instruction tape period")
     object HEIGHT : OmSimMetric("height")
     object WIDTH_TIMES_TWO : OmSimMetric("width*2")
@@ -38,6 +39,7 @@ sealed class OmSimMetric(val id: String) {
     object THROUGHPUT_OUTPUTS_UNRESTRICTED : OmSimMetric("throughput outputs (unrestricted)")
     object THROUGHPUT_WASTE : OmSimMetric("throughput waste")
     class PRODUCT_N_METRIC(n: Int, metric: OmSimMetric) : OmSimMetric("product $n ${metric.id}")
+    class STEADY_STATE(metric: OmSimMetric) : OmSimMetric("steady state ${metric.id}")
     class PARTS_OF_TYPE(partType: PartType) : OmSimMetric("parts of type ${partType.id}")
     object NUMBER_OF_TRACK_SEGMENTS : OmSimMetric("number of track segments")
     object NUMBER_OF_ARMS : OmSimMetric("number of arms")

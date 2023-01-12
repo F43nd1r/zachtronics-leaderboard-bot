@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ public final class Utils {
         return res;
     }
 
-    public static <Cat extends CategoryJava<?, ?, ?, ?>> int getScoreFormatId(@NotNull DisplayContext<Cat> context) {
+    public static <Cat extends CategoryJava<?, ?, ?>> int getScoreFormatId(@NotNull DisplayContext<Cat> context) {
         int formatId = 0b000;
         if (context.getFormat() == StringFormat.REDDIT && context.getCategories() != null) {
             formatId = context.getCategories().stream()

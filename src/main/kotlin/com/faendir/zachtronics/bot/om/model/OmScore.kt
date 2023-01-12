@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,67 +19,98 @@ package com.faendir.zachtronics.bot.om.model
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.Score
 import com.faendir.zachtronics.bot.model.StringFormat
+import com.faendir.zachtronics.bot.utils.InfinInt
+import com.faendir.zachtronics.bot.utils.newEnumSet
 import kotlinx.serialization.Serializable
-import kotlin.reflect.full.memberProperties
+import kotlinx.serialization.Transient
+import java.util.*
 
 @Serializable
 data class OmScore(
-    val cost: Int? = null,
-    val cycles: Int? = null,
-    val area: Int? = null,
-    val instructions: Int? = null,
-    val height: Int? = null,
-    val width: Double? = null,
-    val rate: Double? = null,
-    val trackless: Boolean = false,
-    val overlap: Boolean = false,
+    // @0
+    val cost: Int,
+    val instructions: Int,
+    val overlap: Boolean,
+    val trackless: Boolean,
+
+    // @6
+    val cycles: Int,
+    val area: Int,
+    val height: Int,
+    val width: Double,
+
+    // @INF
+    /**
+     * * FINITE: normal looping solve
+     * * INFINITE: can't happen right now, represents a sublinear solve
+     * * null: solve doesn't get to arbitrary large output numbers due to stopping or crashing
+     */
+    val rate: Double?,
+    val areaINF: InfinInt?,
+    val heightINF: InfinInt?,
+    val widthINF: Double?,
 ) : Score<OmCategory> {
+    // @INF
+    @Transient
+    val looping: Boolean = rate != null
 
-    override fun toDisplayString(context: DisplayContext<OmCategory>): String =
-        (getMetricDescriptions(context) + getModifierDescriptions(context)).joinToString(context.separator) + getAdditionalMetricDescriptions(context)
+    @Transient
+    val manifolds: Set<OmScoreManifold> =
+        // with just 2 manifolds we can cut corners, but this should use the nullity of their scoreParts
+        EnumSet.of(OmScoreManifold.VICTORY).apply { if (looping) add(OmScoreManifold.INFINITY) }
 
-    private fun getMetricDescriptions(context: DisplayContext<OmCategory>): List<String> =
-        (context.categories?.takeIf { it.isNotEmpty() }?.flatMap { it.requiredParts }?.distinct() ?: OmScorePart.values().toList())
-            .mapNotNull { part -> part.format(this)?.let { if (context.format == StringFormat.FILE_NAME) it.replace("∞", "INF") else it } }
+    /**
+     * humans: `12g/34c/56a/78i/3h/4w/OTL@6 12g/34r/57a/78i/6h/7w/OT@∞`
+     *
+     * machines: `12g-34i-15c-12a-3h-4w[-15r-12a-3h-4w]-O-T`
+     */
+    override fun toDisplayString(context: DisplayContext<OmCategory>): String {
 
-    private fun getModifierDescriptions(context: DisplayContext<OmCategory>): List<String> = when (context.format) {
-        StringFormat.DISCORD, StringFormat.PLAIN_TEXT, StringFormat.FILE_NAME ->
-            listOfNotNull("O".takeIf { overlap }, "T".takeIf { trackless })
-        else -> emptyList()
+        if (context.format == StringFormat.FILE_NAME) {
+            // we write a standard machine-readable deduplicated score
+            val allMetrics = OmMetrics.VALUE + listOf(OmMetric.OVERLAP, OmMetric.TRACKLESS)
+            return subScoreDisplay(allMetrics, allMetrics.toSet(), context.separator).replace("∞", "INF")
+        }
+
+        val desiredMetrics = context.categories
+            ?.flatMapTo(HashSet(), OmCategory::requiredParts)
+            ?.takeIf { it.isNotEmpty() }
+            ?.apply { if (context.format != StringFormat.REDDIT) addAll(OmMetrics.MODIFIER) }
+            ?: OmMetrics.FULL_SCORE.toSet()
+
+        val desiredManifolds = context.categories
+            ?.mapTo(newEnumSet(), OmCategory::associatedManifold)
+            ?.takeIf { it.isNotEmpty() }
+            ?: manifolds
+
+        return desiredManifolds.joinToString(" ") {
+            subScoreDisplay(it.scoreParts, desiredMetrics, context.separator)
+                .run { if (desiredManifolds.size > 1) plus(it.displayName) else this }
+        } + additionalMetricDescriptions(context)
     }
 
-    private fun getAdditionalMetricDescriptions(context: DisplayContext<OmCategory>): String = when (context.format) {
+    private fun subScoreDisplay(
+        subScoreParts: List<OmMetric.ScorePart<*>>,
+        desiredParts: Set<OmMetric.ScorePart<*>>,
+        separator: String
+    ) =
+        subScoreParts.filter { it in desiredParts }
+            .mapNotNull { it.describe(this) }
+            .joinToString(separator)
+
+    /** @return extra descriptions of computed metrics, like ` (g+c+a=215)` */
+    private fun additionalMetricDescriptions(context: DisplayContext<OmCategory>): String = when (context.format) {
         StringFormat.DISCORD, StringFormat.PLAIN_TEXT ->
             context.categories
-                ?.flatMap { it.metrics.toList() }
+                ?.flatMap { it.metrics }
+                ?.filterIsInstance<OmMetric.Computed>()
                 ?.distinct()
                 ?.mapNotNull { metric -> metric.describe(this) }
                 ?.takeIf { it.isNotEmpty() }
                 ?.joinToString(separator = ", ", prefix = " (", postfix = ")")
-        else -> null
-    }.orEmpty()
-
-    fun isSupersetOf(other: OmScore): Boolean {
-        var hasMoreData = false
-        for (property in OmScore::class.memberProperties) {
-            val thisValue = property(this)
-            val otherValue = property(other)
-            if (thisValue != otherValue) {
-                if (otherValue == null) {
-                    hasMoreData = true
-                } else {
-                    return false
-                }
-            }
-        }
-        return hasMoreData
+                .orEmpty()
+        else -> ""
     }
 
-    fun isStrictlyBetterThan(other: OmScore): Boolean {
-        if ((overlap && !other.overlap) || (!trackless && other.trackless)) return false
-        val compares = OmScorePart.values().map { it.getValue }
-            .filter { it(other) != null }
-            .map { it(this)?.toDouble()?.compareTo(it(other)!!.toDouble()) }
-        return compares.none { it == null } && compares.none { it!! > 0 } && compares.any { it!! < 0 }
-    }
+    override fun toString() = toDisplayString()
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import static com.faendir.zachtronics.bot.sz.model.SzMetric.*;
 import static com.faendir.zachtronics.bot.sz.model.SzType.STANDARD;
 
 @Getter
-public enum SzCategory implements CategoryJava<SzCategory, SzScore, SzMetric, SzType> {
+public enum SzCategory implements CategoryJava<SzCategory, SzScore, SzMetric> {
     CP("CP", List.of(COST, POWER, LINES), 0b100),
     CL("CL", List.of(COST, LINES, POWER), 0b100),
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import java.util.Set;
 import static com.faendir.zachtronics.bot.cw.model.CwType.STANDARD;
 
 @Getter
-public enum CwCategory implements CategoryJava<CwCategory, CwScore, CwMetric, CwType> {
+public enum CwCategory implements CategoryJava<CwCategory, CwScore, CwMetric> {
     SIZE("Size", List.of(CwMetric.SIZE, CwMetric.FOOTPRINT, CwMetric.WIDTH), 0b10),
     FOOTPRINT("Footprint", List.of(CwMetric.FOOTPRINT, CwMetric.SIZE, CwMetric.WIDTH), 0b01);
 

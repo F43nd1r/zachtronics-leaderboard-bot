@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,24 @@ import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmSubmission
 
+val dummyOmScore = OmScore(
+    cost = 0,
+    instructions = 0,
+    overlap = false,
+    trackless = false,
+    cycles = 0,
+    area = 0,
+    height = 0,
+    width = 0.0,
+    rate = null,
+    areaINF = null,
+    heightINF = null,
+    widthINF = null
+)
+
 fun dummyOmSubmission(
     puzzle: OmPuzzle = OmPuzzle.STABILIZED_WATER,
-    score: OmScore = OmScore(),
+    score: OmScore = dummyOmScore,
     author: String? = null,
     displayLink: String = "https://no.link",
     displayData: ByteArray? = null,

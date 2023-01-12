@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJava<C, S, ?, ?>, P extends Puzzle<C>, S extends Score<C>,
+public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJava<C, S, ?>, P extends Puzzle<C>, S extends Score<C>,
                                                  Sub extends Submission<C, P>, R extends Record<C>, Sol extends Solution<C, P, S, R>>
         implements SolutionRepository<C, P, Sub, R> {
 
@@ -124,8 +124,14 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
     }
 
     protected abstract Sol makeCandidateSolution(@NotNull Sub submission);
-    /** If equal, s1 dominates */
-    protected abstract int dominanceCompare(@NotNull S s1, @NotNull S s2);
+    /**
+     * <ul>
+     *  <li>-1: s1 is strictly better OR equal
+     *  <li> 0: incomparable
+     *  <li>+1: s2 is strictly better
+     *  </ul>
+     */
+    protected abstract int frontierCompare(@NotNull S s1, @NotNull S s2);
     /** Allow same-score changes if you bring a display link or you are the original author and don't regress the display link state */
     protected abstract boolean alreadyPresent(@NotNull Sol candidate, @NotNull Sol solution);
 
@@ -148,7 +154,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         try {
             for (ListIterator<Sol> it = solutions.listIterator(); it.hasNext(); ) {
                 Sol solution = it.next();
-                int r = dominanceCompare(candidate.getScore(), solution.getScore());
+                int r = frontierCompare(candidate.getScore(), solution.getScore());
                 if (r > 0) {
                     // TODO actually return all of the beating sols
                     CategoryRecord<R, C> categoryRecord =

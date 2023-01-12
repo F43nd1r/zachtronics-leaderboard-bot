@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
     }
 
     @Override
-    protected int dominanceCompare(@NotNull IfScore s1, @NotNull IfScore s2) {
+    protected int frontierCompare(@NotNull IfScore s1, @NotNull IfScore s2) {
         int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
         int r2 = Integer.compare(s1.getFootprint(), s2.getFootprint());
         int r3 = Integer.compare(s1.getBlocks(), s2.getBlocks());

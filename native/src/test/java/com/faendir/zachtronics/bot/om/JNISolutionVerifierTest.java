@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,24 @@ package com.faendir.zachtronics.bot.om;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class JNISolutionVerifierTest {
 
     @Test
-    void getHeight() throws IOException {
-        try(JNISolutionVerifier verifier = JNISolutionVerifier.open(
-                getClass().getClassLoader().getResource("P009.puzzle").openStream().readAllBytes(),
-                getClass().getClassLoader().getResource("Face_Powder_Height_1.solution").openStream().readAllBytes())) {
-            int height = verifier.getMetric(OmSimMetric.HEIGHT.INSTANCE);
-            assertEquals(1, height);
+    void goodAndBad() throws IOException {
+        try (InputStream puzzle = getClass().getClassLoader().getResource("P009.puzzle").openStream();
+             InputStream solution = getClass().getClassLoader().getResource("Face_Powder_Height_1.solution").openStream();
+             JNISolutionVerifier verifier = JNISolutionVerifier.open(puzzle.readAllBytes(), solution.readAllBytes())) {
+            // good
+            assertEquals(1, verifier.getMetric(OmSimMetric.HEIGHT.INSTANCE));
+            // bad on purpose
+            assertThrows(OmSimException.class, () -> verifier.getMetric(new OmSimMetric.INSTRUCTIONS_WITH_HOTKEY("wrong!")));
+            // ensure error is reset
+            assertEquals(1, verifier.getMetric(OmSimMetric.HEIGHT.INSTANCE));
         }
     }
 }

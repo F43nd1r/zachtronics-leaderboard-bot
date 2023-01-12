@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -238,7 +238,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     }
 
     @Override
-    protected int dominanceCompare(@NotNull ScScore s1, @NotNull ScScore s2) {
+    protected int frontierCompare(@NotNull ScScore s1, @NotNull ScScore s2) {
         int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
         int r2 = Integer.compare(s1.getReactors(), s2.getReactors());
         int r3 = Integer.compare(s1.getSymbols(), s2.getSymbols());

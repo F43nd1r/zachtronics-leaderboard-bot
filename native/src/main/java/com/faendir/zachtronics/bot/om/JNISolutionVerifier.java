@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,11 @@ public class JNISolutionVerifier implements Closeable {
 
     private static native void closeVerifier(long verifier);
 
-    private static native int getMetric(long verifier, String name);
+    private static native int getMetric(long verifier, String name) throws OmSimException;
 
     private static native int getErrorCycle(long verifier);
+
+    private static native void clearError(long verifier);
 
     public static JNISolutionVerifier open(byte[] puzzle, byte[] solution) {
         return new JNISolutionVerifier(puzzle, solution);
@@ -52,10 +54,10 @@ public class JNISolutionVerifier implements Closeable {
             int result = getMetric(verifier, metric.getId());
             errorCycle = null;
             return result;
-        } catch (Throwable t) {
+        } catch (OmSimException e) {
             errorCycle = getErrorCycle(verifier);
-            close();
-            throw t;
+            clearError(verifier);
+            throw e;
         }
     }
 

@@ -132,7 +132,8 @@ class OmController(private val repository: OmSolutionRepository, private val dis
     @GetMapping(path = ["/records/new/{since}"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getNewRecords(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) since: java.time.Instant): List<OmRecordDTO> {
         val kSince = since.toKotlinInstant()
-        return repository.records.filter { it.record.lastModified != null && it.record.lastModified >= kSince }.sortedBy { it.record.lastModified }
+        return repository.records.filter { it.record.lastModified != null && it.record.lastModified >= kSince }
+            .sortedBy { it.record.lastModified }
             .map { it.toDTO() }
     }
 }

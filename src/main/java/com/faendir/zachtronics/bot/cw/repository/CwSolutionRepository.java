@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ public class CwSolutionRepository extends AbstractSolutionRepository<CwCategory,
     }
 
     @Override
-    protected int dominanceCompare(@NotNull CwScore s1, @NotNull CwScore s2) {
+    protected int frontierCompare(@NotNull CwScore s1, @NotNull CwScore s2) {
         int r1 = Integer.compare(s1.getWidth(), s2.getWidth());
         int r2 = Integer.compare(s1.getHeight(), s2.getHeight());
         int r3 = Integer.compare(s1.getFootprint(), s2.getFootprint());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,4 +19,5 @@ package com.faendir.zachtronics.bot.model
 interface Category {
     val displayName: String
     val metrics: List<@JvmWildcard Metric>
+    val supportedTypes: Set<@JvmWildcard Type>
 }

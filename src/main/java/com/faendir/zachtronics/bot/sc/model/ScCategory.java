@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import static com.faendir.zachtronics.bot.sc.model.ScMetric.*;
 import static com.faendir.zachtronics.bot.sc.model.ScType.*;
 
 @Getter
-public enum ScCategory implements CategoryJava<ScCategory, ScScore, ScMetric, ScType> {
+public enum ScCategory implements CategoryJava<ScCategory, ScScore, ScMetric> {
     C("C", List.of(CYCLES, REACTORS, SYMBOLS, ANY_FLAG), ScTypeSets.ALL, 0b100),
     CNB("CNB", List.of(CYCLES, REACTORS, SYMBOLS, NO_BUGS), ScTypeSets.ALL, 0b100),
     CNP("CNP", List.of(CYCLES, REACTORS, SYMBOLS, NO_PRECOG), ScTypeSets.ALL, 0b100),
