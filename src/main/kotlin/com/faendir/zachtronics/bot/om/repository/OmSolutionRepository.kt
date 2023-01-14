@@ -210,13 +210,14 @@ class OmSolutionRepository(
                          * This isn't symmetrical, as the incoming solution is at a disadvantage wrt
                          * the ones in the leaderboard, but finding a minimal graph covering is out of my abilities.
                          */
+                        unclaimedCategories -= categories
                     }
                     else {
                         possibleManifolds.remove(manifold)
                     }
                     beatingWitnesses[manifold] = CategoryRecord(record, categories)
                     if (beatingWitnesses.keys.containsAll(possibleManifolds))
-                        return SubmitResult.NothingBeaten(beatingWitnesses.values)
+                        return SubmitResult.NothingBeaten(beatingWitnesses.values.distinctBy { it.record.score })
                 }
                 else { // candidate goes in
                     unclaimedCategories -= categories
