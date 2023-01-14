@@ -163,7 +163,11 @@ class OmSolutionRepository(
                     beatenRecords.flatMap { it.categories }.map { it.toString() })
                 hash = leaderboardScope.currentHash()
             }
-            return@use result
+            when(result) {
+                is SubmitResult.Success -> result.copy(record = newMRecord.record)
+                is SubmitResult.Updated -> result.copy(record = newMRecord.record)
+                else -> result
+            }
         }
     }
 
