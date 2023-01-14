@@ -134,7 +134,7 @@ export default function Sidebar() {
                 <Link to="/help" style={{ padding: "1rem", color: theme.palette.primary.main }}>
                     Help
                 </Link>
-                <ExternalLink href="/swagger-ui.html" style={{ padding: "1rem", color: theme.palette.primary.main }}>
+                <ExternalLink href="/swagger-ui/index.html" style={{ padding: "1rem", color: theme.palette.primary.main }}>
                     API docs
                 </ExternalLink>
             </Box>
