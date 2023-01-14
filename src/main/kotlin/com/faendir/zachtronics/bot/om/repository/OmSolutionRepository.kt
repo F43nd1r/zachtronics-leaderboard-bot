@@ -348,8 +348,8 @@ class OmSolutionRepository(
         omUrlMapper.createShortUrl(leaderboardScope.shortCurrentHash(), puzzle, score)
 
     private fun OmMemoryRecord.remove(leaderboardScope: GitRepository.ReadWriteAccess) {
-        leaderboardScope.rm(solutionPath.toFile())
-        leaderboardScope.rm(solutionPath.resolveSibling("${record.toFileStem()}.json").toFile())
+        leaderboardScope.rm(record.dataPath.toFile())
+        leaderboardScope.rm(record.dataPath.resolveSibling("${record.toFileStem()}.json").toFile())
         data[record.puzzle]?.remove(this)
     }
 

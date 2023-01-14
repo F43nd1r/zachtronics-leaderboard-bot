@@ -25,12 +25,12 @@ import java.nio.file.Path
 
 internal data class OmMemoryRecord(
     val record: OmRecord,
-    val solutionPath: Path,
     val frontierManifolds: MutableSet<OmScoreManifold> = newEnumSet<OmScoreManifold>(),
     val categories: MutableSet<OmCategory> = newEnumSet<OmCategory>()
 ) {
     fun toCategoryRecord() = CategoryRecord(record, categories)
 }
 
-internal fun OmRecord.toMemoryRecord(repoPath: Path) = OmMemoryRecord(this, repoPath.resolve(this.dataPath))
+internal fun OmRecord.toMemoryRecord(repoPath: Path) =
+    OmMemoryRecord(this.copy(dataPath = repoPath.resolve(this.dataPath)))
 

@@ -29,7 +29,7 @@ data class OmRecord(
     override val score: OmScore,
     override val displayLink: String?,
     override val dataLink: String,
-    /** relative path to repo root */
+    /** we relativize it to the repo root at (de)serialization */
     @Serializable(with = PathSerializer::class)
     override val dataPath: Path,
     val lastModified: Instant? = null,
