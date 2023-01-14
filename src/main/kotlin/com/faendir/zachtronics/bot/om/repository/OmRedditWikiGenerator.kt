@@ -54,8 +54,6 @@ import com.faendir.zachtronics.bot.reddit.Subreddit.OPUS_MAGNUM
 import com.faendir.zachtronics.bot.utils.Markdown
 import org.springframework.stereotype.Component
 import java.io.File
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import java.util.*
 
 @Component
@@ -63,7 +61,6 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
     private val categories = listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SUM_G, SUM_GP, SUM_C, SUM_CP, SUM_A, SUM_I)
     companion object {
         private const val wikiPage = "index"
-        private const val datePrefix = "Table built on "
     }
 
     private val costCategories = listOf(GC, GA, GX, GCP, GI, GXP)
@@ -118,9 +115,8 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
                 }
                 table += "\n"
             }
-            table += datePrefix + OffsetDateTime.now(ZoneOffset.UTC)
             val content = "$prefix\n$table\n$suffix".trim()
-            if (content.lines().filter { !it.contains(datePrefix) } != reddit.getWikiPage(OPUS_MAGNUM, wikiPage).lines().filter { !it.contains(datePrefix) }) {
+            if (content.lines() != reddit.getWikiPage(OPUS_MAGNUM, wikiPage).lines()) {
                 reddit.updateWikiPage(OPUS_MAGNUM, wikiPage, content, "bot update")
             }
         }
