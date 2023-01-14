@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,25 +19,38 @@ package com.faendir.zachtronics.bot.om.rest.dto
 import com.faendir.zachtronics.bot.om.model.OmScore
 
 data class OmScoreDTO(
-    val cost: Int? = null,
-    val cycles: Int? = null,
-    val area: Int? = null,
-    val instructions: Int? = null,
-    val height: Int? = null,
-    val width: Double? = null,
-    val rate: Double? = null,
-    val trackless: Boolean = false,
-    val overlap: Boolean = false,
+    // @0
+    val cost: Int,
+    val instructions: Int,
+    val overlap: Boolean,
+    val trackless: Boolean,
+
+    // @6
+    val cycles: Int,
+    val area: Int,
+    val height: Int,
+    val width: Double,
+
+    // @INF
+    val rate: Double?,
+    val areaINF: Double?,
+    val heightINF: Double?,
+    val widthINF: Double?,
 )
 
 fun OmScore.toDTO() = OmScoreDTO(
     cost = cost,
+    instructions = instructions,
+    trackless = trackless,
+    overlap = overlap,
+
     cycles = cycles,
     area = area,
-    instructions = instructions,
     height = height,
     width = width,
+
     rate = rate,
-    trackless = trackless,
-    overlap = overlap
+    areaINF = areaINF?.toDouble(),
+    heightINF = heightINF?.toDouble(),
+    widthINF = widthINF,
 )

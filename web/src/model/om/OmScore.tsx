@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 export default interface OmScore {
-    cost?: number
-    cycles?: number
-    area?: number
-    instructions?: number
-    height?: number
-    width?: number
-    rate?: number
+    cost: number
+    instructions: number
     trackless: boolean
     overlap: boolean
+
+    cycles: number
+    area: number
+    height: number
+    width: number
+
+    rate?: number
+    areaINF?: number
+    heightINF?: number
+    widthINF?: number
 }

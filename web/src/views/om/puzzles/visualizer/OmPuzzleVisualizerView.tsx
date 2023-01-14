@@ -35,12 +35,15 @@ export default function OmPuzzleVisualizerView() {
                 filter={{ key: `visualizerFilter-${puzzleId}`, default: { showOnlyFrontier: false } }}
                 metrics={{
                     g: { name: "Cost", get: (score) => score?.cost },
+                    i: { name: "Instructions", get: (score) => score?.instructions },
                     c: { name: "Cycles", get: (score) => score?.cycles },
                     a: { name: "Area", get: (score) => score?.area },
-                    i: { name: "Instructions", get: (score) => score?.instructions },
                     h: { name: "Height", get: (score) => score?.height },
                     w: { name: "Width", get: (score) => score?.width },
                     r: { name: "Rate", get: (score) => score?.rate },
+                    aI: { name: "Area@∞", get: (score) => score?.areaINF },
+                    hI: { name: "Height@∞", get: (score) => score?.heightINF },
+                    wI: { name: "Width@∞", get: (score) => score?.widthINF },
                 }}
                 modifiers={{
                     overlap: {
