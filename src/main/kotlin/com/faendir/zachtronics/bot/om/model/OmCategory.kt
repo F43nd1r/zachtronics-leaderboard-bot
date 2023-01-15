@@ -87,13 +87,13 @@ enum class OmCategory(
     TIA(NORMAL_TYPES, TRACKLESS_INSTRUCTION, AREA, PRODUCT_GC),
 
     RG(NORMAL_TYPES, RATE, COST, PRODUCT_AI_INF),
-    RA(NORMAL_TYPES, RATE, AREA_INF, PRODUCT_GI),
+    RA(NORMAL_TYPES, RATE, AREA_INF, PRODUCT_GI, displayName = "RA"),
     RI(NORMAL_TYPES, RATE, INSTRUCTIONS, PRODUCT_GA_INF),
     ;
 
     override val metrics: List<OmMetric> = metricsVararg.toList()
     val requiredParts: Set<ScorePart<*>> = metrics.flatMapTo(HashSet()) { it.scoreParts }
-    val associatedManifold = OmScoreManifold.values().first { it.scoreParts.containsAll(requiredParts) }
+    val associatedManifold = OmScoreManifold.values().single { it.scoreParts.containsAll(requiredParts) }
     val scoreComparator: Comparator<OmScore> =
         metrics.filter { it !is Modifier }.map(OmMetric::comparator).reduce(Comparator<OmScore>::thenComparing)
 

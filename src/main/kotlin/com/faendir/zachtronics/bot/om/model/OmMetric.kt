@@ -117,13 +117,13 @@ sealed interface OmMetric : Metric {
 
     object CYCLES : Value<Int>("C", 'c', MeasurePoint.VICTORY, OmScore::cycles)
     object AREA : Value<Int>("A", 'a', MeasurePoint.VICTORY, OmScore::area)
-    object HEIGHT : Value<Int>("Height", 'h', MeasurePoint.VICTORY, OmScore::height)
-    object WIDTH : Value<Double>("Width", 'w', MeasurePoint.VICTORY, OmScore::width)
+    object HEIGHT : Value<Int>("H", 'h', MeasurePoint.VICTORY, OmScore::height)
+    object WIDTH : Value<Double>("W", 'w', MeasurePoint.VICTORY, OmScore::width)
 
     object RATE : Value<Double>("R", 'r', MeasurePoint.INFINITY, OmScore::rate)
     object AREA_INF : Value<InfinInt>("A@∞", 'a', MeasurePoint.INFINITY, OmScore::areaINF)
-    object HEIGHT_INF : Value<InfinInt>("Height@∞", 'h', MeasurePoint.INFINITY, OmScore::heightINF)
-    object WIDTH_INF : Value<Double>("Width@∞", 'w', MeasurePoint.INFINITY, OmScore::widthINF)
+    object HEIGHT_INF : Value<InfinInt>("H@∞", 'h', MeasurePoint.INFINITY, OmScore::heightINF)
+    object WIDTH_INF : Value<Double>("W@∞", 'w', MeasurePoint.INFINITY, OmScore::widthINF)
 
     object OVERLAP : Modifier("O", MeasurePoint.START, OmScore::overlap)
     object TRACKLESS : Modifier("T", MeasurePoint.START, OmScore::trackless, reverseOrder = true)

@@ -32,6 +32,7 @@ import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
+import com.faendir.zachtronics.bot.utils.newEnumSet
 import jakarta.annotation.PostConstruct
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -184,43 +185,45 @@ class OmSolutionRepository(
         val mRecords = data.getValue(submission.puzzle)
         val unclaimedCategories = OmCategory.values().filter { it.supportsPuzzle(submission.puzzle) && it.supportsScore(submission.score) }.toMutableSet()
         val possibleManifolds = submission.score.manifolds.toMutableSet()
-        val beatingWitnesses = mutableMapOf<OmScoreManifold, CategoryRecord<OmRecord, OmCategory>>()
+        val beatingWitnesses = mutableMapOf<OmScoreManifold, OmMemoryRecord>()
         val beatenCR = mutableListOf<CategoryRecord<OmRecord?, OmCategory>>()
         for (mRecord in mRecords.toSet()) {
             val record = mRecord.record
-            val categories = mRecord.categories
             if (submission.score == record.score) {
                 @Suppress("LiftReturnOrAssignment")
                 if (submission.displayLink != record.displayLink || record.displayLink == null) {
-                    handleBeatenRecord(mRecord, categories, mRecord.frontierManifolds)
-                    return SubmitResult.Updated(null, CategoryRecord(record, categories))
+                    handleBeatenRecord(mRecord, mRecord.categories, mRecord.frontierManifolds)
+                    return SubmitResult.Updated(null, mRecord.toCategoryRecord())
                 } else {
                     return SubmitResult.AlreadyPresent()
                 }
             }
             for (manifold in possibleManifolds.intersect(mRecord.frontierManifolds)) {
+                val categories = mRecord.categories.filterTo(newEnumSet()) { it.associatedManifold == manifold }
+                unclaimedCategories -= categories
                 val compares: List<Int> = manifold.frontierCompare(submission.score, record.score)
-                if (compares.all { it >= 0 }) { // candidate loses or is identical
-                    if (compares.all { it == 0 }) { // subscores identical
-                        /* If we let this case go below, we allow overlapping-domino edit wars
-                         * where 2 solves that are both paretos in manifold 1 but identical in manifold 2
-                         * can keep beating each other.
-                         * Therefore we leave the manifold as valid, but we add a beating witness
-                         * If a submission's possible manifolds all have a beating witness, the submission is rejected.
-                         * This isn't symmetrical, as the incoming solution is at a disadvantage wrt
-                         * the ones in the leaderboard, but finding a minimal graph covering is out of my abilities.
-                         */
-                        unclaimedCategories -= categories
-                    }
-                    else {
+                /* If we let the identical case just go below, we allow overlapping-domino edit wars
+                 * where 2 solves that are both paretos in manifold 1 but identical in manifold 2
+                 * can keep beating each other.
+                 * Therefore we leave the manifold as valid, but we add a beating witness
+                 * If a submission's possible manifolds all have a beating witness, the submission is rejected.
+                 * This isn't symmetrical, as the incoming solution is at a disadvantage wrt
+                 * the ones in the leaderboard, but finding a minimal graph covering is out of my abilities.
+                 */
+                val identical = compares.all { it == 0 } // subscores identical
+                val strictlyWorse = !identical && compares.all { it >= 0 } // candidate loses
+
+                if (strictlyWorse || identical) {
+                    if (strictlyWorse) {
                         possibleManifolds.remove(manifold)
                     }
-                    beatingWitnesses[manifold] = CategoryRecord(record, categories)
+                    beatingWitnesses[manifold] = mRecord
                     if (beatingWitnesses.keys.containsAll(possibleManifolds))
-                        return SubmitResult.NothingBeaten(beatingWitnesses.values.distinctBy { it.record.score })
+                        return SubmitResult.NothingBeaten(
+                            beatingWitnesses.values.distinctBy { it.record.score }.map { it.toCategoryRecord() })
                 }
-                else { // candidate goes in
-                    unclaimedCategories -= categories
+
+                if (!strictlyWorse) {
                     val beatenCategories = categories.filter { category ->
                         category.supportsScore(submission.score) && category.scoreComparator.compare(
                             submission.score,
@@ -230,7 +233,7 @@ class OmSolutionRepository(
                         }
                     }.toSet()
 
-                    val strictlyBetter = compares.all { it <= 0 } // exactly equal is taken by the branch above
+                    val strictlyBetter = !identical && compares.all { it <= 0 } // exactly equal is taken by the branch above
                     if (strictlyBetter || beatenCategories.isNotEmpty()) {
                         val lostManifolds = if (strictlyBetter) setOf(manifold) else emptySet()
                         handleBeatenRecord(mRecord, beatenCategories, lostManifolds)
