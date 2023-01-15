@@ -165,8 +165,8 @@ class OmSolutionRepository(
                 hash = leaderboardScope.currentHash()
             }
             when(result) {
-                is SubmitResult.Success -> result.copy(record = newMRecord.record)
-                is SubmitResult.Updated -> result.copy(record = newMRecord.record)
+                is SubmitResult.Success -> result.copy(record = newMRecord.record.copy(author = submission.author))
+                is SubmitResult.Updated -> result.copy(record = newMRecord.record.copy(author = submission.author))
                 else -> result
             }
         }
@@ -340,7 +340,6 @@ class OmSolutionRepository(
             dataLink = createLink(leaderboardScope, puzzle, score),
             dataPath = path,
             lastModified = Clock.System.now(),
-            author = author
         )
         leaderboardFile.outputStream().buffered().use { json.encodeToStream(record, it) }
         leaderboardScope.add(leaderboardFile)
