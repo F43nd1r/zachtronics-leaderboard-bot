@@ -32,7 +32,6 @@ import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
-import com.faendir.zachtronics.bot.utils.newEnumSet
 import jakarta.annotation.PostConstruct
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -198,9 +197,9 @@ class OmSolutionRepository(
                     return SubmitResult.AlreadyPresent()
                 }
             }
+            unclaimedCategories -= mRecord.categories
+
             for (manifold in possibleManifolds.intersect(mRecord.frontierManifolds)) {
-                val categories = mRecord.categories.filterTo(newEnumSet()) { it.associatedManifold == manifold }
-                unclaimedCategories -= categories
                 val compares: List<Int> = manifold.frontierCompare(submission.score, record.score)
                 /* If we let the identical case just go below, we allow overlapping-domino edit wars
                  * where 2 solves that are both paretos in manifold 1 but identical in manifold 2
@@ -224,13 +223,12 @@ class OmSolutionRepository(
                 }
 
                 if (!strictlyWorse) {
-                    val beatenCategories = categories.filter { category ->
-                        category.supportsScore(submission.score) && category.scoreComparator.compare(
-                            submission.score,
-                            record.score
-                        ).let {
-                            it < 0 || it == 0 && submission.displayLink != record.displayLink
-                        }
+                    val beatenCategories = mRecord.categories.filter { category ->
+                        category.associatedManifold == manifold && category.supportsScore(submission.score) &&
+                                category.scoreComparator.compare(submission.score, record.score)
+                                    .let {
+                                        it < 0 || it == 0 && submission.displayLink != record.displayLink
+                                    }
                     }.toSet()
 
                     val strictlyBetter = !identical && compares.all { it <= 0 } // exactly equal is taken by the branch above
