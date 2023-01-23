@@ -25,7 +25,7 @@ export default function OmRecordCard(props: RecordCardProps<OmRecord>) {
         <RecordCard
             {...props}
             additionalActions={
-                props.record.solution && !props.record.score?.overlap && (props.record.puzzle as any).type !== "PRODUCTION" ? (
+                props.record.solution ? (
                     <Button size="small" variant="outlined" color="primary">
                         <a
                             href={omCloneUrl}
