@@ -34,7 +34,7 @@
         "@types/react-plotly.js": "2.5.2",
         "@types/react-router-hash-link": "2.4.5",
         "prettier": "2.8.3",
-        "rimraf": "4.1.1",
+        "rimraf": "4.1.2",
         "source-map-explorer": "2.5.3"
     },
     "scripts": {
