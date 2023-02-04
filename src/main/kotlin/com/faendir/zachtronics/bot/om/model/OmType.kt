@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,5 +19,5 @@ package com.faendir.zachtronics.bot.om.model
 import com.faendir.zachtronics.bot.model.Type
 
 enum class OmType(override val displayName: String) : Type {
-    NORMAL("normal"), INFINITE("infinite"), PRODUCTION("production"),
+    NORMAL("normal"), POLYMER("polymer"), PRODUCTION("production"),
 }

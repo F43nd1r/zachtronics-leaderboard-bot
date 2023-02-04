@@ -91,7 +91,7 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
                 val puzzles = OmPuzzle.values().filter { it.group == group }
                 val thirdCategory = puzzles.map {
                     when (it.type) {
-                        OmType.NORMAL, OmType.INFINITE -> "Area"
+                        OmType.NORMAL, OmType.POLYMER -> "Area"
                         PRODUCTION -> "Instructions"
                     }
                 }.distinct().joinToString("/")

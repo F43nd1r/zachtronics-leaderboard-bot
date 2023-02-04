@@ -18,12 +18,12 @@ package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.om.model.OmMetric.*
-import com.faendir.zachtronics.bot.om.model.OmType.INFINITE
 import com.faendir.zachtronics.bot.om.model.OmType.NORMAL
+import com.faendir.zachtronics.bot.om.model.OmType.POLYMER
 import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
 
 
-private val NORMAL_TYPES = setOf(NORMAL, INFINITE)
+private val NORMAL_TYPES = setOf(NORMAL, POLYMER)
 private val PRODUCTION_TYPES = setOf(PRODUCTION)
 
 enum class OmCategory(

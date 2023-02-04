@@ -67,7 +67,7 @@ fun JNISolutionVerifier.getMetricSafe(metric: OmSimMetric) = try {
     null
 }
 
-fun JNISolutionVerifier.getScore(): OmScore {
+fun JNISolutionVerifier.getScore(type: OmType): OmScore {
     // null or 0 THROUGHPUT_OUTPUTS means the solution doesn't output infinite products, hence cannot have a rate
     // infinity rate is reserved for sublinear solutions, which don't really exist and aren't supported by omsim
     val rate: Double? = getMetricSafe(OmSimMetric.THROUGHPUT_OUTPUTS)?.takeIf { it != 0 }?.let {
@@ -95,15 +95,15 @@ fun JNISolutionVerifier.getScore(): OmScore {
             if (it != getMetric(OmSimMetric.PARSED_AREA))
                 throw IllegalArgumentException("Stored area value does not match simulation. Run your solution to completion before submitting.")
         },
-        height = getMetric(OmSimMetric.HEIGHT),
-        width = getMetric(OmSimMetric.WIDTH_TIMES_TWO).toDouble() / 2,
+        height = if (type != OmType.PRODUCTION) getMetric(OmSimMetric.HEIGHT) else null,
+        width = if (type != OmType.PRODUCTION) getMetric(OmSimMetric.WIDTH_TIMES_TWO).toDouble() / 2 else null,
 
         rate = rate,
-        areaINF = if (rate == null) null
+        areaINF = if (rate == null || type == OmType.POLYMER) null
         else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.AREA))?.toInfinInt() ?: InfinInt.INFINITY,
-        heightINF = if (rate == null) null
+        heightINF = if (rate == null || type == OmType.PRODUCTION) null
         else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.HEIGHT))?.toInfinInt() ?: InfinInt.INFINITY,
-        widthINF = if (rate == null) null
+        widthINF = if (rate == null || type != OmType.NORMAL) null
         else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.WIDTH_TIMES_TWO))?.toDouble()?.div(2)
             ?: Double.POSITIVE_INFINITY,
     )
@@ -144,10 +144,10 @@ fun createSubmission(gif: String?, gifData: ByteArray?, author: String, inputByt
             throw IllegalArgumentException("Maximum arm rotations over 4096 are banned.")
         }
         val gifCycles = verifier.getMetricSafe(OmSimMetric.VISUAL_LOOP_START_CYCLE)?.let { it to verifier.getMetric(OmSimMetric.VISUAL_LOOP_END_CYCLE) }
-            ?: (0 to if (puzzle.type == OmType.INFINITE && verifier.errorCycle > solution.cycles + 1) solution.cycles + 1 else solution.cycles)
+            ?: (0 to if (puzzle.type == OmType.POLYMER && verifier.errorCycle > solution.cycles + 1) solution.cycles + 1 else solution.cycles)
         return OmSubmission(
             puzzle,
-            verifier.getScore(),
+            verifier.getScore(puzzle.type),
             author,
             gif,
             gifData,

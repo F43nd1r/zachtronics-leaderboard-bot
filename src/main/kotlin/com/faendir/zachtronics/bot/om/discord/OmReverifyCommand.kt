@@ -67,7 +67,7 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.
                 .filter { (record, _) -> score == null || record.score.toDisplayString().equals(score, ignoreCase = true) }
             for ((record, _) in records) {
                 val newScore = JNISolutionVerifier.open(puzzleFile.readBytes(), record.dataPath.readBytes())
-                    .use { verifier -> verifier.getScore() }
+                    .use { verifier -> verifier.getScore(puzzle.type) }
                 if (newScore != record.score) {
                     overrideRecords.add(record to newScore)
                 }

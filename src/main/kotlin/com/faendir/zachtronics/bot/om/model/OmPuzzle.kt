@@ -36,8 +36,8 @@ import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2019
 import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2020
 import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2021
 import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2022
-import com.faendir.zachtronics.bot.om.model.OmType.INFINITE
 import com.faendir.zachtronics.bot.om.model.OmType.NORMAL
+import com.faendir.zachtronics.bot.om.model.OmType.POLYMER
 import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
 import org.springframework.util.ResourceUtils
 import java.io.File
@@ -64,29 +64,29 @@ enum class OmPuzzle(
     ROCKET_PROPELLANT(CHAPTER_2, NORMAL, "Rocket Propellant", "P019"),
     MIST_OF_INCAPACITATION(CHAPTER_2, NORMAL, "Mist of Incapacitation", "P018"),
     EXPLOSIVE_PHIAL(CHAPTER_2, NORMAL, "Explosive Phial", "P017"),
-    ARMOR_FILAMENT(CHAPTER_2, INFINITE, "Armor Filament", "P020"),
+    ARMOR_FILAMENT(CHAPTER_2, POLYMER, "Armor Filament", "P020"),
     COURAGE_POTION(CHAPTER_2, NORMAL, "Courage Potion", "P021"),
     SURRENDER_FLARE(CHAPTER_2, NORMAL, "Surrender Flare", "P022"),
 
     ALCOHOL_SEPARATION(CHAPTER_3, NORMAL, "Alcohol Separation", "P024"),
     WATER_PURIFIER(CHAPTER_3, NORMAL, "Water Purifier", "P025"),
     SEAL_SOLVENT(CHAPTER_3, NORMAL, "Seal Solvent", "P026"),
-    CLIMBING_ROPE_FIBER(CHAPTER_3, INFINITE, "Climbing Rope Fiber", "P027"),
+    CLIMBING_ROPE_FIBER(CHAPTER_3, POLYMER, "Climbing Rope Fiber", "P027"),
     WARMING_TONIC(CHAPTER_3, NORMAL, "Warming Tonic", "P028"),
     LIFE_SENSING_POTION(CHAPTER_3, NORMAL, "Life-Sensing Potion", "P030b"),
-    VERY_DARK_THREAD(CHAPTER_3, INFINITE, "Very Dark Thread", "P029"),
+    VERY_DARK_THREAD(CHAPTER_3, POLYMER, "Very Dark Thread", "P029"),
 
     LITHARGE_SEPARATION(CHAPTER_4, NORMAL, "Litharge Separation", "P031b"),
     STAIN_REMOVER(CHAPTER_4, NORMAL, "Stain Remover", "P034"),
-    SWORD_ALLOY(CHAPTER_4, INFINITE, "Sword Alloy", "P033"),
+    SWORD_ALLOY(CHAPTER_4, POLYMER, "Sword Alloy", "P033"),
     INVISIBLE_INK(CHAPTER_4, NORMAL, "Invisible Ink", "P032"),
     PURIFIED_GOLD(CHAPTER_4, NORMAL, "Purified Gold", "P036"),
     ALCHEMICAL_JEWEL(CHAPTER_4, NORMAL, "Alchemical Jewel", "P035"),
-    GOLDEN_THREAD(CHAPTER_4, INFINITE, "Golden Thread", "P037"),
+    GOLDEN_THREAD(CHAPTER_4, POLYMER, "Golden Thread", "P037"),
 
     MIST_OF_HALLUCINATION(CHAPTER_5, NORMAL, "Mist of Hallucination", "P038"),
     TIMING_CRYSTAL(CHAPTER_5, NORMAL, "Timing Crystal", "P042"),
-    VOLTAIC_COIL(CHAPTER_5, INFINITE, "Voltaic Coil", "P039"),
+    VOLTAIC_COIL(CHAPTER_5, POLYMER, "Voltaic Coil", "P039"),
     UNSTABLE_COMPOUND(CHAPTER_5, NORMAL, "Unstable Compound", "P040"),
     CURIOUS_LIPSTICK(CHAPTER_5, NORMAL, "Curious Lipstick", "P041"),
     UNIVERSAL_SOLVENT(CHAPTER_5, NORMAL, "Universal Solvent", "P043"),
@@ -104,21 +104,21 @@ enum class OmPuzzle(
     RECONSTRUCTED_SOLVENT(CHAPTER_PRODUCTION, PRODUCTION, "Reconstructed Solvent", "P084"),
 
     VAN_BERLO_S_WHEEL(JOURNAL_I, NORMAL, "Van Berlo's Wheel", "P054"),
-    VAN_BERLO_S_CHAIN(JOURNAL_I, INFINITE, "Van Berlo's Chain", "P055"),
+    VAN_BERLO_S_CHAIN(JOURNAL_I, POLYMER, "Van Berlo's Chain", "P055"),
     REACTIVE_CINNABAR(JOURNAL_I, NORMAL, "Reactive Cinnabar", "P056"),
     SILVER_CAUSTIC(JOURNAL_I, NORMAL, "Silver Caustic", "P057"),
     LAMBENT_II_IX(JOURNAL_I, NORMAL, "Lambent II/IX", "P058"),
 
     EXPLORER_S_SALVE(JOURNAL_II, NORMAL, "Explorer's Salve", "P059"),
     PRESERVATIVE_SALT(JOURNAL_II, NORMAL, "Preservative Salt", "P060"),
-    SAILCLOTH_THREAD(JOURNAL_II, INFINITE, "Sailcloth Thread", "P061"),
-    BUOYANT_CABLE(JOURNAL_II, INFINITE, "Buoyant Cable", "P062"),
+    SAILCLOTH_THREAD(JOURNAL_II, POLYMER, "Sailcloth Thread", "P061"),
+    BUOYANT_CABLE(JOURNAL_II, POLYMER, "Buoyant Cable", "P062"),
     SPYGLASS_CRYSTAL(JOURNAL_II, NORMAL, "Spyglass Crystal", "P063"),
 
     RAVARI_S_WHEEL(JOURNAL_III, NORMAL, "Ravari's Wheel", "P064"),
-    LUBRICATING_FILAMENT(JOURNAL_III, INFINITE, "Lubricating Filament", "P065"),
+    LUBRICATING_FILAMENT(JOURNAL_III, POLYMER, "Lubricating Filament", "P065"),
     RESONANT_CRYSTAL(JOURNAL_III, NORMAL, "Resonant Crystal", "P066"),
-    REFINED_BRONZE(JOURNAL_III, INFINITE, "Refined Bronze", "P067"),
+    REFINED_BRONZE(JOURNAL_III, POLYMER, "Refined Bronze", "P067"),
     ABLATIVE_CRYSTAL(JOURNAL_III, NORMAL, "Ablative Crystal", "P068"),
 
     PROOF_OF_COMPLETENESS(JOURNAL_IV, NORMAL, "Proof of Completeness", "P069"),
@@ -128,7 +128,7 @@ enum class OmPuzzle(
 
     GENERAL_ANAESTHETIC(JOURNAL_V, NORMAL, "General Anaesthetic", "P086"),
     WAKEFULNESS_POTION(JOURNAL_V, NORMAL, "Wakefulness Potion", "P088"),
-    SUTURE_THREAD(JOURNAL_V, INFINITE, "Suture Thread", "P085"),
+    SUTURE_THREAD(JOURNAL_V, POLYMER, "Suture Thread", "P085"),
     BLOOD_STANCHING_POWDER(JOURNAL_V, NORMAL, "Blood-Stanching Powder", "P087"),
     TONIC_OF_HYDRATION(JOURNAL_V, NORMAL, "Tonic of Hydration", "P089"),
 
@@ -140,15 +140,15 @@ enum class OmPuzzle(
 
     VAN_BERLO_S_PIVOTS(JOURNAL_VII, NORMAL, "Van Berlo's Pivots", "P096"),
     REACTIVE_GOLD(JOURNAL_VII, NORMAL, "Reactive Gold", "P095"),
-    ASSASSIN_S_FILAMENT(JOURNAL_VII, INFINITE, "Assassin's Filament", "P097"),
+    ASSASSIN_S_FILAMENT(JOURNAL_VII, POLYMER, "Assassin's Filament", "P097"),
     VAPOROUS_SOLVENT(JOURNAL_VII, NORMAL, "Vaporous Solvent", "P098"),
     ALCHEMICAL_SLAG(JOURNAL_VII, NORMAL, "Alchemical Slag", "P099"),
 
     EXPLOSIVE_VICTRITE(JOURNAL_VIII, NORMAL, "Explosive Victrite", "P100"),
-    CELESTIAL_THREAD(JOURNAL_VIII, INFINITE, "Celestial Thread", "P101"),
+    CELESTIAL_THREAD(JOURNAL_VIII, POLYMER, "Celestial Thread", "P101"),
     VISILLARY_ANAESTHETIC(JOURNAL_VIII, NORMAL, "Visillary Anaesthetic", "P102"),
     ANIMISMUS_BUFFER(JOURNAL_VIII, NORMAL, "Animismus Buffer", "P104"),
-    ELECTRUM_SEPARATION(JOURNAL_VIII, INFINITE, "Electrum Separation", "P103"),
+    ELECTRUM_SEPARATION(JOURNAL_VIII, POLYMER, "Electrum Separation", "P103"),
 
     HYPER_VOLATILE_GAS(JOURNAL_IX, NORMAL, "Hyper-volatile Gas", "P106"),
     VANISHING_MATERIAL(JOURNAL_IX, PRODUCTION, "Vanishing Material", "P105"),
@@ -157,7 +157,7 @@ enum class OmPuzzle(
     QUINTESSENTIAL_MEDIUM(JOURNAL_IX, NORMAL, "Quintessential Medium", "P107"),
 
     UNWINDING(TOURNAMENT_2019, NORMAL, "Unwinding", "w1611998067", "week1"),
-    WIRE_FORMING_AND_UNFORMING(TOURNAMENT_2019, INFINITE, "Wire Forming and Unforming", "w1698784331", "week2"),
+    WIRE_FORMING_AND_UNFORMING(TOURNAMENT_2019, POLYMER, "Wire Forming and Unforming", "w1698784331", "week2"),
     CREATIVE_ACCOUNTING(TOURNAMENT_2019, NORMAL, "Creative Accounting", "w1698785633", "week3"),
     VIRULENT_VECTOR(TOURNAMENT_2019, NORMAL, "Virulent Vector", "w1698785238", "week4"),
     DWARVEN_FIRE_WINE(TOURNAMENT_2019, PRODUCTION, "Dwarven Fire Wine", "w1698786588", "week5"),
@@ -169,7 +169,7 @@ enum class OmPuzzle(
 
     POTENT_POTABLES(TOURNAMENT_2020, NORMAL, "Potent Potables", "w2501727721"),
     AMALGAMATED_GOLD_RING(TOURNAMENT_2020, NORMAL, "Amalgamated Gold Ring", "w2501727808"),
-    SWAMP_FIBER(TOURNAMENT_2020, INFINITE, "Swamp Fiber", "w2501727889"),
+    SWAMP_FIBER(TOURNAMENT_2020, POLYMER, "Swamp Fiber", "w2501727889"),
     VOLATILITY_AND_TRANQUILITY(TOURNAMENT_2020, NORMAL, "Volatility and Tranquility", "w2501727977"),
     OVERLOADED(TOURNAMENT_2020, PRODUCTION, "Overloaded", "w2501728107"),
     ACTIVE_POLYMERASE(TOURNAMENT_2020, NORMAL, "Active Polymerase", "w2501728219"),
@@ -180,13 +180,13 @@ enum class OmPuzzle(
     PANACEA_TO_POISON(TOURNAMENT_2021, NORMAL, "Panacea to Poison", "w2450511665", "OM2021_W2"),
     MIST_OF_DOUSING(TOURNAMENT_2021, NORMAL, "Mist of Dousing", "w2450512021", "OM2021_W3"),
     EMERGENCY_ANTIDOTE(TOURNAMENT_2021, PRODUCTION, "Emergency Antidote", "w2450512232", "OM2021_W4"),
-    CALM_BEFORE_THE_STORM(TOURNAMENT_2021, INFINITE, "Calm before the Storm", "w2450512434", "OM2021_W5"),
+    CALM_BEFORE_THE_STORM(TOURNAMENT_2021, POLYMER, "Calm before the Storm", "w2450512434", "OM2021_W5"),
     QUINTESSENTIAL_STABILIZER(TOURNAMENT_2021, NORMAL, "Quintessential Stabilizer", "w2450512626", "OM2021_W7"),
     ELEMENTAL_JEWEL_SETTING(TOURNAMENT_2021, NORMAL, "Elemental Jewel Setting", "w2450512809", "OM2021_W8"),
 
     FLAKE_SALT(TOURNAMENT_2022, NORMAL, "Flake Salt", "w2788066123", "OM2022_FlakeSalt"),
     LEAVE_NO_TRACE(TOURNAMENT_2022, NORMAL, "Leave no Trace", "w2788066279", "OM2022_LeaveNoTrace"),
-    RUST_REMOVAL(TOURNAMENT_2022, INFINITE, "Rust Removal", "w2788066771", "OM2022_RustRemoval"),
+    RUST_REMOVAL(TOURNAMENT_2022, POLYMER, "Rust Removal", "w2788066771", "OM2022_RustRemoval"),
     SOOTHING_SALVE(TOURNAMENT_2022, NORMAL, "Soothing Salve", "w2788066865", "OM2022_SoothingSalve"),
     LUBRICATING_SOLVENTS(TOURNAMENT_2022, NORMAL, "Lubricating Solvents", "w2788066950", "OM2022_LubricatingSolvents"),
     FILM_CRYSTAL(TOURNAMENT_2022, NORMAL, "Film Crystal", "w2788067038", "OM2022_FilmCrystal"),

@@ -36,8 +36,8 @@ data class OmScore(
     // @6
     val cycles: Int,
     val area: Int,
-    val height: Int,
-    val width: Double,
+    val height: Int?,   // tracked for NORMAL,POLYMER
+    val width: Double?, // tracked for NORMAL,POLYMER
 
     // @INF
     /**
@@ -46,9 +46,9 @@ data class OmScore(
      * * null: solve doesn't get to arbitrary large output numbers due to stopping or crashing
      */
     val rate: Double?,
-    val areaINF: InfinInt?,
-    val heightINF: InfinInt?,
-    val widthINF: Double?,
+    val areaINF: InfinInt?,   // tracked for NORMAL,PRODUCTION
+    val heightINF: InfinInt?, // tracked for NORMAL,POLYMER
+    val widthINF: Double?,    // tracked for NORMAL
 ) : Score<OmCategory> {
     // @INF
     @Transient

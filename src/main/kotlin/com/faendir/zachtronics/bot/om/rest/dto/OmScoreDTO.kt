@@ -28,8 +28,8 @@ data class OmScoreDTO(
     // @6
     val cycles: Int,
     val area: Int,
-    val height: Int,
-    val width: Double,
+    val height: Int?,
+    val width: Double?,
 
     // @INF
     val rate: Double?,
