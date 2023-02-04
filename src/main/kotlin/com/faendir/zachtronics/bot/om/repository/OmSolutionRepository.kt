@@ -185,7 +185,7 @@ class OmSolutionRepository(
         val unclaimedCategories = OmCategory.values().filter { it.supportsPuzzle(submission.puzzle) && it.supportsScore(submission.score) }.toMutableSet()
         val possibleManifolds = submission.score.manifolds.toMutableSet()
         val beatingWitnesses = mutableMapOf<OmScoreManifold, OmMemoryRecord>()
-        val beatenCR = mutableListOf<CategoryRecord<OmRecord?, OmCategory>>()
+        val beatenCR = mutableSetOf<CategoryRecord<OmRecord?, OmCategory>>()
         for (mRecord in mRecords.toSet()) {
             val record = mRecord.record
             if (submission.score == record.score) {
