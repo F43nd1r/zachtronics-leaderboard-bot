@@ -3382,13 +3382,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-plotly.js@npm:2.5.2":
-  version: 2.5.2
-  resolution: "@types/react-plotly.js@npm:2.5.2"
+"@types/react-plotly.js@npm:2.6.0":
+  version: 2.6.0
+  resolution: "@types/react-plotly.js@npm:2.6.0"
   dependencies:
     "@types/plotly.js": "*"
     "@types/react": "*"
-  checksum: 0aa528801bc81e05d63aee7f51c05b389912937ad26cf7ca33c491d98b4099fbecf42b7958f409711529ad2b4758a24db9098e8212c9cfd39240c705b77dba31
+  checksum: 91ab4eb8f1ab68add2884f01419884ce9746121681e6c9e883c8ce26e9a549108bf61cdeb2008b64bd1886934d4ac106af4c3c61d1d159e13236b4a1858e6ea8
   languageName: node
   linkType: hard
 
@@ -13847,7 +13847,7 @@ __metadata:
     "@types/plotly.js": 2.12.18
     "@types/react": 18.0.28
     "@types/react-dom": 18.0.11
-    "@types/react-plotly.js": 2.5.2
+    "@types/react-plotly.js": 2.6.0
     "@types/react-router-hash-link": 2.4.5
     d3-format: 3.1.0
     deep-object-diff: 1.1.9
