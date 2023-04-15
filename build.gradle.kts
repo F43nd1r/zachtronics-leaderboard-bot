@@ -106,18 +106,20 @@ kotlinLombok {
     lombokConfigurationFile(file("lombok.config"))
 }
 
+val wantedYarnVersion = file("web/.yarnrc.yml").useLines { lines ->
+    val regex = Regex("yarnPath: \\.yarn/releases/yarn-(?<version>.*)\\.cjs")
+    val (version) = lines.map { regex.find(it) }
+        .filterNotNull()
+        .first()
+        .destructured
+    return@useLines version
+}
+
 frontend {
     nodeVersion.set(libs.versions.nodejs)
     nodeInstallDirectory.set(file("${project.buildDir}/nodejs"))
     yarnEnabled.set(true)
-    yarnVersion.set(file("web/.yarnrc.yml").useLines { lines ->
-        val regex = Regex("yarnPath: \\.yarn/releases/yarn-(?<version>.*)\\.cjs")
-        val (version) = lines.map { regex.find(it) }
-            .filterNotNull()
-            .first()
-            .destructured
-        return@useLines version
-    })
+    yarnVersion.set(wantedYarnVersion)
     packageJsonDirectory.set(file("web"))
     assembleScript.set("build")
     cleanScript.set("clean")
@@ -137,7 +139,7 @@ tasks.enableYarnBerry {
 }
 
 tasks.installYarn {
-    inputs.property("yarnVersion", libs.versions.yarn)
+    inputs.property("yarnVersion", wantedYarnVersion)
     outputs.dir("web/.yarn/releases")
 }
 
