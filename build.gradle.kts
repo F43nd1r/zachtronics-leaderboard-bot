@@ -15,7 +15,6 @@
  */
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 @Suppress("DSL_SCOPE_VIOLATION") // TODO remove when https://youtrack.jetbrains.com/issue/KTIJ-19369 is fixed
 plugins {
@@ -25,7 +24,6 @@ plugins {
     alias(libs.plugins.kotlin.plugin.spring)
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependencyManagement)
-    alias(libs.plugins.gradle.docker)
     alias(libs.plugins.gradle.lombok)
     alias(libs.plugins.gradle.gitProperties)
     alias(libs.plugins.gradle.frontend)
@@ -93,13 +91,6 @@ tasks.withType<Test> {
             }
         }
     })
-}
-
-docker {
-    name = "f43nd1r/zachtronics-leaderboard-bot"
-    tag("latest", "docker.io/f43nd1r/zachtronics-leaderboard-bot")
-    files(tasks.getByName<BootJar>("bootJar").outputs)
-    copySpec.into("build/libs")
 }
 
 java {

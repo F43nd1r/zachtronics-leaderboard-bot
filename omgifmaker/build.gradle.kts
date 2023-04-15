@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 @Suppress("DSL_SCOPE_VIOLATION") // TODO remove when https://youtrack.jetbrains.com/issue/KTIJ-19369 is fixed
 plugins {
@@ -22,13 +21,6 @@ plugins {
     alias(libs.plugins.kotlin.plugin.spring)
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependencyManagement)
-    alias(libs.plugins.gradle.docker)
-}
-
-docker {
-    name = "f43nd1r/opus-magnum-gif-maker"
-    files(tasks.getByName<BootJar>("bootJar").outputs)
-    copySpec.into("build/libs")
 }
 
 dependencies {

@@ -3,7 +3,6 @@ kotlin = "1.8.20"
 spring-boot = "3.0.2"
 spring-dependencyManagement = "1.1.0"
 spring-cloud = "4.0.1"
-gradle-docker = "0.34.0"
 gradle-lombok = "6.6.3"
 gradle-gitProperties = "2.4.1"
 kotlinx-json = "1.5.0"
@@ -41,7 +40,6 @@ nokee-c-library = { id = "dev.nokee.c-library", version.ref = "nokee" }
 
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependencyManagement = { id = "io.spring.dependency-management", version.ref = "spring-dependencyManagement" }
-gradle-docker = { id = "com.palantir.docker", version.ref = "gradle-docker" }
 gradle-lombok = { id = "io.freefair.lombok", version.ref = "gradle-lombok" }
 gradle-gitProperties = { id = "com.gorylenko.gradle-git-properties", version.ref = "gradle-gitProperties" }
 gradle-frontend = { id = "org.siouan.frontend-jdk11", version.ref = "gradle-frontend" }
