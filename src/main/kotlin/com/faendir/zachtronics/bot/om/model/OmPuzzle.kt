@@ -36,6 +36,7 @@ import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2019
 import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2020
 import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2021
 import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2022
+import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2023
 import com.faendir.zachtronics.bot.om.model.OmType.NORMAL
 import com.faendir.zachtronics.bot.om.model.OmType.POLYMER
 import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
@@ -194,6 +195,16 @@ enum class OmPuzzle(
     FULMINATION(TOURNAMENT_2022, NORMAL, "Fulmination", "w2788067677", "OM2022_Fulmination"),
     POTENT_PAINKILLERS(TOURNAMENT_2022, NORMAL, "Potent Painkillers", "w2788067760", "OM2022_PotentPainkillers"),
     RADIO_RECEIVERS(TOURNAMENT_2022, NORMAL, "Radio Receivers", "w2788067896", "OM2022_RadioReceivers"),
+
+    END_GAME(TOURNAMENT_2023, NORMAL, "End Game", "w2946682691", "OM2023_W0_EndGame"),
+    SELF_PRESSURIZING_GAS(TOURNAMENT_2023, NORMAL, "Self-Pressurizing Gas", "w2946682999", "OM2023_W1_SelfPressurizingGas"),
+    WASTE_RECLAMATION(TOURNAMENT_2023, NORMAL, "Waste Reclamation", "w2946683186", "OM2023_W2_WasteReclamation"),
+    HYDROPONIC_SOLUTION(TOURNAMENT_2023, NORMAL, "Hydroponic Solution", "w2946683261", "OM2023_W3_HydroponicSolution"),
+    BIOSTEEL_FILAMENT(TOURNAMENT_2023, NORMAL, "Biosteel Filament", "w2946684529", "OM2023_W4_BiosteelFilament"),
+    PROBE_MODULE(TOURNAMENT_2023, PRODUCTION, "Probe Module", "w2946684660", "OM2023_W5_ProbeModule"),
+    COOL_EARRINGS(TOURNAMENT_2023, NORMAL, "Cool Earrings", "w2946693353", "OM2023_WO_CoolEarrings"),
+    BICRYSTAL_TRANSCEIVER(TOURNAMENT_2023, NORMAL, "Bicrystal Transceiver", "w2946687073", "OM2023_W6_BicrystalTransceiver"),
+    WARP_FUEL(TOURNAMENT_2023, NORMAL, "Warp Fuel", "w2946687209", "OM2023_W7_WarpFuel"),
     ;
 
     override val supportedCategories: List<OmCategory> = OmCategory.values().filter { it.supportsPuzzle(this) }

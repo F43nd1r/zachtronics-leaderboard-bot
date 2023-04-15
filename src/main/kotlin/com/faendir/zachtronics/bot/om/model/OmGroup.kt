@@ -38,5 +38,6 @@ enum class OmGroup(override val displayName: String) : Group {
     TOURNAMENT_2020("Tournament 2020"),
     TOURNAMENT_2021("Tournament 2021"),
     TOURNAMENT_2022("Tournament 2022"),
+    TOURNAMENT_2023("Tournament 2023"),
     ;
 }
