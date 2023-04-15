@@ -110,7 +110,14 @@ frontend {
     nodeVersion.set(libs.versions.nodejs)
     nodeInstallDirectory.set(file("${project.buildDir}/nodejs"))
     yarnEnabled.set(true)
-    yarnVersion.set(libs.versions.yarn)
+    yarnVersion.set(file("web/.yarnrc.yml").useLines { lines ->
+        val regex = Regex("yarnPath: \\.yarn/releases/yarn-(?<version>.*)\\.cjs")
+        val (version) = lines.map { regex.find(it) }
+            .filterNotNull()
+            .first()
+            .destructured
+        return@useLines version
+    })
     packageJsonDirectory.set(file("web"))
     assembleScript.set("build")
     cleanScript.set("clean")
