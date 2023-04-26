@@ -45,7 +45,7 @@ fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> 
         ?: filter {
             //abbreviation
             val words = it.name().split(wordSeparator)
-            search.length == words.size && words.zip(search.asIterable()).map { (word, char) -> word.startsWith(char, ignoreCase = true) }.reduce(Boolean::and)
+            search.length == words.size && words.zip(search.asIterable()).all { (word, char) -> word.startsWith(char, ignoreCase = true) }
         }.takeIf { it.isNotEmpty() }
         ?: filter {
             //words contain match

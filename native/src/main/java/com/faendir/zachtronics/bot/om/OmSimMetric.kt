@@ -74,7 +74,7 @@ enum class PartType(val id: String) {
     EQUILIBRIUM("glyph-marker"),
     INPUT("input"),
     OUTPUT("out-std"),
-    INFINITE("out-rep"),
+    POLYMER("out-rep"),
     TRACK("track"),
     CONDUIT("pipe")
 }

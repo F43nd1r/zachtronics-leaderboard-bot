@@ -137,10 +137,10 @@ fun createSubmission(gif: String?, gifData: ByteArray?, author: String, inputByt
         ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
     val puzzleFile = puzzle.file
     JNISolutionVerifier.open(puzzleFile.readBytes(), solutionBytes).use { verifier ->
-        if ((verifier.getMetricSafe(OmSimMetric.MAXIMUM_TRACK_GAP_POW_2) ?: 0) > 1) {
+        if (verifier.getMetric(OmSimMetric.MAXIMUM_TRACK_GAP_POW_2) > 1) {
             throw IllegalArgumentException("Quantum Tracks are banned.")
         }
-        if ((verifier.getMetricSafe(OmSimMetric.MAXIMUM_ABSOLUTE_ARM_ROTATION) ?: 0) >= 4096) {
+        if (verifier.getMetric(OmSimMetric.MAXIMUM_ABSOLUTE_ARM_ROTATION) >= 4096) {
             throw IllegalArgumentException("Maximum arm rotations over 4096 are banned.")
         }
         val gifCycles = verifier.getMetricSafe(OmSimMetric.VISUAL_LOOP_START_CYCLE)?.let { it to verifier.getMetric(OmSimMetric.VISUAL_LOOP_END_CYCLE) }
