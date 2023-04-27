@@ -19,14 +19,7 @@ package com.faendir.zachtronics.bot.om.repository
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.imgur.ImgurService
 import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.om.model.OmCategory
-import com.faendir.zachtronics.bot.om.model.OmMetric
-import com.faendir.zachtronics.bot.om.model.OmMetrics
-import com.faendir.zachtronics.bot.om.model.OmPuzzle
-import com.faendir.zachtronics.bot.om.model.OmRecord
-import com.faendir.zachtronics.bot.om.model.OmScore
-import com.faendir.zachtronics.bot.om.model.OmScoreManifold
-import com.faendir.zachtronics.bot.om.model.OmSubmission
+import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.om.rest.GifMakerService
 import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
 import com.faendir.zachtronics.bot.repository.CategoryRecord
@@ -191,7 +184,8 @@ class OmSolutionRepository(
             if (submission.score == record.score) {
                 @Suppress("LiftReturnOrAssignment")
                 if (submission.displayLink != record.displayLink || record.displayLink == null) {
-                    handleBeatenRecord(mRecord, mRecord.categories, mRecord.frontierManifolds)
+                    // copies are needed or they'll edit themselves in the handler
+                    handleBeatenRecord(mRecord, mRecord.categories.toSet(), mRecord.frontierManifolds.toSet())
                     return SubmitResult.Updated(null, mRecord.toCategoryRecord())
                 } else {
                     return SubmitResult.AlreadyPresent()
