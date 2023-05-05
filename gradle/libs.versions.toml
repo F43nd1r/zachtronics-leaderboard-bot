@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.8.20"
-spring-boot = "3.0.2"
+spring-boot = "3.0.6"
 spring-dependencyManagement = "1.1.0"
 spring-cloud = "4.0.2"
 gradle-lombok = "8.0.1"
@@ -51,7 +51,7 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref 
 spring-boot-web = { module = "org.springframework.boot:spring-boot-starter-web" }
 spring-boot-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
 spring-boot-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
-mysqlConnector = { module = "mysql:mysql-connector-java" }
+mysqlConnector = { module = "com.mysql:mysql-connector-j" }
 spring-cloud = { module = "org.springframework.cloud:spring-cloud-starter", version.ref = "spring-cloud" }
 discord4j = { module = "com.discord4j:discord4j-core", version.ref = "discord4j" }
 reactor-kotlin = { module = "io.projectreactor.kotlin:reactor-kotlin-extensions", version.ref = "reactor-kotlin" }
