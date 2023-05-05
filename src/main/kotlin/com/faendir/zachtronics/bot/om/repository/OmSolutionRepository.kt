@@ -20,7 +20,6 @@ import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.imgur.ImgurService
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.model.*
-import com.faendir.zachtronics.bot.om.rest.GifMakerService
 import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
@@ -44,7 +43,6 @@ class OmSolutionRepository(
     @Qualifier("omLeaderboardRepository") private val leaderboard: GitRepository,
     private val pageGenerator: OmRedditWikiGenerator,
     private val omUrlMapper: OmUrlMapper,
-    private val omGifMakerService: GifMakerService,
     private val imgurService: ImgurService,
 ) : SolutionRepository<OmCategory, OmPuzzle, OmSubmission, OmRecord> {
     private val json = Json {
@@ -116,8 +114,8 @@ class OmSolutionRepository(
             val dryRunResult = submitDryRun(submission)
             if (dryRunResult is SubmitResult.Success || dryRunResult is SubmitResult.Updated) {
                 if (submission.displayData == null) {
-                    submission.displayData = omGifMakerService.createGif(submission.data, submission.wantedGifCycles.first, submission.wantedGifCycles.second)
-                        ?: throw IllegalArgumentException("Failed to generate gif for your solution.")
+                    // https://i.imgflip.com/7kpu83.jpg
+                    throw IllegalArgumentException("Failed to generate gif for your solution.")
                 }
                 submission.displayLink = imgurService.upload(submission.displayData!!)
             } else {

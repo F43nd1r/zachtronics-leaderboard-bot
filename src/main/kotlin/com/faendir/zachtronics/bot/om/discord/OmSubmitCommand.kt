@@ -48,6 +48,7 @@ class OmSubmitCommand(private val repository: OmSolutionRepository, private val 
     override val ephemeral = true
     private val solutionOption = omSolutionOptionBuilder().required().build()
     private val gifOption = linkOptionBuilder("gif")
+        .required()
         .description("Link to your solution gif/mp4, can be `m1` to scrape it from your last message")
         .build()
     override val options = listOf(solutionOption, gifOption)
