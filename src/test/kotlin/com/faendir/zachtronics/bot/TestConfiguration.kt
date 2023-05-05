@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot
 import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.reddit.RedditService
+import com.faendir.zachtronics.bot.testutils.JGitNoExternalConfigReader
 import com.faendir.zachtronics.bot.testutils.TestGitRepository
 import com.faendir.zachtronics.bot.testutils.TestRedditService
 import discord4j.core.GatewayDiscordClient
@@ -26,6 +27,7 @@ import discord4j.rest.RestClient
 import io.mockk.every
 import io.mockk.mockk
 import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.util.SystemReader
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cloud.context.restart.RestartEndpoint
 import org.springframework.context.annotation.Bean
@@ -96,6 +98,12 @@ class TestConfiguration(private val gitProperties: GitProperties) {
         val target = Files.createTempDirectory(resourceDir.name).toFile()
         resourceDir.copyRecursively(target)
         return target
+    }
+
+    companion object {
+        init {
+            JGitNoExternalConfigReader.install()
+        }
     }
 }
 

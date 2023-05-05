@@ -24,7 +24,6 @@ import java.io.Closeable;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class JNISolutionVerifier implements Closeable {
     static {
-        NativeLoader.loadLibrary(JNISolutionVerifier.class.getClassLoader(), "omsim");
         NativeLoader.loadLibrary(JNISolutionVerifier.class.getClassLoader(), "native");
     }
 

@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.git
 
 import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.createGitRepositoryFrom
+import com.faendir.zachtronics.bot.testutils.JGitNoExternalConfigReader
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
@@ -34,9 +35,12 @@ import strikt.assertions.isFalse
 import strikt.assertions.isTrue
 import java.io.File
 import java.nio.file.Files
-import java.time.Instant
 
 class GitRepositoryTest {
+    init {
+        JGitNoExternalConfigReader.install()
+    }
+
     private val gitProperties = GitProperties().apply {
         accessToken = ""
         username = "zachtronics-bot-test"

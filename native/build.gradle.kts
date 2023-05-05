@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-@Suppress("DSL_SCOPE_VIOLATION") // TODO remove when https://youtrack.jetbrains.com/issue/KTIJ-19369 is fixed
 plugins {
     java
     alias(libs.plugins.kotlin.jvm)
@@ -25,12 +23,17 @@ plugins {
 
 group = ""
 
+sourceSets {
+    create("omsim")
+}
+
 library {
     targetMachines.set(listOf(machines.linux.x86_64))
 
-    dependencies {
-        nativeImplementation(projects.omsim)
-    }
+    val omsimVerifyFiles = file("src/omsim/c/Makefile").readLines().first { it.startsWith("libverify.so: ") }.removePrefix("libverify.so: ").split(" ")
+
+    cSources.from(omsimVerifyFiles.filter { it.endsWith(".c") }.map { file("src/omsim/c/$it") })
+    privateHeaders.from(omsimVerifyFiles.filter { it.endsWith(".h") }.map { file("src/omsim/c/$it") })
 }
 
 dependencies {
@@ -46,28 +49,5 @@ tasks {
     }
     withType<CCompile> {
         isOptimized = true
-        compilerArgs.addAll(
-            listOf(
-                "-Wall",
-                "-Wextra",
-                "-Wfloat-equal",
-                "-Wundef",
-                "-Wshadow",
-                "-Wpointer-arith",
-                "-Wcast-align",
-                "-Wstrict-prototypes",
-                "-Wstrict-overflow=5",
-                "-Wwrite-strings",
-                "-Waggregate-return",
-                "-Wcast-qual",
-                "-Wswitch-default",
-                "-Wswitch-enum",
-                "-Wconversion",
-                "-Wunreachable-code",
-                "-Wmissing-declarations",
-                "-Werror",
-                "-std=c11"
-            )
-        )
     }
 }
