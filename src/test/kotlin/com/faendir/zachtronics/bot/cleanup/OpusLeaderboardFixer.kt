@@ -67,7 +67,7 @@ class OpusLeaderboardFixer {
             accessToken = ""
             username = "zachtronics-leaderboard-bot"
         }, repo)
-        val repository = OmSolutionRepository(gitRepo, mockk(relaxed = true), OmUrlMapper(), mockk(relaxed = true), mockk(relaxed = true))
+        val repository = OmSolutionRepository(gitRepo, mockk(relaxed = true), OmUrlMapper(), mockk(relaxed = true))
 
         for (puzzle in OmPuzzle.values()) {
             println("Doing ${puzzle.name}")
@@ -93,7 +93,7 @@ class OpusLeaderboardFixer {
             accessToken = ""
             username = "zachtronics-leaderboard-bot"
         })
-        val repository = OmSolutionRepository(newRepo, mockk(relaxed = true), OmUrlMapper(), mockk(relaxed = true), mockk(relaxed = true))
+        val repository = OmSolutionRepository(newRepo, mockk(relaxed = true), OmUrlMapper(), mockk(relaxed = true))
 
         for (file in getAllRecordFiles(repo, OmPuzzle.STABILIZED_WATER)) {
             println("${file.name} is being processed")
