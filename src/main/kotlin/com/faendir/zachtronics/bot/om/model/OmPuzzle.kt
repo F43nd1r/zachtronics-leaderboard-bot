@@ -200,7 +200,7 @@ enum class OmPuzzle(
     SELF_PRESSURIZING_GAS(TOURNAMENT_2023, NORMAL, "Self-Pressurizing Gas", "w2946682999", "OM2023_W1_SelfPressurizingGas"),
     WASTE_RECLAMATION(TOURNAMENT_2023, NORMAL, "Waste Reclamation", "w2946683186", "OM2023_W2_WasteReclamation"),
     HYDROPONIC_SOLUTION(TOURNAMENT_2023, NORMAL, "Hydroponic Solution", "w2946683261", "OM2023_W3_HydroponicSolution"),
-    BIOSTEEL_FILAMENT(TOURNAMENT_2023, NORMAL, "Biosteel Filament", "w2946684529", "OM2023_W4_BiosteelFilament"),
+    BIOSTEEL_FILAMENT(TOURNAMENT_2023, POLYMER, "Biosteel Filament", "w2946684529", "OM2023_W4_BiosteelFilament"),
     PROBE_MODULE(TOURNAMENT_2023, PRODUCTION, "Probe Module", "w2946684660", "OM2023_W5_ProbeModule"),
     COOL_EARRINGS(TOURNAMENT_2023, NORMAL, "Cool Earrings", "w2946693353", "OM2023_WO_CoolEarrings"),
     BICRYSTAL_TRANSCEIVER(TOURNAMENT_2023, NORMAL, "Bicrystal Transceiver", "w2946687073", "OM2023_W6_BicrystalTransceiver"),
