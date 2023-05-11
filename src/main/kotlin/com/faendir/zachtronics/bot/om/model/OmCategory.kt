@@ -79,7 +79,7 @@ enum class OmCategory(
     TIA(NORMAL_TYPES, TRACKLESS_INSTRUCTION, AREA, COST),
 
     TG(NORMAL_TYPES, TRACKLESS, COST, CYCLES, displayName = "TG"),
-    TC(NORMAL_TYPES, TRACKLESS, AREA, COST, displayName = "TC"),
+    TC(NORMAL_TYPES, TRACKLESS, CYCLES, COST, displayName = "TC"),
 
     RG(NORMAL_TYPES, RATE, COST, AREA_INF),
     RA(setOf(NORMAL), RATE, AREA_INF, COST, displayName = "RA"),
