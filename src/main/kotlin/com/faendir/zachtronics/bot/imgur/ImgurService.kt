@@ -20,6 +20,7 @@ import com.faendir.zachtronics.bot.config.ImgurProperties
 import com.fasterxml.jackson.databind.JsonNode
 import kotlinx.serialization.Serializable
 import org.slf4j.LoggerFactory
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -29,12 +30,15 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.HttpStatusCodeException
-import org.springframework.web.client.RestTemplate
+import java.time.Duration
 
 @Service
-class ImgurService(private val imgurProperties: ImgurProperties) {
+class ImgurService(private val imgurProperties: ImgurProperties, restTemplateBuilder: RestTemplateBuilder) {
 
-    private val restTemplate = RestTemplate()
+    private val restTemplate = restTemplateBuilder
+        .setReadTimeout(Duration.ofMinutes(5))
+        .setConnectTimeout(Duration.ofMinutes(5))
+        .build()
 
     private var token: String? = null
 

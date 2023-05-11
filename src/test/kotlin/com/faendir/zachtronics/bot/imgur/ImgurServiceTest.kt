@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.imgur
 import com.faendir.zachtronics.bot.config.ImgurProperties
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.springframework.boot.web.client.RestTemplateBuilder
 
 @Disabled
 internal class ImgurServiceTest {
@@ -27,7 +28,7 @@ internal class ImgurServiceTest {
         refreshToken = ""
         clientId = ""
         clientSecret = ""
-    })
+    }, RestTemplateBuilder())
 
     @Test
     fun upload() {
