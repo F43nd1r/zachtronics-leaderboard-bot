@@ -15,7 +15,7 @@
  */
 
 import Box from "@mui/material/Box"
-import { Tab, Tabs } from "@mui/material"
+import { Button, Tab, Tabs } from "@mui/material"
 import { Link, Navigate, Outlet, useMatch } from "react-router-dom"
 import { usePersistedState } from "../../../utils/usePersistedState"
 import { lazy, ReactElement, useEffect } from "react"
@@ -84,6 +84,8 @@ export default function PuzzleView() {
                     borderBottom: 1,
                     marginBottom: "1rem",
                     borderColor: "divider",
+                    display: "flex",
+                    justifyContent: "space-between",
                 }}
             >
                 {activeTab !== undefined ? (
@@ -94,6 +96,42 @@ export default function PuzzleView() {
                     </Tabs>
                 ) : (
                     <LoadingIndicator />
+                )}
+                {puzzleId?.match(/w[0-9]+/) ? (
+                    <Button
+                        size="small"
+                        variant="outlined"
+                        color="primary"
+                        style={{
+                            marginTop: "auto",
+                            marginBottom: "auto",
+                        }}
+                    >
+                        <a
+                            href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${puzzleId.substring(1)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{
+                                color: "inherit",
+                                textDecoration: "none",
+                            }}
+                        >
+                            Get on Steam
+                        </a>
+                    </Button>
+                ) : (
+                    <Button
+                        size="small"
+                        variant="outlined"
+                        color="primary"
+                        disabled={true}
+                        style={{
+                            marginTop: "auto",
+                            marginBottom: "auto",
+                        }}
+                    >
+                        Built in puzzle
+                    </Button>
                 )}
             </Box>
             <Outlet />
