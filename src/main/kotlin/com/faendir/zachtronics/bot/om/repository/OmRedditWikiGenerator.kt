@@ -38,12 +38,8 @@ import com.faendir.zachtronics.bot.om.model.OmCategory.GXP
 import com.faendir.zachtronics.bot.om.model.OmCategory.IC
 import com.faendir.zachtronics.bot.om.model.OmCategory.IG
 import com.faendir.zachtronics.bot.om.model.OmCategory.IX
-import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_A
-import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_C
-import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_CP
 import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_G
 import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_GP
-import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_I
 import com.faendir.zachtronics.bot.om.model.OmGroup
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
@@ -58,7 +54,7 @@ import java.util.*
 
 @Component
 class OmRedditWikiGenerator(private val reddit: RedditService) {
-    private val categories = listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SUM_G, SUM_GP, SUM_C, SUM_CP, SUM_A, SUM_I)
+    private val categories = listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SUM_G, SUM_GP)
     companion object {
         private const val wikiPage = "index"
     }
@@ -66,7 +62,7 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
     private val costCategories = listOf(GC, GA, GX, GCP, GI, GXP)
     private val cycleCategories = listOf(CG, CA, CX, CGP, CI, CXP)
     private val areaInstructionCategories = listOf(AG, AC, AX, IG, IC, IX)
-    private val sumCategories = listOf(SUM_G, SUM_GP, SUM_C, SUM_CP, SUM_A, SUM_I)
+    private val sumCategories = listOf(SUM_G, SUM_GP)
 
     private fun filterRecords(records: Collection<OmMemoryRecord>, filter: List<OmCategory>): MutableList<Pair<OmRecord, List<OmCategory>>> {
         return records.map { mr -> Pair(mr.record, mr.categories.filter { filter.contains(it) }.sorted()) }
