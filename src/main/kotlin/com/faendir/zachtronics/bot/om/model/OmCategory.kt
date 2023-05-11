@@ -85,8 +85,8 @@ enum class OmCategory(
     RA(setOf(NORMAL), RATE, AREA_INF, COST, displayName = "RA"),
     RI(NORMAL_TYPES, RATE, INSTRUCTIONS, COST),
 
-    HR(NORMAL_TYPES, OmMetric.HEIGHT, RATE, COST, displayName = "HR"),
-    WR(setOf(NORMAL), OmMetric.WIDTH, RATE, COST, displayName = "WR"),
+    HR(NORMAL_TYPES, HEIGHT_INF, RATE, COST, displayName = "HR"),
+    WR(setOf(NORMAL), WIDTH_INF, RATE, COST, displayName = "WR"),
 
     OR(NORMAL_TYPES, OVERLAP, RATE),
     ;
