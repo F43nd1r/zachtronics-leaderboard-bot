@@ -37,6 +37,7 @@ import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2020
 import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2021
 import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2022
 import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2023
+import com.faendir.zachtronics.bot.om.model.OmGroup.WEEKLIES_1
 import com.faendir.zachtronics.bot.om.model.OmType.NORMAL
 import com.faendir.zachtronics.bot.om.model.OmType.POLYMER
 import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
@@ -205,6 +206,17 @@ enum class OmPuzzle(
     COOL_EARRINGS(TOURNAMENT_2023, NORMAL, "Cool Earrings", "w2946693353", "OM2023_WO_CoolEarrings"),
     BICRYSTAL_TRANSCEIVER(TOURNAMENT_2023, NORMAL, "Bicrystal Transceiver", "w2946687073", "OM2023_W6_BicrystalTransceiver"),
     WARP_FUEL(TOURNAMENT_2023, NORMAL, "Warp Fuel", "w2946687209", "OM2023_W7_WarpFuel"),
+
+    HORN_SILVER(WEEKLIES_1, NORMAL, "Horn Silver", "w2513871683", "OM2021Demo_HornSilver"),
+    GREEN_VITRIOL(WEEKLIES_1, NORMAL, "Green Vitriol", "w2539581468", "OM2021Demo_GreenVitriol"),
+    FERROUS_WHEEL(WEEKLIES_1, NORMAL, "Ferrous Wheel", "w2565611826", "OM2021Demo_FerrousWheel"),
+    ARTIFICIAL_ORE(WEEKLIES_1, PRODUCTION, "Artificial Ore", "w2591419339", "OM2021Demo_ArtificialOre"),
+    MARTIAL_REGULUS(WEEKLIES_1, NORMAL, "Martial Regulus", "w2827119474", "OM2022Weeklies_MartialRegulus"),
+    PHILOSOPHERS_CATALYST(WEEKLIES_1, NORMAL, "Philosopher's Catalyst", "w2868339730", "OM2022Weeklies_PhilosophersCatalyst"),
+    NIGHTMARE_FUEL(WEEKLIES_1, NORMAL, "Nightmare Fuel", "w2829050875", "OM2022Weeklies_NightmareFuel"),
+    IGNITION_CORD(WEEKLIES_1, POLYMER, "Ignition Cord", "w2839120106", "OM2022Weeklies_IgnitionCord"),
+    CUPRITE(WEEKLIES_1, NORMAL, "Cuprite", "w2868328394", "OM2022Weeklies_Cuprite"),
+    LUSTROUS_SYRUP(WEEKLIES_1, NORMAL, "Lustrous Syrup", "w2868331650", "OM2022Weeklies_LustrousSyrup"),
     ;
 
     override val supportedCategories: List<OmCategory> = OmCategory.values().filter { it.supportsPuzzle(this) }
