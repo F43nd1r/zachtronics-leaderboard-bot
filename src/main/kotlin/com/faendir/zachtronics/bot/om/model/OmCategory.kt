@@ -88,7 +88,7 @@ enum class OmCategory(
     HR(NORMAL_TYPES, HEIGHT_INF, RATE, COST, displayName = "HR"),
     WR(setOf(NORMAL), WIDTH_INF, RATE, COST, displayName = "WR"),
 
-    OR(NORMAL_TYPES, OVERLAP, RATE),
+    OR(NORMAL_TYPES, OVERLAP, RATE, COST),
     ;
 
     override val metrics: List<OmMetric> = metricsVararg.toList()
