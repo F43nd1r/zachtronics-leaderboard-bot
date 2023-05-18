@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,7 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.om.rest.dto
-
-import com.faendir.zachtronics.bot.om.model.OmCategory
-
-data class OmCategoryDTO(val id: String, val displayName: String, val metrics: List<String>, val puzzleTypes: List<String>, val manifold: OmScoreManifoldDTO)
-
-fun OmCategory.toDTO() = OmCategoryDTO(
-    id = name,
-    displayName = displayName,
-    metrics = metrics.map { metric -> metric.description },
-    puzzleTypes = supportedTypes.map { it.name },
-    manifold = associatedManifold.toDTO()
-)
+export default interface Manifold {
+    id: string
+    displayName: string
+}

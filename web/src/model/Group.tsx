@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
+import Collection from "./Collection"
+
 export default interface Group {
     id: string
     displayName: string
+    collection: Collection
 }

@@ -14,46 +14,51 @@
  * limitations under the License.
  */
 
-import { Box, Divider, List, ListItemText, useTheme, Link as ExternalLink } from "@mui/material"
+import { Box, Divider, Link as ExternalLink, List, ListItemText, useTheme } from "@mui/material"
 import ExpandableListItem from "../components/ExpandableListItem"
 import { Extension, Folder } from "@mui/icons-material"
 import CategoryIcon from "@mui/icons-material/Category"
-import { SxProps } from "@mui/system"
-import { Theme } from "@mui/material/styles"
 import LinkListItem from "../components/LinkListItem"
 import Group from "../model/Group"
 import Puzzle from "../model/Puzzle"
 import Category from "../model/Category"
 import { Link, useMatch } from "react-router-dom"
 import ApiResource from "../utils/ApiResource"
+import Collection from "../model/Collection"
+import { CustomMap } from "../utils/CustomMap"
+import Manifold from "../model/Manifold"
+
+function groupPuzzles(puzzles: Puzzle[]) {
+    return puzzles.reduce<CustomMap<Collection, CustomMap<Group, Puzzle[]>>>((acc, puzzle) => {
+        if (!acc.has(puzzle.group.collection)) acc.set(puzzle.group.collection, new CustomMap((group) => group.id))
+        const collection = acc.get(puzzle.group.collection)!
+        if (!collection.has(puzzle.group)) collection.set(puzzle.group, [puzzle])
+        else collection.get(puzzle.group)!.push(puzzle)
+        return acc
+    }, new CustomMap((collection) => collection.id))
+}
 
 function Groups() {
-    const match = useMatch("/puzzles/*")
+    const match = useMatch("/puzzles/:puzzleId/*")
+    const puzzleId = match?.params?.puzzleId
 
     return (
         <List>
-            <ExpandableListItem
-                title={"Puzzles"}
-                icon={<Extension />}
-                content={ApiResource<Puzzle[]>({
-                    url: "/om/puzzles",
-                    element: (puzzles) => (
-                        <>
-                            {[
-                                ...puzzles
-                                    .reduce<Map<string, Puzzle[]>>((acc, puzzle) => {
-                                        if (!acc.has(puzzle.group.id)) acc.set(puzzle.group.id, [puzzle])
-                                        else acc.get(puzzle.group.id)!.push(puzzle)
-                                        return acc
-                                    }, new Map())
-                                    .entries(),
-                            ].map(([group, puzzles]) => (
-                                <Puzzles group={puzzles[0].group} puzzles={puzzles} key={group} sx={{ pl: 4 }} />
+            <ApiResource<Puzzle[]>
+                url={"/om/puzzles"}
+                element={(puzzles) =>
+                    groupPuzzles(puzzles).map((collection, groups) => (
+                        <ExpandableListItem
+                            key={collection.id}
+                            title={`${collection.displayName} Puzzles`}
+                            icon={<Extension />}
+                            content={groups.map((group, puzzles) => (
+                                <Puzzles group={group} puzzles={puzzles} key={group.id} selectedPuzzleId={puzzleId} />
                             ))}
-                        </>
-                    ),
-                })}
-                open={match !== null}
+                            open={groups.someValue((puzzles) => puzzles.some((puzzle) => puzzleId === puzzle.id))}
+                        />
+                    ))
+                }
             />
         </List>
     )
@@ -62,30 +67,32 @@ function Groups() {
 interface PuzzlesProps {
     group: Group
     puzzles: Puzzle[]
-    sx?: SxProps<Theme>
+    selectedPuzzleId: string | undefined
 }
 
-function Puzzles(props: PuzzlesProps) {
-    const match = useMatch("/puzzles/:puzzleId/*")
-    const puzzleId = match?.params?.puzzleId
+function Puzzles({ group, puzzles, selectedPuzzleId }: PuzzlesProps) {
     return (
-        <List sx={props.sx}>
+        <List sx={{ pl: 4 }}>
             <ExpandableListItem
-                title={props.group.displayName}
+                title={group.displayName}
                 icon={<Folder />}
-                content={
-                    <>
-                        {props.puzzles.map((puzzle) => (
-                            <LinkListItem sx={{ pl: 4 }} key={puzzle.id} to={`/puzzles/${puzzle.id}`} selected={puzzleId === puzzle.id}>
-                                <ListItemText primary={puzzle.displayName} />
-                            </LinkListItem>
-                        ))}
-                    </>
-                }
-                open={props.puzzles.some((puzzle) => puzzleId === puzzle.id)}
+                content={puzzles.map((puzzle) => (
+                    <LinkListItem sx={{ pl: 4 }} key={puzzle.id} to={`/puzzles/${puzzle.id}`} selected={selectedPuzzleId === puzzle.id}>
+                        <ListItemText primary={puzzle.displayName} />
+                    </LinkListItem>
+                ))}
+                open={puzzles.some((puzzle) => selectedPuzzleId === puzzle.id)}
             />
         </List>
     )
+}
+
+function groupCategories(categories: Category[]) {
+    return categories.reduce<CustomMap<Manifold, Category[]>>((acc, category) => {
+        if (!acc.has(category.manifold)) acc.set(category.manifold, [category])
+        else acc.get(category.manifold)!.push(category)
+        return acc
+    }, new CustomMap((manifold) => manifold.id))
 }
 
 function Categories() {
@@ -93,24 +100,28 @@ function Categories() {
     const categoryId = match?.params?.categoryId
     return (
         <List>
-            <ExpandableListItem
-                title={"Categories"}
-                icon={<CategoryIcon />}
-                content={ApiResource<Category[]>({
-                    url: "/om/categories",
-                    element: (categories) => (
-                        <>
-                            {categories
+            <ApiResource<Category[]>
+                url={"/om/categories"}
+                element={(categories) =>
+                    groupCategories(categories).map((manifold, categories) => (
+                        <ExpandableListItem
+                            title={`Categories ${manifold.displayName}`}
+                            icon={<CategoryIcon />}
+                            content={categories
                                 .sort((a, b) => (a.puzzleTypes.includes("PRODUCTION") && !b.puzzleTypes.includes("PRODUCTION") ? 1 : -1))
                                 .map((category) => (
                                     <LinkListItem sx={{ pl: 4 }} key={category.id} to={`/categories/${category.id}`} selected={categoryId === category.id}>
-                                        <ListItemText primary={`${category.displayName} (${category.metrics.join("→")})${category.puzzleTypes.includes("PRODUCTION") ? " (Production)" : ""}`} />
+                                        <ListItemText
+                                            primary={`${category.displayName} (${category.metrics.join("→")})${
+                                                category.puzzleTypes.includes("PRODUCTION") ? " (Production)" : ""
+                                            }`}
+                                        />
                                     </LinkListItem>
                                 ))}
-                        </>
-                    ),
-                })}
-                open={categoryId !== undefined}
+                            open={categories.some((category) => categoryId === category.id)}
+                        />
+                    ))
+                }
             />
         </List>
     )

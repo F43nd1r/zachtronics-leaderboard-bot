@@ -29,7 +29,7 @@ private val PRODUCTION_TYPES = setOf(PRODUCTION)
 enum class OmCategory(
     override val supportedTypes: Set<OmType> = OmType.values().toSet(),
     vararg metricsVararg: OmMetric,
-    override val displayName: String = metricsVararg.take(if (metricsVararg.first() is OmMetric.Modifier) 3 else 2).joinToString("") { it.displayName }
+    override val displayName: String = metricsVararg.take(if (metricsVararg.first() is Modifier) 3 else 2).joinToString("") { it.displayName }
 ) : Category {
     GC(NORMAL_TYPES, COST, CYCLES, AREA),
     GA(NORMAL_TYPES, COST, AREA, CYCLES),

@@ -18,6 +18,6 @@ package com.faendir.zachtronics.bot.om.rest.dto
 
 import com.faendir.zachtronics.bot.om.model.OmGroup
 
-data class OmGroupDTO(val id: String, val displayName: String)
+data class OmGroupDTO(val id: String, val displayName: String, val collection: OmCollectionDTO)
 
-fun OmGroup.toDTO() = OmGroupDTO(name, displayName)
+fun OmGroup.toDTO() = OmGroupDTO(name, displayName, collection.toDTO())

@@ -20,6 +20,8 @@ import com.faendir.zachtronics.bot.om.createSubmission
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmGroup
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.model.OmCollection
+import com.faendir.zachtronics.bot.om.model.OmScoreManifold
 import com.faendir.zachtronics.bot.om.notifyOf
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.om.rest.dto.OmCategoryDTO
@@ -28,6 +30,8 @@ import com.faendir.zachtronics.bot.om.rest.dto.OmPuzzleDTO
 import com.faendir.zachtronics.bot.om.rest.dto.OmRecordChangeDTO
 import com.faendir.zachtronics.bot.om.rest.dto.OmRecordDTO
 import com.faendir.zachtronics.bot.om.rest.dto.OmSubmissionDTO
+import com.faendir.zachtronics.bot.om.rest.dto.OmCollectionDTO
+import com.faendir.zachtronics.bot.om.rest.dto.OmScoreManifoldDTO
 import com.faendir.zachtronics.bot.om.rest.dto.emptyRecord
 import com.faendir.zachtronics.bot.om.rest.dto.id
 import com.faendir.zachtronics.bot.om.rest.dto.toDTO
@@ -68,6 +72,15 @@ class OmController(private val repository: OmSolutionRepository, private val dis
 
     override val groups: List<OmGroupDTO> = OmGroup.values().map { it.toDTO() }
 
+    @get:GetMapping("/collections", produces = [MediaType.APPLICATION_JSON_VALUE])
+    val collections: List<OmCollectionDTO> = OmCollection.values().map { it.toDTO() }
+
+    @GetMapping(path = ["/collection/{collectionId}/groups"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getGroupsByCollection(@PathVariable collectionId: String) : List<OmGroupDTO> {
+        val collection = findCollection(collectionId)
+        return OmGroup.values().filter { it.collection == collection }.map { it.toDTO() }
+    }
+
     override val puzzles: List<OmPuzzleDTO> = OmPuzzle.values().map { it.toDTO() }
 
     override fun getPuzzle(puzzleId: String): OmPuzzleDTO = findPuzzle(puzzleId).toDTO()
@@ -83,6 +96,15 @@ class OmController(private val repository: OmSolutionRepository, private val dis
     override val categories: List<OmCategoryDTO> = OmCategory.values().map { it.toDTO() }
 
     override fun getCategory(categoryId: String): OmCategoryDTO = findCategory(categoryId).toDTO()
+
+    @get:GetMapping("/manifolds", produces = [MediaType.APPLICATION_JSON_VALUE])
+    val manifolds: List<OmScoreManifoldDTO> = OmScoreManifold.values().map { it.toDTO() }
+
+    @GetMapping(path = ["/manifold/{manifoldId}/categories"], produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getCategoriesByManifold(@PathVariable manifoldId: String) : List<OmCategoryDTO> {
+        val manifold = findManifold(manifoldId)
+        return OmCategory.values().filter { it.associatedManifold == manifold }.map { it.toDTO() }
+    }
 
     override fun listRecords(puzzleId: String, includeFrontier: Boolean?): List<OmRecordDTO> {
         val puzzle = findPuzzle(puzzleId)
@@ -148,4 +170,10 @@ private fun findCategory(categoryId: String) = OmCategory.values().find { it.nam
 
 private fun findGroup(groupId: String) =
     OmGroup.values().find { it.name.equals(groupId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Group $groupId not found.")
+
+private fun findCollection(collectionId: String) =
+    OmCollection.values().find { it.name.equals(collectionId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Collection $collectionId not found.")
+
+private fun findManifold(manifoldId: String) =
+    OmScoreManifold.values().find { it.name.equals(manifoldId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Manifold $manifoldId not found.")
 

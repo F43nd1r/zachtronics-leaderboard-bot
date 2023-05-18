@@ -17,28 +17,31 @@
 package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.Group
+import com.faendir.zachtronics.bot.om.model.OmCollection.CAMPAIGN
+import com.faendir.zachtronics.bot.om.model.OmCollection.COMMUNITY
+import com.faendir.zachtronics.bot.om.model.OmCollection.JOURNAL
 
-enum class OmGroup(override val displayName: String) : Group {
-    CHAPTER_1("Chapter 1"),
-    CHAPTER_2("Chapter 2"),
-    CHAPTER_3("Chapter 3"),
-    CHAPTER_4("Chapter 4"),
-    CHAPTER_5("Chapter 5"),
-    CHAPTER_PRODUCTION("Production Alchemy"),
-    JOURNAL_I("Journal I"),
-    JOURNAL_II("Journal II"),
-    JOURNAL_III("Journal III"),
-    JOURNAL_IV("Journal IV"),
-    JOURNAL_V("Journal V"),
-    JOURNAL_VI("Journal VI"),
-    JOURNAL_VII("Journal VII"),
-    JOURNAL_VIII("Journal VIII"),
-    JOURNAL_IX("Journal IX"),
-    TOURNAMENT_2019("Tournament 2019"),
-    TOURNAMENT_2020("Tournament 2020"),
-    TOURNAMENT_2021("Tournament 2021"),
-    TOURNAMENT_2022("Tournament 2022"),
-    TOURNAMENT_2023("Tournament 2023"),
-    WEEKLIES_1("Best Of Weeklies 1")
+enum class OmGroup(val collection: OmCollection, override val displayName: String) : Group {
+    CHAPTER_1(CAMPAIGN, "Chapter 1"),
+    CHAPTER_2(CAMPAIGN, "Chapter 2"),
+    CHAPTER_3(CAMPAIGN, "Chapter 3"),
+    CHAPTER_4(CAMPAIGN, "Chapter 4"),
+    CHAPTER_5(CAMPAIGN, "Chapter 5"),
+    CHAPTER_PRODUCTION(CAMPAIGN, "Production Alchemy"),
+    JOURNAL_I(JOURNAL, "Journal I"),
+    JOURNAL_II(JOURNAL, "Journal II"),
+    JOURNAL_III(JOURNAL, "Journal III"),
+    JOURNAL_IV(JOURNAL, "Journal IV"),
+    JOURNAL_V(JOURNAL, "Journal V"),
+    JOURNAL_VI(JOURNAL, "Journal VI"),
+    JOURNAL_VII(JOURNAL, "Journal VII"),
+    JOURNAL_VIII(JOURNAL, "Journal VIII"),
+    JOURNAL_IX(JOURNAL, "Journal IX"),
+    TOURNAMENT_2019(COMMUNITY, "Tournament 2019"),
+    TOURNAMENT_2020(COMMUNITY, "Tournament 2020"),
+    TOURNAMENT_2021(COMMUNITY, "Tournament 2021"),
+    TOURNAMENT_2022(COMMUNITY, "Tournament 2022"),
+    TOURNAMENT_2023(COMMUNITY, "Tournament 2023"),
+    WEEKLIES_1(COMMUNITY, "Best Of Weeklies 1"),
     ;
 }
