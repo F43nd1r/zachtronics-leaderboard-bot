@@ -22,7 +22,7 @@
         "react-router-hash-link": "2.4.3",
         "react-scripts": "5.0.1",
         "react-sizeme": "3.0.2",
-        "typescript": "5.0.4"
+        "typescript": "5.1.6"
     },
     "devDependencies": {
         "@types/d3-format": "3.0.1",
