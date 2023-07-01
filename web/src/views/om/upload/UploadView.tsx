@@ -20,10 +20,11 @@ import { useEffect, useState } from "react"
 import { fetchFromApiRaw } from "../../../utils/fetchFromApi"
 import { CheckCircle } from "@mui/icons-material"
 import { usePersistedState } from "../../../utils/usePersistedState"
+import { Type } from "@sinclair/typebox"
 
 export default function UploadView() {
     const [files, setFiles] = useState<FileObject[]>([])
-    const [author, setAuthor] = usePersistedState<string>("om-upload-author", "")
+    const [author, setAuthor] = usePersistedState("om-upload-author", Type.String(), "")
     const [error, setError] = useState<string>()
     const [isUploading, setIsUploading] = useState<boolean>(false)
     const [success, setSuccess] = useState<boolean>(false)

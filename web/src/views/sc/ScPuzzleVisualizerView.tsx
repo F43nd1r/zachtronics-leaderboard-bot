@@ -43,7 +43,7 @@ export default function ScPuzzleVisualizerView() {
                 flexShrink: 1,
             }}
         >
-            <Visualizer<string, string, ScScore>
+            <Visualizer<ScScore>
                 url={`/sc/puzzle/${puzzleId}/records?includeFrontier=true`}
                 config={{
                     key: "visualizerConfigSc",

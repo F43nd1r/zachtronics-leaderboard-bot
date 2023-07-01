@@ -15,28 +15,36 @@
  */
 
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { Static, TSchema, TypeGuard } from "@sinclair/typebox"
+import { castOrDefault } from "./castOrDefault"
 
 export interface Serializer<S> {
     fromString: (string: string) => S
     toString: (t: S) => string
 }
 
-type Serializable = object | string | number | boolean
-
-export function getSerializer<S extends Serializable>(defaultValue: S) {
-    const serializer: Serializer<S> =
-        typeof defaultValue === "string"
-            ? { fromString: (s) => s as S, toString: (s) => s as string }
-            : typeof defaultValue === "number"
-            ? { fromString: (s) => Number(s) as S, toString: (s) => s.toString() }
-            : { fromString: (s) => JSON.parse(s), toString: (s) => JSON.stringify(s) }
-    return serializer
+function isStringSchema(schema: TSchema): boolean {
+    return TypeGuard.TString(schema) || TypeGuard.TLiteralString(schema) || (TypeGuard.TUnion(schema) && schema.anyOf.every(isStringSchema))
 }
 
-export function usePersistedState<S extends Serializable>(key: string, defaultValue: S): [S, Dispatch<SetStateAction<S>>] {
-    const serializer = getSerializer(defaultValue)
+function isNumberSchema(schema: TSchema): boolean {
+    return TypeGuard.TNumber(schema) || TypeGuard.TLiteralNumber(schema) || (TypeGuard.TUnion(schema) && schema.anyOf.every(isNumberSchema))
+}
+
+export function getSerializer<S extends TSchema>(schema: S, defaultValue: Static<S>): Serializer<Static<S>> {
+    if (isStringSchema(schema)) {
+        return { fromString: (s) => castOrDefault(schema, s, defaultValue), toString: (s) => s as string }
+    } else if (isNumberSchema(schema)) {
+        return { fromString: (s) => castOrDefault(schema, Number(s), defaultValue), toString: (s) => s!.toString() }
+    } else {
+        return { fromString: (s) => castOrDefault(schema, JSON.parse(s), defaultValue), toString: (s) => JSON.stringify(s) }
+    }
+}
+
+export function usePersistedState<S extends TSchema>(key: string, schema: S, defaultValue: Static<S>): [Static<S>, Dispatch<SetStateAction<Static<S>>>] {
+    const serializer = getSerializer(schema, defaultValue)
     const storedValue = localStorage.getItem(key)
-    const [value, setValue] = useState<S>(storedValue !== null ? serializer.fromString(storedValue) : defaultValue)
+    const [value, setValue] = useState<Static<S>>(storedValue !== null ? serializer.fromString(storedValue) : defaultValue)
 
     useEffect(() => {
         localStorage.setItem(key, serializer.toString(value))

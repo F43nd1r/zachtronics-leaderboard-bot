@@ -35,6 +35,7 @@ import OmRecordGrid from "../../../components/OmRecordGrid"
 import { usePersistedState } from "../../../utils/usePersistedState"
 import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material"
 import { OmRecord } from "../../../model/om/OmRecord"
+import { Type } from "@sinclair/typebox"
 
 enum SinceLast {
     DAY = 1000 * 60 * 60 * 24,
@@ -43,7 +44,7 @@ enum SinceLast {
 }
 
 export default function RecentSubmissionsView() {
-    const [sinceLast, setSinceLast] = usePersistedState<SinceLast>("submissionsSince", SinceLast.WEEK)
+    const [sinceLast, setSinceLast] = usePersistedState("submissionsSince", Type.Enum(SinceLast), SinceLast.WEEK)
 
     const dateSince: Date = useMemo(() => new Date(new Date().getTime() - sinceLast), [sinceLast])
 

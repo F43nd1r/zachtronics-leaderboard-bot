@@ -29,7 +29,7 @@ export default function OmPuzzleVisualizerView() {
 
     return (
         <>
-            <Visualizer<string, string, OmScore, OmRecord>
+            <Visualizer<OmScore, OmRecord>
                 url={`/om/puzzle/${puzzleId}/records?includeFrontier=true`}
                 config={{
                     key: "visualizerConfig",

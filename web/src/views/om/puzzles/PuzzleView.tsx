@@ -22,13 +22,17 @@ import { lazy, ReactElement, useEffect } from "react"
 import fetchFromApi from "../../../utils/fetchFromApi"
 import Puzzle from "../../../model/Puzzle"
 import LoadingIndicator from "../../../components/LoadingIndicator"
+import { Static, Type } from "@sinclair/typebox"
+import { castOrDefault } from "../../../utils/castOrDefault"
 
 const PuzzleRecordsView = lazy(() => import("./records/PuzzleRecordsView"))
 const PuzzleFrontierView = lazy(() => import("./frontier/PuzzleFrontierView"))
 const PuzzleVisualizerView = lazy(() => import("./visualizer/OmPuzzleVisualizerView"))
 
+const PuzzlePathSegmentSchema = Type.Union([Type.Literal("records"), Type.Literal("frontier"), Type.Literal("visualizer")])
+
 interface RouteDefinition {
-    pathSegment: string
+    pathSegment: Static<typeof PuzzlePathSegmentSchema>
     label: string
     component: ReactElement
 }
@@ -53,8 +57,8 @@ export const PuzzleRoutes: RouteDefinition[] = [
 
 export default function PuzzleView() {
     const match = useMatch("puzzles/:puzzleId/:tab")
-    const lastSegment = match?.params?.tab
-    const [activeTab, setActiveTab] = usePersistedState("puzzleTab", PuzzleRoutes[0].pathSegment)
+    const lastSegment = castOrDefault(Type.Union([PuzzlePathSegmentSchema, Type.Undefined()]), match?.params?.tab, undefined)
+    const [activeTab, setActiveTab] = usePersistedState("puzzleTab", PuzzlePathSegmentSchema, PuzzleRoutes[0].pathSegment)
     const lastActiveTab = activeTab
     useEffect(() => {
         lastSegment && setActiveTab(lastSegment)

@@ -43,7 +43,7 @@ export default function CwPuzzleVisualizerView() {
                 flexShrink: 1,
             }}
         >
-            <Visualizer<string, string, CwScore>
+            <Visualizer<CwScore>
                 url={`/cw/puzzle/${puzzleId}/records?includeFrontier=true`}
                 config={{
                     key: "visualizerConfigCw",

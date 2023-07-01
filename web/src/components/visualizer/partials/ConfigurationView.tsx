@@ -21,13 +21,13 @@ import { MouseEvent } from "react"
 import FieldSet from "../../FieldSet"
 import iterate from "../../../utils/iterate"
 
-interface ConfigurationViewProps<METRIC_ID extends string> {
-    metrics: Record<METRIC_ID, Metric<any>>
-    configuration: Configuration<METRIC_ID>
-    setConfiguration: (configuration: Configuration<METRIC_ID>) => void
+interface ConfigurationViewProps {
+    metrics: Record<string, Metric<any>>
+    configuration: Configuration
+    setConfiguration: (configuration: Configuration) => void
 }
 
-export default function ConfigurationView<METRIC_ID extends string>(props: ConfigurationViewProps<METRIC_ID>) {
+export default function ConfigurationView(props: ConfigurationViewProps) {
     return (
         <FieldSet title="Configuration">
             <Stack spacing={1}>
@@ -89,20 +89,20 @@ export default function ConfigurationView<METRIC_ID extends string>(props: Confi
     )
 }
 
-interface MetricSelectProps<METRIC_ID extends string> {
-    metrics: Record<METRIC_ID, Metric<any>>
-    value: MetricConfiguration<METRIC_ID>
-    setValue: (metric: MetricConfiguration<METRIC_ID>) => void
+interface MetricSelectProps {
+    metrics: Record<string, Metric<any>>
+    value: MetricConfiguration
+    setValue: (metric: MetricConfiguration) => void
     disabled?: boolean
 }
 
-function MetricSelect<METRIC_ID extends string>(props: MetricSelectProps<METRIC_ID>) {
+function MetricSelect(props: MetricSelectProps) {
     return (
         <div style={{ display: "flex" }}>
             <FormControl variant={"standard"} fullWidth>
                 <Select
                     value={props.value.metric}
-                    onChange={(event) => props.setValue({ ...props.value, metric: event.target.value as METRIC_ID })}
+                    onChange={(event) => props.setValue({ ...props.value, metric: event.target.value as string })}
                     disabled={props.disabled}
                     fullWidth={true}
                 >

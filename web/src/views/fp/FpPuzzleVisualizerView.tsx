@@ -43,7 +43,7 @@ export default function FpPuzzleVisualizerView() {
                 flexShrink: 1,
             }}
         >
-            <Visualizer<string, string, FpScore>
+            <Visualizer<FpScore>
                 url={`/fp/puzzle/${puzzleId}/records?includeFrontier=true`}
                 config={{
                     key: "visualizerConfigFp",

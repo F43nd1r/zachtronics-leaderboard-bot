@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { Configuration } from "../../model/Configuration"
-import { applyFilter, Filter } from "../../model/Filter"
+import { Configuration, ConfigurationSchema } from "../../model/Configuration"
+import { applyFilter, Filter, FilterSchema } from "../../model/Filter"
 import { Box, Stack } from "@mui/material"
 import ApiResource from "../../utils/ApiResource"
 import RecordDTO from "../../model/RecordDTO"
@@ -27,23 +27,23 @@ import Modifier from "../../model/Modifier"
 import { LegendView } from "./partials/LegendView"
 import { usePersistedUrlState } from "../../utils/usePersistedUrlState"
 
-export interface VisualizerProps<MODIFIER_ID extends string, METRIC_ID extends string, SCORE, RECORD extends RecordDTO<SCORE>> {
+export interface VisualizerProps<SCORE, RECORD extends RecordDTO<SCORE>> {
     url: string
     config: {
         key: string
-        default: Configuration<METRIC_ID>
+        default: Configuration
     }
     filter: {
         key: string
-        default: Filter<MODIFIER_ID, METRIC_ID>
+        default: Filter
     }
-    metrics: Record<METRIC_ID, Metric<SCORE>>
-    modifiers: Record<MODIFIER_ID, Modifier<SCORE>>
+    metrics: Record<string, Metric<SCORE>>
+    modifiers: Record<string, Modifier<SCORE>>
     defaultColor: string
     onClick: (records: RECORD[]) => void
 }
 
-export function Visualizer<MODIFIER_ID extends string, METRIC_ID extends string, SCORE, RECORD extends RecordDTO<SCORE> = RecordDTO<SCORE>>({
+export function Visualizer<SCORE, RECORD extends RecordDTO<SCORE> = RecordDTO<SCORE>>({
     config,
     defaultColor,
     filter: filterConfig,
@@ -51,9 +51,9 @@ export function Visualizer<MODIFIER_ID extends string, METRIC_ID extends string,
     modifiers,
     onClick,
     url,
-}: VisualizerProps<MODIFIER_ID, METRIC_ID, SCORE, RECORD>) {
-    const [configuration, setConfiguration] = usePersistedUrlState(config.key, config.default)
-    const [filter, setFilter] = usePersistedUrlState(filterConfig.key, filterConfig.default)
+}: VisualizerProps<SCORE, RECORD>) {
+    const [configuration, setConfiguration] = usePersistedUrlState(config.key, ConfigurationSchema, config.default)
+    const [filter, setFilter] = usePersistedUrlState(filterConfig.key, FilterSchema, filterConfig.default)
 
     return (
         <Box
@@ -99,7 +99,15 @@ export function Visualizer<MODIFIER_ID extends string, METRIC_ID extends string,
                             />
                             <LegendView modifiers={modifiers} defaultColor={defaultColor} />
                         </Stack>
-                        <PlotView metrics={metrics} modifiers={modifiers} defaultColor={defaultColor} records={records} configuration={configuration} filter={filter} onClick={onClick} />
+                        <PlotView
+                            metrics={metrics}
+                            modifiers={modifiers}
+                            defaultColor={defaultColor}
+                            records={records}
+                            configuration={configuration}
+                            filter={filter}
+                            onClick={onClick}
+                        />
                     </>
                 )}
             />

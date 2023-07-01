@@ -19,23 +19,28 @@ import RecordDTO, { isStrictlyBetterInMetrics } from "./RecordDTO"
 import { Configuration } from "./Configuration"
 import iterate from "../utils/iterate"
 import Modifier from "./Modifier"
+import { Static, Type } from "@sinclair/typebox"
 
-export interface FilterRange {
-    min: number | undefined
-    max: number | undefined
-}
+export const FilterRangeSchema = Type.Object({
+    min: Type.Optional(Type.Number()),
+    max: Type.Optional(Type.Number()),
+})
 
-export interface Filter<MODIFIER_ID extends string, METRIC_ID extends string> {
-    modifiers?: Record<MODIFIER_ID, boolean | undefined>
-    showOnlyFrontier?: boolean
-    range?: Record<METRIC_ID, FilterRange>
-}
+export type FilterRange = Static<typeof FilterRangeSchema>
 
-export function applyFilter<MODIFIER_ID extends string, METRIC_ID extends string, SCORE, RECORD extends RecordDTO<SCORE>>(
-    metrics: Record<METRIC_ID, Metric<SCORE>>,
-    modifiers: Record<MODIFIER_ID, Modifier<SCORE>>,
-    filter: Filter<MODIFIER_ID, METRIC_ID>,
-    configuration: Configuration<METRIC_ID>,
+export const FilterSchema = Type.Object({
+    modifiers: Type.Optional(Type.Record(Type.String(), Type.Union([Type.Boolean(), Type.Undefined()]))),
+    showOnlyFrontier: Type.Optional(Type.Boolean()),
+    range: Type.Optional(Type.Record(Type.String(), Type.Union([FilterRangeSchema, Type.Undefined()]))),
+})
+
+export type Filter = Static<typeof FilterSchema>
+
+export function applyFilter<SCORE, RECORD extends RecordDTO<SCORE>>(
+    metrics: Record<string, Metric<SCORE>>,
+    modifiers: Record<string, Modifier<SCORE>>,
+    filter: Filter,
+    configuration: Configuration,
     records: RECORD[],
 ): RECORD[] {
     const filteredMetrics = filter.range ? iterate(filter.range).map(([key, range]) => ({ metric: metrics[key], ...range })) : []

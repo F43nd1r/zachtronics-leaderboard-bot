@@ -43,7 +43,7 @@ export default function FcPuzzleVisualizerView() {
                 flexShrink: 1,
             }}
         >
-            <Visualizer<string, string, FcScore>
+            <Visualizer<FcScore>
                 url={`/fc/puzzle/${puzzleId}/records?includeFrontier=true`}
                 config={{
                     key: "visualizerConfigFc",

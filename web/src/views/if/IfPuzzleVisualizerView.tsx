@@ -43,7 +43,7 @@ export default function IfPuzzleVisualizerView() {
                 flexShrink: 1,
             }}
         >
-            <Visualizer<string, string, IfScore>
+            <Visualizer<IfScore>
                 url={`/if/puzzle/${puzzleId}/records?includeFrontier=true`}
                 config={{
                     key: "visualizerConfigIf",

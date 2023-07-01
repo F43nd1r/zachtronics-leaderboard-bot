@@ -20,12 +20,12 @@ import FieldSet from "../../FieldSet"
 import Modifier from "../../../model/Modifier"
 import iterate from "../../../utils/iterate"
 
-interface LegendViewProps<MODIFIER_ID extends string> {
-    modifiers: Record<MODIFIER_ID, Modifier<any>>
+interface LegendViewProps {
+    modifiers: Record<string, Modifier<any>>
     defaultColor: string
 }
 
-export function LegendView<MODIFIER_ID extends string>(props: LegendViewProps<MODIFIER_ID>) {
+export function LegendView(props: LegendViewProps) {
     return (
         <FieldSet title="Legend">
             <Stack spacing={1}>

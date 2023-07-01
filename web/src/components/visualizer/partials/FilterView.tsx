@@ -26,15 +26,15 @@ import iterate from "../../../utils/iterate"
 import { ReactNode } from "react"
 import * as d3 from "d3-format"
 
-interface FilterProps<MODIFIER_ID extends string, METRIC_ID extends string, SCORE> {
-    metrics: Record<METRIC_ID, Metric<SCORE>>
-    modifiers: Record<MODIFIER_ID, Modifier<SCORE>>
-    filter: Filter<MODIFIER_ID, METRIC_ID>
-    setFilter: (filter: Filter<MODIFIER_ID, METRIC_ID>) => boolean
+interface FilterProps<SCORE> {
+    metrics: Record<string, Metric<SCORE>>
+    modifiers: Record<string, Modifier<SCORE>>
+    filter: Filter
+    setFilter: (filter: Filter) => boolean
     records: RecordDTO<SCORE>[]
 }
 
-export function FilterView<MODIFIER_ID extends string, METRIC_ID extends string, SCORE>(props: FilterProps<MODIFIER_ID, METRIC_ID, SCORE>) {
+export function FilterView<SCORE>(props: FilterProps<SCORE>) {
     return (
         <FieldSet title={"Filter"}>
             <Stack spacing={1}>
@@ -59,7 +59,7 @@ export function FilterView<MODIFIER_ID extends string, METRIC_ID extends string,
                             props.setFilter({
                                 ...props.filter,
                                 modifiers: {
-                                    ...(props.filter.modifiers ?? ({} as Record<MODIFIER_ID, Modifier<SCORE>>)),
+                                    ...(props.filter.modifiers ?? ({} as Record<string, boolean>)),
                                     [modifierId]: value,
                                 },
                             })
@@ -77,7 +77,7 @@ export function FilterView<MODIFIER_ID extends string, METRIC_ID extends string,
                             props.setFilter({
                                 ...props.filter,
                                 range: {
-                                    ...(props.filter.range ?? ({} as Record<METRIC_ID, Metric<SCORE>>)),
+                                    ...(props.filter.range ?? ({} as Record<string, FilterRange>)),
                                     [metricId]: value,
                                 },
                             })

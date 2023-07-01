@@ -2970,6 +2970,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sinclair/typebox@npm:^0.28.20":
+  version: 0.28.20
+  resolution: "@sinclair/typebox@npm:0.28.20"
+  checksum: 97d866c3fb3bd5ac7f8519f4a1891dfb9e05c32891f77db89d8d34c7c69696ba4599f7c3ac38a83ebdaf287dc1fd1051699929628deed9db437ba64b372bf538
+  languageName: node
+  linkType: hard
+
 "@sinonjs/commons@npm:^1.7.0":
   version: 1.8.3
   resolution: "@sinonjs/commons@npm:1.8.3"
@@ -14023,6 +14030,7 @@ __metadata:
     "@mui/material": 5.13.6
     "@mui/styles": 5.13.2
     "@simbathesailor/use-what-changed": ^2.0.0
+    "@sinclair/typebox": ^0.28.20
     "@types/d3-format": 3.0.1
     "@types/jest": 29.5.2
     "@types/node": 18.16.19

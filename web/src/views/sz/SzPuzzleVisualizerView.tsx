@@ -43,7 +43,7 @@ export default function SzPuzzleVisualizerView() {
                 flexShrink: 1,
             }}
         >
-            <Visualizer<string, string, SzScore>
+            <Visualizer<SzScore>
                 url={`/sz/puzzle/${puzzleId}/records?includeFrontier=true`}
                 config={{
                     key: "visualizerConfigSz",

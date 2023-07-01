@@ -18,10 +18,14 @@ import { usePersistedState } from "../utils/usePersistedState"
 import { createContext, ReactNode, useContext, useMemo } from "react"
 import { createTheme, ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
+import { Static, Type } from "@sinclair/typebox"
+
+const ColorModeSchema = Type.Union([Type.Literal("light"), Type.Literal("dark")])
+type ColorMode = Static<typeof ColorModeSchema>
 
 export interface AppSettings {
-    colorMode: "light" | "dark"
-    setColorMode: (value: "light" | "dark") => void
+    colorMode: ColorMode
+    setColorMode: (value: ColorMode) => void
     autoPlay: boolean
     setAutoPlay: (value: boolean) => void
     showControls: boolean
@@ -39,9 +43,9 @@ export const AppSettingsContext = createContext<AppSettings>({
 
 export default function AppSettingsProvider(props: { children?: ReactNode | undefined }) {
     const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
-    const [colorMode, setColorMode] = usePersistedState("colorMode", prefersDarkMode ? "light" : "dark")
-    const [autoPlay, setAutoPlay] = usePersistedState<boolean>("autoPlay", true)
-    const [showControls, setShowControls] = usePersistedState<boolean>("showControls", false)
+    const [colorMode, setColorMode] = usePersistedState("colorMode", ColorModeSchema, prefersDarkMode ? "light" : "dark")
+    const [autoPlay, setAutoPlay] = usePersistedState("autoPlay", Type.Boolean(), true)
+    const [showControls, setShowControls] = usePersistedState("showControls", Type.Boolean(), false)
     const context = useMemo<AppSettings>(
         () => ({
             colorMode,

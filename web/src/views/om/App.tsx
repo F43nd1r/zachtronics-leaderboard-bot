@@ -25,6 +25,7 @@ import { Link, Outlet } from "react-router-dom"
 import { usePersistedState } from "../../utils/usePersistedState"
 import SearchBar from "../../fragments/SearchBar"
 import { Settings, Upload } from "@mui/icons-material"
+import { Type } from "@sinclair/typebox"
 
 const drawerWidth = 300
 
@@ -88,7 +89,7 @@ export default function App() {
     const theme = useTheme()
     const isNotTinyScreen = useMediaQuery(theme.breakpoints.up("sm"))
     const isAtLeastMediumScreen = useMediaQuery(theme.breakpoints.up("md"))
-    const [open, setOpen] = usePersistedState("sidebarOpen", isNotTinyScreen)
+    const [open, setOpen] = usePersistedState("sidebarOpen", Type.Boolean(), isNotTinyScreen)
     const handleDrawerOpen = () => setOpen(true)
     const handleDrawerClose = () => setOpen(false)
     return (

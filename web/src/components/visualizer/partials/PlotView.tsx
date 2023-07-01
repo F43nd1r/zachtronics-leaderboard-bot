@@ -28,19 +28,19 @@ import { applyFilter, Filter } from "../../../model/Filter"
 import Modifier from "../../../model/Modifier"
 import iterate from "../../../utils/iterate"
 
-export interface PlotViewProps<MODIFIER_ID extends string, METRIC_ID extends string, SCORE, RECORD extends RecordDTO<SCORE>> {
-    metrics: Record<METRIC_ID, Metric<SCORE>>
-    modifiers: Record<MODIFIER_ID, Modifier<SCORE>>
+export interface PlotViewProps<SCORE, RECORD extends RecordDTO<SCORE>> {
+    metrics: Record<string, Metric<SCORE>>
+    modifiers: Record<string, Modifier<SCORE>>
     defaultColor: string
     records: RECORD[]
-    configuration: Configuration<METRIC_ID>
-    filter: Filter<MODIFIER_ID, METRIC_ID>
+    configuration: Configuration
+    filter: Filter
     onClick: (records: RECORD[]) => void
 }
 
 const Plot: ComponentType<PlotParams> = createPlotlyComponent(Plotly)
 
-function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string, SCORE, RECORD extends RecordDTO<SCORE>>({
+function SizeAwarePlotView<SCORE, RECORD extends RecordDTO<SCORE>>({
     configuration,
     metrics,
     modifiers,
@@ -49,7 +49,7 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
     records: recordsIn,
     filter,
     onClick,
-}: PlotViewProps<MODIFIER_ID, METRIC_ID, SCORE, RECORD> & SizeMeProps) {
+}: PlotViewProps<SCORE, RECORD> & SizeMeProps) {
     const records = applyFilter(metrics, modifiers, filter, configuration, recordsIn)
     const x = { metric: metrics[configuration.x.metric], scale: configuration.x.scale }
     const y = { metric: metrics[configuration.y.metric], scale: configuration.y.scale }
@@ -188,9 +188,7 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
     )
 }
 
-export default function PlotView<MODIFIER_ID extends string, METRIC_ID extends string, SCORE, RECORD extends RecordDTO<SCORE>>(
-    props: PlotViewProps<MODIFIER_ID, METRIC_ID, SCORE, RECORD>,
-) {
+export default function PlotView<SCORE, RECORD extends RecordDTO<SCORE>>(props: PlotViewProps<SCORE, RECORD>) {
     return (
         <SizeMe monitorHeight={true} monitorWidth={true}>
             {({ size }) => <SizeAwarePlotView size={size} {...props} />}

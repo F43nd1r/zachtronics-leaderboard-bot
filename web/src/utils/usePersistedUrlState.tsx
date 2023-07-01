@@ -19,22 +19,25 @@ import { useSearchParams } from "react-router-dom"
 import { useDebouncedEffect } from "./useDebouncedEffect"
 import { diff } from "deep-object-diff"
 import { getSerializer } from "./usePersistedState"
+import { Static, TObject } from "@sinclair/typebox"
+import { Value } from "@sinclair/typebox/value"
 
-export function usePersistedUrlState<S extends object>(key: string, defaultValue: S): [S, Dispatch<SetStateAction<S>>] {
-    const serializer = getSerializer(defaultValue)
+export function usePersistedUrlState<S extends TObject>(key: string, schema: S, defaultValue: Static<S>): [Static<S>, Dispatch<SetStateAction<Static<S>>>] {
+    const serializer = getSerializer(schema, defaultValue)
     const [searchParams, setSearchParams] = useSearchParams()
     const relevantKeys = [...searchParams.keys()].filter((k) => k.startsWith(key))
-    let urlValue: S | null = null
+    let urlValue: Static<S> | null = null
     if (relevantKeys.length) {
-        urlValue = deepCopy(defaultValue)
+        urlValue = Value.Clone(defaultValue)
         for (let k of relevantKeys) {
             const path = k.split(".")
             path.shift()
             deepAssign(urlValue, path, searchParams.get(k)!)
         }
+        urlValue = Value.Cast(schema, urlValue)
     }
     const storedValue = localStorage.getItem(key)
-    const [value, setValue] = useState<S>(urlValue ?? (storedValue !== null ? serializer.fromString(storedValue) : defaultValue))
+    const [value, setValue] = useState<Static<S>>(urlValue ?? (storedValue !== null ? serializer.fromString(storedValue) : defaultValue))
 
     useDebouncedEffect(
         (isInitialRender) => {
@@ -80,21 +83,6 @@ export function usePersistedUrlState<S extends object>(key: string, defaultValue
     )
 
     return [value, setValue]
-}
-
-function deepCopy(obj: Record<keyof any, any>): Record<keyof any, any> {
-    const copy: Record<keyof any, any> = {}
-    for (let key in obj) {
-        const value = obj[key]
-        if (typeof value === "object") {
-            copy[key] = deepCopy(value)
-        } else if (Array.isArray(value)) {
-            copy[key] = value.map(deepCopy)
-        } else {
-            copy[key] = value
-        }
-    }
-    return copy
 }
 
 function deepAssign(obj: Record<keyof any, any>, path: string[], value: string) {

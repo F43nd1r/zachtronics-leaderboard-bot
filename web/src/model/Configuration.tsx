@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
+import { Static, Type } from "@sinclair/typebox"
+
 export type Mode = "2D" | "3D"
 
-export interface Configuration<ID extends string> {
-    mode: Mode
-    x: MetricConfiguration<ID>
-    y: MetricConfiguration<ID>
-    z: MetricConfiguration<ID>
-}
+export const MetricConfigurationSchema = Type.Object({
+    metric: Type.String(),
+    scale: Type.Union([Type.Literal("linear"), Type.Literal("log")]),
+})
 
-export interface MetricConfiguration<ID extends string> {
-    metric: ID
-    scale: "linear" | "log"
-}
+export type MetricConfiguration = Static<typeof MetricConfigurationSchema>
+
+export const ConfigurationSchema = Type.Object({
+    mode: Type.Union([Type.Literal("2D"), Type.Literal("3D")]),
+    x: MetricConfigurationSchema,
+    y: MetricConfigurationSchema,
+    z: MetricConfigurationSchema,
+})
+
+export type Configuration = Static<typeof ConfigurationSchema>
