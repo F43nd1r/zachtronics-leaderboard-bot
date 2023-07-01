@@ -164,7 +164,7 @@ fun omPuzzleOptionBuilder() = enumOptionBuilder<OmPuzzle>("puzzle") { displayNam
 
 fun omScoreOptionBuilder() = CommandOptionBuilder.string("score")
     .description("full score of the submission, e.g. 100g/35c/9a/12i/2h/3w/T/L@V 100g/6r/9a/12i/2h/3w/T@INF")
-    .convert { it?.replace("""[\s\u200B]""".toRegex(), "") }
+    .convert { it?.replace("\\u200B".toRegex(), "")?.trim() }
 
 fun omSolutionOptionBuilder() = CommandOptionBuilder.attachment("solution").description("Your solution file")
 
