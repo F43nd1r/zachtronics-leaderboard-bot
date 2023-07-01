@@ -45,7 +45,7 @@ export function applyFilter<SCORE, RECORD extends RecordDTO<SCORE>>(
 ): RECORD[] {
     const filteredMetrics = filter.range ? iterate(filter.range).map(([key, range]) => ({ metric: metrics[key], ...range })) : []
     const activeMetrics = (configuration.mode === "2D" ? [configuration.x, configuration.y] : [configuration.x, configuration.y, configuration.z]).map(
-        (id) => metrics[id.metric],
+        (id) => metrics[id.metric] ?? Object.values(metrics)[0],
     )
     const filteredRecords = records.filter(
         (record: RECORD) =>

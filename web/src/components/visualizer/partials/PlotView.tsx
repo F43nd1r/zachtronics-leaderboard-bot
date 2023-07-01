@@ -22,7 +22,7 @@ import { PlotParams } from "react-plotly.js"
 import createPlotlyComponent from "react-plotly.js/factory"
 import Plotly from "plotly.js-gl3d-dist-min"
 import Metric from "../../../model/Metric"
-import { Configuration } from "../../../model/Configuration"
+import { Configuration, MetricConfiguration } from "../../../model/Configuration"
 import { SizeMe, SizeMeProps } from "react-sizeme"
 import { applyFilter, Filter } from "../../../model/Filter"
 import Modifier from "../../../model/Modifier"
@@ -40,6 +40,10 @@ export interface PlotViewProps<SCORE, RECORD extends RecordDTO<SCORE>> {
 
 const Plot: ComponentType<PlotParams> = createPlotlyComponent(Plotly)
 
+function findMetric<SCORE>(metrics: Record<string, Metric<SCORE>>, configuration: MetricConfiguration) {
+    return { metric: metrics[configuration.metric] ?? Object.values(metrics)[0], scale: configuration.scale }
+}
+
 function SizeAwarePlotView<SCORE, RECORD extends RecordDTO<SCORE>>({
     configuration,
     metrics,
@@ -51,9 +55,9 @@ function SizeAwarePlotView<SCORE, RECORD extends RecordDTO<SCORE>>({
     onClick,
 }: PlotViewProps<SCORE, RECORD> & SizeMeProps) {
     const records = applyFilter(metrics, modifiers, filter, configuration, recordsIn)
-    const x = { metric: metrics[configuration.x.metric], scale: configuration.x.scale }
-    const y = { metric: metrics[configuration.y.metric], scale: configuration.y.scale }
-    const z = { metric: metrics[configuration.z.metric], scale: configuration.z.scale }
+    const x = findMetric(metrics, configuration.x)
+    const y = findMetric(metrics, configuration.y)
+    const z = findMetric(metrics, configuration.z)
     const getPointString = (record: RecordDTO<SCORE>): string =>
         JSON.stringify({
             x: x.metric.get(record.score) ?? 0,

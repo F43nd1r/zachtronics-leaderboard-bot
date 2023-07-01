@@ -17,7 +17,7 @@
 import Metric from "../../../model/Metric"
 import { Configuration, MetricConfiguration, Mode } from "../../../model/Configuration"
 import { FormControl, MenuItem, Select, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material"
-import { MouseEvent } from "react"
+import { MouseEvent, useEffect } from "react"
 import FieldSet from "../../FieldSet"
 import iterate from "../../../utils/iterate"
 
@@ -97,6 +97,16 @@ interface MetricSelectProps {
 }
 
 function MetricSelect(props: MetricSelectProps) {
+    useEffect(() => {
+        const validMetric = iterate(props.metrics).some(([metricId]) => metricId === props.value.metric)
+        const validScale = props.value.scale === "linear" || props.value.scale === "log"
+        if (!validMetric || !validScale) {
+            props.setValue({
+                metric: validMetric ? props.value.metric : Object.keys(props.metrics)[0],
+                scale: validScale ? props.value.scale : "linear",
+            })
+        }
+    })
     return (
         <div style={{ display: "flex" }}>
             <FormControl variant={"standard"} fullWidth>
