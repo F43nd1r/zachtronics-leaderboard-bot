@@ -25,6 +25,7 @@
         "typescript": "5.1.6"
     },
     "devDependencies": {
+        "@simbathesailor/use-what-changed": "^2.0.0",
         "@types/d3-format": "3.0.1",
         "@types/jest": "29.5.2",
         "@types/node": "18.16.19",

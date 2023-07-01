@@ -105,6 +105,7 @@ function Categories() {
                 element={(categories) =>
                     groupCategories(categories).map((manifold, categories) => (
                         <ExpandableListItem
+                            key={manifold.id}
                             title={`Categories ${manifold.displayName}`}
                             icon={<CategoryIcon />}
                             content={categories

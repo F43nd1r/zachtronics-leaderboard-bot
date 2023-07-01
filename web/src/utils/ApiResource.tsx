@@ -16,7 +16,7 @@
 import LoadingIndicator from "../components/LoadingIndicator"
 import { Error } from "@mui/icons-material"
 import { Box } from "@mui/material"
-import { ReactElement, ReactNode, useEffect, useState } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import { ComponentState } from "./ComponentState"
 import fetchFromApi from "./fetchFromApi"
 
@@ -25,7 +25,7 @@ interface ApiResourceProps<T> {
     element: (t: T) => ReactNode
 }
 
-export default function ApiResource<T>(props: ApiResourceProps<T>): ReactElement {
+export default function ApiResource<T>(props: ApiResourceProps<T>): ReactNode {
     const [state, setState] = useState(ComponentState.LOADING)
     const [data, setData] = useState<T | undefined>(undefined)
     useEffect(() => {
@@ -58,6 +58,6 @@ export default function ApiResource<T>(props: ApiResourceProps<T>): ReactElement
                 </Box>
             )
         case ComponentState.READY:
-            return <>{props.element(data as T)}</>
+            return props.element(data as T)
     }
 }

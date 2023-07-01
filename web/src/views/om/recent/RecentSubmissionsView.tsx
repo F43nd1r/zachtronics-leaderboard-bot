@@ -43,7 +43,7 @@ enum SinceLast {
 }
 
 export default function RecentSubmissionsView() {
-    const [sinceLast, setSinceLast] = usePersistedState("submissionsSince", SinceLast.WEEK)
+    const [sinceLast, setSinceLast] = usePersistedState<SinceLast>("submissionsSince", SinceLast.WEEK)
 
     const dateSince: Date = useMemo(() => new Date(new Date().getTime() - sinceLast), [sinceLast])
 
@@ -78,7 +78,13 @@ export default function RecentSubmissionsView() {
             </FormControl>
             <ApiResource<OmRecord[]>
                 url={`/om/records/new/${dateSince.toISOString()}`}
-                element={(changes) => <OmRecordGrid records={changes.reverse()} getTitle={(record) => record.puzzle.displayName} getScore={(record) => record.fullFormattedScore ?? "None"} />}
+                element={(changes) => (
+                    <OmRecordGrid
+                        records={changes.reverse()}
+                        getTitle={(record) => record.puzzle.displayName}
+                        getScore={(record) => record.fullFormattedScore ?? "None"}
+                    />
+                )}
             />
         </Box>
     )

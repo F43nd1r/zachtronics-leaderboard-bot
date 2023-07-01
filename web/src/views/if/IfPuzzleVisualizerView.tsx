@@ -45,7 +45,10 @@ export default function IfPuzzleVisualizerView() {
         >
             <Visualizer<string, string, IfScore>
                 url={`/if/puzzle/${puzzleId}/records?includeFrontier=true`}
-                config={{ key: "visualizerConfigIf", default: { mode: "3D", x: "c", y: "f", z: "b" } }}
+                config={{
+                    key: "visualizerConfigIf",
+                    default: { mode: "3D", x: { metric: "c", scale: "linear" }, y: { metric: "f", scale: "linear" }, z: { metric: "b", scale: "linear" } },
+                }}
                 filter={{ key: `visualizerFilterIf-${puzzleId}`, default: {} }}
                 metrics={{
                     c: { name: "Cycles", get: (score) => score?.cycles },

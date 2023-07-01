@@ -31,7 +31,15 @@ export default function OmPuzzleVisualizerView() {
         <>
             <Visualizer<string, string, OmScore, OmRecord>
                 url={`/om/puzzle/${puzzleId}/records?includeFrontier=true`}
-                config={{ key: "visualizerConfig", default: { mode: "3D", x: "g", y: "c", z: "a" } }}
+                config={{
+                    key: "visualizerConfig",
+                    default: {
+                        mode: "3D",
+                        x: { metric: "g", scale: "linear" },
+                        y: { metric: "c", scale: "linear" },
+                        z: { metric: "a", scale: "linear" },
+                    },
+                }}
                 filter={{ key: `visualizerFilter-${puzzleId}`, default: { showOnlyFrontier: false } }}
                 metrics={{
                     g: { name: "Cost", get: (score) => score?.cost },

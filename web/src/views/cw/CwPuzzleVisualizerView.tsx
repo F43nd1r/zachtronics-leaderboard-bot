@@ -45,7 +45,10 @@ export default function CwPuzzleVisualizerView() {
         >
             <Visualizer<string, string, CwScore>
                 url={`/cw/puzzle/${puzzleId}/records?includeFrontier=true`}
-                config={{ key: "visualizerConfigCw", default: { mode: "3D", x: "w", y: "h", z: "f" } }}
+                config={{
+                    key: "visualizerConfigCw",
+                    default: { mode: "3D", x: { metric: "w", scale: "linear" }, y: { metric: "h", scale: "linear" }, z: { metric: "f", scale: "linear" } },
+                }}
                 filter={{ key: `visualizerFilterCw-${puzzleId}`, default: {} }}
                 metrics={{
                     w: { name: "Width", get: (score) => score?.width },

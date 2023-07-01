@@ -2947,6 +2947,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@simbathesailor/use-what-changed@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@simbathesailor/use-what-changed@npm:2.0.0"
+  peerDependencies:
+    react: ">=16"
+  checksum: a90e5b7388584749d19b138e0ab50fc69d9af69bee7beaa7616fa287122577f027877e0bd622ec1149057adb2f5bd3f27691dae5723c6a7c93d044bfb96e77ec
+  languageName: node
+  linkType: hard
+
 "@sinclair/typebox@npm:^0.23.3":
   version: 0.23.5
   resolution: "@sinclair/typebox@npm:0.23.5"
@@ -14013,6 +14022,7 @@ __metadata:
     "@mui/lab": 5.0.0-alpha.134
     "@mui/material": 5.13.6
     "@mui/styles": 5.13.2
+    "@simbathesailor/use-what-changed": ^2.0.0
     "@types/d3-format": 3.0.1
     "@types/jest": 29.5.2
     "@types/node": 18.16.19

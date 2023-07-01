@@ -18,7 +18,12 @@ export type Mode = "2D" | "3D"
 
 export interface Configuration<ID extends string> {
     mode: Mode
-    x: ID
-    y: ID
-    z: ID
+    x: MetricConfiguration<ID>
+    y: MetricConfiguration<ID>
+    z: MetricConfiguration<ID>
+}
+
+export interface MetricConfiguration<ID extends string> {
+    metric: ID
+    scale: "linear" | "log"
 }

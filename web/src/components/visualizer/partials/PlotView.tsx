@@ -51,14 +51,14 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
     onClick,
 }: PlotViewProps<MODIFIER_ID, METRIC_ID, SCORE, RECORD> & SizeMeProps) {
     const records = applyFilter(metrics, modifiers, filter, configuration, recordsIn)
-    const x = metrics[configuration.x]
-    const y = metrics[configuration.y]
-    const z = metrics[configuration.z]
+    const x = { metric: metrics[configuration.x.metric], scale: configuration.x.scale }
+    const y = { metric: metrics[configuration.y.metric], scale: configuration.y.scale }
+    const z = { metric: metrics[configuration.z.metric], scale: configuration.z.scale }
     const getPointString = (record: RecordDTO<SCORE>): string =>
         JSON.stringify({
-            x: x.get(record.score) ?? 0,
-            y: y.get(record.score) ?? 0,
-            z: configuration.mode === "3D" ? z.get(record.score) : undefined,
+            x: x.metric.get(record.score) ?? 0,
+            y: y.metric.get(record.score) ?? 0,
+            z: configuration.mode === "3D" ? z.metric.get(record.score) : undefined,
         })
     const recordMap = records.reduce((acc, record) => {
         const point = getPointString(record)
@@ -67,13 +67,14 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
 
     const theme = useTheme()
     const gridColor = theme.palette.mode === "light" ? theme.palette.grey["200"] : theme.palette.grey["800"]
-    const makeAxis = (metric: Metric<SCORE>): Partial<Axis> => {
+    const makeAxis = (axis: { metric: Metric<SCORE>; scale: "linear" | "log" }): Partial<Axis> => {
         return {
-            title: metric.name,
+            title: axis.metric.name,
             color: theme.palette.text.primary,
             gridcolor: gridColor,
             zerolinecolor: gridColor,
             rangemode: "tozero",
+            type: axis.scale,
         }
     }
 
@@ -83,7 +84,8 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
             .find((modifier) => modifier.get(record.score))
         return modifier ? modifier.color : defaultColor
     }
-    const getMarkerColors = (...metrics: Metric<SCORE>[]) => records.map((record) => (records.some((r) => isStrictlyBetterInMetrics(r, record, metrics)) ? "#000000" : getColor(record)))
+    const getMarkerColors = (...metrics: Metric<SCORE>[]) =>
+        records.map((record) => (records.some((r) => isStrictlyBetterInMetrics(r, record, metrics)) ? "#000000" : getColor(record)))
 
     const common: Partial<PlotData> = {
         hovertext: records.map(
@@ -92,12 +94,14 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
                 recordMap[getPointString(r)]
                     .map(
                         (record) =>
-                            `${record.fullFormattedScore ?? "none"}${record.author ? "<br>by " + record.author : ""}${record.smartFormattedCategories ? "<br>" + record.smartFormattedCategories : ""}`,
+                            `${record.fullFormattedScore ?? "none"}${record.author ? "<br>by " + record.author : ""}${
+                                record.smartFormattedCategories ? "<br>" + record.smartFormattedCategories : ""
+                            }`,
                     )
                     .join("<br>-----<br>"),
         ),
-        x: records.map((record) => x.get(record.score) ?? 0),
-        y: records.map((record) => y.get(record.score) ?? 0),
+        x: records.map((record) => x.metric.get(record.score) ?? 0),
+        y: records.map((record) => y.metric.get(record.score) ?? 0),
         mode: "markers",
         marker: {
             line: {
@@ -115,12 +119,12 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
                     configuration.mode === "2D"
                         ? {
                               ...common,
-                              hovertemplate: `${x.name}: %{x:.3~f}<br>${y.name}: %{y:.3~f}<br>%{hovertext}<extra></extra>`,
+                              hovertemplate: `${x.metric.name}: %{x:.3~f}<br>${y.metric.name}: %{y:.3~f}<br>%{hovertext}<extra></extra>`,
                               type: "scatter",
                               marker: {
                                   ...common.marker,
                                   size: 20,
-                                  color: getMarkerColors(x, y),
+                                  color: getMarkerColors(x.metric, y.metric),
                                   line: {
                                       ...common.marker?.line,
                                       width: 3,
@@ -129,13 +133,13 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
                           }
                         : {
                               ...common,
-                              z: records.map((record) => z.get(record.score) ?? 0),
-                              hovertemplate: `${x.name}: %{x:.3~f}<br>${y.name}: %{y:.3~f}<br>${z.name}: %{z:.3~f}<br>%{hovertext}<extra></extra>`,
+                              z: records.map((record) => z.metric.get(record.score) ?? 0),
+                              hovertemplate: `${x.metric.name}: %{x:.3~f}<br>${y.metric.name}: %{y:.3~f}<br>${z.metric.name}: %{z:.3~f}<br>%{hovertext}<extra></extra>`,
                               type: "scatter3d",
                               marker: {
                                   ...common.marker,
                                   size: 10,
-                                  color: getMarkerColors(x, y, z),
+                                  color: getMarkerColors(x.metric, y.metric, z.metric),
                                   line: {
                                       ...common.marker?.line,
                                       width: 2,
@@ -184,7 +188,9 @@ function SizeAwarePlotView<MODIFIER_ID extends string, METRIC_ID extends string,
     )
 }
 
-export default function PlotView<MODIFIER_ID extends string, METRIC_ID extends string, SCORE, RECORD extends RecordDTO<SCORE>>(props: PlotViewProps<MODIFIER_ID, METRIC_ID, SCORE, RECORD>) {
+export default function PlotView<MODIFIER_ID extends string, METRIC_ID extends string, SCORE, RECORD extends RecordDTO<SCORE>>(
+    props: PlotViewProps<MODIFIER_ID, METRIC_ID, SCORE, RECORD>,
+) {
     return (
         <SizeMe monitorHeight={true} monitorWidth={true}>
             {({ size }) => <SizeAwarePlotView size={size} {...props} />}

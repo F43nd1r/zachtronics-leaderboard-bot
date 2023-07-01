@@ -26,7 +26,7 @@ export function usePersistedUrlState<S extends object>(key: string, defaultValue
     const relevantKeys = [...searchParams.keys()].filter((k) => k.startsWith(key))
     let urlValue: S | null = null
     if (relevantKeys.length) {
-        urlValue = { ...defaultValue }
+        urlValue = deepCopy(defaultValue)
         for (let k of relevantKeys) {
             const path = k.split(".")
             path.shift()
@@ -71,6 +71,7 @@ export function usePersistedUrlState<S extends object>(key: string, defaultValue
                 anyChanged = true
             }
             if (anyChanged) {
+                newSearchParams.sort()
                 setSearchParams(newSearchParams, { replace: true })
             }
         },
@@ -79,6 +80,21 @@ export function usePersistedUrlState<S extends object>(key: string, defaultValue
     )
 
     return [value, setValue]
+}
+
+function deepCopy(obj: Record<keyof any, any>): Record<keyof any, any> {
+    const copy: Record<keyof any, any> = {}
+    for (let key in obj) {
+        const value = obj[key]
+        if (typeof value === "object") {
+            copy[key] = deepCopy(value)
+        } else if (Array.isArray(value)) {
+            copy[key] = value.map(deepCopy)
+        } else {
+            copy[key] = value
+        }
+    }
+    return copy
 }
 
 function deepAssign(obj: Record<keyof any, any>, path: string[], value: string) {

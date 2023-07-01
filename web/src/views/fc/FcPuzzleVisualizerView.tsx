@@ -45,7 +45,10 @@ export default function FcPuzzleVisualizerView() {
         >
             <Visualizer<string, string, FcScore>
                 url={`/fc/puzzle/${puzzleId}/records?includeFrontier=true`}
-                config={{ key: "visualizerConfigFc", default: { mode: "3D", x: "t", y: "c", z: "w" } }}
+                config={{
+                    key: "visualizerConfigFc",
+                    default: { mode: "3D", x: { metric: "t", scale: "linear" }, y: { metric: "c", scale: "linear" }, z: { metric: "w", scale: "linear" } },
+                }}
                 filter={{ key: `visualizerFilterFc-${puzzleId}`, default: {} }}
                 metrics={{
                     t: { name: "Time", get: (score) => score?.time },

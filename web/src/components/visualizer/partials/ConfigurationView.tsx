@@ -15,7 +15,7 @@
  */
 
 import Metric from "../../../model/Metric"
-import { Configuration, Mode } from "../../../model/Configuration"
+import { Configuration, MetricConfiguration, Mode } from "../../../model/Configuration"
 import { FormControl, MenuItem, Select, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material"
 import { MouseEvent } from "react"
 import FieldSet from "../../FieldSet"
@@ -91,21 +91,39 @@ export default function ConfigurationView<METRIC_ID extends string>(props: Confi
 
 interface MetricSelectProps<METRIC_ID extends string> {
     metrics: Record<METRIC_ID, Metric<any>>
-    value: METRIC_ID
-    setValue: (metric: METRIC_ID) => void
+    value: MetricConfiguration<METRIC_ID>
+    setValue: (metric: MetricConfiguration<METRIC_ID>) => void
     disabled?: boolean
 }
 
 function MetricSelect<METRIC_ID extends string>(props: MetricSelectProps<METRIC_ID>) {
     return (
-        <FormControl variant={"standard"} fullWidth>
-            <Select value={props.value} onChange={(event) => props.setValue(event.target.value as METRIC_ID)} disabled={props.disabled} fullWidth={true}>
-                {iterate(props.metrics).map(([metricId, metric]) => (
-                    <MenuItem value={metricId} key={metricId}>
-                        {metric.name}
-                    </MenuItem>
-                ))}
-            </Select>
-        </FormControl>
+        <div style={{ display: "flex" }}>
+            <FormControl variant={"standard"} fullWidth>
+                <Select
+                    value={props.value.metric}
+                    onChange={(event) => props.setValue({ ...props.value, metric: event.target.value as METRIC_ID })}
+                    disabled={props.disabled}
+                    fullWidth={true}
+                >
+                    {iterate(props.metrics).map(([metricId, metric]) => (
+                        <MenuItem value={metricId} key={metricId}>
+                            {metric.name}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+            <FormControl variant={"standard"} fullWidth>
+                <Select
+                    value={props.value.scale}
+                    onChange={(event) => props.setValue({ ...props.value, scale: event.target.value as "linear" | "log" })}
+                    disabled={props.disabled}
+                    fullWidth={true}
+                >
+                    <MenuItem value={"linear"}>Linear</MenuItem>
+                    <MenuItem value={"log"}>Logarithmic</MenuItem>
+                </Select>
+            </FormControl>
+        </div>
     )
 }

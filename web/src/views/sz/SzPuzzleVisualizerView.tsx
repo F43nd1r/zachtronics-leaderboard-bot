@@ -45,7 +45,10 @@ export default function SzPuzzleVisualizerView() {
         >
             <Visualizer<string, string, SzScore>
                 url={`/sz/puzzle/${puzzleId}/records?includeFrontier=true`}
-                config={{ key: "visualizerConfigSz", default: { mode: "3D", x: "p", y: "c", z: "l" } }}
+                config={{
+                    key: "visualizerConfigSz",
+                    default: { mode: "3D", x: { metric: "p", scale: "linear" }, y: { metric: "c", scale: "linear" }, z: { metric: "l", scale: "linear" } },
+                }}
                 filter={{ key: `visualizerFilterSz-${puzzleId}`, default: {} }}
                 metrics={{
                     c: { name: "Cost", get: (score) => score?.cost },
