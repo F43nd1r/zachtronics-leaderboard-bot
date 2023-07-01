@@ -37,6 +37,7 @@ import com.faendir.zachtronics.bot.utils.user
 import com.roxstudio.utils.CUrl
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import org.springframework.stereotype.Component
+import kotlin.jvm.optionals.getOrNull
 
 @Component
 @OmQualifier
@@ -94,6 +95,6 @@ class OmStatsCommand(private val repository: OmSolutionRepository) : Command.Bas
         } catch (e: Exception) {
             throw IllegalArgumentException("Could not load your solution file")
         }
-        return createSubmission(null, null, event.user().username, bytes)
+        return createSubmission(null, null, event.user().let { it.globalName.getOrNull() ?: it.username }, bytes)
     }
 }
