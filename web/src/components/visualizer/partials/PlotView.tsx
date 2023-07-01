@@ -75,6 +75,7 @@ function SizeAwarePlotView<SCORE, RECORD extends RecordDTO<SCORE>>({
             zerolinecolor: gridColor,
             rangemode: "tozero",
             type: axis.scale,
+            tickformat: "s",
         }
     }
 
