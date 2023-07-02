@@ -10,7 +10,7 @@
         "@mui/lab": "5.0.0-alpha.134",
         "@mui/material": "5.13.6",
         "@mui/styles": "5.13.2",
-        "@sinclair/typebox": "^0.28.20",
+        "@sinclair/typebox": "0.28.20",
         "d3-format": "3.1.0",
         "deep-object-diff": "1.1.9",
         "plotly.js-gl3d-dist-min": "2.24.2",
@@ -26,7 +26,7 @@
         "typescript": "5.1.6"
     },
     "devDependencies": {
-        "@simbathesailor/use-what-changed": "^2.0.0",
+        "@simbathesailor/use-what-changed": "2.0.0",
         "@types/d3-format": "3.0.1",
         "@types/jest": "29.5.2",
         "@types/node": "18.16.19",

@@ -2947,12 +2947,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@simbathesailor/use-what-changed@npm:^2.0.0":
+"@simbathesailor/use-what-changed@npm:2.0.0":
   version: 2.0.0
   resolution: "@simbathesailor/use-what-changed@npm:2.0.0"
   peerDependencies:
     react: ">=16"
   checksum: a90e5b7388584749d19b138e0ab50fc69d9af69bee7beaa7616fa287122577f027877e0bd622ec1149057adb2f5bd3f27691dae5723c6a7c93d044bfb96e77ec
+  languageName: node
+  linkType: hard
+
+"@sinclair/typebox@npm:0.28.20":
+  version: 0.28.20
+  resolution: "@sinclair/typebox@npm:0.28.20"
+  checksum: 97d866c3fb3bd5ac7f8519f4a1891dfb9e05c32891f77db89d8d34c7c69696ba4599f7c3ac38a83ebdaf287dc1fd1051699929628deed9db437ba64b372bf538
   languageName: node
   linkType: hard
 
@@ -2967,13 +2974,6 @@ __metadata:
   version: 0.24.28
   resolution: "@sinclair/typebox@npm:0.24.28"
   checksum: adc1f06c548f0c495dad5a7124394242553e059c5ea3faa19f404b43958125366513240f17fa2b5272a3aec18618cab4137d5c85259e99ce9eaca67538af2732
-  languageName: node
-  linkType: hard
-
-"@sinclair/typebox@npm:^0.28.20":
-  version: 0.28.20
-  resolution: "@sinclair/typebox@npm:0.28.20"
-  checksum: 97d866c3fb3bd5ac7f8519f4a1891dfb9e05c32891f77db89d8d34c7c69696ba4599f7c3ac38a83ebdaf287dc1fd1051699929628deed9db437ba64b372bf538
   languageName: node
   linkType: hard
 
@@ -14029,8 +14029,8 @@ __metadata:
     "@mui/lab": 5.0.0-alpha.134
     "@mui/material": 5.13.6
     "@mui/styles": 5.13.2
-    "@simbathesailor/use-what-changed": ^2.0.0
-    "@sinclair/typebox": ^0.28.20
+    "@simbathesailor/use-what-changed": 2.0.0
+    "@sinclair/typebox": 0.28.20
     "@types/d3-format": 3.0.1
     "@types/jest": 29.5.2
     "@types/node": 18.16.19
