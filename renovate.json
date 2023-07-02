@@ -16,6 +16,7 @@
   "packageRules": [
     {
       "matchUpdateTypes": [
+        "minor",
         "patch",
         "pin",
         "digest"
@@ -27,5 +28,8 @@
       "matchPackagePatterns": ["^org\\.jetbrains\\.kotlin", "^com\\.google\\.devtools\\.ksp"],
       "groupName": "kotlin"
     }
-  ]
+  ],
+  "git-submodules": {
+    "enabled": true
+  }
 }
