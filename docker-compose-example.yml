@@ -29,4 +29,4 @@ services:
       IMGUR_CLIENT_SECRET: MUST_BE_SET
       OM_GIF_MAKER_SERVER_URL: http://om-gif-maker:8080
 ## enable debugger connection
-#    entrypoint: ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "org.springframework.boot.loader.JarLauncher"]
+#      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"

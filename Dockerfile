@@ -24,4 +24,4 @@ RUN true
 COPY --from=builder application/snapshot-dependencies/ ./
 RUN true
 COPY --from=builder application/application/ ./
-ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
+ENTRYPOINT ["java", "-XX:+ErrorFileToStdout", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=90", "-XX:InitialRAMPercentage=90", "org.springframework.boot.loader.JarLauncher"]
