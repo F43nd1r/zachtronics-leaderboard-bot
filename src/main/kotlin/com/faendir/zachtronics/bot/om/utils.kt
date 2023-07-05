@@ -113,7 +113,7 @@ fun createSubmission(gif: String?, gifData: ByteArray?, author: String, inputByt
     val solution = try {
         SolutionParser.parse(ByteArrayInputStream(inputBytes).source().buffer())
     } catch (e: Exception) {
-        throw IllegalArgumentException("I could not parse your solution")
+        throw IllegalArgumentException("I could not parse your solution", e)
     }
     if (solution !is SolvedSolution) {
         throw IllegalArgumentException("only solved solutions are accepted")
