@@ -30,7 +30,7 @@
         "@types/d3-format": "3.0.1",
         "@types/jest": "29.5.2",
         "@types/node": "18.16.19",
-        "@types/plotly.js": "2.12.20",
+        "@types/plotly.js": "2.12.21",
         "@types/react": "18.2.14",
         "@types/react-dom": "18.2.6",
         "@types/react-plotly.js": "2.6.0",
