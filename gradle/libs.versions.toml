@@ -22,7 +22,7 @@ junit = "5.10.0"
 springdoc = "2.1.0"
 guava = "32.1.1-jre"
 nokee = "0.4.3264-202305010539.985612b6"
-opencsv = "5.7.1"
+opencsv = "5.8"
 gradle-frontend = "6.0.0"
 nodejs = "16.20.0"
 
