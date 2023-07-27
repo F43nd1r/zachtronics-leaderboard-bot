@@ -98,7 +98,7 @@ class MultiMessageSafeEmbedMessageBuilder : SafeEmbedMessageBuilder<MultiMessage
             } else if (allowedImageTypes.contains(link.substringAfterLast(".", ""))) {
                 image(link)
             } else {
-                addField("Link", "[$link]($link)")
+                addField("Link", "[${link.replace(Regex("https?://"), "")}]($link)")
             }
         }
     }
