@@ -2,7 +2,7 @@
 kotlin = "1.9.0"
 spring-boot = "3.1.2"
 spring-dependencyManagement = "1.1.2"
-spring-cloud = "4.0.3"
+spring-cloud = "4.0.4"
 gradle-lombok = "8.1.0"
 gradle-gitProperties = "2.4.1"
 kotlinx-json = "1.5.1"
