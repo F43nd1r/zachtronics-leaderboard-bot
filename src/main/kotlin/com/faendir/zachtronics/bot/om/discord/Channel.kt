@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.config
+package com.faendir.zachtronics.bot.om.discord
 
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.context.annotation.Configuration
+import discord4j.common.util.Snowflake
 
-@Configuration("gitAccessProperties")
-@ConfigurationProperties(prefix = "git")
-class GitProperties {
-    lateinit var accessToken: String
-    lateinit var username: String
-    var webhookSecret: String = " "
-    var readonlyMode: Boolean = false
+enum class Channel(idLong: Long) {
+    RECORD(1135223998893002795),
+    PARETO(1135224098088288348),
+    UPDATE(1135224154010955786),
+    MAIN(370367639073062922),
+    ;
+
+    val id = Snowflake.of(idLong)
 }

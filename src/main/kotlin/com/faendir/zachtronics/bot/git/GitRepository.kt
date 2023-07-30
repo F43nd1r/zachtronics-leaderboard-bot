@@ -201,8 +201,10 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
                 .call()
 
         fun push() {
-            git.push().setCredentialsProvider(UsernamePasswordCredentialsProvider(gitProperties.username, gitProperties.accessToken))
-                .setTimeout(120).call()
+            if (!gitProperties.readonlyMode) {
+                git.push().setCredentialsProvider(UsernamePasswordCredentialsProvider(gitProperties.username, gitProperties.accessToken))
+                    .setTimeout(120).call()
+            }
         }
 
         fun resetAndClean(file: File) {

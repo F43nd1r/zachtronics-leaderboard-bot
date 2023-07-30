@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.utils
 import com.google.common.annotations.VisibleForTesting
 import discord4j.core.`object`.entity.channel.MessageChannel
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
+import discord4j.core.`object`.component.ActionRow
 import discord4j.core.`object`.entity.Message
 import discord4j.core.spec.EmbedCreateFields
 import discord4j.core.spec.EmbedCreateSpec
@@ -34,6 +35,7 @@ class MultiMessageSafeEmbedMessageBuilder : SafeEmbedMessageBuilder<MultiMessage
     private var total = 0
     private var fields = 0
     private var color: Color? = null
+    private var actions = mutableListOf<ActionRow>()
 
     override fun title(title: String) = apply {
         val safeTitle = title.truncateWithEllipsis(EmbedLimits.TITLE).ifEmptyZeroWidthSpace()
@@ -103,6 +105,10 @@ class MultiMessageSafeEmbedMessageBuilder : SafeEmbedMessageBuilder<MultiMessage
         }
     }
 
+    fun action(action: ActionRow) = apply {
+        actions.add(action)
+    }
+
     private fun increaseTotal(by: Int) {
         if (total + by > EmbedLimits.TOTAL) {
             nextBuilder()
@@ -131,14 +137,19 @@ class MultiMessageSafeEmbedMessageBuilder : SafeEmbedMessageBuilder<MultiMessage
 
     override fun send(event: DeferrableInteractionEvent): Mono<Void> = mono {
         val embeds = getEmbeds().toMutableList()
-        event.editReply().clear().withEmbedsOrNull(embeds.removeFirst()).awaitSingleOrNull()
+        event.editReply().clear().withEmbedsOrNull(embeds.removeFirst()).withComponentsOrNull(actions).awaitSingleOrNull()
         for (embed in embeds) {
             event.createFollowup().withEmbeds(embed).awaitSingleOrNull()
         }
     }.then()
 
     fun send(channel: MessageChannel): Mono<List<Message>> = mono {
-        getEmbeds().map { embed -> channel.createMessage().withEmbeds(embed).awaitSingle() }
+        getEmbeds().mapIndexed { index, embed ->
+            channel.createMessage()
+                .withEmbeds(embed)
+                .run { if (index == 0) withComponents(actions) else this }
+                .awaitSingle()
+        }
     }
 
     @VisibleForTesting

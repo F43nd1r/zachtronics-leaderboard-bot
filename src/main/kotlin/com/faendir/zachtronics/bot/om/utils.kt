@@ -28,6 +28,8 @@ import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.option.enumOptionBuilder
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.StringFormat
+import com.faendir.zachtronics.bot.om.discord.Channel
+import com.faendir.zachtronics.bot.om.discord.SendToMainChannelButton
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
@@ -44,7 +46,6 @@ import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.filterIsInstance
 import com.faendir.zachtronics.bot.utils.smartFormat
 import com.faendir.zachtronics.bot.utils.toMetricsTree
-import discord4j.common.util.Snowflake
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.entity.channel.MessageChannel
@@ -127,8 +128,8 @@ fun createSubmission(gif: String?, gifData: ByteArray?, author: String, inputByt
     if (solution.parts.filterIsInstance<IO>().groupBy { it.type to it.index }.values.any { it.size > 1 }) {
         throw IllegalArgumentException("Duplicated Inputs or Outputs are banned.")
     }
-    val (puzzle, solutionBytes) = OmPuzzle.values().find { it.id == solution.puzzle }?.let { it to inputBytes }
-        ?: OmPuzzle.values().find { it.altIds.contains(solution.puzzle) }?.let {
+    val (puzzle, solutionBytes) = OmPuzzle.entries.find { it.id == solution.puzzle }?.let { it to inputBytes }
+        ?: OmPuzzle.entries.find { it.altIds.contains(solution.puzzle) }?.let {
             solution.puzzle = it.id
             val out = ByteArrayOutputStream()
             SolutionParser.write(solution, out.sink().buffer(), writeSolved = true)
@@ -184,7 +185,8 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
                                     + (if (submitResult.beatenRecords.isNotEmpty()) "\nPreviously:" else "")
                         )
                         .embedCategoryRecords(submitResult.beatenRecords, record.puzzle.supportedCategories)
-                        .link(record.displayLink), Channel.PARETO
+                        .link(record.displayLink)
+                        .action(SendToMainChannelButton.createAction()), Channel.PARETO
                 )
             } else {
                 sendDiscordMessage(
@@ -196,7 +198,8 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
                                     + (if (submitResult.beatenRecords.isNotEmpty()) "\nPreviously:" else "")
                         )
                         .embedCategoryRecords(submitResult.beatenRecords, record.puzzle.supportedCategories)
-                        .link(record.displayLink), Channel.RECORD
+                        .link(record.displayLink)
+                        .action(SendToMainChannelButton.createAction()), Channel.RECORD
                 )
             }
         }
@@ -216,7 +219,8 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
                         "${record.toDisplayString(DisplayContext(StringFormat.DISCORD, submitResult.oldRecord.categories))} was updated.\nPreviously:"
                     )
                     .embedCategoryRecords(listOf(submitResult.oldRecord), puzzle.supportedCategories)
-                    .link(record.displayLink), Channel.UPDATE
+                    .link(record.displayLink)
+                    .action(SendToMainChannelButton.createAction()), Channel.UPDATE
             )
         }
 
@@ -233,14 +237,4 @@ private suspend fun GatewayDiscordClient.sendDiscordMessage(message: MultiMessag
         .awaitSingleOrNull()
         ?.flatten()
         ?: emptyList()
-}
-
-
-enum class Channel(idLong: Long) {
-    RECORD(370367639073062922),
-    PARETO(909638277756243978),
-    UPDATE(1006543549346611251),
-    ;
-
-    val id = Snowflake.of(idLong)
 }

@@ -48,6 +48,7 @@ class DiscordService(
     private val restartEndpoint: RestartEndpoint,
     private val objectMapper: ObjectMapper,
     private val discordActionCache: DiscordActionCache,
+    private val statelessComponents: List<StatelessComponent>,
 ) {
     companion object {
         private val logger = LoggerFactory.getLogger(DiscordService::class.java)
@@ -83,7 +84,7 @@ class DiscordService(
         }.subscribe()
         discordClient.on(ComponentInteractionEvent::class.java) { event ->
             mono {
-                discordActionCache.trigger(event)
+                statelessComponents.find { it.id == event.customId }?.trigger(event) ?: discordActionCache.trigger(event)
             }
         }.subscribe()
         logger.info("Connected to discord with version ${gitProperties.shortCommitId}")
