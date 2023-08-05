@@ -29,7 +29,7 @@
         "@simbathesailor/use-what-changed": "2.0.0",
         "@types/d3-format": "3.0.1",
         "@types/jest": "29.5.3",
-        "@types/node": "18.17.2",
+        "@types/node": "18.17.3",
         "@types/plotly.js": "2.12.25",
         "@types/react": "18.2.18",
         "@types/react-dom": "18.2.7",
