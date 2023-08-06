@@ -189,7 +189,15 @@ class OmSolutionRepository(
                     return SubmitResult.AlreadyPresent()
                 }
             }
+
             unclaimedCategories -= mRecord.categories
+            // in case the candidate beats the old record all around, use that and skip the details
+            if (OmMetrics.FULL_SCORE.all { it.comparator.compare(submission.score, record.score) <= 0 }) {
+                // copies are needed or they'll edit themselves in the handler
+                handleBeatenRecord(mRecord, mRecord.categories.toSet(), mRecord.frontierManifolds.toSet())
+                beatenCR.add(CategoryRecord(record, mRecord.categories))
+                continue;
+            }
 
             for (manifold in possibleManifolds.intersect(mRecord.frontierManifolds)) {
                 val compares: List<Int> = manifold.frontierCompare(submission.score, record.score)

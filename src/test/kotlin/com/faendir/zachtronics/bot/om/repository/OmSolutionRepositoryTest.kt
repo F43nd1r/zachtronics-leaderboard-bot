@@ -32,14 +32,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
-import strikt.assertions.any
-import strikt.assertions.containsExactlyInAnyOrder
-import strikt.assertions.first
-import strikt.assertions.hasSize
-import strikt.assertions.isA
-import strikt.assertions.isEmpty
-import strikt.assertions.isEqualTo
-import strikt.assertions.none
+import strikt.assertions.*
 import java.io.File
 
 class OmSolutionRepositoryTest {
@@ -175,6 +168,22 @@ class OmSolutionRepositoryTest {
         expectThat(repository.findCategoryHolders(OmPuzzle.STABILIZED_WATER, false)) {
             hasSize(2)
             none { get { record.score }.isEqualTo(score) }
+        }
+    }
+
+    @Test
+    fun `outpareto on opposite manifold`() {
+        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cycles = 10, rate = 100.0)))
+        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cycles = 30, rate = 10.0)))
+
+        val score = dummyOmScore.copy(cycles = 20, rate = 10.0)
+
+        val result = repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score))
+
+        expectThat(result).isA<SubmitResult.Success<OmRecord, OmCategory>>()
+        expectThat(repository.findCategoryHolders(OmPuzzle.STABILIZED_WATER, true)) {
+            hasSize(2)
+            any { get { record.score }.isEqualTo(score) }
         }
     }
 
