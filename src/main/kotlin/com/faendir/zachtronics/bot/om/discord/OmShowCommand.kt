@@ -42,7 +42,7 @@ class OmShowCommand(override val repository: OmSolutionRepository) :
     override val options = listOf(puzzleOption, categoryOption)
 
     private fun findCategoryCandidates(category: String): List<OmCategory> {
-        return OmCategory.values().filter { it.displayName.startsWith(category, ignoreCase = true) }.takeIf { it.isNotEmpty() }
+        return OmCategory.entries.filter { it.displayName.startsWith(category, ignoreCase = true) }.takeIf { it.isNotEmpty() }
             ?: throw IllegalArgumentException("$category is not a tracked category.")
     }
 

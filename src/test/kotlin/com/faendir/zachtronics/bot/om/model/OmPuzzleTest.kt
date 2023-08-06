@@ -8,7 +8,7 @@ import java.io.File
 
 class OmPuzzleTest {
     @TestFactory
-    fun `all puzzle files exist`() = OmPuzzle.values().map { puzzle ->
+    fun `all puzzle files exist`() = OmPuzzle.entries.map { puzzle ->
         DynamicTest.dynamicTest(puzzle.displayName) {
             expectThat(puzzle.file).exists()
         }

@@ -69,7 +69,7 @@ class OpusLeaderboardFixer {
         }, repo)
         val repository = OmSolutionRepository(gitRepo, mockk(relaxed = true), OmUrlMapper(), mockk(relaxed = true))
 
-        for (puzzle in OmPuzzle.values()) {
+        for (puzzle in OmPuzzle.entries) {
             println("Doing ${puzzle.name}")
             for ((record, _) in repository.findCategoryHolders(puzzle, true)) {
                 println("${record.score.toDisplayString(DisplayContext.fileName())} is being processed")

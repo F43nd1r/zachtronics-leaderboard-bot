@@ -53,4 +53,4 @@ class DiscordUserSecured(users: Collection<DiscordUser>) : Secured {
     override fun hasExecutionPermission(event: InteractionCreateEvent, user: User): Boolean = ids.contains(user.id.asLong())
 }
 
-fun User.asDiscordUser() = DiscordUser.values().find { it.id == this.id.asLong() }
+fun User.asDiscordUser() = DiscordUser.entries.find { it.id == this.id.asLong() }

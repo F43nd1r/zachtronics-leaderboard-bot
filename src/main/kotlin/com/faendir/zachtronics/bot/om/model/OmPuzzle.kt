@@ -17,30 +17,8 @@
 package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.Puzzle
-import com.faendir.zachtronics.bot.om.model.OmGroup.CHAPTER_1
-import com.faendir.zachtronics.bot.om.model.OmGroup.CHAPTER_2
-import com.faendir.zachtronics.bot.om.model.OmGroup.CHAPTER_3
-import com.faendir.zachtronics.bot.om.model.OmGroup.CHAPTER_4
-import com.faendir.zachtronics.bot.om.model.OmGroup.CHAPTER_5
-import com.faendir.zachtronics.bot.om.model.OmGroup.CHAPTER_PRODUCTION
-import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_I
-import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_II
-import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_III
-import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_IV
-import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_IX
-import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_V
-import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_VI
-import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_VII
-import com.faendir.zachtronics.bot.om.model.OmGroup.JOURNAL_VIII
-import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2019
-import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2020
-import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2021
-import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2022
-import com.faendir.zachtronics.bot.om.model.OmGroup.TOURNAMENT_2023
-import com.faendir.zachtronics.bot.om.model.OmGroup.WEEKLIES_1
-import com.faendir.zachtronics.bot.om.model.OmType.NORMAL
-import com.faendir.zachtronics.bot.om.model.OmType.POLYMER
-import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
+import com.faendir.zachtronics.bot.om.model.OmGroup.*
+import com.faendir.zachtronics.bot.om.model.OmType.*
 import org.springframework.util.ResourceUtils
 import java.io.File
 
@@ -219,7 +197,7 @@ enum class OmPuzzle(
     LUSTROUS_SYRUP(WEEKLIES_1, NORMAL, "Lustrous Syrup", "w2868331650", "OM2022Weeklies_LustrousSyrup"),
     ;
 
-    override val supportedCategories: List<OmCategory> = OmCategory.values().filter { it.supportsPuzzle(this) }
+    override val supportedCategories: List<OmCategory> = OmCategory.entries.filter { it.supportsPuzzle(this) }
     override val link: String = "https://zlbb.faendir.com/puzzles/$id"
 
     val file: File by lazy { ResourceUtils.getFile("classpath:puzzle/$id.puzzle") }

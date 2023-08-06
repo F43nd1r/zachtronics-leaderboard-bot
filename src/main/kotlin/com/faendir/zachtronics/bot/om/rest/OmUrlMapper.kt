@@ -30,7 +30,7 @@ class OmUrlMapper : UrlMapper {
         val segments = shortUrl.split("/").filter { it.isNotBlank() }
         if (segments.size != 3) return null
         val (commit, puzzleId, record) = segments
-        val puzzle = OmPuzzle.values().find { it.id.equals(puzzleId, ignoreCase = true) } ?: return null
+        val puzzle = OmPuzzle.entries.find { it.id.equals(puzzleId, ignoreCase = true) } ?: return null
         val fileName = if(record.endsWith(puzzle.name)) record else "${record}_${puzzle.name}"
         return "https://raw.githubusercontent.com/f43nd1r/om-leaderboard/${commit}/${puzzle.group.name}/${puzzle.name}/${fileName}.solution"
     }

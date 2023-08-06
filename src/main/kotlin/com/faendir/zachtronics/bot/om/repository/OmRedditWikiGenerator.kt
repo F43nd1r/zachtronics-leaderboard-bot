@@ -19,31 +19,8 @@ package com.faendir.zachtronics.bot.om.repository
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.StringFormat
-import com.faendir.zachtronics.bot.om.model.OmCategory
-import com.faendir.zachtronics.bot.om.model.OmCategory.AC
-import com.faendir.zachtronics.bot.om.model.OmCategory.AG
-import com.faendir.zachtronics.bot.om.model.OmCategory.AX
-import com.faendir.zachtronics.bot.om.model.OmCategory.CA
-import com.faendir.zachtronics.bot.om.model.OmCategory.CG
-import com.faendir.zachtronics.bot.om.model.OmCategory.CGP
-import com.faendir.zachtronics.bot.om.model.OmCategory.CI
-import com.faendir.zachtronics.bot.om.model.OmCategory.CX
-import com.faendir.zachtronics.bot.om.model.OmCategory.CXP
-import com.faendir.zachtronics.bot.om.model.OmCategory.GA
-import com.faendir.zachtronics.bot.om.model.OmCategory.GC
-import com.faendir.zachtronics.bot.om.model.OmCategory.GCP
-import com.faendir.zachtronics.bot.om.model.OmCategory.GI
-import com.faendir.zachtronics.bot.om.model.OmCategory.GX
-import com.faendir.zachtronics.bot.om.model.OmCategory.GXP
-import com.faendir.zachtronics.bot.om.model.OmCategory.IC
-import com.faendir.zachtronics.bot.om.model.OmCategory.IG
-import com.faendir.zachtronics.bot.om.model.OmCategory.IX
-import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_G
-import com.faendir.zachtronics.bot.om.model.OmCategory.SUM_GP
-import com.faendir.zachtronics.bot.om.model.OmGroup
-import com.faendir.zachtronics.bot.om.model.OmPuzzle
-import com.faendir.zachtronics.bot.om.model.OmRecord
-import com.faendir.zachtronics.bot.om.model.OmType
+import com.faendir.zachtronics.bot.om.model.*
+import com.faendir.zachtronics.bot.om.model.OmCategory.*
 import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
 import com.faendir.zachtronics.bot.reddit.RedditService
 import com.faendir.zachtronics.bot.reddit.Subreddit.OPUS_MAGNUM
@@ -82,9 +59,9 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
             val prefix = File(readAccess.repo, "reddit/prefix.md").readText()
             val suffix = File(readAccess.repo, "reddit/suffix.md").readText()
             var table = ""
-            for (group in OmGroup.values()) {
+            for (group in OmGroup.entries) {
                 table += "## ${group.displayName}\n\n"
-                val puzzles = OmPuzzle.values().filter { it.group == group }
+                val puzzles = OmPuzzle.entries.filter { it.group == group }
                 val thirdCategory = puzzles.map {
                     when (it.type) {
                         OmType.NORMAL, OmType.POLYMER -> "Area"

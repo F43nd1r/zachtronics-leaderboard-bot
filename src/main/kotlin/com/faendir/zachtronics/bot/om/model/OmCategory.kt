@@ -18,16 +18,14 @@ package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.om.model.OmMetric.*
-import com.faendir.zachtronics.bot.om.model.OmType.NORMAL
-import com.faendir.zachtronics.bot.om.model.OmType.POLYMER
-import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
+import com.faendir.zachtronics.bot.om.model.OmType.*
 
 
 private val NORMAL_TYPES = setOf(NORMAL, POLYMER)
 private val PRODUCTION_TYPES = setOf(PRODUCTION)
 
 enum class OmCategory(
-    override val supportedTypes: Set<OmType> = OmType.values().toSet(),
+    override val supportedTypes: Set<OmType> = OmType.entries.toSet(),
     vararg metricsVararg: OmMetric,
     override val displayName: String = metricsVararg.take(if (metricsVararg.first() is Modifier) 3 else 2).joinToString("") { it.displayName }
 ) : Category {
@@ -93,7 +91,7 @@ enum class OmCategory(
 
     override val metrics: List<OmMetric> = metricsVararg.toList()
     val requiredParts: Set<ScorePart<*>> = metrics.flatMapTo(HashSet()) { it.scoreParts }
-    val associatedManifold = OmScoreManifold.values().single { it.scoreParts.containsAll(requiredParts) }
+    val associatedManifold = OmScoreManifold.entries.single { it.scoreParts.containsAll(requiredParts) }
     val scoreComparator: Comparator<OmScore> =
         metrics.filter { it !is Modifier }.map(OmMetric::comparator).reduce(Comparator<OmScore>::thenComparing)
 

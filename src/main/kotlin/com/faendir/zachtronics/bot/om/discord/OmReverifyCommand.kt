@@ -22,15 +22,11 @@ import com.faendir.zachtronics.bot.discord.command.option.enumOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUser
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured
 import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.om.JNISolutionVerifier
-import com.faendir.zachtronics.bot.om.OmQualifier
-import com.faendir.zachtronics.bot.om.getScore
+import com.faendir.zachtronics.bot.om.*
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmType
-import com.faendir.zachtronics.bot.om.omPuzzleOptionBuilder
-import com.faendir.zachtronics.bot.om.omScoreOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
@@ -56,7 +52,7 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.
         val puzzleIn = puzzleOption.get(event)
         val type = typeOption.get(event)
         val score = scoreOption.get(event)
-        val puzzles = (puzzleIn?.let { listOf(it) } ?: OmPuzzle.values().toList()).filter {
+        val puzzles = (puzzleIn?.let { listOf(it) } ?: OmPuzzle.entries).filter {
             type == null || type == it.type
         }
         val overrideRecords = mutableListOf<Pair<OmRecord, OmScore>>()
