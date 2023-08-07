@@ -36,7 +36,7 @@ enum class DiscordUser(val id: Long, val getSpecialEmoji: (Guild?) -> ReactionEm
     RP0(213469074598920193, { ReactionEmoji.unicode("\uD83D\uDC3C") }),
     BROTHER_MOJO(182628037601394688, { ReactionEmoji.unicode("\uD83D\uDD76\uFE0F") }),
     SPIRITUAL_SHAMPOO(930111778652835850, { ReactionEmoji.unicode("\uD83E\uDDF4") }),
-    GRIMMY(107902495199604736),
+    GRIMMY(107902495199604736, { ReactionEmoji.unicode("\u1F49C") }),
     SYX(206689051028357121),
     A_SNOWBALL(136186716334587904),
     ;
