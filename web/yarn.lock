@@ -2920,10 +2920,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sinclair/typebox@npm:0.31.6":
-  version: 0.31.6
-  resolution: "@sinclair/typebox@npm:0.31.6"
-  checksum: 60c8e88a404964413266f95d72dcd03c6e2792780df026d25da92ff258ecd59004fd217357a2933769ab21bc8cdb2785c6c560e4daa49faba7ebeaabf70a51d5
+"@sinclair/typebox@npm:0.31.7":
+  version: 0.31.7
+  resolution: "@sinclair/typebox@npm:0.31.7"
+  checksum: ccdf7776d2fe1310a9268ac3735af54029be67e54765990d83554ac693a768335d7f737c48970579fc1fb7ac0e59965cbfd539280866ba041af8f34380822b79
   languageName: node
   linkType: hard
 
@@ -14001,7 +14001,7 @@ __metadata:
     "@mui/material": 5.14.7
     "@mui/styles": 5.14.7
     "@simbathesailor/use-what-changed": 2.0.0
-    "@sinclair/typebox": 0.31.6
+    "@sinclair/typebox": 0.31.7
     "@types/d3-format": 3.0.1
     "@types/jest": 29.5.4
     "@types/node": 18.17.12
