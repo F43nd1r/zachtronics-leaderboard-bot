@@ -3243,10 +3243,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/d3-format@npm:3.0.1":
-  version: 3.0.1
-  resolution: "@types/d3-format@npm:3.0.1"
-  checksum: 6819fae7e7c3fce1e44cd56e9b6d8ea5508f708cb7a42793edf82ff914b120bf6cddc35208b1b33ec82615ab82b843c284709f9cea5c3fe1ea5f012106b3d32c
+"@types/d3-format@npm:3.0.2":
+  version: 3.0.2
+  resolution: "@types/d3-format@npm:3.0.2"
+  checksum: 6db22e3f713bc3d14010085e0a0bb385dc3020f9613926179adf644f4861ca4bad4d4c04be0a14b2c8cd85b4dde70930c20ee02ef14feeb3bd22ca40ded01fe8
   languageName: node
   linkType: hard
 
@@ -14034,7 +14034,7 @@ __metadata:
     "@mui/styles": 5.14.10
     "@simbathesailor/use-what-changed": 2.0.0
     "@sinclair/typebox": 0.31.15
-    "@types/d3-format": 3.0.1
+    "@types/d3-format": 3.0.2
     "@types/jest": 29.5.5
     "@types/node": 18.17.18
     "@types/plotly.js": 2.12.26
