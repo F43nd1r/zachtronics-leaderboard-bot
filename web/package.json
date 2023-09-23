@@ -17,7 +17,7 @@
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "react-intersection-observer": "9.5.2",
-        "react-mui-dropzone": "4.0.6",
+        "react-mui-dropzone": "4.0.7",
         "react-plotly.js": "2.6.0",
         "react-router-dom": "6.16.0",
         "react-router-hash-link": "2.4.3",

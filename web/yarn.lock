@@ -11388,9 +11388,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-mui-dropzone@npm:4.0.6":
-  version: 4.0.6
-  resolution: "react-mui-dropzone@npm:4.0.6"
+"react-mui-dropzone@npm:4.0.7":
+  version: 4.0.7
+  resolution: "react-mui-dropzone@npm:4.0.7"
   dependencies:
     "@babel/runtime": ^7.4.4
     clsx: ^1.0.2
@@ -11402,9 +11402,9 @@ __metadata:
     "@mui/material": ^5.0.2
     "@mui/styles": ^5.0.1
     prop-types: ^15.7.2
-    react: ^17.0.2
-    react-dom: ^17.0.2
-  checksum: 8f36da4b8d5a85f38aaaa4f75e7a1b6e20e38adc7a3de3b9c996a183ed18a06f129df52730507c596cad728a282cc9b75772bcd53f68157e5b56dff90b2ee028
+    react: ^18.2.0
+    react-dom: ^18.2.0
+  checksum: f89d9a8b3bd38f71ea422259107c4014a7ef0ad5a75895a03bfc6b9a11fc61249a30addcbc657ce2edeeabd0f3354226fe8784f98a8ae6264cfa4167c1aad116
   languageName: node
   linkType: hard
 
@@ -14049,7 +14049,7 @@ __metadata:
     react: 18.2.0
     react-dom: 18.2.0
     react-intersection-observer: 9.5.2
-    react-mui-dropzone: 4.0.6
+    react-mui-dropzone: 4.0.7
     react-plotly.js: 2.6.0
     react-router-dom: 6.16.0
     react-router-hash-link: 2.4.3
