@@ -3439,10 +3439,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/plotly.js@npm:2.12.26":
-  version: 2.12.26
-  resolution: "@types/plotly.js@npm:2.12.26"
-  checksum: 3d623adcfc72e45f5398cacc5c0f877b3938ff421b28c60b6e58c06882d733fcda40001aaef0a8341ae46da4839199895477a895b40f45046b32784f74bf2b3f
+"@types/plotly.js@npm:2.12.27":
+  version: 2.12.27
+  resolution: "@types/plotly.js@npm:2.12.27"
+  checksum: f59c27a2b86ccfe680bd0441e84b59d5281dcc74ae9a90f88d51429b8885c2fb9cbf0e7144fc963ad1230a9ac1b7c156e7a6375cde2cf8332159a05e234b66e5
   languageName: node
   linkType: hard
 
@@ -14037,7 +14037,7 @@ __metadata:
     "@types/d3-format": 3.0.2
     "@types/jest": 29.5.5
     "@types/node": 18.17.19
-    "@types/plotly.js": 2.12.26
+    "@types/plotly.js": 2.12.27
     "@types/react": 18.2.22
     "@types/react-dom": 18.2.7
     "@types/react-plotly.js": 2.6.0
