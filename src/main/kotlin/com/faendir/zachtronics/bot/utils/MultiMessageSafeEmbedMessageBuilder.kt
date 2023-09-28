@@ -90,14 +90,14 @@ class MultiMessageSafeEmbedMessageBuilder : SafeEmbedMessageBuilder<MultiMessage
     }
 
     private val rewritableMp4 = Regex("""https?://(?<host>i\.imgur\.com|files\.mors\.technology)/(?<id>.*)\.mp4""")
-    private val allowedImageTypes = setOf("gif", "png", "jpg")
+    private val allowedImageTypes = Regex(""".+\.(gif|png|jpg)(?:\?.*)?""")
 
     fun link(link: String?) = apply {
         if (link != null) {
             val match = rewritableMp4.matchEntire(link)
             if (match != null) {
                 image("https://${match.groups["host"]!!.value}/${match.groups["id"]!!.value}.gif")
-            } else if (allowedImageTypes.contains(link.substringAfterLast(".", ""))) {
+            } else if (allowedImageTypes.matchEntire(link) != null) {
                 image(link)
             } else {
                 addField("Link", "[${link.replace(Regex("https?://"), "")}]($link)")
