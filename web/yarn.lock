@@ -10212,10 +10212,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"plotly.js-gl3d-dist-min@npm:2.26.1":
-  version: 2.26.1
-  resolution: "plotly.js-gl3d-dist-min@npm:2.26.1"
-  checksum: 63a248b9f6a3e9b9a812778b44bc47efed02c416b9055913153006ff6cefc3241a77638fc79222d3c1597f3c4d911682c23397d471c9591ec1cb39485bb378bd
+"plotly.js-gl3d-dist-min@npm:2.26.2":
+  version: 2.26.2
+  resolution: "plotly.js-gl3d-dist-min@npm:2.26.2"
+  checksum: 36b7daf60a028baef06fb867533890d483a04fbd1a632c00903fbd8ebfe4603033a335513c8b3ad916779da0d68ce5376fedd82fcc43c6720c57a99a95358ad4
   languageName: node
   linkType: hard
 
@@ -14037,7 +14037,7 @@ __metadata:
     "@types/react-router-hash-link": 2.4.7
     d3-format: 3.1.0
     deep-object-diff: 1.1.9
-    plotly.js-gl3d-dist-min: 2.26.1
+    plotly.js-gl3d-dist-min: 2.26.2
     prettier: 3.0.3
     react: 18.2.0
     react-dom: 18.2.0
