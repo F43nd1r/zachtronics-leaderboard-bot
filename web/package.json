@@ -27,7 +27,7 @@
     },
     "devDependencies": {
         "@simbathesailor/use-what-changed": "2.0.0",
-        "@types/d3-format": "3.0.2",
+        "@types/d3-format": "3.0.3",
         "@types/jest": "29.5.5",
         "@types/node": "18.18.5",
         "@types/plotly.js": "2.12.27",
