@@ -3,7 +3,7 @@
 
 __metadata:
   version: 8
-  cacheKey: 10
+  cacheKey: 10c0
 
 "@ampproject/remapping@npm:^2.1.0":
   version: 2.2.0
@@ -2970,10 +2970,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sinclair/typebox@npm:0.31.18":
-  version: 0.31.18
-  resolution: "@sinclair/typebox@npm:0.31.18"
-  checksum: 8/06bc64232394cc11a00ec8214696fcecab4e8af0c04da81fb21c69ccd69b398be55d42dedb5f007b8f49abdb6eb6045520785e362975a9af82563ce11032a91b
+"@sinclair/typebox@npm:0.31.19":
+  version: 0.31.19
+  resolution: "@sinclair/typebox@npm:0.31.19"
+  checksum: 8da37ff7f0fce6396188fe5116da3915773fd15e3f56ec9840f6a6f0d99e36ba17e9f0fcf8fb2d8d55050d5e01bca9843e5b0e55f49694929ce9c00067978225
   languageName: node
   linkType: hard
 
@@ -11860,7 +11860,7 @@ __metadata:
     supports-preserve-symlinks-flag: "npm:^1.0.0"
   bin:
     resolve: bin/resolve
-  checksum: 551dd500765cce767c583747f5f21ceb51d437f539b01aee96d6ec39eb2c68a8ff5d646b083d690fe428a81329856bc1bbdb094379b8df4b3f10e7e1f6aa3839
+  checksum: 10/551dd500765cce767c583747f5f21ceb51d437f539b01aee96d6ec39eb2c68a8ff5d646b083d690fe428a81329856bc1bbdb094379b8df4b3f10e7e1f6aa3839
   languageName: node
   linkType: hard
 
@@ -11873,7 +11873,7 @@ __metadata:
     supports-preserve-symlinks-flag: "npm:^1.0.0"
   bin:
     resolve: bin/resolve
-  checksum: 27bff19d8219385bb1e271066317e553cff18daa2a19db9598d94ae444417ef3f5aec19e86927872d6cb241d02649cfb35a4c0d9d10ef2afa6325bce8bc8d903
+  checksum: 10/27bff19d8219385bb1e271066317e553cff18daa2a19db9598d94ae444417ef3f5aec19e86927872d6cb241d02649cfb35a4c0d9d10ef2afa6325bce8bc8d903
   languageName: node
   linkType: hard
 
@@ -13178,7 +13178,7 @@ __metadata:
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: f5481fa3ba0eee8970f46708d13c05650a865ad093b586fc9573f425c64c57ca97e3308e110bb528deb3ccebe83f6fd7b5a8ac90018038da96326a9ccdf8e77c
+  checksum: 10/f5481fa3ba0eee8970f46708d13c05650a865ad093b586fc9573f425c64c57ca97e3308e110bb528deb3ccebe83f6fd7b5a8ac90018038da96326a9ccdf8e77c
   languageName: node
   linkType: hard
 
@@ -14051,7 +14051,7 @@ __metadata:
     "@mui/material": "npm:5.14.15"
     "@mui/styles": "npm:5.14.15"
     "@simbathesailor/use-what-changed": "npm:2.0.0"
-    "@sinclair/typebox": "npm:0.31.18"
+    "@sinclair/typebox": "npm:0.31.19"
     "@types/d3-format": "npm:3.0.3"
     "@types/jest": "npm:29.5.6"
     "@types/node": "npm:18.18.6"
