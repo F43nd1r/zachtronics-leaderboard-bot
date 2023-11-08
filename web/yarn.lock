@@ -3479,14 +3479,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-router-hash-link@npm:2.4.8":
-  version: 2.4.8
-  resolution: "@types/react-router-hash-link@npm:2.4.8"
+"@types/react-router-hash-link@npm:2.4.9":
+  version: 2.4.9
+  resolution: "@types/react-router-hash-link@npm:2.4.9"
   dependencies:
     "@types/history": "npm:^4.7.11"
     "@types/react": "npm:*"
     "@types/react-router-dom": "npm:^5.3.0"
-  checksum: 8/dadf2b8a51e79e6bbe16886f78cc03333e5a6f850fc85759e743a36ac35bc328e83d379b62a242d16a61df8f3231fc47237ee07377a55725c851d143efbefa68
+  checksum: 3e650851a5c4f59aceee17ac1ec23ae1945e1de8917f49b6959da282c4f6a3ffbe8eec39c50843ca24f22edf38ee1128c8ba75fc251ebd22a5a97128c56b9569
   languageName: node
   linkType: hard
 
@@ -14009,7 +14009,7 @@ __metadata:
     "@types/react": "npm:18.2.36"
     "@types/react-dom": "npm:18.2.14"
     "@types/react-plotly.js": "npm:2.6.3"
-    "@types/react-router-hash-link": "npm:2.4.8"
+    "@types/react-router-hash-link": "npm:2.4.9"
     d3-format: "npm:3.1.0"
     deep-object-diff: "npm:1.1.9"
     plotly.js-gl3d-dist-min: "npm:2.27.0"
