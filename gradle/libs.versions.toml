@@ -24,7 +24,7 @@ guava = "32.1.3-jre"
 nokee = "0.4.3264-202305010539.985612b6"
 opencsv = "5.8"
 gradle-frontend = "7.0.0"
-nodejs = "16.20.0"
+nodejs = "18.17.0"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
