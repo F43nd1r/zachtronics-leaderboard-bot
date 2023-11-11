@@ -138,9 +138,15 @@ tasks.assembleFrontend {
         file("web/.yarnrc.yml")
     }
     outputs.dir("web/build")
+    doLast {
+        if(outputs.files.asFileTree.none { it.isFile }) {
+            throw GradleException("Failed to build frontend")
+        }
+    }
 }
 
 val copyWebApp = tasks.register<Copy>("copyWebApp") {
+    group = "frontend"
     from("web/build")
     into("${project.buildDir}/resources/main/static/")
     dependsOn(tasks.assembleFrontend)
