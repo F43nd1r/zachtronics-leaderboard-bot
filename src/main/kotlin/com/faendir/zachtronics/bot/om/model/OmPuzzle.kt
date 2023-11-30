@@ -147,6 +147,7 @@ enum class OmPuzzle(
     EVIL_ORE(TOURNAMENT_2019, NORMAL, "Evil Ore", "w1698788220", "week8"),
     PANACEA(TOURNAMENT_2019, NORMAL, "Panacea", "w1698789743", "weekEX"),
 
+    CONNECT_THE_DOTS(TOURNAMENT_2020, NORMAL, "Connect the Dots", "w3101135731", "OM2020_W0_ConnectTheDots"),
     POTENT_POTABLES(TOURNAMENT_2020, NORMAL, "Potent Potables", "w2501727721", "OM2020_W1_PotentPotables"),
     AMALGAMATED_GOLD_RING(TOURNAMENT_2020, NORMAL, "Amalgamated Gold Ring", "w2501727808", "OM2020_W2_AmalgamatedGoldRing"),
     SWAMP_FIBER(TOURNAMENT_2020, POLYMER, "Swamp Fiber", "w2501727889", "OM2020_W3_SwampFiber"),
