@@ -31,7 +31,7 @@
         "@types/jest": "29.5.11",
         "@types/node": "20.10.4",
         "@types/plotly.js": "2.12.30",
-        "@types/react": "18.2.43",
+        "@types/react": "18.2.45",
         "@types/react-dom": "18.2.17",
         "@types/react-plotly.js": "2.6.3",
         "@types/react-router-hash-link": "2.4.9",
