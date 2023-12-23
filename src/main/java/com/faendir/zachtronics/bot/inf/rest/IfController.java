@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,13 @@ import com.faendir.zachtronics.bot.inf.rest.dto.IfGroupDTO;
 import com.faendir.zachtronics.bot.inf.rest.dto.IfPuzzleDTO;
 import com.faendir.zachtronics.bot.inf.rest.dto.IfRecordDTO;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
+import com.faendir.zachtronics.bot.rest.GameRestController;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
@@ -40,43 +42,47 @@ import java.util.List;
 @RestController
 @RequestMapping("/if")
 @RequiredArgsConstructor
-public class IfController {
+public class IfController implements GameRestController<IfGroupDTO, IfPuzzleDTO, IfCategoryDTO, IfRecordDTO> {
     
     private final IfSolutionRepository repository;
     
-    @Getter(onMethod_ = {@GetMapping(path = "/groups", produces = MediaType.APPLICATION_JSON_VALUE)})
+    @Getter
     private final List<IfGroupDTO> groups = Arrays.stream(IfGroup.values()).map(IfGroupDTO::fromGroup).toList();
 
-    @Getter(onMethod_ = {@GetMapping(path = "/puzzles", produces = MediaType.APPLICATION_JSON_VALUE)})
+    @Getter
     private final List<IfPuzzleDTO> puzzles = Arrays.stream(IfPuzzle.values()).map(IfPuzzleDTO::fromPuzzle).toList();
 
-    @GetMapping(path = "/puzzle/{puzzleId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public IfPuzzleDTO getPuzzle(@PathVariable String puzzleId) { return IfPuzzleDTO.fromPuzzle(findPuzzle(puzzleId)); }
+    @Override
+    public IfPuzzleDTO getPuzzle(@NotNull String puzzleId) {
+        return IfPuzzleDTO.fromPuzzle(findPuzzle(puzzleId));
+    }
 
-    @GetMapping(path = "/group/{groupId}/puzzles", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<IfPuzzleDTO> listPuzzlesByGroup(@PathVariable String groupId) {
+    @Override
+    @NotNull
+    public List<IfPuzzleDTO> listPuzzlesByGroup(@NotNull String groupId) {
         IfGroup group = findGroup(groupId);
         return Arrays.stream(IfPuzzle.values()).filter(p -> p.getGroup() == group).map(IfPuzzleDTO::fromPuzzle).toList();
     }
 
-    @Getter(onMethod_ = {@GetMapping(path = "/categories", produces = MediaType.APPLICATION_JSON_VALUE)})
+    @Getter
     private final List<IfCategoryDTO> categories = Arrays.stream(IfCategory.values()).map(IfCategoryDTO::fromCategory).toList();
 
-    @GetMapping(path = "/category/{categoryId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public IfCategoryDTO getCategory(@PathVariable String categoryId) {
+    @Override
+    public IfCategoryDTO getCategory(@NotNull String categoryId) {
         return IfCategoryDTO.fromCategory(findCategory(categoryId));
     }
 
-    @GetMapping(path = "/puzzle/{puzzleId}/records", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<IfRecordDTO> listRecords(@PathVariable String puzzleId, @RequestParam(required = false) Boolean includeFrontier) {
+    @Override
+    @NotNull
+    public List<IfRecordDTO> listRecords(@NotNull String puzzleId, Boolean includeFrontier) {
         IfPuzzle puzzle = findPuzzle(puzzleId);
         return repository.findCategoryHolders(puzzle, includeFrontier != null && includeFrontier).stream()
                          .map(IfRecordDTO::fromCategoryRecord)
                          .toList();
     }
 
-    @GetMapping(path = "/puzzle/{puzzleId}/category/{categoryId}/record", produces = MediaType.APPLICATION_JSON_VALUE)
-    public IfRecordDTO getRecord(@PathVariable String puzzleId, @PathVariable String categoryId) {
+    @Override
+    public IfRecordDTO getRecord(@NotNull String puzzleId, @NotNull String categoryId) {
         IfPuzzle puzzle = findPuzzle(puzzleId);
         IfCategory category = findCategory(categoryId);
         IfRecord record = repository.find(puzzle, category);
