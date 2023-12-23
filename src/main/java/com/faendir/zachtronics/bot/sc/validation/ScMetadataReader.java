@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ public class ScMetadataReader {
             "(?<cycles>\\d+)-(?<reactors>\\d+)-(?<symbols>\\d+)" +
             "(?:,(?<description>" + SOLUTION_NAME_REGEX + "))?$", Pattern.MULTILINE);
 
-    private ScMetadataReader() {};
+    private ScMetadataReader() {}
     
     /**
      * @param data is the whole export, the first <tt>SOLUTION:</tt> match will dictate the metadata line

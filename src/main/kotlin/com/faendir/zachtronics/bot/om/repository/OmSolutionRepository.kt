@@ -196,7 +196,7 @@ class OmSolutionRepository(
                 // copies are needed or they'll edit themselves in the handler
                 handleBeatenRecord(mRecord, mRecord.categories.toSet(), mRecord.frontierManifolds.toSet())
                 beatenCR.add(CategoryRecord(record, mRecord.categories))
-                continue;
+                continue
             }
 
             for (manifold in possibleManifolds.intersect(mRecord.frontierManifolds)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,9 +151,9 @@ public class SzManualTest {
                                           .sorted()
                                           .collect(Collectors.joining(","));
 
-                    String[] csvRecord = new String[]{record.getScore().toDisplayString(),
-                                                      author,
-                                                      categories};
+                    String[] csvRecord = {record.getScore().toDisplayString(),
+                                          author,
+                                          categories};
                     writer.writeNext(csvRecord, false);
                 }
             }

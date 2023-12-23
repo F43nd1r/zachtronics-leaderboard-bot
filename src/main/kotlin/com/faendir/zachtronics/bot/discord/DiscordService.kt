@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.discord
 
-import com.faendir.zachtronics.bot.config.DiscordProperties
 import com.faendir.zachtronics.bot.discord.command.Command
 import com.faendir.zachtronics.bot.utils.editReplyWithFailure
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -42,7 +41,6 @@ import reactor.core.publisher.Mono
 class DiscordService(
     private val discordClient: GatewayDiscordClient,
     private val commands: List<Command.TopLevel>,
-    private val discordProperties: DiscordProperties,
     private val gitProperties: GitProperties,
     private val restartEndpoint: RestartEndpoint,
     private val objectMapper: ObjectMapper,

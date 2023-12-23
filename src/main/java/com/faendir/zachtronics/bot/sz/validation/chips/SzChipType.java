@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.faendir.zachtronics.bot.sz.validation.chips;
 
-enum SzChipType {
+public enum SzChipType {
     // MCs
     UC4,
     UC4X,
@@ -36,5 +36,5 @@ enum SzChipType {
 
     PGA,
 
-    OTHER;
+    OTHER
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import discord4j.rest.RestClient
 import io.mockk.every
 import io.mockk.mockk
 import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.util.SystemReader
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.cloud.context.restart.RestartEndpoint
 import org.springframework.context.annotation.Bean

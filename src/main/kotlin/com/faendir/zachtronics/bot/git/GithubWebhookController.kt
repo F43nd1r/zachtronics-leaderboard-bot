@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,6 +89,7 @@ data class User(
     val email: String,
 )
 
+@Suppress("PropertyName")
 data class Repository(
     val git_url: String,
     val clone_url: String,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.faendir.zachtronics.bot.om.discord
 
 import com.faendir.zachtronics.bot.discord.DiscordActionCache
-import com.faendir.zachtronics.bot.discord.command.AbstractListCommand
 import com.faendir.zachtronics.bot.discord.command.AbstractPaginatedListCommand
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.OmCategory
@@ -25,7 +24,6 @@ import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.omPuzzleOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import org.springframework.stereotype.Component
 
 @Component

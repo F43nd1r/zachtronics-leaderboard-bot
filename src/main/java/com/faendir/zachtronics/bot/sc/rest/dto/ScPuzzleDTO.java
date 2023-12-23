@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.faendir.zachtronics.bot.sc.rest.dto;
 
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
-import kotlin.jvm.internal.Intrinsics;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
