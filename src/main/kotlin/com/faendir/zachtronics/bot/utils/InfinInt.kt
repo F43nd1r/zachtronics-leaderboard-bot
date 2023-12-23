@@ -80,12 +80,6 @@ class InfinInt private constructor(private val value: Int) : Number(), Comparabl
         return value
     }
 
-    override fun toChar(): Char {
-        if (value == INFINITY_VALUE)
-            throw IllegalArgumentException("The margin of this Char is too small to contain **INFINITY**")
-        return value.toChar()
-    }
-
     override fun toShort(): Short {
         if (value == INFINITY_VALUE)
             throw IllegalArgumentException("The margin of this Short is too small to contain **INFINITY**")
