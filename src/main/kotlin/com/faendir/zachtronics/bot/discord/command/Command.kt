@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import com.faendir.zachtronics.bot.discord.command.security.Secured
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import discord4j.core.event.domain.interaction.ChatInputAutoCompleteEvent
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.core.`object`.command.ApplicationCommandOption
 import discord4j.discordjson.json.ApplicationCommandOptionChoiceData
@@ -84,8 +83,8 @@ sealed interface Command {
             return commands.first { it.name == name }
         }
 
-        override val secured = Secured { event, user ->
-            findCommand(event).secured.hasExecutionPermission(event, user)
+        override val secured = Secured { event ->
+            findCommand(event).secured.hasExecutionPermission(event)
         }
 
         override fun ephemeral(event: ChatInputInteractionEvent) = findCommand(event).ephemeral(event)

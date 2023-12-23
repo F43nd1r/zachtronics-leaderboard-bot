@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package com.faendir.zachtronics.bot.discord.command.security
 
+import com.faendir.zachtronics.bot.utils.user
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.core.`object`.entity.Member
-import discord4j.core.`object`.entity.User
 
 object TrustedLeaderboardPosterRoleSecured : Secured {
-    override fun hasExecutionPermission(event: InteractionCreateEvent, user: User): Boolean {
-        return (user as? Member)?.roles?.any { it.name == "leaderboard poster" }?.block() ?: false
+    override fun hasExecutionPermission(event: InteractionCreateEvent): Boolean {
+        return (event.user() as? Member)?.roles?.any { it.name == "leaderboard poster" }?.block() ?: false
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,7 @@
 package com.faendir.zachtronics.bot.discord.command.security
 
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
-import discord4j.core.`object`.entity.User
 
 object NotSecured : Secured {
-    override fun hasExecutionPermission(event: InteractionCreateEvent, user: User) = true
+    override fun hasExecutionPermission(event: InteractionCreateEvent) = true
 }

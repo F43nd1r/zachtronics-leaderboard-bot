@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.discord
 import com.faendir.zachtronics.bot.config.DiscordProperties
 import com.faendir.zachtronics.bot.discord.command.Command
 import com.faendir.zachtronics.bot.utils.editReplyWithFailure
-import com.faendir.zachtronics.bot.utils.user
 import com.fasterxml.jackson.databind.ObjectMapper
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.event.domain.interaction.ChatInputAutoCompleteEvent
@@ -66,7 +65,7 @@ class DiscordService(
         discordClient.subscribeEvent<ChatInputInteractionEvent> { event ->
             val command = findCommand(event.commandName)
             event.deferReply().withEphemeral(command.ephemeral(event)).awaitSingleOrNull()
-            if (!command.secured.hasExecutionPermission(event, event.user())) {
+            if (!command.secured.hasExecutionPermission(event)) {
                 throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
             }
             command.handle(event).awaitSingleOrNull()
@@ -75,7 +74,7 @@ class DiscordService(
         discordClient.on(ChatInputAutoCompleteEvent::class.java) { event ->
             mono {
                 val command = findCommand(event.commandName)
-                if (!command.secured.hasExecutionPermission(event, event.user())) {
+                if (!command.secured.hasExecutionPermission(event)) {
                     throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
                 }
                 event.respondWithSuggestions(command.autoComplete(event)?.takeIf { it.size <= 25 } ?: emptyList()).awaitSingleOrNull()

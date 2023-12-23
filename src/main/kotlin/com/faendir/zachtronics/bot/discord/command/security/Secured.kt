@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,11 @@
 package com.faendir.zachtronics.bot.discord.command.security
 
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
-import discord4j.core.`object`.entity.User
 
 fun interface Secured {
-    fun hasExecutionPermission(event: InteractionCreateEvent, user: User): Boolean
+    fun hasExecutionPermission(event: InteractionCreateEvent): Boolean
 }
 
 infix fun Secured.or(alternative: Secured) =
-    Secured { event, user -> this.hasExecutionPermission(event, user) || alternative.hasExecutionPermission(event, user) }
+    Secured { event -> this.hasExecutionPermission(event) || alternative.hasExecutionPermission(event) }
 

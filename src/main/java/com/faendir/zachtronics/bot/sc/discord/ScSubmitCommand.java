@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScSubmission;
 import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
-import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
@@ -56,7 +55,7 @@ public class ScSubmitCommand extends AbstractMultiSubmitCommand<ScCategory, ScPu
     private final CommandOption<Boolean, Boolean> bypassValidationOption = CommandOptionBuilder.bool("bypass-validation")
             .description("Skips running SChem on the solutions. Admin-only")
             .convert((event, bypass) -> {
-                if (bypass != null && bypass && !ScSecured.WIKI_ADMINS_ONLY.hasExecutionPermission(event, UtilsKt.user(event))) {
+                if (bypass != null && bypass && !ScSecured.WIKI_ADMINS_ONLY.hasExecutionPermission(event)) {
                     throw new IllegalArgumentException("Only a wiki admin can use this parameter");
                 }
                 return bypass;

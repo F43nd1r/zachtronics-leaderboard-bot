@@ -24,7 +24,6 @@ import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.inf.IfQualifier;
 import com.faendir.zachtronics.bot.inf.model.*;
 import com.faendir.zachtronics.bot.inf.repository.IfSolutionRepository;
-import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
@@ -52,7 +51,7 @@ public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPu
             .convert((event, score) -> {
                 if (score != null)
                     return IfScore.parseScore(score);
-                if (IfSecured.WIKI_ADMINS_ONLY.hasExecutionPermission(event, UtilsKt.user(event)))
+                if (IfSecured.WIKI_ADMINS_ONLY.hasExecutionPermission(event))
                     return null;
                 throw new IllegalArgumentException("Only a wiki admin can load scores from savefile");
             })

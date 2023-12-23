@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.discord.command.security
 
 import com.faendir.zachtronics.bot.utils.asReaction
+import com.faendir.zachtronics.bot.utils.user
 import discord4j.common.util.Snowflake
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.core.`object`.entity.Guild
@@ -44,14 +45,14 @@ enum class DiscordUser(val id: Long, val getSpecialEmoji: (Guild?) -> ReactionEm
     companion object {
         @JvmField
         val BOT_OWNERS = setOf(F43ND1R, IEEE12345)
-        val OM_LB_ADMINS = BOT_OWNERS + setOf(BIGGIE, GRIMMY, RP0, SYX);
+        val OM_LB_ADMINS = BOT_OWNERS + setOf(BIGGIE, GRIMMY, RP0, SYX)
     }
 }
 
 class DiscordUserSecured(users: Collection<DiscordUser>) : Secured {
     private val ids = users.map { it.id }.toSet()
 
-    override fun hasExecutionPermission(event: InteractionCreateEvent, user: User): Boolean = ids.contains(user.id.asLong())
+    override fun hasExecutionPermission(event: InteractionCreateEvent): Boolean = ids.contains(event.user().id.asLong())
 }
 
 fun User.asDiscordUser() = DiscordUser.entries.find { it.id == this.id.asLong() }
