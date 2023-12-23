@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.inf.validation;
 import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
 import com.faendir.zachtronics.bot.inf.model.IfScore;
 import com.faendir.zachtronics.bot.inf.model.IfSubmission;
+import com.faendir.zachtronics.bot.inf.model.IfType;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import org.jetbrains.annotations.NotNull;
 
@@ -93,7 +94,7 @@ class IfValidator {
         // if we have no score we load it from the file, by extending minimal trust to it
         if (score == null)
             score = new IfScore(info.getCycles(), info.getFootprint(), info.getBlocks(), true, true);
-        String id = idSlot.replaceFirst("\\.\\d+", "");
+        String id = idSlot.replaceFirst("\\.\\d$", "");
         IfPuzzle puzzle = Arrays.stream(IfPuzzle.values())
                                 .filter(p -> p.getId().equals(id))
                                 .findFirst().orElseThrow();
@@ -103,6 +104,10 @@ class IfValidator {
                                                """, id, info.getInputRate(), id, info.getSolution());
         // we use a mutable list, as we could fill it later with display links if we have a single valid submission
         IfSubmission submission = new IfSubmission(puzzle, score, author, new ArrayList<>(), leaderboardData);
+
+        // ensure level is tracked
+        if (puzzle.getType() != IfType.STANDARD)
+            return new ValidationResult.Invalid<>(submission, "Boss levels are not supported");
 
         IfSave save = IfSave.unmarshal(info.getSolution());
         int blockScore = save.blockScore();
