@@ -22,6 +22,7 @@ import com.faendir.zachtronics.bot.model.*;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.utils.Markdown;
+import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.opencsv.*;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -79,6 +80,27 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
             return result;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        }
+    }
+
+    @NotNull
+    @Override
+    public List<SubmitResult<R, C>> submitAll(@NotNull Collection<? extends ValidationResult<Sub>> validationResults) {
+        try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
+            List<SubmitResult<R, C>> submitResults = new ArrayList<>();
+
+            for (ValidationResult<Sub> validationResult : validationResults) {
+                if (validationResult instanceof ValidationResult.Valid<Sub>) {
+                    Sub submission = validationResult.getSubmission();
+                    submitResults.add(submitOne(access, submission, (sub, wonCategories) -> {}));
+                }
+                else {
+                    submitResults.add(new SubmitResult.Failure<>(validationResult.getMessage()));
+                }
+            }
+
+            access.push();
+            return submitResults;
         }
     }
 

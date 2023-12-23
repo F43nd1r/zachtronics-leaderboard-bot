@@ -22,8 +22,6 @@ import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
-import com.faendir.zachtronics.bot.repository.SubmitResult;
-import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +31,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 import java.util.function.Function;
 
 import static com.faendir.zachtronics.bot.cw.model.CwCategory.FOOTPRINT;
@@ -56,28 +51,6 @@ public class CwSolutionRepository extends AbstractSolutionRepository<CwCategory,
     private final Class<CwCategory> categoryClass = CwCategory.class;
     private final Function<String[], CwSolution> solUnmarshaller = CwSolution::unmarshal;
     private final Comparator<CwSolution> archiveComparator = Comparator.comparing(CwSolution::getScore, SIZE.getScoreComparator());
-
-    @NotNull
-    @Override
-    public List<SubmitResult<CwRecord, CwCategory>> submitAll(
-            @NotNull Collection<? extends ValidationResult<CwSubmission>> validationResults) {
-        try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
-            List<SubmitResult<CwRecord, CwCategory>> submitResults = new ArrayList<>();
-
-            for (ValidationResult<CwSubmission> validationResult : validationResults) {
-                if (validationResult instanceof ValidationResult.Valid<CwSubmission>) {
-                    CwSubmission submission = validationResult.getSubmission();
-                    submitResults.add(submitOne(access, submission, (sub, wonCategories) -> {}));
-                }
-                else {
-                    submitResults.add(new SubmitResult.Failure<>(validationResult.getMessage()));
-                }
-            }
-
-            access.push();
-            return submitResults;
-        }
-    }
 
     @Override
     protected CwSolution makeCandidateSolution(@NotNull CwSubmission submission) {

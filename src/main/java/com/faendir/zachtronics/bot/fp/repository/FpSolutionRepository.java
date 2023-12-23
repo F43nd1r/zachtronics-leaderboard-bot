@@ -22,8 +22,6 @@ import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
-import com.faendir.zachtronics.bot.repository.SubmitResult;
-import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +31,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 import java.util.function.Function;
 
 import static com.faendir.zachtronics.bot.fp.model.FpCategory.*;
@@ -55,28 +50,6 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
     private final Class<FpCategory> categoryClass = FpCategory.class;
     private final Function<String[], FpSolution> solUnmarshaller = FpSolution::unmarshal;
     private final Comparator<FpSolution> archiveComparator = Comparator.comparing(FpSolution::getScore, RCF.getScoreComparator());
-
-    @NotNull
-    @Override
-    public List<SubmitResult<FpRecord, FpCategory>> submitAll(
-            @NotNull Collection<? extends ValidationResult<FpSubmission>> validationResults) {
-        try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
-            List<SubmitResult<FpRecord, FpCategory>> submitResults = new ArrayList<>();
-
-            for (ValidationResult<FpSubmission> validationResult : validationResults) {
-                if (validationResult instanceof ValidationResult.Valid<FpSubmission>) {
-                    FpSubmission submission = validationResult.getSubmission();
-                    submitResults.add(submitOne(access, submission, (sub, wonCategories) -> {}));
-                }
-                else {
-                    submitResults.add(new SubmitResult.Failure<>(validationResult.getMessage()));
-                }
-            }
-
-            access.push();
-            return submitResults;
-        }
-    }
 
     @Override
     protected FpSolution makeCandidateSolution(@NotNull FpSubmission submission) {
