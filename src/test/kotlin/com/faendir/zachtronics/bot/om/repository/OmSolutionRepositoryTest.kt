@@ -26,11 +26,11 @@ import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.testutils.TestGitRepository
-import com.google.common.io.Files
 import io.mockk.mockk
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import strikt.api.expectThat
 import strikt.assertions.*
 import java.io.File
@@ -41,8 +41,8 @@ class OmSolutionRepositoryTest {
         username = "zachtronics-bot-test"
     }
 
+    @TempDir
     private lateinit var leaderboardDir: File
-    private lateinit var archiveDir: File
 
     private lateinit var leaderboard: GitRepository
 
@@ -50,9 +50,6 @@ class OmSolutionRepositoryTest {
 
     @BeforeEach
     internal fun setUp() {
-        leaderboardDir = Files.createTempDir()
-        archiveDir = Files.createTempDir()
-
         leaderboard = createGitRepositoryFrom(leaderboardDir, gitProperties)
         repository = OmSolutionRepository(leaderboard, mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))
     }
