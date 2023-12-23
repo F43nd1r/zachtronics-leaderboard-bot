@@ -61,7 +61,7 @@ public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPu
             .convert((event, links) -> List.of(links.split(",")))
             .build();
     @Getter
-    private final List<CommandOption<?, ?>> options = List.of(solutionOption, scoreOption, authorOption, videosOption);
+    private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, scoreOption, videosOption);
     @Getter
     private final Secured secured = IfSecured.INSTANCE;
     @Getter
