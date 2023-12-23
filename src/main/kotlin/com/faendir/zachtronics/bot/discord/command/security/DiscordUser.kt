@@ -40,6 +40,7 @@ enum class DiscordUser(val id: Long, val getSpecialEmoji: (Guild?) -> ReactionEm
     GRIMMY(107902495199604736, { ReactionEmoji.unicode("\uD83D\uDC9C") }),
     SYX(206689051028357121),
     A_SNOWBALL(136186716334587904),
+    ROLAMNI(177824842370777088)
     ;
 
     companion object {

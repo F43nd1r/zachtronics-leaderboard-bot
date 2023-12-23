@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ import com.faendir.zachtronics.bot.discord.command.security.*;
 import java.util.Set;
 
 public class IfSecured {
-    public static final DiscordUserSecured WIKI_ADMINS_ONLY = new DiscordUserSecured(Set.of(DiscordUser.IEEE12345, DiscordUser.A_SNOWBALL));
+    private static final Set<DiscordUser> WIKI_ADMINS = Set.of(DiscordUser.IEEE12345, DiscordUser.A_SNOWBALL, DiscordUser.ROLAMNI);
+    public static final DiscordUserSecured WIKI_ADMINS_ONLY = new DiscordUserSecured(WIKI_ADMINS);
     public static final Secured INSTANCE = SecuredKt.or(WIKI_ADMINS_ONLY, TrustedLeaderboardPosterRoleSecured.INSTANCE);
 
     private IfSecured() {}
