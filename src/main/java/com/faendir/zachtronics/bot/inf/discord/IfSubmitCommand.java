@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.faendir.zachtronics.bot.inf.discord;
 
-import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand;
+import com.faendir.zachtronics.bot.discord.command.AbstractMultiSubmitCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
 import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
@@ -24,35 +24,42 @@ import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.inf.IfQualifier;
 import com.faendir.zachtronics.bot.inf.model.*;
 import com.faendir.zachtronics.bot.inf.repository.IfSolutionRepository;
+import com.faendir.zachtronics.bot.utils.UtilsKt;
+import com.faendir.zachtronics.bot.validation.ValidationResult;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Component
 @IfQualifier
-public class IfSubmitCommand extends AbstractSubmitCommand<IfCategory, IfPuzzle, IfSubmission, IfRecord> {
+public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPuzzle, IfSubmission, IfRecord> {
     private final CommandOption<String, String> solutionOption = OptionHelpersKt.linkOptionBuilder("solution")
             .description("Link or `m1` to scrape it from your last message.")
             .required()
-            .build();
-    private final CommandOption<String, IfScore> scoreOption = CommandOptionBuilder.string("score")
-            .description("Score of the solution in ccc/fff/bbb[/GF] format")
-            .required()
-            .convert((event, score) -> IfScore.parseScore(score))
             .build();
     private final CommandOption<String, String> authorOption = CommandOptionBuilder.string("author")
             .description("Name to appear on the Reddit leaderboard")
             .required()
             .build();
-    private static final String SEPARATOR = ",";
+    private final CommandOption<String, IfScore> scoreOption = CommandOptionBuilder.string("score")
+            .description("Score of the solution in ccc/fff/bbb[/GF] format")
+            .convert((event, score) -> {
+                if (score != null)
+                    return IfScore.parseScore(score);
+                if (IfSecured.WIKI_ADMINS_ONLY.hasExecutionPermission(event, UtilsKt.user(event)))
+                    return null;
+                throw new IllegalArgumentException("Only a wiki admin can load scores from savefile");
+            })
+            .build();
     private final CommandOption<String, List<String>> videosOption = OptionHelpersKt.linkOptionBuilder("videos")
             .description("Link(s) to the video(s) of the solution, accepts multiple separated by `,`")
-            .convert((event, links) -> List.of(links.split(SEPARATOR)))
+            .convert((event, links) -> List.of(links.split(",")))
             .build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(solutionOption, scoreOption, authorOption, videosOption);
@@ -63,7 +70,22 @@ public class IfSubmitCommand extends AbstractSubmitCommand<IfCategory, IfPuzzle,
 
     @NotNull
     @Override
-    public IfSubmission parseSubmission(@NotNull ChatInputInteractionEvent event) {
-        return IfSubmission.fromLink(solutionOption.get(event), authorOption.get(event), scoreOption.get(event), videosOption.get(event));
+    public Collection<ValidationResult<IfSubmission>> parseSubmissions(@NotNull ChatInputInteractionEvent event) {
+        IfScore score = scoreOption.get(event);
+        List<String> videos = videosOption.get(event);
+
+        Collection<ValidationResult<IfSubmission>> results = IfSubmission.fromLink(solutionOption.get(event),
+                                                                                   authorOption.get(event),
+                                                                                   score);
+        if (videos != null || score != null) {
+            if (results.size() != 1)
+                throw new IllegalArgumentException("Only one solution can be paired with videos or explicit score");
+
+            ValidationResult<IfSubmission> result = results.iterator().next();
+            if (videos != null && result instanceof ValidationResult.Valid<IfSubmission>) {
+                result.getSubmission().getDisplayLinks().addAll(videos);
+            }
+        }
+        return results;
     }
 }
