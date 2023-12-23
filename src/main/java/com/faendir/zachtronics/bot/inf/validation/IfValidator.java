@@ -109,6 +109,10 @@ class IfValidator {
         if (puzzle.getType() != IfType.STANDARD)
             return new ValidationResult.Invalid<>(submission, "Boss levels are not supported");
 
+        // each level has 10 outputs, plus one cycle of travel
+        if (score.getCycles() <= 10)
+            return new ValidationResult.Invalid<>(submission, "Cycles too low: " + score.getCycles());
+
         IfSave save = IfSave.unmarshal(info.getSolution());
         int blockScore = save.blockScore();
         if (blockScore != score.getBlocks())
