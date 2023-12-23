@@ -70,7 +70,7 @@ class IfValidator {
             "Solution.(?<idSlot>\\d+-\\db?\\.\\d) = (?<value>[A-Za-z0-9+/]+={0,2})");
 
     public static Collection<ValidationResult<IfSubmission>> validateSavefile(@NotNull String data, @NotNull String author, IfScore score) {
-        Map<String, IfSolutionInfo> infosByIdSlot = new HashMap<>(); // 1-1.0 -> {...}
+        Map<String, IfSolutionInfo> infosByIdSlot = new LinkedHashMap<>(); // 1-1.0 -> {...}
 
         for (String line: Pattern.compile("\r?\n").split(data)) {
             if (line.isBlank()) continue;
