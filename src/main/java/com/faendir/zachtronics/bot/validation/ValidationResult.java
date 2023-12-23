@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ public sealed interface ValidationResult<S extends Submission<?, ?>> permits Val
     @NotNull String getMessage();
 
     @Value
-    final class Valid<S extends Submission<?, ?>> implements ValidationResult<S> {
+    class Valid<S extends Submission<?, ?>> implements ValidationResult<S> {
         @NotNull S submission;
 
         @NotNull
@@ -39,13 +39,13 @@ public sealed interface ValidationResult<S extends Submission<?, ?>> permits Val
     }
 
     @Value
-    final class Invalid<S extends Submission<?, ?>> implements ValidationResult<S> {
+    class Invalid<S extends Submission<?, ?>> implements ValidationResult<S> {
         @NotNull S submission;
         @NotNull String message;
     }
 
     @Value
-    final class Unparseable<S extends Submission<?, ?>> implements ValidationResult<S> {
+    class Unparseable<S extends Submission<?, ?>> implements ValidationResult<S> {
         @NotNull String message;
 
         @NotNull
