@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public class IfRecordDTO implements RecordDTO<IfScoreDTO> {
     @NotNull IfScoreDTO score;
     @NotNull String fullFormattedScore;
     @NotNull String author;
-    @Nullable String gif = null;
+    @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
 
@@ -45,6 +45,7 @@ public class IfRecordDTO implements RecordDTO<IfScoreDTO> {
                 IfScoreDTO.fromScore(record.getScore()),
                 record.getScore().toDisplayString(DisplayContext.plainText()),
                 record.getAuthor(),
+                record.getDisplayLink(),
                 record.getDataLink(),
                 UtilsKt.smartFormat(categories, UtilsKt.toMetricsTree(record.getPuzzle().getSupportedCategories()))
         );
@@ -55,6 +56,7 @@ public class IfRecordDTO implements RecordDTO<IfScoreDTO> {
         return new IfRecordDTO(IfScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
                                record.getAuthor(),
+                               record.getDisplayLink(),
                                record.getDataLink(),
                                null);
     }
