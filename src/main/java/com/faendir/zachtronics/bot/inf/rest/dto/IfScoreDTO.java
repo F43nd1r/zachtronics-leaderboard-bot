@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package com.faendir.zachtronics.bot.inf.rest.dto;
 
 import com.faendir.zachtronics.bot.inf.model.IfScore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 import lombok.Value;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +29,7 @@ public class IfScoreDTO {
     int footprint;
     int blocks;
 
+    @Getter(onMethod_ = {@JsonProperty("usesGRA")})
     @Accessors(fluent = true)
     boolean usesGRA;
     boolean finite;
