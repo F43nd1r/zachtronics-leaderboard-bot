@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Component
@@ -56,9 +57,11 @@ public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPu
                 throw new IllegalArgumentException("Only a wiki admin can load scores from savefile");
             })
             .build();
-    private final CommandOption<String, List<String>> videosOption = OptionHelpersKt.linkOptionBuilder("videos")
+    private final CommandOption<String, List<String>> videosOption = CommandOptionBuilder.string("videos")
             .description("Link(s) to the video(s) of the solution, accepts multiple separated by `,`")
-            .convert((event, links) -> List.of(links.split(",")))
+            .convert((event, links) -> Pattern.compile(",").splitAsStream(links)
+                                              .map(l -> OptionHelpersKt.resolveLink(event, l))
+                                              .toList())
             .build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, scoreOption, videosOption);
