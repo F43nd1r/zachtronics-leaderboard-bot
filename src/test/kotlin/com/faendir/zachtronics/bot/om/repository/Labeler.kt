@@ -177,27 +177,9 @@ class Labeler {
         )
         puzzleData.take(10).forEach {
             println("------- Score: ${it.record.score.toDisplayString()}")
-            println("-- Names IEEE: ${labeled1[it]?.sorted()}")
+            println("-- Names IEEE: ${labeled1[it]?.toSet()?.sorted()}")
             println("Names F43nd1r: ${labeled2[it]?.sorted()}")
         }
-    }
-
-    private val compares = mutableMapOf<Set<OmMemoryRecord>, MutableMap<OmMetric, OmMemoryRecord?>>()
-
-    private fun better(a: OmMemoryRecord, b: OmMemoryRecord, metrics: Set<OmMetric>): OmMemoryRecord? {
-        return metrics.mapTo(mutableSetOf()) { metric ->
-            compares.getOrPut(setOf(a, b)) {
-                mutableMapOf()
-            }.getOrPut(metric) {
-                metric.comparator.compare(a.record.score, b.record.score).let {
-                    when {
-                        it < 0 -> a
-                        it > 0 -> b
-                        else -> null
-                    }
-                }
-            }
-        }.singleOrNull()
     }
 
     private fun names2(metrics: Set<OmMetric>, records: Set<OmMemoryRecord>): Map<OmMemoryRecord, Set<OmParetoName>> {
@@ -205,8 +187,13 @@ class Labeler {
 
         for (key in Sets.powerSet(metrics).minusElement(emptySet()).sortedBy { it.size }) {
             val potentialRecords = records - Sets.powerSet(key).minusElement(emptySet()).flatMapTo(mutableSetOf()) { recordsByNamePart[it] ?: emptySet() }
+            val comparators = key.flatMap { it.scoreParts }.map { it.comparator }
             for (potentialRecord in potentialRecords) {
-                if (records.none { it != potentialRecord && better(it, potentialRecord, key) == it }) {
+                if (records.none { record ->
+                        if (record == potentialRecord) return@none false
+                        val compares = comparators.map { it.compare(record.record.score, potentialRecord.record.score) }
+                        compares.all { it <= 0 } && compares.any { it < 0 }
+                    }) {
                     recordsByNamePart.getOrPut(key) { mutableSetOf() }.add(potentialRecord)
                 }
             }
@@ -295,7 +282,7 @@ class Labeler {
                     dataLink = "",
                     dataPath = Path.of(""),
                 )
-            ),OmMemoryRecord(
+            ), OmMemoryRecord(
                 OmRecord(
                     puzzle = OmPuzzle.STABILIZED_WATER,
                     score = OmScore(
@@ -322,8 +309,8 @@ class Labeler {
         val names = names2(setOf(OmMetric.COST, OmMetric.AREA, OmMetric.CYCLES), records.toSet())
 
         records.forEach {
-                    println("Score: ${it.record.score.cost}g/${it.record.score.area}a/${it.record.score.cycles}c")
-                    println("Names: ${names[it]}")
-                }
+            println("Score: ${it.record.score.cost}g/${it.record.score.area}a/${it.record.score.cycles}c")
+            println("Names: ${names[it]}")
+        }
     }
 }
