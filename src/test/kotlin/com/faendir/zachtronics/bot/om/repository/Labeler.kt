@@ -31,7 +31,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 import java.io.File
+import java.nio.file.Path
 import java.util.*
+import kotlin.system.measureTimeMillis
 
 class Labeler {
     private fun <T> Set<T>.isSupersetOfAny(sets: Iterable<Set<T>>) = sets.any { this.containsAll(it) }
@@ -86,7 +88,6 @@ class Labeler {
     }
 
 
-
     private val json = Json {
         prettyPrint = true
         allowSpecialFloatingPointValues = true
@@ -99,8 +100,8 @@ class Labeler {
 
     @OptIn(ExperimentalSerializationApi::class)
     private fun loadData(): Map<OmPuzzle, TreeSet<OmMemoryRecord>> {
-        val repo = File("../opus_magnum/om-leaderboard")
-        val data = OmPuzzle.values().associateWith { sortedSetOf(memoryRecordOrder) }
+        val repo = File("../om-leaderboard")
+        val data = OmPuzzle.entries.associateWith { sortedSetOf(memoryRecordOrder) }
         for ((puzzle, memoryRecords) in data.entries) {
             // fill map
             File(repo, "${puzzle.group.name}/${puzzle.name}").takeIf { it.exists() }
@@ -141,16 +142,188 @@ class Labeler {
     @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Testing")
     fun loadMeBabyOneMoreTime() {
         val data = loadData()
-        assertEquals(11282, data.values.sumOf { it.size })
+        assertEquals(11293, data.values.sumOf { it.size })
         val puzzleData = data[OmPuzzle.STABILIZED_WATER]!!
-        val scoresByManifold = puzzleData
-            .flatMap { mr -> mr.frontierManifolds.associateWith { mr.record.score }.entries }
-            .groupBy({ it.key }, { it.value })
-        val labeled = puzzleData.associateWith { mr ->
-            scoresByManifold.entries.flatMap { (m, s) ->
-                realNames(mr.record.score, m.scoreParts.toSet(), s)
+        val labeled1: Map<OmMemoryRecord, List<String>>
+        println(
+            "Time to label IEEE: ${
+                measureTimeMillis {
+                    val scoresByManifold = puzzleData
+                        .flatMap { mr -> mr.frontierManifolds.associateWith { mr.record.score }.entries }
+                        .groupBy({ it.key }, { it.value })
+                    labeled1 = puzzleData.associateWith { mr ->
+                        scoresByManifold.entries.flatMap { (m, s) ->
+                            realNames(mr.record.score, m.scoreParts.toSet(), s)
+                        }
+                    }
+                }
+            }"
+        )
+        val labeled2: MutableMap<OmMemoryRecord, MutableSet<String>>
+        println(
+            "Time to label F43nd1r: ${
+                measureTimeMillis {
+                    val recordsByManifold = puzzleData
+                        .flatMap { mr -> mr.frontierManifolds.associateWith { mr }.entries }
+                        .groupBy({ it.key }, { it.value })
+                    labeled2 = mutableMapOf()
+                    for ((manifold, records) in recordsByManifold) {
+                        for ((record, names) in names2(manifold.scoreParts.toSet(), records.toSet())) {
+                            labeled2.getOrPut(record) { mutableSetOf() }.addAll(names.map { it.toString() })
+                        }
+                    }
+                }
+            }"
+        )
+        puzzleData.take(10).forEach {
+            println("------- Score: ${it.record.score.toDisplayString()}")
+            println("-- Names IEEE: ${labeled1[it]?.sorted()}")
+            println("Names F43nd1r: ${labeled2[it]?.sorted()}")
+        }
+    }
+
+    private val compares = mutableMapOf<Set<OmMemoryRecord>, MutableMap<OmMetric, OmMemoryRecord?>>()
+
+    private fun better(a: OmMemoryRecord, b: OmMemoryRecord, metrics: Set<OmMetric>): OmMemoryRecord? {
+        return metrics.mapTo(mutableSetOf()) { metric ->
+            compares.getOrPut(setOf(a, b)) {
+                mutableMapOf()
+            }.getOrPut(metric) {
+                metric.comparator.compare(a.record.score, b.record.score).let {
+                    when {
+                        it < 0 -> a
+                        it > 0 -> b
+                        else -> null
+                    }
+                }
+            }
+        }.singleOrNull()
+    }
+
+    private fun names2(metrics: Set<OmMetric>, records: Set<OmMemoryRecord>): Map<OmMemoryRecord, Set<OmParetoName>> {
+        val recordsByNamePart = mutableMapOf<Set<OmMetric>, MutableSet<OmMemoryRecord>>()
+
+        for (key in Sets.powerSet(metrics).minusElement(emptySet()).sortedBy { it.size }) {
+            val potentialRecords = records - Sets.powerSet(key).minusElement(emptySet()).flatMapTo(mutableSetOf()) { recordsByNamePart[it] ?: emptySet() }
+            for (potentialRecord in potentialRecords) {
+                if (records.none { it != potentialRecord && better(it, potentialRecord, key) == it }) {
+                    recordsByNamePart.getOrPut(key) { mutableSetOf() }.add(potentialRecord)
+                }
             }
         }
-        println(labeled)
+
+        val result = mutableMapOf<OmMemoryRecord, MutableSet<OmParetoName>>()
+
+        for ((key, recordsForKey) in recordsByNamePart) {
+            val name = OmParetoName(listOf(OmParetoNamePart(key)))
+            if (recordsForKey.size == 1 || metrics.size == key.size) {
+                for (record in recordsForKey) {
+                    result.getOrPut(record) { mutableSetOf() }.add(name)
+                }
+            } else {
+                for ((record, names) in names2(metrics.minus(key), recordsForKey)) {
+                    result.getOrPut(record) { mutableSetOf() }.addAll(names.map { name + it })
+                }
+            }
+        }
+        return result
+    }
+
+    @Test
+    fun simple() {
+        val records = listOf(
+            OmMemoryRecord(
+                OmRecord(
+                    puzzle = OmPuzzle.STABILIZED_WATER,
+                    score = OmScore(
+                        cost = 1,
+                        area = 5,
+                        instructions = 0,
+                        overlap = false,
+                        trackless = false,
+                        cycles = 0,
+                        height = 0,
+                        width = 0.0,
+                        rate = 0.0,
+                        areaINF = null,
+                        heightINF = null,
+                        widthINF = null,
+                    ),
+                    displayLink = null,
+                    dataLink = "",
+                    dataPath = Path.of(""),
+                )
+            ), OmMemoryRecord(
+                OmRecord(
+                    puzzle = OmPuzzle.STABILIZED_WATER,
+                    score = OmScore(
+                        cost = 5,
+                        area = 1,
+                        instructions = 0,
+                        overlap = false,
+                        trackless = false,
+                        cycles = 0,
+                        height = 0,
+                        width = 0.0,
+                        rate = 0.0,
+                        areaINF = null,
+                        heightINF = null,
+                        widthINF = null,
+                    ),
+                    displayLink = null,
+                    dataLink = "",
+                    dataPath = Path.of(""),
+                )
+            ), OmMemoryRecord(
+                OmRecord(
+                    puzzle = OmPuzzle.STABILIZED_WATER,
+                    score = OmScore(
+                        cost = 2,
+                        area = 3,
+                        instructions = 0,
+                        overlap = false,
+                        trackless = false,
+                        cycles = 0,
+                        height = 0,
+                        width = 0.0,
+                        rate = 0.0,
+                        areaINF = null,
+                        heightINF = null,
+                        widthINF = null,
+                    ),
+                    displayLink = null,
+                    dataLink = "",
+                    dataPath = Path.of(""),
+                )
+            ),OmMemoryRecord(
+                OmRecord(
+                    puzzle = OmPuzzle.STABILIZED_WATER,
+                    score = OmScore(
+                        cost = 3,
+                        area = 2,
+                        instructions = 0,
+                        overlap = false,
+                        trackless = false,
+                        cycles = 0,
+                        height = 0,
+                        width = 0.0,
+                        rate = 0.0,
+                        areaINF = null,
+                        heightINF = null,
+                        widthINF = null,
+                    ),
+                    displayLink = null,
+                    dataLink = "",
+                    dataPath = Path.of(""),
+                )
+            )
+        )
+
+        val names = names2(setOf(OmMetric.COST, OmMetric.AREA, OmMetric.CYCLES), records.toSet())
+
+        records.forEach {
+                    println("Score: ${it.record.score.cost}g/${it.record.score.area}a/${it.record.score.cycles}c")
+                    println("Names: ${names[it]}")
+                }
     }
 }

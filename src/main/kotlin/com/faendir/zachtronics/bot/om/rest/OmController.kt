@@ -84,7 +84,7 @@ class OmController(private val repository: OmSolutionRepository, private val dis
     @GetMapping(path = ["/manifold/{manifoldId}/categories"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getCategoriesByManifold(@PathVariable manifoldId: String) : List<OmCategoryDTO> {
         val manifold = findManifold(manifoldId)
-        return OmCategory.Companion.entries.filter { it.associatedManifold == manifold }.map { it.toDTO() }
+        return OmCategory.entries.filter { it.associatedManifold == manifold }.map { it.toDTO() }
     }
 
     override fun listRecords(puzzleId: String, includeFrontier: Boolean?): List<OmRecordDTO> {
@@ -144,7 +144,7 @@ class OmController(private val repository: OmSolutionRepository, private val dis
 private fun findPuzzle(puzzleId: String) =
     OmPuzzle.entries.find { it.id.equals(puzzleId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Puzzle $puzzleId not found.")
 
-private fun findCategory(categoryId: String) = OmCategory.Companion.entries.find { it.name.equals(categoryId, ignoreCase = true) } ?: throw ResponseStatusException(
+private fun findCategory(categoryId: String) = OmCategory.entries.find { it.name.equals(categoryId, ignoreCase = true) } ?: throw ResponseStatusException(
     HttpStatus.NOT_FOUND,
     "Category $categoryId not found."
 )

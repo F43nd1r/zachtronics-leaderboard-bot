@@ -56,6 +56,8 @@ sealed interface OmMetric : Metric {
 
         override fun describe(score: OmScore): String? =
             getValueFrom(score)?.let { numberFormat.format(it) }?.plus(scoreId)
+
+        override fun toString(): String = displayName
     }
 
     sealed class Modifier(
@@ -69,6 +71,8 @@ sealed interface OmMetric : Metric {
         override val description: String = displayName
 
         override fun describe(score: OmScore): String? = if (getValueFrom(score)) displayName else null
+
+        override fun toString() = displayName
     }
 
     sealed interface Computed : OmMetric {

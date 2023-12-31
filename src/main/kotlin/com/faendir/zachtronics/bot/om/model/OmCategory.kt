@@ -101,8 +101,4 @@ enum class OmCategory(
         (requiredParts.contains(OVERLAP) || !score.overlap) &&
                 (!requiredParts.contains(TRACKLESS) || score.trackless) &&
                 (!(requiredParts.contains(LOOPING) || associatedManifold == OmScoreManifold.INFINITY) || score.looping)
-
-    companion object {
-        val entries = values().toList()
-    }
 }
