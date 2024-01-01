@@ -55,8 +55,7 @@ import java.util.regex.Pattern;
  * </pre>
  *
  */
-public
-class IfValidator {
+public class IfValidator {
     /** InputRate.4-3.1 = 1 */
     private static final Pattern INPUT_RATE_PATTERN = Pattern.compile("InputRate.(?<idSlot>\\d+-\\db?\\.\\d) = (?<value>\\d+)");
     /** Last.1-1.1.Blocks = 44 */
@@ -91,13 +90,20 @@ class IfValidator {
                                                               IfScore score) {
         if (!(info.hasData() && (info.hasScore() || score != null)))
             return new ValidationResult.Unparseable<>("Incomplete data for idSlot: " + idSlot);
-        // if we have no score we load it from the file, by extending minimal trust to it
-        if (score == null)
-            score = new IfScore(info.getCycles(), info.getFootprint(), info.getBlocks(), true, true);
+        IfSave save;
+        try {
+            save = IfSave.unmarshal(info.getSolution());
+        }
+        catch (Exception e) {
+            return new ValidationResult.Unparseable<>("Unparseable solution string for idSlot: " + idSlot);
+        }
         String id = idSlot.replaceFirst("\\.\\d$", "");
         IfPuzzle puzzle = Arrays.stream(IfPuzzle.values())
                                 .filter(p -> p.getId().equals(id))
                                 .findFirst().orElseThrow();
+        // if we have no score we load it from the file, by extending minimal trust to it
+        if (score == null)
+            score = new IfScore(info.getCycles(), info.getFootprint(), info.getBlocks(), save.couldHaveGRA(), true);
         String leaderboardData = String.format("""
                                                InputRate.%s.0 = %d
                                                Solution.%s.0 = %s
@@ -113,7 +119,6 @@ class IfValidator {
         if (score.getCycles() <= 10)
             return new ValidationResult.Invalid<>(submission, "Cycles too low: " + score.getCycles());
 
-        IfSave save = IfSave.unmarshal(info.getSolution());
         int blockScore = save.blockScore();
         if (blockScore != score.getBlocks())
             return new ValidationResult.Invalid<>(submission,
@@ -123,6 +128,9 @@ class IfValidator {
             return new ValidationResult.Invalid<>(submission,
                                                   "Solution has at least " + footprintBound + " footprint, score has " +
                                                   score.getFootprint());
+        if (!save.couldHaveGRA() && score.usesGRA())
+            return new ValidationResult.Invalid<>(submission,
+                                                  "Score declares to have GRA, but prerequisite blocks have not been found");
         return new ValidationResult.Valid<>(submission);
     }
 

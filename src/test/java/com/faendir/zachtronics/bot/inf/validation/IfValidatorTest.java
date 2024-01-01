@@ -66,5 +66,6 @@ class IfValidatorTest {
 
         assertEquals(2, results.size());
         assertTrue(results.stream().allMatch(v -> v instanceof ValidationResult.Valid<IfSubmission>));
+        assertEquals(new IfScore(44, 47, 0, false, true), results.iterator().next().getSubmission().getScore());
     }
 }

@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.inf.repository;
 
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.inf.model.*;
+import com.faendir.zachtronics.bot.inf.validation.IfSave;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -27,10 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @BotTest
@@ -59,10 +57,10 @@ class IfManualTest {
         }
         System.out.println("Done");
     }
-    
+
     @Test
     public void rebuildAllWiki() {
-        for (IfPuzzle puzzle: IfPuzzle.values()) {
+        for (IfPuzzle puzzle : IfPuzzle.values()) {
             if (puzzle.getType() != IfType.STANDARD)
                 continue;
             repository.rebuildRedditLeaderboard(puzzle, "");
@@ -78,7 +76,7 @@ class IfManualTest {
     @Test
     public void createWiki() {
         StringBuilder page = new StringBuilder();
-        for (IfGroup group: IfGroup.values()) {
+        for (IfGroup group : IfGroup.values()) {
             String header = String.format("""
                                           ### %s
 
@@ -95,7 +93,7 @@ class IfManualTest {
         }
         System.out.println(page);
     }
-    
+
     @Test
     public void tagNewCategories() throws IOException {
         Path repoPath = Paths.get("../infinifactory/leaderboard");
@@ -115,6 +113,37 @@ class IfManualTest {
                          .orElseThrow()
                          .getCategories()
                          .add(category);
+            }
+            repository.marshalSolutions(solutions, puzzlePath);
+        }
+    }
+
+    @Test
+    public void unGRATheUnGRAable() throws IOException {
+        Path repoPath = Paths.get("../infinifactory/leaderboard");
+        List<IfPuzzle> puzzles = List.of(IfPuzzle.values());
+
+        for (IfPuzzle puzzle : puzzles) {
+            Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
+            List<IfSolution> solutions = repository.unmarshalSolutions(puzzlePath);
+            if (solutions.isEmpty())
+                continue;
+
+            for (ListIterator<IfSolution> it = solutions.listIterator(); it.hasNext(); ) {
+                IfSolution solution = it.next();
+                IfScore score = solution.getScore();
+                Path archivePath = repository.makeArchivePath(puzzlePath, score);
+                if (Files.exists(archivePath)) {
+                    String solutionData = Files.readAllLines(archivePath).get(1).split(" = ")[1];
+                    IfSave save = IfSave.unmarshal(solutionData);
+                    if (!save.couldHaveGRA() && score.usesGRA()) {
+                        IfScore newScore = new IfScore(score.getCycles(), score.getFootprint(), score.getBlocks(),
+                                                       false, score.isFinite());
+                        it.set(new IfSolution(newScore, solution.getAuthor(), solution.getDisplayLinks()));
+                        Files.move(archivePath, repository.makeArchivePath(puzzlePath, newScore));
+                        System.out.println("UnGRAed " + puzzle + ", " + newScore);
+                    }
+                }
             }
             repository.marshalSolutions(solutions, puzzlePath);
         }

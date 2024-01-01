@@ -23,6 +23,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * The solution has the following representation (all integers are little endian)
@@ -55,7 +57,7 @@ import java.util.Base64;
  * </pre>
  */
 @Value
-class IfSave {
+public class IfSave {
     int version;
     @NotNull IfBlock[] blocks;
 
@@ -66,6 +68,7 @@ class IfSave {
         return unmarshal(byteBuffer);
     }
 
+    @NotNull
     static IfSave unmarshal(@NotNull ByteBuffer byteBuffer) {
         int version = byteBuffer.getInt();
         if (version != 3)
@@ -92,5 +95,17 @@ class IfSave {
         return (int) Arrays.stream(blocks)
                            .map(b -> (b.getPositionX() << 16) | (b.getPositionZ() & 0xFFFF))
                            .distinct().count();
+    }
+
+    /**
+     * Checks if the save has both a rotator and a welder, which are prerequisites to realize GRA:<br>
+     * A GRA consists in rotating an object made up of both factory and input blocks
+     */
+    public boolean couldHaveGRA() {
+        Set<Short> types = Arrays.stream(blocks)
+                                 .map(IfBlock::getType)
+                                 .collect(Collectors.toSet());
+        return (types.contains(IfBlockType.ROTATOR_CW) || types.contains(IfBlockType.ROTATOR_CCW)) &&
+               (types.contains(IfBlockType.WELDER_A) || types.contains(IfBlockType.WELDER_B));
     }
 }
