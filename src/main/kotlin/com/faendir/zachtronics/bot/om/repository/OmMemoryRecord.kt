@@ -40,7 +40,7 @@ internal data class OmMemoryRecord(
 internal fun OmRecord.toMemoryRecord(repoPath: Path) =
     OmMemoryRecord(this.copy(dataPath = repoPath.resolve(this.dataPath)))
 
-data class OmParetoNamePart(val value: Set<OmMetric>) {
+data class OmParetoNamePart(val value: Set<OmMetric.Value<*>>) {
     override fun toString() = when (value.size) {
         0 -> throw IllegalStateException()
         1 -> value.first().displayName
