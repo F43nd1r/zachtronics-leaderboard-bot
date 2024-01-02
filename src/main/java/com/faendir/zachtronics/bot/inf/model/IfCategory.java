@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric> {
 
     FC("FC", List.of(FOOTPRINT, CYCLES, BLOCKS), 0b010),
     FB("FB", List.of(FOOTPRINT, BLOCKS, CYCLES), 0b010),
+    FIC("FIC", List.of(FOOTPRINT, INBOUNDS, CYCLES, BLOCKS), 0b010),
+    FIB("FIB", List.of(FOOTPRINT, INBOUNDS, BLOCKS, CYCLES), 0b010),
 
     BC("BC", List.of(BLOCKS, CYCLES, FOOTPRINT), 0b001),
     BF("BF", List.of(BLOCKS, FOOTPRINT, CYCLES), 0b001),
@@ -61,7 +63,8 @@ public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric> {
 
     @Override
     public boolean supportsScore(@NotNull IfScore score) {
-        return !(this.metrics.contains(NO_GRA) && score.usesGRA()) &&
+        return !(this.metrics.contains(INBOUNDS) && score.isOutOfBounds()) &&
+               !(this.metrics.contains(NO_GRA) && score.usesGRA()) &&
                !(this.metrics.contains(INFINITE) && score.isFinite());
     }
 }

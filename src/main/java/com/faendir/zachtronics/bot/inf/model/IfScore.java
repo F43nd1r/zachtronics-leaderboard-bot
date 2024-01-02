@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,15 +29,18 @@ import java.util.regex.Pattern;
 
 @Value
 public class IfScore implements Score<IfCategory> {
+    public static final int PLACEHOLDER = 1_000_000; // backend encoding for `?`
+
     int cycles;
     int footprint;
     int blocks;
 
+    boolean outOfBounds;
     @Accessors(fluent = true)
     boolean usesGRA;
     boolean finite;
 
-    /** ccc/ff/bb[/GF] */
+    /** ccc/ff/bb[/OGF] */
     @NotNull
     @Override
     public String toDisplayString(@NotNull DisplayContext<IfCategory> context) {
@@ -45,25 +48,25 @@ public class IfScore implements Score<IfCategory> {
         int formatId = Utils.getScoreFormatId(context);
 
         return String.format(IfCategory.FORMAT_STRINGS[formatId], cycles, separator, footprint, separator, blocks, sepFlags(separator))
-                     .replace(Integer.toString(Integer.MAX_VALUE), "?");
+                     .replace(Integer.toString(PLACEHOLDER), "?");
     }
 
-    /** ccc/ff/bb[/GF] */
+    /** ccc/ff/bb[/OGF] */
     private static final Pattern REGEX_SCORE = Pattern.compile("\\**(?<cycles>\\d+|\\?)\\**[/-]" +
                                                                "\\**(?<footprint>\\d+|\\?)\\**[/-]" +
                                                                "\\**(?<blocks>\\d+|\\?)\\**" +
-                                                               "(?:[/-](?<GRAflag>[gG])?(?<Fflag>[fF])?)?");
+                                                               "(?:[/-](?<Oflag>[oO])?(?<GRAflag>[gG])?(?<Fflag>[fF])?)?");
 
-    /** <tt>ccc/ff/bb[/GF]</tt>, tolerates extra <tt>*</tt> */
+    /** <tt>ccc/ff/bb[/OGF]</tt>, tolerates extra <tt>*</tt> */
     @Nullable
     public static IfScore parseScore(@NotNull String string) {
         Matcher m = REGEX_SCORE.matcher(string);
         return m.matches() ? parseScore(m) : null;
     }
 
-    /** Unknown value encoded as {@link Integer#MAX_VALUE} */
+    /** Unknown value encoded as {@link #PLACEHOLDER} */
     private static int parseValue(@NotNull String value) {
-        return value.equals("?") ? Integer.MAX_VALUE : Integer.parseInt(value);
+        return value.equals("?") ? PLACEHOLDER : Integer.parseInt(value);
     }
 
     /** we assume m matches */
@@ -72,20 +75,22 @@ public class IfScore implements Score<IfCategory> {
         int cycles = parseValue(m.group("cycles"));
         int footprint = parseValue(m.group("footprint"));
         int blocks = parseValue(m.group("blocks"));
-        return new IfScore(cycles, footprint, blocks, m.group("GRAflag") != null, m.group("Fflag") != null);
+        return new IfScore(cycles, footprint, blocks,
+                           m.group("Oflag") != null, m.group("GRAflag") != null, m.group("Fflag") != null);
     }
 
     public String sepFlags(String separator) {
-        return sepFlags(separator, usesGRA, finite);
+        return sepFlags(separator, outOfBounds, usesGRA, finite);
     }
 
     /**
-     * @return <tt>""</tt> or <tt>"/G"</tt> or <tt>"/F"</tt> or <tt>"/GF"</tt>
+     * @return <tt>""</tt> or <tt>"/[O][G][F]"</tt>
      */
     @NotNull
-    public static String sepFlags(String separator, boolean usesGRA, boolean finite) {
-        if (usesGRA || finite) {
+    public static String sepFlags(String separator, boolean outOfBounds, boolean usesGRA, boolean finite) {
+        if (outOfBounds || usesGRA || finite) {
             String result = separator;
+            if (outOfBounds) result += "O";
             if (usesGRA) result += "G";
             if (finite) result += "F";
             return result;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,9 @@ public enum IfMetric implements MetricJava<IfScore> {
     CYCLES("C", IfScore::getCycles),
     FOOTPRINT("F", IfScore::getFootprint),
     BLOCKS("B", IfScore::getBlocks),
+    INBOUNDS("Ib", null),
     NO_GRA("NG", null),
-    INFINITE("I", null);
+    INFINITE("If", null);
 
     private final String displayName;
     private final ToIntFunction<IfScore> extract;

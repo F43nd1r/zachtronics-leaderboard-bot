@@ -17,6 +17,7 @@ export default interface IfScore {
     cycles: number
     footprint: number
     blocks: number
+    outOfBounds: boolean
     usesGRA: boolean
     finite: boolean
 }

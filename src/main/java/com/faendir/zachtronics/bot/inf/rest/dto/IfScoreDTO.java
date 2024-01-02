@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ public class IfScoreDTO {
     int footprint;
     int blocks;
 
+    boolean outOfBounds;
     @Getter(onMethod_ = {@JsonProperty("usesGRA")})
     @Accessors(fluent = true)
     boolean usesGRA;
@@ -36,7 +37,8 @@ public class IfScoreDTO {
 
     @NotNull
     public static IfScoreDTO fromScore(@NotNull IfScore score) {
-        return new IfScoreDTO(score.getCycles(), score.getFootprint(), score.getBlocks(), score.usesGRA(), score.isFinite());
+        return new IfScoreDTO(score.getCycles(), score.getFootprint(), score.getBlocks(),
+                              score.isOutOfBounds(), score.usesGRA(), score.isFinite());
     }
 }
 

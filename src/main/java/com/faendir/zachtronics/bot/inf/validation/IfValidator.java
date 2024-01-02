@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,9 +101,9 @@ public class IfValidator {
         IfPuzzle puzzle = Arrays.stream(IfPuzzle.values())
                                 .filter(p -> p.getId().equals(id))
                                 .findFirst().orElseThrow();
-        // if we have no score we load it from the file, by extending minimal trust to it
+        // if we have no score we load it from the file, by extending reasonable trust to it
         if (score == null)
-            score = new IfScore(info.getCycles(), info.getFootprint(), info.getBlocks(), save.couldHaveGRA(), true);
+            score = new IfScore(info.getCycles(), info.getFootprint(), info.getBlocks(), false, save.couldHaveGRA(), true);
         String leaderboardData = String.format("""
                                                InputRate.%s.0 = %d
                                                Solution.%s.0 = %s

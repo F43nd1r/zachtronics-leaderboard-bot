@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ class IfRedditMigrationTest {
                 int footprint = Integer.parseInt(m.group("footprint"));
                 String author = m.group("author");
                 if (author == null) author = "Community";
-                IfScore score = new IfScore(9999, footprint, 9999, true, false);
+                IfScore score = new IfScore(IfScore.PLACEHOLDER, footprint, IfScore.PLACEHOLDER, false, true, false);
 
                 IfSubmission submission = new IfSubmission(puzzle, score, author, Collections.emptyList(), "");
                 repository.submit(submission);
@@ -101,7 +101,7 @@ class IfRedditMigrationTest {
                 int blocks = Integer.parseInt(m.group("blocks"));
                 String author = m.group("author");
                 if (author.equals("###")) author = "Community";
-                IfScore score = new IfScore(9999, 9999, blocks, true, false);
+                IfScore score = new IfScore(IfScore.PLACEHOLDER, IfScore.PLACEHOLDER, blocks, false, true, false);
 
                 List<String> displayLinks = new ArrayList<>(Collections.singleton(m.group("link")));
                 if (m.group("link2") != null)
@@ -161,7 +161,7 @@ class IfRedditMigrationTest {
         if (piece1.matches("\\d+") && ma.matches()) {
             int cycles = Integer.parseInt(piece1);
             String author = ma.group("author");
-            IfScore score = new IfScore(cycles, 9999, 9999, usesGRA, false);
+            IfScore score = new IfScore(cycles, IfScore.PLACEHOLDER, IfScore.PLACEHOLDER, false, usesGRA, false);
 
             List<String> displayLinks = IntStream.rangeClosed(1, 4)
                                                  .mapToObj(i -> ma.group("link" + i))
@@ -195,19 +195,19 @@ class IfRedditMigrationTest {
                 String author = "Community";
 
                 int cycles = Integer.parseInt(m.group("cycles"));
-                IfScore score = new IfScore(cycles, 9999, 9999, true, false);
+                IfScore score = new IfScore(cycles, IfScore.PLACEHOLDER, IfScore.PLACEHOLDER, false, true, false);
                 List<String> displayLinks = Collections.singletonList(m.group("linkc"));
                 IfSubmission submission = new IfSubmission(puzzle, score, author, displayLinks, "");
                 repository.submit(submission);
 
                 int footprint = Integer.parseInt(m.group("footprint"));
-                score = new IfScore(9999, footprint, 9999, true, false);
+                score = new IfScore(IfScore.PLACEHOLDER, footprint, IfScore.PLACEHOLDER, false, true, false);
                 displayLinks = m.group("linkf") == null ? Collections.emptyList() : Collections.singletonList(m.group("linkf"));
                 submission = new IfSubmission(puzzle, score, author, displayLinks, "");
                 repository.submit(submission);
 
                 int blocks = Integer.parseInt(m.group("blocks"));
-                score = new IfScore(9999, 9999, blocks, true, false);
+                score = new IfScore(IfScore.PLACEHOLDER, IfScore.PLACEHOLDER, blocks, false, true, false);
                 displayLinks = Collections.singletonList(m.group("linkb"));
                 submission = new IfSubmission(puzzle, score, author, displayLinks, "");
                 repository.submit(submission);

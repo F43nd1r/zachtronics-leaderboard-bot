@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,7 +138,7 @@ class IfManualTest {
                     IfSave save = IfSave.unmarshal(solutionData);
                     if (!save.couldHaveGRA() && score.usesGRA()) {
                         IfScore newScore = new IfScore(score.getCycles(), score.getFootprint(), score.getBlocks(),
-                                                       false, score.isFinite());
+                                                       score.isOutOfBounds(), false, score.isFinite());
                         it.set(new IfSolution(newScore, solution.getAuthor(), solution.getDisplayLinks()));
                         Files.move(archivePath, repository.makeArchivePath(puzzlePath, newScore));
                         System.out.println("UnGRAed " + puzzle + ", " + newScore);

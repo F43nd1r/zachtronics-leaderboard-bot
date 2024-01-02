@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ import static com.faendir.zachtronics.bot.inf.model.IfCategory.*;
 @Getter(AccessLevel.PROTECTED)
 public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory, IfPuzzle, IfScore, IfSubmission, IfRecord, IfSolution> {
     private final IfCategory[][] wikiCategories = {{CF, CB}, {CFNG, CBNG},
-                                                   {FC, FB},
+                                                   {FC, FB, FIC, FIB},
                                                    {BC, BF, BIC, BIF}};
     private final RedditService redditService;
     private final Subreddit subreddit = Subreddit.INFINIFACTORY;
@@ -53,7 +53,9 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
     private final Class<IfCategory> categoryClass = IfCategory.class;
     private final Function<String[], IfSolution> solUnmarshaller = IfSolution::unmarshal;
     private final Comparator<IfSolution> archiveComparator =
-            Comparator.comparing(IfSolution::getScore, CF.getScoreComparator().thenComparing(IfScore::usesGRA));
+            Comparator.comparing(IfSolution::getScore, CF.getScoreComparator()
+                                                         .thenComparing(IfScore::isOutOfBounds)
+                                                         .thenComparing(IfScore::usesGRA));
 
     @Override
     protected IfSolution makeCandidateSolution(@NotNull IfSubmission submission) {
@@ -65,13 +67,14 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
         int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
         int r2 = Integer.compare(s1.getFootprint(), s2.getFootprint());
         int r3 = Integer.compare(s1.getBlocks(), s2.getBlocks());
-        int r4 = Boolean.compare(s1.usesGRA(), s2.usesGRA());
-        int r5 = Boolean.compare(s1.isFinite(), s2.isFinite());
-        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0 && r5 <= 0) {
+        int r4 = Boolean.compare(s1.isOutOfBounds(), s2.isOutOfBounds());
+        int r5 = Boolean.compare(s1.usesGRA(), s2.usesGRA());
+        int r6 = Boolean.compare(s1.isFinite(), s2.isFinite());
+        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0 && r5 <= 0 && r6 <= 0) {
             // s1 dominates
             return -1;
         }
-        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0 && r5 >= 0) {
+        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0 && r5 >= 0 && r6 >= 0) {
             // s2 dominates
             return 1;
         }

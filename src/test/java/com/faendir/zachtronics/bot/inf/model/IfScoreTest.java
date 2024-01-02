@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class IfScoreTest {
     @Test
     public void serialization() {
-        String str = "1/?/3/GF";
-        IfScore score = new IfScore(1, Integer.MAX_VALUE, 3, true, true);
+        String str = "1/?/3/OGF";
+        IfScore score = new IfScore(1, IfScore.PLACEHOLDER, 3, true, true, true);
 
         assertEquals(score, IfScore.parseScore(str));
         assertEquals(str, score.toDisplayString());

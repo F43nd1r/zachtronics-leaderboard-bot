@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class IfValidatorTest {
                          Solution.1-1.1 = AwAAAAAAAAA=
                          """;
         String author = "12345ieee";
-        IfScore score = new IfScore(1, 1, 0, false, false);
+        IfScore score = new IfScore(1, 1, 0, false, false, false);
         IfSubmission result = IfValidator.validateSavefile(content, author, score).iterator().next().getSubmission();
         IfSubmission expected = new IfSubmission(IfPuzzle.LEVEL_1_1, score, author, Collections.emptyList(),
                                                  content.replace("1-1.1", "1-1.0"));
@@ -66,6 +66,6 @@ class IfValidatorTest {
 
         assertEquals(2, results.size());
         assertTrue(results.stream().allMatch(v -> v instanceof ValidationResult.Valid<IfSubmission>));
-        assertEquals(new IfScore(44, 47, 0, false, true), results.iterator().next().getSubmission().getScore());
+        assertEquals(new IfScore(44, 47, 0, false, false, true), results.iterator().next().getSubmission().getScore());
     }
 }
