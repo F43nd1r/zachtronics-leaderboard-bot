@@ -64,10 +64,13 @@ function SizeAwarePlotView<SCORE, RECORD extends RecordDTO<SCORE>>({
             y: y.metric.get(record.score) ?? 0,
             z: configuration.mode === "3D" ? z.metric.get(record.score) : undefined,
         })
-    const recordMap = records.reduce((acc, record) => {
-        const point = getPointString(record)
-        return { ...acc, [point]: [...(acc[point] ?? []), record] }
-    }, {} as Record<string, RECORD[]>)
+    const recordMap = records.reduce(
+        (acc, record) => {
+            const point = getPointString(record)
+            return { ...acc, [point]: [...(acc[point] ?? []), record] }
+        },
+        {} as Record<string, RECORD[]>,
+    )
 
     const theme = useTheme()
     const gridColor = theme.palette.mode === "light" ? theme.palette.grey["200"] : theme.palette.grey["800"]
@@ -90,7 +93,7 @@ function SizeAwarePlotView<SCORE, RECORD extends RecordDTO<SCORE>>({
         return modifier ? modifier.color : defaultColor
     }
     const getMarkerColors = (...metrics: Metric<SCORE>[]) =>
-        records.map((record) => (records.some((r) => isStrictlyBetterInMetrics(r, record, metrics)) ? "#000000" : getColor(record)))
+        records.map((record) => (records.some((r) => isStrictlyBetterInMetrics(r, record, metrics)) ? theme.palette.background.paper : getColor(record)))
 
     const common: Partial<PlotData> = {
         hovertext: records.map(
