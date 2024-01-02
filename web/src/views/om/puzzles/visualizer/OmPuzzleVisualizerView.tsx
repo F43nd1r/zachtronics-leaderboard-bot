@@ -57,7 +57,7 @@ export default function OmPuzzleVisualizerView() {
                     overlap: {
                         get: (score) => score?.overlap,
                         name: "overlap",
-                        color: VisualizerColor.MOD1,
+                        color: VisualizerColor.BAD1,
                         legendOrder: -1,
                         option1: "Overlap",
                         option2: "Normal",
@@ -65,7 +65,7 @@ export default function OmPuzzleVisualizerView() {
                     trackless: {
                         get: (score) => score?.trackless,
                         name: "trackless",
-                        color: VisualizerColor.MOD2,
+                        color: VisualizerColor.GOOD,
                         legendOrder: 1,
                         option1: "Trackless",
                         option2: "With Track",

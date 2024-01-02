@@ -56,27 +56,27 @@ export default function IfPuzzleVisualizerView() {
                     b: { name: "Blocks", get: (score) => score?.blocks },
                 }}
                 modifiers={{
-                    ouOfBounds: {
+                    outOfBounds: {
                         get: (score) => score?.outOfBounds,
                         name: "outOfBounds",
-                        color: VisualizerColor.MOD1,
-                        legendOrder: -2,
+                        color: VisualizerColor.BAD1,
+                        legendOrder: -3,
                         option1: "Out of bounds",
                         option2: "Inbound",
                     },
                     usesGRA: {
                         get: (score) => score?.usesGRA,
                         name: "usesGRA",
-                        color: VisualizerColor.MOD1,
-                        legendOrder: -1,
+                        color: VisualizerColor.BAD2,
+                        legendOrder: -2,
                         option1: "Uses GRA",
                         option2: "No GRA",
                     },
                     finite: {
                         get: (score) => score?.finite,
                         name: "finite",
-                        color: VisualizerColor.MOD2,
-                        legendOrder: 1,
+                        color: VisualizerColor.BAD3,
+                        legendOrder: -1,
                         option1: "Finite",
                         option2: "Infinite",
                     },

@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-export const enum VisualizerColor {
-    DEFAULT = "#0288d1",
-    MOD1 = "#880e4f",
-    MOD2 = "#558b2f",
+export const enum VisualizerColor { // https://materialui.co/colors
+    DEFAULT = "#0288d1", // Light Blue 700
+    BAD1 = "#880e4f", // Pink 900
+    BAD2 = "#b71c1c", // Red 900
+    BAD3 = "#ffeb3b", // Yellow 500
+    GOOD = "#558b2f", // Light Green 800
 }
