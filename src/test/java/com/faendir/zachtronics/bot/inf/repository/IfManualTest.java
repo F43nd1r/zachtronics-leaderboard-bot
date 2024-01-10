@@ -97,9 +97,8 @@ class IfManualTest {
     @Test
     public void tagNewCategories() throws IOException {
         Path repoPath = Paths.get("../infinifactory/leaderboard");
-        List<IfPuzzle> puzzles = List.of(IfPuzzle.values());
 
-        for (IfPuzzle puzzle : puzzles) {
+        for (IfPuzzle puzzle : IfPuzzle.values()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
             List<IfSolution> solutions = repository.unmarshalSolutions(puzzlePath);
             if (solutions.isEmpty())
@@ -121,9 +120,8 @@ class IfManualTest {
     @Test
     public void unGRATheUnGRAable() throws IOException {
         Path repoPath = Paths.get("../infinifactory/leaderboard");
-        List<IfPuzzle> puzzles = List.of(IfPuzzle.values());
 
-        for (IfPuzzle puzzle : puzzles) {
+        for (IfPuzzle puzzle : IfPuzzle.values()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
             List<IfSolution> solutions = repository.unmarshalSolutions(puzzlePath);
             if (solutions.isEmpty())
@@ -144,6 +142,34 @@ class IfManualTest {
                         System.out.println("UnGRAed " + puzzle + ", " + newScore);
                     }
                 }
+            }
+            repository.marshalSolutions(solutions, puzzlePath);
+        }
+    }
+
+    @Test
+    public void reflagSomeone() throws IOException {
+        Path repoPath = Paths.get("../infinifactory/leaderboard");
+        String author = "NAME";
+
+        for (IfPuzzle puzzle : IfPuzzle.values()) {
+            Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
+            List<IfSolution> solutions = repository.unmarshalSolutions(puzzlePath);
+            if (solutions.isEmpty())
+                continue;
+
+            for (ListIterator<IfSolution> it = solutions.listIterator(); it.hasNext(); ) {
+                IfSolution solution = it.next();
+                if (!solution.getAuthor().equals(author))
+                    continue;
+                IfScore score = solution.getScore();
+                Path archivePath = repository.makeArchivePath(puzzlePath, score);
+                IfScore newScore = new IfScore(score.getCycles(), score.getFootprint(), score.getBlocks(),
+                                               false, false,
+                                               score.isFinite() /* edit condition as needed */);
+                it.set(new IfSolution(newScore, author, solution.getDisplayLinks()));
+                Files.move(archivePath, repository.makeArchivePath(puzzlePath, newScore));
+                System.out.println("Cleaned " + puzzle + ", " + newScore);
             }
             repository.marshalSolutions(solutions, puzzlePath);
         }
