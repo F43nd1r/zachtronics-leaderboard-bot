@@ -29,13 +29,13 @@ class IfSaveTest {
 
     @Test
     void unmarshalGood() throws IOException {
-        ClassPathResource resource = new ClassPathResource("repositories/if-leaderboard/ZONE_1/1-1/2879-363-2.txt");
+        ClassPathResource resource = new ClassPathResource("repositories/if-leaderboard/ZONE_1/1-1/106-37-23.txt");
         String solution = Files.readAllLines(resource.getFile().toPath()).get(1).split(" = ")[1];
         IfSave save = IfSave.unmarshal(solution);
         
         assertEquals(3, save.getVersion());
-        assertEquals(276, save.getBlocks().length);
-        assertEquals(2, save.blockScore());
-        assertTrue(363 >= save.footprintLowerBound());
+        assertEquals(51, save.getBlocks().length);
+        assertEquals(23, save.blockScore());
+        assertTrue(37 >= save.footprintLowerBound());
     }
 }

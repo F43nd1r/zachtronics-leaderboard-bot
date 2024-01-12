@@ -40,13 +40,16 @@ class IfManualTest {
 
     @Test
     public void testFullIO() throws IOException {
+        /*
+        cp -a ../infinifactory/leaderboard/* src/test/resources/repositories/if-leaderboard/
+         */
         for (IfPuzzle p : IfPuzzle.values()) {
 
             Iterable<IfRecord> records = repository.findCategoryHolders(p, true).stream()
                                                    .map(CategoryRecord::getRecord)
                     ::iterator;
             for (IfRecord r : records) {
-                if (r.getDataPath() != null) {
+                if (r.getDataPath() != null && Files.exists(r.getDataPath())) {
                     IfSubmission submission = new IfSubmission(p, r.getScore(), r.getAuthor(), r.getDisplayLinks(),
                                                                Files.readString(r.getDataPath()));
                     repository.submit(submission);
@@ -55,6 +58,13 @@ class IfManualTest {
 
             System.out.println("Done " + p.getDisplayName());
         }
+
+        /*
+        rm -r src/test/resources/repositories/if-leaderboard/
+        git restore --source=HEAD --staged --worktree -- src/test/resources/repositories/if-leaderboard/
+        rsync -a --delete --exclude=README.txt $(ls -1dt /tmp/if-leaderboard* | head -n1)/* ../infinifactory/leaderboard/
+         */
+
         System.out.println("Done");
     }
 
