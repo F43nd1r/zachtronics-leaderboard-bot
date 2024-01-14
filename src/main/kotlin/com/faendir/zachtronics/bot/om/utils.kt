@@ -18,11 +18,7 @@ package com.faendir.zachtronics.bot.om
 
 import com.faendir.om.parser.solution.SolutionParser
 import com.faendir.om.parser.solution.model.SolvedSolution
-import com.faendir.om.parser.solution.model.part.Arm
-import com.faendir.om.parser.solution.model.part.ArmType
-import com.faendir.om.parser.solution.model.part.Glyph
-import com.faendir.om.parser.solution.model.part.GlyphType
-import com.faendir.om.parser.solution.model.part.IO
+import com.faendir.om.parser.solution.model.part.*
 import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.option.enumOptionBuilder
@@ -30,22 +26,11 @@ import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.om.discord.Channel
 import com.faendir.zachtronics.bot.om.discord.SendToMainChannelButton
-import com.faendir.zachtronics.bot.om.model.OmCategory
-import com.faendir.zachtronics.bot.om.model.OmPuzzle
-import com.faendir.zachtronics.bot.om.model.OmRecord
-import com.faendir.zachtronics.bot.om.model.OmScore
-import com.faendir.zachtronics.bot.om.model.OmSubmission
-import com.faendir.zachtronics.bot.om.model.OmType
+import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SubmitResult
-import com.faendir.zachtronics.bot.utils.InfinInt
+import com.faendir.zachtronics.bot.utils.*
 import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
-import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
-import com.faendir.zachtronics.bot.utils.ceil
-import com.faendir.zachtronics.bot.utils.embedCategoryRecords
-import com.faendir.zachtronics.bot.utils.filterIsInstance
-import com.faendir.zachtronics.bot.utils.smartFormat
-import com.faendir.zachtronics.bot.utils.toMetricsTree
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.entity.channel.MessageChannel
@@ -64,7 +49,7 @@ private val logger = LoggerFactory.getLogger("OM Utils")
 fun JNISolutionVerifier.getMetricSafe(metric: OmSimMetric) = try {
     getMetric(metric)
 } catch (e: OmSimException) {
-    logger.info("Verifier threw exception for `${metric.id}`: ${e.message}")
+    logger.debug("Verifier threw exception for `${metric.id}`: ${e.message}")
     null
 }
 
