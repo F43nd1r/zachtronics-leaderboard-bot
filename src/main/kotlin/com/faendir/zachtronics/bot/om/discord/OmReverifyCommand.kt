@@ -28,6 +28,7 @@ import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
+import com.faendir.zachtronics.bot.utils.Markdown
 import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.orEmpty
@@ -80,7 +81,9 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.
                     **Modified Records:** ${overrideRecords.size}
                     
                     **Changed Scores:**
-                    ${overrideRecords.joinToString("\n") { it.second.toDisplayString(DisplayContext.discord()) }}
+                    ${overrideRecords.joinToString("\n") { (record, newScore) ->
+                        Markdown.linkOrText(newScore.toDisplayString(DisplayContext.discord()), record.displayLink) }
+                    }
                     """.trimIndent()
             )
     }
