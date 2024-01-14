@@ -38,6 +38,7 @@ enum class DiscordUser(val id: Long, val getSpecialEmoji: (Guild?) -> ReactionEm
     BROTHER_MOJO(182628037601394688, { ReactionEmoji.unicode("\uD83D\uDD76\uFE0F") }),
     SPIRITUAL_SHAMPOO(930111778652835850, { ReactionEmoji.unicode("\uD83E\uDDF4") }),
     GRIMMY(107902495199604736, { ReactionEmoji.unicode("\uD83D\uDC9C") }),
+    PANIC(146143003822522368),
     SYX(206689051028357121),
     A_SNOWBALL(136186716334587904),
     ROLAMNI(177824842370777088)
@@ -46,7 +47,7 @@ enum class DiscordUser(val id: Long, val getSpecialEmoji: (Guild?) -> ReactionEm
     companion object {
         @JvmField
         val BOT_OWNERS = setOf(F43ND1R, IEEE12345)
-        val OM_LB_ADMINS = BOT_OWNERS + setOf(BIGGIE, GRIMMY, RP0, SYX)
+        val OM_LB_ADMINS = BOT_OWNERS + setOf(BIGGIE, GRIMMY, RP0, PANIC, SYX)
     }
 }
 
