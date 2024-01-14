@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.inf.repository;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.inf.model.*;
 import com.faendir.zachtronics.bot.inf.validation.IfSave;
+import com.faendir.zachtronics.bot.inf.validation.IfValidator;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -144,7 +145,7 @@ class IfManualTest {
                 if (Files.exists(archivePath)) {
                     String solutionData = Files.readAllLines(archivePath).get(1).split(" = ")[1];
                     IfSave save = IfSave.unmarshal(solutionData);
-                    if (!save.couldHaveGRA() && score.usesGRA()) {
+                    if (!IfValidator.couldHaveGRA(save, puzzle) && score.usesGRA()) {
                         IfScore newScore = new IfScore(score.getCycles(), score.getFootprint(), score.getBlocks(),
                                                        score.isOutOfBounds(), false, score.isFinite());
                         it.set(new IfSolution(newScore, solution.getAuthor(), solution.getDisplayLinks()));

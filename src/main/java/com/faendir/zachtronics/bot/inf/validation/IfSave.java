@@ -23,8 +23,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * The solution has the following representation (all integers are little endian)
@@ -95,21 +93,5 @@ public class IfSave {
         return (int) Arrays.stream(blocks)
                            .map(b -> (b.getPositionX() << 16) | (b.getPositionZ() & 0xFFFF))
                            .distinct().count();
-    }
-
-    /**
-     * Checks if the save has a rotator, a welder and an eviscerator or laser, which are prerequisites to realize GRA<br>
-     * Giant Rotating Arms (GRA for friends) are created by:
-     * <li>welding input blocks to factory blocks</li>
-     * <li>rotating the whole assembly</li>
-     * <li>detaching the input blocks by eviscerating/lasering some connecting input blocks</li>
-     */
-    public boolean couldHaveGRA() {
-        Set<Short> types = Arrays.stream(blocks)
-                                 .map(IfBlock::getType)
-                                 .collect(Collectors.toSet());
-        return (types.contains(IfBlockType.ROTATOR_CW) || types.contains(IfBlockType.ROTATOR_CCW)) &&
-               (types.contains(IfBlockType.WELDER_A) || types.contains(IfBlockType.WELDER_B)) &&
-               (types.contains(IfBlockType.EVISCERATOR) || types.contains(IfBlockType.LASER));
     }
 }

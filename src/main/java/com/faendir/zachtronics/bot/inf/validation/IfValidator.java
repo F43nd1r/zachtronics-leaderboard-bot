@@ -16,10 +16,7 @@
 
 package com.faendir.zachtronics.bot.inf.validation;
 
-import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
-import com.faendir.zachtronics.bot.inf.model.IfScore;
-import com.faendir.zachtronics.bot.inf.model.IfSubmission;
-import com.faendir.zachtronics.bot.inf.model.IfType;
+import com.faendir.zachtronics.bot.inf.model.*;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,6 +24,7 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * A general solution file is of the form:
@@ -103,7 +101,8 @@ public class IfValidator {
                                 .findFirst().orElseThrow();
         // if we have no score we load it from the file, by extending reasonable trust to it
         if (score == null)
-            score = new IfScore(info.getCycles(), info.getFootprint(), info.getBlocks(), false, save.couldHaveGRA(), true);
+            score = new IfScore(info.getCycles(), info.getFootprint(), info.getBlocks(),
+                                false, couldHaveGRA(save, puzzle), true);
         String leaderboardData = String.format("""
                                                InputRate.%s.0 = %d
                                                Solution.%s.0 = %s
@@ -128,7 +127,7 @@ public class IfValidator {
             return new ValidationResult.Invalid<>(submission,
                                                   "Solution has at least " + footprintBound + " footprint, score has " +
                                                   score.getFootprint());
-        if (!save.couldHaveGRA() && score.usesGRA())
+        if (!couldHaveGRA(save, puzzle) && score.usesGRA())
             return new ValidationResult.Invalid<>(submission,
                                                   "Score declares to have GRA, but prerequisite blocks have not been found");
         return new ValidationResult.Valid<>(submission);
@@ -142,5 +141,23 @@ public class IfValidator {
             String value = m.group("value");
             loader.accept(info, value);
         }
+    }
+
+    /**
+     * Checks if the save&level have a rotator, a welder and an (eviscerator or laser or teleporter),
+     * which are prerequisites to realize GRA<br>
+     * Giant Rotating Arms (GRA for friends) are created by:
+     * <li>welding input blocks to factory blocks</li>
+     * <li>rotating the whole assembly</li>
+     * <li>detaching the input blocks by teleporter or by eviscerating/lasering some connecting input blocks</li>
+     */
+    public static boolean couldHaveGRA(@NotNull IfSave save, @NotNull IfPuzzle puzzle) {
+        Set<Short> types = Arrays.stream(save.getBlocks())
+                                 .map(IfBlock::getType)
+                                 .collect(Collectors.toSet());
+        return (types.contains(IfBlockType.ROTATOR_CW) || types.contains(IfBlockType.ROTATOR_CCW)) &&
+               (types.contains(IfBlockType.WELDER_A) || types.contains(IfBlockType.WELDER_B)) &&
+               (types.contains(IfBlockType.EVISCERATOR) || types.contains(IfBlockType.LASER) ||
+                puzzle.getGroup() == IfGroup.ZONE_7); // only and all `The Heist` puzzles have teleporters
     }
 }
