@@ -69,24 +69,28 @@ public class IfValidator {
             String[] kv = line.split("\\s*=\\s*", 2);
             String[] keyParts = kv[0].split("\\.");
             String value = kv[1];
-            if (value.isBlank() && !keyParts[3].equals("Flags")) // empty flags are different from null flags
-                continue;
-
-            if (keyParts[0].equals("InputRate") && keyParts.length == 3) // InputRate.1-1.0 = 1
+            if (value.isBlank()) {
+                // empty flags are different from null flags
+                if (keyParts[0].equals("Last") && keyParts.length == 4 && keyParts[3].equals("Flags"))
+                    find.apply(keyParts).loadFlags("");
+            }
+            else if (keyParts[0].equals("InputRate") && keyParts.length == 3) // InputRate.1-1.0 = 1
                 find.apply(keyParts).setInputRate(Integer.parseInt(value));
-            if (keyParts[0].equals("Solution") && keyParts.length == 3) // Solution.1-1.0 = AwAAAAAAAAA=
+            else if (keyParts[0].equals("Solution") && keyParts.length == 3) // Solution.1-1.0 = AwAAAAAAAAA=
                 find.apply(keyParts).setSolution(value);
-            if (keyParts[0].equals("Author") && keyParts.length == 3) // Author.1-1.0 = someGuy
+            else if (keyParts[0].equals("Author") && keyParts.length == 3) // Author.1-1.0 = someGuy
                 find.apply(keyParts).setAuthor(value);
-            if (keyParts[0].equals("Last") && keyParts.length == 4) {
-                if (keyParts[3].equals("Blocks")) // Last.1-1.0.Blocks = 44
-                    find.apply(keyParts).setBlocks(Integer.parseInt(value));
-                if (keyParts[3].equals("Cycles")) // Last.1-1.0.Cycles = 44
-                    find.apply(keyParts).setCycles(Integer.parseInt(value));
-                if (keyParts[3].equals("Footprint")) // Last.1-1.0.Footprint = 47
-                    find.apply(keyParts).setFootprint(Integer.parseInt(value));
-                if (keyParts[3].equals("Flags")) // Last.1-1.0.Flags = F
-                    find.apply(keyParts).loadFlags(value);
+            else if (keyParts[0].equals("Last") && keyParts.length == 4) {
+                switch (keyParts[3]) {
+                    case "Blocks" -> // Last.1-1.0.Blocks = 44
+                        find.apply(keyParts).setBlocks(Integer.parseInt(value));
+                    case "Cycles" -> // Last.1-1.0.Cycles = 44
+                        find.apply(keyParts).setCycles(Integer.parseInt(value));
+                    case "Footprint" -> // Last.1-1.0.Footprint = 47
+                        find.apply(keyParts).setFootprint(Integer.parseInt(value));
+                    case "Flags" -> // Last.1-1.0.Flags = F
+                        find.apply(keyParts).loadFlags(value);
+                }
             }
         }
         return infosByIdSlot.entrySet()
