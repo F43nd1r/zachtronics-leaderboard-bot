@@ -114,7 +114,8 @@ public class IfValidator {
         // if we have no score we load it from the file, by extending reasonable trust to it
         if (score == null) {
             score = new IfScore(info.getCycles(), info.getFootprint(), info.getBlocks(),
-                                info.isOutOfBounds(), info.usesGRA() && couldHaveGRA(save, puzzle), info.isFinite());
+                                info.isOutOfBounds(), info.usesGRA() && couldHaveGRA(save, puzzle),
+                                info.isFinite() && puzzle.getType() == IfType.STANDARD); // boss doesn't track finite
         }
         if (info.getAuthor() != null) // prefer a custom savefile-specified author
             author = info.getAuthor();
@@ -124,10 +125,6 @@ public class IfValidator {
                                                """, id, info.getInputRate(), id, info.getSolution());
         // we use a mutable list, as we could fill it later with display links if we have a single valid submission
         IfSubmission submission = new IfSubmission(puzzle, score, author, new ArrayList<>(), leaderboardData);
-
-        // ensure level is tracked
-        if (puzzle.getType() != IfType.STANDARD)
-            return new ValidationResult.Invalid<>(submission, "Boss levels are not supported");
 
         // each level has 10 outputs, plus one cycle of travel
         if (score.getCycles() <= 10)
@@ -145,6 +142,20 @@ public class IfValidator {
         if (!couldHaveGRA(save, puzzle) && score.usesGRA())
             return new ValidationResult.Invalid<>(submission,
                                                   "Score declares to have GRA, but prerequisite blocks have not been found");
+
+        // the boss level:
+        // * has manual toggles, which we disallow
+        // * finite by design (with a typically hardcoded solution)
+        // * forced to have InputRate = 8
+        if (puzzle.getType() == IfType.BOSS) {
+            if (save.hasManualToggles())
+                return new ValidationResult.Invalid<>(submission, "Manual Toggles are not allowed");
+            if (score.isFinite())
+                return new ValidationResult.Invalid<>(submission, "Finiteness is not tracked in the boss level");
+            if (info.getInputRate() != 8)
+                return new ValidationResult.Invalid<>(submission, "Invalid InputRate in the boss level: " + info.getInputRate());
+        }
+
         return new ValidationResult.Valid<>(submission);
     }
 

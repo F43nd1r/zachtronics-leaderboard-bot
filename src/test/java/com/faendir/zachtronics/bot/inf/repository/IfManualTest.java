@@ -72,8 +72,6 @@ class IfManualTest {
     @Test
     public void rebuildAllWiki() {
         for (IfPuzzle puzzle : IfPuzzle.values()) {
-            if (puzzle.getType() != IfType.STANDARD)
-                continue;
             repository.rebuildRedditLeaderboard(puzzle, "");
             System.out.println("Done " + puzzle.getDisplayName());
         }
@@ -97,7 +95,6 @@ class IfManualTest {
             page.append(header);
             String groupTable = Arrays.stream(IfPuzzle.values())
                                       .filter(p -> p.getGroup() == group)
-                                      .filter(p -> p.getType() == IfType.STANDARD)
                                       .map(p -> String.format("| [%s](%s) | | | | \n", p.getDisplayName(), p.getLink()))
                                       .collect(Collectors.joining("|\n"));
             page.append(groupTable).append('\n');

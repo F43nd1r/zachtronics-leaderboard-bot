@@ -19,7 +19,7 @@ package com.faendir.zachtronics.bot.inf.model;
 import com.faendir.zachtronics.bot.model.Puzzle;
 import lombok.Getter;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 @Getter
@@ -94,7 +94,9 @@ public enum IfPuzzle implements Puzzle<IfCategory> {
         this.group = group;
         this.type = type;
         this.displayName = displayName;
-        this.supportedCategories = type == IfType.BOSS ? Collections.emptyList() : List.of(IfCategory.values());
+        this.supportedCategories = Arrays.stream(IfCategory.values())
+                                         .filter(c -> c.getSupportedTypes().contains(type))
+                                         .toList();
         this.link = "https://zlbb.faendir.com/if/" + id;
     }
 

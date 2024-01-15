@@ -94,4 +94,9 @@ public class IfSave {
                            .map(b -> (b.getPositionX() << 16) | (b.getPositionZ() & 0xFFFF))
                            .distinct().count();
     }
+
+    public boolean hasManualToggles() {
+        return Arrays.stream(blocks).anyMatch(b -> b.getType() == IfBlockType.TOGGLE);
+    }
+
 }
