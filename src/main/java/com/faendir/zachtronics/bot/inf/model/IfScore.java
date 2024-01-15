@@ -51,11 +51,13 @@ public class IfScore implements Score<IfCategory> {
                      .replace(Integer.toString(PLACEHOLDER), "?");
     }
 
+    /** O?G?F? */
+    public static final String FLAGS_REGEX = "(?<Oflag>[oO])?(?<GRAflag>[gG])?(?<Fflag>[fF])?";
     /** ccc/ff/bb[/OGF] */
     private static final Pattern REGEX_SCORE = Pattern.compile("\\**(?<cycles>\\d+|\\?)\\**[/-]" +
                                                                "\\**(?<footprint>\\d+|\\?)\\**[/-]" +
                                                                "\\**(?<blocks>\\d+|\\?)\\**" +
-                                                               "(?:[/-](?<Oflag>[oO])?(?<GRAflag>[gG])?(?<Fflag>[fF])?)?");
+                                                               "(?:[/-]" + FLAGS_REGEX + ")?");
 
     /** <tt>ccc/ff/bb[/OGF]</tt>, tolerates extra <tt>*</tt> */
     @Nullable

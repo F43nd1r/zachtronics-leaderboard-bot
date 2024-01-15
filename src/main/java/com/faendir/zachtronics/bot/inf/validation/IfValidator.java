@@ -21,8 +21,7 @@ import com.faendir.zachtronics.bot.validation.ValidationResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.regex.Matcher;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -37,45 +36,58 @@ import java.util.stream.Collectors;
  * Last.1-1.0.Blocks = 44
  * Last.1-1.0.Cycles = 44
  * Last.1-1.0.Footprint = 47
- * Solution.1-1.0 = AwAAAAAAAAA=
  * Last.1-1.1.Blocks = 25
  * Last.1-1.1.Cycles = 58
  * Last.1-1.1.Footprint = 76
+ * Solution.1-1.0 = AwAAAAAAAAA=
  * Solution.1-1.1 = AwAAAAAAAAA=
  * </pre>
+ * the solution is a base64 encoded string represented by {@link IfSave}<br><br>
  *
- * the solution is a base64 encoded string represented by {@link IfSave}
+ * On top of that we support the 2 extensions:
+ * <pre>
+ * Last.1-1.0.Flags = [/][O][G][F]
+ * Author.1-1.0 = someGuy
+ * </pre>
+ * to set extra fields that aren't in the savefile<br><br>
  *
  * The leaderboard stores just the minimal information needed:
- * <pre>
+// * <pre>
  * InputRate.1-1.1 = 1
  * Solution.1-1.1 = AwAAAAAAAAA=
  * </pre>
- *
  */
 public class IfValidator {
-    /** InputRate.4-3.1 = 1 */
-    private static final Pattern INPUT_RATE_PATTERN = Pattern.compile("InputRate.(?<idSlot>\\d+-\\db?\\.\\d) = (?<value>\\d+)");
-    /** Last.1-1.1.Blocks = 44 */
-    private static final Pattern LAST_BLOCKS_PATTERN = Pattern.compile("Last.(?<idSlot>\\d+-\\db?\\.\\d).Blocks = (?<value>\\d+)");
-    /** Last.1-1.1.Cycles = 44 */
-    private static final Pattern LAST_CYCLES_PATTERN = Pattern.compile("Last.(?<idSlot>\\d+-\\db?\\.\\d).Cycles = (?<value>\\d+)");
-    /** Last.1-1.1.Footprint = 47 */
-    private static final Pattern LAST_FOOTPRINT_PATTERN = Pattern.compile("Last.(?<idSlot>\\d+-\\db?\\.\\d).Footprint = (?<value>\\d+)");
-    /** Solution.4-3.1 = AAAA== */
-    private static final Pattern SOLUTION_PATTERN = Pattern.compile(
-            "Solution.(?<idSlot>\\d+-\\db?\\.\\d) = (?<value>[A-Za-z0-9+/]+={0,2})");
 
     public static Collection<ValidationResult<IfSubmission>> validateSavefile(@NotNull String data, @NotNull String author, IfScore score) {
         Map<String, IfSolutionInfo> infosByIdSlot = new LinkedHashMap<>(); // 1-1.0 -> {...}
+        Function<String[], IfSolutionInfo> find =
+            keyParts -> infosByIdSlot.computeIfAbsent(keyParts[1] + "." + keyParts[2], p -> new IfSolutionInfo());
 
         for (String line: Pattern.compile("\r?\n").split(data)) {
-            if (line.isBlank()) continue;
-            loadLine(infosByIdSlot, INPUT_RATE_PATTERN.matcher(line), (i, v) -> i.setInputRate(Integer.parseInt(v)));
-            loadLine(infosByIdSlot, LAST_BLOCKS_PATTERN.matcher(line), (i, v) -> i.setBlocks(Integer.parseInt(v)));
-            loadLine(infosByIdSlot, LAST_CYCLES_PATTERN.matcher(line), (i, v) -> i.setCycles(Integer.parseInt(v)));
-            loadLine(infosByIdSlot, LAST_FOOTPRINT_PATTERN.matcher(line), (i, v) -> i.setFootprint(Integer.parseInt(v)));
-            loadLine(infosByIdSlot, SOLUTION_PATTERN.matcher(line), IfSolutionInfo::setSolution);
+            if (!line.contains("=")) continue;
+            String[] kv = line.split("\\s*=\\s*", 2);
+            String[] keyParts = kv[0].split("\\.");
+            String value = kv[1];
+            if (value.isBlank() && !keyParts[3].equals("Flags")) // empty flags are different from null flags
+                continue;
+
+            if (keyParts[0].equals("InputRate") && keyParts.length == 3) // InputRate.1-1.0 = 1
+                find.apply(keyParts).setInputRate(Integer.parseInt(value));
+            if (keyParts[0].equals("Solution") && keyParts.length == 3) // Solution.1-1.0 = AwAAAAAAAAA=
+                find.apply(keyParts).setSolution(value);
+            if (keyParts[0].equals("Author") && keyParts.length == 3) // Author.1-1.0 = someGuy
+                find.apply(keyParts).setAuthor(value);
+            if (keyParts[0].equals("Last") && keyParts.length == 4) {
+                if (keyParts[3].equals("Blocks")) // Last.1-1.0.Blocks = 44
+                    find.apply(keyParts).setBlocks(Integer.parseInt(value));
+                if (keyParts[3].equals("Cycles")) // Last.1-1.0.Cycles = 44
+                    find.apply(keyParts).setCycles(Integer.parseInt(value));
+                if (keyParts[3].equals("Footprint")) // Last.1-1.0.Footprint = 47
+                    find.apply(keyParts).setFootprint(Integer.parseInt(value));
+                if (keyParts[3].equals("Flags")) // Last.1-1.0.Flags = F
+                    find.apply(keyParts).loadFlags(value);
+            }
         }
         return infosByIdSlot.entrySet()
                             .stream()
@@ -100,9 +112,12 @@ public class IfValidator {
                                 .filter(p -> p.getId().equals(id))
                                 .findFirst().orElseThrow();
         // if we have no score we load it from the file, by extending reasonable trust to it
-        if (score == null)
+        if (score == null) {
             score = new IfScore(info.getCycles(), info.getFootprint(), info.getBlocks(),
-                                false, couldHaveGRA(save, puzzle), true);
+                                info.isOutOfBounds(), info.usesGRA() && couldHaveGRA(save, puzzle), info.isFinite());
+        }
+        if (info.getAuthor() != null) // prefer a custom savefile-specified author
+            author = info.getAuthor();
         String leaderboardData = String.format("""
                                                InputRate.%s.0 = %d
                                                Solution.%s.0 = %s
@@ -131,16 +146,6 @@ public class IfValidator {
             return new ValidationResult.Invalid<>(submission,
                                                   "Score declares to have GRA, but prerequisite blocks have not been found");
         return new ValidationResult.Valid<>(submission);
-    }
-
-    private static void loadLine(Map<String, IfSolutionInfo> infosByIdSlot, @NotNull Matcher m,
-                                 BiConsumer<IfSolutionInfo, String> loader) {
-        if (m.matches()) {
-            String idSlot = m.group("idSlot");
-            IfSolutionInfo info = infosByIdSlot.computeIfAbsent(idSlot, p -> new IfSolutionInfo());
-            String value = m.group("value");
-            loader.accept(info, value);
-        }
     }
 
     /**
