@@ -95,6 +95,7 @@ public class IfValidator {
         }
         return infosByIdSlot.entrySet()
                             .stream()
+                            .filter(e -> e.getKey().matches("1?\\d-\\db?\\.\\d")) // main game puzzles only
                             .map(e -> validateOne(e.getKey(), e.getValue(), author, score))
                             .toList();
     }
@@ -114,7 +115,9 @@ public class IfValidator {
         String id = idSlot.replaceFirst("\\.\\d$", "");
         IfPuzzle puzzle = Arrays.stream(IfPuzzle.values())
                                 .filter(p -> p.getId().equals(id))
-                                .findFirst().orElseThrow();
+                                .findFirst().orElse(null);
+        if (puzzle == null)
+            return new ValidationResult.Unparseable<>("Unknown puzzle: " + id);
         // if we have no score we load it from the file, by extending reasonable trust to it
         if (score == null) {
             score = new IfScore(info.getCycles(), info.getFootprint(), info.getBlocks(),
