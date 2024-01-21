@@ -18,7 +18,7 @@ The official leaderboard copies managed by the bot are in the wiki page of the g
 1. Locate the game config.cfg, see: https://www.pcgamingwiki.com/wiki/Opus_Magnum#Configuration_file.28s.29_location
 2. Open it with a text editor (e.g. Notepad)
 3. Locate the `ExternalLeaderboardURLs =` line
-4. Edit it to say: `ExternalLeaderboardURLs = https://<YOUR_NAME>@zlbb.faendir.com/om/game-api`,
+4. Edit it to say: `ExternalLeaderboardURLs = https://zlbb.faendir.com/om/game-api/<YOUR_NAME>`,
    replacing `<YOUR_NAME>` with the name you want to submit records under
 
 ## Build

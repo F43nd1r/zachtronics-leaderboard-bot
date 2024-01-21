@@ -19,10 +19,25 @@ package com.faendir.zachtronics.bot.om.rest
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.mors.MorsService
 import com.faendir.zachtronics.bot.om.createSubmission
-import com.faendir.zachtronics.bot.om.model.*
+import com.faendir.zachtronics.bot.om.model.OmCategory
+import com.faendir.zachtronics.bot.om.model.OmCollection
+import com.faendir.zachtronics.bot.om.model.OmGroup
+import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.model.OmScoreManifold
+import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.notifyOf
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
-import com.faendir.zachtronics.bot.om.rest.dto.*
+import com.faendir.zachtronics.bot.om.rest.dto.OmCategoryDTO
+import com.faendir.zachtronics.bot.om.rest.dto.OmCollectionDTO
+import com.faendir.zachtronics.bot.om.rest.dto.OmGroupDTO
+import com.faendir.zachtronics.bot.om.rest.dto.OmPuzzleDTO
+import com.faendir.zachtronics.bot.om.rest.dto.OmRecordChangeDTO
+import com.faendir.zachtronics.bot.om.rest.dto.OmRecordDTO
+import com.faendir.zachtronics.bot.om.rest.dto.OmScoreManifoldDTO
+import com.faendir.zachtronics.bot.om.rest.dto.OmSubmissionDTO
+import com.faendir.zachtronics.bot.om.rest.dto.emptyRecord
+import com.faendir.zachtronics.bot.om.rest.dto.id
+import com.faendir.zachtronics.bot.om.rest.dto.toDTO
 import com.faendir.zachtronics.bot.om.withCategory
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.rest.GameRestController
@@ -34,17 +49,25 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.toKotlinInstant
+import org.slf4j.LoggerFactory
 import org.springframework.format.annotation.DateTimeFormat
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.io.path.readBytes
 import kotlin.reflect.KClass
+import kotlin.time.Duration.Companion.minutes
 
 @RestController
 @RequestMapping("/om")
@@ -52,13 +75,18 @@ class OmController(
     private val repository: OmSolutionRepository,
     private val morsService: MorsService,
     private val discordClient: GatewayDiscordClient
-) :
-    GameRestController<OmGroupDTO, OmPuzzleDTO, OmCategoryDTO, OmRecordDTO> {
+) : GameRestController<OmGroupDTO, OmPuzzleDTO, OmCategoryDTO, OmRecordDTO> {
+    companion object {
+        private val logger = LoggerFactory.getLogger(OmController::class.java)
+    }
+
     private val discordScope = CoroutineScope(Dispatchers.Default)
+    private val gameUploadScope = CoroutineScope(Dispatchers.Default)
 
     @PreDestroy
     fun shutdown() {
         discordScope.cancel()
+        gameUploadScope.cancel()
     }
 
     override val groups: List<OmGroupDTO> = OmGroup.entries.map { it.toDTO() }
@@ -67,7 +95,7 @@ class OmController(
     val collections: List<OmCollectionDTO> = OmCollection.entries.map { it.toDTO() }
 
     @GetMapping(path = ["/collection/{collectionId}/groups"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getGroupsByCollection(@PathVariable collectionId: String) : List<OmGroupDTO> {
+    fun getGroupsByCollection(@PathVariable collectionId: String): List<OmGroupDTO> {
         val collection = findCollection(collectionId)
         return OmGroup.entries.filter { it.collection == collection }.map { it.toDTO() }
     }
@@ -92,7 +120,7 @@ class OmController(
     val manifolds: List<OmScoreManifoldDTO> = OmScoreManifold.entries.map { it.toDTO() }
 
     @GetMapping(path = ["/manifold/{manifoldId}/categories"], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getCategoriesByManifold(@PathVariable manifoldId: String) : List<OmCategoryDTO> {
+    fun getCategoriesByManifold(@PathVariable manifoldId: String): List<OmCategoryDTO> {
         val manifold = findManifold(manifoldId)
         return OmCategory.entries.filter { it.associatedManifold == manifold }.map { it.toDTO() }
     }
@@ -130,20 +158,29 @@ class OmController(
     }
 
     /** game calls this every time a level is solved, we read the author from the basic auth header username */
-    @PostMapping(path = ["/game-api/solved"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun solved(@RequestHeader(HttpHeaders.AUTHORIZATION) auth: String, @ModelAttribute solvedDTO: OmGameApiSolvedDTO) {
-        // we completely ignore the request, as we want gifs
-    }
+//    @PostMapping(path = ["/game-api/{user}/solved"], consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE])
+//    fun solved(@PathVariable user: String, @RequestParam solution: ByteArray) {
+//    }
 
     /** game calls this every time a gif is recorded, we read the author from the basic auth header username */
-    @PostMapping(path = ["/game-api/recorded"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun recorded(@RequestHeader(HttpHeaders.AUTHORIZATION) auth: String, @ModelAttribute recordedDTO: OmGameApiRecordedDTO) {
-        val submission = createSubmission(null, recordedDTO.gif.bytes, userFromBasicAuth(auth), recordedDTO.solution.bytes)
-        doSubmit(submission, setOf(SubmitResult.Success::class))
+    @OptIn(ExperimentalEncodingApi::class)
+    @PostMapping(path = ["/game-api/{user}/recorded"], consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE])
+    fun recorded(@PathVariable user: String, @RequestParam solution: ByteArray, @RequestParam gif: ByteArray) {
+        gameUploadScope.launch {
+            try {
+                withTimeout(15.minutes) {
+                    val submission = createSubmission(null, Base64.decode(gif), user, Base64.decode(solution))
+                    val result = doSubmit(submission, setOf(SubmitResult.Success::class))
+                    logger.info("Received game api submission for ${submission.puzzle.name} from $user. Result: $result")
+                }
+            } catch (e: Exception) {
+                logger.warn("Bad game api submission from $user", e)
+            }
+        }
     }
 
     private fun doSubmit(
-        submission: OmSubmission, allowedResults: Collection<KClass<out SubmitResult<*,*>>>
+        submission: OmSubmission, allowedResults: Collection<KClass<out SubmitResult<*, *>>>
     ): SubmitResultType {
 
         val result = if (submission.displayLink == null) {
@@ -200,12 +237,13 @@ private fun findGroup(groupId: String) =
     OmGroup.entries.find { it.name.equals(groupId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Group $groupId not found.")
 
 private fun findCollection(collectionId: String) =
-    OmCollection.entries.find { it.name.equals(collectionId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Collection $collectionId not found.")
+    OmCollection.entries.find { it.name.equals(collectionId, ignoreCase = true) } ?: throw ResponseStatusException(
+        HttpStatus.NOT_FOUND,
+        "Collection $collectionId not found."
+    )
 
 private fun findManifold(manifoldId: String) =
-    OmScoreManifold.entries.find { it.name.equals(manifoldId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Manifold $manifoldId not found.")
-
-@OptIn(ExperimentalEncodingApi::class)
-private fun userFromBasicAuth(auth: String) =
-    String(Base64.decode(auth.removePrefix("Basic "))).substringBefore(":")
-        .ifEmpty { throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Empty author") }
+    OmScoreManifold.entries.find { it.name.equals(manifoldId, ignoreCase = true) } ?: throw ResponseStatusException(
+        HttpStatus.NOT_FOUND,
+        "Manifold $manifoldId not found."
+    )

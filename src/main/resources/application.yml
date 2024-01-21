@@ -1,5 +1,7 @@
 server:
   forward-headers-strategy: framework
+  tomcat:
+    max-http-form-post-size: 100MB
 
 spring:
   servlet.multipart:
