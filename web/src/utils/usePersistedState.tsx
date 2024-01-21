@@ -24,11 +24,11 @@ export interface Serializer<S> {
 }
 
 function isStringSchema(schema: TSchema): boolean {
-    return TypeGuard.TString(schema) || TypeGuard.TLiteralString(schema) || (TypeGuard.TUnion(schema) && schema.anyOf.every(isStringSchema))
+    return TypeGuard.IsString(schema) || TypeGuard.IsLiteralString(schema) || (TypeGuard.IsUnion(schema) && schema.anyOf.every(isStringSchema))
 }
 
 function isNumberSchema(schema: TSchema): boolean {
-    return TypeGuard.TNumber(schema) || TypeGuard.TLiteralNumber(schema) || (TypeGuard.TUnion(schema) && schema.anyOf.every(isNumberSchema))
+    return TypeGuard.IsNumber(schema) || TypeGuard.IsLiteralNumber(schema) || (TypeGuard.IsUnion(schema) && schema.anyOf.every(isNumberSchema))
 }
 
 export function getSerializer<S extends TSchema>(schema: S, defaultValue: Static<S>): Serializer<Static<S>> {
