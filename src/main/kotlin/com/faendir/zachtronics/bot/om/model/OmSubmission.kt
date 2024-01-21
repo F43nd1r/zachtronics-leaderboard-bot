@@ -23,7 +23,6 @@ data class OmSubmission(
     override val score: OmScore,
     override val author: String?,
     override var displayLink: String?,
-    var displayData: ByteArray?,
-    val wantedGifCycles: Pair<Int, Int>,
+    val displayData: ByteArray?,
     override val data: ByteArray
 ) : Submission<OmCategory, OmPuzzle>

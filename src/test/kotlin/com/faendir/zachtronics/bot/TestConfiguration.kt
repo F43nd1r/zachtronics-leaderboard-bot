@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot
 
 import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.git.GitRepository
+import com.faendir.zachtronics.bot.mors.MorsService
 import com.faendir.zachtronics.bot.reddit.RedditService
 import com.faendir.zachtronics.bot.testutils.JGitNoExternalConfigReader
 import com.faendir.zachtronics.bot.testutils.TestGitRepository
@@ -86,6 +87,9 @@ class TestConfiguration(private val gitProperties: GitProperties) {
         every { client.restClient } returns restClient
         return client
     }
+
+    @Bean
+    fun morsService(): MorsService = mockk<MorsService>(relaxed = true)
 
     @Bean
     fun restartEndpoint() = mockk<RestartEndpoint>(relaxed = true)

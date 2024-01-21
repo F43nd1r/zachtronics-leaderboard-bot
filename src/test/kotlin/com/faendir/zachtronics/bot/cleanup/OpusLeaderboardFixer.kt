@@ -67,7 +67,7 @@ class OpusLeaderboardFixer {
             accessToken = ""
             username = "zachtronics-leaderboard-bot"
         }, repo)
-        val repository = OmSolutionRepository(gitRepo, mockk(relaxed = true), OmUrlMapper(), mockk(relaxed = true))
+        val repository = OmSolutionRepository(gitRepo, mockk(relaxed = true), OmUrlMapper())
 
         for (puzzle in OmPuzzle.entries) {
             println("Doing ${puzzle.name}")
@@ -75,7 +75,7 @@ class OpusLeaderboardFixer {
                 println("${record.score.toDisplayString(DisplayContext.fileName())} is being processed")
                 val solution = repo.toPath().resolve(record.dataPath).readBytes()
                 val submission = OmSubmission(
-                    record.puzzle, record.score, "SomeGuy", record.displayLink, null, 0 to 0, solution
+                    record.puzzle, record.score, "SomeGuy", record.displayLink, null, solution
                 )
 
                 val result = repository.submit(submission)
@@ -93,7 +93,7 @@ class OpusLeaderboardFixer {
             accessToken = ""
             username = "zachtronics-leaderboard-bot"
         })
-        val repository = OmSolutionRepository(newRepo, mockk(relaxed = true), OmUrlMapper(), mockk(relaxed = true))
+        val repository = OmSolutionRepository(newRepo, mockk(relaxed = true), OmUrlMapper())
 
         for (file in getAllRecordFiles(repo, OmPuzzle.STABILIZED_WATER)) {
             println("${file.name} is being processed")

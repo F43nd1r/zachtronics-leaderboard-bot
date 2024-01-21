@@ -11,6 +11,7 @@ COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
 
 FROM openjdk:17-jdk-bullseye
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg
 COPY --from=builder /python /root/.local
 COPY --from=builder /xbpgh-sim/xbpgh_sim /root/.local/lib/python3.9/site-packages/xbpgh_sim
 COPY --from=builder /chipwizard-sim/chipwizard_sim /root/.local/lib/python3.9/site-packages/chipwizard_sim

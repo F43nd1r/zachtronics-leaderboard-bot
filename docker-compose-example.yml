@@ -1,18 +1,9 @@
 version: "3.7"
 
 services:
-  om-gif-maker:
-    build: ./omgifmaker/
-    container_name: om-gif-maker
-    expose:
-      - "8080"
-    environment:
-      OM_GIFMAKER_IMGUR_CLIENT_ID: MUST_BE_SET
   zachtronics-leaderboard-bot:
     build: .
     container_name: zachtronics-leaderboard-bot
-    depends_on:
-      - om-gif-maker
     ports:
       - "8080:8080"
     environment:
@@ -25,9 +16,6 @@ services:
       REDDIT_PASSWORD: MUST_BE_SET
       REDDIT_ACCESS_TOKEN: MUST_BE_SET
       REDDIT_CLIENT_ID: MUST_BE_SET
-      IMGUR_REFRESH_TOKEN: MUST_BE_SET
-      IMGUR_CLIENT_ID: MUST_BE_SET
-      IMGUR_CLIENT_SECRET: MUST_BE_SET
-      OM_GIF_MAKER_SERVER_URL: http://om-gif-maker:8080
+      MORS_API_KEY: MUST_BE_SET
 ## enable debugger connection
 #      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"

@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.springdoc)
     implementation(libs.guava)
     implementation(libs.opencsv)
+    implementation(libs.ffmpeg)
 
     testImplementation(libs.spring.boot.test)
     testImplementation(libs.trove4j)

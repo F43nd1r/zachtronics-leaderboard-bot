@@ -19,10 +19,11 @@ package com.faendir.zachtronics.bot.config
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Configuration
 
+/** See [docs](https://docs.bunny.net/reference/put_-storagezonename-path-filename) */
 @Configuration
-@ConfigurationProperties("imgur")
-class ImgurProperties {
-    lateinit var refreshToken: String
-    lateinit var clientId: String
-    lateinit var clientSecret: String
+@ConfigurationProperties("mors")
+class MorsProperties {
+    val region = "sg"
+    val storageZone = "opus-magnum-gifs"
+    lateinit var apiKey: String
 }

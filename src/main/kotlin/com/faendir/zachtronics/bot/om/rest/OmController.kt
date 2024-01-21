@@ -16,6 +16,8 @@
 
 package com.faendir.zachtronics.bot.om.rest
 
+import com.faendir.zachtronics.bot.model.DisplayContext
+import com.faendir.zachtronics.bot.mors.MorsService
 import com.faendir.zachtronics.bot.om.createSubmission
 import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.om.notifyOf
@@ -34,15 +36,23 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.datetime.toKotlinInstant
 import org.springframework.format.annotation.DateTimeFormat
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.io.path.readBytes
+import kotlin.reflect.KClass
 
 @RestController
 @RequestMapping("/om")
-class OmController(private val repository: OmSolutionRepository, private val discordClient: GatewayDiscordClient) :
+class OmController(
+    private val repository: OmSolutionRepository,
+    private val morsService: MorsService,
+    private val discordClient: GatewayDiscordClient
+) :
     GameRestController<OmGroupDTO, OmPuzzleDTO, OmCategoryDTO, OmRecordDTO> {
     private val discordScope = CoroutineScope(Dispatchers.Default)
 
@@ -116,13 +126,50 @@ class OmController(private val repository: OmSolutionRepository, private val dis
         if (submissionDTO.gif != null && !isValidLink(submissionDTO.gif)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid gif")
         if (submissionDTO.gif == null && submissionDTO.gifData == null) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "no gif")
         val submission = createSubmission(submissionDTO.gif, submissionDTO.gifData?.bytes, submissionDTO.author, submissionDTO.solution.bytes)
-        val result = repository.submit(submission)
+        return doSubmit(submission, setOf(SubmitResult.Success::class, SubmitResult.Updated::class))
+    }
+
+    /** game calls this every time a level is solved, we read the author from the basic auth header username */
+    @PostMapping(path = ["/game-api/solved"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun solved(@RequestHeader(HttpHeaders.AUTHORIZATION) auth: String, @ModelAttribute solvedDTO: OmGameApiSolvedDTO) {
+        // we completely ignore the request, as we want gifs
+    }
+
+    /** game calls this every time a gif is recorded, we read the author from the basic auth header username */
+    @PostMapping(path = ["/game-api/recorded"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun recorded(@RequestHeader(HttpHeaders.AUTHORIZATION) auth: String, @ModelAttribute recordedDTO: OmGameApiRecordedDTO) {
+        val submission = createSubmission(null, recordedDTO.gif.bytes, userFromBasicAuth(auth), recordedDTO.solution.bytes)
+        doSubmit(submission, setOf(SubmitResult.Success::class))
+    }
+
+    private fun doSubmit(
+        submission: OmSubmission, allowedResults: Collection<KClass<out SubmitResult<*,*>>>
+    ): SubmitResultType {
+
+        val result = if (submission.displayLink == null) {
+            val dryRunResult = repository.submitDryRun(submission)
+            if (dryRunResult::class in allowedResults) {
+                if (submission.displayData == null) {
+                    throw IllegalArgumentException("Failed to generate gif for your solution.")
+                }
+                submission.displayLink = morsService.uploadGif(
+                    submission.displayData!!,
+                    submission.puzzle.name,
+                    submission.score.toDisplayString(DisplayContext.fileName())
+                )
+                repository.submit(submission)
+            } else {
+                dryRunResult
+            }
+        } else repository.submit(submission)
+
         discordScope.launch { discordClient.notifyOf(result) }
-        return when (result) {
-            is SubmitResult.Success,is SubmitResult.Updated  -> SubmitResultType.SUCCESS
+
+        return if (result::class in allowedResults) SubmitResultType.SUCCESS
+        else when (result) {
             is SubmitResult.Failure -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, result.message)
             is SubmitResult.NothingBeaten -> SubmitResultType.NOTHING_BEATEN
-            is SubmitResult.AlreadyPresent -> SubmitResultType.ALREADY_PRESENT
+            else -> SubmitResultType.ALREADY_PRESENT
         }
     }
 
@@ -158,3 +205,7 @@ private fun findCollection(collectionId: String) =
 private fun findManifold(manifoldId: String) =
     OmScoreManifold.entries.find { it.name.equals(manifoldId, ignoreCase = true) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Manifold $manifoldId not found.")
 
+@OptIn(ExperimentalEncodingApi::class)
+private fun userFromBasicAuth(auth: String) =
+    String(Base64.decode(auth.removePrefix("Basic "))).substringBefore(":")
+        .ifEmpty { throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Empty author") }

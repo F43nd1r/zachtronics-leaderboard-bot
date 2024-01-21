@@ -14,26 +14,30 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.imgur
+package com.faendir.zachtronics.bot.mors
 
-import com.faendir.zachtronics.bot.config.ImgurProperties
+import com.faendir.zachtronics.bot.config.MorsProperties
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.core.io.ClassPathResource
 
-@Disabled
-internal class ImgurServiceTest {
+@Disabled("Manual upload test")
+internal class MorsServiceTest {
 
-    private val imgurService = ImgurService(ImgurProperties().apply {
-        refreshToken = ""
-        clientId = ""
-        clientSecret = ""
+    private val morsService = MorsService(MorsProperties().apply {
+        apiKey = ""
     }, RestTemplateBuilder())
 
     @Test
     fun upload() {
-        val link = imgurService.upload(javaClass.classLoader.getResource("Face_Powder_Height_1.gif").readBytes())
-
+        val link = morsService.uploadGif(ClassPathResource("Face_Powder_Height_1.gif").file.readBytes(), "test", "omgif")
         println(link)
+    }
+
+    @Test
+    fun delete() {
+        val result = morsService.delete("test/omgif-37f33894.gif")
+        println(result)
     }
 }

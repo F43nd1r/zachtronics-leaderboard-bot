@@ -25,6 +25,7 @@ nokee = "0.4.3264-202305010539.985612b6"
 opencsv = "5.9"
 gradle-frontend = "8.0.0"
 nodejs = "18.17.0"
+ffmpeg = "0.8.0"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -73,4 +74,5 @@ springdoc = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", vers
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 spring-core = { module = "org.springframework:spring-core" }
 opencsv = { module = "com.opencsv:opencsv", version.ref = "opencsv" }
+ffmpeg = { module = "net.bramp.ffmpeg:ffmpeg", version.ref = "ffmpeg" }
 

@@ -8,6 +8,8 @@ reddit:
     clientId: zachtronics-bot-test
     password: ''
     username: zachtronics-bot-test
+mors:
+    apiKey: ''
 spring:
     main:
         allow-bean-definition-overriding: true
