@@ -21,7 +21,7 @@ interface Puzzle<C : Category> {
     val type: Type
     val displayName: String
 
-    val supportedCategories: List<C>
+    val supportedCategories: Collection<C>
 
     val link: String
 }
