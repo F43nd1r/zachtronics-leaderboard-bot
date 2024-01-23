@@ -16,8 +16,12 @@
 
 package com.faendir.zachtronics.bot.om.model
 
+import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.Record
+import com.faendir.zachtronics.bot.model.StringFormat
+import com.faendir.zachtronics.bot.utils.Markdown
 import com.faendir.zachtronics.bot.utils.PathSerializer
+import com.faendir.zachtronics.bot.utils.orEmpty
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -35,4 +39,13 @@ data class OmRecord(
     val lastModified: Instant? = null,
     @Transient
     override val author: String? = null
-) : Record<OmCategory>
+) : Record<OmCategory> {
+
+    override fun toDisplayString(context: DisplayContext<OmCategory>): String {
+        return when (context.format) {
+            StringFormat.DISCORD, StringFormat.REDDIT -> Markdown.fileLinkOrEmpty(dataLink) +
+                    Markdown.linkOrText(score.toDisplayString(context), displayLink) + author.orEmpty(prefix = " by ")
+            else -> score.toDisplayString(context) + author.orEmpty(prefix = " by ") + displayLink.orEmpty(prefix = " ")
+        }
+    }
+}

@@ -16,8 +16,6 @@
 
 package com.faendir.zachtronics.bot.model
 
-import com.faendir.zachtronics.bot.utils.Markdown
-import com.faendir.zachtronics.bot.utils.orEmpty
 import java.io.InputStream
 import java.nio.file.Path
 
@@ -36,13 +34,7 @@ interface Record<C : Category> {
     /** Machine-readable solution representation */
     val dataPath: Path?
 
-    fun toDisplayString(context: DisplayContext<C>): String {
-        return when (context.format) {
-            StringFormat.DISCORD, StringFormat.REDDIT -> Markdown.fileLinkOrEmpty(dataLink) +
-                    Markdown.linkOrText(score.toDisplayString(context), displayLink) + author.orEmpty(prefix = " by ")
-            else -> score.toDisplayString(context) + author.orEmpty(prefix = " by ") + displayLink.orEmpty(prefix = " ")
-        }
-    }
+    fun toDisplayString(context: DisplayContext<C>): String
 
     /** Override for games whose [displayLink] does not embed on Discord, to add an attachment to show */
     fun attachments(): List<Pair<String, InputStream>> = emptyList()
