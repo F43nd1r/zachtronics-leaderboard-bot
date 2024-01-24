@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
  * to set extra fields that aren't in the savefile<br><br>
  *
  * The leaderboard stores just the minimal information needed:
-// * <pre>
+ * <pre>
  * InputRate.1-1.1 = 1
  * Solution.1-1.1 = AwAAAAAAAAA=
  * </pre>

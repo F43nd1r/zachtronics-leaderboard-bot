@@ -48,7 +48,7 @@ public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPu
             .required()
             .build();
     private final CommandOption<String, IfScore> scoreOption = CommandOptionBuilder.string("score")
-            .description("Score of the solution in ccc/fff/bbb[/GF] format")
+            .description("Score of the solution in ccc/fff/bbb[/OGF] format")
             .convert((event, score) -> {
                 if (score != null)
                     return IfScore.parseScore(score);
