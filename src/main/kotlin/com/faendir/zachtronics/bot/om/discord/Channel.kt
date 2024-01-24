@@ -16,10 +16,14 @@
 
 package com.faendir.zachtronics.bot.om.discord
 
-enum class Channel(val discordName: String) {
-    RECORD("category-record-submissions"),
-    PARETO("pareto-record-submissions"),
-    UPDATE("gif-updates"),
-    MAIN("opus-magnum"),
+import discord4j.common.util.Snowflake
+
+enum class Channel(idLong: Long) {
+    RECORD(1135223998893002795),
+    PARETO(1135224098088288348),
+    UPDATE(1135224154010955786),
+    MAIN(370367639073062922),
     ;
+
+    val id = Snowflake.of(idLong)
 }
