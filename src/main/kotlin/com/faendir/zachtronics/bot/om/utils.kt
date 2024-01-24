@@ -18,7 +18,11 @@ package com.faendir.zachtronics.bot.om
 
 import com.faendir.om.parser.solution.SolutionParser
 import com.faendir.om.parser.solution.model.SolvedSolution
-import com.faendir.om.parser.solution.model.part.*
+import com.faendir.om.parser.solution.model.part.Arm
+import com.faendir.om.parser.solution.model.part.ArmType
+import com.faendir.om.parser.solution.model.part.Glyph
+import com.faendir.om.parser.solution.model.part.GlyphType
+import com.faendir.om.parser.solution.model.part.IO
 import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.option.enumOptionBuilder
@@ -26,22 +30,46 @@ import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.om.discord.Channel
 import com.faendir.zachtronics.bot.om.discord.SendToMainChannelButton
-import com.faendir.zachtronics.bot.om.model.*
+import com.faendir.zachtronics.bot.om.model.OmCategory
+import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.om.model.OmScore
+import com.faendir.zachtronics.bot.om.model.OmSubmission
+import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SubmitResult
-import com.faendir.zachtronics.bot.utils.*
+import com.faendir.zachtronics.bot.utils.InfinInt
 import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
+import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.ceil
+import com.faendir.zachtronics.bot.utils.embedCategoryRecords
+import com.faendir.zachtronics.bot.utils.filterIsInstance
+import com.faendir.zachtronics.bot.utils.smartFormat
+import com.faendir.zachtronics.bot.utils.toMetricsTree
+import discord4j.common.util.Snowflake
 import discord4j.core.GatewayDiscordClient
+import discord4j.core.`object`.entity.Guild
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.entity.channel.MessageChannel
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
+import kotlinx.coroutines.reactor.mono
 import okio.buffer
 import okio.sink
 import okio.source
 import org.slf4j.LoggerFactory
-import reactor.core.publisher.Mono
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import kotlin.jvm.optionals.getOrNull
 
 
 private val logger = LoggerFactory.getLogger("OM Utils")
@@ -212,11 +240,30 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
 
 private suspend fun GatewayDiscordClient.sendDiscordMessage(message: MultiMessageSafeEmbedMessageBuilder, channel: Channel): List<Message> {
     return guilds
-        .flatMap { it.getChannelById(channel.id).onErrorResume { Mono.empty() } }
+        .flatMap { guild -> mono { guild.findChannel(channel) } }
         .filterIsInstance<MessageChannel>()
         .flatMap { message.send(it) }
         .collectList()
         .awaitSingleOrNull()
         ?.flatten()
         ?: emptyList()
+}
+
+private val guildChannelIdCache = mutableMapOf<Pair<Snowflake, Channel>, Snowflake?>()
+
+@OptIn(FlowPreview::class)
+private suspend fun Guild.findChannel(channel: Channel): MessageChannel? {
+    if(guildChannelIdCache.containsKey(id to channel)) { // not using null check because null is a valid cache value
+        return guildChannelIdCache[id to channel]?.let { getChannelById(it).awaitSingle() as MessageChannel }
+    }
+    val discordChannel = (channels.filter { it.name == channel.discordName }.filterIsInstance<MessageChannel>().awaitFirstOrNull()
+        ?: activeThreads.awaitSingleOrNull()?.threads?.filter { it.name == channel.discordName }?.filterIsInstance<MessageChannel>()?.firstOrNull()
+        ?: channels.asFlow().flatMapConcat { guildChannel -> guildChannel.restChannel.publicArchivedThreads.asFlow().flatMapConcat { it.threads().asFlow() } }
+            .filter { it.name().toOptional().getOrNull() == channel.discordName }
+            .map { getChannelById(Snowflake.of(it.id())).awaitSingleOrNull() }
+            .filterIsInstance<MessageChannel>().firstOrNull())
+
+    guildChannelIdCache[id to channel] = discordChannel?.id
+
+    return discordChannel
 }

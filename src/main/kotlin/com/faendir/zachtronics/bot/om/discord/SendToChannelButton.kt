@@ -39,7 +39,7 @@ class SendToMainChannelButton(private val discord: GatewayDiscordClient) : State
         if (event is ButtonInteractionEvent) {
             val message = event.message.getOrNull() ?: return
             val user = event.user()
-            discord.guilds.flatMap { it.getChannelById(Channel.MAIN.id) }
+            discord.guilds.flatMap { guild -> guild.channels.filter { it.name == Channel.MAIN.discordName } }
                 .filterIsInstance<MessageChannel>()
                 .flatMap { channel ->
                     channel.createMessage()

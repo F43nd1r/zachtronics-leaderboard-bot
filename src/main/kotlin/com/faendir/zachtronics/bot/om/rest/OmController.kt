@@ -81,7 +81,7 @@ class OmController(
     }
 
     private val discordScope = CoroutineScope(Dispatchers.Default)
-    private val gameUploadScope = CoroutineScope(Dispatchers.Default)
+    private val gameUploadScope = CoroutineScope(Dispatchers.IO)
 
     @PreDestroy
     fun shutdown() {
