@@ -41,7 +41,6 @@ import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.InfinInt
 import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
 import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
-import com.faendir.zachtronics.bot.utils.ceil
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.filterIsInstance
 import com.faendir.zachtronics.bot.utils.smartFormat
@@ -57,6 +56,7 @@ import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import kotlin.math.ceil
 
 
 private val logger = LoggerFactory.getLogger("OM Utils")
@@ -72,7 +72,8 @@ fun JNISolutionVerifier.getScore(type: OmType): OmScore {
     // null or 0 THROUGHPUT_OUTPUTS means the solution doesn't output infinite products, hence cannot have a rate
     // infinity rate is reserved for sublinear solutions, which don't really exist and aren't supported by omsim
     val rate: Double? = getMetricSafe(OmSimMetric.THROUGHPUT_OUTPUTS)?.takeIf { it != 0 }?.let {
-        (getMetric(OmSimMetric.THROUGHPUT_CYCLES).toDouble() / it).ceil(precision = 2)
+        val precision = 100.0
+        ceil((precision * getMetric(OmSimMetric.THROUGHPUT_CYCLES).toDouble() / it)) / precision
     }
 
     return OmScore(

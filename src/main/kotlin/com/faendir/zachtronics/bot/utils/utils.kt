@@ -17,7 +17,11 @@
 package com.faendir.zachtronics.bot.utils
 
 import com.faendir.zachtronics.bot.discord.Colors
-import com.faendir.zachtronics.bot.model.*
+import com.faendir.zachtronics.bot.model.Category
+import com.faendir.zachtronics.bot.model.DisplayContext
+import com.faendir.zachtronics.bot.model.Metric
+import com.faendir.zachtronics.bot.model.Record
+import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
@@ -32,7 +36,6 @@ import java.io.Closeable
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
-import kotlin.math.pow
 
 private val wordSeparator = Regex("[\\s-/,:]+")
 
@@ -161,11 +164,6 @@ fun isValidLink(string: String): Boolean {
     } catch (e: Exception) {
         false
     }
-}
-
-fun Double.ceil(precision: Int): Double {
-    val factor = 10.0.pow(precision)
-    return kotlin.math.ceil(this * factor) / factor
 }
 
 val Message.url
