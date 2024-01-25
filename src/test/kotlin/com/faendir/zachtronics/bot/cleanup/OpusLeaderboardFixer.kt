@@ -75,7 +75,7 @@ class OpusLeaderboardFixer {
                 println("${record.score.toDisplayString(DisplayContext.fileName())} is being processed")
                 val solution = repo.toPath().resolve(record.dataPath).readBytes()
                 val submission = OmSubmission(
-                    record.puzzle, record.score, "SomeGuy", record.displayLink, null, solution
+                    record.puzzle, record.score, "SomeGuy", record.displayLink, solution
                 )
 
                 val result = repository.submit(submission)
@@ -102,7 +102,7 @@ class OpusLeaderboardFixer {
             val solution: File = file.resolveSibling(file.name.replace(".json", ".solution"))
             val bytes = solution.readBytes()
             val submission = try {
-                createSubmission(displayLink, null, "Manifoldius", bytes)
+                createSubmission(displayLink, "Manifoldius", bytes)
             }
             catch (e: Exception) {
                 e.printStackTrace()

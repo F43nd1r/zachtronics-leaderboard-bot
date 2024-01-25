@@ -110,7 +110,7 @@ fun JNISolutionVerifier.getScore(type: OmType): OmScore {
     )
 }
 
-fun createSubmission(gif: String?, gifData: ByteArray?, author: String, inputBytes: ByteArray): OmSubmission {
+fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSubmission {
     val solution = try {
         SolutionParser.parse(ByteArrayInputStream(inputBytes).source().buffer())
     } catch (e: Exception) {
@@ -149,7 +149,6 @@ fun createSubmission(gif: String?, gifData: ByteArray?, author: String, inputByt
             verifier.getScore(puzzle.type),
             author,
             gif,
-            gifData,
             solutionBytes
         )
     }
@@ -182,7 +181,7 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
                                     + (if (submitResult.beatenRecords.isNotEmpty()) "\nPreviously:" else "")
                         )
                         .embedCategoryRecords(submitResult.beatenRecords, record.puzzle.supportedCategories)
-                        .link(record.displayLink)
+                        .link(record.displayLinkEmbed ?: record.displayLink)
                         .action(SendToMainChannelButton.createAction()), Channel.PARETO
                 )
             } else {
@@ -195,7 +194,7 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
                                     + (if (submitResult.beatenRecords.isNotEmpty()) "\nPreviously:" else "")
                         )
                         .embedCategoryRecords(submitResult.beatenRecords, record.puzzle.supportedCategories)
-                        .link(record.displayLink)
+                        .link(record.displayLinkEmbed ?: record.displayLink)
                         .action(SendToMainChannelButton.createAction()), Channel.RECORD
                 )
             }
@@ -216,7 +215,7 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
                         "${record.toDisplayString(DisplayContext(StringFormat.DISCORD, submitResult.oldRecord.categories))} was updated.\nPreviously:"
                     )
                     .embedCategoryRecords(listOf(submitResult.oldRecord), puzzle.supportedCategories)
-                    .link(record.displayLink)
+                    .link(record.displayLinkEmbed ?: record.displayLink)
                     .action(SendToMainChannelButton.createAction()), Channel.UPDATE
             )
         }

@@ -40,6 +40,5 @@ fun dummyOmSubmission(
     score: OmScore = dummyOmScore,
     author: String? = null,
     displayLink: String = "https://no.link",
-    displayData: ByteArray? = null,
     data: ByteArray = ByteArray(0)
-) = OmSubmission(puzzle, score, author, displayLink, displayData, data)
+) = OmSubmission(puzzle, score, author, displayLink, data)

@@ -153,24 +153,24 @@ class OmController(
     fun submit(@ModelAttribute submissionDTO: OmSubmissionDTO): SubmitResultType {
         if (submissionDTO.gif != null && !isValidLink(submissionDTO.gif)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid gif")
         if (submissionDTO.gif == null && submissionDTO.gifData == null) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "no gif")
-        val submission = createSubmission(submissionDTO.gif, submissionDTO.gifData?.bytes, submissionDTO.author, submissionDTO.solution.bytes)
-        return doSubmit(submission, setOf(SubmitResult.Success::class, SubmitResult.Updated::class))
+        val submission = createSubmission(submissionDTO.gif, submissionDTO.author, submissionDTO.solution.bytes)
+        return doSubmit(submission, submissionDTO.gifData?.bytes, setOf(SubmitResult.Success::class, SubmitResult.Updated::class))
     }
 
-    /** game calls this every time a level is solved, we read the author from the basic auth header username */
+//    /** game calls this every time a level is solved */
 //    @PostMapping(path = ["/game-api/{user}/solved"], consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE])
 //    fun solved(@PathVariable user: String, @RequestParam solution: ByteArray) {
 //    }
 
-    /** game calls this every time a gif is recorded, we read the author from the basic auth header username */
+    /** game calls this every time a gif is recorded */
     @OptIn(ExperimentalEncodingApi::class)
     @PostMapping(path = ["/game-api/{user}/recorded"], consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE])
     fun recorded(@PathVariable user: String, @RequestParam solution: ByteArray, @RequestParam gif: ByteArray) {
         gameUploadScope.launch {
             try {
                 withTimeout(15.minutes) {
-                    val submission = createSubmission(null, Base64.decode(gif), user, Base64.decode(solution))
-                    val result = doSubmit(submission, setOf(SubmitResult.Success::class))
+                    val submission = createSubmission(null, user, Base64.decode(solution))
+                    val result = doSubmit(submission, Base64.decode(gif), setOf(SubmitResult.Success::class))
                     logger.info("Received game api submission for ${submission.puzzle.name} from $user. Result: $result")
                 }
             } catch (e: Exception) {
@@ -180,20 +180,22 @@ class OmController(
     }
 
     private fun doSubmit(
-        submission: OmSubmission, allowedResults: Collection<KClass<out SubmitResult<*, *>>>
+        submission: OmSubmission, gifData: ByteArray?, allowedResults: Collection<KClass<out SubmitResult<*, *>>>
     ): SubmitResultType {
 
         val result = if (submission.displayLink == null) {
             val dryRunResult = repository.submitDryRun(submission)
             if (dryRunResult::class in allowedResults) {
-                if (submission.displayData == null) {
+                if (gifData == null) {
                     throw IllegalArgumentException("Failed to generate gif for your solution.")
                 }
-                submission.displayLink = morsService.uploadGif(
-                    submission.displayData!!,
+                val (gif, video) = morsService.uploadGif(
+                    gifData,
                     submission.puzzle.name,
                     submission.score.toDisplayString(DisplayContext.fileName())
                 )
+                submission.displayLinkEmbed = gif
+                submission.displayLink = video
                 repository.submit(submission)
             } else {
                 dryRunResult

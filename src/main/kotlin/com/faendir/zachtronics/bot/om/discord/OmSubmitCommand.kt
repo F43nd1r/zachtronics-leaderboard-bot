@@ -97,6 +97,6 @@ class OmSubmitCommand(private val repository: OmSolutionRepository, private val 
         } catch (e: Exception) {
             throw IllegalArgumentException("Could not load your solution file")
         }
-        return createSubmission(gif, null, event.user().username, bytes)
+        return createSubmission(gif, event.user().username, bytes)
     }
 }

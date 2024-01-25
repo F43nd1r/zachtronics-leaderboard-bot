@@ -45,11 +45,11 @@ class MorsService(private val morsProperties: MorsProperties, restTemplateBuilde
     private val ffmpeg = FFmpegExecutor(FFmpeg("/usr/bin/ffmpeg"), FFprobe("/usr/bin/ffprobe"))
 
     /**
-     * The final url will be: https://files.mors.technology/$path/$name-$hash(0,8).mp4
+     * The final url will be: https://files.mors.technology/$path/$name-$hash(0,8).$ext
+     * @return (gif_url, video_url)
      */
-    fun uploadGif(gif: ByteArray, path: String, stem: String): String {
-        upload(gif, path, stem, "gif")
-        return upload(convertToVideo(gif), path, stem, "mp4")
+    fun uploadGif(gif: ByteArray, path: String, stem: String): Pair<String, String> {
+        return upload(gif, path, stem, "gif") to upload(convertToVideo(gif), path, stem, "mp4")
     }
 
     fun upload(gif: ByteArray, path: String, stem: String, ext: String): String {

@@ -37,8 +37,8 @@ data class OmRecord(
     @Serializable(with = PathSerializer::class)
     override val dataPath: Path,
     val lastModified: Instant? = null,
-    @Transient
-    override val author: String? = null
+    @Transient val displayLinkEmbed: String? = null,
+    @Transient override val author: String? = null
 ) : Record<OmCategory> {
 
     override fun toDisplayString(context: DisplayContext<OmCategory>): String {

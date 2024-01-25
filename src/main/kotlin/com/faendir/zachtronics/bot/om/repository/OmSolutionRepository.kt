@@ -144,9 +144,11 @@ class OmSolutionRepository(
                     beatenRecords.flatMap { it.categories }.map { it.toString() })
                 hash = leaderboardScope.currentHash()
             }
-            when(result) {
-                is SubmitResult.Success -> result.copy(record = newMRecord.record.copy(author = submission.author))
-                is SubmitResult.Updated -> result.copy(record = newMRecord.record.copy(author = submission.author))
+            fun patchedUpRecord() = // add transient fields from submission
+                newMRecord.record.copy(author = submission.author, displayLinkEmbed = submission.displayLinkEmbed)
+            when (result) {
+                is SubmitResult.Success -> result.copy(record = patchedUpRecord())
+                is SubmitResult.Updated -> result.copy(record = patchedUpRecord())
                 else -> result
             }
         }

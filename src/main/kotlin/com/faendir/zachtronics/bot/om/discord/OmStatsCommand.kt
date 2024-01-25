@@ -95,6 +95,6 @@ class OmStatsCommand(private val repository: OmSolutionRepository) : Command.Bas
         } catch (e: Exception) {
             throw IllegalArgumentException("Could not load your solution file")
         }
-        return createSubmission(null, null, event.user().let { it.globalName.getOrNull() ?: it.username }, bytes)
+        return createSubmission(null, event.user().let { it.globalName.getOrNull() ?: it.username }, bytes)
     }
 }
