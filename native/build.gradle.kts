@@ -30,10 +30,13 @@ sourceSets {
 library {
     targetMachines.set(listOf(machines.linux.x86_64))
 
-    val omsimVerifyFiles = file("src/omsim/c/Makefile").readLines().first { it.startsWith("libverify.so: ") }.removePrefix("libverify.so: ").split(" ")
+    val grabFiles = { type: String -> // this is megabrittle
+        file("src/omsim/c/Makefile").readLines().first { it.startsWith("$type=") }.removePrefix("$type=").split(" ")
+            .map { file("src/omsim/c/$it") }
+    }
 
-    cSources.from(omsimVerifyFiles.filter { it.endsWith(".c") }.map { file("src/omsim/c/$it") })
-    privateHeaders.from(omsimVerifyFiles.filter { it.endsWith(".h") }.map { file("src/omsim/c/$it") })
+    cSources.from(grabFiles("SOURCE"))
+    privateHeaders.from(grabFiles("HEADER"))
 }
 
 dependencies {

@@ -26,21 +26,29 @@ sealed class OmSimMetric(val id: String) {
     object COST : OmSimMetric("cost")
     object AREA : OmSimMetric("area")
     object INSTRUCTIONS : OmSimMetric("instructions")
-    class INSTRUCTIONS_WITH_HOTKEY(hotkey: String) : OmSimMetric("instructions with hotkey $hotkey")
+    class INSTRUCTIONS_WITH_HOTKEY(hotkeys: String) : OmSimMetric("instructions with hotkey $hotkeys")
     object EXECUTED_INSTRUCTIONS : OmSimMetric("executed instructions")
+    object INSTRUCTION_EXECUTION : OmSimMetric("instruction executions")
+    class INSTRUCTION_EXECUTIONS_WITH_HOTKEY(hotkeys: String) : OmSimMetric("instruction executions with hotkey $hotkeys")
     object INSTRUCTION_TAPE_PERIOD : OmSimMetric("instruction tape period")
     object HEIGHT : OmSimMetric("height")
     object WIDTH_TIMES_TWO : OmSimMetric("width*2")
     object OMNI_HEIGHT : OmSimMetric("omniheight")
     object OMNI_WIDTH_TIMES_TWO : OmSimMetric("omniwidth*2")
+    object HEIGHT_AT_0_DEGREES : OmSimMetric("height at 0 degrees")
+    object HEIGHT_AT_60_DEGREES : OmSimMetric("height at 60 degrees")
+    object HEIGHT_AT_120_DEGREES : OmSimMetric("height at 120 degrees")
+    object WIDTH_TIMES_TWO_AT_0_DEGREES : OmSimMetric("width*2 at 0 degrees")
+    object WIDTH_TIMES_TWO_AT_60_DEGREES : OmSimMetric("width*2 at 60 degrees")
+    object WIDTH_TIMES_TWO_AT_120_DEGREES : OmSimMetric("width*2 at 120 degrees")
     object THROUGHPUT_CYCLES : OmSimMetric("throughput cycles")
     object THROUGHPUT_OUTPUTS : OmSimMetric("throughput outputs")
-    object THROUGHPUT_CYCLES_UNRESTRICTED : OmSimMetric("throughput cycles (unrestricted)")
-    object THROUGHPUT_OUTPUTS_UNRESTRICTED : OmSimMetric("throughput outputs (unrestricted)")
     object THROUGHPUT_WASTE : OmSimMetric("throughput waste")
     class PRODUCT_N_METRIC(n: Int, metric: OmSimMetric) : OmSimMetric("product $n ${metric.id}")
     class STEADY_STATE(metric: OmSimMetric) : OmSimMetric("steady state ${metric.id}")
     class PARTS_OF_TYPE(partType: PartType) : OmSimMetric("parts of type ${partType.id}")
+    object ATOMS_GRABBED : OmSimMetric("atoms grabbed")
+    class ATOMS_GRABBED_OF_TYPE(atomType: AtomType) : OmSimMetric("atoms grabbed of type ${atomType.id}")
     object NUMBER_OF_TRACK_SEGMENTS : OmSimMetric("number of track segments")
     object NUMBER_OF_ARMS : OmSimMetric("number of arms")
     object MAXIMUM_ABSOLUTE_ARM_ROTATION : OmSimMetric("maximum absolute arm rotation")
@@ -77,4 +85,22 @@ enum class PartType(val id: String) {
     POLYMER("out-rep"),
     TRACK("track"),
     CONDUIT("pipe")
+}
+
+enum class AtomType(val id: String) {
+    SALT("salt"),
+    AIR("air"),
+    EARTH("earth"),
+    FIRE("fire"),
+    WATER("water"),
+    QUICKSILVER("quicksilver"),
+    GOLD("gold"),
+    SILVER("silver"),
+    COPPER("copper"),
+    IRON("iron"),
+    TIN("tin"),
+    LEAD("lead"),
+    VITAE("vitae"),
+    MORS("mors"),
+    QUINTESSENCE("quintessence"),
 }
