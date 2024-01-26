@@ -50,7 +50,7 @@ public class IfSolution implements Solution<IfCategory, IfPuzzle, IfScore, IfRec
     }
 
     @NotNull
-    public static IfSolution unmarshal(@NotNull String[] fields) {
+    public static IfSolution unmarshal(String @NotNull [] fields) {
         assert fields.length == 4;
         IfScore score = Objects.requireNonNull(IfScore.parseScore(fields[0]));
         String author = fields[1];
@@ -66,8 +66,7 @@ public class IfSolution implements Solution<IfCategory, IfPuzzle, IfScore, IfRec
     }
 
     @Override
-    @NotNull
-    public String[] marshal() {
+    public String @NotNull [] marshal() {
         return new String[]{
                 score.toDisplayString(),
                 author,

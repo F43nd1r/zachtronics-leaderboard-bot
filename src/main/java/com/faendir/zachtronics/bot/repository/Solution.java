@@ -36,6 +36,5 @@ public interface Solution<C extends Enum<C> & Category, P extends Puzzle<C>, S e
         return new CategoryRecord<>(extendToRecord(puzzle, dataLink, dataPath), getCategories());
     }
 
-    @NotNull
-    String[] marshal();
+    String @NotNull [] marshal();
 }

@@ -48,7 +48,7 @@ public class CwSolution implements Solution<CwCategory, CwPuzzle, CwScore, CwRec
     }
 
     @NotNull
-    public static CwSolution unmarshal(@NotNull String[] fields) {
+    public static CwSolution unmarshal(String @NotNull [] fields) {
         assert fields.length == 4;
         CwScore score = Objects.requireNonNull(CwScore.parseScore(fields[0]));
         String author = fields[1];
@@ -62,8 +62,7 @@ public class CwSolution implements Solution<CwCategory, CwPuzzle, CwScore, CwRec
     }
 
     @Override
-    @NotNull
-    public String[] marshal() {
+    public String @NotNull [] marshal() {
         return new String[]{
                 score.toDisplayString(),
                 author,

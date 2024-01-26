@@ -48,7 +48,7 @@ public class FcSolution implements Solution<FcCategory, FcPuzzle, FcScore, FcRec
     }
 
     @NotNull
-    public static FcSolution unmarshal(@NotNull String[] fields) {
+    public static FcSolution unmarshal(String @NotNull [] fields) {
         assert fields.length == 4;
         FcScore score = Objects.requireNonNull(FcScore.parseScore(fields[0]));
         String author = fields[1];
@@ -62,8 +62,7 @@ public class FcSolution implements Solution<FcCategory, FcPuzzle, FcScore, FcRec
     }
 
     @Override
-    @NotNull
-    public String[] marshal() {
+    public String @NotNull [] marshal() {
         return new String[]{
                 score.toDisplayString(),
                 author,

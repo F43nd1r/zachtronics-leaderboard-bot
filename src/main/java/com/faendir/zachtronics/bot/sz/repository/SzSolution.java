@@ -47,7 +47,7 @@ public class SzSolution implements Solution<SzCategory, SzPuzzle, SzScore, SzRec
     }
 
     @NotNull
-    public static SzSolution unmarshal(@NotNull String[] fields) {
+    public static SzSolution unmarshal(String @NotNull [] fields) {
         assert fields.length == 4;
         SzScore score = Objects.requireNonNull(SzScore.parseScore(fields[0]));
         String author = fields[1];
@@ -61,8 +61,7 @@ public class SzSolution implements Solution<SzCategory, SzPuzzle, SzScore, SzRec
     }
 
     @Override
-    @NotNull
-    public String[] marshal() {
+    public String @NotNull [] marshal() {
         return new String[]{
                 score.toDisplayString(),
                 author,
