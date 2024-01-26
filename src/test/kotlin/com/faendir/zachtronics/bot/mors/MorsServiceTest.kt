@@ -31,8 +31,8 @@ internal class MorsServiceTest {
 
     @Test
     fun upload() {
-        val link = morsService.uploadGif(ClassPathResource("Face_Powder_Height_1.gif").file.readBytes(), "test", "omgif")
-        println(link)
+        val links = morsService.uploadGif(ClassPathResource("Face_Powder_Height_1.gif").file.readBytes(), "test", "omgif")
+        println(links)
     }
 
     @Test

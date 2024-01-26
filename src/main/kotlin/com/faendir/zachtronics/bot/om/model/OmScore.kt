@@ -69,7 +69,7 @@ data class OmScore(
         if (context.format == StringFormat.FILE_NAME) {
             // we write a standard machine-readable deduplicated score
             val allMetrics = OmMetrics.VALUE + listOf(OmMetric.OVERLAP, OmMetric.TRACKLESS)
-            return subScoreDisplay(allMetrics, allMetrics.toSet(), context.separator).replace("∞", "INF")
+            return subScoreDisplay(allMetrics, context.separator).replace("∞", "INF")
         }
 
         val desiredMetrics = context.categories
@@ -83,20 +83,16 @@ data class OmScore(
             ?.takeIf { it.isNotEmpty() }
             ?: manifolds
 
-        return desiredManifolds.joinToString(" ") {
-            subScoreDisplay(it.scoreParts, desiredMetrics, context.separator)
-                .run { if (desiredManifolds.size > 1) plus(it.displayName) else this }
+        return desiredManifolds.joinToString(" ") { manifold ->
+            subScoreDisplay(manifold.scoreParts.filter { it in desiredMetrics }, context.separator)
+                .run { if (desiredManifolds.size > 1) plus(manifold.displayName) else this }
         } + additionalMetricDescriptions(context)
     }
 
     private fun subScoreDisplay(
         subScoreParts: List<OmMetric.ScorePart<*>>,
-        desiredParts: Set<OmMetric.ScorePart<*>>,
         separator: String
-    ) =
-        subScoreParts.filter { it in desiredParts }
-            .mapNotNull { it.describe(this) }
-            .joinToString(separator)
+    ) = subScoreParts.mapNotNull { it.describe(this) }.joinToString(separator)
 
     /** @return extra descriptions of computed metrics, like ` (g+c+a=215)` */
     private fun additionalMetricDescriptions(context: DisplayContext<OmCategory>): String = when (context.format) {
@@ -111,6 +107,13 @@ data class OmScore(
                 .orEmpty()
         else -> ""
     }
+
+    /** `12g-15c-12a-34i[-O][-T]` to comply with Syx's desires */
+    fun toMorsString(): String = subScoreDisplay(
+        listOf(
+            OmMetric.COST, OmMetric.CYCLES, OmMetric.AREA, OmMetric.INSTRUCTIONS, OmMetric.OVERLAP, OmMetric.TRACKLESS
+        ), StringFormat.FILE_NAME.separator
+    )
 
     override fun toString() = toDisplayString()
 }

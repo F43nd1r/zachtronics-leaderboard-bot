@@ -25,7 +25,11 @@ import net.bramp.ffmpeg.builder.FFmpegBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
-import org.springframework.http.*
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.client.exchange
 import java.io.File
@@ -45,20 +49,18 @@ class MorsService(private val morsProperties: MorsProperties, restTemplateBuilde
     private val ffmpeg = FFmpegExecutor(FFmpeg("/usr/bin/ffmpeg"), FFprobe("/usr/bin/ffprobe"))
 
     /**
-     * The final url will be: https://files.mors.technology/$path/$name-$hash(0,8).$ext
+     * The final url will be: https://files.mors.technology/$path/$stem.$ext
      * @return (gif_url, video_url)
      */
     fun uploadGif(gif: ByteArray, path: String, stem: String): Pair<String, String> {
-        return upload(gif, path, stem, "gif") to upload(convertToVideo(gif), path, stem, "mp4")
+        return upload(gif, "$path/$stem.gif") to upload(convertToVideo(gif), "$path/$stem.mp4")
     }
 
-    fun upload(gif: ByteArray, path: String, stem: String, ext: String): String {
-        val hash = Hashing.sha256().hashBytes(gif).toString()
+    fun upload(gif: ByteArray, fullPath: String): String {
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_OCTET_STREAM
         headers["AccessKey"] = morsProperties.apiKey
-        headers["Checksum"] = hash
-        val fullPath = "$path/$stem-${hash.substring(0, 8)}.$ext"
+        headers["Checksum"] = Hashing.sha256().hashBytes(gif).toString()
         logger.info("Uploading to Mors: $fullPath")
         val result = restTemplate.exchange<Void>("$rootUrl/$fullPath", HttpMethod.PUT, HttpEntity(gif, headers))
         when (result.statusCode) {

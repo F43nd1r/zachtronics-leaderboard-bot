@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.om.rest
 
-import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.mors.MorsService
 import com.faendir.zachtronics.bot.om.createSubmission
 import com.faendir.zachtronics.bot.om.model.OmCategory
@@ -43,6 +42,7 @@ import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.rest.GameRestController
 import com.faendir.zachtronics.bot.rest.dto.SubmitResultType
 import com.faendir.zachtronics.bot.utils.isValidLink
+import com.google.common.hash.Hashing
 import discord4j.core.GatewayDiscordClient
 import jakarta.annotation.PreDestroy
 import kotlinx.coroutines.CoroutineScope
@@ -192,7 +192,7 @@ class OmController(
                 val (gif, video) = morsService.uploadGif(
                     gifData,
                     submission.puzzle.name,
-                    submission.score.toDisplayString(DisplayContext.fileName())
+                    "${submission.score.toMorsString()}-${Hashing.sha256().hashBytes(submission.data).toString().substring(0, 8)}"
                 )
                 submission.displayLinkEmbed = gif
                 submission.displayLink = video
