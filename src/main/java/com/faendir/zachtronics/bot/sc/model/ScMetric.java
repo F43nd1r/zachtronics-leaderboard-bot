@@ -19,8 +19,9 @@ package com.faendir.zachtronics.bot.sc.model;
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.function.ToIntFunction;
+import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
@@ -28,11 +29,11 @@ public enum ScMetric implements MetricJava<ScScore> {
     CYCLES("C", ScScore::getCycles),
     REACTORS("R", ScScore::getReactors),
     SYMBOLS("S", ScScore::getSymbols),
-    ANY_FLAG("", null),
-    NO_BUGS("NB", null),
-    NO_PRECOG("NP", null),
-    NO_FLAGS("NBP", null);
+    ANY_FLAG("", s -> false),
+    NO_BUGS("NB", ScScore::isBugged),
+    NO_PRECOG("NP", ScScore::isPrecognitive),
+    NO_FLAGS("NBP", s -> s.isBugged() || s.isPrecognitive());
 
-    private final String displayName;
-    private final ToIntFunction<ScScore> extract;
+    @NotNull private final String displayName;
+    @NotNull private final Function<ScScore, Comparable<?>> extract;
 }

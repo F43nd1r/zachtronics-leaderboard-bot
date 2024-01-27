@@ -19,8 +19,9 @@ package com.faendir.zachtronics.bot.inf.model;
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.function.ToIntFunction;
+import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
@@ -28,11 +29,12 @@ public enum IfMetric implements MetricJava<IfScore> {
     CYCLES("C", IfScore::getCycles),
     FOOTPRINT("F", IfScore::getFootprint),
     BLOCKS("B", IfScore::getBlocks),
-    INBOUNDS("I", null),
-    NO_GRA("NG", null),
-    INFINITE("I", null),
-    NO_FLAGS("N", null);
+    ANY_FLAG("", s -> false),
+    INBOUNDS("I", IfScore::isOutOfBounds),
+    NO_GRA("NG", IfScore::usesGRA),
+    INFINITE("I", IfScore::isFinite),
+    NO_FLAGS("N", s -> s.isOutOfBounds() || s.usesGRA() || s.isFinite());
 
-    private final String displayName;
-    private final ToIntFunction<IfScore> extract;
+    @NotNull private final String displayName;
+    @NotNull private final Function<IfScore, Comparable<?>> extract;
 }

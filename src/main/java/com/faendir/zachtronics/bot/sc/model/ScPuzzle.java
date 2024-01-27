@@ -417,7 +417,8 @@ public enum ScPuzzle implements Puzzle<ScCategory> {
         this.isDeterministic = isDeterministic;
         this.supportedCategories  = Arrays.stream(ScCategory.values())
                                           .filter(c -> c.getSupportedTypes().contains(type) &&
-                                                       !(isDeterministic && c.isPrecogFree()))
+                                                       !(isDeterministic && (c.getEligibility() == ScMetric.NO_PRECOG ||
+                                                                             c.getEligibility() == ScMetric.NO_FLAGS)))
                                           .toList();
         this.link = "https://zlbb.faendir.com/sc/" + name();
     }

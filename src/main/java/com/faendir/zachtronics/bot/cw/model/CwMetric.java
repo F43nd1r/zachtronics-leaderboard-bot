@@ -19,8 +19,9 @@ package com.faendir.zachtronics.bot.cw.model;
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.function.ToIntFunction;
+import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
@@ -30,6 +31,6 @@ public enum CwMetric implements MetricJava<CwScore> {
     SIZE("S", CwScore::getSize),
     FOOTPRINT("F", CwScore::getFootprint);
 
-    private final String displayName;
-    private final ToIntFunction<CwScore> extract;
+    @NotNull private final String displayName;
+    @NotNull private final Function<CwScore, Integer> extract;
 }

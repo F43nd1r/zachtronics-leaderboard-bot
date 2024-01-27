@@ -19,8 +19,9 @@ package com.faendir.zachtronics.bot.sz.model;
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.function.ToIntFunction;
+import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
@@ -29,6 +30,6 @@ public enum SzMetric implements MetricJava<SzScore> {
     POWER("P", SzScore::getPower),
     LINES("L", SzScore::getLines);
 
-    private final String displayName;
-    private final ToIntFunction<SzScore> extract;
+    @NotNull private final String displayName;
+    @NotNull private final Function<SzScore, Integer> extract;
 }

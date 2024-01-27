@@ -20,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 public interface CategoryJava<C extends Enum<C> & Category, S extends Score<C>, M extends MetricJava<S>> extends Category {
     @NotNull Comparator<S> getScoreComparator();
@@ -31,8 +30,7 @@ public interface CategoryJava<C extends Enum<C> & Category, S extends Score<C>, 
     default Comparator<S> makeCategoryComparator(@NotNull List<M> metrics) {
         return metrics.stream()
                       .map(M::getExtract)
-                      .filter(Objects::nonNull)
-                      .map(Comparator::comparingInt)
+                      .map(Comparator::comparing)
                       .reduce(Comparator::thenComparing)
                       .orElseThrow();
     }

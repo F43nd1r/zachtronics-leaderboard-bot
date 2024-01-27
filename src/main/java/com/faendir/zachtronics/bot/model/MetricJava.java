@@ -16,8 +16,10 @@
 
 package com.faendir.zachtronics.bot.model;
 
-import java.util.function.ToIntFunction;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Function;
 
 public interface MetricJava<S extends Score<?>> extends Metric {
-    ToIntFunction<S> getExtract();
+    @NotNull <R extends Comparable<R>> Function<S, R> getExtract();
 }
