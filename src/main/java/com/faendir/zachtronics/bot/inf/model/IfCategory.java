@@ -39,8 +39,8 @@ public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric> {
 
     BC("BC", List.of(BLOCKS, CYCLES, FOOTPRINT), 0b001),
     BF("BF", List.of(BLOCKS, FOOTPRINT, CYCLES), 0b001),
-    BIC("BIC", List.of(BLOCKS, INFINITE, CYCLES, FOOTPRINT), 0b001),
-    BIF("BIF", List.of(BLOCKS, INFINITE, FOOTPRINT, CYCLES), 0b001);
+    BNC("BNC", List.of(BLOCKS, NO_FLAGS, CYCLES, FOOTPRINT), 0b001),
+    BNF("BNF", List.of(BLOCKS, NO_FLAGS, FOOTPRINT, CYCLES), 0b001);
 
     /** contains <tt>%d%s%d%s%d%s</tt> plus a bunch of <tt>*</tt> most likely */
     static final String[] FORMAT_STRINGS = {"%d%s%d%s%d%s", "%d%s%d%s**%d**%s", "%d%s**%d**%s%d%s", null, "**%d**%s%d%s%d%s"};
@@ -55,14 +55,14 @@ public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric> {
         this.displayName = displayName;
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
-        this.supportedTypes = metrics.contains(INFINITE) ? Collections.singleton(STANDARD) : EnumSet.allOf(IfType.class);
+        this.supportedTypes = (metrics.contains(INFINITE) || metrics.contains(NO_FLAGS)) ? Collections.singleton(STANDARD) : EnumSet.allOf(IfType.class);
         this.scoreFormatId = scoreFormatId;
     }
 
     @Override
     public boolean supportsScore(@NotNull IfScore score) {
-        return !(this.metrics.contains(INBOUNDS) && score.isOutOfBounds()) &&
-               !(this.metrics.contains(NO_GRA) && score.usesGRA()) &&
-               !(this.metrics.contains(INFINITE) && score.isFinite());
+        return !((metrics.contains(INBOUNDS) || metrics.contains(NO_FLAGS)) && score.isOutOfBounds()) &&
+               !((metrics.contains(NO_GRA) || metrics.contains(NO_FLAGS)) && score.usesGRA()) &&
+               !((metrics.contains(INFINITE) || metrics.contains(NO_FLAGS)) && score.isFinite());
     }
 }

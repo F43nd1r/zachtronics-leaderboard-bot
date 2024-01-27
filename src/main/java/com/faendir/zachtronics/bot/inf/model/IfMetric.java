@@ -30,7 +30,8 @@ public enum IfMetric implements MetricJava<IfScore> {
     BLOCKS("B", IfScore::getBlocks),
     INBOUNDS("I", null),
     NO_GRA("NG", null),
-    INFINITE("I", null);
+    INFINITE("I", null),
+    NO_FLAGS("N", null);
 
     private final String displayName;
     private final ToIntFunction<IfScore> extract;

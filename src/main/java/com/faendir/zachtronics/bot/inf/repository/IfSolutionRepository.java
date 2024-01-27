@@ -43,7 +43,7 @@ import static com.faendir.zachtronics.bot.inf.model.IfCategory.*;
 public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory, IfPuzzle, IfScore, IfSubmission, IfRecord, IfSolution> {
     private final IfCategory[][] wikiCategories = {{CF, CB}, {CFNG, CBNG},
                                                    {FC, FB, FIC, FIB},
-                                                   {BC, BF, BIC, BIF}};
+                                                   {BC, BF, BNC, BNF}};
     private final RedditService redditService;
     private final Subreddit subreddit = Subreddit.INFINIFACTORY;
     private final String wikiPageName = "index";
