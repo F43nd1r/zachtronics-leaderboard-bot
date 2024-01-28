@@ -55,7 +55,7 @@ class ScManualTest {
 
     @Test
     public void testFullIO() {
-        for (ScPuzzle p : ScPuzzle.values()) {
+        for (ScPuzzle p : repository.getTrackedPuzzles()) {
             List<ValidationResult<ScSubmission>> submissions =
                     repository.findCategoryHolders(p, true)
                               .stream()
@@ -81,10 +81,7 @@ class ScManualTest {
 
     @Test
     public void rebuildAllWiki() {
-        for (ScPuzzle puzzle: ScPuzzle.values()) {
-            repository.rebuildRedditLeaderboard(puzzle, "");
-            System.out.println("Done " + puzzle.getDisplayName());
-        }
+        repository.rebuildRedditLeaderboard(null);
 
         String pages = Arrays.stream(ScGroup.values())
                              .map(ScGroup::getWikiPage).distinct()
@@ -99,7 +96,7 @@ class ScManualTest {
     public void bootstrapPsv() throws IOException {
         Path repoPath = Paths.get("../spacechem/archive");
 
-        for (ScPuzzle puzzle : ScPuzzle.values()) {
+        for (ScPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path indexPath = repoPath.resolve(puzzle.getGroup().name()).resolve(puzzle.name()).resolve("solutions.psv");
             try (ICSVWriter writer = new CSVWriterBuilder(Files.newBufferedWriter(indexPath)).withSeparator('|').build()) {
 
@@ -124,9 +121,8 @@ class ScManualTest {
     @Test
     public void tagNewCategories() throws IOException {
         Path repoPath = Paths.get("../spacechem/archive");
-        List<ScPuzzle> puzzles = List.of(ScPuzzle.values());
 
-        for (ScPuzzle puzzle : puzzles) {
+        for (ScPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
             List<ScSolution> solutions = repository.unmarshalSolutions(puzzlePath);
             if (solutions.isEmpty())
@@ -149,7 +145,7 @@ class ScManualTest {
     public void markVideoOnly() throws IOException {
         Path repoPath = Paths.get("../spacechem/archive");
 
-        for (ScPuzzle puzzle : ScPuzzle.values()) {
+        for (ScPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
             List<ScSolution> solutions = repository.unmarshalSolutions(puzzlePath);
             if (solutions.isEmpty())
@@ -183,7 +179,7 @@ class ScManualTest {
                                                                            .filter(s -> s.getDisplayLink() != null)
                                                                            .collect(groupingBy(ScSubmission::getPuzzle));
 
-        for (ScPuzzle puzzle : ScPuzzle.values()) {
+        for (ScPuzzle puzzle : repository.getTrackedPuzzles()) {
             List<ScSubmission> puzzleSubmissions = solnetSubmissions.get(puzzle);
             if (puzzleSubmissions == null)
                 continue;

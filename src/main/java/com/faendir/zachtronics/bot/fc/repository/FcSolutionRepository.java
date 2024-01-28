@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Function;
 
 import static com.faendir.zachtronics.bot.fc.model.FcCategory.*;
@@ -46,13 +47,18 @@ public class FcSolutionRepository extends AbstractSolutionRepository<FcCategory,
                                                    {WTC, WCS, WST}};
     private final RedditService redditService;
     private final Subreddit subreddit = Subreddit.LASTCALLBBS;
-    private final String wikiPageName = "foodcourt";
 
     @Qualifier("fcRepository")
     private final GitRepository gitRepo;
     private final Class<FcCategory> categoryClass = FcCategory.class;
     private final Function<String[], FcSolution> solUnmarshaller = FcSolution::unmarshal;
     private final Comparator<FcSolution> archiveComparator = Comparator.comparing(FcSolution::getScore, TCS.getScoreComparator());
+    private final List<FcPuzzle> trackedPuzzles = List.of(FcPuzzle.values());
+
+    @Override
+    protected @NotNull String wikiPageName(FcPuzzle puzzle) {
+        return "foodcourt";
+    }
 
     @Override
     protected FcSolution makeCandidateSolution(@NotNull FcSubmission submission) {

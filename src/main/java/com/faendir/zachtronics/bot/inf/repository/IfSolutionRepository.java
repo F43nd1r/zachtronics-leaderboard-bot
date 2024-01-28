@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Function;
 
 import static com.faendir.zachtronics.bot.inf.model.IfCategory.*;
@@ -46,7 +47,6 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
                                                    {BC, BF, BNC, BNF}};
     private final RedditService redditService;
     private final Subreddit subreddit = Subreddit.INFINIFACTORY;
-    private final String wikiPageName = "index";
 
     @Qualifier("ifRepository")
     private final GitRepository gitRepo;
@@ -56,6 +56,12 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
             Comparator.comparing(IfSolution::getScore, CF.getScoreComparator()
                                                          .thenComparing(IfScore::isOutOfBounds)
                                                          .thenComparing(IfScore::usesGRA));
+    private final List<IfPuzzle> trackedPuzzles = List.of(IfPuzzle.values());
+
+    @Override
+    protected @NotNull String wikiPageName(IfPuzzle puzzle) {
+        return "index";
+    }
 
     @Override
     protected IfSolution makeCandidateSolution(@NotNull IfSubmission submission) {

@@ -31,7 +31,9 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Function;
 
 import static com.faendir.zachtronics.bot.sz.model.SzCategory.*;
@@ -43,13 +45,18 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
     private final SzCategory[][] wikiCategories = {{CP, CL}, {PC, PL}, {LC, LP}};
     private final RedditService redditService;
     private final Subreddit subreddit = Subreddit.SHENZHEN_IO;
-    private final String wikiPageName = "index";
 
     @Qualifier("szRepository")
     private final GitRepository gitRepo;
     private final Class<SzCategory> categoryClass = SzCategory.class;
     private final Function<String[], SzSolution> solUnmarshaller = SzSolution::unmarshal;
     private final Comparator<SzSolution> archiveComparator = Comparator.comparing(SzSolution::getScore, SzCategory.CP.getScoreComparator());
+    private final List<SzPuzzle> trackedPuzzles = Arrays.stream(SzPuzzle.values()).filter(p -> p.getType() != SzType.SANDBOX).toList();
+
+    @Override
+    protected @NotNull String wikiPageName(SzPuzzle puzzle) {
+        return "index";
+    }
 
     @Override
     protected SzSolution makeCandidateSolution(@NotNull SzSubmission submission) {

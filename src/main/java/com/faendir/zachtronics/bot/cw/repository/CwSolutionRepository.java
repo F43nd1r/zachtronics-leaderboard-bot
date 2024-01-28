@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Function;
 
 import static com.faendir.zachtronics.bot.cw.model.CwCategory.FOOTPRINT;
@@ -44,13 +45,19 @@ public class CwSolutionRepository extends AbstractSolutionRepository<CwCategory,
     private final CwCategory[][] wikiCategories = {{SIZE}, {FOOTPRINT}};
     private final RedditService redditService;
     private final Subreddit subreddit = Subreddit.LASTCALLBBS;
-    private final String wikiPageName = "chipwizard";
 
     @Qualifier("cwRepository")
     private final GitRepository gitRepo;
     private final Class<CwCategory> categoryClass = CwCategory.class;
     private final Function<String[], CwSolution> solUnmarshaller = CwSolution::unmarshal;
     private final Comparator<CwSolution> archiveComparator = Comparator.comparing(CwSolution::getScore, SIZE.getScoreComparator());
+    private final List<CwPuzzle> trackedPuzzles = List.of(CwPuzzle.values());
+
+    @Override
+    @NotNull
+    protected String wikiPageName(CwPuzzle puzzle) {
+        return "chipwizard";
+    }
 
     @Override
     protected CwSolution makeCandidateSolution(@NotNull CwSubmission submission) {

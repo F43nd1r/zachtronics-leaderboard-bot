@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -48,7 +49,7 @@ public class SzManualTest {
 
     @Test
     public void testFullIO() throws IOException {
-        for (SzPuzzle p : SzPuzzle.values()) {
+        for (SzPuzzle p : repository.getTrackedPuzzles()) {
 
             Iterable<SzRecord> records = repository.findCategoryHolders(p, true).stream()
                                                    .map(CategoryRecord::getRecord)
@@ -66,14 +67,7 @@ public class SzManualTest {
 
     @Test
     public void rebuildRedditWiki() {
-        for (SzPuzzle puzzle : SzPuzzle.values()) {
-            if (puzzle.getType() == SzType.SANDBOX)
-                continue;
-            repository.rebuildRedditLeaderboard(puzzle, "");
-
-            System.out.println("Done " + puzzle.getDisplayName());
-        }
-
+        repository.rebuildRedditLeaderboard(null);
         String page = redditService.getWikiPage(Subreddit.SHENZHEN_IO, "index")
                                    .replaceAll("file:/tmp/sz-leaderboard[0-9]+/",
                                                "https://raw.githubusercontent.com/12345ieee/shenzhenIO-leaderboard/master");
@@ -89,29 +83,26 @@ public class SzManualTest {
         cp -a ../shenzhenIO/leaderboard/* src/test/resources/repositories/sz-leaderboard/
          */
 
-        for (SzPuzzle puzzle : SzPuzzle.values()) {
-            if (puzzle.getType() != SzType.STANDARD)
-                continue;
-
-            Iterable<Path> paths = Files.newDirectoryStream(savesPath, puzzle.getId() + "*");
-
-            for (Path path : paths) {
-                String data = Files.readString(path).replace("\r\n", "\n");
-                SzSubmission submission;
-                try {
-                    submission = SzSubmission.fromData(data, author, null);
-                }
-                catch (Exception e) {
-                    if (e instanceof ValidationException) {
-                        String message = e.getMessage();
-                        if (message.equals("Solution must be solved") || message.matches("Declared (?:cost|lines): .+"))
-                            continue;
+        for (SzPuzzle puzzle : repository.getTrackedPuzzles()) {
+            try (DirectoryStream<Path> paths = Files.newDirectoryStream(savesPath, puzzle.getId() + "*")) {
+                for (Path path : paths) {
+                    String data = Files.readString(path).replace("\r\n", "\n");
+                    SzSubmission submission;
+                    try {
+                        submission = SzSubmission.fromData(data, author, null);
                     }
-                    System.err.println(path);
-                    throw e;
-                }
+                    catch (Exception e) {
+                        if (e instanceof ValidationException) {
+                            String message = e.getMessage();
+                            if (message.equals("Solution must be solved") || message.matches("Declared (?:cost|lines): .+"))
+                                continue;
+                        }
+                        System.err.println(path);
+                        throw e;
+                    }
 
-                repository.submit(submission);
+                    repository.submit(submission);
+                }
             }
         }
 
@@ -127,9 +118,7 @@ public class SzManualTest {
     public void bootstrapPsv() throws IOException {
         Path repoPath = Paths.get("../shenzhenIO/leaderboard");
 
-        for (SzPuzzle puzzle : SzPuzzle.values()) {
-            if (puzzle.getType() != SzType.STANDARD)
-                continue;
+        for (SzPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path indexPath = repoPath.resolve(puzzle.getGroup().getRepoFolder()).resolve(puzzle.getId()).resolve("solutions.psv");
             try (ICSVWriter writer = new CSVWriterBuilder(Files.newBufferedWriter(indexPath)).withSeparator('|').build()) {
 

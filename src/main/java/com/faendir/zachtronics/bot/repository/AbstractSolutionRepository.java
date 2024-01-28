@@ -27,6 +27,7 @@ import com.opencsv.*;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -50,7 +51,6 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
 
     protected abstract RedditService getRedditService();
     protected abstract Subreddit getSubreddit();
-    protected abstract String getWikiPageName();
     /** For each column, every category in order of appearance */
     protected abstract C[][] getWikiCategories();
 
@@ -59,6 +59,9 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
     protected abstract Function<String[], Sol> getSolUnmarshaller();
     /** Sorting order of the solutions index */
     protected abstract Comparator<Sol> getArchiveComparator();
+    protected abstract List<P> getTrackedPuzzles();
+
+    protected abstract @NotNull String wikiPageName(P puzzle);
 
     @NotNull
     @Override
@@ -135,9 +138,12 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
             Set<C> wonCategories = submissionSolution.getCategories();
             if (!wonCategories.isEmpty()) {
                 // write the reddit lb, as there are changes to write
+                List<String> lines = readRedditWiki(wikiPageName(puzzle));
+                updateRedditLeaderboard(lines, puzzle, puzzlePath, solutions);
+
                 String updateMessage = puzzle.getDisplayName() + " " + submission.getScore().toDisplayString() +
                                        " by " + submission.getAuthor();
-                writeToRedditLeaderboard(puzzle, puzzlePath, solutions, updateMessage);
+                getRedditService().updateWikiPage(getSubreddit(), wikiPageName(puzzle), String.join("\n", lines), updateMessage);
             }
             successCallback.accept(submission, wonCategories);
         }
@@ -306,21 +312,37 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         }
     }
 
-    public void rebuildRedditLeaderboard(P puzzle, String updateMessage) {
+    public void rebuildRedditLeaderboard(@Nullable P maybePuzzle) {
+        Map<String, List<P>> pageToPuzzles =
+            maybePuzzle == null ? getTrackedPuzzles().stream().collect(Collectors.groupingBy(this::wikiPageName))
+                                : Map.of(wikiPageName(maybePuzzle), Collections.singletonList(maybePuzzle));
+
         try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
-            Path puzzlePath = getPuzzlePath(access, puzzle);
-            List<Sol> solutions = unmarshalSolutions(puzzlePath);
-            writeToRedditLeaderboard(puzzle, puzzlePath, solutions, updateMessage);
+            for (Map.Entry<String, List<P>> entry : pageToPuzzles.entrySet()) {
+                String page = entry.getKey();
+                List<String> lines = readRedditWiki(page);
+                for (P puzzle : entry.getValue()) {
+                    Path puzzlePath = getPuzzlePath(access, puzzle);
+                    List<Sol> solutions = unmarshalSolutions(puzzlePath);
+                    updateRedditLeaderboard(lines, puzzle, puzzlePath, solutions);
+                }
+                getRedditService().updateWikiPage(getSubreddit(), page, String.join("\n", lines), "Manual wiki rebuild");
+            }
         }
         catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    protected void writeToRedditLeaderboard(@NotNull P puzzle, Path puzzlePath, @NotNull List<Sol> solutions, String updateMessage) {
-        List<String> lines = Pattern.compile("\\r?\\n")
-                                    .splitAsStream(getRedditService().getWikiPage(getSubreddit(), getWikiPageName()))
-                                    .collect(Collectors.toList()); // mutable list
+    @NotNull
+    private List<String> readRedditWiki(String page) {
+        return Pattern.compile("\\r?\\n")
+                      .splitAsStream(getRedditService().getWikiPage(getSubreddit(), page))
+                      .collect(Collectors.toList());
+    }
+
+    /** @param lines mutable list of wiki lines, it will be updated in place */
+    protected void updateRedditLeaderboard(@NotNull List<String> lines, @NotNull P puzzle, Path puzzlePath, @NotNull List<Sol> solutions) {
         Pattern puzzleRegex = Pattern.compile("^\\| \\[" + Pattern.quote(puzzle.getDisplayName()) + "]");
 
         ListIterator<String> it = lines.listIterator();
@@ -390,8 +412,6 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
             }
             it.add(row.toString());
         }
-
-        getRedditService().updateWikiPage(getSubreddit(), getWikiPageName(), String.join("\n", lines), updateMessage);
     }
 
     @NotNull

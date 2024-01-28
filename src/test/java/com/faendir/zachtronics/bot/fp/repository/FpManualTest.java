@@ -31,7 +31,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -46,7 +45,7 @@ class FpManualTest {
 
     @Test
     public void testFullIO() {
-        for (FpPuzzle p : FpPuzzle.values()) {
+        for (FpPuzzle p : repository.getTrackedPuzzles()) {
             List<ValidationResult<FpSubmission>> submissions =
                     repository.findCategoryHolders(p, true)
                               .stream()
@@ -74,7 +73,7 @@ class FpManualTest {
     public void addLevelPrefixToSolutionFiles() throws IOException {
         Path repoPath = Paths.get("../bbs/forbidden-path-leaderboard");
 
-        for (FpPuzzle puzzle : FpPuzzle.values()) {
+        for (FpPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(puzzle.getGroup().name()).resolve(puzzle.name());
             List<FpSolution> solutions = repository.unmarshalSolutions(puzzlePath);
             for (FpSolution solution : solutions) {
@@ -89,14 +88,8 @@ class FpManualTest {
 
     @Test
     public void rebuildAllWiki() {
-        for (FpPuzzle puzzle: FpPuzzle.values()) {
-            if (puzzle.getType() == FpType.EDITOR)
-                continue;
-            repository.rebuildRedditLeaderboard(puzzle, "");
-            System.out.println("Done " + puzzle.getDisplayName());
-        }
-
-        String page = repository.getRedditService().getWikiPage(repository.getSubreddit(), repository.getWikiPageName())
+        repository.rebuildRedditLeaderboard(null);
+        String page = repository.getRedditService().getWikiPage(repository.getSubreddit(), repository.wikiPageName(null))
                                 .replaceAll("file:/tmp/fp-leaderboard[0-9]+/",
                                             "https://raw.githubusercontent.com/lastcallbbs-community-developers/forbidden-path-leaderboard/master");
         System.out.println(page);
@@ -113,11 +106,10 @@ class FpManualTest {
                                           | ---  | ---  | --- | ---
                                           """, group.getDisplayName());
             page.append(header);
-            String groupTable = Arrays.stream(FpPuzzle.values())
-                                      .filter(p -> p.getGroup() == group)
-                                      .filter(p -> p.getType() != FpType.EDITOR)
-                                      .map(p -> String.format("| [%s](%s) | | | \n", p.getDisplayName(), p.getLink()))
-                                      .collect(Collectors.joining("|\n"));
+            String groupTable = repository.getTrackedPuzzles().stream()
+                                          .filter(p -> p.getGroup() == group)
+                                          .map(p -> String.format("| [%s](%s) | | | \n", p.getDisplayName(), p.getLink()))
+                                          .collect(Collectors.joining("|\n"));
             page.append(groupTable).append('\n');
         }
         System.out.println(page);
@@ -126,9 +118,8 @@ class FpManualTest {
     @Test
     public void tagNewCategories() throws IOException {
         Path repoPath = Paths.get("../bbs/forbidden-path-leaderboard");
-        List<FpPuzzle> puzzles = List.of(FpPuzzle.values());
 
-        for (FpPuzzle puzzle : puzzles) {
+        for (FpPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
             List<FpSolution> solutions = repository.unmarshalSolutions(puzzlePath);
             if (solutions.isEmpty())

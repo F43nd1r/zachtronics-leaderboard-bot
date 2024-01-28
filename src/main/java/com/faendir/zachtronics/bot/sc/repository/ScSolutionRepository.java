@@ -50,7 +50,6 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                                                    {RC, RCNB, RCNP, RCNBP}, {RS, RSNB, RSNP, RSNBP}};
     private final RedditService redditService;
     private final Subreddit subreddit = Subreddit.SPACECHEM;
-    private final String wikiPageName = null;
 
     @Qualifier("scArchiveRepository")
     private final GitRepository gitRepo;
@@ -60,6 +59,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
             Comparator.comparing(ScSolution::getScore, ScCategory.C.getScoreComparator()
                                                                    .thenComparing(ScScore::isBugged)
                                                                    .thenComparing(ScScore::isPrecognitive));
+    private final List<ScPuzzle> trackedPuzzles = Arrays.stream(ScPuzzle.values()).filter(p -> p.getType() != ScType.BOSS_RANDOM).toList();
 
     @NotNull
     @Override
@@ -74,6 +74,11 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
             };
             return submitOne(access, submission, successCallback);
         }
+    }
+
+    @Override
+    protected @NotNull String wikiPageName(ScPuzzle puzzle) {
+        return puzzle.getGroup().getWikiPage();
     }
 
     @NotNull
@@ -107,8 +112,8 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     }
 
     @Override
-    protected void writeToRedditLeaderboard(@NotNull ScPuzzle puzzle, Path puzzlePath, @NotNull List<ScSolution> solutions,
-                                            String updateMessage) {
+    protected void updateRedditLeaderboard(@NotNull List<String> lines, @NotNull ScPuzzle puzzle, Path puzzlePath,
+                                           @NotNull List<ScSolution> solutions) {
 
         Map<ScCategory, ScRecord> recordMap = new EnumMap<>(ScCategory.class);
         Map<ScCategory, ScRecord> videoRecordMap = new EnumMap<>(ScCategory.class);
@@ -131,15 +136,14 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
             }
         }
 
-        String[] lines = redditService.getWikiPage(subreddit, puzzle.getGroup().getWikiPage()).split("\\r?\\n");
         Pattern puzzleRegex = Pattern.compile("^\\| \\[" + Pattern.quote(puzzle.getDisplayName()) + "(?: - |])");
 
         int rowIdx = 0;
 
         // | [Puzzle](https://zlbb) | [(**ccc**/r/ss) author](https://li.nk) | ← | [(ccc/r/**ss**) author](https://li.nk) | ←
         // | [Puzzle - 1 Reactor](https://zlbb) | [(**ccc**/**r**/ss) author](https://li.nk) | ← | [(ccc/**r**/**ss**) author](https://li.nk) | ←
-        for (int lineIdx = 0; lineIdx < lines.length; lineIdx++) {
-            String line = lines[lineIdx];
+        for (int lineIdx = 0; lineIdx < lines.size(); lineIdx++) {
+            String line = lines.get(lineIdx);
             if (puzzleRegex.matcher(line).find()) {
                 String[] prevElems = line.trim().split("\\s*\\|\\s*", -1);
                 int halfSize = (prevElems.length - 2) / 2;
@@ -189,7 +193,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                             row.append(prevElems[2 + block * halfSize + i]);
                     }
                 }
-                lines[lineIdx] = row.toString();
+                lines.set(lineIdx, row.toString());
 
                 rowIdx++;
             }
@@ -198,12 +202,10 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                 break;
             }
         }
-
-        redditService.updateWikiPage(subreddit, puzzle.getGroup().getWikiPage(), String.join("\n", lines), updateMessage);
     }
 
     @NotNull
-    private static String makeLeaderboardCell(@NotNull ScRecord[] blockRecords, int i, int minReactors,
+    private static String makeLeaderboardCell(ScRecord @NotNull [] blockRecords, int i, int minReactors,
                                               DisplayContext<ScCategory> displayContext) {
         ScRecord record = blockRecords[i];
         for (int prev = 0; prev < i; prev++) {

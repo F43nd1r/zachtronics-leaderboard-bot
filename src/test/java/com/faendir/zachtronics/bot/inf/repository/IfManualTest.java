@@ -29,7 +29,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @BotTest
@@ -44,7 +47,7 @@ class IfManualTest {
         /*
         cp -a ../infinifactory/leaderboard/* src/test/resources/repositories/if-leaderboard/
          */
-        for (IfPuzzle p : IfPuzzle.values()) {
+        for (IfPuzzle p : repository.getTrackedPuzzles()) {
 
             Iterable<IfRecord> records = repository.findCategoryHolders(p, true).stream()
                                                    .map(CategoryRecord::getRecord)
@@ -71,12 +74,8 @@ class IfManualTest {
 
     @Test
     public void rebuildAllWiki() {
-        for (IfPuzzle puzzle : IfPuzzle.values()) {
-            repository.rebuildRedditLeaderboard(puzzle, "");
-            System.out.println("Done " + puzzle.getDisplayName());
-        }
-
-        String page = repository.getRedditService().getWikiPage(repository.getSubreddit(), repository.getWikiPageName())
+        repository.rebuildRedditLeaderboard(null);
+        String page = repository.getRedditService().getWikiPage(repository.getSubreddit(), repository.wikiPageName(null))
                                 .replaceAll("file:/tmp/if-leaderboard[0-9]+/",
                                             "https://raw.githubusercontent.com/12345ieee/infinifactory-leaderboard/master");
         System.out.println(page);
@@ -93,10 +92,10 @@ class IfManualTest {
                                           | ---  | ---  | --- | --- | ---
                                           """, group.getDisplayName());
             page.append(header);
-            String groupTable = Arrays.stream(IfPuzzle.values())
-                                      .filter(p -> p.getGroup() == group)
-                                      .map(p -> String.format("| [%s](%s) | | | | \n", p.getDisplayName(), p.getLink()))
-                                      .collect(Collectors.joining("|\n"));
+            String groupTable = repository.getTrackedPuzzles().stream()
+                                          .filter(p -> p.getGroup() == group)
+                                          .map(p -> String.format("| [%s](%s) | | | | \n", p.getDisplayName(), p.getLink()))
+                                          .collect(Collectors.joining("|\n"));
             page.append(groupTable).append('\n');
         }
         System.out.println(page);
@@ -106,7 +105,7 @@ class IfManualTest {
     public void tagNewCategories() throws IOException {
         Path repoPath = Paths.get("../infinifactory/leaderboard");
 
-        for (IfPuzzle puzzle : IfPuzzle.values()) {
+        for (IfPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
             List<IfSolution> solutions = repository.unmarshalSolutions(puzzlePath);
             if (solutions.isEmpty())
@@ -129,7 +128,7 @@ class IfManualTest {
     public void unGRATheUnGRAable() throws IOException {
         Path repoPath = Paths.get("../infinifactory/leaderboard");
 
-        for (IfPuzzle puzzle : IfPuzzle.values()) {
+        for (IfPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
             List<IfSolution> solutions = repository.unmarshalSolutions(puzzlePath);
             if (solutions.isEmpty())
@@ -160,7 +159,7 @@ class IfManualTest {
         Path repoPath = Paths.get("../infinifactory/leaderboard");
         String author = "NAME";
 
-        for (IfPuzzle puzzle : IfPuzzle.values()) {
+        for (IfPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
             List<IfSolution> solutions = repository.unmarshalSolutions(puzzlePath);
             if (solutions.isEmpty())

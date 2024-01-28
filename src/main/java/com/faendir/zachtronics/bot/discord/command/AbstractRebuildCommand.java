@@ -26,6 +26,9 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
+import java.util.List;
+
 public abstract class AbstractRebuildCommand<P extends Puzzle<?>> extends Command.BasicLeaf {
     @Getter
     private final String name = "rebuild";
@@ -37,14 +40,19 @@ public abstract class AbstractRebuildCommand<P extends Puzzle<?>> extends Comman
     @NotNull
     @Override
     public SafeMessageBuilder handleEvent(@NotNull ChatInputInteractionEvent event) {
-        P puzzle = getPuzzleOption().get(event);
-        String updateMessage = "Rebuilt wiki section of " + puzzle.getDisplayName();
-        getRepository().rebuildRedditLeaderboard(puzzle, updateMessage);
+        P maybePuzzle = getPuzzleOption().get(event);
+        getRepository().rebuildRedditLeaderboard(maybePuzzle);
         return new MultiMessageSafeEmbedMessageBuilder()
-                .title(updateMessage)
-                .color(Colors.SUCCESS);
+            .title((maybePuzzle == null ? "Rebuilt all wiki" : "Rebuilt wiki section of puzzle " + maybePuzzle.getDisplayName()))
+            .color(Colors.SUCCESS);
     }
 
     @NotNull
     protected abstract CommandOption<String, P> getPuzzleOption();
+
+    @NotNull
+    @Override
+    public List<CommandOption<?, ?>> getOptions() {
+        return Collections.singletonList(getPuzzleOption());
+    }
 }

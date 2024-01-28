@@ -18,7 +18,10 @@ package com.faendir.zachtronics.bot.fc.repository;
 
 
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.fc.model.*;
+import com.faendir.zachtronics.bot.fc.model.FcGroup;
+import com.faendir.zachtronics.bot.fc.model.FcPuzzle;
+import com.faendir.zachtronics.bot.fc.model.FcRecord;
+import com.faendir.zachtronics.bot.fc.model.FcSubmission;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.utils.LambdaUtils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
@@ -28,7 +31,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +43,7 @@ class FcManualTest {
 
     @Test
     public void testFullIO() {
-        for (FcPuzzle p : FcPuzzle.values()) {
+        for (FcPuzzle p : repository.getTrackedPuzzles()) {
             List<ValidationResult<FcSubmission>> submissions =
                     repository.findCategoryHolders(p, true)
                               .stream()
@@ -67,14 +69,8 @@ class FcManualTest {
 
     @Test
     public void rebuildAllWiki() {
-        for (FcPuzzle puzzle: FcPuzzle.values()) {
-            if (puzzle.getType() != FcType.STANDARD)
-                continue;
-            repository.rebuildRedditLeaderboard(puzzle, "");
-            System.out.println("Done " + puzzle.getDisplayName());
-        }
-
-        String page = repository.getRedditService().getWikiPage(repository.getSubreddit(), repository.getWikiPageName())
+        repository.rebuildRedditLeaderboard(null);
+        String page = repository.getRedditService().getWikiPage(repository.getSubreddit(), repository.wikiPageName(null))
                                 .replaceAll("file:/tmp/fc-leaderboard[0-9]+/",
                                             "https://raw.githubusercontent.com/lastcallbbs-community-developers/foodcourt-leaderboard/master");
         System.out.println(page);
@@ -91,10 +87,10 @@ class FcManualTest {
                                           | ---  | ---  | --- | --- | ---
                                           """, group.getDisplayName());
             page.append(header);
-            String groupTable = Arrays.stream(FcPuzzle.values())
-                                      .filter(p -> p.getGroup() == group)
-                                      .map(p -> String.format("| [%s](%s) | | | | \n", p.getDisplayName(), p.getLink()))
-                                      .collect(Collectors.joining("|\n"));
+            String groupTable = repository.getTrackedPuzzles().stream()
+                                          .filter(p -> p.getGroup() == group)
+                                          .map(p -> String.format("| [%s](%s) | | | | \n", p.getDisplayName(), p.getLink()))
+                                          .collect(Collectors.joining("|\n"));
             page.append(groupTable).append('\n');
         }
         System.out.println(page);

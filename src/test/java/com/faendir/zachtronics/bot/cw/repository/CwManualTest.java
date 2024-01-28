@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +44,7 @@ class CwManualTest {
 
     @Test
     public void testFullIO() {
-        for (CwPuzzle p : CwPuzzle.values()) {
+        for (CwPuzzle p : repository.getTrackedPuzzles()) {
             List<ValidationResult<CwSubmission>> submissions =
                     repository.findCategoryHolders(p, true)
                               .stream()
@@ -71,14 +70,8 @@ class CwManualTest {
 
     @Test
     public void rebuildAllWiki() {
-        for (CwPuzzle puzzle: CwPuzzle.values()) {
-            if (puzzle.getType() != CwType.STANDARD)
-                continue;
-            repository.rebuildRedditLeaderboard(puzzle, "");
-            System.out.println("Done " + puzzle.getDisplayName());
-        }
-
-        String page = repository.getRedditService().getWikiPage(repository.getSubreddit(), repository.getWikiPageName())
+        repository.rebuildRedditLeaderboard(null);
+        String page = repository.getRedditService().getWikiPage(repository.getSubreddit(), repository.wikiPageName(null))
                                 .replaceAll("file:/tmp/cw-leaderboard[0-9]+/",
                                             "https://raw.githubusercontent.com/lastcallbbs-community-developers/forbidden-path-leaderboard/master");
         System.out.println(page);
@@ -95,10 +88,10 @@ class CwManualTest {
                                           | ---  | ---  | ---
                                           """, group.getDisplayName());
             page.append(header);
-            String groupTable = Arrays.stream(CwPuzzle.values())
-                                      .filter(p -> p.getGroup() == group)
-                                      .map(p -> String.format("| [%s](%s) | | \n", p.getDisplayName(), p.getLink()))
-                                      .collect(Collectors.joining("|\n"));
+            String groupTable = repository.getTrackedPuzzles().stream()
+                                          .filter(p -> p.getGroup() == group)
+                                          .map(p -> String.format("| [%s](%s) | | \n", p.getDisplayName(), p.getLink()))
+                                          .collect(Collectors.joining("|\n"));
             page.append(groupTable).append('\n');
         }
         System.out.println(page);
@@ -107,9 +100,8 @@ class CwManualTest {
     @Test
     public void tagNewCategories() throws IOException {
         Path repoPath = Paths.get("../bbs/forbidden-path-leaderboard");
-        List<CwPuzzle> puzzles = List.of(CwPuzzle.values());
 
-        for (CwPuzzle puzzle : puzzles) {
+        for (CwPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
             List<CwSolution> solutions = repository.unmarshalSolutions(puzzlePath);
             if (solutions.isEmpty())

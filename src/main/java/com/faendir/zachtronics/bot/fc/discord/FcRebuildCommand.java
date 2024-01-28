@@ -27,8 +27,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 @RequiredArgsConstructor
 @FcQualifier
@@ -36,10 +34,7 @@ public class FcRebuildCommand extends AbstractRebuildCommand<FcPuzzle> {
     @Getter
     private final CommandOption<String, FcPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", FcPuzzle.class, FcPuzzle::getDisplayName)
             .description("Puzzle name. Can be shortened or abbreviated. E.g. `1-1`, `add 2-3`")
-            .required()
             .build();
-    @Getter
-    private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
     @Getter
     private final Secured secured = FcSecured.ADMINS_ONLY;
     @Getter

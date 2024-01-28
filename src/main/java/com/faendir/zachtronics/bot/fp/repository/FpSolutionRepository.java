@@ -31,7 +31,9 @@ import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Function;
 
 import static com.faendir.zachtronics.bot.fp.model.FpCategory.*;
@@ -43,13 +45,18 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
     private final FpCategory[][] wikiCategories = {{RCF, RFC}, {CRF, CFR}, {FRC, FCR}, {wRCF, wFRC}};
     private final RedditService redditService;
     private final Subreddit subreddit = Subreddit.LASTCALLBBS;
-    private final String wikiPageName = "forbidden-path";
 
     @Qualifier("fpRepository")
     private final GitRepository gitRepo;
     private final Class<FpCategory> categoryClass = FpCategory.class;
     private final Function<String[], FpSolution> solUnmarshaller = FpSolution::unmarshal;
     private final Comparator<FpSolution> archiveComparator = Comparator.comparing(FpSolution::getScore, RCF.getScoreComparator());
+    private final List<FpPuzzle> trackedPuzzles = Arrays.stream(FpPuzzle.values()).filter(p -> p.getType() != FpType.EDITOR).toList();
+
+    @Override
+    protected @NotNull String wikiPageName(FpPuzzle puzzle) {
+        return "forbidden-path";
+    }
 
     @Override
     protected FpSolution makeCandidateSolution(@NotNull FpSubmission submission) {

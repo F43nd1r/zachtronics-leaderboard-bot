@@ -27,8 +27,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 @RequiredArgsConstructor
 @IfQualifier
@@ -36,10 +34,7 @@ public class IfRebuildCommand extends AbstractRebuildCommand<IfPuzzle> {
     @Getter
     private final CommandOption<String, IfPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", IfPuzzle.class, IfPuzzle::getDisplayName)
             .description("Puzzle name. Can be shortened or abbreviated. E.g. `Gne ch`, `TBB`")
-            .required()
             .build();
-    @Getter
-    private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
     @Getter
     private final Secured secured = IfSecured.WIKI_ADMINS_ONLY;
     @Getter

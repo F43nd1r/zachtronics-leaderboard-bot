@@ -27,8 +27,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 @RequiredArgsConstructor
 @ScQualifier
@@ -36,10 +34,7 @@ public class ScRebuildCommand extends AbstractRebuildCommand<ScPuzzle> {
     @Getter
     private final CommandOption<String, ScPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", ScPuzzle.class, ScPuzzle::getDisplayName)
             .description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
-            .required()
             .build();
-    @Getter
-    private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
     @Getter
     private final Secured secured = ScSecured.WIKI_ADMINS_ONLY;
     @Getter
