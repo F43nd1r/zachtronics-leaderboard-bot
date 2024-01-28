@@ -17,23 +17,22 @@
 package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.MetricJava;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
-@Getter
-@RequiredArgsConstructor
-public enum ScMetric implements MetricJava<ScScore> {
-    CYCLES("C", ScScore::getCycles),
-    REACTORS("R", ScScore::getReactors),
-    SYMBOLS("S", ScScore::getSymbols),
-    ANY_FLAG("", s -> false),
-    NO_BUGS("NB", ScScore::isBugged),
-    NO_PRECOG("NP", ScScore::isPrecognitive),
-    NO_FLAGS("NBP", s -> s.isBugged() || s.isPrecognitive());
+@Value
+public class ScMetric<T extends Comparable<T>> implements MetricJava<ScScore, T> {
+    public static final ScMetric<Integer> CYCLES = new ScMetric<>("C", ScScore::getCycles);
+    public static final ScMetric<Integer> REACTORS = new ScMetric<>("R", ScScore::getReactors);
+    public static final ScMetric<Integer> SYMBOLS = new ScMetric<>("S", ScScore::getSymbols);
 
-    @NotNull private final String displayName;
-    @NotNull private final Function<ScScore, Comparable<?>> extract;
+    public static final ScMetric<Boolean> ANY_FLAG = new ScMetric<>("", s -> false);
+    public static final ScMetric<Boolean> NO_BUGS = new ScMetric<>("NB", ScScore::isBugged);
+    public static final ScMetric<Boolean> NO_PRECOG = new ScMetric<>("NP", ScScore::isPrecognitive);
+    public static final ScMetric<Boolean> NO_FLAGS = new ScMetric<>("NBP", s -> s.isBugged() || s.isPrecognitive());
+
+    @NotNull String displayName;
+    @NotNull Function<ScScore, T> extract;
 }

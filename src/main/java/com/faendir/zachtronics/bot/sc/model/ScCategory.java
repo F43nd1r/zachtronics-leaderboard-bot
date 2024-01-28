@@ -30,7 +30,7 @@ import static com.faendir.zachtronics.bot.sc.model.ScMetric.*;
 import static com.faendir.zachtronics.bot.sc.model.ScType.*;
 
 @Getter
-public enum ScCategory implements CategoryJava<ScCategory, ScScore, ScMetric> {
+public enum ScCategory implements CategoryJava<ScCategory, ScScore, ScMetric<?>> {
     C("C", List.of(CYCLES, REACTORS, SYMBOLS, ANY_FLAG), ANY_FLAG, ScTypeSets.ALL, 0b100),
     CNB("CNB", List.of(CYCLES, REACTORS, SYMBOLS, NO_BUGS), NO_BUGS, ScTypeSets.ALL, 0b100),
     CNP("CNP", List.of(CYCLES, REACTORS, SYMBOLS, NO_PRECOG), NO_PRECOG, ScTypeSets.ALL, 0b100),
@@ -58,24 +58,25 @@ public enum ScCategory implements CategoryJava<ScCategory, ScScore, ScMetric> {
                                             "**%s**%s**%d**%s%d%s", "**%s**%s**%d**%s**%d**%s"};
 
     private final String displayName;
-    private final List<ScMetric> metrics;
+    private final List<ScMetric<?>> metrics;
     private final Comparator<ScScore> scoreComparator;
-    private final ScMetric eligibility;
+    private final ScMetric<Boolean> admission;
     private final Set<ScType> supportedTypes;
     private final int scoreFormatId;
 
-    ScCategory(String displayName, @NotNull List<ScMetric> metrics, ScMetric eligibility, Set<ScType> supportedTypes, int scoreFormatId) {
+    ScCategory(String displayName, @NotNull List<ScMetric<?>> metrics, @NotNull ScMetric<Boolean> admission, Set<ScType> supportedTypes,
+               int scoreFormatId) {
         this.displayName = displayName;
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
         this.supportedTypes = supportedTypes;
-        this.eligibility = eligibility;
+        this.admission = admission;
         this.scoreFormatId = scoreFormatId;
     }
 
     @Override
     public boolean supportsScore(@NotNull ScScore score) {
-        return !((Boolean) eligibility.getExtract().apply(score));
+        return !admission.get(score);
     }
 
     static class ScTypeSets {

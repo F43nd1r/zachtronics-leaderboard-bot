@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
-public enum CwMetric implements MetricJava<CwScore> {
+public enum CwMetric implements MetricJava<CwScore, Integer> {
     WIDTH("W", CwScore::getWidth),
     HEIGHT("H", CwScore::getHeight),
     SIZE("S", CwScore::getSize),

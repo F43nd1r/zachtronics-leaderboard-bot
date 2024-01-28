@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
-public enum SzMetric implements MetricJava<SzScore> {
+public enum SzMetric implements MetricJava<SzScore, Integer> {
     COST("C", SzScore::getCost),
     POWER("P", SzScore::getPower),
     LINES("L", SzScore::getLines);

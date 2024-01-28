@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Comparator;
 import java.util.List;
 
-public interface CategoryJava<C extends Enum<C> & Category, S extends Score<C>, M extends MetricJava<S>> extends Category {
+public interface CategoryJava<C extends Enum<C> & Category, S extends Score<C>, M extends MetricJava<S, ?>> extends Category {
     @NotNull Comparator<S> getScoreComparator();
     int getScoreFormatId();
 
@@ -29,8 +29,7 @@ public interface CategoryJava<C extends Enum<C> & Category, S extends Score<C>, 
 
     default Comparator<S> makeCategoryComparator(@NotNull List<M> metrics) {
         return metrics.stream()
-                      .map(M::getExtract)
-                      .map(Comparator::comparing)
+                      .map(M::comparator)
                       .reduce(Comparator::thenComparing)
                       .orElseThrow();
     }

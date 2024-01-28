@@ -26,7 +26,7 @@ import static com.faendir.zachtronics.bot.inf.model.IfMetric.*;
 import static com.faendir.zachtronics.bot.inf.model.IfType.STANDARD;
 
 @Getter
-public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric> {
+public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric<?>> {
     CF("CF", List.of(CYCLES, FOOTPRINT, BLOCKS), ANY_FLAG, 0b100),
     CB("CB", List.of(CYCLES, BLOCKS, FOOTPRINT), ANY_FLAG, 0b100),
     CFNG("CFNG", List.of(CYCLES, NO_GRA, FOOTPRINT, BLOCKS), NO_GRA, 0b100),
@@ -46,24 +46,24 @@ public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric> {
     static final String[] FORMAT_STRINGS = {"%d%s%d%s%d%s", "%d%s%d%s**%d**%s", "%d%s**%d**%s%d%s", null, "**%d**%s%d%s%d%s"};
 
     private final String displayName;
-    private final List<IfMetric> metrics;
+    private final List<IfMetric<?>> metrics;
     private final Comparator<IfScore> scoreComparator;
-    private final IfMetric eligibility;
+    private final IfMetric<Boolean> admission;
     private final Set<IfType> supportedTypes;
     private final int scoreFormatId;
 
-    IfCategory(String displayName, @NotNull List<IfMetric> metrics, @NotNull IfMetric eligibility, int scoreFormatId) {
+    IfCategory(String displayName, @NotNull List<IfMetric<?>> metrics, @NotNull IfMetric<Boolean> admission, int scoreFormatId) {
         this.displayName = displayName;
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
-        this.eligibility = eligibility;
-        this.supportedTypes = (eligibility == INFINITE || eligibility == NO_FLAGS) ? Collections.singleton(STANDARD)
-                                                                                   : EnumSet.allOf(IfType.class);
+        this.admission = admission;
+        this.supportedTypes = (admission == INFINITE || admission == NO_FLAGS) ? Collections.singleton(STANDARD)
+                                                                               : EnumSet.allOf(IfType.class);
         this.scoreFormatId = scoreFormatId;
     }
 
     @Override
     public boolean supportsScore(@NotNull IfScore score) {
-        return !((Boolean) eligibility.getExtract().apply(score));
+        return !admission.get(score);
     }
 }

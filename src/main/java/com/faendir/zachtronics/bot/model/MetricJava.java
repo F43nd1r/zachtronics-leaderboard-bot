@@ -18,8 +18,17 @@ package com.faendir.zachtronics.bot.model;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Comparator;
 import java.util.function.Function;
 
-public interface MetricJava<S extends Score<?>> extends Metric {
-    @NotNull <R extends Comparable<R>> Function<S, R> getExtract();
+public interface MetricJava<S extends Score<?>, T extends Comparable<T>> extends Metric {
+    @NotNull Function<S, T> getExtract();
+
+    default T get(S score) {
+        return getExtract().apply(score);
+    }
+
+    default Comparator<S> comparator() {
+        return Comparator.comparing(getExtract());
+    }
 }

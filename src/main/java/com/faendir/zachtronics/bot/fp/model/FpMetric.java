@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
-public enum FpMetric implements MetricJava<FpScore> {
+public enum FpMetric implements MetricJava<FpScore, Integer> {
     RULES("R", FpScore::getRules),
     CONDITIONAL_RULES("C", FpScore::getConditionalRules),
     FRAMES("F", FpScore::getFrames),

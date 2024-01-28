@@ -49,8 +49,7 @@ public final class Utils {
         return link;
     }
 
-    @NotNull
-    public static byte[] downloadSolutionFileBytes(@NotNull String link) {
+    public static byte @NotNull [] downloadSolutionFileBytes(@NotNull String link) {
         try (InputStream is = new URL(Utils.rawContentURL(link)).openStream()) {
             return is.readAllBytes();
         } catch (MalformedURLException e) {

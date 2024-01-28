@@ -17,24 +17,23 @@
 package com.faendir.zachtronics.bot.inf.model;
 
 import com.faendir.zachtronics.bot.model.MetricJava;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
-@Getter
-@RequiredArgsConstructor
-public enum IfMetric implements MetricJava<IfScore> {
-    CYCLES("C", IfScore::getCycles),
-    FOOTPRINT("F", IfScore::getFootprint),
-    BLOCKS("B", IfScore::getBlocks),
-    ANY_FLAG("", s -> false),
-    INBOUNDS("I", IfScore::isOutOfBounds),
-    NO_GRA("NG", IfScore::usesGRA),
-    INFINITE("I", IfScore::isFinite),
-    NO_FLAGS("N", s -> s.isOutOfBounds() || s.usesGRA() || s.isFinite());
+@Value
+public class IfMetric<T extends Comparable<T>> implements MetricJava<IfScore, T> {
+    public static final IfMetric<Integer> CYCLES = new IfMetric<>("C", IfScore::getCycles);
+    public static final IfMetric<Integer> FOOTPRINT = new IfMetric<>("F", IfScore::getFootprint);
+    public static final IfMetric<Integer> BLOCKS = new IfMetric<>("B", IfScore::getBlocks);
 
-    @NotNull private final String displayName;
-    @NotNull private final Function<IfScore, Comparable<?>> extract;
+    public static final IfMetric<Boolean> ANY_FLAG = new IfMetric<>("", s -> false);
+    public static final IfMetric<Boolean> INBOUNDS = new IfMetric<>("I", IfScore::isOutOfBounds);
+    public static final IfMetric<Boolean> NO_GRA = new IfMetric<>("NG", IfScore::usesGRA);
+    public static final IfMetric<Boolean> INFINITE = new IfMetric<>("I", IfScore::isFinite);
+    public static final IfMetric<Boolean> NO_FLAGS = new IfMetric<>("N", s -> s.isOutOfBounds() || s.usesGRA() || s.isFinite());
+
+    @NotNull String displayName;
+    @NotNull Function<IfScore, T> extract;
 }

@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
-public enum FcMetric implements MetricJava<FcScore> {
+public enum FcMetric implements MetricJava<FcScore, Integer> {
     TIME("T", FcScore::getTime),
     COST("C", FcScore::getCost),
     SUM_TIMES("S", FcScore::getSumTimes),
