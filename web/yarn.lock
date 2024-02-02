@@ -11322,12 +11322,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-intersection-observer@npm:9.5.4":
-  version: 9.5.4
-  resolution: "react-intersection-observer@npm:9.5.4"
+"react-intersection-observer@npm:9.6.0":
+  version: 9.6.0
+  resolution: "react-intersection-observer@npm:9.6.0"
   peerDependencies:
     react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
-  checksum: 10c0/1c899be11dc8625b9ea7b53773612f09a4e0d41b2ca7082726766674645c50abc0e4b781a4779ed2a221a40e1def716bac06b98a50cc8c0a34ec2285037f34f1
+    react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+  checksum: 10c0/200ca442022028de6a609601d64ecfac7cf0fc92412ca5eea48c679402cb0af2202ffd61fb9b85e1d97635896dd45d81a2a1b48af5ec8552eed7ac0488c570b5
   languageName: node
   linkType: hard
 
@@ -14028,7 +14032,7 @@ __metadata:
     prettier: "npm:3.2.4"
     react: "npm:18.2.0"
     react-dom: "npm:18.2.0"
-    react-intersection-observer: "npm:9.5.4"
+    react-intersection-observer: "npm:9.6.0"
     react-mui-dropzone: "npm:4.0.7"
     react-plotly.js: "npm:2.6.0"
     react-router-dom: "npm:6.21.3"
