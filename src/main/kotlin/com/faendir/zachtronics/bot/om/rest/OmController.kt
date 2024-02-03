@@ -157,15 +157,16 @@ class OmController(
         return doSubmit(submission, submissionDTO.gifData?.bytes, setOf(SubmitResult.Success::class, SubmitResult.Updated::class))
     }
 
-//    /** game calls this every time a level is solved */
-//    @PostMapping(path = ["/game-api/{user}/solved"], consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE])
-//    fun solved(@PathVariable user: String, @RequestParam solution: ByteArray) {
-//    }
+    /** game calls this every time a level is solved */
+    @PostMapping(path = ["/game-api/{user}/solved"], consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE])
+    fun solved(@PathVariable user: String, @RequestParam solution: ByteArray): String {
+        return "This leaderboard only accepts submissions with gifs."
+    }
 
     /** game calls this every time a gif is recorded */
     @OptIn(ExperimentalEncodingApi::class)
     @PostMapping(path = ["/game-api/{user}/recorded"], consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE])
-    fun recorded(@PathVariable user: String, @RequestParam solution: ByteArray, @RequestParam gif: ByteArray) {
+    fun recorded(@PathVariable user: String, @RequestParam solution: ByteArray, @RequestParam gif: ByteArray): String {
         gameUploadScope.launch {
             try {
                 withTimeout(15.minutes) {
@@ -177,6 +178,7 @@ class OmController(
                 logger.warn("Bad game api submission from $user", e)
             }
         }
+        return "Thank you for your submission. It is being processed asynchronously."
     }
 
     private fun doSubmit(
