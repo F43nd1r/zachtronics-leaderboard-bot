@@ -157,7 +157,10 @@ inline fun <reified T: Enum<T>> newEnumSet(): EnumSet<T> = EnumSet.noneOf(T::cla
 
 fun isValidLink(string: String): Boolean {
     return try {
-        val connection = URL(string).openConnection() as HttpURLConnection
+        val url = URL(string)
+        if (url.host.contains("reddit.com")) // the bot IP has been banned from reddit crawling, we just accept them
+            return true
+        val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "HEAD"
         connection.setRequestProperty("Accept", "*/*")
         connection.responseCode in (200 until 400) // accept all redirects as well
