@@ -32,7 +32,6 @@ import discord4j.core.`object`.reaction.ReactionEmoji
 import discord4j.core.spec.EmbedCreateFields
 import discord4j.core.spec.EmbedCreateSpec
 import discord4j.core.spec.InteractionReplyEditMono
-import java.io.Closeable
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
@@ -127,29 +126,6 @@ fun DeferrableInteractionEvent.editReplyWithFailure(message: String?) =
 fun String.truncateWithEllipsis(maxLength: Int) = if (length > maxLength) substring(0, maxLength - 1) + "…" else this
 
 fun String.ifEmptyZeroWidthSpace() = ifEmpty { "\u200B" }
-
-fun <K, V, C : MutableCollection<V>> MutableMap<K, C>.add(key: K, values: C) {
-    if (containsKey(key)) {
-        getValue(key) += values
-    } else {
-        put(key, values)
-    }
-}
-
-inline fun <T : Closeable?, U : Closeable?, R> Pair<T, U>.use(block: (T, U) -> R): R {
-    try {
-        return block(first, second)
-    } finally {
-        try {
-            first?.close()
-        } catch (closeException: Throwable) {
-        }
-        try {
-            second?.close()
-        } catch (closeException: Throwable) {
-        }
-    }
-}
 
 fun String?.orEmpty(prefix: String = "", suffix: String = "") = this?.let { prefix + it + suffix } ?: ""
 
