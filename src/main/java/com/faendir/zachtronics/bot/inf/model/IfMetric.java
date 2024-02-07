@@ -32,6 +32,7 @@ public class IfMetric<T extends Comparable<T>> implements MetricJava<IfScore, T>
     public static final IfMetric<Boolean> INBOUNDS = new IfMetric<>("I", IfScore::isOutOfBounds);
     public static final IfMetric<Boolean> NO_GRA = new IfMetric<>("NG", IfScore::usesGRA);
     public static final IfMetric<Boolean> INFINITE = new IfMetric<>("I", IfScore::isFinite);
+    public static final IfMetric<Boolean> NO_OOB_GRA = new IfMetric<>("N", s -> s.isOutOfBounds() || s.usesGRA());
     public static final IfMetric<Boolean> NO_FLAGS = new IfMetric<>("N", s -> s.isOutOfBounds() || s.usesGRA() || s.isFinite());
 
     @NotNull String displayName;

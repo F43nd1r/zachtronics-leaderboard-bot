@@ -27,33 +27,32 @@ import static com.faendir.zachtronics.bot.inf.model.IfType.STANDARD;
 
 @Getter
 public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric<?>> {
-    CF("CF", List.of(CYCLES, FOOTPRINT, BLOCKS), ANY_FLAG, 0b100),
-    CB("CB", List.of(CYCLES, BLOCKS, FOOTPRINT), ANY_FLAG, 0b100),
-    CFNG("CFNG", List.of(CYCLES, NO_GRA, FOOTPRINT, BLOCKS), NO_GRA, 0b100),
-    CBNG("CBNG", List.of(CYCLES, NO_GRA, BLOCKS, FOOTPRINT), NO_GRA, 0b100),
+    CF(List.of(CYCLES, INFINITE, FOOTPRINT, BLOCKS), INBOUNDS, 0b100),
+    CB(List.of(CYCLES, INFINITE, BLOCKS, FOOTPRINT), INBOUNDS, 0b100),
+    CFNG(List.of(CYCLES, NO_GRA, INFINITE, FOOTPRINT, BLOCKS), NO_OOB_GRA, 0b100),
+    CBNG(List.of(CYCLES, NO_GRA, INFINITE, BLOCKS, FOOTPRINT), NO_OOB_GRA, 0b100),
 
-    FC("FC", List.of(FOOTPRINT, CYCLES, BLOCKS), ANY_FLAG, 0b010),
-    FB("FB", List.of(FOOTPRINT, BLOCKS, CYCLES), ANY_FLAG, 0b010),
-    FIC("FIC", List.of(FOOTPRINT, INBOUNDS, CYCLES, BLOCKS), INBOUNDS, 0b010),
-    FIB("FIB", List.of(FOOTPRINT, INBOUNDS, BLOCKS, CYCLES), INBOUNDS, 0b010),
+    FC(List.of(FOOTPRINT, CYCLES, BLOCKS), ANY_FLAG, 0b010),
+    FB(List.of(FOOTPRINT, BLOCKS, CYCLES), ANY_FLAG, 0b010),
+    FIC(List.of(FOOTPRINT, INBOUNDS, CYCLES, BLOCKS), INBOUNDS, 0b010),
+    FIB(List.of(FOOTPRINT, INBOUNDS, BLOCKS, CYCLES), INBOUNDS, 0b010),
 
-    BC("BC", List.of(BLOCKS, CYCLES, FOOTPRINT), ANY_FLAG, 0b001),
-    BF("BF", List.of(BLOCKS, FOOTPRINT, CYCLES), ANY_FLAG, 0b001),
-    BNC("BNC", List.of(BLOCKS, NO_FLAGS, CYCLES, FOOTPRINT), NO_FLAGS, 0b001),
-    BNF("BNF", List.of(BLOCKS, NO_FLAGS, FOOTPRINT, CYCLES), NO_FLAGS, 0b001);
+    BC(List.of(BLOCKS, CYCLES, FOOTPRINT), ANY_FLAG, 0b001),
+    BF(List.of(BLOCKS, FOOTPRINT, CYCLES), ANY_FLAG, 0b001),
+    BNC(List.of(BLOCKS, NO_FLAGS, CYCLES, FOOTPRINT), NO_FLAGS, 0b001),
+    BNF(List.of(BLOCKS, NO_FLAGS, FOOTPRINT, CYCLES), NO_FLAGS, 0b001);
 
     /** contains <tt>%d%s%d%s%d%s</tt> plus a bunch of <tt>*</tt> most likely */
     static final String[] FORMAT_STRINGS = {"%d%s%d%s%d%s", "%d%s%d%s**%d**%s", "%d%s**%d**%s%d%s", null, "**%d**%s%d%s%d%s"};
 
-    private final String displayName;
+    private final String displayName = name();
     private final List<IfMetric<?>> metrics;
     private final Comparator<IfScore> scoreComparator;
     private final IfMetric<Boolean> admission;
     private final Set<IfType> supportedTypes;
     private final int scoreFormatId;
 
-    IfCategory(String displayName, @NotNull List<IfMetric<?>> metrics, @NotNull IfMetric<Boolean> admission, int scoreFormatId) {
-        this.displayName = displayName;
+    IfCategory(@NotNull List<IfMetric<?>> metrics, @NotNull IfMetric<Boolean> admission, int scoreFormatId) {
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
         this.admission = admission;
