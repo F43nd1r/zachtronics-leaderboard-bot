@@ -15,11 +15,7 @@ The graphical leaderboard, frontier visualizer and API is hosted at https://zlbb
 The official leaderboard copies managed by the bot are in the wiki page of the game subreddits.
 
 ## Set up the leaderboard integration in Opus Magnum
-1. Locate the game config.cfg, see: https://www.pcgamingwiki.com/wiki/Opus_Magnum#Configuration_file.28s.29_location
-2. Open it with a text editor (e.g. Notepad)
-3. Locate the `ExternalLeaderboardURLs =` line
-4. Edit it to say: `ExternalLeaderboardURLs = https://zlbb.faendir.com/om/game-api/<YOUR_NAME>`,
-   replacing `<YOUR_NAME>` with the name you want to submit records under
+See https://github.com/F43nd1r/zachtronics-leaderboard-bot/wiki/How-to-submit-from-within-the-game
 
 ## Build
 0. Set up docker-compose, create a discord bot, create a reddit app, get a github personal access token. Follow respective guides.
