@@ -49,6 +49,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.toKotlinInstant
 import org.slf4j.LoggerFactory
@@ -80,12 +81,10 @@ class OmController(
         private val logger = LoggerFactory.getLogger(OmController::class.java)
     }
 
-    private val discordScope = CoroutineScope(Dispatchers.Default)
     private val gameUploadScope = CoroutineScope(Dispatchers.IO)
 
     @PreDestroy
     fun shutdown() {
-        discordScope.cancel()
         gameUploadScope.cancel()
     }
 
@@ -154,7 +153,7 @@ class OmController(
         if (submissionDTO.gif != null && !isValidLink(submissionDTO.gif)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid gif")
         if (submissionDTO.gif == null && submissionDTO.gifData == null) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "no gif")
         val submission = createSubmission(submissionDTO.gif, submissionDTO.author, submissionDTO.solution.bytes)
-        return doSubmit(submission, submissionDTO.gifData?.bytes, setOf(SubmitResult.Success::class, SubmitResult.Updated::class))
+        return runBlocking { doSubmit(submission, submissionDTO.gifData?.bytes, setOf(SubmitResult.Success::class, SubmitResult.Updated::class)) }
     }
 
     /** game calls this every time a level is solved */
@@ -181,7 +180,7 @@ class OmController(
         return "Thank you for your submission. It is being processed asynchronously."
     }
 
-    private fun doSubmit(
+    private suspend fun doSubmit(
         submission: OmSubmission, gifData: ByteArray?, allowedResults: Collection<KClass<out SubmitResult<*, *>>>
     ): SubmitResultType {
 
@@ -204,7 +203,7 @@ class OmController(
             }
         } else repository.submit(submission)
 
-        discordScope.launch { discordClient.notifyOf(result) }
+        discordClient.notifyOf(result)
 
         return if (result::class in allowedResults) SubmitResultType.SUCCESS
         else when (result) {

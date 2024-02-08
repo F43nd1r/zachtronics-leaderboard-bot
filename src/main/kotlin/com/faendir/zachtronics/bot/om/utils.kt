@@ -42,18 +42,19 @@ import com.faendir.zachtronics.bot.utils.InfinInt
 import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
 import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
-import com.faendir.zachtronics.bot.utils.filterIsInstance
 import com.faendir.zachtronics.bot.utils.smartFormat
 import com.faendir.zachtronics.bot.utils.toMetricsTree
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.entity.channel.MessageChannel
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.singleOrNull
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import okio.buffer
 import okio.sink
 import okio.source
 import org.slf4j.LoggerFactory
-import reactor.core.publisher.Mono
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import kotlin.math.ceil
@@ -222,16 +223,32 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
         }
 
         else -> emptyList()
+    }.also {
+        if (it.isNotEmpty()) {
+            logger.info("Successfully notified discord of $submitResult with ${it.size} messages.")
+        } else {
+            logger.warn("No discord messages sent for $submitResult")
+        }
     }
 }
 
 private suspend fun GatewayDiscordClient.sendDiscordMessage(message: MultiMessageSafeEmbedMessageBuilder, channel: Channel): List<Message> {
-    return guilds
-        .flatMap { it.getChannelById(channel.id).onErrorResume { Mono.empty() } }
-        .filterIsInstance<MessageChannel>()
-        .flatMap { message.send(it) }
-        .collectList()
-        .awaitSingleOrNull()
-        ?.flatten()
-        ?: emptyList()
+    val discordChannel = guilds.asFlow().mapNotNull {
+        try {
+            it.getChannelById(channel.id).awaitSingleOrNull()
+        } catch (e: Exception) {
+            logger.debug("Failed to get channel $channel in guild ${it.name}", e)
+            null
+        }
+    }.singleOrNull()
+    if (discordChannel == null) {
+        logger.warn("Did not find channel $channel in any guild, unable to send messages")
+        return emptyList()
+    }
+    if (discordChannel !is MessageChannel) {
+        logger.warn("Channel $channel is not a message channel, unable to send messages")
+        return emptyList()
+    }
+    return message.send(discordChannel).awaitSingleOrNull().orEmpty()
+
 }
