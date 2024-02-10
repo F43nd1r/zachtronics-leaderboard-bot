@@ -28,8 +28,9 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
 /** Represents an immutable element in {[MIN_FINITE_VALUE], ..., [MAX_FINITE_VALUE]} U {INF} */
+@JvmInline
 @Serializable(with = InfinIntSerializer::class)
-class InfinInt private constructor(private val value: Int) : Number(), Comparable<InfinInt> {
+value class InfinInt private constructor(private val value: Int) : Comparable<InfinInt> {
     companion object {
         private const val MIN_FINITE_VALUE: Int = Int.MIN_VALUE
         private const val MAX_FINITE_VALUE: Int = Int.MAX_VALUE - 1
@@ -56,40 +57,16 @@ class InfinInt private constructor(private val value: Int) : Number(), Comparabl
         }
     }
 
-    override fun toDouble(): Double {
+    fun toDouble(): Double {
         if (value == INFINITY_VALUE)
             return Double.POSITIVE_INFINITY
         return value.toDouble()
     }
 
-    override fun toFloat(): Float {
-        if (value == INFINITY_VALUE)
-            return Float.POSITIVE_INFINITY
-        return value.toFloat()
-    }
-
-    override fun toLong(): Long {
-        if (value == INFINITY_VALUE)
-            throw IllegalArgumentException("The margin of this Long is too small to contain **INFINITY**")
-        return value.toLong()
-    }
-
-    override fun toInt(): Int {
+    fun toInt(): Int {
         if (value == INFINITY_VALUE)
             throw IllegalArgumentException("The margin of this Int is too small to contain **INFINITY**")
         return value
-    }
-
-    override fun toShort(): Short {
-        if (value == INFINITY_VALUE)
-            throw IllegalArgumentException("The margin of this Short is too small to contain **INFINITY**")
-        return value.toShort()
-    }
-
-    override fun toByte(): Byte {
-        if (value == INFINITY_VALUE)
-            throw IllegalArgumentException("The margin of this Byte is too small to contain **INFINITY**")
-        return value.toByte()
     }
 
     override fun compareTo(other: InfinInt): Int {
@@ -108,22 +85,6 @@ class InfinInt private constructor(private val value: Int) : Number(), Comparabl
             return "INF"
         return value.toString()
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as InfinInt
-
-        if (value != other.value) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return value
-    }
-
 }
 
 object InfinIntSerializer : KSerializer<InfinInt> {

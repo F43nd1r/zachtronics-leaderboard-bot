@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2023
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,14 @@
 
 package com.faendir.zachtronics.bot.utils
 
-import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
-import reactor.core.publisher.Mono
+import kotlinx.serialization.Serializable
 
-interface SafeMessageBuilder {
-    fun send(event: DeferrableInteractionEvent): Mono<Void>
+/** Represents a pair (int, double) with lexicographical order */
+@Serializable
+data class LevelValue(val level: Int, val value: Double) : Comparable<LevelValue> {
+    override fun compareTo(other: LevelValue): Int {
+        val l = level - other.level
+        if (l != 0) return l
+        return value.compareTo(other.value)
+    }
 }

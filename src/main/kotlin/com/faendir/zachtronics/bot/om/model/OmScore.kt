@@ -20,6 +20,7 @@ import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.Score
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.utils.InfinInt
+import com.faendir.zachtronics.bot.utils.LevelValue
 import com.faendir.zachtronics.bot.utils.newEnumSet
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -46,7 +47,15 @@ data class OmScore(
      * * null: solve doesn't get to arbitrary large output numbers due to stopping or crashing
      */
     val rate: Double?,
-    val areaINF: InfinInt?,   // tracked for NORMAL,PRODUCTION
+    /**
+     * the possibilities are:
+     * * A integer, A'=0, A''=0
+     * * A=INF, A' float, A''=0
+     * * A=INF, A'=INF, A'' float
+     *
+     * represented as (level, value)
+     */
+    val areaINF: LevelValue?,
     val heightINF: InfinInt?, // tracked for NORMAL,POLYMER
     val widthINF: Double?,    // tracked for NORMAL
 ) : Score<OmCategory> {
@@ -62,14 +71,14 @@ data class OmScore(
     /**
      * humans: `12g/34c/56a/78i/3h/4w/OTL@6 12g/34r/57a/78i/6h/7w/OT@∞`
      *
-     * machines: `12g-34i-15c-12a-3h-4w[-15r-12a-3h-4w]-O-T`
+     * machines: `12g-34i-15c-12a-3h-4w[-15r-12a0-3h-4w]-O-T`
      */
     override fun toDisplayString(context: DisplayContext<OmCategory>): String {
 
         if (context.format == StringFormat.FILE_NAME) {
             // we write a standard machine-readable deduplicated score
             val allMetrics = OmMetrics.VALUE + listOf(OmMetric.OVERLAP, OmMetric.TRACKLESS)
-            return subScoreDisplay(allMetrics, context.separator).replace("∞", "INF")
+            return subScoreDisplay(allMetrics, context.format)
         }
 
         val desiredMetrics = context.categories
@@ -84,15 +93,15 @@ data class OmScore(
             ?: manifolds
 
         return desiredManifolds.joinToString(" ") { manifold ->
-            subScoreDisplay(manifold.scoreParts.filter { it in desiredMetrics }, context.separator)
+            subScoreDisplay(manifold.scoreParts.filter { it in desiredMetrics }, context.format)
                 .run { if (desiredManifolds.size > 1) plus(manifold.displayName) else this }
         } + additionalMetricDescriptions(context)
     }
 
     private fun subScoreDisplay(
         subScoreParts: List<OmMetric.ScorePart<*>>,
-        separator: String
-    ) = subScoreParts.mapNotNull { it.describe(this) }.joinToString(separator)
+        format: StringFormat
+    ) = subScoreParts.mapNotNull { it.describe(this, format) }.joinToString(format.separator)
 
     /** @return extra descriptions of computed metrics, like ` (g+c+a=215)` */
     private fun additionalMetricDescriptions(context: DisplayContext<OmCategory>): String = when (context.format) {
@@ -101,7 +110,7 @@ data class OmScore(
                 ?.flatMap { it.metrics }
                 ?.filterIsInstance<OmMetric.Computed>()
                 ?.distinct()
-                ?.mapNotNull { metric -> metric.describe(this) }
+                ?.mapNotNull { metric -> metric.describe(this, context.format) }
                 ?.takeIf { it.isNotEmpty() }
                 ?.joinToString(separator = ", ", prefix = " (", postfix = ")")
                 .orEmpty()
@@ -112,7 +121,7 @@ data class OmScore(
     fun toMorsString(): String = subScoreDisplay(
         listOf(
             OmMetric.COST, OmMetric.CYCLES, OmMetric.AREA, OmMetric.INSTRUCTIONS, OmMetric.OVERLAP, OmMetric.TRACKLESS
-        ), StringFormat.FILE_NAME.separator
+        ), StringFormat.FILE_NAME
     )
 
     override fun toString() = toDisplayString()

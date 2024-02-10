@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.utils
+package com.faendir.zachtronics.bot.discord.embed
 
 import com.faendir.zachtronics.bot.discord.DiscordActionCache
+import com.faendir.zachtronics.bot.utils.clear
+import com.faendir.zachtronics.bot.utils.ifEmptyZeroWidthSpace
+import com.faendir.zachtronics.bot.utils.truncateWithEllipsis
+import com.faendir.zachtronics.bot.utils.user
 import discord4j.core.event.domain.interaction.ButtonInteractionEvent
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.`object`.component.ActionComponent
@@ -30,7 +34,8 @@ import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import reactor.core.publisher.Mono
 
-class PaginatedSafeEmbedMessageBuilder(private val discordActionCache: DiscordActionCache) : SafeEmbedMessageBuilder<PaginatedSafeEmbedMessageBuilder> {
+class PaginatedSafeEmbedMessageBuilder(private val discordActionCache: DiscordActionCache) :
+    SafeEmbedMessageBuilder<PaginatedSafeEmbedMessageBuilder> {
     private var title: String? = null
     private var url: String? = null
     private var author: Triple<String, String?, String?>? = null

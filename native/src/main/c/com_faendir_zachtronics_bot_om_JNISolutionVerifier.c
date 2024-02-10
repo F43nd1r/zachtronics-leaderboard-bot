@@ -1,6 +1,6 @@
 #include "com_faendir_zachtronics_bot_om_JNISolutionVerifier.h"
 #include "verifier.h"
-#include <limits.h>
+#include <stdbool.h>
 
 JNIEXPORT jlong JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_prepareVerifier
     (JNIEnv *env, jclass cls, jbyteArray jPuzzle, jbyteArray jSolution) {
@@ -25,6 +25,16 @@ JNIEXPORT void JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_c
     verifier_destroy(verifier);
 }
 
+static bool throw_if_error(JNIEnv *env, void* verifier) {
+    const char *error = verifier_error(verifier);
+    if (error) {
+        jclass exc = (*env)->FindClass(env, "com/faendir/zachtronics/bot/om/OmSimException");
+        (*env)->ThrowNew(env, exc, error);
+        return true;
+    }
+    return false;
+}
+
 JNIEXPORT jint JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_getMetric
     (JNIEnv *env, jclass cls, jlong jVerifier, jstring jMetric) {
     (void)cls;
@@ -32,21 +42,19 @@ JNIEXPORT jint JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_g
     void *verifier = (void*) jVerifier;
     const char *metric = (*env)->GetStringUTFChars(env, jMetric, 0);
     int result = verifier_evaluate_metric(verifier, metric);
-    const char *error = verifier_error(verifier);
-    if (error) {
-        (*env)->ThrowNew(env, (*env)->FindClass(env, "com/faendir/zachtronics/bot/om/OmSimException"), error);
-        result = INT_MAX;
-    }
+    throw_if_error(env, verifier);
     return result;
 }
 
-JNIEXPORT jint JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_getErrorCycle
-    (JNIEnv *env, jclass cls, jlong jVerifier) {
-    (void)env;
+JNIEXPORT jdouble JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_getApproximateMetric
+    (JNIEnv *env, jclass cls, jlong jVerifier, jstring jMetric) {
     (void)cls;
 
     void *verifier = (void*) jVerifier;
-    return verifier_error_cycle(verifier);
+    const char *metric = (*env)->GetStringUTFChars(env, jMetric, 0);
+    int result = verifier_evaluate_approximate_metric(verifier, metric);
+    throw_if_error(env, verifier);
+    return result;
 }
 
 JNIEXPORT void JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifier_clearError

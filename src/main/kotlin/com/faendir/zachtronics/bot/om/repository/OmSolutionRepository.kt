@@ -137,12 +137,13 @@ class OmSolutionRepository(
             }
             if (beatenRecords != null) {
                 pageGenerator.update(leaderboardScope, beatenRecords.flatMap { it.categories }, data)
-                leaderboardScope.commitAndPush(
+                val rev = leaderboardScope.commit(
                     submission.author,
                     submission.puzzle,
                     submission.score,
                     beatenRecords.flatMap { it.categories }.map { it.toString() })
-                hash = leaderboardScope.currentHash()
+                hash = rev.name()
+                leaderboardScope.push()
             }
             fun patchedUpRecord() = // add transient fields from submission
                 newMRecord.record.copy(author = submission.author, displayLinkEmbed = submission.displayLinkEmbed)

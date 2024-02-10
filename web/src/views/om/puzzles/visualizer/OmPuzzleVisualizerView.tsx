@@ -49,7 +49,7 @@ export default function OmPuzzleVisualizerView() {
                     h: { name: "Height", get: (score) => score?.height },
                     w: { name: "Width", get: (score) => score?.width },
                     r: { name: "Rate", get: (score) => score?.rate },
-                    aI: { name: "Area@∞", get: (score) => score?.areaINF },
+                    aI: { name: "Area@∞", get: (score) => score && score.areaINFValue * 10 ** (10 * score.areaINFLevel)},
                     hI: { name: "Height@∞", get: (score) => score?.heightINF },
                     wI: { name: "Width@∞", get: (score) => score?.widthINF },
                 }}

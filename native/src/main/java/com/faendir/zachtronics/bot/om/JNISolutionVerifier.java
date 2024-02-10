@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.om;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Closeable;
 
@@ -31,18 +32,16 @@ public class JNISolutionVerifier implements Closeable {
     private final byte[] solution;
     private Long verifier = null;
 
-    private Integer errorCycle = null;
-
     private static native long prepareVerifier(byte[] puzzle, byte[] solution);
 
     private static native void closeVerifier(long verifier);
 
     private static native int getMetric(long verifier, String name) throws OmSimException;
-
-    private static native int getErrorCycle(long verifier);
+    private static native double getApproximateMetric(long verifier, String name) throws OmSimException;
 
     private static native void clearError(long verifier);
 
+    @NotNull
     public static JNISolutionVerifier open(byte[] puzzle, byte[] solution) {
         return new JNISolutionVerifier(puzzle, solution);
     }
@@ -50,21 +49,20 @@ public class JNISolutionVerifier implements Closeable {
     public int getMetric(OmSimMetric metric) {
         if (verifier == null) verifier = prepareVerifier(puzzle, solution);
         try {
-            int result = getMetric(verifier, metric.getId());
-            errorCycle = null;
-            return result;
+            return getMetric(verifier, metric.getId());
         } catch (OmSimException e) {
-            errorCycle = getErrorCycle(verifier);
             clearError(verifier);
             throw e;
         }
     }
 
-    public int getErrorCycle() {
-        if (errorCycle != null) {
-            return errorCycle;
-        } else {
-            throw new IllegalStateException("Tried to get error cycle but there was no error state");
+    public double getApproximateMetric(OmSimMetric metric) {
+        if (verifier == null) verifier = prepareVerifier(puzzle, solution);
+        try {
+            return getApproximateMetric(verifier, metric.getId());
+        } catch (OmSimException e) {
+            clearError(verifier);
+            throw e;
         }
     }
 

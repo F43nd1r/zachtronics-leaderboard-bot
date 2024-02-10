@@ -122,7 +122,7 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
 
         fun currentHash(): String = git.repository.resolve("HEAD").name()
 
-        fun shortCurrentHash(): String = git.repository.resolve("HEAD").abbreviate(7).name()
+        fun shortCurrentHash(): String = git.repository.resolve("HEAD").abbreviate(8).name()
 
         override fun close() {
             lock.unlock()
@@ -189,9 +189,8 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
             push()
         }
 
-        fun commit(user: String?, puzzle: Puzzle<*>, score: Score<*>, updated: Collection<String>) {
+        fun commit(user: String?, puzzle: Puzzle<*>, score: Score<*>, updated: Collection<String>) =
             commit("${puzzle.displayName} ${score.toDisplayString()} $updated by ${user ?: "unknown"}")
-        }
 
         fun commit(message: String): RevCommit =
             git.commit()

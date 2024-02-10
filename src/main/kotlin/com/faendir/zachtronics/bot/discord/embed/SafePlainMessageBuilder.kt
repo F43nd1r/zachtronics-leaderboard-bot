@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.utils
+package com.faendir.zachtronics.bot.discord.embed
 
+import com.faendir.zachtronics.bot.utils.clear
+import com.faendir.zachtronics.bot.utils.truncateWithEllipsis
 import com.google.common.annotations.VisibleForTesting
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.spec.MessageCreateFields

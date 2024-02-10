@@ -17,6 +17,8 @@
 package com.faendir.zachtronics.bot.utils
 
 import com.faendir.zachtronics.bot.discord.Colors
+import com.faendir.zachtronics.bot.discord.embed.EmbedLimits
+import com.faendir.zachtronics.bot.discord.embed.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.Metric

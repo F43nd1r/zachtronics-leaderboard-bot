@@ -15,7 +15,7 @@
  */
 package com.faendir.zachtronics.bot.om
 
-@Suppress("ClassName")
+@Suppress("ClassName", "Unused")
 sealed class OmSimMetric(val id: String) {
     // see http://events.critelli.technology/static/metrics.html
     object PARSED_CYCLES : OmSimMetric("parsed cycles")
@@ -41,10 +41,15 @@ sealed class OmSimMetric(val id: String) {
     object WIDTH_TIMES_TWO_AT_0_DEGREES : OmSimMetric("width*2 at 0 degrees")
     object WIDTH_TIMES_TWO_AT_60_DEGREES : OmSimMetric("width*2 at 60 degrees")
     object WIDTH_TIMES_TWO_AT_120_DEGREES : OmSimMetric("width*2 at 120 degrees")
-    object THROUGHPUT_CYCLES : OmSimMetric("throughput cycles")
-    object THROUGHPUT_OUTPUTS : OmSimMetric("throughput outputs")
+//    object THROUGHPUT_CYCLES : OmSimMetric("throughput cycles")
+    object PER_REPETITION_CYCLES : OmSimMetric("per repetition cycles")
+//    object THROUGHPUT_OUTPUTS : OmSimMetric("throughput outputs")
+    object PER_REPETITION_OUTPUTS : OmSimMetric("per repetition outputs")
+    object PER_REPETITION_AREA : OmSimMetric("per repetition area")
+    object PER_REPETITION_SQUARED_AREA : OmSimMetric("per repetition^2 area")
     object THROUGHPUT_WASTE : OmSimMetric("throughput waste")
     class PRODUCT_N_METRIC(n: Int, metric: OmSimMetric) : OmSimMetric("product $n ${metric.id}")
+    object REACHES_STEADY_STATE : OmSimMetric("reaches steady state")
     class STEADY_STATE(metric: OmSimMetric) : OmSimMetric("steady state ${metric.id}")
     class PARTS_OF_TYPE(partType: PartType) : OmSimMetric("parts of type ${partType.id}")
     object ATOMS_GRABBED : OmSimMetric("atoms grabbed")
@@ -60,6 +65,7 @@ sealed class OmSimMetric(val id: String) {
     object VISUAL_LOOP_END_CYCLE : OmSimMetric("visual loop end cycle")
 }
 
+@Suppress("Unused")
 enum class PartType(val id: String) {
     ARM1("arm1"),
     ARM2("arm2"),
@@ -87,6 +93,7 @@ enum class PartType(val id: String) {
     CONDUIT("pipe")
 }
 
+@Suppress("Unused")
 enum class AtomType(val id: String) {
     SALT("salt"),
     AIR("air"),

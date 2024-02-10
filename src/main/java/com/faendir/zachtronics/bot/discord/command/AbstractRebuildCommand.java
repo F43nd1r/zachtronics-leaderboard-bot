@@ -18,10 +18,10 @@ package com.faendir.zachtronics.bot.discord.command;
 
 import com.faendir.zachtronics.bot.discord.Colors;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
+import com.faendir.zachtronics.bot.discord.embed.MultiMessageSafeEmbedMessageBuilder;
+import com.faendir.zachtronics.bot.discord.embed.SafeMessageBuilder;
 import com.faendir.zachtronics.bot.model.Puzzle;
 import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
-import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder;
-import com.faendir.zachtronics.bot.utils.SafeMessageBuilder;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;

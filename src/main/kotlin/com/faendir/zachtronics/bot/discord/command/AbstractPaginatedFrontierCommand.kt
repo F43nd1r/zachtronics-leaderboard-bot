@@ -20,12 +20,12 @@ import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.discord.DiscordActionCache
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured
+import com.faendir.zachtronics.bot.discord.embed.PaginatedSafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.discord.embed.SafeMessageBuilder
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.repository.SolutionRepository
-import com.faendir.zachtronics.bot.utils.PaginatedSafeEmbedMessageBuilder
-import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedRecords
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 

@@ -21,6 +21,7 @@ import com.faendir.zachtronics.bot.discord.command.Command
 import com.faendir.zachtronics.bot.discord.command.option.linkOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured
 import com.faendir.zachtronics.bot.discord.command.security.Secured
+import com.faendir.zachtronics.bot.discord.embed.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.createSubmission
@@ -29,7 +30,6 @@ import com.faendir.zachtronics.bot.om.notifyOf
 import com.faendir.zachtronics.bot.om.omSolutionOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
-import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.url
 import com.faendir.zachtronics.bot.utils.user

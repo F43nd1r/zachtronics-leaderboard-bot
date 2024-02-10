@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.discord.command
 
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption
 import com.faendir.zachtronics.bot.discord.command.security.Secured
-import com.faendir.zachtronics.bot.utils.SafeMessageBuilder
+import com.faendir.zachtronics.bot.discord.embed.SafeMessageBuilder
 import discord4j.core.event.domain.interaction.ChatInputAutoCompleteEvent
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.core.event.domain.interaction.InteractionCreateEvent

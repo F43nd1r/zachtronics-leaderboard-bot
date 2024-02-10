@@ -33,7 +33,8 @@ data class OmScoreDTO(
 
     // @INF
     val rate: Double?,
-    val areaINF: Double?,
+    val areaINFLevel: Int?,
+    val areaINFValue: Double?,
     val heightINF: Double?,
     val widthINF: Double?,
 )
@@ -50,7 +51,8 @@ fun OmScore.toDTO() = OmScoreDTO(
     width = width,
 
     rate = rate,
-    areaINF = areaINF?.toDouble(),
+    areaINFLevel = areaINF?.level,
+    areaINFValue = areaINF?.value,
     heightINF = heightINF?.toDouble(),
     widthINF = widthINF,
 )

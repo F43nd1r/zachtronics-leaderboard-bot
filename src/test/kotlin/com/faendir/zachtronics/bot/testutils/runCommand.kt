@@ -18,9 +18,9 @@ package com.faendir.zachtronics.bot.testutils
 
 import com.faendir.zachtronics.bot.discord.command.Command
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUser
+import com.faendir.zachtronics.bot.discord.embed.MultiMessageSafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.discord.embed.SafePlainMessageBuilder
 import com.faendir.zachtronics.bot.model.StringFormat
-import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
-import com.faendir.zachtronics.bot.utils.SafePlainMessageBuilder
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.core.`object`.command.ApplicationCommandInteractionOption

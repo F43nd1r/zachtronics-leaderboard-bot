@@ -19,8 +19,12 @@ package com.faendir.zachtronics.bot.om.repository
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.StringFormat
-import com.faendir.zachtronics.bot.om.model.*
+import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmCategory.*
+import com.faendir.zachtronics.bot.om.model.OmGroup
+import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
 import com.faendir.zachtronics.bot.reddit.RedditService
 import com.faendir.zachtronics.bot.reddit.Subreddit.OPUS_MAGNUM
@@ -31,17 +35,17 @@ import java.util.*
 
 @Component
 class OmRedditWikiGenerator(private val reddit: RedditService) {
-    private val categories = listOf(GC, GA, GX, GCP, GI, GXP, CG, CA, CX, CGP, CI, CXP, AG, AC, AX, IG, IC, IX, SUM_G, SUM_GP)
     companion object {
         private const val wikiPage = "index"
     }
 
-    private val costCategories = listOf(GC, GA, GX, GCP, GI, GXP)
-    private val cycleCategories = listOf(CG, CA, CX, CGP, CI, CXP)
-    private val areaInstructionCategories = listOf(AG, AC, AX, IG, IC, IX)
-    private val sumCategories = listOf(SUM_G, SUM_GP)
+    private val costCategories = setOf(GC, GA, GX, GCP, GI, GXP)
+    private val cycleCategories = setOf(CG, CA, CX, CGP, CI, CXP)
+    private val areaInstructionCategories = setOf(AG, AC, AX, IG, IC, IX)
+    private val sumCategories = setOf(SUM_G, SUM_GP)
+    private val categories = costCategories + cycleCategories + areaInstructionCategories + sumCategories
 
-    private fun filterRecords(records: Collection<OmMemoryRecord>, filter: List<OmCategory>): MutableList<Pair<OmRecord, List<OmCategory>>> {
+    private fun filterRecords(records: Collection<OmMemoryRecord>, filter: Set<OmCategory>): MutableList<Pair<OmRecord, List<OmCategory>>> {
         return records.map { mr -> Pair(mr.record, mr.categories.filter { filter.contains(it) }.sorted()) }
             .filter { it.second.isNotEmpty() }
             .sortedBy { (_, categories) -> categories.first() }

@@ -25,7 +25,8 @@ export default interface OmScore {
     width: number
 
     rate?: number
-    areaINF?: number
+    areaINFLevel?: number
+    areaINFValue?: number
     heightINF?: number
     widthINF?: number
 }

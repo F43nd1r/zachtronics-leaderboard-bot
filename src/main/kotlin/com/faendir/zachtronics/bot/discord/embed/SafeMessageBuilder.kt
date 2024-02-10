@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.utils
+package com.faendir.zachtronics.bot.discord.embed
 
-import discord4j.core.spec.EmbedCreateFields
-import discord4j.rest.util.Color
+import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
+import reactor.core.publisher.Mono
 
-interface SafeEmbedMessageBuilder<SELF : SafeEmbedMessageBuilder<SELF>> : SafeMessageBuilder {
-    fun title(title: String): SELF
-    fun url(url: String): SELF
-    fun addField(name: String, value: String, inline: Boolean = false): SELF
-    fun addFields(fields: Iterable<EmbedCreateFields.Field>): SELF
-    fun author(author: String, url: String? = null, iconUrl: String? = null): SELF
-    fun color(color: Color): SELF
+interface SafeMessageBuilder {
+    fun send(event: DeferrableInteractionEvent): Mono<Void>
 }

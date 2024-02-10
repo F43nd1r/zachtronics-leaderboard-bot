@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.cleanup
+package com.faendir.zachtronics.bot.om.cleanup
 
 import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.createGitRepositoryFrom
@@ -46,7 +46,7 @@ import kotlin.streams.asStream
  */
 @Disabled
 @OptIn(ExperimentalSerializationApi::class)
-class OpusLeaderboardFixer {
+class OmLeaderboardFixer {
     private val json = Json {
         prettyPrint = true
         allowSpecialFloatingPointValues = true
@@ -61,7 +61,7 @@ class OpusLeaderboardFixer {
 
     @Test
     fun resubmitAll() {
-        val repo = File("../opus_magnum/om-leaderboard")
+        val repo = File("../opus_magnum/leaderboard")
 
         val gitRepo = TestGitRepository(GitProperties().apply {
             accessToken = ""
@@ -86,8 +86,8 @@ class OpusLeaderboardFixer {
 
     @Test
     fun `it's manifolding time`() {
-        val repo = File("../opus_magnum/om-leaderboard")
-        val newRepoFile = File("../opus_magnum/om-leaderboard-new")
+        val repo = File("../opus_magnum/leaderboard")
+        val newRepoFile = File("../opus_magnum/leaderboard-new")
 
         val newRepo = createGitRepositoryFrom(newRepoFile, GitProperties().apply {
             accessToken = ""
@@ -95,14 +95,34 @@ class OpusLeaderboardFixer {
         })
         val repository = OmSolutionRepository(newRepo, mockk(relaxed = true), OmUrlMapper())
 
-        for (file in getAllRecordFiles(repo, OmPuzzle.STABILIZED_WATER)) {
+        for (file in getAllRecordFiles(repo)) {
             println("${file.name} is being processed")
             val oldRecord = json.parseToJsonElement(file.readText()) as JsonObject
             val displayLink = oldRecord["displayLink"]!!.jsonPrimitive.content
             val solution: File = file.resolveSibling(file.name.replace(".json", ".solution"))
             val bytes = solution.readBytes()
+            val submission = createSubmission(displayLink, "Manifoldius", bytes)
+            val result = repository.submit(submission)
+            println(result)
+        }
+    }
+
+    @Test
+    fun `submit folder`() {
+        val folder = File("/tmp/outparetoed")
+        val repoFile = File("../opus_magnum/leaderboard-new")
+
+        val repo = TestGitRepository(GitProperties().apply {
+            accessToken = ""
+            username = "zachtronics-leaderboard-bot"
+        }, repoFile)
+        val repository = OmSolutionRepository(repo, mockk(relaxed = true), OmUrlMapper())
+
+        for (solution in folder.listFiles()!!.sorted()) {
+            println("${solution.name} is being processed")
+            val bytes = solution.readBytes()
             val submission = try {
-                createSubmission(displayLink, "Manifoldius", bytes)
+                createSubmission("https://new.cool.score", "Folderius", bytes)
             }
             catch (e: Exception) {
                 e.printStackTrace()
@@ -156,11 +176,11 @@ class OpusLeaderboardFixer {
 
     @Test
     fun `fix data links`() {
-        val root = File("../om-leaderboard")
+        val root = File("../opus_magnum/leaderboard")
         val mapper = OmUrlMapper()
         val exec = Runtime.getRuntime().exec("git rev-parse --short HEAD", null, root)
         exec.waitFor()
-        val commitHash = exec.inputStream.bufferedReader().readText().trim()
+        val commitHash = exec.inputStream.bufferedReader().readText().trim().substring(0, 8)
         getAllRecordFiles(root).asStream().parallel()
             .forEach { file ->
                 println("${file.name} is being processed")
@@ -177,7 +197,7 @@ class OpusLeaderboardFixer {
 
     @Test
     fun `fix last modified`() {
-        val root = File("../om-leaderboard")
+        val root = File("../opus_magnum/leaderboard")
         val git = Git.open(root)
         getAllRecordFiles(root).asStream().parallel()
             .forEach { file ->
@@ -188,7 +208,9 @@ class OpusLeaderboardFixer {
                         json.encodeToString(
                             record.copy(
                                 lastModified = git.log().addPath(file.relativeTo(root).path).call()
-                                    .firstOrNull()?.commitTime?.let { Instant.fromEpochSeconds(it.toLong()) })
+                                    .firstOrNull()?.commitTime?.let { Instant.fromEpochSeconds(it.toLong()) }
+                                // lastModified = null
+                            )
                         )
                     )
                 } catch (e: Exception) {

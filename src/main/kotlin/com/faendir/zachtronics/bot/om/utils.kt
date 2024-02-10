@@ -26,6 +26,7 @@ import com.faendir.om.parser.solution.model.part.IO
 import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.option.enumOptionBuilder
+import com.faendir.zachtronics.bot.discord.embed.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.om.discord.Channel
@@ -40,7 +41,7 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.InfinInt
 import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
-import com.faendir.zachtronics.bot.utils.MultiMessageSafeEmbedMessageBuilder
+import com.faendir.zachtronics.bot.utils.LevelValue
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.smartFormat
 import com.faendir.zachtronics.bot.utils.toMetricsTree
@@ -69,13 +70,20 @@ fun JNISolutionVerifier.getMetricSafe(metric: OmSimMetric) = try {
     null
 }
 
+private fun JNISolutionVerifier.getAreaINF(outputsAtINF: Int?): LevelValue? {
+    if (outputsAtINF == null)
+        return null
+    val a2 = getApproximateMetric(OmSimMetric.PER_REPETITION_SQUARED_AREA)
+    if (a2 != 0.0) return LevelValue(2, a2 / (outputsAtINF * outputsAtINF))
+    val a1 = getMetric(OmSimMetric.PER_REPETITION_AREA)
+    if (a1 != 0) return LevelValue(1, a1.toDouble() / outputsAtINF)
+    val a0 = getMetric(OmSimMetric.STEADY_STATE(OmSimMetric.AREA))
+    return LevelValue(0, a0.toDouble())
+}
+
 fun JNISolutionVerifier.getScore(type: OmType): OmScore {
-    // null or 0 THROUGHPUT_OUTPUTS means the solution doesn't output infinite products, hence cannot have a rate
-    // infinity rate is reserved for sublinear solutions, which don't really exist and aren't supported by omsim
-    val rate: Double? = getMetricSafe(OmSimMetric.THROUGHPUT_OUTPUTS)?.takeIf { it != 0 }?.let {
-        val precision = 100.0
-        ceil((precision * getMetric(OmSimMetric.THROUGHPUT_CYCLES).toDouble() / it)) / precision
-    }
+    // null or 0 PER_REPETITION_OUTPUTS means the solution doesn't output infinite products, hence cannot have a @INF point
+    val outputsAtINF: Int? = getMetricSafe(OmSimMetric.PER_REPETITION_OUTPUTS)?.takeIf { it != 0 }
 
     return OmScore(
         cost = getMetric(OmSimMetric.COST).also {
@@ -101,12 +109,14 @@ fun JNISolutionVerifier.getScore(type: OmType): OmScore {
         height = if (type != OmType.PRODUCTION) getMetric(OmSimMetric.HEIGHT) else null,
         width = if (type != OmType.PRODUCTION) getMetric(OmSimMetric.WIDTH_TIMES_TWO).toDouble() / 2 else null,
 
-        rate = rate,
-        areaINF = if (rate == null || type == OmType.POLYMER) null
-        else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.AREA))?.toInfinInt() ?: InfinInt.INFINITY,
-        heightINF = if (rate == null || type == OmType.PRODUCTION) null
+        rate = outputsAtINF?.run {
+            val precision = 100.0
+            ceil((precision * getMetric(OmSimMetric.PER_REPETITION_CYCLES).toDouble() / this)) / precision
+        },
+        areaINF = getAreaINF(outputsAtINF),
+        heightINF = if (outputsAtINF == null || type == OmType.PRODUCTION) null
         else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.HEIGHT))?.toInfinInt() ?: InfinInt.INFINITY,
-        widthINF = if (rate == null || type != OmType.NORMAL) null
+        widthINF = if (outputsAtINF == null || type != OmType.NORMAL) null
         else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.WIDTH_TIMES_TWO))?.toDouble()?.div(2)
             ?: Double.POSITIVE_INFINITY,
     )

@@ -80,7 +80,7 @@ enum class OmCategory(
     TC(NORMAL_TYPES, TRACKLESS, CYCLES, COST, displayName = "TC"),
 
     RG(NORMAL_TYPES, RATE, COST, AREA_INF),
-    RA(setOf(NORMAL), RATE, AREA_INF, COST, displayName = "RA"),
+    RA(NORMAL_TYPES, RATE, AREA_INF, COST, displayName = "RA"),
     RI(NORMAL_TYPES, RATE, INSTRUCTIONS, COST),
 
     HR(NORMAL_TYPES, HEIGHT_INF, RATE, COST, displayName = "HR"),
