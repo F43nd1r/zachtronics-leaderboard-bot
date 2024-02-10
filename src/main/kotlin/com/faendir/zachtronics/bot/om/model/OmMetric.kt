@@ -135,7 +135,7 @@ sealed interface OmMetric : Metric {
 
     object RATE : NumericValue<Double>("R", 'r', MeasurePoint.INFINITY, OmScore::rate)
     object AREA_INF : Value<LevelValue>("A@∞", 'a', MeasurePoint.INFINITY, OmScore::areaINF,
-        { s -> s.areaINF?.run { value * 10.0.pow(10 * level) } }) {
+        { s -> s.areaINF?.run { value * 10.0.pow(5 * level) } }) {
         override fun describe(score: OmScore, format: StringFormat): String? {
             val area = score.areaINF ?: return null
             return when (format) {
