@@ -53,7 +53,7 @@ export default function CwPuzzleVisualizerView() {
                 metrics={{
                     w: { name: "Width", get: (score) => score?.width },
                     h: { name: "Height", get: (score) => score?.height },
-                    s: { name: "Size", get: (score) => score && score?.width * score?.height },
+                    s: { name: "Size", get: (score) => score && score.width * score.height },
                     f: { name: "Footprint", get: (score) => score?.footprint },
                 }}
                 modifiers={{}}
