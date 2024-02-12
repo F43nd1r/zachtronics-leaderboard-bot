@@ -186,6 +186,7 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
                 sendDiscordMessage(
                     MultiMessageSafeEmbedMessageBuilder()
                         .title("New Submission: *${record.puzzle.displayName}* Pareto")
+                        .url(record.puzzle.link)
                         .color(Colors.SUCCESS)
                         .description(
                             record.toDisplayString(DisplayContext(StringFormat.DISCORD, beatenCategories))
@@ -200,6 +201,7 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
                 sendDiscordMessage(
                     MultiMessageSafeEmbedMessageBuilder()
                         .title("New Submission: *${record.puzzle.displayName}* ${beatenCategories.smartFormat(record.puzzle.supportedCategories.toMetricsTree())}")
+                        .url(record.puzzle.link)
                         .color(Colors.SUCCESS)
                         .description(
                             record.toDisplayString(DisplayContext(StringFormat.DISCORD, beatenCategories))

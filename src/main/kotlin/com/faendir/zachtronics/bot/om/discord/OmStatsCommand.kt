@@ -58,6 +58,7 @@ class OmStatsCommand(private val repository: OmSolutionRepository) : Command.Bas
                 val beatenCategories: List<OmCategory> = result.beatenRecords.flatMap { it.categories }
                 return MultiMessageSafeEmbedMessageBuilder()
                     .title("Stats: *${submission.puzzle.displayName}*")
+                    .url(submission.puzzle.link)
                     .color(Colors.SUCCESS)
                     .description(
                         "`${submission.score.toDisplayString(DisplayContext.discord())}`"
@@ -75,12 +76,14 @@ class OmStatsCommand(private val repository: OmSolutionRepository) : Command.Bas
             is SubmitResult.AlreadyPresent, is SubmitResult.Updated ->
                 return MultiMessageSafeEmbedMessageBuilder()
                     .title("Stats: *${submission.puzzle.displayName}*")
+                    .url(submission.puzzle.link)
                     .color(Colors.UNCHANGED)
                     .description("`${submission.score.toDisplayString(DisplayContext.discord())}` was already submitted.")
 
             is SubmitResult.NothingBeaten ->
                 return MultiMessageSafeEmbedMessageBuilder()
                     .title("Stats: *${submission.puzzle.displayName}*")
+                    .url(submission.puzzle.link)
                     .color(Colors.UNCHANGED)
                     .description("`${submission.score.toDisplayString(DisplayContext.discord())}` is beaten by:")
                     .embedCategoryRecords(result.records, submission.puzzle.supportedCategories)
