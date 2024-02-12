@@ -25,16 +25,17 @@ import com.faendir.zachtronics.bot.om.model.OmType.*
 private val NORMAL_TYPES = setOf(NORMAL, POLYMER)
 private val PRODUCTION_TYPES = setOf(PRODUCTION)
 
+/** [OVERLAP] is tracked by the admission criteria, so it's effectively in (-1)th place all the time */
 private val DEFAULT_TIEBREAKERS = mapOf(
     VICTORY to mapOf(
-        NORMAL to listOf(OVERLAP, COST, CYCLES, AREA, LOOPING, INSTRUCTIONS, TRACKLESS, HEIGHT, WIDTH),
-        POLYMER to listOf(OVERLAP, COST, CYCLES, AREA, LOOPING, INSTRUCTIONS, TRACKLESS, HEIGHT, WIDTH),
-        PRODUCTION to listOf(OVERLAP, COST, CYCLES, INSTRUCTIONS, LOOPING, AREA, TRACKLESS),
+        NORMAL to listOf(COST, CYCLES, AREA, LOOPING, INSTRUCTIONS, TRACKLESS, HEIGHT, WIDTH),
+        POLYMER to listOf(COST, CYCLES, AREA, LOOPING, INSTRUCTIONS, TRACKLESS, HEIGHT, WIDTH),
+        PRODUCTION to listOf(COST, CYCLES, INSTRUCTIONS, LOOPING, AREA, TRACKLESS),
     ),
     INFINITY to mapOf(
-        NORMAL to listOf(OVERLAP, COST, RATE, AREA_INF, INSTRUCTIONS, TRACKLESS, HEIGHT_INF, WIDTH_INF),
-        POLYMER to listOf(OVERLAP, COST, RATE, AREA_INF, INSTRUCTIONS, TRACKLESS, HEIGHT_INF),
-        PRODUCTION to listOf(OVERLAP, COST, RATE, INSTRUCTIONS, AREA_INF, TRACKLESS),
+        NORMAL to listOf(COST, RATE, AREA_INF, INSTRUCTIONS, TRACKLESS, HEIGHT_INF, WIDTH_INF),
+        POLYMER to listOf(COST, RATE, AREA_INF, INSTRUCTIONS, TRACKLESS, HEIGHT_INF),
+        PRODUCTION to listOf(COST, RATE, INSTRUCTIONS, AREA_INF, TRACKLESS),
     )
 )
 
@@ -108,7 +109,8 @@ enum class OmCategory(
     val associatedManifold = OmScoreManifold.entries.single { it.scoreParts.containsAll(requiredParts) }
     val scoreComparators: Map<OmType, Comparator<OmScore>> =
         DEFAULT_TIEBREAKERS[associatedManifold]!!.mapValues { (_, tiebreakers) ->
-            (metrics + (tiebreakers - metrics)).map(OmMetric::comparator).reduce(Comparator<OmScore>::thenComparing)
+            (metrics.filter { it != OVERLAP } + (tiebreakers - metrics)).map(OmMetric::comparator)
+                .reduce(Comparator<OmScore>::thenComparing)
         }
 
     fun supportsPuzzle(puzzle: OmPuzzle) = supportedTypes.contains(puzzle.type)
