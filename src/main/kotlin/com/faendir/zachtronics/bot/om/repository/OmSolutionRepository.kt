@@ -91,7 +91,7 @@ class OmSolutionRepository(
                 for (category in OmCategory.entries.filter { it.supportsPuzzle(puzzle) }) {
                     memoryRecords
                         .filter { category.supportsScore(it.record.score) }
-                        .minWithOrNull(Comparator.comparing({ it.record.score }, category.scoreComparator))
+                        .minWithOrNull(Comparator.comparing({ it.record.score }, category.scoreComparators[puzzle.type]))
                         ?.categories
                         ?.add(category)
                 }
@@ -165,8 +165,9 @@ class OmSolutionRepository(
         handleBeatenRecord: (beatenMRecord: OmMemoryRecord?, beatenCategories: Set<OmCategory>, lostManifolds: Set<OmScoreManifold>) -> Unit
     ): SubmitResult<OmRecord, OmCategory> {
         loadDataIfNecessary(leaderboardScope)
-        val mRecords = data.getValue(submission.puzzle)
-        val unclaimedCategories = OmCategory.entries.filter { it.supportsPuzzle(submission.puzzle) && it.supportsScore(submission.score) }.toMutableSet()
+        val puzzle = submission.puzzle
+        val mRecords = data.getValue(puzzle)
+        val unclaimedCategories = OmCategory.entries.filter { it.supportsPuzzle(puzzle) && it.supportsScore(submission.score) }.toMutableSet()
         val possibleManifolds = submission.score.manifolds.toMutableSet()
         val beatingWitnesses = mutableMapOf<OmScoreManifold, OmMemoryRecord>()
         val beatenCR = mutableSetOf<CategoryRecord<OmRecord?, OmCategory>>()
@@ -218,7 +219,7 @@ class OmSolutionRepository(
                 if (!strictlyWorse) {
                     val beatenCategories = mRecord.categories.filter { category ->
                         category.associatedManifold == manifold && category.supportsScore(submission.score) &&
-                                category.scoreComparator.compare(submission.score, record.score)
+                                category.scoreComparators[puzzle.type]!!.compare(submission.score, record.score)
                                     .let {
                                         it < 0 || it == 0 && submission.displayLink != record.displayLink
                                     }

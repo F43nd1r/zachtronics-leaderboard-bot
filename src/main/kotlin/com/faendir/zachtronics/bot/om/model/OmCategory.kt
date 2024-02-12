@@ -18,14 +18,28 @@ package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.om.model.OmMetric.*
+import com.faendir.zachtronics.bot.om.model.OmScoreManifold.*
 import com.faendir.zachtronics.bot.om.model.OmType.*
 
 
 private val NORMAL_TYPES = setOf(NORMAL, POLYMER)
 private val PRODUCTION_TYPES = setOf(PRODUCTION)
 
+private val DEFAULT_TIEBREAKERS = mapOf(
+    VICTORY to mapOf(
+        NORMAL to listOf(OVERLAP, COST, CYCLES, AREA, LOOPING, INSTRUCTIONS, TRACKLESS, HEIGHT, WIDTH),
+        POLYMER to listOf(OVERLAP, COST, CYCLES, AREA, LOOPING, INSTRUCTIONS, TRACKLESS, HEIGHT, WIDTH),
+        PRODUCTION to listOf(OVERLAP, COST, CYCLES, INSTRUCTIONS, LOOPING, AREA, TRACKLESS),
+    ),
+    INFINITY to mapOf(
+        NORMAL to listOf(OVERLAP, COST, RATE, AREA_INF, INSTRUCTIONS, TRACKLESS, HEIGHT_INF, WIDTH_INF),
+        POLYMER to listOf(OVERLAP, COST, RATE, AREA_INF, INSTRUCTIONS, TRACKLESS, HEIGHT_INF),
+        PRODUCTION to listOf(OVERLAP, COST, RATE, INSTRUCTIONS, AREA_INF, TRACKLESS),
+    )
+)
+
 enum class OmCategory(
-    override val supportedTypes: Set<OmType> = OmType.entries.toSet(),
+    override val supportedTypes: Set<OmType>,
     vararg metricsVararg: OmMetric,
     override val displayName: String = metricsVararg.take(if (metricsVararg.first() is Modifier) 3 else 2).joinToString("") { it.displayName }
 ) : Category {
@@ -62,10 +76,10 @@ enum class OmCategory(
 
     SUM4_G(NORMAL_TYPES, SUM4, COST, displayName = "Sum4"),
 
-    HG(NORMAL_TYPES, OmMetric.HEIGHT, COST, CYCLES, displayName = "HG"),
-    HEIGHT(NORMAL_TYPES, OmMetric.HEIGHT, CYCLES, COST, displayName = "HC"),
-    WG(setOf(NORMAL), OmMetric.WIDTH, COST, CYCLES, displayName = "WG"),
-    WIDTH(setOf(NORMAL), OmMetric.WIDTH, CYCLES, COST, displayName = "WC"),
+    HG(NORMAL_TYPES, HEIGHT, COST, CYCLES),
+    HC(NORMAL_TYPES, HEIGHT, CYCLES, COST),
+    WG(setOf(NORMAL), WIDTH, COST, CYCLES),
+    HW(setOf(NORMAL), WIDTH, CYCLES, COST),
 
     OGC(NORMAL_TYPES, OVERLAP, COST, CYCLES, AREA),
     OCX(NORMAL_TYPES, OVERLAP, CYCLES, PRODUCT_GA),
@@ -92,13 +106,15 @@ enum class OmCategory(
     override val metrics: List<OmMetric> = metricsVararg.toList()
     val requiredParts: Set<ScorePart<*>> = metrics.flatMapTo(HashSet()) { it.scoreParts }
     val associatedManifold = OmScoreManifold.entries.single { it.scoreParts.containsAll(requiredParts) }
-    val scoreComparator: Comparator<OmScore> =
-        metrics.filter { it !is Modifier }.map(OmMetric::comparator).reduce(Comparator<OmScore>::thenComparing)
+    val scoreComparators: Map<OmType, Comparator<OmScore>> =
+        DEFAULT_TIEBREAKERS[associatedManifold]!!.mapValues { (_, tiebreakers) ->
+            (metrics + (tiebreakers - metrics)).map(OmMetric::comparator).reduce(Comparator<OmScore>::thenComparing)
+        }
 
     fun supportsPuzzle(puzzle: OmPuzzle) = supportedTypes.contains(puzzle.type)
 
     fun supportsScore(score: OmScore) =
         (requiredParts.contains(OVERLAP) || !score.overlap) &&
                 (!requiredParts.contains(TRACKLESS) || score.trackless) &&
-                (!(requiredParts.contains(LOOPING) || associatedManifold == OmScoreManifold.INFINITY) || score.looping)
+                (!(requiredParts.contains(LOOPING) || associatedManifold == INFINITY) || score.looping)
 }
