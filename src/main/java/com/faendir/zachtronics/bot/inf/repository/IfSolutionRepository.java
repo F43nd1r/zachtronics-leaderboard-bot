@@ -53,9 +53,11 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
     private final Class<IfCategory> categoryClass = IfCategory.class;
     private final Function<String[], IfSolution> solUnmarshaller = IfSolution::unmarshal;
     private final Comparator<IfSolution> archiveComparator =
-            Comparator.comparing(IfSolution::getScore, CF.getScoreComparator()
-                                                         .thenComparing(IfScore::isOutOfBounds)
-                                                         .thenComparing(IfScore::usesGRA));
+        Comparator.comparing(IfSolution::getScore, Comparator.comparing(IfScore::getCycles)
+                                                             .thenComparing(IfScore::getFootprint)
+                                                             .thenComparing(IfScore::getBlocks)
+                                                             .thenComparing(IfScore::isOutOfBounds)
+                                                             .thenComparing(IfScore::usesGRA));
     private final List<IfPuzzle> trackedPuzzles = List.of(IfPuzzle.values());
 
     @Override
