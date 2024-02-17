@@ -50,11 +50,10 @@ public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPu
     private final CommandOption<String, IfScore> scoreOption = CommandOptionBuilder.string("score")
             .description("Score of the solution in ccc/fff/bbb[/OGF] format")
             .convert((event, score) -> {
-                if (score != null)
-                    return IfScore.parseScore(score);
-                if (IfSecured.WIKI_ADMINS_ONLY.hasExecutionPermission(event))
-                    return null;
-                throw new IllegalArgumentException("Only a wiki admin can load scores from savefile");
+                IfScore ifScore = IfScore.parseScore(score);
+                if (ifScore != null)
+                    return ifScore;
+                throw new IllegalArgumentException("Invalid score: " + score);
             })
             .build();
     private final CommandOption<String, List<String>> videosOption = CommandOptionBuilder.string("videos")
@@ -75,6 +74,7 @@ public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPu
     public Collection<ValidationResult<IfSubmission>> parseSubmissions(@NotNull ChatInputInteractionEvent event) {
         IfScore score = scoreOption.get(event);
         List<String> videos = videosOption.get(event);
+        boolean isAdmin = IfSecured.WIKI_ADMINS_ONLY.hasExecutionPermission(event);
 
         Collection<ValidationResult<IfSubmission>> results = IfSubmission.fromLink(solutionOption.get(event),
                                                                                    authorOption.get(event),

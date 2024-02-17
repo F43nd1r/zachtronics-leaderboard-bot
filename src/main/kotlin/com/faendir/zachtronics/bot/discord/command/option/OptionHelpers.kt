@@ -41,7 +41,7 @@ fun <T : Enum<T>> enumOptionBuilder(name: String, type: Class<T>, displayName: T
             } else {
                 autoComplete { partial -> values.fuzzyMatch(partial) { displayName() }.associate { it.displayName() to it.displayName() } }
                     .convert { name ->
-                        name?.let {
+                        name.let {
                             val match = values.fuzzyMatch(it) { displayName() }
                             when (match.size) {
                                 0 -> throw IllegalArgumentException("I did not recognize \"$name\".")

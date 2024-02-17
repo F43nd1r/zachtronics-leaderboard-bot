@@ -55,7 +55,7 @@ public class ScSubmitCommand extends AbstractMultiSubmitCommand<ScCategory, ScPu
     private final CommandOption<Boolean, Boolean> bypassValidationOption = CommandOptionBuilder.bool("bypass-validation")
             .description("Skips running SChem on the solutions. Admin-only")
             .convert((event, bypass) -> {
-                if (bypass != null && bypass && !ScSecured.WIKI_ADMINS_ONLY.hasExecutionPermission(event)) {
+                if (bypass && !ScSecured.WIKI_ADMINS_ONLY.hasExecutionPermission(event)) {
                     throw new IllegalArgumentException("Only a wiki admin can use this parameter");
                 }
                 return bypass;

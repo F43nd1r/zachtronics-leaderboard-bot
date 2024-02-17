@@ -42,7 +42,7 @@ data class CommandOption<T, R>(
     val choices: Map<String, T & Any>?,
     private val autoComplete: ((partial: T & Any) -> Map<String, T & Any>)?,
     private val getValue: (ApplicationCommandInteractionOptionValue) -> T,
-    private val convert: InteractionCreateEvent.(T) -> R,
+    private val convert: InteractionCreateEvent.(T & Any) -> R,
 ) {
 
     @Suppress("UNCHECKED_CAST")
@@ -86,7 +86,7 @@ class CommandOptionBuilder<T, R> private constructor(
     private val type: ApplicationCommandOption.Type,
     private val name: String,
     private val getValue: (ApplicationCommandInteractionOptionValue) -> T,
-    private var convert: InteractionCreateEvent.(T) -> R,
+    private var convert: InteractionCreateEvent.(T & Any) -> R,
 ) {
     private var required: Boolean = false
     private var description: String? = null
@@ -104,7 +104,7 @@ class CommandOptionBuilder<T, R> private constructor(
 
     fun autoComplete(autoComplete: (partial: T & Any) -> Map<String, T & Any>) = apply { this.autoComplete = autoComplete }
 
-    fun <U> convert(convert: InteractionCreateEvent.(T) -> U): CommandOptionBuilder<T, U> {
+    fun <U> convert(convert: InteractionCreateEvent.(T & Any) -> U): CommandOptionBuilder<T, U> {
         @Suppress("UNCHECKED_CAST")
         return (this as CommandOptionBuilder<T, U>).apply {
             this.convert = convert
