@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -59,7 +60,8 @@ import java.util.stream.Collectors;
  */
 public class IfValidator {
 
-    public static Collection<ValidationResult<IfSubmission>> validateSavefile(@NotNull String data, @NotNull String author, IfScore score) {
+    public static Collection<ValidationResult<IfSubmission>> validateSavefile(@NotNull String data, @NotNull String author, IfScore score,
+                                                                              boolean isAdmin) {
         Map<String, IfSolutionInfo> infosByIdSlot = new LinkedHashMap<>(); // 1-1.0 -> {...}
         Function<String[], IfSolutionInfo> find =
             keyParts -> infosByIdSlot.computeIfAbsent(keyParts[1] + "." + keyParts[2], p -> new IfSolutionInfo());
@@ -69,12 +71,7 @@ public class IfValidator {
             String[] kv = line.split("\\s*=\\s*", 2);
             String[] keyParts = kv[0].split("\\.");
             String value = kv[1];
-            if (value.isBlank()) {
-                // empty flags are different from null flags
-                if (keyParts[0].equals("Last") && keyParts.length == 4 && keyParts[3].equals("Flags"))
-                    find.apply(keyParts).loadFlags("");
-            }
-            else if (keyParts[0].equals("InputRate") && keyParts.length == 3) // InputRate.1-1.0 = 1
+            if (keyParts[0].equals("InputRate") && keyParts.length == 3) // InputRate.1-1.0 = 1
                 find.apply(keyParts).setInputRate(Integer.parseInt(value));
             else if (keyParts[0].equals("Solution") && keyParts.length == 3) // Solution.1-1.0 = AwAAAAAAAAA=
                 find.apply(keyParts).setSolution(value);
@@ -89,22 +86,24 @@ public class IfValidator {
                     case "Footprint" -> // Last.1-1.0.Footprint = 47
                         find.apply(keyParts).setFootprint(Integer.parseInt(value));
                     case "Flags" -> // Last.1-1.0.Flags = F
-                        find.apply(keyParts).loadFlags(value);
+                        find.apply(keyParts).setFlags(value.trim());
                 }
             }
         }
         return infosByIdSlot.entrySet()
                             .stream()
                             .filter(e -> e.getKey().matches("1?\\d-\\db?\\.\\d")) // main game puzzles only
-                            .map(e -> validateOne(e.getKey(), e.getValue(), author, score))
+                            .map(e -> validateOne(e.getKey(), e.getValue(), author, score, isAdmin))
                             .toList();
     }
 
+    private static final Pattern FLAGS_REGEX = Pattern.compile("/?" + IfScore.FLAGS_REGEX);
+
     @NotNull
     private static ValidationResult<IfSubmission> validateOne(@NotNull String idSlot, @NotNull IfSolutionInfo info, String author,
-                                                              IfScore score) {
-        if (!(info.hasData() && (info.hasScore() || score != null)))
-            return new ValidationResult.Unparseable<>("Incomplete data for idSlot: " + idSlot);
+                                                              IfScore score, boolean isAdmin) {
+        if (!info.hasData())
+            return new ValidationResult.Unparseable<>("Incomplete necessary data for idSlot: " + idSlot);
         IfSave save;
         try {
             save = IfSave.unmarshal(info.getSolution());
@@ -112,17 +111,44 @@ public class IfValidator {
         catch (Exception e) {
             return new ValidationResult.Unparseable<>("Unparseable solution string for idSlot: " + idSlot);
         }
+
         String id = idSlot.replaceFirst("\\.\\d$", "");
         IfPuzzle puzzle = Arrays.stream(IfPuzzle.values())
                                 .filter(p -> p.getId().equals(id))
                                 .findFirst().orElse(null);
         if (puzzle == null)
             return new ValidationResult.Unparseable<>("Unknown puzzle: " + id);
-        // if we have no score we load it from the file, by extending reasonable trust to it
+
+        // if we have no score we load it from the file
+        // users must give the flags explicitly, admins can deduce the flags from the solution
         if (score == null) {
-            score = new IfScore(info.getCycles(), info.getFootprint(), info.getBlocks(),
-                                info.isOutOfBounds(), info.usesGRA() && couldHaveGRA(save, puzzle),
-                                info.isFinite() && puzzle.getType() == IfType.STANDARD); // boss doesn't track finite
+            if (!info.hasScore())
+                return new ValidationResult.Unparseable<>("Incomplete score data for idSlot: " + idSlot);
+
+            boolean outOfBounds;
+            boolean usesGRA;
+            boolean finite;
+            if (info.getFlags() == null) {
+                if (isAdmin) {
+                    outOfBounds = false;
+                    usesGRA = couldHaveGRA(save, puzzle);
+                    finite = puzzle.getType() != IfType.BOSS; // boss doesn't track finiteness
+                }
+                else
+                    return new ValidationResult.Unparseable<>("Missing score flags for idSlot: " + idSlot);
+            }
+            else {
+                Matcher m = FLAGS_REGEX.matcher(info.getFlags());
+                if (m.matches()) {
+                    outOfBounds = m.group("Oflag") != null;
+                    usesGRA = m.group("GRAflag") != null;
+                    finite = m.group("Fflag") != null;
+                }
+                else
+                    return new ValidationResult.Unparseable<>("Invalid score flags for idSlot: " + idSlot + " flags: " + info.getFlags());
+            }
+
+            score = new IfScore(info.getCycles(), info.getFootprint(), info.getBlocks(), outOfBounds, usesGRA, finite);
         }
         if (info.getAuthor() != null) // prefer a custom savefile-specified author
             author = info.getAuthor();

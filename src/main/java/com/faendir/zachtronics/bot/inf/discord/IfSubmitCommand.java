@@ -78,7 +78,7 @@ public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPu
 
         Collection<ValidationResult<IfSubmission>> results = IfSubmission.fromLink(solutionOption.get(event),
                                                                                    authorOption.get(event),
-                                                                                   score);
+                                                                                   score, isAdmin);
         if (videos != null || score != null) {
             if (results.size() != 1)
                 throw new IllegalArgumentException("Only one solution can be paired with videos or explicit score");

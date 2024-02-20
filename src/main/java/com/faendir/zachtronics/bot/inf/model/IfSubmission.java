@@ -42,13 +42,15 @@ public class IfSubmission implements Submission<IfCategory, IfPuzzle> {
     }
 
     @NotNull
-    public static Collection<ValidationResult<IfSubmission>> fromData(@NotNull String data, @NotNull String author, IfScore score) {
-        return IfValidator.validateSavefile(data, author, score);
+    public static Collection<ValidationResult<IfSubmission>> fromData(@NotNull String data, @NotNull String author, IfScore score,
+                                                                      boolean isAdmin) {
+        return IfValidator.validateSavefile(data, author, score, isAdmin);
     }
 
     @NotNull
-    public static Collection<ValidationResult<IfSubmission>> fromLink(@NotNull String link, @NotNull String author, IfScore score) {
+    public static Collection<ValidationResult<IfSubmission>> fromLink(@NotNull String link, @NotNull String author, IfScore score,
+                                                                      boolean isAdmin) {
         String data = Utils.downloadSolutionFile(link);
-        return fromData(data, author, score);
+        return fromData(data, author, score, isAdmin);
     }
 }

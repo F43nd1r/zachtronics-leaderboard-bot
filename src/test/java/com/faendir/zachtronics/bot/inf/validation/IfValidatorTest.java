@@ -24,9 +24,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class IfValidatorTest {
 
@@ -36,16 +36,16 @@ class IfValidatorTest {
                          InputRate.1-1.1 = 1
                          Solution.1-1.1 = AwAAAAAAAAA=
                          """;
-        String author = "12345ieee";
+        String author = "User";
         IfScore score = new IfScore(1, 1, 0, false, false, false);
-        IfSubmission result = IfValidator.validateSavefile(content, author, score).iterator().next().getSubmission();
+        IfSubmission result = IfValidator.validateSavefile(content, author, score, false).iterator().next().getSubmission();
         IfSubmission expected = new IfSubmission(IfPuzzle.LEVEL_1_1, score, author, Collections.emptyList(),
                                                  content.replace("1-1.1", "1-1.0"));
         assertEquals(expected, result);
     }
 
     @Test
-    public void testMany() {
+    public void testManyAsAdmin() {
         String content = """
                          Best.1-1.Blocks = 0
                          Best.1-1.Cycles = 44
@@ -62,10 +62,55 @@ class IfValidatorTest {
                          Solution.1-1.1 = AwAAAAAAAAA=
                          """;
         String author = "12345ieee";
-        Collection<ValidationResult<IfSubmission>> results = IfValidator.validateSavefile(content, author, null);
+        Collection<ValidationResult<IfSubmission>> results = IfValidator.validateSavefile(content, author, null, true);
 
         assertEquals(2, results.size());
-        assertTrue(results.stream().allMatch(v -> v instanceof ValidationResult.Valid<IfSubmission>));
+        results.forEach(v -> assertInstanceOf(ValidationResult.Valid.class, v));
         assertEquals(new IfScore(44, 47, 0, false, false, true), results.iterator().next().getSubmission().getScore());
+    }
+
+    @Test
+    public void testMany() {
+        String content = """
+                         Best.1-1.Blocks = 0
+                         Best.1-1.Cycles = 44
+                         Best.1-1.Footprint = 21
+                         InputRate.1-1.0 = 1
+                         InputRate.1-1.1 = 1
+                         Last.1-1.0.Blocks = 0
+                         Last.1-1.0.Cycles = 44
+                         Last.1-1.0.Footprint = 47
+                         Last.1-1.0.Flags =
+                         Solution.1-1.0 = AwAAAAAAAAA=
+                         Last.1-1.1.Blocks = 0
+                         Last.1-1.1.Cycles = 58
+                         Last.1-1.1.Footprint = 21
+                         Last.1-1.1.Flags = /F
+                         Solution.1-1.1 = AwAAAAAAAAA=
+                         """;
+        String author = "User";
+        Collection<ValidationResult<IfSubmission>> results = IfValidator.validateSavefile(content, author, null, false);
+
+        assertEquals(2, results.size());
+        results.forEach(v -> assertInstanceOf(ValidationResult.Valid.class, v));
+        Iterator<ValidationResult<IfSubmission>> it = results.iterator();
+        assertFalse(it.next().getSubmission().getScore().isFinite());
+        assertTrue(it.next().getSubmission().getScore().isFinite());
+    }
+
+    @Test
+    public void testBad() {
+        String content = """
+                         InputRate.1-1.2 = 1
+                         Last.1-1.2.Blocks = 0
+                         Last.1-1.2.Cycles = 55
+                         Last.1-1.2.Footprint = 33
+                         Solution.1-1.2 = AwAAAAAAAAA=
+                         """;
+        String author = "User";
+        Collection<ValidationResult<IfSubmission>> results = IfValidator.validateSavefile(content, author, null, false);
+
+        assertEquals(1, results.size());
+        assertInstanceOf(ValidationResult.Unparseable.class, results.iterator().next());
     }
 }
