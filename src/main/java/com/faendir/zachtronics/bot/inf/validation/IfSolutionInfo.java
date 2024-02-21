@@ -32,6 +32,7 @@ class IfSolutionInfo {
     String flags;
 
     String author;
+    String videos;
 
     boolean hasData() {
         return inputRate != null && solution != null;

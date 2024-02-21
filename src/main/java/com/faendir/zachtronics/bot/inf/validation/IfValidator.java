@@ -17,8 +17,10 @@
 package com.faendir.zachtronics.bot.inf.validation;
 
 import com.faendir.zachtronics.bot.inf.model.*;
+import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -45,10 +47,11 @@ import java.util.stream.Collectors;
  * </pre>
  * the solution is a base64 encoded string represented by {@link IfSave}<br><br>
  *
- * On top of that we support the 2 extensions:
+ * On top of that we support the extensions:
  * <pre>
  * Last.1-1.0.Flags = [/][O][G][F]
  * Author.1-1.0 = someGuy
+ * Videos.1-1.0 = one.link[,two.link,...]
  * </pre>
  * to set extra fields that aren't in the savefile<br><br>
  *
@@ -60,7 +63,8 @@ import java.util.stream.Collectors;
  */
 public class IfValidator {
 
-    public static Collection<ValidationResult<IfSubmission>> validateSavefile(@NotNull String data, @NotNull String author, IfScore score,
+    public static Collection<ValidationResult<IfSubmission>> validateSavefile(@NotNull String data, @NotNull String author,
+                                                                              @Nullable IfScore score, @Nullable List<String> videos,
                                                                               boolean isAdmin) {
         Map<String, IfSolutionInfo> infosByIdSlot = new LinkedHashMap<>(); // 1-1.0 -> {...}
         Function<String[], IfSolutionInfo> find =
@@ -70,14 +74,20 @@ public class IfValidator {
             if (!line.contains("=")) continue;
             String[] kv = line.split("\\s*=\\s*", 2);
             String[] keyParts = kv[0].split("\\.");
-            String value = kv[1];
-            if (keyParts[0].equals("InputRate") && keyParts.length == 3) // InputRate.1-1.0 = 1
-                find.apply(keyParts).setInputRate(Integer.parseInt(value));
-            else if (keyParts[0].equals("Solution") && keyParts.length == 3) // Solution.1-1.0 = AwAAAAAAAAA=
-                find.apply(keyParts).setSolution(value);
-            else if (keyParts[0].equals("Author") && keyParts.length == 3) // Author.1-1.0 = someGuy
-                find.apply(keyParts).setAuthor(value);
-            else if (keyParts[0].equals("Last") && keyParts.length == 4) {
+            String value = kv[1].trim();
+            if (keyParts.length == 3) {
+                switch (keyParts[0]) {
+                    case "InputRate" -> // InputRate.1-1.0 = 1
+                        find.apply(keyParts).setInputRate(Integer.parseInt(value));
+                    case "Solution" -> // Solution.1-1.0 = AwAAAAAAAAA=
+                        find.apply(keyParts).setSolution(value);
+                    case "Author" -> // Author.1-1.0 = someGuy
+                        find.apply(keyParts).setAuthor(value);
+                    case "Videos" -> // Videos.1-1.0 = one.link[,two.link,...]
+                        find.apply(keyParts).setVideos(value);
+                }
+            }
+            else if (keyParts.length == 4 && keyParts[0].equals("Last")) {
                 switch (keyParts[3]) {
                     case "Blocks" -> // Last.1-1.0.Blocks = 44
                         find.apply(keyParts).setBlocks(Integer.parseInt(value));
@@ -86,22 +96,26 @@ public class IfValidator {
                     case "Footprint" -> // Last.1-1.0.Footprint = 47
                         find.apply(keyParts).setFootprint(Integer.parseInt(value));
                     case "Flags" -> // Last.1-1.0.Flags = F
-                        find.apply(keyParts).setFlags(value.trim());
+                        find.apply(keyParts).setFlags(value);
                 }
             }
         }
+        infosByIdSlot.entrySet().removeIf(e -> !e.getKey().matches("1?\\d-\\db?\\.\\d")); // main game puzzles only
+
+        if ((videos != null || score != null) && infosByIdSlot.size() != 1)
+            throw new IllegalArgumentException("Only one solution can be paired with videos or explicit score");
+
         return infosByIdSlot.entrySet()
                             .stream()
-                            .filter(e -> e.getKey().matches("1?\\d-\\db?\\.\\d")) // main game puzzles only
-                            .map(e -> validateOne(e.getKey(), e.getValue(), author, score, isAdmin))
+                            .map(e -> validateOne(e.getKey(), e.getValue(), author, score, videos, isAdmin))
                             .toList();
     }
 
     private static final Pattern FLAGS_REGEX = Pattern.compile("/?" + IfScore.FLAGS_REGEX);
 
     @NotNull
-    private static ValidationResult<IfSubmission> validateOne(@NotNull String idSlot, @NotNull IfSolutionInfo info, String author,
-                                                              IfScore score, boolean isAdmin) {
+    private static ValidationResult<IfSubmission> validateOne(@NotNull String idSlot, @NotNull IfSolutionInfo info, @NotNull String author,
+                                                              @Nullable IfScore score, @Nullable List<String> videos, boolean isAdmin) {
         if (!info.hasData())
             return new ValidationResult.Unparseable<>("Incomplete necessary data for idSlot: " + idSlot);
         IfSave save;
@@ -152,12 +166,20 @@ public class IfValidator {
         }
         if (info.getAuthor() != null) // prefer a custom savefile-specified author
             author = info.getAuthor();
+        if (info.getVideos() != null) // prefer a custom savefile-specified videos list
+            videos = Pattern.compile(",").splitAsStream(info.getVideos())
+                            .peek(l -> {
+                                if (!UtilsKt.isValidLink(l))
+                                    throw new IllegalArgumentException("\"" + l + "\" is not a valid link");
+                            })
+                            .toList();
+        else if (videos == null)
+            videos = Collections.emptyList();
         String leaderboardData = String.format("""
                                                InputRate.%s.0 = %d
                                                Solution.%s.0 = %s
                                                """, id, info.getInputRate(), id, info.getSolution());
-        // we use a mutable list, as we could fill it later with display links if we have a single valid submission
-        IfSubmission submission = new IfSubmission(puzzle, score, author, new ArrayList<>(), leaderboardData);
+        IfSubmission submission = new IfSubmission(puzzle, score, author, videos, leaderboardData);
 
         // each level has 10 outputs, plus one cycle of travel
         if (score.getCycles() <= 10)

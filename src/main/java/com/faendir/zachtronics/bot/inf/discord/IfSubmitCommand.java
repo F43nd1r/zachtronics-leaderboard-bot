@@ -76,18 +76,6 @@ public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPu
         List<String> videos = videosOption.get(event);
         boolean isAdmin = IfSecured.WIKI_ADMINS_ONLY.hasExecutionPermission(event);
 
-        Collection<ValidationResult<IfSubmission>> results = IfSubmission.fromLink(solutionOption.get(event),
-                                                                                   authorOption.get(event),
-                                                                                   score, isAdmin);
-        if (videos != null || score != null) {
-            if (results.size() != 1)
-                throw new IllegalArgumentException("Only one solution can be paired with videos or explicit score");
-
-            ValidationResult<IfSubmission> result = results.iterator().next();
-            if (videos != null && result instanceof ValidationResult.Valid<IfSubmission>) {
-                result.getSubmission().getDisplayLinks().addAll(videos);
-            }
-        }
-        return results;
+        return IfSubmission.fromLink(solutionOption.get(event), authorOption.get(event), score, videos, isAdmin);
     }
 }
