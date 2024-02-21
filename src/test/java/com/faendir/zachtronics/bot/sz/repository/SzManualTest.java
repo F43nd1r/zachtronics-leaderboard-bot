@@ -76,9 +76,9 @@ public class SzManualTest {
 
     @Test
     public void submitSaveFolder() throws IOException {
-        String author = "12345ieee";
+        String author = "someGuy";
 
-        Path savesPath = Paths.get("../shenzhenIO/saves");
+        Path savesPath = Paths.get("../shenzhenIO/other_saves/" + author);
         /*
         cp -a ../shenzhenIO/leaderboard/* src/test/resources/repositories/sz-leaderboard/
          */
@@ -94,19 +94,21 @@ public class SzManualTest {
                     catch (Exception e) {
                         if (e instanceof ValidationException) {
                             String message = e.getMessage();
-                            if (message.equals("Solution must be solved") || message.matches("Declared (?:cost|lines): .+"))
+                            if (message.equals("Solution must be solved") || message.matches("Declared (?:cost|lines): .+") ||
+                                message.startsWith("Unknown puzzle: "))
                                 continue;
                         }
                         System.err.println(path);
                         throw e;
                     }
 
-                    repository.submit(submission);
+                    System.out.println(repository.submit(submission));
                 }
             }
         }
 
         /*
+        rm -r src/test/resources/repositories/sz-leaderboard/
         git restore --source=HEAD --staged --worktree -- src/test/resources/repositories/sz-leaderboard/
         rsync -a --delete --exclude=README.txt $(ls -1dt /tmp/sz-leaderboard* | head -n1)/* ../shenzhenIO/leaderboard/
          */

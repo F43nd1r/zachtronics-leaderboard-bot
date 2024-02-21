@@ -34,7 +34,7 @@ class SzSaveTest {
         SzSave save = SzSave.unmarshal(solution);
 
         assertEquals("Top solution Power", save.getName());
-        assertEquals(SzPuzzle.Sz000, save.getPuzzle());
+        assertEquals(SzPuzzle.Sz000.name(), save.getPuzzle());
         assertEquals(6, save.cost());
         assertEquals(57, save.getPowerUsage());
         assertEquals(8, save.lines());

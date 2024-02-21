@@ -21,8 +21,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-import static com.faendir.zachtronics.bot.sz.validation.SzValidator.getBoolean;
-import static com.faendir.zachtronics.bot.sz.validation.SzValidator.getInt;
+import static com.faendir.zachtronics.bot.sz.validation.SzSave.getBoolean;
+import static com.faendir.zachtronics.bot.sz.validation.SzSave.getInt;
 
 /**
  * <pre>
@@ -45,7 +45,7 @@ class SzChipPGA implements SzChip {
     boolean arraySwitch;
     @NotNull String arrayData;
 
-    static SzChipPGA unmarshal(@NotNull Map<String, String> chipMap) {
+    static @NotNull SzChipPGA unmarshal(@NotNull Map<String, String> chipMap) {
         return new SzChipPGA(getInt(chipMap, "x"),
                              getInt(chipMap, "y"),
                              getBoolean(chipMap, "array-switch"),

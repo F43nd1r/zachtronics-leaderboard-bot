@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-import static com.faendir.zachtronics.bot.sz.validation.SzValidator.getInt;
+import static com.faendir.zachtronics.bot.sz.validation.SzSave.getInt;
 
 
 /**
@@ -31,7 +31,6 @@ import static com.faendir.zachtronics.bot.sz.validation.SzValidator.getInt;
  * [x] 13
  * [y] 4
  * </pre>
- * rotated is absent if false
  */
 @Value
 class SzChipRAM implements SzChip {
@@ -41,7 +40,7 @@ class SzChipRAM implements SzChip {
     int x;
     int y;
 
-    static SzChipRAM unmarshal(@NotNull Map<String, String> chipMap) {
+    static @NotNull SzChipRAM unmarshal(@NotNull Map<String, String> chipMap) {
         return new SzChipRAM(getInt(chipMap, "x"),
                              getInt(chipMap, "y"));
     }

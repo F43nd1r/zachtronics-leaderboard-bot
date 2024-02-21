@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 
-import static com.faendir.zachtronics.bot.sz.validation.SzValidator.getInt;
+import static com.faendir.zachtronics.bot.sz.validation.SzSave.getInt;
 
 /**
  * <pre>
@@ -45,7 +45,7 @@ class SzChipUC4 implements SzChipUC {
     int y;
     @NotNull List<SzCodeLine> lines;
 
-    static SzChipUC4 unmarshal(SzChipType type, @NotNull Map<String, String> chipMap) {
+    static @NotNull SzChipUC4 unmarshal(@NotNull SzChipType type, @NotNull Map<String, String> chipMap) {
         return new SzChipUC4(type,
                              getInt(chipMap, "x"),
                              getInt(chipMap, "y"),

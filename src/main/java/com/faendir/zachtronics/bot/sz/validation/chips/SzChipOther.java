@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-import static com.faendir.zachtronics.bot.sz.validation.SzValidator.getInt;
+import static com.faendir.zachtronics.bot.sz.validation.SzSave.getInt;
 
 
 /**
@@ -42,7 +42,7 @@ class SzChipOther implements SzChip {
     int x;
     int y;
 
-    static SzChipOther unmarshal(@NotNull Map<String, String> chipMap) {
+    static @NotNull SzChipOther unmarshal(@NotNull Map<String, String> chipMap) {
         return new SzChipOther(getInt(chipMap, "x"),
                                getInt(chipMap, "y"));
     }

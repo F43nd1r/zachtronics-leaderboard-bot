@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.sz.validation.chips;
 
-import com.faendir.zachtronics.bot.sz.validation.SzValidator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -36,12 +35,6 @@ public interface SzChip {
     int getCost();
     int getX();
     int getY();
-
-    @NotNull
-    static SzChip unmarshal(String block) {
-        Map<String, String> chipMap = SzValidator.readAllTags(block);
-        return unmarshal(chipMap);
-    }
 
     @NotNull
     static SzChip unmarshal(@NotNull Map<String, String> chipMap) {

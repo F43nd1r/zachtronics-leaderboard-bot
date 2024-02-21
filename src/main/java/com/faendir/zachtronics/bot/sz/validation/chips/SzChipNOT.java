@@ -21,8 +21,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-import static com.faendir.zachtronics.bot.sz.validation.SzValidator.getBoolean;
-import static com.faendir.zachtronics.bot.sz.validation.SzValidator.getInt;
+import static com.faendir.zachtronics.bot.sz.validation.SzSave.getBoolean;
+import static com.faendir.zachtronics.bot.sz.validation.SzSave.getInt;
 
 
 /**
@@ -44,7 +44,7 @@ class SzChipNOT implements SzChip {
     int y;
     boolean rotated;
 
-    static SzChipNOT unmarshal(@NotNull Map<String, String> chipMap) {
+    static @NotNull SzChipNOT unmarshal(@NotNull Map<String, String> chipMap) {
         return new SzChipNOT(getInt(chipMap, "x"),
                              getInt(chipMap, "y"),
                              getBoolean(chipMap, "rotated"));

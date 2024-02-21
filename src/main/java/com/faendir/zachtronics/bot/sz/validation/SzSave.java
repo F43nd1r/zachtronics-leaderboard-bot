@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.sz.validation;
 
-import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.validation.chips.SzChip;
 import com.faendir.zachtronics.bot.sz.validation.chips.SzChipUC;
 import com.faendir.zachtronics.bot.validation.ValidationException;
@@ -25,18 +24,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static com.faendir.zachtronics.bot.sz.validation.SzValidator.getIntOrNull;
-
 @Value
-class SzSave {
+public class SzSave {
     private static final Pattern TRACES_REGEX = Pattern.compile("[\\.0-9A-Z]{22}\\n".repeat(14));
 
     @NotNull String name;
-    @NotNull SzPuzzle puzzle;
+    @NotNull String puzzle;
     /** in Yen cents */
     @Nullable Integer productionCost;
     @Nullable Integer powerUsage;
@@ -55,23 +53,70 @@ class SzSave {
         String metadataBlock = blocks.get(0);
         if (!metadataBlock.startsWith("[name]"))
             throw new ValidationException("Invalid solution file, first block: \"" + metadataBlock + "\"");
-        Map<String, String> metadataMap = SzValidator.readAllTags(metadataBlock);
+        Map<String, String> metadataMap = readAllTags(metadataBlock);
 
         String tracesBlock = blocks.get(1);
-        String traces = SzValidator.readTag(tracesBlock, "traces");
+        String traces = readTag(tracesBlock, "traces");
         if (!TRACES_REGEX.matcher(traces).matches())
             throw new ValidationException("traces");
 
         List<String> chipBlocks = blocks.subList(2, blocks.size());
-        List<SzChip> chips = chipBlocks.stream().map(SzChip::unmarshal).toList();
+        List<SzChip> chips = chipBlocks.stream()
+                                       .map(SzSave::readAllTags)
+                                       .map(SzChip::unmarshal)
+                                       .toList();
 
         return new SzSave(metadataMap.get("name"),
-                          SzPuzzle.valueOf(metadataMap.get("puzzle")),
+                          metadataMap.get("puzzle"),
                           getIntOrNull(metadataMap, "production-cost"),
                           getIntOrNull(metadataMap, "power-usage"),
                           getIntOrNull(metadataMap, "lines-of-code"),
                           traces,
                           chips);
+    }
+
+
+    @NotNull
+    private static String readTag(@NotNull String block, @NotNull String tag) {
+        if (block.startsWith("[" + tag + "]")) {
+            int headerLength = tag.length() + 2;
+            return block.substring(headerLength).stripLeading();
+        }
+        else
+            throw new ValidationException("No [" + tag + "] in \"" + block + "\"");
+    }
+
+    @NotNull
+    private static Map<String, String> readAllTags(@NotNull String lines) {
+        String[] blocks = Pattern.compile("\\n(?:(?=\\[)|$)").split(lines);
+        Map<String, String> result = new HashMap<>();
+        for (String block : blocks) {
+            String tag = block.substring(1, block.indexOf(']'));
+            String content = block.substring(block.indexOf(']') + 1).stripLeading();
+            result.put(tag, content);
+        }
+        return result;
+    }
+
+    /** absent = exception */
+    public static int getInt(@NotNull Map<String, String> map, @NotNull String tag) {
+        String candidate = map.get(tag);
+        if (candidate != null)
+            return Integer.parseInt(candidate);
+        else
+            throw new ValidationException("No [" + tag + "] in map");
+    }
+
+    /** absent = null */
+    @Nullable
+    public static Integer getIntOrNull(@NotNull Map<String, String> map, @NotNull String tag) {
+        String candidate = map.get(tag);
+        return candidate == null ? null : Integer.valueOf(candidate);
+    }
+
+    /** absent = false */
+    public static boolean getBoolean(@NotNull Map<String, String> map, @NotNull String tag) {
+        return Boolean.parseBoolean(map.get(tag));
     }
 
     public int cost() {
