@@ -104,9 +104,9 @@ class CommandOptionBuilder<T, R> private constructor(
 
     fun autoComplete(autoComplete: (partial: T & Any) -> Map<String, T & Any>) = apply { this.autoComplete = autoComplete }
 
-    fun <U> convert(convert: InteractionCreateEvent.(T & Any) -> U): CommandOptionBuilder<T, U> {
+    fun <U> convert(convert: InteractionCreateEvent.(T & Any) -> U): CommandOptionBuilder<T, U?> {
         @Suppress("UNCHECKED_CAST")
-        return (this as CommandOptionBuilder<T, U>).apply {
+        return (this as CommandOptionBuilder<T, U?>).apply {
             this.convert = convert
         }
     }

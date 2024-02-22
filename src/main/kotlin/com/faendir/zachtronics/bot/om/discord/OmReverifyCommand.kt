@@ -30,6 +30,7 @@ import com.faendir.zachtronics.bot.om.getScore
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
+import com.faendir.zachtronics.bot.om.model.OmScoreManifold
 import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.om.omPuzzleOptionBuilder
 import com.faendir.zachtronics.bot.om.omScoreOptionBuilder
@@ -48,24 +49,30 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.
 
     private val typeOption = enumOptionBuilder<OmType>("type") { displayName }.build()
     private val puzzleOption = omPuzzleOptionBuilder().build()
+    private val manifoldOption = enumOptionBuilder<OmScoreManifold>("manifold") { name }.build()
     private val scoreOption = omScoreOptionBuilder().build()
-    override val options = listOf(typeOption, puzzleOption, scoreOption)
+    override val options = listOf(typeOption, puzzleOption, manifoldOption, scoreOption)
 
     override val secured = DiscordUserSecured(DiscordUser.OM_LB_ADMINS)
 
     override fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder {
         val puzzleIn = puzzleOption.get(event)
         val type = typeOption.get(event)
+        val manifold = manifoldOption.get(event)
         val score = scoreOption.get(event)
         val puzzles = (puzzleIn?.let { listOf(it) } ?: OmPuzzle.entries).filter {
             type == null || type == it.type
         }
+
         val overrideRecords = mutableListOf<Pair<OmRecord, OmScore>>()
         for (puzzle in puzzles) {
             val puzzleFile = puzzle.file
-
             val records = repository.findCategoryHolders(puzzle, true)
-                .filter { (record, _) -> score == null || record.score.toDisplayString().equals(score, ignoreCase = true) }
+                .filter { (record, _) ->
+                    (manifold == null || manifold in record.score.manifolds) &&
+                            (score == null || record.score.toDisplayString().equals(score, ignoreCase = true))
+                }
+
             for ((record, _) in records) {
                 val newScore = JNISolutionVerifier.open(puzzleFile.readBytes(), record.dataPath.readBytes())
                     .use { verifier -> verifier.getScore(puzzle.type) }
@@ -78,7 +85,7 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.
             repository.overrideScores(overrideRecords)
         }
         return MultiMessageSafeEmbedMessageBuilder().title(
-                "Reverify" + type?.displayName.orEmpty(" ") + puzzleIn?.displayName.orEmpty(" ")
+                "Reverify" + type?.displayName.orEmpty(" ") + manifold?.displayName.orEmpty(" ") + puzzleIn?.displayName.orEmpty(" ")
             )
             .description(
                 """
