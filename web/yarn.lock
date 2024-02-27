@@ -1939,9 +1939,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emotion/react@npm:11.11.3":
-  version: 11.11.3
-  resolution: "@emotion/react@npm:11.11.3"
+"@emotion/react@npm:11.11.4":
+  version: 11.11.4
+  resolution: "@emotion/react@npm:11.11.4"
   dependencies:
     "@babel/runtime": "npm:^7.18.3"
     "@emotion/babel-plugin": "npm:^11.11.0"
@@ -1956,7 +1956,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10c0/ce995395b8714343715284beb8478afdfa72b89ed83981a15a170ca0f4a2f77d7a4a198fd50c1f9c6efcd0535768d168ff88c5921dc5f90bb33134c7a75f9455
+  checksum: 10c0/6df892fd9e04b5c8c37aacfd7f461631e04e00e845edc3c5b2955ab8ad681abf5cd49584101f579427e08b82f2f88369c78d37ae2fe9360a8f68fd4e51b8e448
   languageName: node
   linkType: hard
 
@@ -14010,7 +14010,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "zlbb@workspace:."
   dependencies:
-    "@emotion/react": "npm:11.11.3"
+    "@emotion/react": "npm:11.11.4"
     "@emotion/styled": "npm:11.11.0"
     "@mui/icons-material": "npm:5.15.11"
     "@mui/lab": "npm:5.0.0-alpha.166"
