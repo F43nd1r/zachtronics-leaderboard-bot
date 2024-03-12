@@ -3378,12 +3378,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:20.11.25":
-  version: 20.11.25
-  resolution: "@types/node@npm:20.11.25"
+"@types/node@npm:20.11.26":
+  version: 20.11.26
+  resolution: "@types/node@npm:20.11.26"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10c0/3a65a0469309d503e572a3198d81c9248876236b1bcc0c9943e995cfa536df7ce9a9302638258984877420d1613167a8a82dbfb3a92197319fb79ebebf9abc83
+  checksum: 10c0/2df81e4f109588c4c490f2c7d616a06d2b3b9298f217468134b80711af810c9a6017a59beb3e6b1c596eb9b6c5a39d33403b99179acb89006badfbc55f2468bb
   languageName: node
   linkType: hard
 
@@ -14020,7 +14020,7 @@ __metadata:
     "@sinclair/typebox": "npm:0.32.15"
     "@types/d3-format": "npm:3.0.4"
     "@types/jest": "npm:29.5.12"
-    "@types/node": "npm:20.11.25"
+    "@types/node": "npm:20.11.26"
     "@types/plotly.js": "npm:2.29.2"
     "@types/react": "npm:18.2.64"
     "@types/react-dom": "npm:18.2.21"
