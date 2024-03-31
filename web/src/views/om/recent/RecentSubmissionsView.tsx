@@ -36,6 +36,7 @@ import { usePersistedState } from "../../../utils/usePersistedState"
 import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material"
 import { OmRecord } from "../../../model/om/OmRecord"
 import { Type } from "@sinclair/typebox"
+import { Link } from "react-router-dom"
 
 enum SinceLast {
     DAY = 1000 * 60 * 60 * 24,
@@ -82,7 +83,17 @@ export default function RecentSubmissionsView() {
                 element={(changes) => (
                     <OmRecordGrid
                         records={changes.reverse()}
-                        getTitle={(record) => record.puzzle.displayName}
+                        getTitle={(record) => (
+                            <Link
+                                to={`/puzzles/${record.puzzle.id}`}
+                                style={{
+                                    color: "inherit",
+                                    textDecoration: "none",
+                                }}
+                            >
+                                {record.puzzle.displayName}
+                            </Link>
+                        )}
                         getScore={(record) => record.fullFormattedScore ?? "None"}
                     />
                 )}

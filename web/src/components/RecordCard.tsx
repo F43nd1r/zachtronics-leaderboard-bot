@@ -23,7 +23,7 @@ import { useInView } from "react-intersection-observer"
 
 export interface RecordCardProps<RECORD extends RecordDTO<any> = RecordDTO<any>> {
     record: RECORD
-    title: string
+    title: ReactNode
     score: ReactNode
     additionalActions?: ReactNode
 }

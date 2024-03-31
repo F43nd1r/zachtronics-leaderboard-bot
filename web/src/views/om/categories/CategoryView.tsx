@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import OmRecordGrid from "../../../components/OmRecordGrid"
 import ApiResource from "../../../utils/ApiResource"
 import fetchFromApi from "../../../utils/fetchFromApi"
@@ -34,7 +34,21 @@ export default function CategoryView() {
         <ApiResource<OmRecord[]>
             url={`/om/category/${categoryId}/records`}
             element={(records) => (
-                <OmRecordGrid records={records} getTitle={(record) => record.puzzle.displayName} getScore={(record) => record.smartFormattedScore ?? record.fullFormattedScore ?? "None"} />
+                <OmRecordGrid
+                    records={records}
+                    getTitle={(record) => (
+                        <Link
+                            to={`/puzzles/${record.puzzle.id}`}
+                            style={{
+                                color: "inherit",
+                                textDecoration: "none",
+                            }}
+                        >
+                            {record.puzzle.displayName}
+                        </Link>
+                    )}
+                    getScore={(record) => record.smartFormattedScore ?? record.fullFormattedScore ?? "None"}
+                />
             )}
         />
     )

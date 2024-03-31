@@ -17,10 +17,11 @@
 import { Grid } from "@mui/material"
 import OmRecordCard from "./OmRecordCard"
 import { OmRecord } from "../model/om/OmRecord"
+import { ReactNode } from "react"
 
 interface RecordGridProps {
     records: OmRecord[]
-    getTitle: (record: OmRecord) => string
+    getTitle: (record: OmRecord) => ReactNode
     getScore: (record: OmRecord) => string
 }
 
