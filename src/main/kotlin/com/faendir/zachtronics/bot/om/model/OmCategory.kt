@@ -42,7 +42,7 @@ private val DEFAULT_TIEBREAKERS = mapOf(
 enum class OmCategory(
     override val supportedTypes: Set<OmType>,
     vararg metricsVararg: OmMetric,
-    override val displayName: String = metricsVararg.take(if (metricsVararg.first() is Modifier) 3 else 2).joinToString("") { it.displayName }
+    override val displayName: String = metricsVararg.take(if (metricsVararg.first() is Modifier) 3 else 2).joinToString("") { it.displayName },
 ) : Category {
     GC(NORMAL_TYPES, COST, CYCLES, AREA),
     GA(NORMAL_TYPES, COST, AREA, CYCLES),
@@ -87,9 +87,9 @@ enum class OmCategory(
     OAC(NORMAL_TYPES, OVERLAP, AREA, CYCLES, COST),
     OIC(NORMAL_TYPES, OVERLAP, INSTRUCTIONS, CYCLES, COST),
 
-    TIG(NORMAL_TYPES, TRACKLESS_INSTRUCTION, COST, CYCLES),
-    TIC(NORMAL_TYPES, TRACKLESS_INSTRUCTION, CYCLES, COST),
-    TIA(NORMAL_TYPES, TRACKLESS_INSTRUCTION, AREA, COST),
+    TIG(NORMAL_TYPES, TRACKLESS, INSTRUCTIONS, COST, CYCLES),
+    TIC(NORMAL_TYPES, TRACKLESS, INSTRUCTIONS, CYCLES, COST),
+    TIA(NORMAL_TYPES, TRACKLESS, INSTRUCTIONS, AREA, COST),
 
     TG(NORMAL_TYPES, TRACKLESS, COST, CYCLES, displayName = "TG"),
     TC(NORMAL_TYPES, TRACKLESS, CYCLES, COST, displayName = "TC"),

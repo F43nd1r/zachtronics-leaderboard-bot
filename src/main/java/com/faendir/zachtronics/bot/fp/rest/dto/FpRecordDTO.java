@@ -21,7 +21,7 @@ import com.faendir.zachtronics.bot.fp.model.FpRecord;
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.dto.RecordDTO;
-import com.faendir.zachtronics.bot.utils.UtilsKt;
+import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +47,7 @@ public class FpRecordDTO implements RecordDTO<FpScoreDTO> {
                 record.getAuthor(),
                 record.getDisplayLink(),
                 record.getDataLink(),
-                UtilsKt.smartFormat(categories, UtilsKt.toMetricsTree(record.getPuzzle().getSupportedCategories()))
+                MetricsTreeKt.smartFormat(categories, record.getPuzzle().getSupportedCategories())
         );
     }
 

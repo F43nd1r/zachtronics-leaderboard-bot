@@ -19,4 +19,5 @@ package com.faendir.zachtronics.bot.model
 /** Represents a statistic either natively tracked or computed about solutions */
 interface Metric {
     val displayName: String
+    val collapsible: Boolean get() = true
 }

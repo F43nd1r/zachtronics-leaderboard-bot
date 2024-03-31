@@ -24,7 +24,6 @@ import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.rest.dto.RecordDTO
 import com.faendir.zachtronics.bot.utils.smartFormat
-import com.faendir.zachtronics.bot.utils.toMetricsTree
 import kotlinx.datetime.toJavaInstant
 
 val OmRecord.id get() = score.toDisplayString(DisplayContext.fileName())
@@ -54,7 +53,7 @@ fun CategoryRecord<OmRecord, OmCategory>.toDTO() =
         gif = record.displayLink,
         solution = record.dataLink,
         categoryIds = categories.map { it.name },
-        smartFormattedCategories = categories.smartFormat(record.puzzle.supportedCategories.toMetricsTree()),
+        smartFormattedCategories = categories.smartFormat(record.puzzle.supportedCategories),
         lastModified = record.lastModified?.toJavaInstant(),
     )
 

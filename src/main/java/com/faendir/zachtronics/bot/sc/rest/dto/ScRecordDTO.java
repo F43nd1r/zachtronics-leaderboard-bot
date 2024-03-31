@@ -21,7 +21,7 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.dto.RecordDTO;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
-import com.faendir.zachtronics.bot.utils.UtilsKt;
+import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +47,7 @@ public class ScRecordDTO implements RecordDTO<ScScoreDTO> {
                 record.getAuthor(),
                 record.getDisplayLink(),
                 record.getDataLink(),
-                UtilsKt.smartFormat(categories, UtilsKt.toMetricsTree(record.getPuzzle().getSupportedCategories()))
+                MetricsTreeKt.smartFormat(categories, record.getPuzzle().getSupportedCategories())
         );
     }
 

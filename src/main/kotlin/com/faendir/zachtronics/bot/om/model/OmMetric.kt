@@ -80,6 +80,7 @@ sealed interface OmMetric : Metric {
         override val comparator: Comparator<OmScore> =
             Comparator.comparing(getValueFrom).let { if (reverseOrder) it.reversed() else it }
         override val description: String = displayName
+        override val collapsible: Boolean = false
 
         override fun describe(score: OmScore, format: StringFormat): String? = if (getValueFrom(score)) displayName else null
     }
@@ -116,25 +117,16 @@ sealed interface OmMetric : Metric {
             extract(score)?.let { "$description=${numberFormat.format(it)}" }
     }
 
-    sealed class Concatenation(final override vararg val partVararg: ScorePart<*>) : Computed {
-        final override val displayName: String = partVararg.joinToString("") { it.displayName }
-        override val comparator: Comparator<OmScore> = partVararg.map { it.comparator }.reduce(Comparator<OmScore>::thenComparing)
-        override val description: String = displayName
+    data object COST : NumericValue<Int>("G", 'g', MeasurePoint.START, OmScore::cost)
+    data object INSTRUCTIONS : NumericValue<Int>("I", 'i', MeasurePoint.START, OmScore::instructions)
 
-        /** will be described as the underlying score metrics */
-        override fun describe(score: OmScore, format: StringFormat): String? = null
-    }
+    data object CYCLES : NumericValue<Int>("C", 'c', MeasurePoint.VICTORY, OmScore::cycles)
+    data object AREA : NumericValue<Int>("A", 'a', MeasurePoint.VICTORY, OmScore::area)
+    data object HEIGHT : NumericValue<Int>("H", 'h', MeasurePoint.VICTORY, OmScore::height)
+    data object WIDTH : NumericValue<Double>("W", 'w', MeasurePoint.VICTORY, OmScore::width)
 
-    object COST : NumericValue<Int>("G", 'g', MeasurePoint.START, OmScore::cost)
-    object INSTRUCTIONS : NumericValue<Int>("I", 'i', MeasurePoint.START, OmScore::instructions)
-
-    object CYCLES : NumericValue<Int>("C", 'c', MeasurePoint.VICTORY, OmScore::cycles)
-    object AREA : NumericValue<Int>("A", 'a', MeasurePoint.VICTORY, OmScore::area)
-    object HEIGHT : NumericValue<Int>("H", 'h', MeasurePoint.VICTORY, OmScore::height)
-    object WIDTH : NumericValue<Double>("W", 'w', MeasurePoint.VICTORY, OmScore::width)
-
-    object RATE : NumericValue<Double>("R", 'r', MeasurePoint.INFINITY, OmScore::rate)
-    object AREA_INF : Value<LevelValue>("A@∞", 'a', MeasurePoint.INFINITY, OmScore::areaINF,
+    data object RATE : NumericValue<Double>("R", 'r', MeasurePoint.INFINITY, OmScore::rate)
+    data object AREA_INF : Value<LevelValue>("A@∞", 'a', MeasurePoint.INFINITY, OmScore::areaINF,
         { s -> s.areaINF?.run { value * 10.0.pow(5 * level) } }) {
         override fun describe(score: OmScore, format: StringFormat): String? {
             val area = score.areaINF ?: return null
@@ -144,7 +136,7 @@ sealed interface OmMetric : Metric {
             }
         }
     }
-    object HEIGHT_INF : Value<InfinInt>("H@∞", 'h', MeasurePoint.INFINITY, OmScore::heightINF, { it.heightINF?.toDouble() }) {
+    data object HEIGHT_INF : Value<InfinInt>("H@∞", 'h', MeasurePoint.INFINITY, OmScore::heightINF, { it.heightINF?.toDouble() }) {
         override fun describe(score: OmScore, format: StringFormat): String? {
             val height = getValueFrom(score) ?: return null
             return when (format) {
@@ -152,31 +144,32 @@ sealed interface OmMetric : Metric {
                 else -> "$height$scoreId"
             }
         }
+
+        override val collapsible: Boolean = false
     }
-    object WIDTH_INF : NumericValue<Double>("W@∞", 'w', MeasurePoint.INFINITY, OmScore::widthINF) {
+    data object WIDTH_INF : NumericValue<Double>("W@∞", 'w', MeasurePoint.INFINITY, OmScore::widthINF) {
         override fun describe(score: OmScore, format: StringFormat): String? =
             super.describe(score, format)?.run { if (format == StringFormat.FILE_NAME) replace("∞", "INF") else this }
+
+        override val collapsible: Boolean = false
     }
 
-    object OVERLAP : Modifier("O", MeasurePoint.START, OmScore::overlap)
-    object TRACKLESS : Modifier("T", MeasurePoint.START, OmScore::trackless, reverseOrder = true)
-    object LOOPING : Modifier("L", MeasurePoint.INFINITY, OmScore::looping, reverseOrder = true)
+    data object OVERLAP : Modifier("O", MeasurePoint.START, OmScore::overlap)
+    data object TRACKLESS : Modifier("T", MeasurePoint.START, OmScore::trackless, reverseOrder = true)
+    data object LOOPING : Modifier("L", MeasurePoint.INFINITY, OmScore::looping, reverseOrder = true)
 
-    object SUM3A : Sum("Sum", COST, CYCLES, AREA)
-    object SUM3I : Sum("Sum", COST, CYCLES, INSTRUCTIONS)
-    object SUM4 : Sum("Sum4", COST, CYCLES, AREA, INSTRUCTIONS)
+    data object SUM3A : Sum("Sum", COST, CYCLES, AREA)
+    data object SUM3I : Sum("Sum", COST, CYCLES, INSTRUCTIONS)
+    data object SUM4 : Sum("Sum4", COST, CYCLES, AREA, INSTRUCTIONS)
 
-    object PRODUCT_GC : Product(COST, CYCLES)
-    object PRODUCT_GA : Product(COST, AREA)
-    object PRODUCT_GI : Product(COST, INSTRUCTIONS)
-    object PRODUCT_CA : Product(CYCLES, AREA)
-    object PRODUCT_CI : Product(CYCLES, INSTRUCTIONS)
+    data object PRODUCT_GC : Product(COST, CYCLES)
+    data object PRODUCT_GA : Product(COST, AREA)
+    data object PRODUCT_GI : Product(COST, INSTRUCTIONS)
+    data object PRODUCT_CA : Product(CYCLES, AREA)
+    data object PRODUCT_CI : Product(CYCLES, INSTRUCTIONS)
 
-    object PRODUCT_GA_INF : Product(COST, AREA_INF)
-    object PRODUCT_AI_INF : Product(AREA_INF, INSTRUCTIONS)
-
-    // hack: don't want to show just "T", so need two-in-one
-    object TRACKLESS_INSTRUCTION : Concatenation(TRACKLESS, INSTRUCTIONS)
+    data object PRODUCT_GA_INF : Product(COST, AREA_INF)
+    data object PRODUCT_AI_INF : Product(AREA_INF, INSTRUCTIONS)
 
     /**
      * @property displayName @X

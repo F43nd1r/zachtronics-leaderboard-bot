@@ -27,7 +27,6 @@ import com.faendir.zachtronics.bot.model.Submission
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.orEmpty
 import com.faendir.zachtronics.bot.utils.smartFormat
-import com.faendir.zachtronics.bot.utils.toMetricsTree
 import com.faendir.zachtronics.bot.validation.ValidationResult
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 
@@ -63,7 +62,7 @@ abstract class AbstractMultiSubmitCommand<C : Category, P : Puzzle<C>, S : Submi
                         ((submitResult as? SubmitResult.Success)?.beatenRecords
                             ?.flatMap { it.categories }
                             ?.takeIf { it.isNotEmpty() }
-                            ?.smartFormat(validationResult.submission.puzzle.supportedCategories.toMetricsTree())
+                            ?.smartFormat(validationResult.submission.puzzle.supportedCategories)
                             .orEmpty(prefix = " "))
             }
             val value = when (validationResult) {

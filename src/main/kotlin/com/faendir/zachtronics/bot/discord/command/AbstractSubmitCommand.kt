@@ -30,7 +30,6 @@ import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.orEmpty
 import com.faendir.zachtronics.bot.utils.smartFormat
-import com.faendir.zachtronics.bot.utils.toMetricsTree
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 
 abstract class AbstractSubmitCommand<C : Category, P : Puzzle<C>, S : Submission<C, P>, R : Record<C>> : Command.BasicLeaf() {
@@ -51,7 +50,7 @@ abstract class AbstractSubmitCommand<C : Category, P : Puzzle<C>, S : Submission
                 return MultiMessageSafeEmbedMessageBuilder()
                     .title(
                         "Success: *${submission.puzzle.displayName}* ${
-                            beatenCategories.takeIf { it.isNotEmpty() }?.smartFormat(submission.puzzle.supportedCategories.toMetricsTree()) ?: "Pareto"
+                            beatenCategories.takeIf { it.isNotEmpty() }?.smartFormat(submission.puzzle.supportedCategories) ?: "Pareto"
                         }"
                     )
                     .url(submission.puzzle.link)
@@ -69,7 +68,7 @@ abstract class AbstractSubmitCommand<C : Category, P : Puzzle<C>, S : Submission
             is SubmitResult.Updated ->
                 return MultiMessageSafeEmbedMessageBuilder()
                     .title("Updated: *${submission.puzzle.displayName}* ${
-                        result.oldRecord.categories.takeIf { it.isNotEmpty() }?.smartFormat(submission.puzzle.supportedCategories.toMetricsTree()) ?: "Pareto"
+                        result.oldRecord.categories.takeIf { it.isNotEmpty() }?.smartFormat(submission.puzzle.supportedCategories) ?: "Pareto"
                     }")
                     .url(submission.puzzle.link)
                     .color(Colors.SUCCESS)

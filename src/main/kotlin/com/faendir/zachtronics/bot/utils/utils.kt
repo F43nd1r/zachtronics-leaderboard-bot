@@ -21,7 +21,6 @@ import com.faendir.zachtronics.bot.discord.embed.EmbedLimits
 import com.faendir.zachtronics.bot.discord.embed.SafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.model.Category
 import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.model.Metric
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.repository.CategoryRecord
@@ -63,21 +62,8 @@ fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> 
         }
 }
 
-fun Collection<Category>.toMetricsTree(): TreeRoot<Pair<Metric, Category?>> = TreeRoot<Pair<Metric, Category?>>().also { tree ->
-    forEach { category -> tree.addPath(category.metrics.dropLast(1).map { it to null } + (category.metrics.last() to category)) }
-}
-
-fun Collection<Category>.smartFormat(reference: TreeRoot<Pair<Metric, Category?>>): String {
-    val metricsTree = toMetricsTree()
-    metricsTree.collapseFullyPresentNodes(reference)
-    val shortenedCategories = metricsTree.getAllPaths()
-        .map { list -> list.map { it.first } to list.last().second }
-        .map { (metrics, category) -> category?.displayName ?: metrics.joinToString("") { it.displayName } }
-    return shortenedCategories.joinToString(", ")
-}
-
 @Suppress("UNCHECKED_CAST")
-fun <B: SafeEmbedMessageBuilder<B>, R : Record<C>?, C : Category> B.embedCategoryRecords(
+fun <B : SafeEmbedMessageBuilder<B>, R : Record<C>?, C : Category> B.embedCategoryRecords(
     records: Iterable<CategoryRecord<R, C>>,
     supportedCategories: Collection<C> = emptyList()
 ): B {
@@ -94,16 +80,15 @@ fun <B: SafeEmbedMessageBuilder<B>, R : Record<C>?, C : Category> B.embedCategor
     )
 }
 
-fun <B: SafeEmbedMessageBuilder<B>, R : Record<C>?, C : Category> B.embedRecords(
+fun <B : SafeEmbedMessageBuilder<B>, R : Record<C>?, C : Category> B.embedRecords(
     records: Iterable<CategoryRecord<R, C>>,
     supportedCategories: Collection<C> = emptyList(),
     formatCategorySpecific: Boolean = false
 ): B {
-    val reference = supportedCategories.toMetricsTree()
     return this.addFields(
         records.map { (record, categories) ->
             EmbedCreateFields.Field.of(
-                categories.smartFormat(reference).ifEmptyZeroWidthSpace(),
+                categories.smartFormat(supportedCategories).ifEmptyZeroWidthSpace(),
                 record?.toDisplayString(DisplayContext(StringFormat.DISCORD, categories.takeIf { formatCategorySpecific })) ?: "none",
                 true
             )
@@ -131,7 +116,7 @@ fun String.ifEmptyZeroWidthSpace() = ifEmpty { "\u200B" }
 
 fun String?.orEmpty(prefix: String = "", suffix: String = "") = this?.let { prefix + it + suffix } ?: ""
 
-inline fun <reified T: Enum<T>> newEnumSet(): EnumSet<T> = EnumSet.noneOf(T::class.java)
+inline fun <reified T : Enum<T>> newEnumSet(): EnumSet<T> = EnumSet.noneOf(T::class.java)
 
 fun isValidLink(string: String): Boolean {
     return try {

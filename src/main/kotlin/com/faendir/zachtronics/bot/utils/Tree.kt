@@ -17,24 +17,24 @@
 package com.faendir.zachtronics.bot.utils
 
 abstract class Node<T> {
+    // not a set because [DataNode] equals/hashCode is mutable
     protected val children: MutableList<DataNode<T>> = mutableListOf()
+
+    fun add(child: T): DataNode<T> = DataNode(child).also { children.add(it) }
 
     fun addPath(path: List<T>) {
         if (path.isEmpty()) return
         val data = path.first()
-        (children.find { it.data == data } ?: DataNode(data).also { children.add(it) }).addPath(path.drop(1))
+        (children.find { it.data == data } ?: add(data)).addPath(path.drop(1))
     }
 
-    fun collapseFullyPresentNodes(reference: Node<T>) {
-        for (referenceChild in reference.children) {
-            val child = children.find { it.data == referenceChild.data } ?: continue
-            if (child == referenceChild) {
-                child.children.clear()
-            } else {
-                child.collapseFullyPresentNodes(referenceChild)
-            }
-        }
+    fun removeAllChildren() {
+        children.clear()
     }
+
+    fun getChildren(): Set<DataNode<T>> = children.toSet()
+
+    abstract fun getAllPaths(): Set<List<T>>
 }
 
 class DataNode<T>(val data: T) : Node<T>() {
@@ -45,10 +45,10 @@ class DataNode<T>(val data: T) : Node<T>() {
 
     override fun hashCode(): Int = data.hashCode() + 31 * children.toSet().hashCode()
 
-    fun getAllPaths(): Set<List<T>> =
+    override fun getAllPaths(): Set<List<T>> =
         if (children.isEmpty()) setOf(listOf(data)) else children.flatMap { node -> node.getAllPaths().map { listOf(data) + it } }.toSet()
 }
 
 class TreeRoot<T> : Node<T>() {
-    fun getAllPaths() = children.flatMap { it.getAllPaths() }
+    override fun getAllPaths(): Set<List<T>> = children.flatMapTo(mutableSetOf()) { it.getAllPaths() }
 }

@@ -32,7 +32,6 @@ import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.orEmpty
 import com.faendir.zachtronics.bot.utils.smartFormat
-import com.faendir.zachtronics.bot.utils.toMetricsTree
 import com.faendir.zachtronics.bot.utils.user
 import com.roxstudio.utils.CUrl
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
@@ -63,9 +62,7 @@ class OmStatsCommand(private val repository: OmSolutionRepository) : Command.Bas
                     .description(
                         "`${submission.score.toDisplayString(DisplayContext.discord())}`"
                                 + (if (beatenCategories.isEmpty()) " would be included in the pareto frontier." else " would be ${
-                            beatenCategories.smartFormat(
-                                submission.puzzle.supportedCategories.toMetricsTree()
-                            )
+                            beatenCategories.smartFormat(submission.puzzle.supportedCategories)
                         }")
                                 + (result.message.orEmpty(prefix = "\n"))
                                 + (if (result.beatenRecords.isNotEmpty()) "\nWould beat:" else "")

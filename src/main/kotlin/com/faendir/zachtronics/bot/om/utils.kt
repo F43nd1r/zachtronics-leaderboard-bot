@@ -44,7 +44,6 @@ import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
 import com.faendir.zachtronics.bot.utils.LevelValue
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.smartFormat
-import com.faendir.zachtronics.bot.utils.toMetricsTree
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.entity.channel.MessageChannel
@@ -200,7 +199,7 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
             } else {
                 sendDiscordMessage(
                     MultiMessageSafeEmbedMessageBuilder()
-                        .title("New Submission: *${record.puzzle.displayName}* ${beatenCategories.smartFormat(record.puzzle.supportedCategories.toMetricsTree())}")
+                        .title("New Submission: *${record.puzzle.displayName}* ${beatenCategories.smartFormat(record.puzzle.supportedCategories)}")
                         .url(record.puzzle.link)
                         .color(Colors.SUCCESS)
                         .description(
@@ -221,7 +220,7 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
                 MultiMessageSafeEmbedMessageBuilder()
                     .title(
                         "Updated: *${puzzle.displayName}* ${
-                            submitResult.oldRecord.categories.takeIf { it.isNotEmpty() }?.smartFormat(puzzle.supportedCategories.toMetricsTree()) ?: "Pareto"
+                            submitResult.oldRecord.categories.takeIf { it.isNotEmpty() }?.smartFormat(puzzle.supportedCategories) ?: "Pareto"
                         }"
                     )
                     .color(Colors.SUCCESS)
