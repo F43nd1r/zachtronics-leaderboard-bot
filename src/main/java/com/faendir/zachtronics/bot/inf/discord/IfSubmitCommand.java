@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
 @Component
 @IfQualifier
 public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPuzzle, IfSubmission, IfRecord> {
-    private final CommandOption<String, String> solutionOption = OptionHelpersKt.linkOptionBuilder("solution")
+    private final CommandOption<String, String> solutionOption = OptionHelpersKt.dataLinkOptionBuilder("solution")
             .description("Link or `m1` to scrape it from your last message.")
             .required()
             .build();
@@ -59,7 +59,7 @@ public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPu
     private final CommandOption<String, List<String>> videosOption = CommandOptionBuilder.string("videos")
             .description("Link(s) to the video(s) of the solution, accepts multiple separated by `,`")
             .convert((event, links) -> Pattern.compile(",").splitAsStream(links)
-                                              .map(l -> OptionHelpersKt.resolveLink(event, l))
+                                              .map(l -> OptionHelpersKt.resolveLink(event, l, false))
                                               .toList())
             .build();
     @Getter

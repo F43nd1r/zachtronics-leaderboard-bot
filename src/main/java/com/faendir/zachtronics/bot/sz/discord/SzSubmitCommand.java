@@ -39,7 +39,7 @@ import java.util.List;
 @Component
 @SzQualifier
 public class SzSubmitCommand extends AbstractSubmitCommand<SzCategory, SzPuzzle, SzSubmission, SzRecord> {
-    private final CommandOption<String, String> solutionOption = OptionHelpersKt.linkOptionBuilder("solution")
+    private final CommandOption<String, String> solutionOption = OptionHelpersKt.dataLinkOptionBuilder("solution")
             .description("Link to the solution file, can be `m1` to scrape it from your last message")
             .required()
             .build();
@@ -47,8 +47,8 @@ public class SzSubmitCommand extends AbstractSubmitCommand<SzCategory, SzPuzzle,
             .description("Name to appear on the Reddit leaderboard")
             .required()
             .build();
-    private final CommandOption<String, String> imageOption = OptionHelpersKt.linkOptionBuilder("image")
-            .description("Link to your image of the solution, can be `m1` to scrape it from your last message")
+    private final CommandOption<String, String> imageOption = OptionHelpersKt.displayLinkOptionBuilder("image")
+            .description("Link to your image of the solution")
             .build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, imageOption);

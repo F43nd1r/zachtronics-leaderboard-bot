@@ -42,7 +42,7 @@ import java.util.List;
 @Component
 @FcQualifier
 public class FcSubmitCommand extends AbstractMultiSubmitCommand<FcCategory, FcPuzzle, FcSubmission, FcRecord> {
-    private final CommandOption<String, String> solutionOption = OptionHelpersKt.linkOptionBuilder("solution")
+    private final CommandOption<String, String> solutionOption = OptionHelpersKt.dataLinkOptionBuilder("solution")
             .description("Link to the solution file, can be `m1` to scrape it from your last message or single solution text")
             .required()
             .build();
@@ -50,7 +50,7 @@ public class FcSubmitCommand extends AbstractMultiSubmitCommand<FcCategory, FcPu
             .description("Name to appear on the Reddit leaderboard")
             .required()
             .build();
-    private final CommandOption<String, String> imageOption = OptionHelpersKt.linkOptionBuilder("image")
+    private final CommandOption<String, String> imageOption = OptionHelpersKt.displayLinkOptionBuilder("image")
             .description("Link to your image of the solution, can be `m1` to scrape it from your last message")
             .build();
     @Getter

@@ -42,15 +42,15 @@ import java.util.List;
 @RequiredArgsConstructor
 @ScQualifier
 public class ScSubmitCommand extends AbstractMultiSubmitCommand<ScCategory, ScPuzzle, ScSubmission, ScRecord> {
-    private final CommandOption<String, String> exportOption = OptionHelpersKt.linkOptionBuilder("export")
+    private final CommandOption<String, String> exportOption = OptionHelpersKt.dataLinkOptionBuilder("export")
             .description("Link or `m1` to scrape it from your last message. Start the solution name with `/B?P?` to set flags")
             .required()
             .build();
     private final CommandOption<String, String> authorOption = CommandOptionBuilder.string("author")
             .description("Name to appear on the Reddit leaderboard")
             .build();
-    private final CommandOption<String, String> videoOption = OptionHelpersKt.linkOptionBuilder("video")
-            .description("Link to your video of the solution, can be `m1` to scrape it from your last message")
+    private final CommandOption<String, String> videoOption = OptionHelpersKt.displayLinkOptionBuilder("video")
+            .description("Link to your video of the solution")
             .build();
     private final CommandOption<Boolean, Boolean> bypassValidationOption = CommandOptionBuilder.bool("bypass-validation")
             .description("Skips running SChem on the solutions. Admin-only")

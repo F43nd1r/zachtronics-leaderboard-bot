@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.om.discord
 
 import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.discord.command.Command
-import com.faendir.zachtronics.bot.discord.command.option.linkOptionBuilder
+import com.faendir.zachtronics.bot.discord.command.option.displayLinkOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured
 import com.faendir.zachtronics.bot.discord.command.security.Secured
 import com.faendir.zachtronics.bot.discord.embed.MultiMessageSafeEmbedMessageBuilder
@@ -47,9 +47,9 @@ class OmSubmitCommand(private val repository: OmSolutionRepository, private val 
     override val description = "Submit a solution"
     override val ephemeral = true
     private val solutionOption = omSolutionOptionBuilder().required().build()
-    private val gifOption = linkOptionBuilder("gif")
+    private val gifOption = displayLinkOptionBuilder("gif")
         .required()
-        .description("Link to your solution gif/mp4, can be `m1` to scrape it from your last message")
+        .description("Link to your solution gif/mp4")
         .build()
     override val options = listOf(solutionOption, gifOption)
     override val secured: Secured = NotSecured

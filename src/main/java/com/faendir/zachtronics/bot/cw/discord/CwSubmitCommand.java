@@ -47,14 +47,14 @@ public class CwSubmitCommand extends AbstractMultiSubmitCommand<CwCategory, CwPu
     private final CommandOption<String, String> solutionOption = CommandOptionBuilder.string("solution")
             .description("Link to the solution file, can be `m1` to scrape it from your last message or single solution text")
             .required()
-            .convert((event, link) -> link.startsWith(SOLUTION_PREFIX) ? link : OptionHelpersKt.resolveLink(event, link))
+            .convert((event, link) -> link.startsWith(SOLUTION_PREFIX) ? link : OptionHelpersKt.resolveLink(event, link, true))
             .build();
     private final CommandOption<String, String> authorOption = CommandOptionBuilder.string("author")
             .description("Name to appear on the Reddit leaderboard")
             .required()
             .build();
-    private final CommandOption<String, String> imageOption = OptionHelpersKt.linkOptionBuilder("image")
-            .description("Link to your image of the solution, can be `m1` to scrape it from your last message")
+    private final CommandOption<String, String> imageOption = OptionHelpersKt.displayLinkOptionBuilder("image")
+            .description("Link to your image of the solution")
             .build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, imageOption);

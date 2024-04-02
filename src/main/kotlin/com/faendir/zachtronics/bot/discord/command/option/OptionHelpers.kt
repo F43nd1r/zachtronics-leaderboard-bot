@@ -23,9 +23,7 @@ import com.faendir.zachtronics.bot.utils.url
 import discord4j.common.util.Snowflake
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.core.`object`.command.Interaction
-import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.reaction.ReactionEmoji
-import reactor.core.publisher.Flux
 import reactor.kotlin.core.publisher.toFlux
 import java.time.Instant
 
@@ -54,39 +52,40 @@ fun <T : Enum<T>> enumOptionBuilder(name: String, type: Class<T>, displayName: T
         }
 }
 
-fun linkOptionBuilder(name: String) = CommandOptionBuilder.string(name)
+/** does not allow storage of discord links, as they expire shortly */
+fun displayLinkOptionBuilder(name: String) = CommandOptionBuilder.string(name)
+    .convert { link -> resolveLink(link, resolveDiscord = false) }
+fun dataLinkOptionBuilder(name: String) = CommandOptionBuilder.string(name)
     .convert { link -> resolveLink(link) }
 
-fun InteractionCreateEvent.resolveLink(link: String?): String? {
-    return link?.let { l ->
-        findLink(
-            interaction,
-            l.trim(),
-            interaction.channel.flatMapMany { channel ->
-                val lastMessageId = channel.lastMessageId.orElseGet { Snowflake.of(Instant.now()) }
-                channel.lastMessage.toFlux().concatWith(
-                    channel.getMessagesBefore(lastMessageId).filter { it.id.asLong() != lastMessageId.asLong() })
+private val discordLinkRegex = Regex("m(?<message>\\d{1,2})(\\.(?<attachment>\\d{1,2}))?")
+fun InteractionCreateEvent.resolveLink(text: String, resolveDiscord: Boolean = true): String {
+    var link = text.trim()
+    if (resolveDiscord)
+        link = discordLinkRegex.matchEntire(link)?.let { match ->
+            val num = match.groups["message"]!!.value.toInt()
+            val attachment = match.groups["attachment"]?.value?.toInt()
+            val message = interaction.messages().elementAt(num - 1).block()!!
+
+            message.attachments.getOrNull(attachment?.minus(1) ?: 0)?.url?.also {
+                message.addReaction(reactionEmoji(interaction)).block()
             }
-                .filter { it.author.isPresent && it.author.get() == interaction.user })
-    }
-}
-
-
-private val linkRegex = Regex("m(?<message>\\d{1,2})(\\.(?<attachment>\\d{1,2}))?")
-private fun findLink(interaction: Interaction, input: String, messages: Flux<Message>): String {
-    val link = linkRegex.matchEntire(input)?.let { match ->
-        val num = match.groups["message"]!!.value.toInt()
-        val attachment = match.groups["attachment"]?.value?.toInt()
-        val message = messages.elementAt(num - 1).block()!!
-        message.attachments.getOrNull(attachment?.minus(1) ?: 0)?.url?.also { message.addReaction(reactionEmoji(interaction)).block() }
-            ?: throw IllegalArgumentException("${message.url} had no attachments")
-    } ?: input
+                ?: throw IllegalArgumentException("${message.url} had no attachments")
+        } ?: link
 
     if (!isValidLink(link)) {
         throw IllegalArgumentException("\"$link\" is not a valid link")
     }
     return link
 }
+
+private fun Interaction.messages() =
+    channel.flatMapMany { channel ->
+        val lastMessageId = channel.lastMessageId.orElseGet { Snowflake.of(Instant.now()) }
+        channel.lastMessage.toFlux().concatWith(
+            channel.getMessagesBefore(lastMessageId).filter { it.id.asLong() != lastMessageId.asLong() })
+    }
+        .filter { it.author.isPresent && it.author.get() == user }
 
 private fun reactionEmoji(interaction: Interaction) =
     interaction.user.asDiscordUser()?.getSpecialEmoji?.invoke(interaction.guild.block()) ?: ReactionEmoji.unicode("\uD83D\uDC4D"/* 👍 */)
