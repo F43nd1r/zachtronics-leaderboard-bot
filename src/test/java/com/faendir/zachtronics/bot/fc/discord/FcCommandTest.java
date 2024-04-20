@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public class FcCommandTest {
     @Test
     @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses FoodCourtSim")
     public void testSubmitOne() {
-        Map<String, String> args = Map.of("solution", "https://cdn.discordapp.com/attachments/993498489717805076/1020989449531817984/2twelve-1.solution",
+        Map<String, String> args = Map.of("solution", "https://github.com/lastcallbbs-community-developers/foodcourt-leaderboard/raw/master/CAMPAIGN/2twelve/2twelve-8T-65k-16S-4W.solution",
                                           "author", "testMan");
         String result = runCommand("submit", args);
         assertTrue(result.contains("2Twelve") && result.contains("8T/65k/16S/4W"));
