@@ -109,12 +109,15 @@ function Categories() {
                             title={`Categories ${manifold.displayName}`}
                             icon={<CategoryIcon />}
                             content={categories
-                                .sort((a, b) => (a.puzzleTypes.includes("PRODUCTION") && !b.puzzleTypes.includes("PRODUCTION") ? 1 : -1))
+                                .sort((a, b) => (b.puzzleTypes.length - a.puzzleTypes.length)) // all then freespace then prods
                                 .map((category) => (
                                     <LinkListItem sx={{ pl: 4 }} key={category.id} to={`/categories/${category.id}`} selected={categoryId === category.id}>
                                         <ListItemText
-                                            primary={`${category.displayName} (${category.metrics.join("→")})${
-                                                category.puzzleTypes.includes("PRODUCTION") ? " (Production)" : ""
+                                            primary={`${category.displayName} (${category.metrics.filter(Boolean).join("→")})${
+                                                {'["NORMAL"]':' (Normal)',
+                                                 '["PRODUCTION"]':' (Production)',
+                                                 '["NORMAL","POLYMER"]':' (Freespace)'
+                                                }[JSON.stringify(category.puzzleTypes)] ?? " (All)"
                                             }`}
                                         />
                                     </LinkListItem>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,8 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
         private const val wikiPage = "index"
     }
 
-    private val costCategories = setOf(GC, GA, GX, GCP, GI, GXP)
-    private val cycleCategories = setOf(CG, CA, CX, CGP, CI, CXP)
+    private val costCategories = setOf(GC, GA, GX, GI, GXP)
+    private val cycleCategories = setOf(CG, CA, CX, CI, CXP)
     private val areaInstructionCategories = setOf(AG, AC, AX, IG, IC, IX)
     private val sumCategories = setOf(SUM_G, SUM_GP)
     private val categories = costCategories + cycleCategories + areaInstructionCategories + sumCategories
