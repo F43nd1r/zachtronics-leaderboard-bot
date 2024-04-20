@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,6 @@ import static com.faendir.zachtronics.bot.sz.validation.SzSave.getInt;
  */
 @Value
 class SzChipBinGate implements SzChip {
-    private static final int cost = 1;
-
     @NotNull SzChipType type;
     int x;
     int y;
@@ -49,10 +47,5 @@ class SzChipBinGate implements SzChip {
                                  getInt(chipMap, "x"),
                                  getInt(chipMap, "y"),
                                  getBoolean(chipMap, "rotated"));
-    }
-
-    @Override
-    public int getCost() {
-        return cost;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.sz.model.SzScore;
 import lombok.Value;
+import lombok.With;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
 public class SzSolution implements Solution<SzCategory, SzPuzzle, SzScore, SzRecord> {
     @NotNull SzScore score;
     @NotNull String author;
-    String displayLink;
+    @With String displayLink;
     /** empty if it holds no categories */
     EnumSet<SzCategory> categories = EnumSet.noneOf(SzCategory.class);
 

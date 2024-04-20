@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.sz.validation.chips;
 
+import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,25 +27,31 @@ import static com.faendir.zachtronics.bot.sz.validation.SzSave.getInt;
 /**
  * <pre>
  * [chip]
- * [type] BANK
+ * [type] NOTE
  * [x] 13
  * [y] 4
- * [rom]
- * -9,-90,-900,-101,0,-101,0,-101,0,-101,0,-101,999,-999
+ * [code]
+ * line1
+ * line2
+ * ...
  * </pre>
  */
 @Value
-class SzChipBANK implements SzChip {
-    private static final SzChipType type = SzChipType.BANK;
+public class SzChipNOTE implements SzChip {
+    private static final SzChipType type = SzChipType.NOTE;
 
     int x;
     int y;
-    @NotNull String rom;
+    @NotNull String[] lines;
 
-    static @NotNull SzChipBANK unmarshal(@NotNull Map<String, String> chipMap) {
-        return new SzChipBANK(getInt(chipMap, "x"),
+    static @NotNull SzChipNOTE unmarshal(@NotNull Map<String, String> chipMap) {
+        String[] lines = chipMap.get("code").split("\\n");
+        if (lines.length > 9)
+            throw new ValidationException("NOTE has " + lines.length + " LOC when the limit is 9");
+
+        return new SzChipNOTE(getInt(chipMap, "x"),
                               getInt(chipMap, "y"),
-                              chipMap.get("rom"));
+                              lines);
     }
 
     @NotNull

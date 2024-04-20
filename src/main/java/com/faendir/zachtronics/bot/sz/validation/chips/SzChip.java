@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.sz.validation.chips;
 
+import com.faendir.zachtronics.bot.validation.ValidationException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -32,8 +33,9 @@ import java.util.Map;
  */
 public interface SzChip {
     @NotNull SzChipType getType();
-    int getCost();
+    /** min 1 at left */
     int getX();
+    /** min 1 at the bottom */
     int getY();
 
     @NotNull
@@ -45,8 +47,17 @@ public interface SzChip {
         catch (IllegalArgumentException e) {
             type = SzChipType.OTHER;
         }
+        catch (NullPointerException e) {
+            throw new ValidationException("Missing chip type");
+        }
 
         switch (type) {
+            case NOTE -> {
+                return SzChipNOTE.unmarshal(chipMap);
+            }
+            case BRIDGE -> {
+                return SzChipBRIDGE.unmarshal(chipMap);
+            }
             case UC4, UC4X -> {
                 return SzChipUC4.unmarshal(type, chipMap);
             }

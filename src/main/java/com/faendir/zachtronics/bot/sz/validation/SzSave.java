@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,21 @@
 package com.faendir.zachtronics.bot.sz.validation;
 
 import com.faendir.zachtronics.bot.sz.validation.chips.SzChip;
+import com.faendir.zachtronics.bot.sz.validation.chips.SzChipType;
 import com.faendir.zachtronics.bot.sz.validation.chips.SzChipUC;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Value
 public class SzSave {
-    private static final Pattern TRACES_REGEX = Pattern.compile("[\\.0-9A-Z]{22}\\n".repeat(14));
+    private static final int BOARD_SIZE_X = 22;
+    private static final int BOARD_SIZE_Y = 14;
+    private static final Pattern TRACES_REGEX = Pattern.compile("(?:[.0-9A-Z]{22}\\n){14}");
 
     @NotNull String name;
     @NotNull String puzzle;
@@ -60,11 +60,15 @@ public class SzSave {
         if (!TRACES_REGEX.matcher(traces).matches())
             throw new ValidationException("traces");
 
-        List<String> chipBlocks = blocks.subList(2, blocks.size());
-        List<SzChip> chips = chipBlocks.stream()
-                                       .map(SzSave::readAllTags)
-                                       .map(SzChip::unmarshal)
-                                       .toList();
+        List<SzChip> chips = new ArrayList<>();
+        int[][] occupancy = new int[BOARD_SIZE_X][BOARD_SIZE_Y];
+        for (int chipIndex = 2; chipIndex < blocks.size(); chipIndex++) {
+            String block = blocks.get(chipIndex);
+            Map<String, String> tags = readAllTags(block);
+            SzChip chip = SzChip.unmarshal(tags);
+            fillOccupancy(occupancy, chip, chipIndex);
+            chips.add(chip);
+        }
 
         return new SzSave(metadataMap.get("name"),
                           metadataMap.get("puzzle"),
@@ -75,6 +79,24 @@ public class SzSave {
                           chips);
     }
 
+    private static void fillOccupancy(int[][] occupancy, @NotNull SzChip chip, int chipIndex) {
+        for (int dx = 0; dx < chip.getType().getSizeX(); dx++) {
+            for (int dy = 0; dy < chip.getType().getSizeY(); dy++) {
+                int x = chip.getX() + dx;
+                int y = chip.getY() + dy;
+                try {
+                    if (occupancy[x][y] != 0)
+                        throw new ValidationException("Point (" + x + ", " + y + ") already occupied by chip " + occupancy[x][y]);
+                    else
+                        occupancy[x][y] = chipIndex;
+                }
+                catch (IndexOutOfBoundsException e) {
+                    if (chip.getType() != SzChipType.NOTE) // allow notes to exist OOB, used for mass documentation
+                        throw new ValidationException("Point (" + x + ", " + y + ") is OOB");
+                }
+            }
+        }
+    }
 
     @NotNull
     private static String readTag(@NotNull String block, @NotNull String tag) {
@@ -124,7 +146,7 @@ public class SzSave {
             throw new ValidationException("Solution must be solved");
 
         int cost = chips.stream()
-                        .mapToInt(SzChip::getCost)
+                        .mapToInt(c -> c.getType().getCost())
                         .sum();
         if (cost * 100 != productionCost)
             throw new ValidationException("Declared cost: " + productionCost / 100 + ", effective cost: " + cost);

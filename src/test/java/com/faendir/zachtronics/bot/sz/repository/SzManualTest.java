@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,12 @@
 package com.faendir.zachtronics.bot.sz.repository;
 
 import com.faendir.zachtronics.bot.BotTest;
+import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.sz.model.*;
+import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
@@ -33,10 +35,11 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @BotTest
 @Disabled("Massive tests only for manual testing or migrations")
@@ -72,6 +75,48 @@ public class SzManualTest {
                                    .replaceAll("file:/tmp/sz-leaderboard[0-9]+/",
                                                "https://raw.githubusercontent.com/12345ieee/shenzhenIO-leaderboard/master");
         System.out.println(page);
+    }
+
+    @Test
+    public void validateLeaderboard() throws IOException {
+        Path repoPath = Paths.get("../shenzhenIO/leaderboard");
+
+        for (SzPuzzle puzzle : repository.getTrackedPuzzles()) {
+            Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
+            List<SzSolution> solutions = repository.unmarshalSolutions(puzzlePath);
+
+            for (SzSolution solution : solutions) {
+                Path dataPath = repository.makeArchivePath(puzzlePath, solution.getScore());
+                String data = Files.readString(dataPath);
+                SzSubmission submission = SzSubmission.fromData(data, solution.getAuthor(), solution.getDisplayLink());
+
+                assertEquals(puzzle, submission.getPuzzle());
+                assertEquals(solution.getScore(), submission.getScore());
+            }
+        }
+    }
+
+    @Test
+    public void tagNewCategories() throws IOException {
+        Path repoPath = Paths.get("../shenzhenIO/leaderboard");
+
+        for (SzPuzzle puzzle : repository.getTrackedPuzzles()) {
+            Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
+            List<SzSolution> solutions = repository.unmarshalSolutions(puzzlePath);
+            if (solutions.isEmpty())
+                continue;
+
+            solutions.stream().map(SzSolution::getCategories).forEach(Set::clear);
+            for (SzCategory category : puzzle.getSupportedCategories()) {
+                solutions.stream()
+                         .filter(s -> category.supportsScore(s.getScore()))
+                         .min(Comparator.comparing(SzSolution::getScore, category.getScoreComparator()))
+                         .orElseThrow()
+                         .getCategories()
+                         .add(category);
+            }
+            repository.marshalSolutions(solutions, puzzlePath);
+        }
     }
 
     @Test
@@ -148,6 +193,35 @@ public class SzManualTest {
                     writer.writeNext(csvRecord, false);
                 }
             }
+        }
+    }
+
+    @Test
+    public void attach837951602Images() throws IOException {
+        Path repoPath = Paths.get("../shenzhenIO/leaderboard");
+        String baseURL = "https://raw.githubusercontent.com/837951602/shenzhenIO-leaderboard-images/master/Images/";
+        // +  "airline-cocktail-mixer-16-115-13.png";
+
+        for (SzPuzzle puzzle : repository.getTrackedPuzzles()) {
+            boolean edited = false;
+            Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
+            List<SzSolution> solutions = repository.unmarshalSolutions(puzzlePath);
+
+            for (ListIterator<SzSolution> it = solutions.listIterator(); it.hasNext(); ) {
+                SzSolution solution = it.next();
+                if (solution.getDisplayLink() == null || solution.getDisplayLink().startsWith("https://cdn.discordapp.com/")) {
+                    String imageURL =
+                        baseURL + puzzle.getId() + "-" + solution.getScore().toDisplayString(DisplayContext.fileName()) + ".png";
+                    if (UtilsKt.isValidLink(imageURL)) {
+                        SzSolution newSolution = solution.withDisplayLink(imageURL);
+                        newSolution.getCategories().addAll(solution.getCategories());
+                        it.set(newSolution);
+                        edited = true;
+                    }
+                }
+            }
+            if (edited)
+                repository.marshalSolutions(solutions, puzzlePath);
         }
     }
 }

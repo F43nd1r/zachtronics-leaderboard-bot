@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@ import static com.faendir.zachtronics.bot.sz.validation.SzSave.getInt;
 @Value
 class SzChipPGA implements SzChip {
     private static final SzChipType type = SzChipType.PGA;
-    private static final int cost = 5;
 
     int x;
     int y;
@@ -56,10 +55,5 @@ class SzChipPGA implements SzChip {
     @Override
     public SzChipType getType() {
         return type;
-    }
-
-    @Override
-    public int getCost() {
-        return cost;
     }
 }

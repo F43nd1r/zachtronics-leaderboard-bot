@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,37 @@
 
 package com.faendir.zachtronics.bot.sz.validation.chips;
 
-public enum SzChipType {
-    // MCs
-    UC4,
-    UC4X,
-    UC6,
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-    DX3,
+@Getter
+@RequiredArgsConstructor
+public enum SzChipType {
+    NOTE(0, 3, 2),
+    BRIDGE(0, 1, 3),
+
+    // MCs
+    UC4(3, 3, 2),
+    UC4X(3, 3, 2),
+    UC6(5, 3, 3),
+
+    DX3(1, 2, 3),
 
     // memories
-    RAM,
-    BANK,
+    RAM(2, 3, 2),
+    BANK(2, 3, 2),
 
     // gates
-    NOT,
-    AND,
-    OR,
-    XOR,
+    NOT(1, 2, 1),
+    AND(1, 2, 2),
+    OR(1, 2, 2),
+    XOR(1, 2, 2),
 
-    PGA,
+    PGA(5, 3, 3),
 
-    OTHER
+    OTHER(0, 1, 1); // TODO handle more components
+
+    private final int cost;
+    private final int sizeX;
+    private final int sizeY;
 }

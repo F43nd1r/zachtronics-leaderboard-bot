@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,6 @@ import static com.faendir.zachtronics.bot.sz.validation.SzSave.getInt;
 @Value
 class SzChipUC6 implements SzChipUC {
     private static final SzChipType type = SzChipType.UC6;
-    private static final int cost = 5;
 
     int x;
     int y;
@@ -55,10 +54,5 @@ class SzChipUC6 implements SzChipUC {
     @Override
     public SzChipType getType() {
         return type;
-    }
-
-    @Override
-    public int getCost() {
-        return cost;
     }
 }
