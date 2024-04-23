@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,8 @@ import org.jetbrains.annotations.Nullable;
  "author": "12345ieee",
  "solution_name": "s",
  "precog": false,
- "precogExplanation": "PrecogError(\"Solution is precognitive;...",
+ "precogExplanation": "Solution is precognitive; ...; ...",
+ "success_rate": 1
  "error": "ReactionError(\"Cycle 209: Reactor 1: Collision between molecules.\")"
  }</pre>
  */
@@ -41,7 +42,7 @@ public class SChemResult {
     /** <tt>null</tt> for import error */
     @Nullable String levelName;
     /** <tt>null</tt> for main game */
-    @Nullable int[] resnetId;
+    int @Nullable [] resnetId;
     /** <tt>null</tt> for reaction error or timeout */
     @Nullable Integer cycles;
     /** <tt>0</tt> for import error */
@@ -56,6 +57,8 @@ public class SChemResult {
     @Nullable Boolean precog;
     /** <tt>null</tt> if no check needed */
     @Nullable String precogExplanation;
+    /** <tt>null</tt> if no check needed */
+    @Nullable Double successRate;
     /** <tt>null</tt> unless the <tt>--export</tt> flag was passed */
     @Nullable String export;
     /** <tt>null</tt> if submission is invalid */

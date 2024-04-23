@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,8 +46,9 @@ class SChemResultTest {
                 """;
 
         SChemResult result = validateSingle(export);
-        SChemResult expected = new SChemResult("QT-1", null, 20, 1, 5, "12345ieee", "s", false,
-                                               result.getPrecogExplanation(), result.getExport(), null);
+        SChemResult expected = new SChemResult("QT-1", null, 20, 1, 5, "12345ieee", "s",
+                                               false, result.getPrecogExplanation(), 1.0,
+                                               result.getExport(), null);
         assertEquals(expected, result);
 
         export = """
@@ -68,8 +69,9 @@ class SChemResultTest {
                 """;
 
         result = validateSingle(export);
-        expected = new SChemResult("Tunnels I", new int[]{1, 1, 1}, 20, 1, 6, "12345ieee", null, false,
-                                   result.getPrecogExplanation(), result.getExport(), null);
+        expected = new SChemResult("Tunnels I", new int[]{1, 1, 1}, 20, 1, 6, "12345ieee", null,
+                                   false, result.getPrecogExplanation(), 1.0,
+                                   result.getExport(), null);
         assertEquals(expected, result);
     }
 
@@ -219,7 +221,7 @@ class SChemResultTest {
         SChemResult result = validateSingle(export);
         SChemResult expected = new SChemResult("Freon", new int[]{1, 10, 2}, 112, 1, 63, "Andy", "/P",
                                                // no need to care about the specific precog details
-                                               true, result.getPrecogExplanation(),
+                                               true, result.getPrecogExplanation(), 0.0,
                                                // export is normalized, so we pull it from the result
                                                result.getExport(), null);
         assertEquals(expected, result);

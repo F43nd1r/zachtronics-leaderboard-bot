@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.groupingBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @BotTest
 @Disabled("Massive tests only for manual testing or migrations")
@@ -57,12 +58,12 @@ class ScManualTest {
     public void testFullIO() {
         for (ScPuzzle p : repository.getTrackedPuzzles()) {
             List<ValidationResult<ScSubmission>> submissions =
-                    repository.findCategoryHolders(p, true)
-                              .stream()
-                              .map(CategoryRecord::getRecord)
-                              .map(ScManualTest::recordToSubmissions)
-                              .<ValidationResult<ScSubmission>>map(ValidationResult.Valid::new)
-                              .toList();
+                repository.findCategoryHolders(p, true)
+                          .stream()
+                          .map(CategoryRecord::getRecord)
+                          .map(ScManualTest::recordToSubmissions)
+                          .<ValidationResult<ScSubmission>>map(ValidationResult.Valid::new)
+                          .toList();
 
             repository.submitAll(submissions);
 
@@ -119,6 +120,33 @@ class ScManualTest {
     }
 
     @Test
+    public void validateLeaderboard() throws IOException {
+        Path repoPath = Paths.get("../spacechem/archive");
+
+        for (ScPuzzle puzzle : repository.getTrackedPuzzles()) {
+            Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
+            List<ScSolution> solutions = repository.unmarshalSolutions(puzzlePath);
+            solutions.removeIf(s -> s.isVideoOnly() || s.getScore().isBugged());
+
+            // do a whole puzzle at a time for speed
+            String puzzleSolutions = solutions.stream()
+                                              .map(solution -> repository.makeArchivePath(puzzlePath, solution.getScore()))
+                                              .map(LambdaUtils.uncheckIOException(Files::readString))
+                                              .collect(Collectors.joining("\n"));
+            Collection<ValidationResult<ScSubmission>> results = ScSubmission.fromData(puzzleSolutions, false, null);
+
+            Iterator<ValidationResult<ScSubmission>> it = results.iterator();
+            for (ScSolution solution : solutions) {
+                ScSubmission submission = it.next().getSubmission();
+                assertEquals(puzzle, submission.getPuzzle());
+                assertEquals(solution.getScore(), submission.getScore());
+
+                System.out.println("Validated " + puzzle.getDisplayName() + ": " + solution.getScore().toDisplayString());
+            }
+        }
+    }
+
+    @Test
     public void tagNewCategories() throws IOException {
         Path repoPath = Paths.get("../spacechem/archive");
 
@@ -152,8 +180,7 @@ class ScManualTest {
                 continue;
 
             boolean edited = false;
-            for (ListIterator<ScSolution> it = solutions.listIterator(); it.hasNext(); )
-            {
+            for (ListIterator<ScSolution> it = solutions.listIterator(); it.hasNext(); ) {
                 ScSolution solution = it.next();
                 Path dataPath = repository.makeArchivePath(puzzlePath, solution.getScore());
                 if (!Files.exists(dataPath)) {
@@ -171,47 +198,47 @@ class ScManualTest {
         Path solnetDumpPath = Paths.get("../spacechem/solutionnet/data/score_dump.csv");
         Path repoPath = Paths.get("../spacechem/archive");
 
-        CSVReader reader = new CSVReaderBuilder(Files.newBufferedReader(solnetDumpPath)).withFieldAsNull(CSVReaderNullFieldIndicator.BOTH)
-                                                                                        .withSkipLines(1)
-                                                                                        .build();
-        Map<ScPuzzle, List<ScSubmission>> solnetSubmissions = StreamSupport.stream(reader.spliterator(), false)
-                                                                           .map(ScManualTest::fromSolnetData)
-                                                                           .filter(s -> s.getDisplayLink() != null)
-                                                                           .collect(groupingBy(ScSubmission::getPuzzle));
+        try (CSVReader reader = new CSVReaderBuilder(Files.newBufferedReader(solnetDumpPath)).withFieldAsNull(
+            CSVReaderNullFieldIndicator.BOTH).withSkipLines(1).build()) {
+            Map<ScPuzzle, List<ScSubmission>> solnetSubmissions = StreamSupport.stream(reader.spliterator(), false)
+                                                                               .map(ScManualTest::fromSolnetData)
+                                                                               .filter(s -> s.getDisplayLink() != null)
+                                                                               .collect(groupingBy(ScSubmission::getPuzzle));
 
-        for (ScPuzzle puzzle : repository.getTrackedPuzzles()) {
-            List<ScSubmission> puzzleSubmissions = solnetSubmissions.get(puzzle);
-            if (puzzleSubmissions == null)
-                continue;
-            Path puzzlePath = repoPath.resolve(puzzle.getGroup().name()).resolve(puzzle.name());
-            List<ScSolution> solutions = repository.unmarshalSolutions(puzzlePath);
-            List<ScSolution> newSolutions = new ArrayList<>();
-            boolean edited = false;
-            for (ScSolution solution : solutions) {
-                String matchingVideo = null;
-                if (solution.getDisplayLink() == null) {
-                    ScScore searchScore = new ScScore(solution.getScore().getCycles(), solution.getScore().getReactors(),
-                                                      solution.getScore().getSymbols(), false, false);
-                    String searchAuthor = solution.getAuthor();
-                    matchingVideo = puzzleSubmissions.stream()
-                                                     .filter(s -> s.getScore().equals(searchScore) &&
-                                                                  s.getAuthor().equalsIgnoreCase(searchAuthor))
-                                                     .findFirst()
-                                                     .map(ScSubmission::getDisplayLink)
-                                                     .orElse(null);
-                }
+            for (ScPuzzle puzzle : repository.getTrackedPuzzles()) {
+                List<ScSubmission> puzzleSubmissions = solnetSubmissions.get(puzzle);
+                if (puzzleSubmissions == null)
+                    continue;
+                Path puzzlePath = repoPath.resolve(puzzle.getGroup().name()).resolve(puzzle.name());
+                List<ScSolution> solutions = repository.unmarshalSolutions(puzzlePath);
+                List<ScSolution> newSolutions = new ArrayList<>();
+                boolean edited = false;
+                for (ScSolution solution : solutions) {
+                    String matchingVideo = null;
+                    if (solution.getDisplayLink() == null) {
+                        ScScore searchScore = new ScScore(solution.getScore().getCycles(), solution.getScore().getReactors(),
+                                                          solution.getScore().getSymbols(), false, false);
+                        String searchAuthor = solution.getAuthor();
+                        matchingVideo = puzzleSubmissions.stream()
+                                                         .filter(s -> s.getScore().equals(searchScore) &&
+                                                                      s.getAuthor().equalsIgnoreCase(searchAuthor))
+                                                         .findFirst()
+                                                         .map(ScSubmission::getDisplayLink)
+                                                         .orElse(null);
+                    }
 
-                if (matchingVideo != null) {
-                    String cleanVideoLink = matchingVideo.replaceAll("&hd=1|hd=1&|&feature=share|&feature=related", "");
-                    newSolutions.add(solution.withDisplayLink(cleanVideoLink));
-                    edited = true;
+                    if (matchingVideo != null) {
+                        String cleanVideoLink = matchingVideo.replaceAll("&hd=1|hd=1&|&feature=share|&feature=related", "");
+                        newSolutions.add(solution.withDisplayLink(cleanVideoLink));
+                        edited = true;
+                    }
+                    else {
+                        newSolutions.add(solution);
+                    }
                 }
-                else {
-                    newSolutions.add(solution);
+                if (edited) {
+                    repository.marshalSolutions(newSolutions, puzzlePath);
                 }
-            }
-            if (edited) {
-                repository.marshalSolutions(newSolutions, puzzlePath);
             }
         }
     }

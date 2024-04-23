@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ public final class LambdaUtils {
     }
 
     @NotNull
-    public static <T, R> Function<T, R> uncheckIOException(FunctionIOException<T, R> excFunction) {
+    public static <T, R> Function<T, R> uncheckIOException(@NotNull FunctionIOException<T, R> excFunction) {
         return t -> {
             try {
                 return excFunction.apply(t);

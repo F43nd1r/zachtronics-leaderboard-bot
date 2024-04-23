@@ -1,7 +1,7 @@
 FROM openjdk:17-jdk-bullseye as builder
 RUN apt-get update && apt-get install -y python3-pip
 RUN pip install --prefix=/python -r https://raw.githubusercontent.com/spacechem-community-developers/SChem/main/schem/minimal-requirements.txt
-RUN pip install --prefix=/python --no-dependencies 'schem==0.32.*'
+RUN pip install --prefix=/python --no-dependencies 'schem==0.33.*'
 RUN git clone --depth 1 --branch v1.0 https://github.com/lastcallbbs-community-developers/xbpgh-sim /xbpgh-sim
 RUN git clone --depth 1 --branch v1.0 https://github.com/lastcallbbs-community-developers/chipwizard-sim /chipwizard-sim
 RUN git clone --depth 1 https://github.com/lastcallbbs-community-developers/foodcourt-sim /foodcourt-sim
