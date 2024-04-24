@@ -57,7 +57,7 @@ enum class OmCategory(
     val associatedManifold: OmScoreManifold,
     private val admission: OmMetric<Boolean>,
     vararg metricsVararg: OmMetric<*>,
-    override val displayName: String = admission.displayName + metricsVararg.joinToString("") { it.displayName },
+    override val displayName: String = admission.displayName + metricsVararg.take(2).joinToString("") { it.displayName },
 ) : Category {
     GC(FREESPACE_TYPES, VICTORY, NOVERLAP, COST, CYCLES, AREA),
     GC_P(setOf(PRODUCTION), VICTORY, NOVERLAP, COST, CYCLES, INSTRUCTIONS),
@@ -106,8 +106,8 @@ enum class OmCategory(
     TIC(FREESPACE_TYPES, VICTORY, NOVERLAP_TRACKLESS, INSTRUCTIONS, CYCLES, COST, AREA),
     TIA(FREESPACE_TYPES, VICTORY, NOVERLAP_TRACKLESS, INSTRUCTIONS, AREA, COST, CYCLES),
 
-    TG(FREESPACE_TYPES, VICTORY, NOVERLAP_TRACKLESS, COST, CYCLES, AREA),
-    TC(FREESPACE_TYPES, VICTORY, NOVERLAP_TRACKLESS, CYCLES, COST, AREA),
+    TG(FREESPACE_TYPES, VICTORY, NOVERLAP_TRACKLESS, COST, CYCLES, AREA, displayName = "TG"),
+    TC(FREESPACE_TYPES, VICTORY, NOVERLAP_TRACKLESS, CYCLES, COST, AREA, displayName = "TC"),
 
     RG(FREESPACE_TYPES, INFINITY, NOVERLAP, RATE, COST, AREA_INF),
     RG_P(setOf(PRODUCTION), INFINITY, NOVERLAP, RATE, COST, INSTRUCTIONS),

@@ -28,9 +28,7 @@ class OmCategoryTest {
     @Test
     fun `ensure manifold consistency`() {
         for (cat in OmCategory.entries) {
-            for (m in cat.metrics) {
-                expectThat(cat.associatedManifold.scoreParts).contains(m.scoreParts)
-            }
+            expectThat(cat.associatedManifold.scoreParts).contains(cat.requiredParts)
         }
     }
 
