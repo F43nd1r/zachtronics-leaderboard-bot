@@ -39,10 +39,10 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
         private const val wikiPage = "index"
     }
 
-    private val costCategories = setOf(GC, GA, GX, GI, GXP)
-    private val cycleCategories = setOf(CG, CA, CX, CI, CXP)
-    private val areaInstructionCategories = setOf(AG, AC, AX, IG, IC, IX)
-    private val sumCategories = setOf(SUM_G, SUM_GP)
+    private val costCategories = setOf(GC, GC_P, GA, GX, GX_P, GI_P)
+    private val cycleCategories = setOf(CG, CG_P, CA, CX, CX_P, CI_P)
+    private val areaInstructionCategories = setOf(AG, AC, AX, IG_P, IC_P, IX_P)
+    private val sumCategories = setOf(SUM, SUM_P)
     private val categories = costCategories + cycleCategories + areaInstructionCategories + sumCategories
 
     private fun filterRecords(records: Collection<OmMemoryRecord>, filter: Set<OmCategory>): MutableList<Pair<OmRecord, List<OmCategory>>> {
