@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,12 @@ import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
-public enum FcMetric implements MetricJava<FcScore, Integer> {
+public enum FcMetric implements MetricJava<FcScore, @NotNull Integer> {
     TIME("T", FcScore::getTime),
     COST("C", FcScore::getCost),
     SUM_TIMES("S", FcScore::getSumTimes),
     WIRES("W", FcScore::getWires);
 
     @NotNull private final String displayName;
-    @NotNull private final Function<FcScore, Integer> extract;
+    @NotNull private final Function<FcScore, @NotNull Integer> extract;
 }

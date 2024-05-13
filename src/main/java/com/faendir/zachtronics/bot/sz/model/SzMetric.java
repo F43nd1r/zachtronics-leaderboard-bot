@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,11 @@ import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
-public enum SzMetric implements MetricJava<SzScore, Integer> {
+public enum SzMetric implements MetricJava<SzScore, @NotNull Integer> {
     COST("C", SzScore::getCost),
     POWER("P", SzScore::getPower),
     LINES("L", SzScore::getLines);
 
     @NotNull private final String displayName;
-    @NotNull private final Function<SzScore, Integer> extract;
+    @NotNull private final Function<SzScore, @NotNull Integer> extract;
 }

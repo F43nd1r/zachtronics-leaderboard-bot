@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,10 +32,10 @@ public class FcSubmission implements Submission<FcCategory, FcPuzzle> {
     @NotNull FcScore score;
     @NotNull String author;
     @With String displayLink;
-    @NotNull byte[] data;
+    byte @NotNull [] data;
 
     @NotNull
-    public static Collection<ValidationResult<FcSubmission>> fromData(@NotNull byte[] data, String author) {
+    public static Collection<ValidationResult<FcSubmission>> fromData(byte @NotNull [] data, String author) {
         return FoodCourtSim.validateMultiExport(data, author);
     }
 

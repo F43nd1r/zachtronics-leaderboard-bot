@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class FoodCourtSim {
      * @param author author to override all imports
      */
     @NotNull
-    public static Collection<ValidationResult<FcSubmission>> validateMultiExport(@NotNull byte[] data, @NotNull String author) {
+    public static Collection<ValidationResult<FcSubmission>> validateMultiExport(byte @NotNull [] data, @NotNull String author) {
         FcSimResult[] results = validate(data);
         if (results.length == 0)
             throw new ValidationException("No valid solution provided");
@@ -85,7 +85,7 @@ public class FoodCourtSim {
      * @throws ValidationException if there is a communication error, solution errors are handled in the onject
      */
     @NotNull
-    static FcSimResult[] validate(@NotNull byte[] data) throws ValidationException {
+    static FcSimResult[] validate(byte @NotNull [] data) throws ValidationException {
         String[] command = {"python3", "-m", "foodcourt_sim", "simulate", "--json", "--include-solution", "-"};
         return ValidationUtils.callValidator(FcSimResult[].class, data, command);
     }

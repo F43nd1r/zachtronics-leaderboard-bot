@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Score;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
+import org.checkerframework.common.value.qual.IntRange;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,9 +29,9 @@ import java.util.regex.Pattern;
 
 @Value
 public class CwScore implements Score<CwCategory> {
-    int width;
-    int height;
-    int footprint;
+    @IntRange(from = 1, to = 6) int width;
+    @IntRange(from = 1, to = 5) int height;
+    @IntRange(from = 1, to = 30) int footprint;
 
     /** W*H */
     public int getSize() {

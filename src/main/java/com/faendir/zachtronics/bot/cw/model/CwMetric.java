@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,12 @@ import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
-public enum CwMetric implements MetricJava<CwScore, Integer> {
+public enum CwMetric implements MetricJava<CwScore, @NotNull Integer> {
     WIDTH("W", CwScore::getWidth),
     HEIGHT("H", CwScore::getHeight),
     SIZE("S", CwScore::getSize),
     FOOTPRINT("F", CwScore::getFootprint);
 
     @NotNull private final String displayName;
-    @NotNull private final Function<CwScore, Integer> extract;
+    @NotNull private final Function<CwScore, @NotNull Integer> extract;
 }
