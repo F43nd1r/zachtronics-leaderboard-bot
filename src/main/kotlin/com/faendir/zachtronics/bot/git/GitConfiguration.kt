@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ class GitConfiguration(private val gitProperties: GitProperties) {
     fun ifRepository() = GitRepository(gitProperties, "infinifactory-leaderboard", "https://github.com/12345ieee/infinifactory-leaderboard.git")
 
     @Bean("omLeaderboardRepository")
-    fun omGithubPagesLeaderboardRepository() = GitRepository(gitProperties, "om-leaderboard", "https://github.com/F43nd1r/om-leaderboard.git")
+    fun omLeaderboardRepository() = GitRepository(gitProperties, "om-leaderboard", "https://github.com/F43nd1r/om-leaderboard.git")
 
     @Bean("scArchiveRepository")
     fun scArchiveRepository() = GitRepository(gitProperties, "sc-archive", "https://github.com/spacechem-community-developers/spacechem-archive.git")
