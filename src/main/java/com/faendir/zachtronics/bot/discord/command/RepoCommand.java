@@ -56,13 +56,14 @@ public class RepoCommand extends Command.Group {
         private final String displayName;
         private final Function<GitRepository, GitRepository.ReadAccess> lockAction;
 
-        private @NotNull Lock makeLock(GitRepository repo) {
-            return new Lock(this, lockAction.apply(repo));
+        private @NotNull RepoLock makeRepoLock(GitRepository repo) {
+            return new RepoLock(repo, this, lockAction.apply(repo));
         }
     }
     
     @Value
-    static class Lock implements Closeable {
+    static class RepoLock implements Closeable {
+        @NotNull GitRepository repo;
         @NotNull LockType lockType;
         @Nullable GitRepository.ReadAccess lock;
 
@@ -79,12 +80,10 @@ public class RepoCommand extends Command.Group {
     @Getter
     private final String description = "Leaderboard repository management";
 
-    /** spring id -> repo */
-    private final Map<String, @NotNull GitRepository> repositories;
-    /** repo name -> lock */
-    private final Map<String, @NotNull Lock> locks;
+    /** repo name -> (repo, type, lock) */
+    private final Map<String, @NotNull RepoLock> locks;
 
-    private final CommandOption<String, GitRepository> repoOption;
+    private final CommandOption<String, String> repoOption;
     private final CommandOption<String, LockType> lockTypeOption =
         OptionHelpersKt.enumOptionBuilder("locktype", LockType.class, LockType::getDisplayName)
                        .description("Select lock type (defaults to write)")
@@ -93,17 +92,14 @@ public class RepoCommand extends Command.Group {
     @Getter
     private final List<Command.Leaf> commands;
 
-    public RepoCommand(@NotNull Map<String, GitRepository> repositories) {
+    public RepoCommand(@NotNull List<GitRepository> repositories) {
         // repositories come from spring, we need to init what depends on them in the constructor
         // as field initializers would run before the constructor and find a `null` repositories map
-        this.repositories = repositories;
-        locks = repositories.values().stream().collect(toMap(GitRepository::getName, LockType.NONE::makeLock));
+        locks = repositories.stream().collect(toMap(GitRepository::getName, LockType.NONE::makeRepoLock));
         repoOption = CommandOptionBuilder.string("repo")
                                          .description("Select repository to lock")
-                                         .choices(repositories.entrySet()
-                                                              .stream()
-                                                              .collect(toMap(e -> e.getValue().getName(), Map.Entry::getKey)))
-                                         .convert((event, k) -> this.repositories.get(k))
+                                         .choices(repositories.stream()
+                                                              .collect(toMap(GitRepository::getName, GitRepository::getName)))
                                          .required()
                                          .build();
         commands = List.of(new StatusCommand(), new LockCommand());
@@ -122,10 +118,10 @@ public class RepoCommand extends Command.Group {
             MultiMessageSafeEmbedMessageBuilder embed = new MultiMessageSafeEmbedMessageBuilder()
                 .title("Repositories")
                 .color(Colors.READ);
-            for (Map.Entry<String, Lock> entry: locks.entrySet()) {
-                String name = entry.getKey();
-                LockType lockType = entry.getValue().getLockType();
-                embed.addField("", Markdown.link(lockType.getDisplayName(), name) + " Lock: " + lockType.getDisplayName(), false);
+            for (@NotNull RepoLock repoLock: locks.values()) {
+                GitRepository repo = repoLock.getRepo();
+                LockType lockType = repoLock.getLockType();
+                embed.addField("", Markdown.link(repo.getName(), repo.getUrl()) + " Lock: " + lockType.getDisplayName(), false);
             }
             return embed;
         }
@@ -141,21 +137,22 @@ public class RepoCommand extends Command.Group {
         @NotNull
         @Override
         public SafeMessageBuilder handleEvent(@NotNull ChatInputInteractionEvent event) {
-            GitRepository repo = repoOption.get(event);
+            String repoName = repoOption.get(event);
             LockType lockType = lockTypeOption.get(event);
             if (lockType == null)
                 lockType = LockType.WRITE;
 
-            Lock oldLock = locks.get(repo.getName());
+            RepoLock oldLock = locks.get(repoName);
             if (oldLock.getLockType() != lockType) {
                 oldLock.close();
-                locks.put(repo.getName(), lockType.makeLock(repo));
+                GitRepository repo = oldLock.getRepo();
+                locks.put(repoName, lockType.makeRepoLock(repo));
                 return new MultiMessageSafeEmbedMessageBuilder()
-                    .title((lockType == LockType.NONE ? "Unlocked " : "Locked ") + repo.getName())
+                    .title((lockType == LockType.NONE ? "Unlocked " : "Locked ") + repoName)
                     .color(Colors.SUCCESS);
             }
             return new MultiMessageSafeEmbedMessageBuilder()
-                .title(repo.getName() + " lock state didn't change")
+                .title(repoName + " lock state didn't change")
                 .color(Colors.UNCHANGED);
         }
     }
