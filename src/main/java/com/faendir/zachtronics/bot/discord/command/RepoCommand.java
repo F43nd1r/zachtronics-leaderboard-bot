@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.discord.command;
 import com.faendir.zachtronics.bot.discord.Colors;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUser;
 import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured;
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured;
@@ -31,47 +30,28 @@ import com.faendir.zachtronics.bot.utils.Markdown;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
-import java.io.Closeable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import static java.util.stream.Collectors.toMap;
 
 @Component
 public class RepoCommand extends Command.Group {
+    @Getter
     @RequiredArgsConstructor
-    private enum LockType {
-        NONE("None", r -> null),
-        WRITE("Write", GitRepository::acquireReadAccess),
-        READWRITE("ReadWrite", GitRepository::acquireWriteAccess);
+    static class RepoLock {
+        private final @NotNull GitRepository repo;
+        private boolean locked = false;
 
-        @Getter
-        private final String displayName;
-        private final Function<GitRepository, GitRepository.ReadAccess> lockAction;
-
-        private @NotNull RepoLock makeRepoLock(GitRepository repo) {
-            return new RepoLock(repo, this, lockAction.apply(repo));
-        }
-    }
-    
-    @Value
-    static class RepoLock implements Closeable {
-        @NotNull GitRepository repo;
-        @NotNull LockType lockType;
-        @Nullable GitRepository.ReadAccess lock;
-
-        @Override
-        public void close() {
-            if (lock != null) {
-                lock.close();
-            }
+        private void lock() {
+            // yes, we just throw it away, as the thread that locked the repo would not be around later to unlock it,
+            // may as well not store the lock at all, indeed this is sad, FIXME if you can
+            repo.acquireReadAccess();
+            locked = true;
         }
     }
 
@@ -84,10 +64,6 @@ public class RepoCommand extends Command.Group {
     private final Map<String, @NotNull RepoLock> locks;
 
     private final CommandOption<String, String> repoOption;
-    private final CommandOption<String, LockType> lockTypeOption =
-        OptionHelpersKt.enumOptionBuilder("locktype", LockType.class, LockType::getDisplayName)
-                       .description("Select lock type (defaults to write)")
-                       .build();
 
     @Getter
     private final List<Command.Leaf> commands;
@@ -95,7 +71,7 @@ public class RepoCommand extends Command.Group {
     public RepoCommand(@NotNull List<GitRepository> repositories) {
         // repositories come from spring, we need to init what depends on them in the constructor
         // as field initializers would run before the constructor and find a `null` repositories map
-        locks = repositories.stream().collect(toMap(GitRepository::getName, LockType.NONE::makeRepoLock));
+        locks = repositories.stream().collect(toMap(GitRepository::getName, RepoLock::new));
         repoOption = CommandOptionBuilder.string("repo")
                                          .description("Select repository to lock")
                                          .choices(repositories.stream()
@@ -120,8 +96,7 @@ public class RepoCommand extends Command.Group {
                 .color(Colors.READ);
             for (@NotNull RepoLock repoLock: locks.values()) {
                 GitRepository repo = repoLock.getRepo();
-                LockType lockType = repoLock.getLockType();
-                embed.addField("", Markdown.link(repo.getName(), repo.getUrl()) + " Lock: " + lockType.getDisplayName(), false);
+                embed.addField("", Markdown.link(repo.getName(), repo.getUrl()) + (repoLock.isLocked() ? " LOCKED" : ""), false);
             }
             return embed;
         }
@@ -131,28 +106,23 @@ public class RepoCommand extends Command.Group {
     class LockCommand extends Command.BasicLeaf {
         private final Secured secured = new DiscordUserSecured(DiscordUser.BOT_OWNERS);
         private final String name = "lock";
-        private final String description = "(Un)Lock selected repository from write or readWrite, used for maintenance";
-        private final List<CommandOption<?,?>> options = List.of(repoOption, lockTypeOption);
+        private final String description = "Permanently lock selected repository from Writing, used for maintenance";
+        private final List<CommandOption<?,?>> options = List.of(repoOption);
 
         @NotNull
         @Override
         public SafeMessageBuilder handleEvent(@NotNull ChatInputInteractionEvent event) {
             String repoName = repoOption.get(event);
-            LockType lockType = lockTypeOption.get(event);
-            if (lockType == null)
-                lockType = LockType.WRITE;
 
-            RepoLock oldLock = locks.get(repoName);
-            if (oldLock.getLockType() != lockType) {
-                oldLock.close();
-                GitRepository repo = oldLock.getRepo();
-                locks.put(repoName, lockType.makeRepoLock(repo));
+            RepoLock repoLock = locks.get(repoName);
+            if (!repoLock.isLocked()) {
+                repoLock.lock();
                 return new MultiMessageSafeEmbedMessageBuilder()
-                    .title((lockType == LockType.NONE ? "Unlocked " : "Locked ") + repoName)
+                    .title("Locked " + repoName)
                     .color(Colors.SUCCESS);
             }
             return new MultiMessageSafeEmbedMessageBuilder()
-                .title(repoName + " lock state didn't change")
+                .title(repoName + " was already locked")
                 .color(Colors.UNCHANGED);
         }
     }
