@@ -85,11 +85,13 @@ data class OmScore(
         }
 
         val desiredMetrics = context.categories
+            ?.ifEmpty { null }
             ?.flatMapTo(HashSet(), OmCategory::requiredParts)
             ?.apply { if (context.format != StringFormat.REDDIT) addAll(OmMetrics.MODIFIER) }
             ?: OmMetrics.FULL_SCORE.toSet()
 
         val desiredMeasurePoints = context.categories
+            ?.ifEmpty { null }
             ?.mapTo(newEnumSet()) { it.manifold.measurePoint }
             ?: measurePoints
 

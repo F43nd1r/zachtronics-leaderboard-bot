@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.DisplayContext
+import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
 import com.faendir.zachtronics.bot.utils.LevelValue
 import org.junit.jupiter.api.Test
@@ -32,7 +33,10 @@ class OmScoreTest {
             2, 3, 4, 5.0, 6,
             7.0, LevelValue(0, 8.0), 9.toInfinInt(), 10.0, 11.toInfinInt()
         )
-        expectThat(score.toDisplayString()).isEqualTo("0g/2c/3a/1i/4h/5w/6b/O/T/L@V 0g/7r/8a/1i/9h/10w/11b/O/T@∞")
-        expectThat(score.toDisplayString(DisplayContext.fileName())).isEqualTo("0g-1i-2c-3a-4h-5w-6b-7r-8a0-9h-10w-11b-O-T")
+        val human = "0g/2c/3a/1i/4h/5w/6b/O/T/L@V 0g/7r/8a/1i/9h/10w/11b/O/T@∞"
+        val machine = "0g-1i-2c-3a-4h-5w-6b-7r-8a0-9h-10w-11b-O-T"
+        expectThat(score.toDisplayString()).isEqualTo(human)
+        expectThat(score.toDisplayString(DisplayContext(StringFormat.PLAIN_TEXT, emptySet()))).isEqualTo(human)
+        expectThat(score.toDisplayString(DisplayContext.fileName())).isEqualTo(machine)
     }
 }
