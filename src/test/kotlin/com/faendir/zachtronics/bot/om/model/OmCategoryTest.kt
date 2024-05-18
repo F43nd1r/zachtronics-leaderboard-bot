@@ -17,7 +17,6 @@
 package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.om.dummyOmScore
-import com.faendir.zachtronics.bot.om.model.OmScoreManifold.VICTORY
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.contains
@@ -28,7 +27,7 @@ class OmCategoryTest {
     @Test
     fun `ensure manifold consistency`() {
         for (cat in OmCategory.entries) {
-            expectThat(cat.associatedManifold.scoreParts).contains(cat.requiredParts)
+            expectThat(cat).get { manifold.scoreParts }.contains(cat.requiredParts)
         }
     }
 
@@ -36,7 +35,7 @@ class OmCategoryTest {
     fun `ensure admission consistency`() {
         val victoryOnly = dummyOmScore
         for (cat in OmCategory.entries) {
-            expectThat(cat.associatedManifold == VICTORY || !cat.supportsScore(victoryOnly)).isTrue()
+            expectThat(cat.manifold.measurePoint == MeasurePoint.VICTORY || !cat.supportsScore(victoryOnly)).isTrue()
         }
     }
 
@@ -46,7 +45,7 @@ class OmCategoryTest {
             for (type in cat.supportedTypes) {
                 expectThat(cat) {
                     get { requiredParts }.contains(OmMetric.OVERLAP)
-                    get { requiredParts }.contains(INGAME_METRICS[cat.associatedManifold]!![type]!!)
+                    get { requiredParts }.contains(cat.manifold.ingameMetrics)
                 }
             }
         }

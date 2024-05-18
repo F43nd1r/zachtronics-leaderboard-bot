@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,14 @@ package com.faendir.zachtronics.bot.om.cleanup
 import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.createGitRepositoryFrom
 import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.om.createSubmission
+import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
+import com.faendir.zachtronics.bot.om.validation.createSubmission
+import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.testutils.TestGitRepository
 import io.mockk.mockk
 import kotlinx.datetime.Instant
@@ -79,6 +81,13 @@ class OmLeaderboardFixer {
                 )
 
                 val result = repository.submit(submission)
+                when (result) {
+                    is SubmitResult.Success -> {}
+                    is SubmitResult.Updated -> {}
+                    is SubmitResult.AlreadyPresent -> {}
+                    is SubmitResult.NothingBeaten<OmRecord, OmCategory> -> repository.delete(record)
+                    is SubmitResult.Failure -> throw IllegalStateException(result.message)
+                }
                 println(result)
             }
         }
@@ -110,7 +119,7 @@ class OmLeaderboardFixer {
     @Test
     fun `submit folder`() {
         val folder = File("/tmp/outparetoed")
-        val repoFile = File("../opus_magnum/leaderboard-new")
+        val repoFile = File("../opus_magnum/leaderboard")
 
         val repo = TestGitRepository(GitProperties().apply {
             accessToken = ""

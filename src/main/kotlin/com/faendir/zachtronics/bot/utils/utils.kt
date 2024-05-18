@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,6 +115,8 @@ fun String.truncateWithEllipsis(maxLength: Int) = if (length > maxLength) substr
 fun String.ifEmptyZeroWidthSpace() = ifEmpty { "\u200B" }
 
 fun String?.orEmpty(prefix: String = "", suffix: String = "") = this?.let { prefix + it + suffix } ?: ""
+
+inline fun <T> T.runIf(condition: Boolean, transform: T.() -> T): T = if (condition) transform() else this
 
 inline fun <reified T : Enum<T>> newEnumSet(): EnumSet<T> = EnumSet.noneOf(T::class.java)
 

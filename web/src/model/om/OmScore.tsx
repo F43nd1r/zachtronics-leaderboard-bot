@@ -21,12 +21,14 @@ export default interface OmScore {
 
     cycles: number
     area: number
-    height: number
-    width: number
+    height?: number
+    width?: number
+    boundingHex?: number
 
     rate?: number
     areaINFLevel?: number
     areaINFValue?: number
     heightINF?: number
     widthINF?: number
+    boundingHexINF?: number
 }

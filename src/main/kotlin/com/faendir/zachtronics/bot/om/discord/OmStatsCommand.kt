@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@ import com.faendir.zachtronics.bot.discord.embed.MultiMessageSafeEmbedMessageBui
 import com.faendir.zachtronics.bot.discord.embed.SafeMessageBuilder
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.OmQualifier
-import com.faendir.zachtronics.bot.om.createSubmission
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.omSolutionOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
+import com.faendir.zachtronics.bot.om.validation.createSubmission
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.orEmpty

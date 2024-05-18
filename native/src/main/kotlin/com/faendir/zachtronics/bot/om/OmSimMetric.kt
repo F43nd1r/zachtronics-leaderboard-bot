@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package com.faendir.zachtronics.bot.om
 
+/** see http://events.critelli.technology/static/metrics.html */
 @Suppress("ClassName", "Unused")
 sealed class OmSimMetric(val id: String) {
-    // see http://events.critelli.technology/static/metrics.html
     object PARSED_CYCLES : OmSimMetric("parsed cycles")
     object PARSED_COST : OmSimMetric("parsed cost")
     object PARSED_AREA : OmSimMetric("parsed area")
@@ -41,6 +41,7 @@ sealed class OmSimMetric(val id: String) {
     object WIDTH_TIMES_TWO_AT_0_DEGREES : OmSimMetric("width*2 at 0 degrees")
     object WIDTH_TIMES_TWO_AT_60_DEGREES : OmSimMetric("width*2 at 60 degrees")
     object WIDTH_TIMES_TWO_AT_120_DEGREES : OmSimMetric("width*2 at 120 degrees")
+    object MINIMUM_HEXAGON : OmSimMetric("minimum hexagon")
 //    object THROUGHPUT_CYCLES : OmSimMetric("throughput cycles")
     object PER_REPETITION_CYCLES : OmSimMetric("per repetition cycles")
 //    object THROUGHPUT_OUTPUTS : OmSimMetric("throughput outputs")
@@ -49,6 +50,7 @@ sealed class OmSimMetric(val id: String) {
     object PER_REPETITION_SQUARED_AREA : OmSimMetric("per repetition^2 area")
     object THROUGHPUT_WASTE : OmSimMetric("throughput waste")
     class PRODUCT_N_METRIC(n: Int, metric: OmSimMetric) : OmSimMetric("product $n ${metric.id}")
+    class CYCLE_N_METRIC(n: Int, metric: OmSimMetric) : OmSimMetric("cycle $n ${metric.id}")
     object REACHES_STEADY_STATE : OmSimMetric("reaches steady state")
     class STEADY_STATE(metric: OmSimMetric) : OmSimMetric("steady state ${metric.id}")
     class PARTS_OF_TYPE(partType: PartType) : OmSimMetric("parts of type ${partType.id}")

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import com.faendir.zachtronics.bot.discord.embed.SafeMessageBuilder
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.JNISolutionVerifier
 import com.faendir.zachtronics.bot.om.OmQualifier
-import com.faendir.zachtronics.bot.om.getScore
+import com.faendir.zachtronics.bot.om.model.MeasurePoint
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
@@ -35,6 +35,7 @@ import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.om.omPuzzleOptionBuilder
 import com.faendir.zachtronics.bot.om.omScoreOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
+import com.faendir.zachtronics.bot.om.validation.getScore
 import com.faendir.zachtronics.bot.utils.Markdown
 import com.faendir.zachtronics.bot.utils.orEmpty
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
@@ -50,8 +51,9 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.
     private val typeOption = enumOptionBuilder<OmType>("type") { displayName }.build()
     private val puzzleOption = omPuzzleOptionBuilder().build()
     private val manifoldOption = enumOptionBuilder<OmScoreManifold>("manifold") { name }.build()
+    private val measurePointOption = enumOptionBuilder<MeasurePoint>("measure-point") { name }.build()
     private val scoreOption = omScoreOptionBuilder().build()
-    override val options = listOf(typeOption, puzzleOption, manifoldOption, scoreOption)
+    override val options = listOf(typeOption, puzzleOption, manifoldOption, measurePointOption, scoreOption)
 
     override val secured = DiscordUserSecured(DiscordUser.OM_LB_ADMINS)
 
@@ -59,6 +61,7 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.
         val puzzleIn = puzzleOption.get(event)
         val type = typeOption.get(event)
         val manifold = manifoldOption.get(event)
+        val measurePoint = measurePointOption.get(event)
         val score = scoreOption.get(event)
         val puzzles = (puzzleIn?.let { listOf(it) } ?: OmPuzzle.entries).filter {
             type == null || type == it.type
@@ -67,9 +70,10 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.
         val overrideRecords = mutableListOf<Pair<OmRecord, OmScore>>()
         for (puzzle in puzzles) {
             val puzzleFile = puzzle.file
-            val records = repository.findCategoryHolders(puzzle, true)
-                .filter { (record, _) ->
-                    (manifold == null || manifold in record.score.manifolds) &&
+            val records = repository.immutableData.getValue(puzzle)
+                .filter { (record, manifolds, _) ->
+                    (manifold == null || manifold in manifolds) &&
+                            (measurePoint == null || measurePoint in record.score.measurePoints) &&
                             (score == null || record.score.toDisplayString().equals(score, ignoreCase = true))
                 }
 
@@ -85,7 +89,8 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.
             repository.overrideScores(overrideRecords)
         }
         return MultiMessageSafeEmbedMessageBuilder().title(
-                "Reverify" + type?.displayName.orEmpty(" ") + manifold?.displayName.orEmpty(" ") + puzzleIn?.displayName.orEmpty(" ")
+                "Reverify" + type?.displayName.orEmpty(" ") + manifold?.displayName.orEmpty(" ") +
+                        measurePoint?.displayName.orEmpty(" ") + puzzleIn?.displayName.orEmpty(" ")
             )
             .description(
                 """

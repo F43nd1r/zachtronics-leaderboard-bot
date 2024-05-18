@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
+import com.faendir.zachtronics.bot.utils.newEnumSet
 import jakarta.annotation.PostConstruct
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -43,22 +44,28 @@ class OmSolutionRepository(
     private val pageGenerator: OmRedditWikiGenerator,
     private val omUrlMapper: OmUrlMapper,
 ) : SolutionRepository<OmCategory, OmPuzzle, OmSubmission, OmRecord> {
-    private val json = Json {
-        prettyPrint = true
-        allowSpecialFloatingPointValues = true
-    }
-    private val memoryRecordOrder = Comparator.comparing({ r: OmMemoryRecord -> r.record.score },
-        (listOf(OmMetric.OVERLAP) + OmMetrics.VALUE) // overlap scores last, trackless in the mix
+    companion object {
+        private val json = Json {
+            prettyPrint = true
+            allowSpecialFloatingPointValues = true
+        }
+        /** overlap scores last, trackless in the mix */
+        private val dataOrder = (listOf(OmMetric.OVERLAP) + OmMetrics.VALUE)
             .map { it.comparator }
-            .reduce(Comparator<OmScore>::thenComparing))
+            .reduce(Comparator<OmScore>::thenComparing)
+        private val memoryRecordOrder = Comparator.comparing({ r: OmMemoryRecord -> r.record.score }, dataOrder)!!
+    }
+
     private lateinit var data: Map<OmPuzzle, SortedSet<OmMemoryRecord>>
+    internal val immutableData: Map<OmPuzzle, Set<OmMemoryRecord>>
+        get() = data
     private var hash: String? = null
 
     @PostConstruct
     fun init() {
         leaderboard.acquireReadAccess().use { leaderboardScope ->
             loadData(leaderboardScope)
-            pageGenerator.update(leaderboardScope, OmCategory.entries, data)
+            pageGenerator.update(leaderboardScope, OmCategory.entries, immutableData)
         }
     }
 
@@ -75,8 +82,9 @@ class OmSolutionRepository(
                 ?.forEach(memoryRecords::add)
 
             // fill valid manifolds
+            val possibleManifolds = OmScoreManifold.entries.filter { it.supportedTypes.contains(puzzle.type) }
             for (mRecord in memoryRecords) {
-                manifolds@ for (manifold in OmScoreManifold.entries) {
+                manifolds@ for (manifold in possibleManifolds.filter { it.supportsScore(mRecord.record.score) }) {
                     for (otherMRecord in memoryRecords) {
                         val compares = manifold.frontierCompare(mRecord.record.score, otherMRecord.record.score)
                         if (compares.all { it >= 0 } && compares.any { it > 0 })
@@ -91,7 +99,7 @@ class OmSolutionRepository(
                 for (category in OmCategory.entries.filter { it.supportsPuzzle(puzzle) }) {
                     memoryRecords
                         .filter { category.supportsScore(it.record.score) }
-                        .minWithOrNull(Comparator.comparing({ it.record.score }, category.scoreComparators[puzzle.type]))
+                        .minWithOrNull(Comparator.comparing({ it.record.score }, category.scoreComparator))
                         ?.categories
                         ?.add(category)
                 }
@@ -166,14 +174,18 @@ class OmSolutionRepository(
     ): SubmitResult<OmRecord, OmCategory> {
         loadDataIfNecessary(leaderboardScope)
         val puzzle = submission.puzzle
-        val mRecords = data.getValue(puzzle)
-        val unclaimedCategories = OmCategory.entries.filter { it.supportsPuzzle(puzzle) && it.supportsScore(submission.score) }.toMutableSet()
-        val possibleManifolds = submission.score.manifolds.toMutableSet()
+        val unclaimedCategories = OmCategory.entries.filterTo(newEnumSet()) { it.supportsPuzzle(puzzle) && it.supportsScore(submission.score) }
+        val possibleManifolds = OmScoreManifold.entries.filterTo(newEnumSet()) {
+            it.supportedTypes.contains(puzzle.type) && it.supportsScore(submission.score)
+        }
         val beatingWitnesses = mutableMapOf<OmScoreManifold, OmMemoryRecord>()
         val beatenCR = mutableSetOf<CategoryRecord<OmRecord?, OmCategory>>()
+        val mRecords = data.getValue(puzzle)
         for (mRecord in mRecords.toSet()) {
             val record = mRecord.record
-            if (submission.score == record.score) {
+            val fullCompares = OmMetrics.FULL_SCORE.map { it.comparator.compare(submission.score, record.score) }
+
+            if (fullCompares.all { it == 0 }) { // candidate is identical to record
                 @Suppress("LiftReturnOrAssignment")
                 if (submission.displayLink != record.displayLink || record.displayLink == null) {
                     // copies are needed or they'll edit themselves in the handler
@@ -183,16 +195,18 @@ class OmSolutionRepository(
                     return SubmitResult.AlreadyPresent()
                 }
             }
-
+            if (fullCompares.all { it >= 0 }) { // candidate is strictly worse all around, give up immediately
+                return SubmitResult.NothingBeaten(listOf(mRecord.toCategoryRecord()))
+            }
             unclaimedCategories -= mRecord.categories
-            // in case the candidate beats the old record all around, use that and skip the details
-            if (OmMetrics.FULL_SCORE.all { it.comparator.compare(submission.score, record.score) <= 0 }) {
+            if (fullCompares.all { it <= 0 }) { // candidate beats the old record all around, use that and skip the details
                 // copies are needed or they'll edit themselves in the handler
                 handleBeatenRecord(mRecord, mRecord.categories.toSet(), mRecord.frontierManifolds.toSet())
                 beatenCR.add(CategoryRecord(record, mRecord.categories))
                 continue
             }
 
+            // we were not lucky, at this point we go manifold by manifold
             for (manifold in possibleManifolds.intersect(mRecord.frontierManifolds)) {
                 val compares: List<Int> = manifold.frontierCompare(submission.score, record.score)
                 /* If we let the identical case just go below, we allow overlapping-domino edit wars
@@ -218,10 +232,12 @@ class OmSolutionRepository(
 
                 if (!strictlyWorse) {
                     val beatenCategories = mRecord.categories.filter { category ->
-                        category.associatedManifold == manifold && category.supportsScore(submission.score) &&
-                                category.scoreComparators[puzzle.type]!!.compare(submission.score, record.score)
+                        category.manifold == manifold && category.supportsScore(submission.score) &&
+                                category.scoreComparator.compare(submission.score, record.score)
                                     .let {
-                                        it < 0 || it == 0 && submission.displayLink != record.displayLink
+                                        // for scores that are exactly equal in this manifold we choose the first in the data order
+                                        // which is exactly the same choice the data loader makes, so there are no edit wars
+                                        it < 0 || it == 0 && dataOrder.compare(submission.score, record.score) < 0
                                     }
                     }.toSet()
 
@@ -271,7 +287,7 @@ class OmSolutionRepository(
             }
             leaderboardScope.commitAndPush("Score overrides (metadata)")
             loadData(leaderboardScope)
-            pageGenerator.update(leaderboardScope, OmCategory.entries, data)
+            pageGenerator.update(leaderboardScope, OmCategory.entries, immutableData)
         }
     }
 
@@ -282,7 +298,7 @@ class OmSolutionRepository(
             leaderboardScope.rm(File(dir, "${record.toFileStem()}.json"))
             leaderboardScope.commitAndPush(null, record.puzzle, record.score, listOf("DELETE"))
             loadData(leaderboardScope)
-            pageGenerator.update(leaderboardScope, OmCategory.entries, data)
+            pageGenerator.update(leaderboardScope, OmCategory.entries, immutableData)
         }
     }
 
@@ -345,7 +361,7 @@ class OmSolutionRepository(
     private fun OmMemoryRecord.remove(leaderboardScope: GitRepository.ReadWriteAccess) {
         leaderboardScope.rm(record.dataPath.toFile())
         leaderboardScope.rm(record.dataPath.resolveSibling("${record.toFileStem()}.json").toFile())
-        data[record.puzzle]?.remove(this)
+        data[record.puzzle]!!.remove(this)
     }
 
     private fun GitRepository.ReadAccess.getPuzzleDir(puzzle: OmPuzzle): File = File(repo, "${puzzle.group.name}/${puzzle.name}")

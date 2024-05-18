@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,12 +44,13 @@ import java.nio.file.Files
 import java.util.*
 import java.util.concurrent.locks.Lock
 
-open class GitRepository(private val gitProperties: GitProperties, val name: String, val url: String) {
+open class GitRepository(private val gitProperties: GitProperties, val name: String, val url: String, branch: String? = null) {
     companion object {
         private val logger = LoggerFactory.getLogger(GitRepository::class.java)
     }
 
-    val rawFilesUrl = Regex("github.com/([^/]+)/([^/.]+)(?:.git)?").replaceFirst(url, "raw.githubusercontent.com/$1/$2/master")
+    val rawFilesUrl = Regex("github.com/([^/]+)/([^/.]+)(?:.git)?")
+        .replaceFirst(url, "raw.githubusercontent.com/$1/$2/${branch ?: "master"}")
     private val repo = Files.createTempDirectory(name).toFile()
     private val git: Git
     private val lock = CycleDetectingLockFactory.newInstance(CycleDetectingLockFactory.Policies.WARN).newReentrantReadWriteLock(name)
@@ -61,7 +62,7 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
 
     init {
         writeLock.lock()
-        git = Git.cloneRepository().setURI(url).setDirectory(repo).call()
+        git = Git.cloneRepository().setURI(url).setDirectory(repo).setBranch(branch).call()
         remoteHash = git.repository.resolve("HEAD").name()
         writeLock.unlock()
     }

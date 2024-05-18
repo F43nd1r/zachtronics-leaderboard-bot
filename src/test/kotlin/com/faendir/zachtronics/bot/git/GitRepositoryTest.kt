@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,8 +158,8 @@ class GitRepositoryTest {
     }
 
     @Test
-    fun `should not allow additional write lock during write`() {
-        gitRepository.acquireWriteAccess().use {
+    fun `should not allow additional write lock any other lock`() {
+        gitRepository.acquireReadAccess().use {
             val thread = Thread {
                 gitRepository.acquireWriteAccess().close()
             }

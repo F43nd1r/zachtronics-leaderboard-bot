@@ -48,11 +48,13 @@ export default function OmPuzzleVisualizerView() {
                     a: { name: "Area", get: (score) => score?.area },
                     h: { name: "Height", get: (score) => score?.height },
                     w: { name: "Width", get: (score) => score?.width },
+                    b: { name: "Bounding Hex", get: (score) => score?.boundingHex },
                     r: { name: "Rate", get: (score) => score?.rate },
                     aI: { name: "Area@∞", get: (score) => score?.areaINFValue != null && score?.areaINFLevel != null ?
                                                           score.areaINFValue * 10 ** (5 * score.areaINFLevel) : undefined},
                     hI: { name: "Height@∞", get: (score) => score?.heightINF },
                     wI: { name: "Width@∞", get: (score) => score?.widthINF },
+                    bI: { name: "Bounding Hex@∞", get: (score) => score?.boundingHexINF },
                 }}
                 modifiers={{
                     overlap: {

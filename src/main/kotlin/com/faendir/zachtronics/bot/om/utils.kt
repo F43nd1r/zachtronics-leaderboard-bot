@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,6 @@
 
 package com.faendir.zachtronics.bot.om
 
-import com.faendir.om.parser.solution.SolutionParser
-import com.faendir.om.parser.solution.model.SolvedSolution
-import com.faendir.om.parser.solution.model.part.Arm
-import com.faendir.om.parser.solution.model.part.ArmType
-import com.faendir.om.parser.solution.model.part.Glyph
-import com.faendir.om.parser.solution.model.part.GlyphType
-import com.faendir.om.parser.solution.model.part.IO
 import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.option.enumOptionBuilder
@@ -34,14 +27,8 @@ import com.faendir.zachtronics.bot.om.discord.SendToMainChannelButton
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
-import com.faendir.zachtronics.bot.om.model.OmScore
-import com.faendir.zachtronics.bot.om.model.OmSubmission
-import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SubmitResult
-import com.faendir.zachtronics.bot.utils.InfinInt
-import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
-import com.faendir.zachtronics.bot.utils.LevelValue
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.smartFormat
 import discord4j.core.GatewayDiscordClient
@@ -51,119 +38,10 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingleOrNull
-import okio.buffer
-import okio.sink
-import okio.source
 import org.slf4j.LoggerFactory
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import kotlin.math.ceil
 
 
 private val logger = LoggerFactory.getLogger("OM Utils")
-
-fun JNISolutionVerifier.getMetricSafe(metric: OmSimMetric) = try {
-    getMetric(metric)
-} catch (e: OmSimException) {
-    logger.debug("Verifier threw exception for `${metric.id}`: ${e.message}")
-    null
-}
-
-private fun JNISolutionVerifier.getAreaINF(outputsAtINF: Int?): LevelValue? {
-    if (outputsAtINF == null)
-        return null
-    val a2 = getApproximateMetric(OmSimMetric.PER_REPETITION_SQUARED_AREA)
-    if (a2 != 0.0) return LevelValue(2, a2 / (outputsAtINF * outputsAtINF))
-    val a1 = getMetric(OmSimMetric.PER_REPETITION_AREA)
-    if (a1 != 0) return LevelValue(1, a1.toDouble() / outputsAtINF)
-    val a0 = getMetric(OmSimMetric.STEADY_STATE(OmSimMetric.AREA))
-    return LevelValue(0, a0.toDouble())
-}
-
-fun JNISolutionVerifier.getScore(type: OmType): OmScore {
-    // null or 0 PER_REPETITION_OUTPUTS means the solution doesn't output infinite products, hence cannot have a @INF point
-    val outputsAtINF: Int? = getMetricSafe(OmSimMetric.PER_REPETITION_OUTPUTS)?.takeIf { it != 0 }
-
-    return OmScore(
-        cost = getMetric(OmSimMetric.COST).also {
-            if (it != getMetric(OmSimMetric.PARSED_COST))
-                throw IllegalArgumentException("Stored cost value does not match simulation. Run your solution to completion before submitting.")
-        },
-        instructions = getMetric(OmSimMetric.INSTRUCTIONS).also {
-            if (it != getMetric(OmSimMetric.PARSED_INSTRUCTIONS))
-                throw IllegalArgumentException("Stored instructions value does not match simulation. Run your solution to completion before submitting.")
-        },
-
-        overlap = getMetric(OmSimMetric.OVERLAP) != 0,
-        trackless = getMetric(OmSimMetric.NUMBER_OF_TRACK_SEGMENTS) == 0,
-
-        cycles = getMetric(OmSimMetric.CYCLES).also {
-            if (it != getMetric(OmSimMetric.PARSED_CYCLES))
-                throw IllegalArgumentException("Stored cycles value does not match simulation. Run your solution to completion before submitting.")
-        },
-        area = getMetric(OmSimMetric.AREA).also {
-            if (it != getMetric(OmSimMetric.PARSED_AREA))
-                throw IllegalArgumentException("Stored area value does not match simulation. Run your solution to completion before submitting.")
-        },
-        height = if (type != OmType.PRODUCTION) getMetric(OmSimMetric.HEIGHT) else null,
-        width = if (type != OmType.PRODUCTION) getMetric(OmSimMetric.WIDTH_TIMES_TWO).toDouble() / 2 else null,
-
-        rate = outputsAtINF?.run {
-            val precision = 100.0
-            ceil((precision * getMetric(OmSimMetric.PER_REPETITION_CYCLES).toDouble() / this)) / precision
-        },
-        areaINF = getAreaINF(outputsAtINF),
-        heightINF = if (outputsAtINF == null || type == OmType.PRODUCTION) null
-        else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.HEIGHT))?.toInfinInt() ?: InfinInt.INFINITY,
-        widthINF = if (outputsAtINF == null || type != OmType.NORMAL) null
-        else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.WIDTH_TIMES_TWO))?.toDouble()?.div(2)
-            ?: Double.POSITIVE_INFINITY,
-    )
-}
-
-fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSubmission {
-    val solution = try {
-        SolutionParser.parse(ByteArrayInputStream(inputBytes).source().buffer())
-    } catch (e: Exception) {
-        throw IllegalArgumentException("I could not parse your solution", e)
-    }
-    if (solution !is SolvedSolution) {
-        throw IllegalArgumentException("only solved solutions are accepted")
-    }
-    if (solution.parts.count { it is Arm && it.type == ArmType.VAN_BERLOS_WHEEL } > 1) {
-        throw IllegalArgumentException("Multiple Van Berlo's Wheels are banned.")
-    }
-    if (solution.parts.count { it is Glyph && it.type == GlyphType.DISPOSAL } > 1) {
-        throw IllegalArgumentException("Multiple Disposal glyphs are banned.")
-    }
-    if (solution.parts.filterIsInstance<IO>().groupBy { it.type to it.index }.values.any { it.size > 1 }) {
-        throw IllegalArgumentException("Duplicated Inputs or Outputs are banned.")
-    }
-    val (puzzle, solutionBytes) = OmPuzzle.entries.find { it.id == solution.puzzle }?.let { it to inputBytes }
-        ?: OmPuzzle.entries.find { it.altIds.contains(solution.puzzle) }?.let {
-            solution.puzzle = it.id
-            val out = ByteArrayOutputStream()
-            SolutionParser.write(solution, out.sink().buffer(), writeSolved = true)
-            it to out.toByteArray()
-        }
-        ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
-    val puzzleFile = puzzle.file
-    JNISolutionVerifier.open(puzzleFile.readBytes(), solutionBytes).use { verifier ->
-        if (verifier.getMetric(OmSimMetric.MAXIMUM_TRACK_GAP_POW_2) > 1) {
-            throw IllegalArgumentException("Quantum Tracks are banned.")
-        }
-        if (verifier.getMetric(OmSimMetric.MAXIMUM_ABSOLUTE_ARM_ROTATION) >= 4096) {
-            throw IllegalArgumentException("Maximum arm rotations over 4096 are banned.")
-        }
-        return OmSubmission(
-            puzzle,
-            verifier.getScore(puzzle.type),
-            author,
-            gif,
-            solutionBytes
-        )
-    }
-}
 
 fun OmRecord.withCategory(category: OmCategory) = CategoryRecord(this, setOf(category))
 

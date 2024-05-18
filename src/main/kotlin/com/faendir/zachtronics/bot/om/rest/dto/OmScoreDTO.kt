@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,12 @@ data class OmScoreDTO(
     val overlap: Boolean,
     val trackless: Boolean,
 
-    // @6
+    // @V
     val cycles: Int,
     val area: Int,
     val height: Int?,
     val width: Double?,
+    val boundingHex: Int?,
 
     // @INF
     val rate: Double?,
@@ -37,6 +38,7 @@ data class OmScoreDTO(
     val areaINFValue: Double?,
     val heightINF: Double?,
     val widthINF: Double?,
+    val boundingHexINF: Double?
 )
 
 fun OmScore.toDTO() = OmScoreDTO(
@@ -49,10 +51,12 @@ fun OmScore.toDTO() = OmScoreDTO(
     area = area,
     height = height,
     width = width,
+    boundingHex = boundingHex,
 
     rate = rate,
     areaINFLevel = areaINF?.level,
     areaINFValue = areaINF?.value,
     heightINF = heightINF?.toDouble(),
     widthINF = widthINF,
+    boundingHexINF = boundingHexINF?.toDouble(),
 )

@@ -31,7 +31,6 @@ import com.faendir.zachtronics.bot.reddit.Subreddit.OPUS_MAGNUM
 import com.faendir.zachtronics.bot.utils.Markdown
 import org.springframework.stereotype.Component
 import java.io.File
-import java.util.*
 
 @Component
 class OmRedditWikiGenerator(private val reddit: RedditService) {
@@ -58,7 +57,7 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
         return "${Markdown.linkOrText(score, first.displayLink)}${if (second.any { it.name.contains("X") }) "*" else ""}"
     }
 
-    internal fun update(readAccess: GitRepository.ReadAccess, categories: List<OmCategory>, data: Map<OmPuzzle, SortedSet<OmMemoryRecord>>) {
+    internal fun update(readAccess: GitRepository.ReadAccess, categories: List<OmCategory>, data: Map<OmPuzzle, Set<OmMemoryRecord>>) {
         if (categories.any { this.categories.contains(it) }) {
             val prefix = File(readAccess.repo, "reddit/prefix.md").readText()
             val suffix = File(readAccess.repo, "reddit/suffix.md").readText()

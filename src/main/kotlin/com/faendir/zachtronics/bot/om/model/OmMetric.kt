@@ -20,10 +20,10 @@ import com.faendir.zachtronics.bot.model.Metric
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.utils.InfinInt
 import com.faendir.zachtronics.bot.utils.LevelValue
+import com.faendir.zachtronics.bot.utils.runIf
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
-import kotlin.math.pow
 
 @Suppress("ClassName")
 sealed interface OmMetric<T> : Metric where T : Comparable<T> {
@@ -51,24 +51,32 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
 
     sealed class Value<T>(
         override val displayName: String,
-        internal val scoreId: Char,
+        private val scoreId: Char,
         override val measurePoint: MeasurePoint,
         final override val getValueFrom: (OmScore) -> T?,
-        val getDoubleFrom: (OmScore) -> Double?
+        private val describer: Value<T>.(T, StringFormat) -> String
     ) : ScorePart<T> where T : Comparable<T> {
         override val description: String = scoreId.toString()
-    }
-
-    sealed class NumericValue<T>(
-        displayName: String,
-        scoreId: Char,
-        measurePoint: MeasurePoint,
-        getValueFrom: (OmScore) -> T?,
-    ) : Value<T>(displayName, scoreId, measurePoint, getValueFrom, { getValueFrom(it)?.toDouble() })
-            where T : Number, T : Comparable<T> {
-
         override fun describe(score: OmScore, format: StringFormat): String? =
-            getValueFrom(score)?.let { numberFormat.format(it) }?.plus(scoreId)
+            getValueFrom(score)?.let { describer(it, format) }
+
+        internal fun describeInt(value: Int, format: StringFormat): String = "$value$scoreId"
+
+        internal fun describeInfinInt(value: InfinInt, format: StringFormat): String =
+            when (format) {
+                StringFormat.FILE_NAME -> "${value.toLatinString()}$scoreId"
+                else -> "$value$scoreId"
+            }
+
+        internal fun describeDouble(value: Double, format: StringFormat): String =
+            numberFormat.format(value).runIf(format == StringFormat.FILE_NAME) { replace("∞", "INF") } + scoreId
+
+        /** `1.23a1` and `1.23a'` */
+        internal fun describeLevelValue(lv: LevelValue, format: StringFormat): String =
+            when (format) {
+                StringFormat.FILE_NAME -> "${numberFormat.format(lv.value)}$scoreId${lv.level}"
+                else -> "${numberFormat.format(lv.value)}$scoreId" + "'".repeat(lv.level)
+            }
     }
 
     sealed class Modifier(
@@ -92,23 +100,23 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
             get() = subMetrics.flatMap { it.scoreParts }
     }
 
-    sealed class Sum(override val displayName: String, final override vararg val subMetrics: NumericValue<Int>) : Computed<Int> {
+    sealed class Sum(override val displayName: String, final override vararg val subMetrics: OmMetric<Int>) : Computed<Int> {
         override val getValueFrom = l@{ score: OmScore ->
             subMetrics.sumOf { it.getValueFrom(score) ?: return@l null }
         }
 
-        override val description: String = subMetrics.joinToString("+") { it.scoreId.toString() }
+        override val description: String = subMetrics.joinToString("+") { it.description }
 
         override fun describe(score: OmScore, format: StringFormat): String? =
             getValueFrom(score)?.let { "$description=$it" }
     }
 
-    sealed class Product(final override vararg val subMetrics: Value<*>) : Computed<Double> {
+    sealed class Product(final override vararg val subMetrics: OmMetric<Int>) : Computed<Double> {
         override val getValueFrom = l@{ score: OmScore ->
-            subMetrics.fold(1.0) { acc, part -> acc * (part.getDoubleFrom(score) ?: return@l null) }
+            subMetrics.fold(1.0) { acc, part -> acc * (part.getValueFrom(score) ?: return@l null) }
         }
         override val displayName = "X"
-        override val description: String = subMetrics.joinToString("·") { it.scoreId.toString() }
+        override val description: String = subMetrics.joinToString("·") { it.description }
 
         override fun describe(score: OmScore, format: StringFormat): String? =
             getValueFrom(score)?.let { "$description=${numberFormat.format(it)}" }
@@ -146,46 +154,31 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
         override fun describe(score: OmScore, format: StringFormat): String? = null
     }
 
-    data object COST : NumericValue<Int>("G", 'g', MeasurePoint.START, OmScore::cost)
-    data object INSTRUCTIONS : NumericValue<Int>("I", 'i', MeasurePoint.START, OmScore::instructions)
+    data object COST : Value<Int>("G", 'g', MeasurePoint.START, OmScore::cost, Value<*>::describeInt)
+    data object INSTRUCTIONS : Value<Int>("I", 'i', MeasurePoint.START, OmScore::instructions, Value<*>::describeInt)
 
-    data object CYCLES : NumericValue<Int>("C", 'c', MeasurePoint.VICTORY, OmScore::cycles)
-    data object AREA : NumericValue<Int>("A", 'a', MeasurePoint.VICTORY, OmScore::area)
-    data object HEIGHT : NumericValue<Int>("H", 'h', MeasurePoint.VICTORY, OmScore::height)
-    data object WIDTH : NumericValue<Double>("W", 'w', MeasurePoint.VICTORY, OmScore::width)
+    data object CYCLES : Value<Int>("C", 'c', MeasurePoint.VICTORY, OmScore::cycles, Value<*>::describeInt)
+    data object AREA : Value<Int>("A", 'a', MeasurePoint.VICTORY, OmScore::area, Value<*>::describeInt)
+    data object HEIGHT : Value<Int>("H", 'h', MeasurePoint.VICTORY, OmScore::height, Value<*>::describeInt)
+    data object WIDTH : Value<Double>("W", 'w', MeasurePoint.VICTORY, OmScore::width, Value<*>::describeDouble)
+    data object BOUNDING_HEX : Value<Int>("B", 'b', MeasurePoint.VICTORY, OmScore::boundingHex, Value<*>::describeInt)
 
-    data object RATE : NumericValue<Double>("R", 'r', MeasurePoint.INFINITY, OmScore::rate)
-    data object AREA_INF : Value<LevelValue>("A", 'a', MeasurePoint.INFINITY, OmScore::areaINF,
-        { s -> s.areaINF?.run { value * 10.0.pow(5 * level) } }) {
-        override fun describe(score: OmScore, format: StringFormat): String? {
-            val area = score.areaINF ?: return null
-            return when (format) {
-                StringFormat.FILE_NAME -> "${numberFormat.format(area.value)}a${area.level}"
-                else -> "${numberFormat.format(area.value)}a" + "'".repeat(area.level)
-            }
-        }
-    }
-    data object HEIGHT_INF : Value<InfinInt>("H", 'h', MeasurePoint.INFINITY, OmScore::heightINF, { it.heightINF?.toDouble() }) {
-        override fun describe(score: OmScore, format: StringFormat): String? {
-            val height = getValueFrom(score) ?: return null
-            return when (format) {
-                StringFormat.FILE_NAME -> "${height.toLatinString()}$scoreId"
-                else -> "$height$scoreId"
-            }
-        }
-
+    data object RATE : Value<Double>("R", 'r', MeasurePoint.INFINITY, OmScore::rate, Value<*>::describeDouble)
+    data object AREA_INF : Value<LevelValue>("A", 'a', MeasurePoint.INFINITY, OmScore::areaINF, Value<*>::describeLevelValue)
+    data object HEIGHT_INF : Value<InfinInt>("H", 'h', MeasurePoint.INFINITY, OmScore::heightINF, Value<*>::describeInfinInt) {
         override val collapsible: Boolean = false
     }
-    data object WIDTH_INF : NumericValue<Double>("W", 'w', MeasurePoint.INFINITY, OmScore::widthINF) {
-        override fun describe(score: OmScore, format: StringFormat): String? =
-            super.describe(score, format)?.run { if (format == StringFormat.FILE_NAME) replace("∞", "INF") else this }
-
+    data object WIDTH_INF : Value<Double>("W", 'w', MeasurePoint.INFINITY, OmScore::widthINF, Value<*>::describeDouble) {
+        override val collapsible: Boolean = false
+    }
+    data object BOUNDING_HEX_INF : Value<InfinInt>("B", 'b', MeasurePoint.INFINITY, OmScore::boundingHexINF, Value<*>::describeInfinInt) {
         override val collapsible: Boolean = false
     }
 
     data object OVERLAP : Modifier("O", MeasurePoint.START, OmScore::overlap)
     data object TRACKLESS : Modifier("T", MeasurePoint.START, OmScore::trackless, reverseOrder = true)
-    data object LOOPING : Modifier("L", MeasurePoint.INFINITY, OmScore::looping, reverseOrder = true)
+    /** we're massively cheating by making it a first class [Modifier]@V instead of a [Computed]@INF, what do I not do for pretty gifs */
+    data object LOOPING : Modifier("L", MeasurePoint.VICTORY, OmScore::looping, reverseOrder = true)
 
     data object ANYTHING_GOES : Constant<Boolean>("O", true)
     data object NOVERLAP : Not("", OVERLAP)
@@ -200,22 +193,20 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
     data object PRODUCT_GI : Product(COST, INSTRUCTIONS)
     data object PRODUCT_CA : Product(CYCLES, AREA)
     data object PRODUCT_CI : Product(CYCLES, INSTRUCTIONS)
+}
 
-    data object PRODUCT_GA_INF : Product(COST, AREA_INF)
-    data object PRODUCT_AI_INF : Product(AREA_INF, INSTRUCTIONS)
-
-    /**
-     * @property displayName @X
-     */
-    enum class MeasurePoint(val displayName: String) {
-        START("@0"),
-        VICTORY("@V"),
-        INFINITY("@∞")
-    }
+/**
+ * @property displayName @X
+ */
+enum class MeasurePoint(val displayName: String) {
+    START("@0"),
+    VICTORY("@V"),
+    INFINITY("@∞")
 }
 
 // https://youtrack.jetbrains.com/issue/KT-8970 stops us from doing some nice reflectivy thingy
 object OmMetrics {
+    /** Score printing order for machines */
     val VALUE = listOf(
         OmMetric.COST,
         OmMetric.INSTRUCTIONS,
@@ -223,11 +214,40 @@ object OmMetrics {
         OmMetric.AREA,
         OmMetric.HEIGHT,
         OmMetric.WIDTH,
+        OmMetric.BOUNDING_HEX,
         OmMetric.RATE,
         OmMetric.AREA_INF,
         OmMetric.HEIGHT_INF,
-        OmMetric.WIDTH_INF
+        OmMetric.WIDTH_INF,
+        OmMetric.BOUNDING_HEX_INF,
     )
     val MODIFIER = listOf(OmMetric.OVERLAP, OmMetric.TRACKLESS, OmMetric.LOOPING)
     val FULL_SCORE = VALUE + MODIFIER
+
+    /** Score printing order for humans */
+    val BY_MEASURE_POINT = mapOf(
+        MeasurePoint.VICTORY to listOf(
+            OmMetric.COST,
+            OmMetric.CYCLES,
+            OmMetric.AREA,
+            OmMetric.INSTRUCTIONS,
+            OmMetric.HEIGHT,
+            OmMetric.WIDTH,
+            OmMetric.BOUNDING_HEX,
+            OmMetric.OVERLAP,
+            OmMetric.TRACKLESS,
+            OmMetric.LOOPING,
+        ),
+        MeasurePoint.INFINITY to listOf(
+            OmMetric.COST,
+            OmMetric.RATE,
+            OmMetric.AREA_INF,
+            OmMetric.INSTRUCTIONS,
+            OmMetric.HEIGHT_INF,
+            OmMetric.WIDTH_INF,
+            OmMetric.BOUNDING_HEX_INF,
+            OmMetric.OVERLAP,
+            OmMetric.TRACKLESS
+        )
+    )
 }

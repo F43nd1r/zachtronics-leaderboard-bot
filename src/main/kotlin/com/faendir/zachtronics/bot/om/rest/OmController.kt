@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.faendir.zachtronics.bot.om.rest
 
 import com.faendir.zachtronics.bot.mors.MorsService
-import com.faendir.zachtronics.bot.om.createSubmission
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmCollection
 import com.faendir.zachtronics.bot.om.model.OmGroup
@@ -37,6 +36,7 @@ import com.faendir.zachtronics.bot.om.rest.dto.OmSubmissionDTO
 import com.faendir.zachtronics.bot.om.rest.dto.emptyRecord
 import com.faendir.zachtronics.bot.om.rest.dto.id
 import com.faendir.zachtronics.bot.om.rest.dto.toDTO
+import com.faendir.zachtronics.bot.om.validation.createSubmission
 import com.faendir.zachtronics.bot.om.withCategory
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.rest.GameRestController
@@ -121,7 +121,7 @@ class OmController(
     @GetMapping(path = ["/manifold/{manifoldId}/categories"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getCategoriesByManifold(@PathVariable manifoldId: String): List<OmCategoryDTO> {
         val manifold = findManifold(manifoldId)
-        return OmCategory.entries.filter { it.associatedManifold == manifold }.map { it.toDTO() }
+        return OmCategory.entries.filter { it.manifold == manifold }.map { it.toDTO() }
     }
 
     override fun listRecords(puzzleId: String, includeFrontier: Boolean?): List<OmRecordDTO> {

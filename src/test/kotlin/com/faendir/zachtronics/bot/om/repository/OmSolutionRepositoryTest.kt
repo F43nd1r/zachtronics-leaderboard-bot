@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,14 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import strikt.api.expectThat
-import strikt.assertions.*
+import strikt.assertions.any
+import strikt.assertions.containsExactlyInAnyOrder
+import strikt.assertions.first
+import strikt.assertions.hasSize
+import strikt.assertions.isA
+import strikt.assertions.isEmpty
+import strikt.assertions.isEqualTo
+import strikt.assertions.none
 import java.io.File
 
 class OmSolutionRepositoryTest {
@@ -170,10 +177,10 @@ class OmSolutionRepositoryTest {
 
     @Test
     fun `outpareto on opposite manifold`() {
-        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cycles = 10, rate = 100.0)))
-        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cycles = 30, rate = 10.0)))
+        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cycles = 10, rate = 100.0, widthINF = 1.0)))
+        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cycles = 30, rate = 10.0, widthINF = 1.0)))
 
-        val score = dummyOmScore.copy(cycles = 20, rate = 10.0)
+        val score = dummyOmScore.copy(cycles = 20, rate = 10.0, widthINF = 1.0)
 
         val result = repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score))
 

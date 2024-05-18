@@ -22,6 +22,7 @@ import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.utils.InfinInt
 import com.faendir.zachtronics.bot.utils.LevelValue
 import com.faendir.zachtronics.bot.utils.newEnumSet
+import com.faendir.zachtronics.bot.utils.runIf
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.util.*
@@ -34,11 +35,12 @@ data class OmScore(
     val overlap: Boolean,
     val trackless: Boolean,
 
-    // @6
+    // @V
     val cycles: Int,
     val area: Int,
-    val height: Int?,   // tracked for NORMAL,POLYMER
-    val width: Double?, // tracked for NORMAL,POLYMER
+    val height: Int?,      // tracked for NORMAL,POLYMER
+    val width: Double?,    // tracked for NORMAL
+    val boundingHex: Int?, // tracked for NORMAL
 
     // @INF
     /**
@@ -56,22 +58,23 @@ data class OmScore(
      * represented as (level, value)
      */
     val areaINF: LevelValue?,
-    val heightINF: InfinInt?, // tracked for NORMAL,POLYMER
-    val widthINF: Double?,    // tracked for NORMAL
+    val heightINF: InfinInt?,      // tracked for NORMAL,POLYMER
+    val widthINF: Double?,         // tracked for NORMAL
+    val boundingHexINF: InfinInt?, // tracked for NORMAL
 ) : Score<OmCategory> {
-    // @INF
     @Transient
     val looping: Boolean = rate != null
 
+    /** Values in {[MeasurePoint.VICTORY], [MeasurePoint.INFINITY]} */
     @Transient
-    val manifolds: Set<OmScoreManifold> =
-        // with just 2 manifolds we can cut corners, but this should use the nullity of their scoreParts
-        EnumSet.of(OmScoreManifold.VICTORY).apply { if (looping) add(OmScoreManifold.INFINITY) }
+    val measurePoints: EnumSet<MeasurePoint> =
+        // with just 2 non-start measure points we can cut corners, hopefully we don't need to track more
+        EnumSet.of(MeasurePoint.VICTORY).apply { if (looping) add(MeasurePoint.INFINITY) }
 
     /**
-     * humans: `12g/34c/56a/78i/3h/4w/OTL@6 12g/34r/57a/78i/6h/7w/OT@∞`
+     * humans: `12g/34c/56a/78i/3h/4w/8b/O/T/L@V 12g/34r/57a/78i/6h/7w/9b/O/T@∞`
      *
-     * machines: `12g-34i-15c-12a-3h-4w[-15r-12a0-3h-4w]-O-T`
+     * machines: `12g-34i-15c-12a-3h-4w-8b[-15r-12a0-3h-4w-9b]-O-T`
      */
     override fun toDisplayString(context: DisplayContext<OmCategory>): String {
 
@@ -83,18 +86,16 @@ data class OmScore(
 
         val desiredMetrics = context.categories
             ?.flatMapTo(HashSet(), OmCategory::requiredParts)
-            ?.takeIf { it.isNotEmpty() }
             ?.apply { if (context.format != StringFormat.REDDIT) addAll(OmMetrics.MODIFIER) }
             ?: OmMetrics.FULL_SCORE.toSet()
 
-        val desiredManifolds = context.categories
-            ?.mapTo(newEnumSet(), OmCategory::associatedManifold)
-            ?.takeIf { it.isNotEmpty() }
-            ?: manifolds
+        val desiredMeasurePoints = context.categories
+            ?.mapTo(newEnumSet()) { it.manifold.measurePoint }
+            ?: measurePoints
 
-        return desiredManifolds.joinToString(" ") { manifold ->
-            subScoreDisplay(manifold.scoreParts.filter { it in desiredMetrics }, context.format)
-                .run { if (desiredManifolds.size > 1) plus(manifold.displayName) else this }
+        return desiredMeasurePoints.joinToString(" ") { measurePoint ->
+            subScoreDisplay(OmMetrics.BY_MEASURE_POINT[measurePoint]!!.filter { it in desiredMetrics }, context.format)
+                .runIf(desiredMeasurePoints.size > 1) { plus(measurePoint.displayName) }
         } + additionalMetricDescriptions(context)
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,10 @@ internal class OmUrlMapperTest {
     @Test
     fun `should create short url`() {
         expectThat(urlMapper.createShortUrl("d5524ee3", OmPuzzle.ELECTRUM_SEPARATION,
-            OmScore(2265, 516, false, false, 47, 1694, 59, 34.5, 1.0, LevelValue(0, 1800.0), 60.toInfinInt(), 35.0)))
-            .isEqualTo("https://zlbb.faendir.com/l/om/d5524ee3/P103/2265g-516i-47c-1694a-59h-34.5w-1r-1800a0-60h-35w")
+            OmScore(
+                2265, 516, false, false,
+                47, 1694, 59, 34.5, 12,
+                1.0, LevelValue(0, 1800.0), 60.toInfinInt(), 35.0, 12.toInfinInt())
+        )).isEqualTo("https://zlbb.faendir.com/l/om/d5524ee3/P103/2265g-516i-47c-1694a-59h-34.5w-12b-1r-1800a0-60h-35w-12b")
     }
 }
