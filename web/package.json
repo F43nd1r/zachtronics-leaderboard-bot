@@ -13,7 +13,7 @@
         "@sinclair/typebox": "0.32.31",
         "d3-format": "3.1.0",
         "deep-object-diff": "1.1.9",
-        "plotly.js-gl3d-dist-min": "2.32.0",
+        "plotly.js-gl3d-dist-min": "2.33.0",
         "react": "18.3.1",
         "react-dom": "18.3.1",
         "react-intersection-observer": "9.10.2",
