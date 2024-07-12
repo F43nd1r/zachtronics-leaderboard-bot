@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,25 +31,25 @@ import static com.faendir.zachtronics.bot.sc.model.ScType.*;
 
 @Getter
 public enum ScCategory implements CategoryJava<ScCategory, ScScore, ScMetric<?>> {
-    C("C", List.of(CYCLES, REACTORS, SYMBOLS, ANY_FLAG), ANY_FLAG, ScTypeSets.ALL, 0b100),
-    CNB("CNB", List.of(CYCLES, REACTORS, SYMBOLS, NO_BUGS), NO_BUGS, ScTypeSets.ALL, 0b100),
-    CNP("CNP", List.of(CYCLES, REACTORS, SYMBOLS, NO_PRECOG), NO_PRECOG, ScTypeSets.ALL, 0b100),
-    CNBP("CNBP", List.of(CYCLES, REACTORS, SYMBOLS, NO_FLAGS), NO_FLAGS, ScTypeSets.ALL, 0b100),
+    C("C", ANY_FLAG, List.of(CYCLES, REACTORS, SYMBOLS, ANY_FLAG), ScTypeSets.ALL, 0b100),
+    CNB("CNB", NO_BUGS, List.of(CYCLES, REACTORS, SYMBOLS, NO_BUGS), ScTypeSets.ALL, 0b100),
+    CNP("CNP", NO_PRECOG, List.of(CYCLES, REACTORS, SYMBOLS, NO_PRECOG), ScTypeSets.ALL, 0b100),
+    CNBP("CNBP", NO_FLAGS, List.of(CYCLES, REACTORS, SYMBOLS, NO_FLAGS), ScTypeSets.ALL, 0b100),
 
-    S("S", List.of(SYMBOLS, REACTORS, CYCLES, ANY_FLAG), ANY_FLAG, ScTypeSets.ALL, 0b001),
-    SNB("SNB", List.of(SYMBOLS, REACTORS, CYCLES, NO_BUGS), NO_BUGS, ScTypeSets.ALL, 0b001),
-    SNP("SNP", List.of(SYMBOLS, REACTORS, CYCLES, NO_PRECOG), NO_PRECOG, ScTypeSets.ALL, 0b001),
-    SNBP("SNBP", List.of(SYMBOLS, REACTORS, CYCLES, NO_FLAGS), NO_FLAGS, ScTypeSets.ALL, 0b001),
+    S("S", ANY_FLAG, List.of(SYMBOLS, REACTORS, CYCLES, ANY_FLAG), ScTypeSets.ALL, 0b001),
+    SNB("SNB", NO_BUGS, List.of(SYMBOLS, REACTORS, CYCLES, NO_BUGS), ScTypeSets.ALL, 0b001),
+    SNP("SNP", NO_PRECOG, List.of(SYMBOLS, REACTORS, CYCLES, NO_PRECOG), ScTypeSets.ALL, 0b001),
+    SNBP("SNBP", NO_FLAGS, List.of(SYMBOLS, REACTORS, CYCLES, NO_FLAGS), ScTypeSets.ALL, 0b001),
 
-    RC("RC", List.of(REACTORS, CYCLES, SYMBOLS, ANY_FLAG), ANY_FLAG, ScTypeSets.PROD, 0b110),
-    RCNB("RCNB", List.of(REACTORS, CYCLES, SYMBOLS, NO_BUGS), NO_BUGS, ScTypeSets.PROD, 0b110),
-    RCNP("RCNP", List.of(REACTORS, CYCLES, SYMBOLS, NO_PRECOG), NO_PRECOG, ScTypeSets.PROD, 0b110),
-    RCNBP("RCNBP", List.of(REACTORS, CYCLES, SYMBOLS, NO_FLAGS), NO_FLAGS, ScTypeSets.PROD, 0b110),
+    RC("RC", ANY_FLAG, List.of(REACTORS, CYCLES, SYMBOLS, ANY_FLAG), ScTypeSets.PROD, 0b110),
+    RCNB("RCNB", NO_BUGS, List.of(REACTORS, CYCLES, SYMBOLS, NO_BUGS), ScTypeSets.PROD, 0b110),
+    RCNP("RCNP", NO_PRECOG, List.of(REACTORS, CYCLES, SYMBOLS, NO_PRECOG), ScTypeSets.PROD, 0b110),
+    RCNBP("RCNBP", NO_FLAGS, List.of(REACTORS, CYCLES, SYMBOLS, NO_FLAGS), ScTypeSets.PROD, 0b110),
 
-    RS("RS", List.of(REACTORS, SYMBOLS, CYCLES, ANY_FLAG), ANY_FLAG, ScTypeSets.PROD, 0b011),
-    RSNB("RSNB", List.of(REACTORS, SYMBOLS, CYCLES, NO_BUGS), NO_BUGS, ScTypeSets.PROD, 0b011),
-    RSNP("RSNP", List.of(REACTORS, SYMBOLS, CYCLES, NO_PRECOG), NO_PRECOG, ScTypeSets.PROD, 0b011),
-    RSNBP("RSNBP", List.of(REACTORS, SYMBOLS, CYCLES, NO_FLAGS), NO_FLAGS, ScTypeSets.PROD, 0b011);
+    RS("RS", ANY_FLAG, List.of(REACTORS, SYMBOLS, CYCLES, ANY_FLAG), ScTypeSets.PROD, 0b011),
+    RSNB("RSNB", NO_BUGS, List.of(REACTORS, SYMBOLS, CYCLES, NO_BUGS), ScTypeSets.PROD, 0b011),
+    RSNP("RSNP", NO_PRECOG, List.of(REACTORS, SYMBOLS, CYCLES, NO_PRECOG), ScTypeSets.PROD, 0b011),
+    RSNBP("RSNBP", NO_FLAGS, List.of(REACTORS, SYMBOLS, CYCLES, NO_FLAGS), ScTypeSets.PROD, 0b011);
 
     /** contains <tt>%s%s%d%s%d%s</tt> plus a bunch of <tt>*</tt> most likely */
     static final String[] FORMAT_STRINGS = {"%s%s%d%s%d%s", "%s%s%d%s**%d**%s",
@@ -58,19 +58,19 @@ public enum ScCategory implements CategoryJava<ScCategory, ScScore, ScMetric<?>>
                                             "**%s**%s**%d**%s%d%s", "**%s**%s**%d**%s**%d**%s"};
 
     private final String displayName;
+    private final ScMetric<Boolean> admission;
     private final List<ScMetric<?>> metrics;
     private final Comparator<ScScore> scoreComparator;
-    private final ScMetric<Boolean> admission;
     private final Set<ScType> supportedTypes;
     private final int scoreFormatId;
 
-    ScCategory(String displayName, @NotNull List<ScMetric<?>> metrics, @NotNull ScMetric<Boolean> admission, Set<ScType> supportedTypes,
+    ScCategory(String displayName, @NotNull ScMetric<Boolean> admission, @NotNull List<ScMetric<?>> metrics, Set<ScType> supportedTypes,
                int scoreFormatId) {
         this.displayName = displayName;
+        this.admission = admission;
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
         this.supportedTypes = supportedTypes;
-        this.admission = admission;
         this.scoreFormatId = scoreFormatId;
     }
 
