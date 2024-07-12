@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,10 @@
 package com.faendir.zachtronics.bot.utils
 
 object Markdown {
+    /** See [Markdown gui](https://github.com/mattcone/markdown-guide/blob/master/_basic-syntax/escaping-characters.md) */
+    @JvmStatic
+    fun escape(text: String) = Regex("""[\\`*_{}\[\]<>()#+\-.!|]""").replace(text, """\\$0""")
+
     @JvmStatic
     @JvmOverloads
     fun link(text: String, link: String, embed: Boolean = true) = "[$text](${if (embed) link else "<$link>"})"

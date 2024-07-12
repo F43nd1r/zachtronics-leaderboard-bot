@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class ScRecord implements Record<ScCategory> {
      */
     @NotNull
     public String toDisplayString(@NotNull DisplayContext<ScCategory> context, String reactorPrefix) {
-        String scoreAuthor = "(" + score.toDisplayString(context) + ") " + author;
+        String scoreAuthor = "(" + score.toDisplayString(context) + ") " + Markdown.escape(author);
         return Markdown.fileLinkOrEmpty(dataLink) +
                reactorPrefix + Markdown.linkOrText(scoreAuthor, displayLink);
     }

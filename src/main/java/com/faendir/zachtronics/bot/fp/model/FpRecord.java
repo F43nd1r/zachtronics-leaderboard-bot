@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,6 @@ public class FpRecord implements Record<FpCategory> {
     @Override
     public String toDisplayString(@NotNull DisplayContext<FpCategory> context) {
         return Markdown.fileLinkOrEmpty(dataLink) +
-               Markdown.linkOrText(score.toDisplayString(context) + " " + author, displayLink);
+               Markdown.linkOrText(score.toDisplayString(context) + " " + Markdown.escape(author), displayLink);
     }
 }

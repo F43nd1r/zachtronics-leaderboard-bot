@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,8 @@ data class OmRecord(
     override fun toDisplayString(context: DisplayContext<OmCategory>): String {
         return when (context.format) {
             StringFormat.DISCORD, StringFormat.REDDIT -> Markdown.fileLinkOrEmpty(dataLink) +
-                    Markdown.linkOrText(score.toDisplayString(context), displayLink) + author.orEmpty(prefix = " by ")
+                    Markdown.linkOrText(score.toDisplayString(context), displayLink) +
+                    author?.let { Markdown.escape(it) }.orEmpty(prefix = " by ")
             else -> score.toDisplayString(context) + author.orEmpty(prefix = " by ") + displayLink.orEmpty(prefix = " ")
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class SzRecord implements Record<SzCategory> {
     @NotNull
     @Override
     public String toDisplayString(@NotNull DisplayContext<SzCategory> context) {
-        String scoreAuthor = "(" + score.toDisplayString(context) + ")" + " " + author;
+        String scoreAuthor = "(" + score.toDisplayString(context) + ")" + " " + Markdown.escape(author);
         return Markdown.fileLinkOrEmpty(dataLink) + Markdown.linkOrText(scoreAuthor, displayLink);
     }
 }

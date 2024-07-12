@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class IfRecord implements Record<IfCategory> {
     @Override
     public String toDisplayString(@NotNull DisplayContext<IfCategory> context) {
         String result = Markdown.fileLinkOrEmpty(dataLink) +
-                        Markdown.linkOrText(score.toDisplayString(context) + " " + author, getDisplayLink());
+                        Markdown.linkOrText(score.toDisplayString(context) + " " + Markdown.escape(author), getDisplayLink());
         if (displayLinks.size() > 1) {
             for (int i = 1; i < displayLinks.size(); i++) {
                 String text = (context.getFormat() == StringFormat.REDDIT ?  "^" : "") + "[" + (i + 1) + "]";
