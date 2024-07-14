@@ -57,7 +57,7 @@ public class TISSubmitCommand extends AbstractSubmitCommand<TISCategory, TISPuzz
             .description("Link to your image of the solution")
             .build();
     @Getter
-    private final List<CommandOption<?, ?>> options = List.of(solutionOption, puzzleOption, authorOption, scoreOption, imageOption);
+    private final List<CommandOption<?, ?>> options = List.of(solutionOption, puzzleOption, scoreOption, authorOption, imageOption);
     @Getter
     private final Secured secured = TISSecured.INSTANCE;
     @Getter
