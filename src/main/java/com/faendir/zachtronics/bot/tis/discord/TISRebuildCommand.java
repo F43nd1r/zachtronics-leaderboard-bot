@@ -36,7 +36,6 @@ public class TISRebuildCommand extends AbstractRebuildCommand<TISPuzzle> {
     @Getter
     private final CommandOption<String, TISPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", TISPuzzle.class, TISPuzzle::getDisplayName)
             .description("Puzzle name. Can be shortened or abbreviated. E.g. `SIGN AMPL`, `ITP1`")
-            .required()
             .build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
