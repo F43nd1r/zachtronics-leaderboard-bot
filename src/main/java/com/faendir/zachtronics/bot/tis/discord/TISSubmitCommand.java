@@ -57,7 +57,7 @@ public class TISSubmitCommand extends AbstractSubmitCommand<TISCategory, TISPuzz
             .description("Link to your image of the solution")
             .build();
     @Getter
-    private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, scoreOption, imageOption);
+    private final List<CommandOption<?, ?>> options = List.of(solutionOption, puzzleOption, authorOption, scoreOption, imageOption);
     @Getter
     private final Secured secured = TISSecured.INSTANCE;
     @Getter
@@ -66,7 +66,7 @@ public class TISSubmitCommand extends AbstractSubmitCommand<TISCategory, TISPuzz
     @NotNull
     @Override
     public TISSubmission parseSubmission(@NotNull ChatInputInteractionEvent event) {
-        return TISSubmission.fromLink(solutionOption.get(event), puzzleOption.get(event), authorOption.get(event), scoreOption.get(event),
+        return TISSubmission.fromLink(solutionOption.get(event), puzzleOption.get(event), scoreOption.get(event), authorOption.get(event),
                                       imageOption.get(event));
     }
 }

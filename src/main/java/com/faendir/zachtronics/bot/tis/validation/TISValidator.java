@@ -29,8 +29,11 @@ import java.util.regex.Pattern;
 public class TISValidator {
     private TISValidator() {}
 
+    /**
+     * @param score it will get patched to <tt>/a</tt> if the solution actually gets an achievement
+     */
     @NotNull
-    public static TISSubmission validate(@NotNull String data, @NotNull TISPuzzle puzzle, String author, @NotNull TISScore score,
+    public static TISSubmission validate(@NotNull String data, @NotNull TISPuzzle puzzle, @NotNull TISScore score, @NotNull String author,
                                          String displayLink) {
         if (puzzle.getType() == TISType.SANDBOX)
             throw new ValidationException("Sandbox levels are not supported");

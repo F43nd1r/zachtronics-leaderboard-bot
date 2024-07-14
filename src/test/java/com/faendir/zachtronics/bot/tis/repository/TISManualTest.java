@@ -152,7 +152,7 @@ class TISManualTest {
                         String data = Files.readString(path).replace("\r\n", "\n");
                         TISSubmission submission;
                         try {
-                            submission = TISSubmission.fromData(data, puzzle, author, score, "http://li.nk");
+                            submission = TISSubmission.fromData(data, puzzle, score, author, "http://li.nk");
                         }
                         catch (Exception e) {
                             if (e instanceof ValidationException) {

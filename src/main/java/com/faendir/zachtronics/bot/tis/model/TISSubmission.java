@@ -33,15 +33,15 @@ public class TISSubmission implements Submission<TISCategory, TISPuzzle> {
     @NotNull String data;
 
     @NotNull
-    public static TISSubmission fromData(@NotNull String data, @NotNull TISPuzzle puzzle, String author, @NotNull TISScore score,
+    public static TISSubmission fromData(@NotNull String data, @NotNull TISPuzzle puzzle, @NotNull TISScore score, @NotNull String author,
                                          String displayLink) throws ValidationException {
-        return TISValidator.validate(data, puzzle, author, score, displayLink);
+        return TISValidator.validate(data, puzzle, score, author, displayLink);
     }
 
     @NotNull
-    public static TISSubmission fromLink(@NotNull String link, @NotNull TISPuzzle puzzle, String author, @NotNull TISScore score,
+    public static TISSubmission fromLink(@NotNull String link, @NotNull TISPuzzle puzzle, @NotNull TISScore score, @NotNull String author,
                                          String displayLink) throws ValidationException {
         String data = Utils.downloadSolutionFile(link);
-        return fromData(data, puzzle, author, score, displayLink);
+        return fromData(data, puzzle, score, author, displayLink);
     }
 }

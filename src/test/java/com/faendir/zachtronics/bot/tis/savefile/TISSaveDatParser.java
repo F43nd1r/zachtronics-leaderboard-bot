@@ -137,7 +137,7 @@ public class TISSaveDatParser {
 
         TISSubmission submission;
         try {
-            submission = TISSubmission.fromData(solution, puzzle, author, score, "https://li.nk");
+            submission = TISSubmission.fromData(solution, puzzle, score, author, "https://li.nk");
         }
         catch (ValidationException e) {
             return new ValidationResult.Unparseable<>(e.getMessage());

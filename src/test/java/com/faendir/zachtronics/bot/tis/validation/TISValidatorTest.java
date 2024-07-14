@@ -53,7 +53,7 @@ class TISValidatorTest {
                 """;
 
         TISScore score = new TISScore(83, 8, 8, false, false);
-        TISSubmission result = TISValidator.validate(solution, TISPuzzle.SELF_TEST_DIAGNOSTIC, "12345ieee", score, "image.link");
+        TISSubmission result = TISValidator.validate(solution, TISPuzzle.SELF_TEST_DIAGNOSTIC, score, "12345ieee", "image.link");
         TISSubmission expected = new TISSubmission(TISPuzzle.SELF_TEST_DIAGNOSTIC, score,
                                                    "12345ieee", "image.link", solution);
         assertEquals(expected, result);
