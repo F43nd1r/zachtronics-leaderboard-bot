@@ -25,8 +25,8 @@ import java.util.function.Function;
 @Value
 public class TISMetric<T extends Comparable<T>> implements MetricJava<TISScore, T> {
     public static final TISMetric<Integer> CYCLES = new TISMetric<>("C", TISScore::getCycles);
-    public static final TISMetric<Integer> NODES = new TISMetric<>("F", TISScore::getNodes);
-    public static final TISMetric<Integer> INSTRUCTIONS = new TISMetric<>("B", TISScore::getInstructions);
+    public static final TISMetric<Integer> NODES = new TISMetric<>("N", TISScore::getNodes);
+    public static final TISMetric<Integer> INSTRUCTIONS = new TISMetric<>("I", TISScore::getInstructions);
 
     public static final TISMetric<Integer> PROD_CN = new TISMetric<>("X", s -> s.getCycles() * s.getNodes());
     public static final TISMetric<Integer> PROD_CI = new TISMetric<>("X", s -> s.getCycles() * s.getInstructions());
