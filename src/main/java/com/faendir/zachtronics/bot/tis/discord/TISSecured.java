@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.tis.discord;
 
-enum class Subreddit(val id: String) {
-    INFINIFACTORY("infinifactory"),
-    LASTCALLBBS("lastcallbbs"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
-    TIS100("tis100")
+import com.faendir.zachtronics.bot.discord.command.security.*;
+
+import java.util.Set;
+
+public class TISSecured {
+    private static final Set<DiscordUser> WIKI_ADMINS = Set.of(DiscordUser.IEEE12345, DiscordUser.BIGGIE);
+    public static final DiscordUserSecured WIKI_ADMINS_ONLY = new DiscordUserSecured(WIKI_ADMINS);
+    public static final Secured INSTANCE = SecuredKt.or(WIKI_ADMINS_ONLY, TrustedLeaderboardPosterRoleSecured.INSTANCE);
+
+    private TISSecured() {}
 }
+

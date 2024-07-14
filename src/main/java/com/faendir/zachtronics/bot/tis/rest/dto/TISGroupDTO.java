@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.tis.rest.dto;
 
-enum class Subreddit(val id: String) {
-    INFINIFACTORY("infinifactory"),
-    LASTCALLBBS("lastcallbbs"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
-    TIS100("tis100")
+import com.faendir.zachtronics.bot.tis.model.TISGroup;
+import lombok.Value;
+import org.jetbrains.annotations.NotNull;
+
+@Value
+public class TISGroupDTO {
+    @NotNull String id;
+    @NotNull String displayName;
+
+    @NotNull
+    public static TISGroupDTO fromGroup(@NotNull TISGroup group) {
+        return new TISGroupDTO(group.name(), group.getDisplayName());
+    }
 }

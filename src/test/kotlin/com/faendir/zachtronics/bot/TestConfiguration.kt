@@ -74,6 +74,11 @@ class TestConfiguration(private val gitProperties: GitProperties) {
         return createTestGitRepository("repositories/sz-leaderboard")
     }
 
+    @Bean("tisRepository")
+    fun tisRepository(): GitRepository {
+        return createTestGitRepository("repositories/tis-leaderboard")
+    }
+
     @Bean
     fun redditService(): RedditService {
         return TestRedditService(extractResourceDirectory("reddit"))

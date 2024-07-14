@@ -14,13 +14,22 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.tis.savefile;
 
-enum class Subreddit(val id: String) {
-    INFINIFACTORY("infinifactory"),
-    LASTCALLBBS("lastcallbbs"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
-    TIS100("tis100")
+import lombok.Data;
+
+/**
+ * This class holds the properties of a specific save slot, custom extensions included
+ */
+@Data
+class TISSolutionInfo {
+    Integer cycles;
+    Integer instructions;
+    Integer nodes;
+
+    String flags;
+
+    boolean hasScore() {
+        return cycles != null && instructions != null && nodes != null;
+    }
 }

@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.tis.model;
 
-enum class Subreddit(val id: String) {
-    INFINIFACTORY("infinifactory"),
-    LASTCALLBBS("lastcallbbs"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
-    TIS100("tis100")
+import com.faendir.zachtronics.bot.model.Group;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+public enum TISGroup implements Group {
+    TIS_100_SEGMENT_MAP("TIS-100 SEGMENT MAP"),
+    TIS_NET_DIRECTORY("TIS-NET DIRECTORY");
+
+    private final String displayName;
 }

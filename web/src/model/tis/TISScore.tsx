@@ -13,14 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.faendir.zachtronics.bot.reddit
-
-enum class Subreddit(val id: String) {
-    INFINIFACTORY("infinifactory"),
-    LASTCALLBBS("lastcallbbs"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
-    TIS100("tis100")
+export default interface TISScore {
+    cycles: number
+    nodes: number
+    instructions: number
+    achievement: boolean
+    cheating: boolean
 }

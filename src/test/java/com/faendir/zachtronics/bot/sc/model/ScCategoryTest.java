@@ -16,25 +16,36 @@
 
 package com.faendir.zachtronics.bot.sc.model;
 
+import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.Arrays;
+import java.util.List;
+
+import static com.faendir.zachtronics.bot.sc.model.ScCategory.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ScCategoryTest {
 
     @Test
-    void testSupportsScore() {
-        assertTrue(supportsFlags(ScCategory.C, true, true));
-        assertTrue(supportsFlags(ScCategory.C, false, false));
+    public void ensureCategoryPacking() {
+        List<ScCategory> allCats = Arrays.asList(ScCategory.values());
+        assertEquals("C", MetricsTreeKt.smartFormat(Arrays.asList(C, CNB, CNP, CNBP), allCats));
+        assertEquals("C, CNB, CNP", MetricsTreeKt.smartFormat(Arrays.asList(C, CNB, CNP), allCats));
+    }
 
-        assertFalse(supportsFlags(ScCategory.SNB, true, false));
-        assertTrue(supportsFlags(ScCategory.SNB, false, true));
+    @Test
+    public void testSupportsScore() {
+        assertTrue(supportsFlags(C, true, true));
+        assertTrue(supportsFlags(C, false, false));
 
-        assertFalse(supportsFlags(ScCategory.RCNBP, true, false));
-        assertFalse(supportsFlags(ScCategory.RCNBP, false, true));
-        assertTrue(supportsFlags(ScCategory.RCNBP, false, false));
+        assertFalse(supportsFlags(SNB, true, false));
+        assertTrue(supportsFlags(SNB, false, true));
+
+        assertFalse(supportsFlags(RCNBP, true, false));
+        assertFalse(supportsFlags(RCNBP, false, true));
+        assertTrue(supportsFlags(RCNBP, false, false));
     }
 
     private static boolean supportsFlags(@NotNull ScCategory category, boolean bugged, boolean precognitive) {

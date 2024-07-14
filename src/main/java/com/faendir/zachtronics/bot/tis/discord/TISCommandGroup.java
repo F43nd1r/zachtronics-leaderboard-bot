@@ -14,13 +14,22 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.tis.discord;
 
-enum class Subreddit(val id: String) {
-    INFINIFACTORY("infinifactory"),
-    LASTCALLBBS("lastcallbbs"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
-    TIS100("tis100")
+import com.faendir.zachtronics.bot.discord.command.Command;
+import com.faendir.zachtronics.bot.tis.TISQualifier;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+@RequiredArgsConstructor
+public class TISCommandGroup extends Command.Group {
+    @Getter
+    private final String name = "tis";
+    @Getter
+    @TISQualifier
+    private final List<Command.Leaf> commands;
 }

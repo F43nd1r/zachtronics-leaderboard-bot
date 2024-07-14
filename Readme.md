@@ -6,6 +6,7 @@ Currently included:
  - [Opus Magnum](https://www.zachtronics.com/opus-magnum/)
  - [SpaceChem](https://www.zachtronics.com/spacechem/)
  - [Infinifactory](https://www.zachtronics.com/infinifactory/)
+ - [TIS-100](https://www.zachtronics.com/tis-100/)
  - [Shenzhen I/O](https://www.zachtronics.com/shenzhen-io/)
  - [Last Call BBS](https://www.zachtronics.com/last-call-bbs/)
  

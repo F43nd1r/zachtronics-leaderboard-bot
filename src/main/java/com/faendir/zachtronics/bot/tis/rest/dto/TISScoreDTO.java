@@ -14,13 +14,24 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.tis.rest.dto;
 
-enum class Subreddit(val id: String) {
-    INFINIFACTORY("infinifactory"),
-    LASTCALLBBS("lastcallbbs"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
-    TIS100("tis100")
+import com.faendir.zachtronics.bot.tis.model.TISScore;
+import lombok.Value;
+import org.jetbrains.annotations.NotNull;
+
+@Value
+public class TISScoreDTO {
+    int cycles;
+    int nodes;
+    int instructions;
+
+    boolean achievement;
+    boolean cheating;
+
+    @NotNull
+    public static TISScoreDTO fromScore(@NotNull TISScore score) {
+        return new TISScoreDTO(score.getCycles(), score.getNodes(), score.getInstructions(), score.isAchievement(), score.isCheating());
+    }
 }
+

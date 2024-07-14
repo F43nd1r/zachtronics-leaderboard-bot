@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,8 +112,8 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     }
 
     @Override
-    protected void updateRedditLeaderboard(@NotNull List<String> lines, @NotNull ScPuzzle puzzle, Path puzzlePath,
-                                           @NotNull List<ScSolution> solutions) {
+    protected void updateRedditLeaderboard(@NotNull List<String> lines, @NotNull ScPuzzle puzzle,
+                                           GitRepository.@NotNull ReadWriteAccess access, @NotNull List<ScSolution> solutions) {
 
         Map<ScCategory, ScRecord> recordMap = new EnumMap<>(ScCategory.class);
         Map<ScCategory, ScRecord> videoRecordMap = new EnumMap<>(ScCategory.class);
@@ -121,6 +121,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                                                .filter(s -> s.getDisplayLink() != null)
                                                .map(s -> s.extendToRecord(puzzle, null, null)) // no export needed
                                                .toList();
+        Path puzzlePath = getPuzzlePath(access, puzzle);
         for (ScSolution solution: solutions) {
             ScRecord record = solution.extendToRecord(puzzle,
                                                       makeArchiveLink(puzzle, solution.getScore()),

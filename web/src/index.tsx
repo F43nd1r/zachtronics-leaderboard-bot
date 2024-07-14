@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ const FpPuzzleVisualizerView = lazy(() => import("./views/fp/FpPuzzleVisualizerV
 const IfPuzzleVisualizerView = lazy(() => import("./views/if/IfPuzzleVisualizerView"))
 const ScPuzzleVisualizerView = lazy(() => import("./views/sc/ScPuzzleVisualizerView"))
 const SzPuzzleVisualizerView = lazy(() => import("./views/sz/SzPuzzleVisualizerView"))
+const TISPuzzleVisualizerView = lazy(() => import("./views/tis/TISPuzzleVisualizerView"))
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
@@ -60,6 +61,7 @@ createRoot(document.getElementById("root")!).render(
                         <Route path="if/:puzzleId" element={<IfPuzzleVisualizerView />} />
                         <Route path="sc/:puzzleId" element={<ScPuzzleVisualizerView />} />
                         <Route path="sz/:puzzleId" element={<SzPuzzleVisualizerView />} />
+                        <Route path="tis/:puzzleId" element={<TISPuzzleVisualizerView />} />
                     </Routes>
                 </BrowserRouter>
             </Suspense>
