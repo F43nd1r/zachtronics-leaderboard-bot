@@ -174,7 +174,7 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
             for (TISPuzzle puzzle : achievPuzzles) {
                 Map<TISCategory, TISRecord> recordMap = data.get(puzzle);
 
-                String link = puzzle.getLink() + "?visualizerFilterTIS-" + puzzle.getId() + ".modifiers.achievement=true";
+                String link = puzzle.getLink() + "?visualizerFilterTIS-" + puzzle.getId().replace('.', '-') + ".modifiers.achievement=true";
                 String puzzleHeader = Markdown.link(puzzle.getDisplayName(), link) + " (" + puzzle.getAchievement() + ")";
                 addPuzzleLines(it, puzzle, achievCategories, recordMap, puzzleHeader);
                 it.add("|");
@@ -200,7 +200,7 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
                 if (recordMap.isEmpty())
                     continue; // there is no cheating solve at all
 
-                String link = puzzle.getLink() + "?visualizerFilterTIS-" + puzzle.getId() + ".modifiers.cheating=true";
+                String link = puzzle.getLink() + "?visualizerFilterTIS-" + puzzle.getId().replace('.', '-') + ".modifiers.cheating=true";
                 String puzzleHeader = Markdown.link(puzzle.getDisplayName(), link);
                 addPuzzleLines(it, puzzle, cheatCategories, recordMap, puzzleHeader);
                 it.add("|");

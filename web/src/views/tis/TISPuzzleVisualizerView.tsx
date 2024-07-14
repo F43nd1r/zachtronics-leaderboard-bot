@@ -49,7 +49,7 @@ export default function TISPuzzleVisualizerView() {
                     key: "visualizerConfigTIS",
                     default: { mode: "3D", x: { metric: "c", scale: "linear" }, y: { metric: "n", scale: "linear" }, z: { metric: "i", scale: "linear" } },
                 }}
-                filter={{ key: `visualizerFilterTIS-${puzzleId}`, default: {} }}
+                filter={{ key: `visualizerFilterTIS-${puzzleId.replaceAll(".", "-")}`, default: {} }}
                 metrics={{
                     c: { name: "Cycles", get: (score) => score?.cycles },
                     n: { name: "Nodes", get: (score) => score?.nodes },
