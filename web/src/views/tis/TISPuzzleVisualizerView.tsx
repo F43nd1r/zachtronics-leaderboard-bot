@@ -19,7 +19,7 @@ import { useParams } from "react-router-dom"
 import { Visualizer } from "../../components/visualizer/Visualizer"
 import { VisualizerColor } from "../../utils/VisualizerColor"
 import Puzzle from "../../model/Puzzle"
-import IfScore from "../../model/tis/TISScore"
+import TISScore from "../../model/tis/TISScore"
 import fetchFromApi from "../../utils/fetchFromApi"
 import { RecordModal } from "../../components/RecordModal"
 import { useState } from "react"
@@ -27,7 +27,7 @@ import RecordDTO from "../../model/RecordDTO"
 
 export default function TISPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId
-    fetchFromApi<Puzzle>(`/itis/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - TIS-100 Leaderboard`))
+    fetchFromApi<Puzzle>(`/tis/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - TIS-100 Leaderboard`))
     const [activeRecords, setActiveRecords] = useState<RecordDTO<TISScore>[] | undefined>(undefined)
 
     return (
