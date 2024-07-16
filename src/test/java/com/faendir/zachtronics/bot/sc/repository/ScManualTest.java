@@ -82,6 +82,7 @@ class ScManualTest {
 
     @Test
     public void rebuildAllWiki() {
+        // cp -a ../spacechem/archive/* src/test/resources/repositories/sc-archive/
         repository.rebuildRedditLeaderboard(null);
 
         String pages = Arrays.stream(ScGroup.values())

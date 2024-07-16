@@ -324,9 +324,9 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
                                                   "Manual wiki rebuild for " + maybePuzzle.getDisplayName());
             }
             else {
-                List<String> pages = getTrackedPuzzles().stream()
-                                                        .map(this::wikiPageName)
-                                                        .toList();
+                Set<String> pages = getTrackedPuzzles().stream()
+                                                       .map(this::wikiPageName)
+                                                       .collect(Collectors.toSet());
                 for (String page : pages) {
                     List<String> lines = rebuildRedditPage(page, access);
                     getRedditService().updateWikiPage(getSubreddit(), page, String.join("\n", lines), "Manual wiki rebuild");
