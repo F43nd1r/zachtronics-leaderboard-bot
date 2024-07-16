@@ -22,13 +22,13 @@ import org.jetbrains.annotations.NotNull;
 
 @Value
 public class TISPuzzleDTO {
-    @NotNull String name;
+    @NotNull String id;
     @NotNull String displayName;
     @NotNull TISGroupDTO group;
     @NotNull String type;
 
     @NotNull
     public static TISPuzzleDTO fromPuzzle(@NotNull TISPuzzle puzzle) {
-        return new TISPuzzleDTO(puzzle.name(), puzzle.getDisplayName(), TISGroupDTO.fromGroup(puzzle.getGroup()), puzzle.getType().name());
+        return new TISPuzzleDTO(puzzle.getId(), puzzle.getDisplayName(), TISGroupDTO.fromGroup(puzzle.getGroup()), puzzle.getType().name());
     }
 }
