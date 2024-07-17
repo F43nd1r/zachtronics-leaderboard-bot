@@ -131,10 +131,10 @@ class TISManualTest {
         System.out.println("Done");
     }
 
-    /** looks for files formatted like <tt>$id[stuff]{.,-}$ccc.$nn.$ii[.c][stuff].txt</tt> */
+    /** looks for files formatted like <tt>$id[stuff].$ccc.$nn.$ii[.c].[stuff]txt</tt>, dots are actually <tt>[.-]</tt> */
     @Test
     public void scavengeSaveFolder() throws IOException {
-        Pattern maybeScorePattern = Pattern.compile(".*[.-](?<c>\\d+)[.-](?<n>\\d{1,2})[.-](?<i>\\d{1,3})(?<f>\\.c)?[.-].*txt");
+        Pattern maybeScorePattern = Pattern.compile(".*[.-](?<c>\\d+)[.-](?<n>\\d{1,2})[.-](?<i>\\d{1,3})(?<f>[.-]c)?[.-].*txt");
         String author = "12345ieee";
 
         /*
@@ -143,7 +143,7 @@ class TISManualTest {
         Path savesPath = Paths.get("../tis100/saves", author, "save");
 
         for (TISPuzzle puzzle : repository.getTrackedPuzzles()) {
-            try (DirectoryStream<Path> paths = Files.newDirectoryStream(savesPath, puzzle.getId() + ".*.txt")) {
+            try (DirectoryStream<Path> paths = Files.newDirectoryStream(savesPath, puzzle.getId() + "*.*txt")) {
                 for (Path path : paths) {
                     Matcher m = maybeScorePattern.matcher(path.getFileName().toString().substring(puzzle.getId().length()));
                     if (m.matches()) {

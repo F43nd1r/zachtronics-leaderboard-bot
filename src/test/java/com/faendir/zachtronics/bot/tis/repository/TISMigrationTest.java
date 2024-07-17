@@ -17,9 +17,8 @@
 package com.faendir.zachtronics.bot.tis.repository;
 
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.tis.model.TISPuzzle;
-import com.faendir.zachtronics.bot.tis.model.TISScore;
-import com.faendir.zachtronics.bot.tis.model.TISSubmission;
+import com.faendir.zachtronics.bot.repository.SubmitResult;
+import com.faendir.zachtronics.bot.tis.model.*;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -94,10 +93,10 @@ class TISMigrationTest {
     @Value
     private static class UserFrontier {
         String name;
-        List<List<Integer>> data;
+        List<int[]> data;
     }
 
-    /** data that powered the <a href="http://landonkryger.com/tis100/frontier/?id=0">frontier graphs</a> */
+    /** data that powered the <a href="http://landonkryger.com/tis100/frontier/">frontier graphs</a> */
     @Test
     public void parseExport() throws IOException {
 //        SELF-TEST DIAGNOSTIC,1,1
@@ -119,29 +118,33 @@ class TISMigrationTest {
             String puzzleLine = iterator.next();
             String jsonLine = iterator.next();
 
-            String puzzleStr = puzzleLine.substring(0, puzzleLine.indexOf(","));
+            String[] pieces = puzzleLine.split(",");
+
+            String puzzleStr = pieces[0];
             boolean achievement = puzzleStr.contains("(");
             if (achievement)
                 puzzleStr = puzzleLine.substring(0, puzzleLine.indexOf("(") - 1);
             TISPuzzle puzzle = findPuzzle(puzzleStr);
 
+            int solutions = Integer.parseInt(pieces[1]);
+            int players = Integer.parseInt(pieces[2]);
+
             String correctJson = "[" + jsonLine + "]";
             UserFrontier[] frontier = objectMapper.readValue(correctJson, UserFrontier[].class);
+
+            if (frontier.length != players || Arrays.stream(frontier).mapToInt(f -> f.getData().size()).sum() != solutions)
+                throw new IllegalStateException(puzzleLine);
 
             for (UserFrontier uf : frontier) {
                 String author = uf.getName();
                 if (author.isEmpty())
                     author = "Community";
 
-                for (List<Integer> intScore : uf.getData()) {
-                    TISScore score;
-                    if (achievement)
-                        score = new TISScore(intScore.get(0), intScore.get(1), intScore.get(2), true, false);
-                    else
-                        score = new TISScore(intScore.get(0), intScore.get(1), intScore.get(2), false, false);
-
+                for (int[] intScore : uf.getData()) {
+                    TISScore score = new TISScore(intScore[0], intScore[1], intScore[2], achievement, false);
                     TISSubmission submission = new TISSubmission(puzzle, score, author, null, "");
-                    repository.submit(submission);
+                    SubmitResult<TISRecord, TISCategory> result = repository.submit(submission);
+                    System.out.println(result);
                 }
             }
 
