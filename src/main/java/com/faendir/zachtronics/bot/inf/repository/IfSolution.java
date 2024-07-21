@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import com.faendir.zachtronics.bot.repository.Solution;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -43,7 +42,7 @@ public class IfSolution implements Solution<IfCategory, IfPuzzle, IfScore, IfRec
 
     @Override
     public IfRecord extendToRecord(IfPuzzle puzzle, String dataLink, Path dataPath) {
-        if (dataPath != null && Files.exists(dataPath))
+        if (dataPath != null)
             return new IfRecord(puzzle, score, author, displayLinks, dataLink, dataPath);
         else
             return new IfRecord(puzzle, score, author, displayLinks, null, null);

@@ -142,8 +142,7 @@ class IfManualTest {
                     String solutionData = Files.readAllLines(archivePath).get(1).split(" = ")[1];
                     IfSave save = IfSave.unmarshal(solutionData);
                     if (!IfValidator.couldHaveGRA(save, puzzle) && score.usesGRA()) {
-                        IfScore newScore = new IfScore(score.getCycles(), score.getFootprint(), score.getBlocks(),
-                                                       score.isOutOfBounds(), false, score.isFinite());
+                        IfScore newScore = score.withUsesGRA(false);
                         it.set(new IfSolution(newScore, solution.getAuthor(), solution.getDisplayLinks()));
                         Files.move(archivePath, repository.makeArchivePath(puzzlePath, newScore));
                         System.out.println("UnGRAed " + puzzle + ", " + newScore);

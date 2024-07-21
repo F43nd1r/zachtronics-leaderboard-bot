@@ -23,8 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class IfScoreTest {
     @Test
     public void serialization() {
-        String str = "1/?/3/OGF";
-        IfScore score = new IfScore(1, IfScore.PLACEHOLDER, 3, true, true, true);
+        String str = "1/2/3/OGF";
+        IfScore score = new IfScore(1, 2, 3, true, true, true);
 
         assertEquals(score, IfScore.parseScore(str));
         assertEquals(str, score.toDisplayString());

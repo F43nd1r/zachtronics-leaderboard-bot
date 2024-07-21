@@ -39,6 +39,7 @@ import java.util.stream.IntStream;
 @BotTest
 @Disabled("Massive tests only for manual migrations")
 class IfRedditMigrationTest {
+    private static final int SCORE_PLACEHOLDER = 1_000_000;
 
     @Autowired
     private IfSolutionRepository repository;
@@ -65,7 +66,7 @@ class IfRedditMigrationTest {
                 int footprint = Integer.parseInt(m.group("footprint"));
                 String author = m.group("author");
                 if (author == null) author = "Community";
-                IfScore score = new IfScore(IfScore.PLACEHOLDER, footprint, IfScore.PLACEHOLDER, false, true, false);
+                IfScore score = new IfScore(SCORE_PLACEHOLDER, footprint, SCORE_PLACEHOLDER, false, true, false);
 
                 IfSubmission submission = new IfSubmission(puzzle, score, author, Collections.emptyList(), "");
                 repository.submit(submission);
@@ -101,7 +102,7 @@ class IfRedditMigrationTest {
                 int blocks = Integer.parseInt(m.group("blocks"));
                 String author = m.group("author");
                 if (author.equals("###")) author = "Community";
-                IfScore score = new IfScore(IfScore.PLACEHOLDER, IfScore.PLACEHOLDER, blocks, false, true, false);
+                IfScore score = new IfScore(SCORE_PLACEHOLDER, SCORE_PLACEHOLDER, blocks, false, true, false);
 
                 List<String> displayLinks = new ArrayList<>(Collections.singleton(m.group("link")));
                 if (m.group("link2") != null)
@@ -161,7 +162,7 @@ class IfRedditMigrationTest {
         if (piece1.matches("\\d+") && ma.matches()) {
             int cycles = Integer.parseInt(piece1);
             String author = ma.group("author");
-            IfScore score = new IfScore(cycles, IfScore.PLACEHOLDER, IfScore.PLACEHOLDER, false, usesGRA, false);
+            IfScore score = new IfScore(cycles, SCORE_PLACEHOLDER, SCORE_PLACEHOLDER, false, usesGRA, false);
 
             List<String> displayLinks = IntStream.rangeClosed(1, 4)
                                                  .mapToObj(i -> ma.group("link" + i))
@@ -195,19 +196,19 @@ class IfRedditMigrationTest {
                 String author = "Community";
 
                 int cycles = Integer.parseInt(m.group("cycles"));
-                IfScore score = new IfScore(cycles, IfScore.PLACEHOLDER, IfScore.PLACEHOLDER, false, true, false);
+                IfScore score = new IfScore(cycles, SCORE_PLACEHOLDER, SCORE_PLACEHOLDER, false, true, false);
                 List<String> displayLinks = Collections.singletonList(m.group("linkc"));
                 IfSubmission submission = new IfSubmission(puzzle, score, author, displayLinks, "");
                 repository.submit(submission);
 
                 int footprint = Integer.parseInt(m.group("footprint"));
-                score = new IfScore(IfScore.PLACEHOLDER, footprint, IfScore.PLACEHOLDER, false, true, false);
+                score = new IfScore(SCORE_PLACEHOLDER, footprint, SCORE_PLACEHOLDER, false, true, false);
                 displayLinks = m.group("linkf") == null ? Collections.emptyList() : Collections.singletonList(m.group("linkf"));
                 submission = new IfSubmission(puzzle, score, author, displayLinks, "");
                 repository.submit(submission);
 
                 int blocks = Integer.parseInt(m.group("blocks"));
-                score = new IfScore(IfScore.PLACEHOLDER, IfScore.PLACEHOLDER, blocks, false, true, false);
+                score = new IfScore(SCORE_PLACEHOLDER, SCORE_PLACEHOLDER, blocks, false, true, false);
                 displayLinks = Collections.singletonList(m.group("linkb"));
                 submission = new IfSubmission(puzzle, score, author, displayLinks, "");
                 repository.submit(submission);

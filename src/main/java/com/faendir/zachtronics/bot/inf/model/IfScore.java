@@ -20,6 +20,7 @@ import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Score;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
+import lombok.With;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,16 +30,14 @@ import java.util.regex.Pattern;
 
 @Value
 public class IfScore implements Score<IfCategory> {
-    public static final int PLACEHOLDER = 1_000_000; // backend encoding for `?`
-
     int cycles;
     int footprint;
     int blocks;
 
-    boolean outOfBounds;
+    @With boolean outOfBounds;
     @Accessors(fluent = true)
-    boolean usesGRA;
-    boolean finite;
+    @With boolean usesGRA;
+    @With boolean finite;
 
     /** ccc/ff/bb[/OGF] */
     @NotNull
@@ -47,16 +46,15 @@ public class IfScore implements Score<IfCategory> {
         String separator = context.getSeparator();
         int formatId = Utils.getScoreFormatId(context);
 
-        return String.format(IfCategory.FORMAT_STRINGS[formatId], cycles, separator, footprint, separator, blocks, sepFlags(separator))
-                     .replace(Integer.toString(PLACEHOLDER), "?");
+        return String.format(IfCategory.FORMAT_STRINGS[formatId], cycles, separator, footprint, separator, blocks, sepFlags(separator));
     }
 
     /** O?G?F? */
     public static final String FLAGS_REGEX = "(?<Oflag>[oO])?(?<GRAflag>[gG])?(?<Fflag>[fF])?";
     /** ccc/ff/bb[/OGF] */
-    private static final Pattern REGEX_SCORE = Pattern.compile("\\**(?<cycles>\\d+|\\?)\\**[/-]" +
-                                                               "\\**(?<footprint>\\d+|\\?)\\**[/-]" +
-                                                               "\\**(?<blocks>\\d+|\\?)\\**" +
+    private static final Pattern REGEX_SCORE = Pattern.compile("\\**(?<cycles>\\d+)\\**[/-]" +
+                                                               "\\**(?<footprint>\\d+)\\**[/-]" +
+                                                               "\\**(?<blocks>\\d+)\\**" +
                                                                "(?:[/-]" + FLAGS_REGEX + ")?");
 
     /** <tt>ccc/ff/bb[/OGF]</tt>, tolerates extra <tt>*</tt> */
@@ -66,17 +64,12 @@ public class IfScore implements Score<IfCategory> {
         return m.matches() ? parseScore(m) : null;
     }
 
-    /** Unknown value encoded as {@link #PLACEHOLDER} */
-    private static int parseValue(@NotNull String value) {
-        return value.equals("?") ? PLACEHOLDER : Integer.parseInt(value);
-    }
-
     /** we assume m matches */
     @NotNull
     public static IfScore parseScore(@NotNull Matcher m) {
-        int cycles = parseValue(m.group("cycles"));
-        int footprint = parseValue(m.group("footprint"));
-        int blocks = parseValue(m.group("blocks"));
+        int cycles = Integer.parseInt(m.group("cycles"));
+        int footprint = Integer.parseInt(m.group("footprint"));
+        int blocks = Integer.parseInt(m.group("blocks"));
         return new IfScore(cycles, footprint, blocks,
                            m.group("Oflag") != null, m.group("GRAflag") != null, m.group("Fflag") != null);
     }
