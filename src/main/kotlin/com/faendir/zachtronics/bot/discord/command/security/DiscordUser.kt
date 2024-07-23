@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ enum class DiscordUser(val id: Long, val getSpecialEmoji: (Guild?) -> ReactionEm
     IEEE12345(295868901042946048, { ReactionEmoji.unicode("\uD83D\uDC18") }), // aka 12345IEEE
     TT(516462621382410260),
     ZIG(185983061190508544),
-    OMGITSABIST(223019983557361664, { guild -> guild?.getGuildEmojiById(Snowflake.of(1030311764182704138L))?.block()?.asReaction() }),
+    OMGITSABIST(223019983557361664, { guild -> guild?.getEmojiById(Snowflake.of(1030311764182704138L))?.block()?.asReaction() }),
     TULARE(219319015649181698, { ReactionEmoji.unicode("\uD83C\uDF52") }),
     REGULAR_HUMANOID(297954865223696384, { ReactionEmoji.unicode("\uD83D\uDC0C") }),
     BIGGIE(255092784128720896, { ReactionEmoji.unicode("\uD83C\uDF54") }),
