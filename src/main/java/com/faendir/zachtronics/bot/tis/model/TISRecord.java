@@ -37,6 +37,6 @@ public class TISRecord implements Record<TISCategory> {
     @Override
     public String toDisplayString(@NotNull DisplayContext<TISCategory> context) {
         return Markdown.fileLinkOrEmpty(dataLink) +
-               Markdown.linkOrText(Markdown.escape(author) + " " + score.toDisplayString(context), displayLink);
+               Markdown.linkOrText(score.toDisplayString(context) + " " + Markdown.escape(author), displayLink);
     }
 }
