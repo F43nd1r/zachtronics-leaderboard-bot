@@ -30,13 +30,18 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.CheckReturnValue;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.faendir.zachtronics.bot.tis.model.TISCategory.*;
 import static java.util.stream.Collectors.*;
@@ -225,30 +230,43 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
             };
 
         addLbTableHeader.accept("Most record solutions");
-        Map<String, List<TISSolution>> solutionsByAuthor = allSolutions.stream().collect(groupingBy(TISSolution::getAuthor));
-        solutionsByAuthor.entrySet().stream()
-                         .collect(groupingBy(e -> e.getValue().stream().filter(s -> !s.getCategories().isEmpty()).count(),
-                                             mapping(Map.Entry::getKey, toList())))
-                         .entrySet().stream()
-                         .filter(e -> e.getKey() != 0)
-                         .sorted(Collections.reverseOrder(Map.Entry.comparingByKey()))
-                         .forEach(e -> it.add("| " + e.getKey() + " | " + e.getValue().stream()
-                                                                           .sorted(String.CASE_INSENSITIVE_ORDER)
-                                                                           .map(Markdown::escape)
-                                                                           .collect(joining(", "))));
+        metaLeaderboardStream(allSolutions, s -> !s.getCategories().isEmpty()).forEach(it::add);
         it.add("");
-
         addLbTableHeader.accept("Most frontier solutions");
-        solutionsByAuthor.entrySet().stream()
-                         .collect(groupingBy(e -> e.getValue().size(),
-                                             mapping(Map.Entry::getKey, toList())))
-                         .entrySet().stream()
-                         .sorted(Collections.reverseOrder(Map.Entry.comparingByKey()))
-                         .forEach(e -> it.add("| " + e.getKey() + " | " + e.getValue().stream()
-                                                                           .sorted(String.CASE_INSENSITIVE_ORDER)
-                                                                           .map(Markdown::escape)
-                                                                           .collect(joining(", "))));
+        metaLeaderboardStream(allSolutions, s -> true).forEach(it::add);
+
         return lines;
+    }
+
+    private static final DecimalFormat format = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.ENGLISH));
+    @CheckReturnValue
+    private static Stream<String> metaLeaderboardStream(@NotNull List<TISSolution> allSolutions, Predicate<TISSolution> filterSol) {
+        Map<String, Double> authorToAmount = new HashMap<>();
+        for (TISSolution solution: allSolutions) {
+            if (filterSol.test(solution)) {
+                String[] authors;
+                if (solution.getAuthor().contains("/")) {
+                    authors = solution.getAuthor().split("/");
+                }
+                else {
+                    authors = new String[]{solution.getAuthor()};
+                }
+                double part = 1.0 / authors.length;
+                for (String author : authors)
+                    authorToAmount.merge(author, part, Double::sum);
+            }
+        }
+        return authorToAmount.entrySet()
+                             .stream()
+                             .collect(groupingBy(Map.Entry::getValue, mapping(Map.Entry::getKey, toList())))
+                             .entrySet()
+                             .stream()
+                             .sorted(Collections.reverseOrder(Map.Entry.comparingByKey()))
+                             .map(e -> "| " + format.format(e.getKey()) + " | " + e.getValue()
+                                                                                   .stream()
+                                                                                   .sorted(String.CASE_INSENSITIVE_ORDER)
+                                                                                   .map(Markdown::escape)
+                                                                                   .collect(joining(", ")));
     }
 
     @Override
