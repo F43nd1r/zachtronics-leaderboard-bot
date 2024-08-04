@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.tis.model;
 
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Score;
-import com.faendir.zachtronics.bot.tis.validation.TISSave;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
 import lombok.With;
@@ -32,13 +31,13 @@ import java.util.regex.Pattern;
 @Value
 public class TISScore implements Score<TISCategory> {
     @IntRange(from = 0) int cycles;
-    @IntRange(from = 1, to = TISSave.MAX_NODES) int nodes;
-    @IntRange(from = 1, to = TISSave.MAX_NODES * TISSave.MAX_NODE_INSTR) int instructions;
+    @IntRange(from = 1, to = 4 * 3) int nodes;
+    @IntRange(from = 1, to = 4 * 3 * 15) int instructions;
 
     @With boolean achievement;
     @With boolean cheating;
 
-    /** ccc/nn/ii[/AC] */
+    /** ccc/nn/ii[/ac] */
     @NotNull
     @Override
     public String toDisplayString(@NotNull DisplayContext<TISCategory> context) {
@@ -48,15 +47,15 @@ public class TISScore implements Score<TISCategory> {
         return String.format(TISCategory.FORMAT_STRINGS[formatId], cycles, separator, nodes, separator, instructions, sepFlags(separator));
     }
 
-    /** A?C? */
+    /** a?c? */
     public static final String FLAGS_REGEX = "(?<Aflag>[aA])?(?<Cflag>[cC])?";
-    /** ccc/nn/ii[/AC] */
+    /** ccc/nn/ii[/ac] */
     private static final Pattern REGEX_SCORE = Pattern.compile("\\**(?<cycles>\\d+)\\**[/-]" +
                                                                "\\**(?<nodes>\\d{1,2})\\**[/-]" +
                                                                "\\**(?<instructions>\\d{1,3})\\**" +
                                                                "(?:[/-]" + FLAGS_REGEX + ")?");
 
-    /** <tt>ccc/nn/ii[/AC]</tt>, tolerates extra <tt>*</tt> */
+    /** <tt>ccc/nn/ii[/ac]</tt>, tolerates extra <tt>*</tt> */
     @Nullable
     public static TISScore parseScore(@NotNull String string) {
         Matcher m = REGEX_SCORE.matcher(string);

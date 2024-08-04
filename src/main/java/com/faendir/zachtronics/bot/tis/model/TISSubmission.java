@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.tis.model;
 
 import com.faendir.zachtronics.bot.model.Submission;
-import com.faendir.zachtronics.bot.tis.validation.TISValidator;
+import com.faendir.zachtronics.bot.tis.validation.TIS100CXX;
 import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
@@ -33,15 +33,15 @@ public class TISSubmission implements Submission<TISCategory, TISPuzzle> {
     @NotNull String data;
 
     @NotNull
-    public static TISSubmission fromData(@NotNull String data, @NotNull TISPuzzle puzzle, @NotNull TISScore score, @NotNull String author,
+    public static TISSubmission fromData(@NotNull String data, @NotNull TISPuzzle puzzle, boolean cheating, @NotNull String author,
                                          String displayLink) throws ValidationException {
-        return TISValidator.validate(data, puzzle, score, author, displayLink);
+        return TIS100CXX.validate(data, puzzle, cheating, author, displayLink);
     }
 
     @NotNull
-    public static TISSubmission fromLink(@NotNull String link, @NotNull TISPuzzle puzzle, @NotNull TISScore score, @NotNull String author,
+    public static TISSubmission fromLink(@NotNull String link, @NotNull TISPuzzle puzzle, boolean cheating, @NotNull String author,
                                          String displayLink) throws ValidationException {
         String data = Utils.downloadSolutionFile(link);
-        return fromData(data, puzzle, score, author, displayLink);
+        return fromData(data, puzzle, cheating, author, displayLink);
     }
 }

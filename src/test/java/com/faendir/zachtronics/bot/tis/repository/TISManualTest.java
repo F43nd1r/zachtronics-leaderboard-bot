@@ -18,11 +18,11 @@ package com.faendir.zachtronics.bot.tis.repository;
 
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
-import com.faendir.zachtronics.bot.repository.SubmitResult;
-import com.faendir.zachtronics.bot.tis.model.*;
-import com.faendir.zachtronics.bot.tis.savefile.TISSaveDatParser;
+import com.faendir.zachtronics.bot.tis.model.TISCategory;
+import com.faendir.zachtronics.bot.tis.model.TISPuzzle;
+import com.faendir.zachtronics.bot.tis.model.TISRecord;
+import com.faendir.zachtronics.bot.tis.model.TISSubmission;
 import com.faendir.zachtronics.bot.validation.ValidationException;
-import com.faendir.zachtronics.bot.validation.ValidationResult;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +32,9 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @BotTest
 @Disabled("Massive tests only for manual testing or migrations")
@@ -108,56 +105,37 @@ class TISManualTest {
 
     @Test
     public void submitSaveFolder() throws IOException {
-        String author = "12345ieee";
-        boolean trustSave = true;
+        Path savesRoot = Paths.get("../tis100/saves");
+//        List<String> authors = Files.list(savesRoot).filter(Files::isDirectory).map(p -> p.getFileName().toString()).toList();
+        List<String> authors = List.of("12345ieee");
 
         /*
         cp -a ../tis100/leaderboard/* src/test/resources/repositories/tis-leaderboard/
          */
-        Path savesPath = Paths.get("../tis100/saves", author);
-        Collection<ValidationResult<TISSubmission>> vResults = TISSaveDatParser.validateSave(savesPath, author, trustSave);
 
-        List<SubmitResult<TISRecord, TISCategory>> sResults = repository.submitAll(vResults);
-        for (SubmitResult<TISRecord, TISCategory> result : sResults) {
-            System.out.println(result);
-        }
+        for (String author : authors) {
+            Path savesPath = savesRoot.resolve(author).resolve("save");
+//            if (!Files.exists(savesPath)) // it's in a subfolder called `random numbers`
+//                savesPath = Files.list(savesPath.getParent())
+//                                 .filter(Files::isDirectory)
+//                                 .filter(p -> p.getFileName().toString().matches("\\d+"))
+//                                 .findFirst().orElseThrow()
+//                                 .resolve("save");
 
-        /*
-        rm -r src/test/resources/repositories/tis-leaderboard/*
-        git restore --source=HEAD --staged --worktree -- src/test/resources/repositories/tis-leaderboard/
-        rsync -a --delete --exclude=README.txt $(ls -1dt /tmp/tis-leaderboard* | head -n1)/* ../tis100/leaderboard/
-         */
-
-        System.out.println("Done");
-    }
-
-    /** looks for files formatted like <tt>$id[stuff].$ccc.$nn.$ii[.c].[stuff]txt</tt>, dots are actually <tt>[.-]</tt> */
-    @Test
-    public void scavengeSaveFolder() throws IOException {
-        Pattern maybeScorePattern = Pattern.compile(".*[.-](?<c>\\d+)[.-](?<n>\\d{1,2})[.-](?<i>\\d{1,3})(?<f>[.-]c)?[.-].*txt");
-        String author = "12345ieee";
-
-        /*
-        cp -a ../tis100/leaderboard/* src/test/resources/repositories/tis-leaderboard/
-         */
-        Path savesPath = Paths.get("../tis100/saves", author, "save");
-
-        for (TISPuzzle puzzle : repository.getTrackedPuzzles()) {
-            try (DirectoryStream<Path> paths = Files.newDirectoryStream(savesPath, puzzle.getId() + "*.*txt")) {
-                for (Path path : paths) {
-                    Matcher m = maybeScorePattern.matcher(path.getFileName().toString().substring(puzzle.getId().length()));
-                    if (m.matches()) {
-                        TISScore score = new TISScore(Integer.parseInt(m.group("c")), Integer.parseInt(m.group("n")),
-                                                      Integer.parseInt(m.group("i")), false, m.group("f") != null);
+            for (TISPuzzle puzzle : repository.getTrackedPuzzles()) {
+                try (DirectoryStream<Path> paths = Files.newDirectoryStream(savesPath, puzzle.getId() + "*.*txt")) {
+                    for (Path path : paths) {
+                        boolean cheating = path.getFileName().toString().matches(puzzle.getId() + ".+c.+txt");
                         String data = Files.readString(path).replace("\r\n", "\n");
                         TISSubmission submission;
                         try {
-                            submission = TISSubmission.fromData(data, puzzle, score, author, "http://li.nk");
+                            submission = TISSubmission.fromData(data, puzzle, cheating, author, "http://li.nk");
                         }
                         catch (Exception e) {
                             if (e instanceof ValidationException) {
                                 String message = e.getMessage();
-                                if (message.startsWith("Solution has "/* N nodes/instructions ... */))
+                                if (message.startsWith("ERROR: failed with exception:") ||
+                                    message.contains("validation failure for output"))
                                     continue;
                             }
                             System.err.println(path);

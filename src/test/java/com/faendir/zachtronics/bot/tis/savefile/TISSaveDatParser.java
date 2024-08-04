@@ -54,6 +54,7 @@ import java.util.regex.Pattern;
  *
  * The leaderboard only needs metadata from here, the real solves are in the separate files
  */
+@SuppressWarnings("unused")
 public class TISSaveDatParser {
     private static final Pattern LINE_REGEX = Pattern.compile("Last\\.(?<idSlot>.+)\\.(?<part>.+?)\\s*=\\s*(?<value>.*)");
 
@@ -105,11 +106,9 @@ public class TISSaveDatParser {
         if (puzzle == null)
             return new ValidationResult.Unparseable<>("Unknown puzzle: " + id);
 
-        boolean achievement;
         boolean cheating;
         if (info.getFlags() == null) {
             if (trustSave) {
-                achievement = false;
                 cheating = info.getCycles() < puzzle.getLegitCyclesBound() || info.getNodes() < puzzle.getLegitNodesBound();
             }
             else
@@ -118,13 +117,11 @@ public class TISSaveDatParser {
         else {
             Matcher m = FLAGS_REGEX.matcher(info.getFlags());
             if (m.matches()) {
-                achievement = m.group("Aflag") != null;
                 cheating = m.group("Cflag") != null;
             }
             else
                 return new ValidationResult.Unparseable<>("Invalid score flags for idSlot: " + idSlot + " flags: " + info.getFlags());
         }
-        TISScore score = new TISScore(info.getCycles(), info.getNodes(), info.getInstructions(), achievement, cheating);
 
         Path solutionPath = savesPath.resolve(idSlot + ".txt");
         String solution;
@@ -137,7 +134,7 @@ public class TISSaveDatParser {
 
         TISSubmission submission;
         try {
-            submission = TISSubmission.fromData(solution, puzzle, score, author, "https://li.nk");
+            submission = TISSubmission.fromData(solution, puzzle, cheating, author, "https://li.nk");
         }
         catch (ValidationException e) {
             return new ValidationResult.Unparseable<>(e.getMessage());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.validation;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,10 +24,11 @@ import java.io.IOException;
 public class ValidationUtils {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().configure(
-            DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+        DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+
     private ValidationUtils() {}
 
-    public static <T> T callValidator(Class<T> resultClass, byte[] data, String... command) {
+    public static byte[] callValidator(byte[] data, String... command) {
         ProcessBuilder builder = new ProcessBuilder(command);
 
         try {
@@ -43,14 +43,25 @@ public class ValidationUtils {
                 if (stderr.length != 0)
                     throw new ValidationException(new String(stderr));
             }
-            return OBJECT_MAPPER.readValue(result, resultClass);
+            return result;
 
-        } catch (JsonProcessingException e) {
-            throw new ValidationException("Error in reading back results", e);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new ValidationException("Error in communicating with the validator", e);
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             throw new ValidationException("Thread was killed while waiting for the validator", e);
+        }
+    }
+
+    public static <T> T callValidator(Class<T> resultClass, byte[] data, String... command) {
+        byte[] result = callValidator(data, command);
+
+        try {
+            return OBJECT_MAPPER.readValue(result, resultClass);
+        }
+        catch (IOException e) {
+            throw new ValidationException("Error in reading back results", e);
         }
     }
 }

@@ -22,7 +22,10 @@ import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
 import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.tis.TISQualifier;
-import com.faendir.zachtronics.bot.tis.model.*;
+import com.faendir.zachtronics.bot.tis.model.TISCategory;
+import com.faendir.zachtronics.bot.tis.model.TISPuzzle;
+import com.faendir.zachtronics.bot.tis.model.TISRecord;
+import com.faendir.zachtronics.bot.tis.model.TISSubmission;
 import com.faendir.zachtronics.bot.tis.repository.TISSolutionRepository;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
@@ -48,16 +51,15 @@ public class TISSubmitCommand extends AbstractSubmitCommand<TISCategory, TISPuzz
             .description("Name to appear on the Reddit leaderboard")
             .required()
             .build();
-    private final CommandOption<String, TISScore> scoreOption = CommandOptionBuilder.string("score")
-            .description("Score of the solution in ccc/nn/ii[/AC] format")
+    private final CommandOption<Boolean, Boolean> cheatingOption = CommandOptionBuilder.bool("cheating")
+            .description("True if solution is cheating (be honest!)")
             .required()
-            .convert((event, score) -> TISScore.parseScore(score))
             .build();
     private final CommandOption<String, String> imageOption = OptionHelpersKt.displayLinkOptionBuilder("image")
             .description("Link to your image of the solution")
             .build();
     @Getter
-    private final List<CommandOption<?, ?>> options = List.of(solutionOption, puzzleOption, scoreOption, authorOption, imageOption);
+    private final List<CommandOption<?, ?>> options = List.of(solutionOption, puzzleOption, cheatingOption, authorOption, imageOption);
     @Getter
     private final Secured secured = TISSecured.INSTANCE;
     @Getter
@@ -66,7 +68,7 @@ public class TISSubmitCommand extends AbstractSubmitCommand<TISCategory, TISPuzz
     @NotNull
     @Override
     public TISSubmission parseSubmission(@NotNull ChatInputInteractionEvent event) {
-        return TISSubmission.fromLink(solutionOption.get(event), puzzleOption.get(event), scoreOption.get(event), authorOption.get(event),
+        return TISSubmission.fromLink(solutionOption.get(event), puzzleOption.get(event), cheatingOption.get(event), authorOption.get(event),
                                       imageOption.get(event));
     }
 }
