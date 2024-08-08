@@ -51,15 +51,11 @@ public class TISSubmitCommand extends AbstractSubmitCommand<TISCategory, TISPuzz
             .description("Name to appear on the Reddit leaderboard")
             .required()
             .build();
-    private final CommandOption<Boolean, Boolean> cheatingOption = CommandOptionBuilder.bool("cheating")
-            .description("True if solution is cheating (be honest!)")
-            .required()
-            .build();
     private final CommandOption<String, String> imageOption = OptionHelpersKt.displayLinkOptionBuilder("image")
             .description("Link to your image of the solution")
             .build();
     @Getter
-    private final List<CommandOption<?, ?>> options = List.of(solutionOption, puzzleOption, cheatingOption, authorOption, imageOption);
+    private final List<CommandOption<?, ?>> options = List.of(solutionOption, puzzleOption, authorOption, imageOption);
     @Getter
     private final Secured secured = TISSecured.INSTANCE;
     @Getter
@@ -68,7 +64,6 @@ public class TISSubmitCommand extends AbstractSubmitCommand<TISCategory, TISPuzz
     @NotNull
     @Override
     public TISSubmission parseSubmission(@NotNull ChatInputInteractionEvent event) {
-        return TISSubmission.fromLink(solutionOption.get(event), puzzleOption.get(event), cheatingOption.get(event), authorOption.get(event),
-                                      imageOption.get(event));
+        return TISSubmission.fromLink(solutionOption.get(event), puzzleOption.get(event), authorOption.get(event), imageOption.get(event));
     }
 }

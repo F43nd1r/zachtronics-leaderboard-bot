@@ -33,8 +33,9 @@ public class TISMetric<T extends Comparable<T>> implements MetricJava<TISScore, 
     public static final TISMetric<Integer> PROD_NI = new TISMetric<>("X", s -> s.getNodes() * s.getInstructions());
 
     public static final TISMetric<Boolean> ACHIEVEMENT = new TISMetric<>("a", TISScore::isAchievement);
-    public static final TISMetric<Boolean> CAN_CHEAT = new TISMetric<>("c", s -> true);
     public static final TISMetric<Boolean> NOT_CHEATING = new TISMetric<>("", s -> !s.isCheating());
+    public static final TISMetric<Boolean> NOT_HARDCODED = new TISMetric<>("c", s -> !s.isHardcoded());
+    public static final TISMetric<Boolean> CAN_HARDCODE = new TISMetric<>("h", s -> true);
 
     @NotNull String displayName;
     @NotNull Function<TISScore, T> extract;

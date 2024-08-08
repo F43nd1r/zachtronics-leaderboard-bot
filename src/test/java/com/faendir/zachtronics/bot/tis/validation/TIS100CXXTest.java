@@ -18,13 +18,11 @@ package com.faendir.zachtronics.bot.tis.validation;
 
 import com.faendir.zachtronics.bot.tis.model.TISPuzzle;
 import com.faendir.zachtronics.bot.tis.model.TISScore;
-import com.faendir.zachtronics.bot.tis.model.TISSubmission;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses TIS-100-CXX")
 class TIS100CXXTest {
@@ -56,10 +54,67 @@ class TIS100CXXTest {
                 MOV LEFT, DOWN
                 """;
 
-        TISScore score = new TISScore(83, 8, 8, false, false);
-        TISSubmission result = TIS100CXX.validate(solution, TISPuzzle.SELF_TEST_DIAGNOSTIC, score.isCheating(), "12345ieee", "image.link");
-        TISSubmission expected = new TISSubmission(TISPuzzle.SELF_TEST_DIAGNOSTIC, score,
-                                                   "12345ieee", "image.link", solution);
+        TISScore expected = new TISScore(83, 8, 8, false, false, false);
+        TISScore result = TIS100CXX.validate(solution, TISPuzzle.SELF_TEST_DIAGNOSTIC);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void cheating() {
+        String solution = """
+                @0
+                
+                @1
+                MOV 5 ACC
+                SUB UP
+                MOV ACC,RIGHT
+                SUB 10
+                ADD UP
+                NEG
+                MOV ACC,RIGHT
+                
+                @2
+                JRO LEFT
+                MOV UP,NIL
+                MOV UP,NIL
+                MOV UP,NIL
+                MOV UP,NIL
+                N:MOV UP,DOWN
+                MOV UP,DOWN
+                JRO LEFT
+                MOV UP,DOWN
+                MOV UP,DOWN
+                MOV UP,DOWN
+                MOV 0 DOWN
+                B:MOV UP,ACC
+                JNZ B
+                
+                @3
+                
+                
+                @4
+                
+                
+                @5
+                
+                
+                @6
+                MOV UP,DOWN
+                
+                @7
+                
+                
+                @8
+                
+                
+                @9
+                MOV UP,DOWN
+                
+                @10
+                """;
+
+        TISScore expected = new TISScore(113, 4, 23, false, true, false);
+        TISScore result = TIS100CXX.validate(solution, TISPuzzle.SUBSEQUENCE_EXTRACTOR);
         assertEquals(expected, result);
     }
 
@@ -67,35 +122,29 @@ class TIS100CXXTest {
     public void timeout() {
         String solution = """
                 @0
-                MOV UP, DOWN
                 
                 @1
-                MOV RIGHT, DOWN
                 
                 @2
-                MOV UP, LEFT
                 
                 @3
-                MOV UP, DOWN
                 
                 @4
-                MOV UP, DOWN
                 
                 @5
-                MOV UP, DOWN
                 
                 @6
-                MOV UP, RIGHT
                 
                 @7
-                MOV LEFT, DOWN
                 """;
 
-        TISScore score = new TISScore(83, 8, 8, false, false);
-        TISSubmission result = TIS100CXX.validate(solution, TISPuzzle.SELF_TEST_DIAGNOSTIC, score.isCheating(), "12345ieee", "image.link");
-        TISSubmission expected = new TISSubmission(TISPuzzle.SELF_TEST_DIAGNOSTIC, score,
-                                                   "12345ieee", "image.link", solution);
-        assertEquals(expected, result);
+        try {
+            TIS100CXX.validate(solution, TISPuzzle.SELF_TEST_DIAGNOSTIC);
+            fail("Validation should fail");
+        }
+        catch (ValidationException e) {
+            assertTrue(e.getMessage().contains("timeout"));
+        }
     }
 
     @Test
@@ -106,6 +155,6 @@ class TIS100CXXTest {
                 """;
 
         assertThrows(ValidationException.class,
-                     () -> TIS100CXX.validate(solution, TISPuzzle.SELF_TEST_DIAGNOSTIC, false, "12345ieee", "image.link"));
+                     () -> TIS100CXX.validate(solution, TISPuzzle.SELF_TEST_DIAGNOSTIC));
     }
 }

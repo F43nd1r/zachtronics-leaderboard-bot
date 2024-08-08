@@ -56,10 +56,18 @@ export default function TISPuzzleVisualizerView() {
                     i: { name: "Instructions", get: (score) => score?.instructions },
                 }}
                 modifiers={{
+                    hardcoded: {
+                        get: (score) => score?.hardcoded,
+                        name: "cheating",
+                        color: VisualizerColor.BAD1,
+                        legendOrder: -1,
+                        option1: "Hardcoded",
+                        option2: "Not hardcoded",
+                    },
                     cheating: {
                         get: (score) => score?.cheating,
                         name: "cheating",
-                        color: VisualizerColor.BAD1,
+                        color: VisualizerColor.BAD2,
                         legendOrder: -1,
                         option1: "Cheating",
                         option2: "Legit",

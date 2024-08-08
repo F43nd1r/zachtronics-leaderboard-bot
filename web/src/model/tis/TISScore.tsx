@@ -19,4 +19,5 @@ export default interface TISScore {
     instructions: number
     achievement: boolean
     cheating: boolean
+    hardcoded: boolean
 }

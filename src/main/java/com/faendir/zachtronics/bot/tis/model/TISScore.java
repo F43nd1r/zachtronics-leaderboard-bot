@@ -36,8 +36,10 @@ public class TISScore implements Score<TISCategory> {
 
     @With boolean achievement;
     @With boolean cheating;
+    /** implies {@link #cheating}{@code =true} */
+    @With boolean hardcoded;
 
-    /** ccc/nn/ii[/ac] */
+    /** ccc/nn/ii[/ach] */
     @NotNull
     @Override
     public String toDisplayString(@NotNull DisplayContext<TISCategory> context) {
@@ -47,15 +49,13 @@ public class TISScore implements Score<TISCategory> {
         return String.format(TISCategory.FORMAT_STRINGS[formatId], cycles, separator, nodes, separator, instructions, sepFlags(separator));
     }
 
-    /** a?c? */
-    public static final String FLAGS_REGEX = "(?<Aflag>[aA])?(?<Cflag>[cC])?";
-    /** ccc/nn/ii[/ac] */
+    /** ccc/nn/ii[/ach] */
     private static final Pattern REGEX_SCORE = Pattern.compile("\\**(?<cycles>\\d+)\\**[/-]" +
                                                                "\\**(?<nodes>\\d{1,2})\\**[/-]" +
                                                                "\\**(?<instructions>\\d{1,3})\\**" +
-                                                               "(?:[/-]" + FLAGS_REGEX + ")?");
+                                                               "(?:[/-](?<Aflag>[aA])?(?<Cflag>[cC])?(?<Hflag>[hH])?)?");
 
-    /** <tt>ccc/nn/ii[/ac]</tt>, tolerates extra <tt>*</tt> */
+    /** <tt>ccc/nn/ii[/ach]</tt>, tolerates extra <tt>*</tt> */
     @Nullable
     public static TISScore parseScore(@NotNull String string) {
         Matcher m = REGEX_SCORE.matcher(string);
@@ -68,22 +68,24 @@ public class TISScore implements Score<TISCategory> {
         int cycles = Integer.parseInt(m.group("cycles"));
         int nodes = Integer.parseInt(m.group("nodes"));
         int instructions = Integer.parseInt(m.group("instructions"));
-        return new TISScore(cycles, nodes, instructions, m.group("Aflag") != null, m.group("Cflag") != null);
+        boolean cheating = m.group("Cflag") != null || m.group("Hflag") != null;
+        return new TISScore(cycles, nodes, instructions, m.group("Aflag") != null, cheating, m.group("Hflag") != null);
     }
 
     public String sepFlags(String separator) {
-        return sepFlags(separator, achievement, cheating);
+        return sepFlags(separator, achievement, cheating, hardcoded);
     }
 
     /**
-     * @return <tt>""</tt> or <tt>"/a"</tt> or <tt>"/c"</tt> or <tt>"/ac"</tt>
+     * @return <tt>""</tt> or <tt>"/a"</tt> or <tt>"/c"</tt> or <tt>"/h"</tt> or <tt>"/ac"</tt> or <tt>"/ah"</tt>
      */
     @NotNull
-    public static String sepFlags(String separator, boolean achievement, boolean cheating) {
+    public static String sepFlags(String separator, boolean achievement, boolean cheating, boolean hardcoded) {
         if (achievement || cheating) {
             String result = separator;
             if (achievement) result += "a";
-            if (cheating) result += "c";
+            if (cheating && !hardcoded) result += "c";
+            if (hardcoded) result += "h";
             return result;
         }
         else return "";

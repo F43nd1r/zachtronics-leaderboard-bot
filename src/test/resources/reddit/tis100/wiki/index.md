@@ -15,9 +15,10 @@ For example, in the nodes column, there are separate records for the minimum nod
 # Submitting and accessing solutions
 The 📄 icons are links to the solution files, which can be opened in-game.
 
-To add your solution to the bot, join the discord server at https://discord.gg/98QNzdJ and invoke the Leaderboard bot via `/tis submit solution:<export link> puzzle:<puzzle name> score:<ccc/nn/ii[/ac]> author:<your name>`.  
+To add your solution to the bot, join the discord server at https://discord.gg/98QNzdJ and invoke the Leaderboard bot via `/tis submit solution:<export link> puzzle:<puzzle name> author:<your name>`.  
 Use `m1` for the solution link to refer to the preceding message if that's how you uploaded the export.  
-You can use the optional image parameter to give a screenshot of your solution, showing the code.
+You can use the optional `image` parameter to give a screenshot of your solution, showing the code.  
+The solutions are evaluated by the [TIS simulator](https://github.com/killerbee13/TIS-100-CXX) and scored automatically.
 
 If you want to import a previously stored solution into your own game, you can find it by following the relevant link in this table (if it is a record solution); or by going to the Discord Server and invoking the Leaderboard Bot via `/tis frontier puzzle:<puzzle name>`; or by going to the leaderboard git repository and navigating to the campaign, level and solution you want.  
 The files can be copied directly into the game's save folder and opened in-game.
@@ -29,6 +30,8 @@ Cheats are defined as:
 - Designed to behave differently on the fixed input test from the random tests, such as by outputting hardcoded values and then hoping for a lucky random test.
 
 A cheated solution will still be uploaded to the repository, but with a `/c` flag to designate this behavior. They will never overwrite a legitimate solution to the same level. A separate table for cheated solutions which have been proven to pass one random test is included on this page.
+
+Solutions with a pass rate below 5% are tagged `/h` for hardcoding, they too are in the cheating table.
 
 # Achievements
 Certain [achievements in game](https://steamcommunity.com/stats/370360/achievements) require creating suboptimal solutions, such as BUSY_LOOP. For these puzzles, an extra table on this page shows the most optimized solutions that also get this achievement.
@@ -49,8 +52,8 @@ Certain [achievements in game](https://steamcommunity.com/stats/370360/achieveme
 | [SIGNAL COMPARATOR](https://zlbb.faendir.com/tis/21340) | **195**/6/71 jpgrossman | 195/**6**/71 jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/21340/21340.296-6-15.txt) 296/6/**15** jpgrossman
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/21340/21340.296-6-15.txt) 296/**6**/15 jpgrossman |
 |
-| [SIGNAL MULTIPLEXER](https://zlbb.faendir.com/tis/22280) | **148**/9/54 jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/22280/22280.236-5-19.txt) 236/**5**/19 ImprobableFish | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/22280/22280.298-6-14.txt) 298/6/**14** jpgrossman
-|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/22280/22280.262-5-15.txt) 262/**5**/15 Snowball |
+| [SIGNAL MULTIPLEXER](https://zlbb.faendir.com/tis/22280) | **148**/9/54 jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/22280/22280.236-5-19.txt) 236/**5**/19 ImprobableFish | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/22280/22280.239-7-14.txt) [239/7/**14** longingforrest/Hersmunch](https://imgur.com/a/PJAPWbT)
+|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/22280/22280.262-5-15.txt) 262/**5**/15 Snowball | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/22280/22280.287-6-14.txt) [287/6/**14** longingforrest](https://imgur.com/a/F0ksmKZ)
 |
 | [SEQUENCE GENERATOR](https://zlbb.faendir.com/tis/30647) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/30647/30647.86-8-36.txt) **86**/8/36 pusalieth | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/30647/30647.110-4-20.txt) 110/**4**/20 Brian142857 | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/30647/30647.140-5-13.txt) 140/5/**13** jpgrossman
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/30647/30647.155-4-16.txt) 155/**4**/16 Hersmunch |
@@ -71,15 +74,15 @@ Certain [achievements in game](https://steamcommunity.com/stats/370360/achieveme
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/40196/40196.173-4-13.txt) 173/**4**/13 jpgrossman |
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/40196/40196.155-4-14.txt) 155/**4**/14 Brian142857 |
 |
-| [SEQUENCE PEAK DETECTOR](https://zlbb.faendir.com/tis/41427) | **195**/9/49 LowLevel\- | 269/**4**/35 jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/41427/41427.686-4-21.txt) [686/4/**21** Hersmunch](https://imgur.com/Bj4DuMA)
-|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/41427/41427.686-4-21.txt) [686/**4**/21 Hersmunch](https://imgur.com/Bj4DuMA) |
+| [SEQUENCE PEAK DETECTOR](https://zlbb.faendir.com/tis/41427) | **195**/9/49 LowLevel\- | 269/**4**/35 jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/41427/41427.648-4-21.txt) [648/4/**21** Hersmunch/Brian142857](https://imgur.com/FQiUu8t)
+|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/41427/41427.648-4-21.txt) [648/**4**/21 Hersmunch/Brian142857](https://imgur.com/FQiUu8t) |
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/41427/41427.334-4-26.txt) 334/**4**/26 Hersmunch |
 |
 | [SEQUENCE REVERSER](https://zlbb.faendir.com/tis/42656) | **190**/7/49 jpgrossman | 252/**3**/26 LowLevel\- | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/42656/42656.314-3-8.txt) 314/3/**8** dionadar
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/42656/42656.314-3-8.txt) 314/**3**/8 dionadar |
 |
-| [SIGNAL MULTIPLIER](https://zlbb.faendir.com/tis/43786) | **229**/9/79 jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/43786/43786.386-4-33.txt) 386/**4**/33 Brian142857 | 1645/4/**14** jpgrossman
-|  |  | 1645/**4**/14 jpgrossman |
+| [SIGNAL MULTIPLIER](https://zlbb.faendir.com/tis/43786) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/43786/43786.228-9-75.txt) **228**/9/75 Hersmunch/Brian142857 | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/43786/43786.386-4-33.txt) 386/**4**/33 Brian142857 | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/43786/43786.1510-4-14.txt) 1510/4/**14** Brian142857/Hersmunch
+|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/43786/43786.1510-4-14.txt) 1510/**4**/14 Brian142857/Hersmunch |
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/43786/43786.434-4-23.txt) 434/**4**/23 ImprobableFish |
 |
 | [IMAGE TEST PATTERN 1](https://zlbb.faendir.com/tis/50370) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/50370/50370.1186-2-20.txt) **1186**/2/20 GuiltyBystander | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/50370/50370.1346-1-15.txt) 1346/**1**/15 GuiltyBystander | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/50370/50370.2282-1-7.txt) 2282/1/**7** GuiltyBystander
@@ -91,7 +94,7 @@ Certain [achievements in game](https://steamcommunity.com/stats/370360/achieveme
 |  |  | 1778/**1**/11 MAKESPEARE |
 |
 | [EXPOSURE MASK VIEWER](https://zlbb.faendir.com/tis/52544) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/52544/52544.515-5-36.txt) **515**/5/36 Hersmunch | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/52544/52544.549-4-58.txt) 549/**4**/58 Hersmunch | 1037/5/**25** jpgrossman
-|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/52544/52544.601-4-34.txt) 601/**4**/34 Brian142857 |
+|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/52544/52544.1087-4-26.txt) 1087/**4**/26 Hersmunch |
 |  |  | 568/**4**/35 PocketLint2012 |
 |
 | [HISTOGRAM VIEWER](https://zlbb.faendir.com/tis/53897) | **1215**/11/142 PocketLint2012 | 1801/**4**/56 jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/53897/53897.2773-5-14.txt) [2773/5/**14** Hersmunch](https://imgur.com/wPgPNAx)
@@ -106,7 +109,7 @@ Certain [achievements in game](https://steamcommunity.com/stats/370360/achieveme
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/61212/61212.6155-5-19.txt) 6155/**5**/19 \_Fluff\_ | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/61212/61212.6155-5-19.txt) 6155/5/**19** \_Fluff\_
 |  |  | 1824/**5**/33 jpgrossman |
 |
-| [SEQUENCE INDEXER](https://zlbb.faendir.com/tis/62711) | **301**/9/102 trevdak2 | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/62711/62711.926-4-50.txt) 926/**4**/50 Hersmunch | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/62711/62711.2158-5-17.txt) 2158/5/**17** ImprobableFish
+| [SEQUENCE INDEXER](https://zlbb.faendir.com/tis/62711) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/62711/62711.303-9-97.txt) **303**/9/97 trevdak2 | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/62711/62711.926-4-50.txt) 926/**4**/50 Hersmunch | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/62711/62711.2158-5-17.txt) 2158/5/**17** ImprobableFish
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/62711/62711.3173-4-21.txt) 3173/**4**/21 Hersmunch |
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/62711/62711.932-4-39.txt) 932/**4**/39 Hersmunch |
 |
@@ -114,30 +117,30 @@ Certain [achievements in game](https://steamcommunity.com/stats/370360/achieveme
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/63534/63534.2150-3-31.txt) [2150/**3**/31 Hersmunch](https://imgur.com/aAj8Ec2) |
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/63534/63534.1541-3-35.txt) 1541/**3**/35 Hersmunch |
 |
-| [STORED IMAGE DECODER](https://zlbb.faendir.com/tis/70601) | **1190**/7/51 jpgrossman | 1371/**4**/41 jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/70601/70601.2707-4-16.txt) 2707/4/**16** Hersmunch
-|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/70601/70601.2707-4-16.txt) 2707/**4**/16 Hersmunch |
+| [STORED IMAGE DECODER](https://zlbb.faendir.com/tis/70601) | **1190**/7/51 jpgrossman | 1371/**4**/41 jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/70601/70601.2344-4-17.txt) 2344/4/**17** Hersmunch
+|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/70601/70601.2344-4-17.txt) 2344/**4**/17 Hersmunch |
 |  |  | 1635/**4**/21 jpgrossman |
 |
 | [UNKNOWN](https://zlbb.faendir.com/tis/UNKNOWN) | **247**/8/64 jpgrossman | 317/**4**/54 jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/UNKNOWN/UNKNOWN.649-4-25.txt) 649/4/**25** Hersmunch
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/UNKNOWN/UNKNOWN.649-4-25.txt) 649/**4**/25 Hersmunch |
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/UNKNOWN/UNKNOWN.392-4-32.txt) 392/**4**/32 Hersmunch |
 |
-| **Totals** | **9106** | **95** | **345**
+| **Totals** | **9107** | **95** | **346**
 
 # TIS-NET DIRECTORY
 
 | Puzzle | Cycles | Nodes | Instructions
 | --- | --- | --- | --- | ---
-| [SEQUENCE MERGER](https://zlbb.faendir.com/tis/NEXUS.00.526.6) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.00.526.6/NEXUS.00.526.6.283-6-33.txt) **283**/6/33 Hersmunch | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.00.526.6/NEXUS.00.526.6.283-6-33.txt) 283/**6**/33 Hersmunch | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.00.526.6/NEXUS.00.526.6.370-6-22.txt) 370/6/**22** Hersmunch
-|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.00.526.6/NEXUS.00.526.6.370-6-22.txt) 370/**6**/22 Hersmunch |
-|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.00.526.6/NEXUS.00.526.6.342-6-23.txt) 342/**6**/23 Hersmunch |
+| [SEQUENCE MERGER](https://zlbb.faendir.com/tis/NEXUS.00.526.6) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.00.526.6/NEXUS.00.526.6.283-6-33.txt) [**283**/6/33 Hersmunch](https://imgur.com/djxYANr) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.00.526.6/NEXUS.00.526.6.283-6-33.txt) [283/**6**/33 Hersmunch](https://imgur.com/djxYANr) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.00.526.6/NEXUS.00.526.6.370-6-22.txt) [370/6/**22** Hersmunch](https://imgur.com/RoQOIl9)
+|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.00.526.6/NEXUS.00.526.6.370-6-22.txt) [370/**6**/22 Hersmunch](https://imgur.com/RoQOIl9) |
+|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.00.526.6/NEXUS.00.526.6.342-6-23.txt) [342/**6**/23 Hersmunch](https://imgur.com/qewpt4G) |
 |
 | [INTEGER SERIES CALCULATOR](https://zlbb.faendir.com/tis/NEXUS.01.874.8) | **268**/9/135 jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.01.874.8/NEXUS.01.874.8.855-3-32.txt) 855/**3**/32 Brian142857 | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.01.874.8/NEXUS.01.874.8.4014-3-10.txt) 4014/3/**10** \_Fluff\_
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.01.874.8/NEXUS.01.874.8.4014-3-10.txt) 4014/**3**/10 \_Fluff\_ |
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.01.874.8/NEXUS.01.874.8.1389-3-18.txt) 1389/**3**/18 Brian142857 |
 |
-| [SEQUENCE RANGE LIMITER](https://zlbb.faendir.com/tis/NEXUS.02.981.2) | **154**/11/99 jpgrossman | 259/**5**/44 jpgrossman | 506/5/**25** jpgrossman
-|  |  | 506/**5**/25 jpgrossman |
+| [SEQUENCE RANGE LIMITER](https://zlbb.faendir.com/tis/NEXUS.02.981.2) | **154**/11/99 jpgrossman | 259/**5**/44 jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.02.981.2/NEXUS.02.981.2.654-5-24.txt) 654/5/**24** Hersmunch
+|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.02.981.2/NEXUS.02.981.2.654-5-24.txt) 654/**5**/24 Hersmunch |
 |  |  | 310/**5**/30 jpgrossman |
 |
 | [SIGNAL ERROR CORRECTOR](https://zlbb.faendir.com/tis/NEXUS.03.176.9) | **140**/10/54 jpgrossman | 256/**5**/21 jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.03.176.9/NEXUS.03.176.9.437-5-14.txt) 437/5/**14** ImprobableFish
@@ -168,14 +171,14 @@ Certain [achievements in game](https://steamcommunity.com/stats/370360/achieveme
 |  |  | 1752/**3**/43 jpgrossman |
 |
 | [SEQUENCE NORMALIZER](https://zlbb.faendir.com/tis/NEXUS.10.656.5) | **399**/8/86 jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.10.656.5/NEXUS.10.656.5.665-3-40.txt) 665/**3**/40 Hersmunch | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.10.656.5/NEXUS.10.656.5.725-4-27.txt) 725/4/**27** Hersmunch
-|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.10.656.5/NEXUS.10.656.5.749-3-37.txt) 749/**3**/37 Hersmunch |
+|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.10.656.5/NEXUS.10.656.5.3548-3-29.txt) 3548/**3**/29 Hersmunch |
 |  |  | 674/**3**/38 jpgrossman |
 |
 | [IMAGE TEST PATTERN 3](https://zlbb.faendir.com/tis/NEXUS.11.711.2) | **882**/10/80 PocketLint2012 | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.11.711.2/NEXUS.11.711.2.2574-3-40.txt) 2574/**3**/40 biggiemac42 | 2746/5/**27** jpgrossman
 |  |  | 2764/**3**/32 jpgrossman |
 |
-| [IMAGE TEST PATTERN 4](https://zlbb.faendir.com/tis/NEXUS.12.534.4) | **1166**/8/51 PocketLint2012 | 1474/**2**/24 MAKESPEARE | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.12.534.4/NEXUS.12.534.4.2289-3-16.txt) 2289/3/**16** Brian142857
-|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.12.534.4/NEXUS.12.534.4.2290-2-17.txt) 2290/**2**/17 Brian142857 |
+| [IMAGE TEST PATTERN 4](https://zlbb.faendir.com/tis/NEXUS.12.534.4) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.12.534.4/NEXUS.12.534.4.1166-6-34.txt) **1166**/6/34 Hersmunch | 1474/**2**/24 MAKESPEARE | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.12.534.4/NEXUS.12.534.4.1253-4-14.txt) 1253/4/**14** Hersmunch
+|  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.12.534.4/NEXUS.12.534.4.1166-7-30.txt) **1166**/7/30 Hersmunch | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.12.534.4/NEXUS.12.534.4.2289-2-17.txt) [2289/**2**/17 Brian142857/longingforrest](https://imgur.com/a/2CprZAo) |
 |  |  | 1645/**2**/21 MAKESPEARE |
 |
 | [SPATIAL PATH VIEWER](https://zlbb.faendir.com/tis/NEXUS.13.370.9) | **745**/9/62 jpgrossman | 1050/**4**/55 jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.13.370.9/NEXUS.13.370.9.1507-4-22.txt) 1507/4/**22** Hersmunch
@@ -189,7 +192,6 @@ Certain [achievements in game](https://steamcommunity.com/stats/370360/achieveme
 |  |  | 736/**4**/22 jpgrossman |
 |
 | [DYNAMIC PATTERN DETECTOR](https://zlbb.faendir.com/tis/NEXUS.16.212.8) | **166**/11/56 jpgrossman | 250/**5**/56 jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.16.212.8/NEXUS.16.212.8.647-8-23.txt) 647/8/**23** Hersmunch
-|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.16.212.8/NEXUS.16.212.8.253-5-49.txt) 253/**5**/49 Brian142857 |
 |
 | [SEQUENCE GAP INTERPOLATOR](https://zlbb.faendir.com/tis/NEXUS.17.135.0) | **106**/7/81 jpgrossman | 351/**3**/29 jpgrossman | 498/3/**21** jpgrossman
 |  |  | 498/**3**/21 jpgrossman |
@@ -220,7 +222,7 @@ Certain [achievements in game](https://steamcommunity.com/stats/370360/achieveme
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.24.511.7/NEXUS.24.511.7.957-6-31.txt) 957/**6**/31 Hersmunch |
 |  |  | 470/**6**/36 jpgrossman |
 |
-| **Totals** | **8865** | **102** | **564**
+| **Totals** | **8865** | **102** | **561**
 
 # Achievement Solutions
 
@@ -233,7 +235,7 @@ Certain [achievements in game](https://steamcommunity.com/stats/370360/achieveme
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/21340/21340.282-6-19-a.txt) 282/**6**/19/a Hersmunch |
 |
 | [SEQUENCE REVERSER](https://zlbb.faendir.com/tis/42656?visualizerFilterTIS-42656.modifiers.achievement=true) (NO_MEMORY) | **191**/7/50/a jpgrossman | 228/**4**/51/a jpgrossman | 685/5/**26**/a jpgrossman
-|  |  | 606/**4**/40/a GuiltyBystander |
+|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/42656/42656.478-4-35-a.txt) [478/**4**/35/a la3225/longingforrest](https://imgur.com/a/s8PrfRA) |
 |  |  | 233/**4**/47/a jpgrossman |
 |
 | **Totals** | **100402** | **18** | **54**
@@ -244,18 +246,23 @@ Certain [achievements in game](https://steamcommunity.com/stats/370360/achieveme
 | --- | --- | --- | --- | ---
 | [SEQUENCE COUNTER](https://zlbb.faendir.com/tis/31904?visualizerFilterTIS-31904.modifiers.cheating=true) | **55**/11/147/c F1000003 |  |
 |
-| [SIGNAL EDGE DETECTOR](https://zlbb.faendir.com/tis/32050?visualizerFilterTIS-32050.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/32050/32050.80-9-98-c.txt) **80**/9/98/c biggiemac42 |  |
+| [SIGNAL EDGE DETECTOR](https://zlbb.faendir.com/tis/32050?visualizerFilterTIS-32050.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/32050/32050.80-9-98-h.txt) **80**/9/98/h biggiemac42 |  |
 |
 | [SIGNAL PATTERN DETECTOR](https://zlbb.faendir.com/tis/40196?visualizerFilterTIS-40196.modifiers.cheating=true) | **81**/9/56/c AmitaiG |  |
 |
-| [SEQUENCE PEAK DETECTOR](https://zlbb.faendir.com/tis/41427?visualizerFilterTIS-41427.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/41427/41427.30-11-150-c.txt) **30**/11/150/c biggiemac42 |  |
+| [SEQUENCE PEAK DETECTOR](https://zlbb.faendir.com/tis/41427?visualizerFilterTIS-41427.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/41427/41427.30-11-150-h.txt) **30**/11/150/h biggiemac42 |  |
 |
 | [SEQUENCE REVERSER](https://zlbb.faendir.com/tis/42656?visualizerFilterTIS-42656.modifiers.cheating=true) | **185**/9/87/c Amitai |  |
 |
+| [SEQUENCE INDEXER](https://zlbb.faendir.com/tis/62711?visualizerFilterTIS-62711.modifiers.cheating=true) | **301**/9/102/c trevdak2 |  |
+|
 | [SEQUENCE SORTER](https://zlbb.faendir.com/tis/63534?visualizerFilterTIS-63534.modifiers.cheating=true) |  | 1361/**3**/44/c jpgrossman |
+|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/63534/63534.2078-3-31-c.txt) 2078/**3**/31/c Hersmunch |
 |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/63534/63534.1481-3-35-c.txt) 1481/**3**/35/c Hersmunch |
 |
-| [UNKNOWN](https://zlbb.faendir.com/tis/UNKNOWN?visualizerFilterTIS-UNKNOWN.modifiers.cheating=true) |  | 314/**4**/51/c jpgrossman |
+| [STORED IMAGE DECODER](https://zlbb.faendir.com/tis/70601?visualizerFilterTIS-70601.modifiers.cheating=true) |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/70601/70601.2707-4-16-c.txt) 2707/**4**/16/c Hersmunch | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/70601/70601.2707-4-16-c.txt) 2707/4/**16**/c Hersmunch
+|
+| [UNKNOWN](https://zlbb.faendir.com/tis/UNKNOWN?visualizerFilterTIS-UNKNOWN.modifiers.cheating=true) |  | 314/**4**/51/c jpgrossman | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_100_SEGMENT_MAP/UNKNOWN/UNKNOWN.539-5-24-c.txt) 539/5/**24**/c longingforrest
 |
 | [SEQUENCE MERGER](https://zlbb.faendir.com/tis/NEXUS.00.526.6?visualizerFilterTIS-NEXUS-00-526-6.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.00.526.6/NEXUS.00.526.6.281-6-40-c.txt) **281**/6/40/c Hersmunch | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.00.526.6/NEXUS.00.526.6.281-6-40-c.txt) 281/**6**/40/c Hersmunch |
 |
@@ -263,59 +270,63 @@ Certain [achievements in game](https://steamcommunity.com/stats/370360/achieveme
 |
 | [SIGNAL AVERAGER](https://zlbb.faendir.com/tis/NEXUS.06.786.0?visualizerFilterTIS-NEXUS-06-786-0.modifiers.cheating=true) |  | 1124/**4**/48/c jpgrossman |
 |
-| [SEQUENCE MODE CALCULATOR](https://zlbb.faendir.com/tis/NEXUS.09.904.9?visualizerFilterTIS-NEXUS-09-904-9.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.09.904.9/NEXUS.09.904.9.23-3-33-c.txt) **23**/3/33/c negative\_seven | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.09.904.9/NEXUS.09.904.9.23-3-33-c.txt) 23/**3**/33/c negative\_seven | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.09.904.9/NEXUS.09.904.9.24-3-27-c.txt) 24/3/**27**/c negative\_seven
-|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.09.904.9/NEXUS.09.904.9.24-3-27-c.txt) 24/**3**/27/c negative\_seven |
+| [SEQUENCE MODE CALCULATOR](https://zlbb.faendir.com/tis/NEXUS.09.904.9?visualizerFilterTIS-NEXUS-09-904-9.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.09.904.9/NEXUS.09.904.9.23-3-33-h.txt) **23**/3/33/h negative\_seven | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.09.904.9/NEXUS.09.904.9.23-3-33-h.txt) 23/**3**/33/h negative\_seven | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.09.904.9/NEXUS.09.904.9.24-3-27-h.txt) 24/3/**27**/h negative\_seven
+|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.09.904.9/NEXUS.09.904.9.24-3-27-h.txt) 24/**3**/27/h negative\_seven |
 |
-| [DYNAMIC PATTERN DETECTOR](https://zlbb.faendir.com/tis/NEXUS.16.212.8?visualizerFilterTIS-NEXUS-16-212-8.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.16.212.8/NEXUS.16.212.8.78-6-53-c.txt) **78**/6/53/c negative\_seven | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.16.212.8/NEXUS.16.212.8.149-3-23-c.txt) 149/**3**/23/c biggiemac42 | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.16.212.8/NEXUS.16.212.8.355-5-20-c.txt) 355/5/**20**/c Hersmunch
+| [SEQUENCE NORMALIZER](https://zlbb.faendir.com/tis/NEXUS.10.656.5?visualizerFilterTIS-NEXUS-10-656-5.modifiers.cheating=true) |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.10.656.5/NEXUS.10.656.5.661-3-41-c.txt) 661/**3**/41/c Hersmunch |
+|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.10.656.5/NEXUS.10.656.5.3534-3-29-c.txt) 3534/**3**/29/c Hersmunch |
 |
-| [SEQUENCE GAP INTERPOLATOR](https://zlbb.faendir.com/tis/NEXUS.17.135.0?visualizerFilterTIS-NEXUS-17-135-0.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.17.135.0/NEXUS.17.135.0.29-6-70-c.txt) **29**/6/70/c negative\_seven |  |
+| [DYNAMIC PATTERN DETECTOR](https://zlbb.faendir.com/tis/NEXUS.16.212.8?visualizerFilterTIS-NEXUS-16-212-8.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.16.212.8/NEXUS.16.212.8.78-6-53-h.txt) **78**/6/53/h negative\_seven | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.16.212.8/NEXUS.16.212.8.149-3-23-h.txt) 149/**3**/23/h biggiemac42 | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.16.212.8/NEXUS.16.212.8.355-5-20-c.txt) 355/5/**20**/c Hersmunch
+|  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.16.212.8/NEXUS.16.212.8.355-5-20-c.txt) 355/**5**/20/c Hersmunch |
 |
-| [PROLONGED SEQUENCE SORTER](https://zlbb.faendir.com/tis/NEXUS.19.762.9?visualizerFilterTIS-NEXUS-19-762-9.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.19.762.9/NEXUS.19.762.9.210-8-99-c.txt) [**210**/8/99/c biggiemac42](https://youtu.be/oW1zItkQ2us) |  |
+| [SEQUENCE GAP INTERPOLATOR](https://zlbb.faendir.com/tis/NEXUS.17.135.0?visualizerFilterTIS-NEXUS-17-135-0.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.17.135.0/NEXUS.17.135.0.29-6-70-h.txt) **29**/6/70/h negative\_seven |  |
+|
+| [PROLONGED SEQUENCE SORTER](https://zlbb.faendir.com/tis/NEXUS.19.762.9?visualizerFilterTIS-NEXUS-19-762-9.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.19.762.9/NEXUS.19.762.9.210-8-99-h.txt) [**210**/8/99/h biggiemac42](https://youtu.be/oW1zItkQ2us) |  |
 |
 | [PRIME FACTOR CALCULATOR](https://zlbb.faendir.com/tis/NEXUS.20.433.1?visualizerFilterTIS-NEXUS-20-433-1.modifiers.cheating=true) |  |  | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.20.433.1/NEXUS.20.433.1.15666-6-26-c.txt) 15666/6/**26**/c Hersmunch
 |
 | [SIGNAL EXPONENTIATOR](https://zlbb.faendir.com/tis/NEXUS.21.601.6?visualizerFilterTIS-NEXUS-21-601-6.modifiers.cheating=true) | **278**/8/116/c jpgrossman |  |
 |
-| [T20 NODE EMULATOR](https://zlbb.faendir.com/tis/NEXUS.22.280.8?visualizerFilterTIS-NEXUS-22-280-8.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.22.280.8/NEXUS.22.280.8.29-4-36-c.txt) **29**/4/36/c biggiemac42 | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.22.280.8/NEXUS.22.280.8.40-3-34-c.txt) 40/**3**/34/c biggiemac42 |
+| [T20 NODE EMULATOR](https://zlbb.faendir.com/tis/NEXUS.22.280.8?visualizerFilterTIS-NEXUS-22-280-8.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.22.280.8/NEXUS.22.280.8.29-4-36-h.txt) **29**/4/36/h biggiemac42 | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.22.280.8/NEXUS.22.280.8.40-3-34-h.txt) 40/**3**/34/h biggiemac42 |
 |
-| [T31 NODE EMULATOR](https://zlbb.faendir.com/tis/NEXUS.23.727.9?visualizerFilterTIS-NEXUS-23-727-9.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.23.727.9/NEXUS.23.727.9.21-3-26-c.txt) **21**/3/26/c Hersmunch | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.23.727.9/NEXUS.23.727.9.21-3-26-c.txt) 21/**3**/26/c Hersmunch | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.23.727.9/NEXUS.23.727.9.661-4-23-c.txt) 661/4/**23**/c Hersmunch
+| [T31 NODE EMULATOR](https://zlbb.faendir.com/tis/NEXUS.23.727.9?visualizerFilterTIS-NEXUS-23-727-9.modifiers.cheating=true) | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.23.727.9/NEXUS.23.727.9.21-3-26-h.txt) **21**/3/26/h Hersmunch | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.23.727.9/NEXUS.23.727.9.21-3-26-h.txt) 21/**3**/26/h Hersmunch | [📄](https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master/TIS_NET_DIRECTORY/NEXUS.23.727.9/NEXUS.23.727.9.51-4-22-h.txt) 51/4/**22**/h cf
 |
-| **Totals** | **1380** | **29** | **96**
+| **Totals** | **1681** | **32** | **135**
 
 # Most record solutions
 
 | Solutions | Name(s)
 | --- | --- 
-| 87.5 | jpgrossman
-| 59.5 | Hersmunch
-| 23 | Brian142857
+| 83.5 | jpgrossman
+| 68.5 | Hersmunch
+| 21 | Brian142857
 | 9 | ImprobableFish
 | 8 | biggiemac42
-| 6 | GuiltyBystander
-| 5 | MAKESPEARE, PocketLint2012
-| 4 | \_Fluff\_, Community, negative\_seven
+| 5 | GuiltyBystander, MAKESPEARE
+| 4.5 | longingforrest
+| 4 | \_Fluff\_, Community, negative\_seven, PocketLint2012
 | 3 | dionadar
-| 2 | LowLevel\-
-| 1 | Amitai, AmitaiG, F1000003, Grimmy, Ling Ling, longingforrest, pusalieth, rhinospray, Snowball, trevdak2, Untellect
+| 2 | LowLevel\-, trevdak2
+| 1 | Amitai, AmitaiG, cf, F1000003, Grimmy, Ling Ling, pusalieth, rhinospray, Snowball, Untellect
+| 0.5 | la3225
 
 # Most frontier solutions
 
 | Solutions | Name(s)
 | --- | --- 
-| 217.5 | Hersmunch
-| 174 | Brian142857
-| 119.5 | jpgrossman
+| 245.5 | Hersmunch
+| 175 | Brian142857
+| 115.5 | jpgrossman
+| 54 | longingforrest
 | 36 | Csaboka
-| 31 | GuiltyBystander
+| 26 | GuiltyBystander
 | 22 | ImprobableFish
-| 15 | longingforrest
-| 13 | biggiemac42, ShadowCluster
-| 12 | Andrash
-| 10 | Grimmy
-| 7 | rolamni
+| 13 | biggiemac42
+| 12 | Andrash, ShadowCluster
+| 11 | Grimmy
 | 6 | MAKESPEARE, negative\_seven
-| 5 | \_Fluff\_, Community, PocketLint2012
-| 4 | Snowball, starfish
-| 3 | dionadar, nsmaciej, rhinospray
-| 2 | LowLevel\-, notgreat, vcque
-| 1 | Akari\_Takai, Amitai, AmitaiG, andy75381, anningmay, bdekeijzer, cf, Daniel\_Nson, davidtriphon, Entity\_, F1000003, Forgetful, gravypod, i\_dont\_want\_karma, ilyakharlamov, isaac\.wass, killerbee13, l10veu, Ling Ling, mlehmk, mr\_screg, proudHaskeller, pusalieth, shufb\_demon, trevdak2, Untellect
+| 5 | \_Fluff\_, Community
+| 4 | cf, PocketLint2012, rolamni, Snowball
+| 3 | dionadar, rhinospray, starfish
+| 2 | LowLevel\-, trevdak2, vcque
+| 1 | Akari\_Takai, Amitai, AmitaiG, andy75381, bdekeijzer, Daniel\_Nson, davidtriphon, Entity\_, F1000003, Forgetful, foxyseta, gravypod, i\_dont\_want\_karma, ilyakharlamov, isaac\.wass, killerbee13, l10veu, la3225, Ling Ling, mlehmk, mr\_screg, notgreat, nsmaciej, proudHaskeller, pusalieth, shufb\_demon, Untellect

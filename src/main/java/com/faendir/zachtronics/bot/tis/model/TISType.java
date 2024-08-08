@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public enum TISType implements Type {
     STANDARD("standard"),
     WITH_ACHIEVEMENT("achievement"),
+    FIXED_IMAGE("fixed image"),
     SANDBOX("sandbox");
 
     private final String displayName;

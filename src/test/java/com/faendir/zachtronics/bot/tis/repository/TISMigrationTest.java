@@ -141,7 +141,7 @@ class TISMigrationTest {
                     author = "Community";
 
                 for (int[] intScore : uf.getData()) {
-                    TISScore score = new TISScore(intScore[0], intScore[1], intScore[2], achievement, false);
+                    TISScore score = new TISScore(intScore[0], intScore[1], intScore[2], achievement, false, false);
                     TISSubmission submission = new TISSubmission(puzzle, score, author, null, "");
                     SubmitResult<TISRecord, TISCategory> result = repository.submit(submission);
                     System.out.println(result);

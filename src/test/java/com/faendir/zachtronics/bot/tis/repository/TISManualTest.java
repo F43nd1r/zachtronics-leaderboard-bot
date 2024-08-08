@@ -18,10 +18,8 @@ package com.faendir.zachtronics.bot.tis.repository;
 
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
-import com.faendir.zachtronics.bot.tis.model.TISCategory;
-import com.faendir.zachtronics.bot.tis.model.TISPuzzle;
-import com.faendir.zachtronics.bot.tis.model.TISRecord;
-import com.faendir.zachtronics.bot.tis.model.TISSubmission;
+import com.faendir.zachtronics.bot.tis.model.*;
+import com.faendir.zachtronics.bot.tis.validation.TIS100CXX;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -34,6 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 @BotTest
@@ -104,6 +103,35 @@ class TISManualTest {
     }
 
     @Test
+    public void reverifyLeaderboard() throws IOException {
+        Path repoPath = Paths.get("../tis100/leaderboard");
+
+        for (TISPuzzle puzzle : List.of(TISPuzzle.SIGNAL_PRESCALER)) {
+            Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
+            List<TISSolution> solutions = repository.unmarshalSolutions(puzzlePath);
+
+            for (ListIterator<TISSolution> it = solutions.listIterator(); it.hasNext(); ) {
+                TISSolution solution = it.next();
+                Path dataPath = repository.makeArchivePath(puzzlePath, solution.getScore());
+                if (Files.exists(dataPath)) {
+                    String data = Files.readString(dataPath);
+                    TISScore newScore = TIS100CXX.validate(data, puzzle);
+                    if (!newScore.equals(solution.getScore())) {
+                        it.set(new TISSolution(newScore, solution.getAuthor(), solution.getDisplayLink()));
+                        Files.move(dataPath, repository.makeArchivePath(puzzlePath, newScore));
+                        System.out.println("Changed " + puzzle.getId() + ": " +
+                                           solution.getScore().toDisplayString() + " -> " + newScore.toDisplayString());
+                    }
+                }
+            }
+            repository.marshalSolutions(solutions, puzzlePath);
+            System.out.println("Done " + puzzle.getId());
+        }
+
+        System.out.println("Done");
+    }
+
+    @Test
     public void submitSaveFolder() throws IOException {
         Path savesRoot = Paths.get("../tis100/saves");
 //        List<String> authors = Files.list(savesRoot).filter(Files::isDirectory).map(p -> p.getFileName().toString()).toList();
@@ -125,11 +153,10 @@ class TISManualTest {
             for (TISPuzzle puzzle : repository.getTrackedPuzzles()) {
                 try (DirectoryStream<Path> paths = Files.newDirectoryStream(savesPath, puzzle.getId() + "*.*txt")) {
                     for (Path path : paths) {
-                        boolean cheating = path.getFileName().toString().matches(puzzle.getId() + ".+c.+txt");
                         String data = Files.readString(path).replace("\r\n", "\n");
                         TISSubmission submission;
                         try {
-                            submission = TISSubmission.fromData(data, puzzle, cheating, author, "http://li.nk");
+                            submission = TISSubmission.fromData(data, puzzle, author, "http://li.nk");
                         }
                         catch (Exception e) {
                             if (e instanceof ValidationException) {

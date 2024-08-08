@@ -28,10 +28,12 @@ public class TISScoreDTO {
 
     boolean achievement;
     boolean cheating;
+    boolean hardcoded;
 
     @NotNull
     public static TISScoreDTO fromScore(@NotNull TISScore score) {
-        return new TISScoreDTO(score.getCycles(), score.getNodes(), score.getInstructions(), score.isAchievement(), score.isCheating());
+        return new TISScoreDTO(score.getCycles(), score.getNodes(), score.getInstructions(),
+                               score.isAchievement(), score.isCheating(), score.isHardcoded());
     }
 }
 

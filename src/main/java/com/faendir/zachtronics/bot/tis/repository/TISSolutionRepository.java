@@ -59,7 +59,9 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
     private final Class<TISCategory> categoryClass = TISCategory.class;
     private final Function<String[], TISSolution> solUnmarshaller = TISSolution::unmarshal;
     private final Comparator<TISSolution> archiveComparator =
-        Comparator.comparing(TISSolution::getScore, CN.getScoreComparator().thenComparing(s -> !s.isAchievement()));
+        Comparator.comparing(TISSolution::getScore, CN.getScoreComparator()
+                                                      .thenComparing(s -> !s.isAchievement())
+                                                      .thenComparing(TISScore::isCheating));
     private final List<TISPuzzle> trackedPuzzles = Arrays.stream(TISPuzzle.values()).filter(p -> p.getType() != TISType.SANDBOX).toList();
 
     @Override
@@ -79,12 +81,13 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
         int r3 = Integer.compare(s1.getInstructions(), s2.getInstructions());
         int r4 = Boolean.compare(!s1.isAchievement(), !s2.isAchievement());
         int r5 = Boolean.compare(s1.isCheating(), s2.isCheating());
+        int r6 = Boolean.compare(s1.isHardcoded(), s2.isHardcoded());
 
-        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0 && r5 <= 0) {
+        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0 && r5 <= 0 && r6 <= 0) {
             // s1 dominates
             return -1;
         }
-        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0 && r5 >= 0) {
+        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0 && r5 >= 0 && r6 <= 0) {
             // s2 dominates
             return 1;
         }
@@ -161,9 +164,11 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
                 addPuzzleLines(it, puzzle, wikiCategories, recordMap, Markdown.link(puzzle.getDisplayName(), puzzle.getLink()));
                 it.add("|");
 
-                totalCycles += recordMap.get(wikiCategories[0][0]).getScore().getCycles();
-                totalNodes += recordMap.get(wikiCategories[1][0]).getScore().getNodes();
-                totalInstructions += recordMap.get(wikiCategories[2][0]).getScore().getInstructions();
+                if (recordMap.containsKey(wikiCategories[0][0])) {
+                    totalCycles += recordMap.get(wikiCategories[0][0]).getScore().getCycles();
+                    totalNodes += recordMap.get(wikiCategories[1][0]).getScore().getNodes();
+                    totalInstructions += recordMap.get(wikiCategories[2][0]).getScore().getInstructions();
+                }
             }
             it.add(String.format("| **Totals** | **%d** | **%d** | **%d**", totalCycles, totalNodes, totalInstructions));
             it.add("");
@@ -184,9 +189,11 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
                 addPuzzleLines(it, puzzle, achievCategories, recordMap, puzzleHeader);
                 it.add("|");
 
-                totalCycles += recordMap.get(achievCategories[0][0]).getScore().getCycles();
-                totalNodes += recordMap.get(achievCategories[1][0]).getScore().getNodes();
-                totalInstructions += recordMap.get(achievCategories[2][0]).getScore().getInstructions();
+                if (recordMap.containsKey(achievCategories[0][0])) {
+                    totalCycles += recordMap.get(achievCategories[0][0]).getScore().getCycles();
+                    totalNodes += recordMap.get(achievCategories[1][0]).getScore().getNodes();
+                    totalInstructions += recordMap.get(achievCategories[2][0]).getScore().getInstructions();
+                }
             }
             it.add(String.format("| **Totals** | **%d** | **%d** | **%d**", totalCycles, totalNodes, totalInstructions));
             it.add("");
@@ -197,7 +204,9 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
             int totalNodes = 0;
             int totalInstructions = 0;
             addPuzzleTableHeader.accept("Cheating Solutions");
-            TISCategory[][] cheatCategories = {{cCN, cCI, cCX}, {cNC, cNI, cNX}, {cIC, cIN, cIX}};
+            TISCategory[][] cheatCategories = {{hCN, hCI, hCX, cCN, cCI, cCX},
+                                               {hNC, hNI, hNX, cNC, cNI, cNX},
+                                               {hIC, hIN, hIX, cIC, cIN, cIX}};
             for (TISPuzzle puzzle : trackedPuzzles) {
                 // copy to edit
                 Map<TISCategory, TISRecord> recordMap = new EnumMap<>(data.get(puzzle));
