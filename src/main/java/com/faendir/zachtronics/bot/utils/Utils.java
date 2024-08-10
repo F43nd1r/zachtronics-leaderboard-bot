@@ -71,8 +71,11 @@ public final class Utils {
         try {
             URLConnection connection = new URL(Utils.rawContentURL(link)).openConnection();
             try (InputStream is = connection.getInputStream()) { // we're connected now
-                ContentDisposition cd = ContentDisposition.parse(connection.getHeaderField("content-disposition"));
-                return new FileInfo(cd.getFilename(), is.readAllBytes());
+                String filename = null;
+                String cdHeader = connection.getHeaderField("content-disposition");
+                if (cdHeader != null)
+                    filename = ContentDisposition.parse(cdHeader).getFilename();
+                return new FileInfo(filename, is.readAllBytes());
             }
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Could not parse your link");
