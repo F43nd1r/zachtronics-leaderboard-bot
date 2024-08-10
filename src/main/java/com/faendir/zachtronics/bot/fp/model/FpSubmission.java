@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public class FpSubmission implements Submission<FpCategory, FpPuzzle> {
 
     @NotNull
     public static Collection<ValidationResult<FpSubmission>> fromLink(@NotNull String link, String author) {
-        String data = Utils.downloadSolutionFile(link);
+        String data = Utils.downloadFile(link).dataAsString();
         return fromData(data, author);
     }
 }

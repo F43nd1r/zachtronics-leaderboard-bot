@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ public class ScSubmission implements Submission<ScCategory, ScPuzzle> {
     @NotNull
     public static Collection<ValidationResult<ScSubmission>> fromExportLink(@NotNull String exportLink, boolean bypassValidation,
                                                                             String author) {
-        String export = Utils.downloadSolutionFile(exportLink);
+        String export = Utils.downloadFile(exportLink).dataAsString();
         return fromData(export, bypassValidation, author);
     }
 }

@@ -23,6 +23,10 @@ import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
 import lombok.With;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.function.Supplier;
 
 @Value
 public class TISSubmission implements Submission<TISCategory, TISPuzzle> {
@@ -40,9 +44,19 @@ public class TISSubmission implements Submission<TISCategory, TISPuzzle> {
     }
 
     @NotNull
-    public static TISSubmission fromLink(@NotNull String link, @NotNull TISPuzzle puzzle, @NotNull String author, String displayLink)
+    public static TISSubmission fromLink(@NotNull String link, @Nullable TISPuzzle puzzle, @NotNull String author, String displayLink)
     throws ValidationException {
-        String data = Utils.downloadSolutionFile(link);
-        return fromData(data, puzzle, author, displayLink);
+        Utils.FileInfo info = Utils.downloadFile(link);
+        if (puzzle == null) {
+            Supplier<ValidationException> failureSupplier = () -> new ValidationException(
+                "It was not possible to deduce the puzzle automatically, use the `puzzle` option");
+            if (info.getFilename() == null)
+                throw failureSupplier.get();
+            puzzle = Arrays.stream(TISPuzzle.values())
+                           .filter(p -> info.getFilename().startsWith(p.getId()))
+                           .findFirst()
+                           .orElseThrow(failureSupplier);
+        }
+        return fromData(info.dataAsString(), puzzle, author, displayLink);
     }
 }

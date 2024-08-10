@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ public class IfSubmission implements Submission<IfCategory, IfPuzzle> {
     @NotNull
     public static Collection<ValidationResult<IfSubmission>> fromLink(@NotNull String link, @NotNull String author, IfScore score,
                                                                       List<String> videos, boolean isAdmin) {
-        String data = Utils.downloadSolutionFile(link);
+        String data = Utils.downloadFile(link).dataAsString();
         return fromData(data, author, score, videos, isAdmin);
     }
 }

@@ -41,7 +41,7 @@ public class FcSubmission implements Submission<FcCategory, FcPuzzle> {
 
     @NotNull
     public static Collection<ValidationResult<FcSubmission>> fromLink(@NotNull String link, String author) {
-        byte[] data = Utils.downloadSolutionFileBytes(link);
+        byte[] data = Utils.downloadFile(link).getData();
         return fromData(data, author);
     }
 }

@@ -43,19 +43,18 @@ public class TISSubmitCommand extends AbstractSubmitCommand<TISCategory, TISPuzz
             .description("Link to the solution file, can be `m1` to scrape it from your last message")
             .required()
             .build();
-    private final CommandOption<String, TISPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", TISPuzzle.class, TISPuzzle::getDisplayName)
-            .description("Puzzle name. Can be shortened or abbreviated. E.g. `SIGN AMPL`, `ITP1`")
-            .required()
-            .build();
     private final CommandOption<String, String> authorOption = CommandOptionBuilder.string("author")
             .description("Name to appear on the Reddit leaderboard")
             .required()
+            .build();
+    private final CommandOption<String, TISPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", TISPuzzle.class, TISPuzzle::getDisplayName)
+            .description("Puzzle name. Can be shortened or abbreviated. E.g. `SIGN AMPL`, `ITP1`")
             .build();
     private final CommandOption<String, String> imageOption = OptionHelpersKt.displayLinkOptionBuilder("image")
             .description("Link to your image of the solution")
             .build();
     @Getter
-    private final List<CommandOption<?, ?>> options = List.of(solutionOption, puzzleOption, authorOption, imageOption);
+    private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, puzzleOption, imageOption);
     @Getter
     private final Secured secured = TISSecured.INSTANCE;
     @Getter

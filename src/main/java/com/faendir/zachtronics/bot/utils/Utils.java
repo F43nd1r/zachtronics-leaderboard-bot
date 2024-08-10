@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,16 @@ package com.faendir.zachtronics.bot.utils;
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.StringFormat;
+import lombok.Value;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.springframework.http.ContentDisposition;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.EnumSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,24 +53,32 @@ public final class Utils {
         return link;
     }
 
-    public static byte @NotNull [] downloadSolutionFileBytes(@NotNull String link) {
-        try (InputStream is = new URL(Utils.rawContentURL(link)).openStream()) {
-            return is.readAllBytes();
+    @Value
+    public static class FileInfo {
+        @Nullable String filename;
+        byte @NotNull [] data;
+
+        public @NotNull String dataAsString() {
+            String content = new String(data).replace("\r\n", "\n");
+            content = content.replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
+            if (!content.isEmpty() && content.charAt(0) == '\uFEFF') // remove BOM
+                content = content.substring(1);
+            return content;
+        }
+    }
+
+    public static @NotNull FileInfo downloadFile(@NotNull String link) {
+        try {
+            URLConnection connection = new URL(Utils.rawContentURL(link)).openConnection();
+            try (InputStream is = connection.getInputStream()) { // we're connected now
+                ContentDisposition cd = ContentDisposition.parse(connection.getHeaderField("content-disposition"));
+                return new FileInfo(cd.getFilename(), is.readAllBytes());
+            }
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Could not parse your link");
         } catch (IOException e) {
             throw new IllegalArgumentException("Could not read your solution");
         }
-    }
-
-    @NotNull
-    public static String downloadSolutionFile(@NotNull String link) {
-        byte[] rawContent = downloadSolutionFileBytes(link);
-        String content = new String(rawContent).replace("\r\n", "\n");
-        content = content.replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
-        if (content.length() > 0 && content.charAt(0) == '\uFEFF') // remove BOM
-            content = content.substring(1);
-        return content;
     }
 
     @NotNull
