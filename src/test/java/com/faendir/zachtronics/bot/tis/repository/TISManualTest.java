@@ -26,14 +26,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @BotTest
 @Disabled("Massive tests only for manual testing or migrations")
@@ -134,7 +132,11 @@ class TISManualTest {
     @Test
     public void submitSaveFolder() throws IOException {
         Path savesRoot = Paths.get("../tis100/saves");
-//        List<String> authors = Files.list(savesRoot).filter(Files::isDirectory).map(p -> p.getFileName().toString()).toList();
+//        List<String> authors = Files.list(savesRoot)
+//                                    .filter(Files::isDirectory)
+//                                    .map(p -> p.getFileName().toString())
+//                                    .sorted(String.CASE_INSENSITIVE_ORDER)
+//                                    .toList();
         List<String> authors = List.of("12345ieee");
 
         /*
@@ -142,13 +144,14 @@ class TISManualTest {
          */
 
         for (String author : authors) {
-            Path savesPath = savesRoot.resolve(author).resolve("save");
-//            if (!Files.exists(savesPath)) // it's in a subfolder called `random numbers`
-//                savesPath = Files.list(savesPath.getParent())
-//                                 .filter(Files::isDirectory)
-//                                 .filter(p -> p.getFileName().toString().matches("\\d+"))
-//                                 .findFirst().orElseThrow()
-//                                 .resolve("save");
+            System.out.println("Starting " + author);
+            Path savesPath;
+            try (Stream<Path> walk = Files.walk(savesRoot.resolve(author), FileVisitOption.FOLLOW_LINKS)) {
+                savesPath = walk.filter(p -> Files.isRegularFile(p) && p.getFileName().toString().matches("\\d{5}\\..*txt"))
+                                .findFirst()
+                                .orElseThrow()
+                                .getParent();
+            }
 
             for (TISPuzzle puzzle : repository.getTrackedPuzzles()) {
                 try (DirectoryStream<Path> paths = Files.newDirectoryStream(savesPath, puzzle.getId() + "*.*txt")) {
@@ -162,7 +165,8 @@ class TISManualTest {
                             if (e instanceof ValidationException) {
                                 String message = e.getMessage();
                                 if (message.startsWith("ERROR: failed with exception:") ||
-                                    message.contains("validation failure for output"))
+                                    message.contains("validation failure for output") ||
+                                    message.contains("validation failed for fixed test"))
                                     continue;
                             }
                             System.err.println(path);

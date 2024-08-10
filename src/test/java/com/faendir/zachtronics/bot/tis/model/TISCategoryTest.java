@@ -31,12 +31,15 @@ class TISCategoryTest {
     public void ensureCategoryPacking() {
         List<TISCategory> nCats = Arrays.asList(CN, CI, CX);
         List<TISCategory> ncCats = Arrays.asList(CN, cCN, CI, cCI, CX, cCX);
-        List<TISCategory> nacCats = Arrays.asList(CN, aCN, cCN, CI, aCI, cCI, CX, aCX, cCX);
+        List<TISCategory> chCats = Arrays.asList(cCN, hCN, cCI, hCI, cCX, hCX);
+        List<TISCategory> nchCats = Arrays.asList(CN, cCN, hCN, CI, cCI, hCI, CX, cCX, hCX);
 
         assertEquals("C", MetricsTreeKt.smartFormat(nCats, Arrays.asList(TISCategory.values())));
         assertEquals("C, cC", MetricsTreeKt.smartFormat(ncCats, Arrays.asList(TISCategory.values())));
-        assertEquals("C, aC, cC", MetricsTreeKt.smartFormat(nacCats, Arrays.asList(TISCategory.values())));
+        assertEquals("cC, hC", MetricsTreeKt.smartFormat(chCats, Arrays.asList(TISCategory.values())));
+        assertEquals("C, cC, hC", MetricsTreeKt.smartFormat(nchCats, Arrays.asList(TISCategory.values())));
         assertEquals("C", MetricsTreeKt.smartFormat(nCats, TISPuzzle.UNKNOWN.getSupportedCategories()));
         assertEquals("C, cC", MetricsTreeKt.smartFormat(ncCats, TISPuzzle.UNKNOWN.getSupportedCategories()));
+        assertEquals("cC, hC", MetricsTreeKt.smartFormat(chCats, TISPuzzle.UNKNOWN.getSupportedCategories()));
     }
 }
