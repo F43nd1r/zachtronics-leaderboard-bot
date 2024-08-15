@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class SzRebuildCommand extends AbstractRebuildCommand<SzPuzzle> {
             .description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
             .build();
     @Getter
-    private final Secured secured = SzSecured.ADMINS_ONLY;
+    private final Secured secured = SzSecured.WIKI_ADMINS_ONLY;
     @Getter
     private final SzSolutionRepository repository;
 }

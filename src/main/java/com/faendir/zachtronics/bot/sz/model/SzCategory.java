@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2024
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,14 +30,14 @@ import static com.faendir.zachtronics.bot.sz.model.SzType.STANDARD;
 
 @Getter
 public enum SzCategory implements CategoryJava<SzCategory, SzScore, SzMetric> {
-    CP("CP", List.of(COST, POWER, LINES), 0b100),
-    CL("CL", List.of(COST, LINES, POWER), 0b100),
+    CP(List.of(COST, POWER, LINES), 0b100),
+    CL(List.of(COST, LINES, POWER), 0b100),
 
-    PC("PC", List.of(POWER, COST, LINES), 0b010),
-    PL("PL", List.of(POWER, LINES, COST), 0b010),
+    PC(List.of(POWER, COST, LINES), 0b010),
+    PL(List.of(POWER, LINES, COST), 0b010),
 
-    LC("LC", List.of(LINES, COST, POWER), 0b001),
-    LP("LP", List.of(LINES, POWER, COST), 0b001);
+    LC(List.of(LINES, COST, POWER), 0b001),
+    LP(List.of(LINES, POWER, COST), 0b001);
 
     /** contains <tt>%d%s%d%s%d</tt> plus a bunch of <tt>*</tt> most likely */
     static final String[] FORMAT_STRINGS = {"%d%s%d%s%d", "%d%s%d%s**%d**", "%d%s**%d**%s%d", null, "**%d**%s%d%s%d"};
@@ -48,8 +48,8 @@ public enum SzCategory implements CategoryJava<SzCategory, SzScore, SzMetric> {
     private final Set<SzType> supportedTypes = Collections.singleton(STANDARD);
     private final int scoreFormatId;
 
-    SzCategory(String displayName, @NotNull List<SzMetric> metrics, int scoreFormatId) {
-        this.displayName = displayName;
+    SzCategory(@NotNull List<SzMetric> metrics, int scoreFormatId) {
+        this.displayName = name();
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
         this.scoreFormatId = scoreFormatId;
