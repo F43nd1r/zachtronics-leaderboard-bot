@@ -25,7 +25,7 @@ jobs:
           key: ${{ runner.os }}-node-modules-${{ hashFiles('web/yarn.lock') }}
 
       - name: Gradle Tests
-        uses: burrunan/gradle-cache-action@v1
+        uses: burrunan/gradle-cache-action@v2
         with:
           arguments: test
         env:
@@ -75,7 +75,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build release
-        uses: burrunan/gradle-cache-action@v1
+        uses: burrunan/gradle-cache-action@v2
         with:
           arguments: :bootJar
         env:
