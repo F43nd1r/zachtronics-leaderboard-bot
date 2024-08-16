@@ -164,7 +164,7 @@ class TISManualTest {
                         catch (Exception e) {
                             if (e instanceof ValidationException) {
                                 String message = e.getMessage();
-                                if (message.startsWith("ERROR: failed with exception:") ||
+                                if (message.startsWith("ERROR: Failed with exception of type") ||
                                     message.contains("validation failure for output") ||
                                     message.contains("validation failed for fixed test"))
                                     continue;
