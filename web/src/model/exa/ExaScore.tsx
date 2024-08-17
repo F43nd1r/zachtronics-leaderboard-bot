@@ -13,15 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.faendir.zachtronics.bot.reddit
-
-enum class Subreddit(val id: String) {
-    EXAPUNKS("exapunks"),
-    INFINIFACTORY("infinifactory"),
-    LASTCALLBBS("lastcallbbs"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
-    TIS100("tis100")
+export default interface ExaScore {
+    cycles: number
+    size: number
+    activity: number
+    cheesy: boolean
 }

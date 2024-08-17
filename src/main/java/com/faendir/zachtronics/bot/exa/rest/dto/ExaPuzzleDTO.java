@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.exa.rest.dto;
 
-enum class Subreddit(val id: String) {
-    EXAPUNKS("exapunks"),
-    INFINIFACTORY("infinifactory"),
-    LASTCALLBBS("lastcallbbs"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
-    TIS100("tis100")
+import com.faendir.zachtronics.bot.exa.model.ExaPuzzle;
+import lombok.Value;
+import org.jetbrains.annotations.NotNull;
+
+@Value
+public class ExaPuzzleDTO {
+    @NotNull String id;
+    @NotNull String displayName;
+    @NotNull ExaGroupDTO group;
+    @NotNull String type;
+
+    @NotNull
+    public static ExaPuzzleDTO fromPuzzle(@NotNull ExaPuzzle puzzle) {
+        return new ExaPuzzleDTO(puzzle.name(), puzzle.getDisplayName(), ExaGroupDTO.fromGroup(puzzle.getGroup()), puzzle.getType().name());
+    }
 }

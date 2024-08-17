@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.exa.discord;
 
-enum class Subreddit(val id: String) {
-    EXAPUNKS("exapunks"),
-    INFINIFACTORY("infinifactory"),
-    LASTCALLBBS("lastcallbbs"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
-    TIS100("tis100")
+import com.faendir.zachtronics.bot.discord.command.Command;
+import com.faendir.zachtronics.bot.exa.ExaQualifier;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+@RequiredArgsConstructor
+public class ExaCommandGroup extends Command.Group {
+    @Getter
+    private final String name = "exa";
+    @Getter
+    @ExaQualifier
+    private final List<Leaf> commands;
 }

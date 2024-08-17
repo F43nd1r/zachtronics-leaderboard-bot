@@ -8,6 +8,7 @@ Currently included:
  - [Infinifactory](https://www.zachtronics.com/infinifactory/)
  - [TIS-100](https://www.zachtronics.com/tis-100/)
  - [Shenzhen I/O](https://www.zachtronics.com/shenzhen-io/)
+ - [Exapunks](https://www.zachtronics.com/exapunks/)
  - [Last Call BBS](https://www.zachtronics.com/last-call-bbs/)
  
 ## Use

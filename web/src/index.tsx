@@ -30,6 +30,7 @@ const SettingsView = lazy(() => import("./views/om/settings/SettingsView"))
 const HelpView = lazy(() => import("./views/om/help/HelpView"))
 const UploadView = lazy(() => import("./views/om/upload/UploadView"))
 const CwPuzzleVisualizerView = lazy(() => import("./views/cw/CwPuzzleVisualizerView"))
+const ExaPuzzleVisualizerView = lazy(() => import("./views/exa/ExaPuzzleVisualizerView"))
 const FcPuzzleVisualizerView = lazy(() => import("./views/fc/FcPuzzleVisualizerView"))
 const FpPuzzleVisualizerView = lazy(() => import("./views/fp/FpPuzzleVisualizerView"))
 const IfPuzzleVisualizerView = lazy(() => import("./views/if/IfPuzzleVisualizerView"))
@@ -56,6 +57,7 @@ createRoot(document.getElementById("root")!).render(
                         </Route>
                         <Route path="upload" element={<UploadView />} />
                         <Route path="cw/:puzzleId" element={<CwPuzzleVisualizerView />} />
+                        <Route path="exa/:puzzleId" element={<ExaPuzzleVisualizerView />} />
                         <Route path="fc/:puzzleId" element={<FcPuzzleVisualizerView />} />
                         <Route path="fp/:puzzleId" element={<FpPuzzleVisualizerView />} />
                         <Route path="if/:puzzleId" element={<IfPuzzleVisualizerView />} />

@@ -19,16 +19,16 @@ import { useParams } from "react-router-dom"
 import { Visualizer } from "../../components/visualizer/Visualizer"
 import { VisualizerColor } from "../../utils/VisualizerColor"
 import Puzzle from "../../model/Puzzle"
-import TISScore from "../../model/tis/TISScore"
+import ExaScore from "../../model/exa/ExaScore"
 import fetchFromApi from "../../utils/fetchFromApi"
 import { RecordModal } from "../../components/RecordModal"
 import { useState } from "react"
 import RecordDTO from "../../model/RecordDTO"
 
-export default function TISPuzzleVisualizerView() {
+export default function ExaPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId
-    fetchFromApi<Puzzle>(`/tis/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - TIS-100 Leaderboard`))
-    const [activeRecords, setActiveRecords] = useState<RecordDTO<TISScore>[] | undefined>(undefined)
+    fetchFromApi<Puzzle>(`/exa/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - Exapunks Leaderboard`))
+    const [activeRecords, setActiveRecords] = useState<RecordDTO<ExaScore>[] | undefined>(undefined)
 
     return (
         <Box
@@ -43,42 +43,26 @@ export default function TISPuzzleVisualizerView() {
                 flexShrink: 1,
             }}
         >
-            <Visualizer<TISScore>
-                url={`/tis/puzzle/${puzzleId}/records?includeFrontier=true`}
+            <Visualizer<ExaScore>
+                url={`/exa/puzzle/${puzzleId}/records?includeFrontier=true`}
                 config={{
-                    key: "visualizerConfigTIS",
-                    default: { mode: "3D", x: { metric: "c", scale: "linear" }, y: { metric: "n", scale: "linear" }, z: { metric: "i", scale: "linear" } },
+                    key: "visualizerConfigExa",
+                    default: { mode: "3D", x: { metric: "c", scale: "linear" }, y: { metric: "s", scale: "linear" }, z: { metric: "a", scale: "linear" } },
                 }}
-                filter={{ key: `visualizerFilterTIS-${puzzleId.replaceAll(".", "-")}`, default: {} }}
+                filter={{ key: `visualizerFilterExa-${puzzleId}`, default: {} }}
                 metrics={{
                     c: { name: "Cycles", get: (score) => score?.cycles },
-                    n: { name: "Nodes", get: (score) => score?.nodes },
-                    i: { name: "Instructions", get: (score) => score?.instructions },
+                    s: { name: "Size", get: (score) => score?.size },
+                    a: { name: "Activity", get: (score) => score?.activity },
                 }}
                 modifiers={{
-                    hardcoded: {
-                        get: (score) => score?.hardcoded,
-                        name: "cheating",
-                        color: VisualizerColor.BAD1,
-                        legendOrder: -2,
-                        option1: "Hardcoded",
-                        option2: "Not hardcoded",
-                    },
-                    cheating: {
-                        get: (score) => score?.cheating,
-                        name: "cheating",
+                    cheesy: {
+                        get: (score) => score?.cheesy,
+                        name: "cheesy",
                         color: VisualizerColor.BAD2,
                         legendOrder: -1,
-                        option1: "Cheating",
+                        option1: "Cheesy",
                         option2: "Legit",
-                    },
-                    achievement: {
-                        get: (score) => score?.achievement,
-                        name: "achievement",
-                        color: VisualizerColor.GOOD,
-                        legendOrder: 1,
-                        option1: "Achievement",
-                        option2: "No Achievement",
                     },
                 }}
                 defaultColor={VisualizerColor.DEFAULT}

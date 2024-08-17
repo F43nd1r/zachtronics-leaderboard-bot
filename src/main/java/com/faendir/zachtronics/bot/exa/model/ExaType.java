@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.exa.model;
 
-enum class Subreddit(val id: String) {
-    EXAPUNKS("exapunks"),
-    INFINIFACTORY("infinifactory"),
-    LASTCALLBBS("lastcallbbs"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
-    TIS100("tis100")
+import com.faendir.zachtronics.bot.model.Type;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+public enum ExaType implements Type {
+    STANDARD("standard"),
+    UNCHEESABLE("uncheesable");
+
+    private final String displayName;
 }

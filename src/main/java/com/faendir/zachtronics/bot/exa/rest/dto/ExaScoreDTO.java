@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.exa.rest.dto;
 
-enum class Subreddit(val id: String) {
-    EXAPUNKS("exapunks"),
-    INFINIFACTORY("infinifactory"),
-    LASTCALLBBS("lastcallbbs"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
-    TIS100("tis100")
+import com.faendir.zachtronics.bot.exa.model.ExaScore;
+import lombok.Value;
+import org.jetbrains.annotations.NotNull;
+
+@Value
+public class ExaScoreDTO {
+    int cycles;
+    int size;
+    int activity;
+
+    boolean cheesy;
+
+    @NotNull
+    public static ExaScoreDTO fromScore(@NotNull ExaScore score) {
+        return new ExaScoreDTO(score.getCycles(), score.getSize(), score.getActivity(), score.isCheesy());
+    }
 }
+
