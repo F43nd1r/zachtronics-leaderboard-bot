@@ -42,6 +42,8 @@ public class ExaValidator {
         if (save.getSize() != actualSize)
             throw new ValidationException("Actual size different from declared: " + actualSize + " != " + save.getSize());
 
+        cheesy |= save.getName().matches(".*/C\\b.*");
+
         ExaScore score = new ExaScore(save.getCycles(), save.getSize(), save.getActivity(), cheesy);
         return new ExaSubmission(puzzle, score, author, displayLink, data);
     }

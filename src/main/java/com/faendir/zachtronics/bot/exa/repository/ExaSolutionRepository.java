@@ -115,7 +115,7 @@ public class ExaSolutionRepository extends AbstractSolutionRepository<ExaCategor
                                            boolean doCheese) {
         super.updateRedditLeaderboard(lines, puzzle, access, solutions);
 
-        if (doCheese && solutions.stream().noneMatch(s -> s.getScore().isCheesy())) {
+        if (doCheese && solutions.stream().anyMatch(s -> s.getScore().isCheesy())) {
             try {
                 rebuildCheeseTable(lines, access);
             }
