@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.exa.validation;
 
 import lombok.Value;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,22 +58,22 @@ public class ExaChip {
 
     int size() {
         int result = 0;
+        int repMulti = 1;
 
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i].trim();
-            if (line.isEmpty() || line.startsWith("NOTE") || line.startsWith(";")) {
-                continue;
+        for (String rawLine : lines) {
+            String line = StringUtils.substringBefore(rawLine, ';').trim(); // strip away partial comments
+            if (line.isEmpty() || line.startsWith("NOTE")) {
+                // effectively empty lines
             }
-            if (line.startsWith("@REP")) {
-                int repTimes = Integer.parseInt(line.substring(5));
-                for (i++; i < lines.length; i++) {
-                    if (lines[i].trim().equals("@END"))
-                        break;
-                    result += repTimes;
-                }
-                continue;
+            else if (line.startsWith("@REP")) {
+                repMulti = Integer.parseInt(line.substring(5));
             }
-            result++;
+            else if (line.equals("@END")) {
+                repMulti = 1;
+            }
+            else {
+                result += repMulti;
+            }
         }
         return result;
     }

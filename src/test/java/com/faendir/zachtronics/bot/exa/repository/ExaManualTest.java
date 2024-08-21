@@ -141,39 +141,42 @@ public class ExaManualTest {
 
     @Test
     public void submitSaveFolder() throws IOException {
-        String author = "someGuy";
+        List<String> authors = List.of("someGuy");
+//        List<String> authors = Files.list(Paths.get("../exapunks/saves/")).map(p -> p.getFileName().toString()).sorted().toList();
 
-        Path savesPath = Paths.get("../exapunks/saves/" + author);
-        /*
-        cp -a ../exapunks/leaderboard/* src/test/resources/repositories/exa-leaderboard/
-         */
+        for (String author: authors) {
+            Path savesPath = Paths.get("../exapunks/saves/" + author);
+            /*
+            cp -a ../exapunks/leaderboard/* src/test/resources/repositories/exa-leaderboard/
+             */
 
-        Iterable<String> prefixes = Arrays.stream(ExaPuzzle.values())
-                                          .map(ExaPuzzle::getPrefix)
-                                          .collect(Collectors.toCollection(LinkedHashSet::new));
-        for (String prefix : prefixes) {
-            try (DirectoryStream<Path> paths = Files.newDirectoryStream(savesPath, prefix + "*.solution")) {
-                for (Path path : paths) {
-                    byte[] data = Files.readAllBytes(path);
-                    ExaSubmission submission;
-                    try {
-                        submission = ExaSubmission.fromData(data, false, author, "https://li.nk");
-                    }
-                    catch (Exception e) {
-                        if (e instanceof ValidationException) {
-                            String message = e.getMessage();
-                            if (message.equals("Unsolved solution") || message.equals("Corrupted solution") ||
-                                message.startsWith("Size larger than puzzle limit") ||
-                                message.startsWith("Actual size different from declared") ||
-                                message.startsWith("Hacker battles won") ||
-                                message.startsWith("Sandbox indicator") || message.startsWith("Unknown puzzle"))
-                                continue;
+            Iterable<String> prefixes = Arrays.stream(ExaPuzzle.values())
+                                              .map(ExaPuzzle::getPrefix)
+                                              .collect(Collectors.toCollection(LinkedHashSet::new));
+            for (String prefix : prefixes) {
+                try (DirectoryStream<Path> paths = Files.newDirectoryStream(savesPath, prefix + "*.solution")) {
+                    for (Path path : paths) {
+                        byte[] data = Files.readAllBytes(path);
+                        ExaSubmission submission;
+                        try {
+                            submission = ExaSubmission.fromData(data, false, author, "https://li.nk");
                         }
-                        System.err.println(path);
-                        throw e;
-                    }
+                        catch (Exception e) {
+                            if (e instanceof ValidationException) {
+                                String message = e.getMessage();
+                                if (message.equals("Unsolved solution") || message.equals("Corrupted solution") ||
+                                    message.startsWith("Size larger than puzzle limit") ||
+                                    message.startsWith("Actual size different from declared") ||
+                                    message.startsWith("Hacker battles won") ||
+                                    message.startsWith("Sandbox indicator") || message.startsWith("Unknown puzzle"))
+                                    continue;
+                            }
+                            System.err.println(path);
+                            throw e;
+                        }
 
-                    System.out.println(repository.submit(submission));
+                        System.out.println(repository.submit(submission));
+                    }
                 }
             }
         }
