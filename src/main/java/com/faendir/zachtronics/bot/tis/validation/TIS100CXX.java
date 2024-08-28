@@ -36,11 +36,11 @@ public class TIS100CXX {
 
         StringJoiner seedJoiner = new StringJoiner(",");
         Arrays.stream(puzzle.getExtraWitnessSeeds()).mapToObj(Integer::toString).forEach(seedJoiner::add);
-        seedJoiner.add("100000..109999");
+        seedJoiner.add("100000..199999");
         String seeds = seedJoiner.toString();
 
         String[] command = {"TIS-100-CXX",
-                            "-q", "--seeds", seeds, "--limit", "120000", "--total-limit", "50000000",
+                            "-q", "--seeds", seeds, "--limit", "120000", "--total-limit", Integer.toString(100_000_000),
                             "-", puzzle.getId()};
         byte[] result = ValidationUtils.callValidator(data.getBytes(), command);
         String simResult = new String(result).trim();
