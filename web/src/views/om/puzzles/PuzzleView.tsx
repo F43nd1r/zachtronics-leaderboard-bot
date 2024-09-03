@@ -102,27 +102,50 @@ export default function PuzzleView() {
                     <LoadingIndicator />
                 )}
                 {puzzleId?.match(/w[0-9]+/) ? (
-                    <Button
-                        size="small"
-                        variant="outlined"
-                        color="primary"
-                        style={{
-                            marginTop: "auto",
-                            marginBottom: "auto",
-                        }}
-                    >
-                        <a
-                            href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${puzzleId.substring(1)}`}
-                            target="_blank"
-                            rel="noreferrer"
+                    <>
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            color="primary"
                             style={{
-                                color: "inherit",
-                                textDecoration: "none",
+                                marginTop: "auto",
+                                marginBottom: "auto",
                             }}
                         >
-                            Get on Steam
-                        </a>
-                    </Button>
+                            <a
+                                href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${puzzleId.substring(1)}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                style={{
+                                    color: "inherit",
+                                    textDecoration: "none",
+                                }}
+                            >
+                                Get Puzle Direct
+                            </a>
+                        </Button>
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            color="primary"
+                            style={{
+                                marginTop: "auto",
+                                marginBottom: "auto",
+                            }}
+                        >
+                            <a
+                                href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${puzzleId.substring(1)}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                style={{
+                                    color: "inherit",
+                                    textDecoration: "none",
+                                }}
+                            >
+                                Get on Steam
+                            </a>
+                        </Button>
+                    </>
                 ) : (
                     <Button
                         size="small"
