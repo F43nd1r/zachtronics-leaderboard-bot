@@ -3035,10 +3035,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@remix-run/router@npm:1.19.1":
-  version: 1.19.1
-  resolution: "@remix-run/router@npm:1.19.1"
-  checksum: 10c0/9101fc96646e5107b6b0ef248d4c93bd965590c37ac02d35bcc57d1902467db7fc6eeec0a1fb97d0ce5bc96fae58e75239555e44a983239a61badba18e82d3b8
+"@remix-run/router@npm:1.19.2":
+  version: 1.19.2
+  resolution: "@remix-run/router@npm:1.19.2"
+  checksum: 10c0/ac7fc813350686705f2c29219e70e1e299d9a8e3b301e9e81f7e84f578c40c6462b590cf0d78863bac40dbc325b68c71ae070f4a1465793d1d1971b619618295
   languageName: node
   linkType: hard
 
@@ -3571,12 +3571,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:20.16.4":
-  version: 20.16.4
-  resolution: "@types/node@npm:20.16.4"
+"@types/node@npm:20.16.5":
+  version: 20.16.5
+  resolution: "@types/node@npm:20.16.5"
   dependencies:
     undici-types: "npm:~6.19.2"
-  checksum: 10c0/1dfd24b8a1552adf1f37c189bcebb6e287184852188d8aa28f8e955f15079f8ee62d88f142b6a52c0fd59132fc40644bf6197c139e4e1d645c1db040b231caaa
+  checksum: 10c0/6af7994129815010bcbc4cf8221865559c8116ff43e74a6549525c2108267596fc2d18aff5d5ecfe089fb60a119f975631343e2c65c52bfa0955ed9dc56733d6
   languageName: node
   linkType: hard
 
@@ -10397,10 +10397,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"plotly.js-gl3d-dist-min@npm:2.35.0":
-  version: 2.35.0
-  resolution: "plotly.js-gl3d-dist-min@npm:2.35.0"
-  checksum: 10c0/282e71a547755fa4471c92e9a1d3e4af7d7d0d80a2878bdfb968a1968421e86b331afb28de94105f62cec649c257f4625f2986e6761c70b2c92cc663da14a375
+"plotly.js-gl3d-dist-min@npm:2.35.2":
+  version: 2.35.2
+  resolution: "plotly.js-gl3d-dist-min@npm:2.35.2"
+  checksum: 10c0/10f6c685516467cf4003fbe59f70dee2bcb5d9ddc053bf012957763f6fcc01a6b408126277567d599d1c43446ce50eedda5ecaa2ccc3f02460d3b59b18b6beb3
   languageName: node
   linkType: hard
 
@@ -11536,16 +11536,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-intersection-observer@npm:9.13.0":
-  version: 9.13.0
-  resolution: "react-intersection-observer@npm:9.13.0"
+"react-intersection-observer@npm:9.13.1":
+  version: 9.13.1
+  resolution: "react-intersection-observer@npm:9.13.1"
   peerDependencies:
     react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
     react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
   peerDependenciesMeta:
     react-dom:
       optional: true
-  checksum: 10c0/7e446b763edc0d9e5642c03c0a151fa6e25fd91c7d004b8af918b0ec9a01f0c252909c13c6fbf95d331e7064bbe1d5668ed788610acab400ce38063d82f9e1b3
+  checksum: 10c0/c64722db407e0ca83945bf97621ab4618fa74f3a70b528ff43988818d46feee8962bd12e70203d2d92b31030889a1f813d00e0aa3d781a7bc39fb293c277ee04
   languageName: node
   linkType: hard
 
@@ -11616,16 +11616,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router-dom@npm:6.26.1":
-  version: 6.26.1
-  resolution: "react-router-dom@npm:6.26.1"
+"react-router-dom@npm:6.26.2":
+  version: 6.26.2
+  resolution: "react-router-dom@npm:6.26.2"
   dependencies:
-    "@remix-run/router": "npm:1.19.1"
-    react-router: "npm:6.26.1"
+    "@remix-run/router": "npm:1.19.2"
+    react-router: "npm:6.26.2"
   peerDependencies:
     react: ">=16.8"
     react-dom: ">=16.8"
-  checksum: 10c0/9d9d8ed54d1c95497c6fa35a6ab46992efeccf1cfc6f0f6089c6c9b040af3eae09568fbb80c690bae08051a955d92d7aa3a0e730f626eb69285114993d31d430
+  checksum: 10c0/7515128a98eef0a6b2bf354ef9dfefad03556a06be00fa9220eda6526aaada8a42f294911083473d7ced6d7128c3088bd193218bbb3d62593f9f4f7053781c23
   languageName: node
   linkType: hard
 
@@ -11641,14 +11641,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router@npm:6.26.1":
-  version: 6.26.1
-  resolution: "react-router@npm:6.26.1"
+"react-router@npm:6.26.2":
+  version: 6.26.2
+  resolution: "react-router@npm:6.26.2"
   dependencies:
-    "@remix-run/router": "npm:1.19.1"
+    "@remix-run/router": "npm:1.19.2"
   peerDependencies:
     react: ">=16.8"
-  checksum: 10c0/463078e740462b42bb5ba8004448f33fc9e63778f432a4ed55c57b93c5b519e25fb17913ee8435b0fda33c6b9f75df8ef6fcb2c3a4f8db84fb546d202e29aa51
+  checksum: 10c0/0d15a39b419c99fb5ccad76388bfc4ee2b01323b3b1b694595a9f9ea28e1fbeea25486b5398f5d3d93922f5c6a9aa751b6bb27419488d85279f6ca5ff9e0a6bb
   languageName: node
   linkType: hard
 
@@ -13343,23 +13343,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:5.5.4":
-  version: 5.5.4
-  resolution: "typescript@npm:5.5.4"
+"typescript@npm:5.6.2":
+  version: 5.6.2
+  resolution: "typescript@npm:5.6.2"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/422be60f89e661eab29ac488c974b6cc0a660fb2228003b297c3d10c32c90f3bcffc1009b43876a082515a3c376b1eefcce823d6e78982e6878408b9a923199c
+  checksum: 10c0/3ed8297a8c7c56b7fec282532503d1ac795239d06e7c4966b42d4330c6cf433a170b53bcf93a130a7f14ccc5235de5560df4f1045eb7f3550b46ebed16d3c5e5
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A5.5.4#optional!builtin<compat/typescript>":
-  version: 5.5.4
-  resolution: "typescript@patch:typescript@npm%3A5.5.4#optional!builtin<compat/typescript>::version=5.5.4&hash=379a07"
+"typescript@patch:typescript@npm%3A5.6.2#optional!builtin<compat/typescript>":
+  version: 5.6.2
+  resolution: "typescript@patch:typescript@npm%3A5.6.2#optional!builtin<compat/typescript>::version=5.6.2&hash=8c6c40"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/73409d7b9196a5a1217b3aaad929bf76294d3ce7d6e9766dd880ece296ee91cf7d7db6b16c6c6c630ee5096eccde726c0ef17c7dfa52b01a243e57ae1f09ef07
+  checksum: 10c0/94eb47e130d3edd964b76da85975601dcb3604b0c848a36f63ac448d0104e93819d94c8bdf6b07c00120f2ce9c05256b8b6092d23cf5cf1c6fa911159e4d572f
   languageName: node
   linkType: hard
 
@@ -14242,7 +14242,7 @@ __metadata:
     "@sinclair/typebox": "npm:0.33.9"
     "@types/d3-format": "npm:3.0.4"
     "@types/jest": "npm:29.5.12"
-    "@types/node": "npm:20.16.4"
+    "@types/node": "npm:20.16.5"
     "@types/plotly.js": "npm:2.33.3"
     "@types/react": "npm:18.3.5"
     "@types/react-dom": "npm:18.3.0"
@@ -14250,19 +14250,19 @@ __metadata:
     "@types/react-router-hash-link": "npm:2.4.9"
     d3-format: "npm:3.1.0"
     deep-object-diff: "npm:1.1.9"
-    plotly.js-gl3d-dist-min: "npm:2.35.0"
+    plotly.js-gl3d-dist-min: "npm:2.35.2"
     prettier: "npm:3.3.3"
     react: "npm:18.3.1"
     react-dom: "npm:18.3.1"
-    react-intersection-observer: "npm:9.13.0"
+    react-intersection-observer: "npm:9.13.1"
     react-mui-dropzone: "npm:4.0.7"
     react-plotly.js: "npm:2.6.0"
-    react-router-dom: "npm:6.26.1"
+    react-router-dom: "npm:6.26.2"
     react-router-hash-link: "npm:2.4.3"
     react-scripts: "npm:5.0.1"
     react-sizeme: "npm:3.0.2"
     rimraf: "npm:6.0.1"
     source-map-explorer: "npm:2.5.3"
-    typescript: "npm:5.5.4"
+    typescript: "npm:5.6.2"
   languageName: unknown
   linkType: soft
