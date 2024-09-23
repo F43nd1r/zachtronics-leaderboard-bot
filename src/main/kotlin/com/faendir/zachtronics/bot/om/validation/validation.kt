@@ -38,6 +38,7 @@ import okio.sink
 import okio.source
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import kotlin.math.abs
 import kotlin.math.ceil
 
 
@@ -123,7 +124,7 @@ fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSub
     if (solution.parts.filterIsInstance<IO>().groupBy { it.type to it.index }.values.any { it.size > 1 }) {
         throw IllegalArgumentException("Duplicated Inputs or Outputs are banned.")
     }
-    if (solution.parts.any { (it.position.x >= 65536) or (it.position.y >= 65536) }) {
+    if (solution.parts.any { (abs(it.position.x) >= 65536) or (abs(it.position.y) >= 65536) }) {
         throw IllegalArgumentException("Parts farther than 2^16 from the origin are banned.")
     }
     val (puzzle, solutionBytes) = OmPuzzle.entries.find { it.id == solution.puzzle }?.let { it to inputBytes }
