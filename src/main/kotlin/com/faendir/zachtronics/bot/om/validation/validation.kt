@@ -109,7 +109,10 @@ fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSub
         throw IllegalArgumentException("I could not parse your solution", e)
     }
     if (solution !is SolvedSolution) {
-        throw IllegalArgumentException("only solved solutions are accepted")
+        throw IllegalArgumentException("Only solved solutions are accepted")
+    }
+    if (solution.instructions >= 65536) {
+        throw IllegalArgumentException("Using more than 2^16 instructions is banned.")
     }
     if (solution.parts.count { it is Arm && it.type == ArmType.VAN_BERLOS_WHEEL } > 1) {
         throw IllegalArgumentException("Multiple Van Berlo's Wheels are banned.")
@@ -119,6 +122,9 @@ fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSub
     }
     if (solution.parts.filterIsInstance<IO>().groupBy { it.type to it.index }.values.any { it.size > 1 }) {
         throw IllegalArgumentException("Duplicated Inputs or Outputs are banned.")
+    }
+    if (solution.parts.any { (it.position.x >= 65536) or (it.position.y >= 65536) }) {
+        throw IllegalArgumentException("Parts farther than 2^16 from the origin are banned.")
     }
     val (puzzle, solutionBytes) = OmPuzzle.entries.find { it.id == solution.puzzle }?.let { it to inputBytes }
         ?: OmPuzzle.entries.find { it.altIds.contains(solution.puzzle) }?.let {
