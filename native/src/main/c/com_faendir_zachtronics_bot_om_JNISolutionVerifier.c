@@ -52,7 +52,7 @@ JNIEXPORT jdouble JNICALL Java_com_faendir_zachtronics_bot_om_JNISolutionVerifie
 
     void *verifier = (void*) jVerifier;
     const char *metric = (*env)->GetStringUTFChars(env, jMetric, 0);
-    int result = verifier_evaluate_approximate_metric(verifier, metric);
+    double result = verifier_evaluate_approximate_metric(verifier, metric);
     throw_if_error(env, verifier);
     return result;
 }
