@@ -40,8 +40,7 @@ public class TIS100CXX {
         String seeds = seedJoiner.toString();
 
         String[] command = {"TIS-100-CXX",
-                            "-q", "--seeds", seeds, "--limit", "120000", "--total-limit", Integer.toString(100_000_000),
-                            "-", puzzle.getId()};
+                            "-q", "--seeds", seeds, "--limit", "120k", "--total-limit", "100M", "-l", puzzle.getId(), "-"};
         byte[] result = ValidationUtils.callValidator(data.getBytes(), command);
         String simResult = new String(result).trim();
 
