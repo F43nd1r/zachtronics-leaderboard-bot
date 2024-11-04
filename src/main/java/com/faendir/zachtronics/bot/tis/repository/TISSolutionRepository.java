@@ -180,7 +180,9 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
             int totalInstructions = 0;
             addPuzzleTableHeader.accept("Achievement Solutions");
             Iterable<TISPuzzle> achievPuzzles = trackedPuzzles.stream().filter(p -> p.getAchievement() != null)::iterator;
-            TISCategory[][] achievCategories = {{aCN, aCI, aCX}, {aNC, aNI, aNX}, {aIC, aIN, aIX}};
+            TISCategory[][] achievCategories = {{aCN, aCI, aCX, acCN, acCI, acCX},
+                                                {aNC, aNI, aNX, acNC, acNI, acNX},
+                                                {aIC, aIN, aIX, acIC, acIN, acIX}};
             for (TISPuzzle puzzle : achievPuzzles) {
                 Map<TISCategory, TISRecord> recordMap = data.get(puzzle);
 
@@ -210,7 +212,7 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
             for (TISPuzzle puzzle : trackedPuzzles) {
                 // copy to edit
                 Map<TISCategory, TISRecord> recordMap = new EnumMap<>(data.get(puzzle));
-                recordMap.values().removeIf(r -> !r.getScore().isCheating());
+                recordMap.values().removeIf(r -> !r.getScore().isCheating() || r.getScore().isAchievement());
                 if (recordMap.isEmpty())
                     continue; // there is no cheating solve at all
 
