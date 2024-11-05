@@ -102,7 +102,7 @@ export default function PuzzleView() {
                     <LoadingIndicator />
                 )}
                 {puzzleId?.match(/w[0-9]+/) ? (
-                    <Download_Buttons>
+                    <>
                         <Button
                             size="small"
                             variant="outlined"
@@ -145,7 +145,7 @@ export default function PuzzleView() {
                                 Get on Steam
                             </a>
                         </Button>
-                    </Download_Buttons>
+                    </>
                 ) : (
                     <Button
                         size="small"
