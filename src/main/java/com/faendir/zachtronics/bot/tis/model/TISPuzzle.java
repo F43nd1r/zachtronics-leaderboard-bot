@@ -106,7 +106,7 @@ public enum TISPuzzle implements Puzzle<TISCategory> {
         this.type = type;
         this.supportedCategories = switch (type) {
             case STANDARD -> Arrays.stream(TISCategory.values())
-                                   .filter(c -> c.getAdmission() != TISMetric.ACHIEVEMENT)
+                                   .filter(c -> !c.getAdmission().getDisplayName().contains("a"))
                                    .toList();
             case WITH_ACHIEVEMENT -> List.of(TISCategory.values());
             case FIXED_IMAGE -> Arrays.stream(TISCategory.values())
