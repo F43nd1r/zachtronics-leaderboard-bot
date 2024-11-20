@@ -3168,10 +3168,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sinclair/typebox@npm:0.34.4":
-  version: 0.34.4
-  resolution: "@sinclair/typebox@npm:0.34.4"
-  checksum: 10c0/0f519282b1371deec90d71bc9a29970e9756cfabf0b8506797a3f009407e31e551fc871038a4633e5039a045987c457fb34e47ae73dc06d24cd3c969406bf4fd
+"@sinclair/typebox@npm:0.34.5":
+  version: 0.34.5
+  resolution: "@sinclair/typebox@npm:0.34.5"
+  checksum: 10c0/3167be46a3dec069594e494d347bb8e4b58197f52dd10db9387a04f8717165f5a264101abe3c57f1b9cd5cebedcb827e096c43a622d3f114b8ea38ae90ff7657
   languageName: node
   linkType: hard
 
@@ -14298,7 +14298,7 @@ __metadata:
     "@mui/material": "npm:6.1.7"
     "@mui/styles": "npm:6.1.7"
     "@simbathesailor/use-what-changed": "npm:2.0.0"
-    "@sinclair/typebox": "npm:0.34.4"
+    "@sinclair/typebox": "npm:0.34.5"
     "@types/d3-format": "npm:3.0.4"
     "@types/jest": "npm:29.5.14"
     "@types/node": "npm:22.9.1"
