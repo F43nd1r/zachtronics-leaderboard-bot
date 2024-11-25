@@ -2,7 +2,7 @@
     "name": "zlbb",
     "version": "0.1.0",
     "private": true,
-    "packageManager": "yarn@4.5.2",
+    "packageManager": "yarn@4.5.3",
     "dependencies": {
         "@emotion/react": "11.13.5",
         "@emotion/styled": "11.13.5",
