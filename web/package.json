@@ -6,10 +6,10 @@
     "dependencies": {
         "@emotion/react": "11.13.5",
         "@emotion/styled": "11.13.5",
-        "@mui/icons-material": "6.1.8",
+        "@mui/icons-material": "6.1.9",
         "@mui/lab": "5.0.0-alpha.173",
-        "@mui/material": "6.1.8",
-        "@mui/styles": "6.1.8",
+        "@mui/material": "6.1.9",
+        "@mui/styles": "6.1.9",
         "@sinclair/typebox": "0.34.9",
         "d3-format": "3.1.0",
         "deep-object-diff": "1.1.9",
