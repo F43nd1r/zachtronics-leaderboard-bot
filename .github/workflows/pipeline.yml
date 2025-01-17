@@ -18,6 +18,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Yarn Cache
         uses: actions/cache@v4
         with:
@@ -25,9 +28,7 @@ jobs:
           key: ${{ runner.os }}-node-modules-${{ hashFiles('web/yarn.lock') }}
 
       - name: Gradle Tests
-        uses: burrunan/gradle-cache-action@v2
-        with:
-          arguments: test
+        run: ./gradlew test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -56,6 +57,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Yarn Cache
         uses: actions/cache@v4
         with:
@@ -75,9 +79,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build release
-        uses: burrunan/gradle-cache-action@v2
-        with:
-          arguments: :bootJar
+        run: ./gradlew :bootJar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
