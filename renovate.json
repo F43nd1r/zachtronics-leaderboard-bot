@@ -1,6 +1,5 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "onboarding": false,
   "ignoreDeps": [
     "openjdk"
   ],
@@ -8,7 +7,8 @@
     "group:monorepos",
     "group:recommended",
     "packages:react",
-    "workarounds:all"
+    "workarounds:all",
+    ":dependencyDashboard"
   ],
   "rangeStrategy": "pin",
   "packageRules": [
