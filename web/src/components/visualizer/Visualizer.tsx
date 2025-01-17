@@ -77,9 +77,15 @@ export function Visualizer<SCORE, RECORD extends RecordDTO<SCORE> = RecordDTO<SC
                             sx={(theme) => ({
                                 width: "100%",
                                 [theme.breakpoints.up("md")]: {
-                                    width: "30rem",
+                                    width: "16rem",
                                     height: "100%",
                                     overflowY: "auto",
+                                },
+                                [theme.breakpoints.up("lg")]: {
+                                    width: "20rem",
+                                },
+                                [theme.breakpoints.up("xl")]: {
+                                    width: "24rem",
                                 },
                             })}
                         >

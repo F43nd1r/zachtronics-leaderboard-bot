@@ -23,10 +23,10 @@ import createPlotlyComponent from "react-plotly.js/factory"
 import Plotly from "plotly.js-gl3d-dist-min"
 import Metric from "../../../model/Metric"
 import { Configuration, MetricConfiguration } from "../../../model/Configuration"
-import { SizeMe, SizeMeProps } from "react-sizeme"
 import { applyFilter, Filter } from "../../../model/Filter"
 import Modifier from "../../../model/Modifier"
 import iterate from "../../../utils/iterate"
+import useDimensions from "react-cool-dimensions"
 
 export interface PlotViewProps<SCORE, RECORD extends RecordDTO<SCORE>> {
     metrics: Record<string, Metric<SCORE>>
@@ -53,7 +53,7 @@ function SizeAwarePlotView<SCORE, RECORD extends RecordDTO<SCORE>>({
     records: recordsIn,
     filter,
     onClick,
-}: PlotViewProps<SCORE, RECORD> & SizeMeProps) {
+}: PlotViewProps<SCORE, RECORD> & { size: { width?: number; height?: number } }) {
     const records = applyFilter(metrics, modifiers, filter, configuration, recordsIn)
     const x = findMetric(metrics, configuration.x)
     const y = findMetric(metrics, configuration.y)
@@ -197,9 +197,10 @@ function SizeAwarePlotView<SCORE, RECORD extends RecordDTO<SCORE>>({
 }
 
 export default function PlotView<SCORE, RECORD extends RecordDTO<SCORE>>(props: PlotViewProps<SCORE, RECORD>) {
+    const { observe, width, height } = useDimensions()
     return (
-        <SizeMe monitorHeight={true} monitorWidth={true}>
-            {({ size }) => <SizeAwarePlotView size={size} {...props} />}
-        </SizeMe>
+        <div ref={observe} style={{ minWidth: 0, flex: 1 }}>
+            <SizeAwarePlotView size={{ width, height }} {...props} />
+        </div>
     )
 }
