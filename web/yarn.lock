@@ -14016,7 +14016,7 @@ __metadata:
     "@types/d3-format": "npm:3.0.4"
     "@types/jest": "npm:29.5.14"
     "@types/node": "npm:22.10.9"
-    "@types/plotly.js": "npm:*"
+    "@types/plotly.js": "npm:2.35.2"
     "@types/react": "npm:19.0.8"
     "@types/react-dom": "npm:19.0.3"
     "@types/react-plotly.js": "npm:2.6.3"
