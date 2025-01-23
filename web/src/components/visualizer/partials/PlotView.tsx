@@ -17,7 +17,7 @@
 import { useTheme } from "@mui/material"
 import { ComponentType } from "react"
 import RecordDTO, { isStrictlyBetterInMetrics } from "../../../model/RecordDTO"
-import { Axis, PlotData } from "plotly.js"
+import { LayoutAxis, PlotData } from "plotly.js"
 import { PlotParams } from "react-plotly.js"
 import createPlotlyComponent from "react-plotly.js/factory"
 import Plotly from "plotly.js-gl3d-dist-min"
@@ -74,7 +74,7 @@ function SizeAwarePlotView<SCORE, RECORD extends RecordDTO<SCORE>>({
 
     const theme = useTheme()
     const gridColor = theme.palette.mode === "light" ? theme.palette.grey["200"] : theme.palette.grey["800"]
-    const makeAxis = (axis: { metric: Metric<SCORE>; scale: "linear" | "log" }): Partial<Axis> => {
+    const makeAxis = (axis: { metric: Metric<SCORE>; scale: "linear" | "log" }): Partial<LayoutAxis> => {
         return {
             title: axis.metric.name,
             color: theme.palette.text.primary,
@@ -83,6 +83,7 @@ function SizeAwarePlotView<SCORE, RECORD extends RecordDTO<SCORE>>({
             rangemode: "tozero",
             type: axis.scale,
             tickformat: "s",
+            automargin: true,
         }
     }
 
@@ -159,6 +160,13 @@ function SizeAwarePlotView<SCORE, RECORD extends RecordDTO<SCORE>>({
                     autosize: false,
                     width: size.width ?? undefined,
                     height: size.height ?? undefined,
+                    margin: {
+                        l: 0,
+                        r: 0,
+                        b: 0,
+                        t: 0,
+                        pad: 0,
+                    },
                     paper_bgcolor: "transparent",
                     plot_bgcolor: "transparent",
                     xaxis: makeAxis(x),

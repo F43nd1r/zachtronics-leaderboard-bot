@@ -3229,13 +3229,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/d3@npm:^3":
-  version: 3.5.47
-  resolution: "@types/d3@npm:3.5.47"
-  checksum: 10c0/b60bc92f0c620899e045a40e2553f37f16f8e5eea77e5b3fa299a36f3d5365d33a1627b8a249a2394be2022888b835c562c1c67590499905fb277b5260a5a445
-  languageName: node
-  linkType: hard
-
 "@types/eslint-scope@npm:^3.7.3":
   version: 3.7.3
   resolution: "@types/eslint-scope@npm:3.7.3"
@@ -3408,15 +3401,6 @@ __metadata:
   version: 4.0.0
   resolution: "@types/parse-json@npm:4.0.0"
   checksum: 10c0/1d3012ab2fcdad1ba313e1d065b737578f6506c8958e2a7a5bdbdef517c7e930796cb1599ee067d5dee942fb3a764df64b5eef7e9ae98548d776e86dcffba985
-  languageName: node
-  linkType: hard
-
-"@types/plotly.js@npm:*":
-  version: 1.54.22
-  resolution: "@types/plotly.js@npm:1.54.22"
-  dependencies:
-    "@types/d3": "npm:^3"
-  checksum: 10c0/bb9888d6f74dea0ad7b19c35d8cbf46154212d3517cb34edbe80b72098d02bb005013e10bc8e93b34de2dee8741a4ed71b7c765d0d5109e168ca2ef067c374b8
   languageName: node
   linkType: hard
 
@@ -14032,7 +14016,7 @@ __metadata:
     "@types/d3-format": "npm:3.0.4"
     "@types/jest": "npm:29.5.14"
     "@types/node": "npm:22.10.9"
-    "@types/plotly.js": "npm:2.35.2"
+    "@types/plotly.js": "npm:*"
     "@types/react": "npm:19.0.8"
     "@types/react-dom": "npm:19.0.3"
     "@types/react-plotly.js": "npm:2.6.3"
