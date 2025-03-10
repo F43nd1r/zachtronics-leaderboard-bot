@@ -10,7 +10,7 @@
         "@mui/lab": "6.0.0-beta.30",
         "@mui/material": "6.4.7",
         "@mui/styles": "6.4.7",
-        "@sinclair/typebox": "0.34.28",
+        "@sinclair/typebox": "0.34.29",
         "d3-format": "3.1.0",
         "deep-object-diff": "1.1.9",
         "plotly.js-gl3d-dist-min": "2.35.3",
