@@ -196,6 +196,14 @@ enum class OmPuzzle(
     THERMAL_FUSE(TOURNAMENT_2024, POLYMER, "Thermal Fuse", "w3210188410", "OM2024_W6_Thermal_Fuse"),
     CRITELLIUM(TOURNAMENT_2024, NORMAL, "Critellium", "w3210197400", "OM2024_W7_Critellium"),
 
+    CRITELLIUM(TOURNAMENT_2025, NORMAL, "Hydrophobic Water", "w3446275126", "OM2025_1_Hydrophobic_Water"),
+    CRITELLIUM(TOURNAMENT_2025, PRODUCTION, "Thermic Capacitor", "w3446275900", "OM2025_2_Thermic_Capacitor"),
+    CRITELLIUM(TOURNAMENT_2025, NORMAL, "Self-Organizing Fluid", "w3446276105", "OM2025_3_Self-Organizing_Fluid"),
+    //CRITELLIUM(TOURNAMENT_2025, NORMAL, "Material Salvage", "w3446276940", "OM2025_break_Material Salvage"),
+    CRITELLIUM(TOURNAMENT_2025, NORMAL, "Crystallized Air", "w3446278612", "OM2025_5_Crystallized_Air"),
+    //CRITELLIUM(TOURNAMENT_2025, NORMAL, "Bulk Transmutation", "w3446278995", "OM2025_6_Bulk_Transmutation"),
+    //CRITELLIUM(TOURNAMENT_2025, NORMAL, "Pass-Through Alloy", "w3446279881", "OM2025_7_Pass-Through_Alloy"),
+
     HORN_SILVER(WEEKLIES_1, NORMAL, "Horn Silver", "w2513871683", "OM2021Demo_HornSilver"),
     GREEN_VITRIOL(WEEKLIES_1, NORMAL, "Green Vitriol", "w2539581468", "OM2021Demo_GreenVitriol"),
     FERROUS_WHEEL(WEEKLIES_1, NORMAL, "Ferrous Wheel", "w2565611826", "OM2021Demo_FerrousWheel"),
