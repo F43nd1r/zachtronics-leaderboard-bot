@@ -199,9 +199,9 @@ enum class OmPuzzle(
     HYDROPHOBIC_WATER(TOURNAMENT_2025, NORMAL, "Hydrophobic Water", "w3446275126", "OM2025_1_Hydrophobic_Water"),
     THERMIC_CAPACITOR(TOURNAMENT_2025, PRODUCTION, "Thermic Capacitor", "w3446275900", "OM2025_2_Thermic_Capacitor"),
     SELF_ORGANIZING_FLUID(TOURNAMENT_2025, NORMAL, "Self-Organizing Fluid", "w3446276105", "OM2025_3_Self-Organizing_Fluid"),
-    //MATERIAL_SALVAGE(TOURNAMENT_2025, NORMAL, "Material Salvage", "w3446276940", "OM2025_break_Material Salvage"),
+    MATERIAL_SALVAGE(TOURNAMENT_2025, NORMAL, "Material Salvage", "w3446276940", "OM2025_break_Material Salvage"),
     CRYSTALLIZED_AIR(TOURNAMENT_2025, NORMAL, "Crystallized Air", "w3446278612", "OM2025_5_Crystallized_Air"),
-    //BULK_TRANSMUTATION(TOURNAMENT_2025, NORMAL, "Bulk Transmutation", "w3446278995", "OM2025_6_Bulk_Transmutation"),
+    BULK_TRANSMUTATION(TOURNAMENT_2025, NORMAL, "Bulk Transmutation", "w3446278995", "OM2025_6_Bulk_Transmutation"),
     //PASS_THROUGH_ALLOY(TOURNAMENT_2025, NORMAL, "Pass-Through Alloy", "w3446279881", "OM2025_7_Pass-Through_Alloy"),
 
     HORN_SILVER(WEEKLIES_1, NORMAL, "Horn Silver", "w2513871683", "OM2021Demo_HornSilver"),
