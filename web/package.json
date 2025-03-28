@@ -30,7 +30,7 @@
         "@types/d3-format": "3.0.4",
         "@types/jest": "29.5.14",
         "@types/node": "22.13.14",
-        "@types/plotly.js": "2.35.2",
+        "@types/plotly.js": "2.35.4",
         "@types/react": "19.0.12",
         "@types/react-dom": "19.0.4",
         "@types/react-plotly.js": "2.6.3",
@@ -40,7 +40,7 @@
         "source-map-explorer": "2.5.3"
     },
     "resolutions": {
-        "@types/plotly.js": "2.35.2"
+        "@types/plotly.js": "2.35.4"
     },
     "scripts": {
         "start": "react-scripts start",
