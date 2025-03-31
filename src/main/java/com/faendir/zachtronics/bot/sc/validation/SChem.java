@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,7 +159,7 @@ public class SChem {
     @NotNull
     static SChemResult[] validate(@NotNull String export, boolean onlyImport) throws ValidationException {
         String runFlag = onlyImport ? "--no-run" : "--check-precog";
-        String[] command = {"python3", "-m", "schem", "--json", "--export", runFlag};
+        List<String> command = List.of("python3", "-m", "schem", "--json", "--export", runFlag);
         return ValidationUtils.callValidator(SChemResult[].class, export.getBytes(), command);
     }
 }

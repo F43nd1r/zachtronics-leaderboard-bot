@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@ package com.faendir.zachtronics.bot.validation;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.List;
 
 public class ValidationUtils {
 
@@ -28,7 +30,7 @@ public class ValidationUtils {
 
     private ValidationUtils() {}
 
-    public static byte[] callValidator(byte[] data, String... command) {
+    public static byte @NotNull [] callValidator(byte[] data, List<String> command) {
         ProcessBuilder builder = new ProcessBuilder(command);
 
         try {
@@ -54,7 +56,7 @@ public class ValidationUtils {
         }
     }
 
-    public static <T> T callValidator(Class<T> resultClass, byte[] data, String... command) {
+    public static <T> T callValidator(Class<T> resultClass, byte[] data, List<String> command) {
         byte[] result = callValidator(data, command);
 
         try {

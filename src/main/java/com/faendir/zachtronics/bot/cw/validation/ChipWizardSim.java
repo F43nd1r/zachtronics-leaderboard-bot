@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /** Wrapper for a chipwizard-sim module installed on the system */
@@ -80,7 +81,7 @@ public class ChipWizardSim {
      */
     @NotNull
     static CwSimResult[] validate(@NotNull String data) throws ValidationException {
-        String[] command = {"python3", "-m", "chipwizard_sim", "validate_all", "--json", "--include-solution", "-"};
+        List<String> command = List.of("python3", "-m", "chipwizard_sim", "validate_all", "--json", "--include-solution", "-");
         return ValidationUtils.callValidator(CwSimResult[].class, data.getBytes(), command);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,7 @@ import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.faendir.zachtronics.bot.validation.ValidationUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /** Wrapper for a foodcourt-sim module installed on the system */
@@ -86,7 +83,7 @@ public class FoodCourtSim {
      */
     @NotNull
     static FcSimResult[] validate(byte @NotNull [] data) throws ValidationException {
-        String[] command = {"python3", "-m", "foodcourt_sim", "simulate", "--json", "--include-solution", "-"};
+        List<String> command = List.of("python3", "-m", "foodcourt_sim", "simulate", "--json", "--include-solution", "-");
         return ValidationUtils.callValidator(FcSimResult[].class, data, command);
     }
 }

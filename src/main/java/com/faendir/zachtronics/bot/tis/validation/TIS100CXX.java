@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import com.faendir.zachtronics.bot.validation.ValidationUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.StringJoiner;
 
 /** Wrapper for a TIS-100-CXX executable installed on the system */
@@ -39,8 +40,9 @@ public class TIS100CXX {
         seedJoiner.add("100000..199999");
         String seeds = seedJoiner.toString();
 
-        String[] command = {"TIS-100-CXX",
-                            "-q", "--seeds", seeds, "--limit", "120k", "--total-limit", "100M", "-l", puzzle.getId(), "-"};
+        List<String> command = List.of("TIS-100-CXX",
+                                       "-q", "--seeds", seeds, "--limit", "120k", "--total-limit", "100M", "-l", puzzle.getId(),
+                                       "-");
         byte[] result = ValidationUtils.callValidator(data.getBytes(), command);
         String simResult = new String(result).trim();
 
