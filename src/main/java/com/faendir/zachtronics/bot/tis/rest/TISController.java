@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,23 +18,22 @@ package com.faendir.zachtronics.bot.tis.rest;
 
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.GameRestController;
-import com.faendir.zachtronics.bot.tis.model.TISCategory;
-import com.faendir.zachtronics.bot.tis.model.TISGroup;
-import com.faendir.zachtronics.bot.tis.model.TISPuzzle;
-import com.faendir.zachtronics.bot.tis.model.TISRecord;
+import com.faendir.zachtronics.bot.tis.model.*;
 import com.faendir.zachtronics.bot.tis.repository.TISSolutionRepository;
-import com.faendir.zachtronics.bot.tis.rest.dto.TISCategoryDTO;
-import com.faendir.zachtronics.bot.tis.rest.dto.TISGroupDTO;
-import com.faendir.zachtronics.bot.tis.rest.dto.TISPuzzleDTO;
-import com.faendir.zachtronics.bot.tis.rest.dto.TISRecordDTO;
+import com.faendir.zachtronics.bot.tis.rest.dto.*;
+import com.faendir.zachtronics.bot.utils.UtilsKt;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -90,6 +89,17 @@ public class TISController implements GameRestController<TISGroupDTO, TISPuzzleD
             return TISRecordDTO.fromCategoryRecord(new CategoryRecord<>(record, EnumSet.of(category)));
         else
             return null;
+    }
+
+    @PostMapping(path = "/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Object submit(@NotNull @ModelAttribute TISSubmissionDTO submissionDTO) throws IOException {
+        if (submissionDTO.getImage() != null && !UtilsKt.isValidLink(submissionDTO.getImage()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid image link");
+        TISPuzzle puzzle = findPuzzle(submissionDTO.getPuzzleId());
+        String data = new String(submissionDTO.getData().getBytes());
+        TISSubmission submission = TISSubmission.fromData(data, puzzle, submissionDTO.getAuthor(), submissionDTO.getImage());
+
+        return repository.submit(submission);
     }
 
     private static TISPuzzle findPuzzle(String puzzleId) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import com.faendir.zachtronics.bot.rest.dto.SubmitResultTypeKt;
 import com.faendir.zachtronics.bot.sc.model.*;
 import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
 import com.faendir.zachtronics.bot.sc.rest.dto.*;
-import com.faendir.zachtronics.bot.sc.validation.SChem;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Getter;
@@ -98,7 +97,7 @@ public class ScController implements GameRestController<ScGroupDTO, ScPuzzleDTO,
         if (submissionDTO.getVideo() != null && !UtilsKt.isValidLink(submissionDTO.getVideo()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid video link");
         String export = new String(submissionDTO.getExport().getBytes());
-        Collection<ValidationResult<ScSubmission>> submissions = SChem.validateMultiExport(export, false, submissionDTO.getAuthor());
+        Collection<ValidationResult<ScSubmission>> submissions = ScSubmission.fromData(export, false, submissionDTO.getAuthor());
 
         return repository.submitAll(submissions).stream()
                          .map(r -> Map.of("result", SubmitResultTypeKt.toType(r), "data", r))
