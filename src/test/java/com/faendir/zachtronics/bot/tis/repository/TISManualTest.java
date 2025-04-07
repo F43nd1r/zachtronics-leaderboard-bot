@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ class TISManualTest {
     @Test
     public void testFullIO() throws IOException {
         /*
-        cp -a ../tis100/leaderboard/* src/test/resources/repositories/tis-leaderboard/
+        rsync -a --delete ../tis100/leaderboard/* src/test/resources/repositories/tis-leaderboard/
          */
         for (TISPuzzle p : repository.getTrackedPuzzles()) {
 
@@ -140,7 +140,7 @@ class TISManualTest {
         List<String> authors = List.of("12345ieee");
 
         /*
-        cp -a ../tis100/leaderboard/* src/test/resources/repositories/tis-leaderboard/
+        rsync -a --delete ../tis100/leaderboard/* src/test/resources/repositories/tis-leaderboard/
          */
 
         for (String author : authors) {
@@ -164,8 +164,8 @@ class TISManualTest {
                         catch (Exception e) {
                             if (e instanceof ValidationException) {
                                 String message = e.getMessage();
-                                if (message.startsWith("ERROR: Failed with exception of type")) {
-                                    System.err.print(path + message.substring(36));
+                                if (message.startsWith("ERROR: ")) {
+                                    System.err.print(path + message.substring(7));
                                     continue;
                                 }
                                 if (message.contains("validation failed for fixed test"))

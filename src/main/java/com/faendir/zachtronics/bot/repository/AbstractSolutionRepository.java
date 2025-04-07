@@ -272,6 +272,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
             return new SubmitResult.AlreadyPresent<>();
         }
 
+//        String result = submission.getPuzzle().getDisplayName() + " " + submission.getScore().toDisplayString();
         String result = commit(access, submission, puzzlePath);
         if (submissionIsUpdate) {
             // update existing score with new solution/metadata
