@@ -37,7 +37,7 @@ public class TIS100CXX {
 
         StringJoiner seedJoiner = new StringJoiner(",");
         Arrays.stream(puzzle.getExtraWitnessSeeds()).mapToObj(Integer::toString).forEach(seedJoiner::add);
-        seedJoiner.add("100000..199999");
+        seedJoiner.add("100000.." + (200000 - 1 - puzzle.getExtraWitnessSeeds().length));
         String seeds = seedJoiner.toString();
 
         List<String> command = List.of("TIS-100-CXX",
