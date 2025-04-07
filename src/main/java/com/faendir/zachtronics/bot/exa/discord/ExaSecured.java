@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import java.util.Set;
 
 public class ExaSecured {
     public static final DiscordUserSecured WIKI_ADMINS_ONLY = new DiscordUserSecured(Set.of(DiscordUser.IEEE12345, DiscordUser.GRIMMY));
-    public static final Secured INSTANCE = SecuredKt.or(WIKI_ADMINS_ONLY, TrustedLeaderboardPosterRoleSecured.INSTANCE);
+    public static final Secured SUBMIT = SecuredKt.or(WIKI_ADMINS_ONLY, TrustedLeaderboardPosterRoleSecured.INSTANCE);
 
     private ExaSecured() {}
 }

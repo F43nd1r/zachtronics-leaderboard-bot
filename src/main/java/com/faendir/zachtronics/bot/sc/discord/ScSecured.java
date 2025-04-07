@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package com.faendir.zachtronics.bot.sc.discord;
 
-import com.faendir.zachtronics.bot.discord.command.security.*;
+import com.faendir.zachtronics.bot.discord.command.security.DiscordUser;
+import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured;
 
 import java.util.Set;
 
 public class ScSecured {
     public static final DiscordUserSecured WIKI_ADMINS_ONLY = new DiscordUserSecured(
-            Set.of(DiscordUser.IEEE12345, DiscordUser.TT, DiscordUser.ZIG));
-    public static final Secured INSTANCE = SecuredKt.or(WIKI_ADMINS_ONLY, TrustedLeaderboardPosterRoleSecured.INSTANCE);
+        Set.of(DiscordUser.IEEE12345, DiscordUser.TT, DiscordUser.ZIG));
 
     private ScSecured() {}
 }

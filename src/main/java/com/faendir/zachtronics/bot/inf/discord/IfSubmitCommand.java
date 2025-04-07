@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPu
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, scoreOption, videosOption);
     @Getter
-    private final Secured secured = IfSecured.INSTANCE;
+    private final Secured secured = IfSecured.SUBMIT;
     @Getter
     private final IfSolutionRepository repository;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ public class SzSubmitCommand extends AbstractSubmitCommand<SzCategory, SzPuzzle,
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, imageOption);
     @Getter
-    private final Secured secured = SzSecured.INSTANCE;
+    private final Secured secured = SzSecured.SUBMIT;
     @Getter
     private final SzSolutionRepository repository;
 

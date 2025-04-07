@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ public class ExaSubmitCommand extends AbstractSubmitCommand<ExaCategory, ExaPuzz
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(solutionOption, cheesyOption, authorOption, imageOption);
     @Getter
-    private final Secured secured = ExaSecured.INSTANCE;
+    private final Secured secured = ExaSecured.SUBMIT;
     @Getter
     private final ExaSolutionRepository repository;
 
