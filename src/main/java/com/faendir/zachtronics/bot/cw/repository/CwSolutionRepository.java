@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,10 +85,9 @@ public class CwSolutionRepository extends AbstractSolutionRepository<CwCategory,
     }
 
     @Override
-    protected boolean alreadyPresent(@NotNull CwSolution candidate, @NotNull CwSolution solution) {
-        return candidate.getScore().equals(solution.getScore()) &&
-               candidate.getDisplayLink() == null &&
-               !(candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
+    protected boolean allowedSameScoreUpdate(@NotNull CwSolution candidate, @NotNull CwSolution solution) {
+        return candidate.getDisplayLink() != null ||
+               (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
 
     @Override

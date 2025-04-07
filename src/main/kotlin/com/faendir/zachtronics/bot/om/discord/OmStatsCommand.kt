@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.om.validation.createSubmission
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
-import com.faendir.zachtronics.bot.utils.orEmpty
 import com.faendir.zachtronics.bot.utils.smartFormat
 import com.faendir.zachtronics.bot.utils.user
 import com.roxstudio.utils.CUrl
@@ -64,7 +63,6 @@ class OmStatsCommand(private val repository: OmSolutionRepository) : Command.Bas
                                 + (if (beatenCategories.isEmpty()) " would be included in the pareto frontier." else " would be ${
                             beatenCategories.smartFormat(submission.puzzle.supportedCategories)
                         }")
-                                + (result.message.orEmpty(prefix = "\n"))
                                 + (if (result.beatenRecords.isNotEmpty()) "\nWould beat:" else "")
                     )
                     .embedCategoryRecords(result.beatenRecords, submission.puzzle.supportedCategories)

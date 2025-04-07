@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -263,10 +263,9 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     }
 
     @Override
-    protected boolean alreadyPresent(@NotNull ScSolution candidate, @NotNull ScSolution solution) {
-        return candidate.getScore().equals(solution.getScore()) &&
-               candidate.getDisplayLink() == null &&
-               !(candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
+    protected boolean allowedSameScoreUpdate(@NotNull ScSolution candidate, @NotNull ScSolution solution) {
+        return candidate.getDisplayLink() != null ||
+               (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
 
     @Override

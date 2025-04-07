@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -190,7 +190,7 @@ class OmSolutionRepository(
                 if (submission.displayLink != record.displayLink || record.displayLink == null) {
                     // copies are needed or they'll edit themselves in the handler
                     handleBeatenRecord(mRecord, mRecord.categories.toSet(), mRecord.frontierManifolds.toSet())
-                    return SubmitResult.Updated(null, mRecord.toCategoryRecord())
+                    return SubmitResult.Updated(null, null, mRecord.toCategoryRecord())
                 } else {
                     return SubmitResult.AlreadyPresent()
                 }

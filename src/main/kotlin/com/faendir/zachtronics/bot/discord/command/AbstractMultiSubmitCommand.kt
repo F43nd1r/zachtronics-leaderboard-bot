@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,13 +70,14 @@ abstract class AbstractMultiSubmitCommand<C : Category, P : Puzzle<C>, S : Submi
                     val score = validationResult.submission.score.toDisplayString(DisplayContext.discord())
                     when (submitResult) {
                         is SubmitResult.Success -> "`$score`${validationResult.submission.author.orEmpty(prefix = " by ")} was added.\n${submitResult.message}"
-                        is SubmitResult.Updated -> "`$score` was updated."
+                        is SubmitResult.Updated -> "`$score`${validationResult.submission.author.orEmpty(prefix = " by ")} was updated.\n${submitResult.message}"
                         is SubmitResult.AlreadyPresent -> "`$score` was already present."
                         is SubmitResult.NothingBeaten -> "`$score` did not beat anything."
                         is SubmitResult.Failure -> "`$score` failed.\n${submitResult.message}"
                     }
                 }
-               is ValidationResult.Unparseable -> validationResult.message
+
+                is ValidationResult.Unparseable -> validationResult.message
             }
             embed.addField(name, value, true)
         }

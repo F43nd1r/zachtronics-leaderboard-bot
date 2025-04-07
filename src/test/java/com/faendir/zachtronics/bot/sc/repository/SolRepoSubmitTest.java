@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,8 @@ public class SolRepoSubmitTest {
         score = new ScScore(100, 100, 100, false, true);
         assertInstanceOf(SubmitResult.NothingBeaten.class, doSubmitScore(score)); // our score is a P, fail
         score = new ScScore(100, 100, 100, false, false);
-        assertInstanceOf(SubmitResult.Success.class, doSubmitScore(score)); // identical score, different content, accept
+        assertInstanceOf(SubmitResult.Updated.class, doSubmitScore(score)); // identical score, different content, accept
+        assertInstanceOf(SubmitResult.AlreadyPresent.class, doSubmitScore(score)); // identical everything, fail
         score = new ScScore(10, 100, 1000, true, true);
         assertInstanceOf(SubmitResult.Success.class, doSubmitScore(score)); // new frontier piece
         score = new ScScore(1000, 100, 10, true, true);
@@ -69,7 +70,7 @@ public class SolRepoSubmitTest {
         assertInstanceOf(SubmitResult.AlreadyPresent.class, doSubmitData(data)); // identical
 
         data = "SOLUTION:A Most Unfortunate Malfunction,12345ieee,45-1-14\ndifferent stuff...";
-        assertInstanceOf(SubmitResult.Success.class, doSubmitData(data)); // changed data, I can
+        assertInstanceOf(SubmitResult.Updated.class, doSubmitData(data)); // changed data, I can
 
         data = "SOLUTION:A Most Unfortunate Malfunction,BadGuy,45-1-14\ndifferent stuff...";
         assertInstanceOf(SubmitResult.AlreadyPresent.class, doSubmitData(data)); // stealing is bad
@@ -95,10 +96,10 @@ public class SolRepoSubmitTest {
     public void testSubmitDataVideo() {
         // we start at 100/100/100
         String data = "SOLUTION:A Most Unfortunate Malfunction,12345ieee,100-100-100\nhas video";
-        assertInstanceOf(SubmitResult.Success.class, doSubmitDataVideo(data, "http://my.video")); // add video
+        assertInstanceOf(SubmitResult.Updated.class, doSubmitDataVideo(data, "http://my.video")); // add video
 
         data = "SOLUTION:A Most Unfortunate Malfunction,AnotherGuy,100-100-100\ndifferent video";
-        assertInstanceOf(SubmitResult.Success.class, doSubmitDataVideo(data, "http://his.video")); // with a video you can steal
+        assertInstanceOf(SubmitResult.Updated.class, doSubmitDataVideo(data, "http://his.video")); // with a video you can steal
 
         data = "SOLUTION:A Most Unfortunate Malfunction,AnotherGuy,100-100-100\nchanged data";
         assertInstanceOf(SubmitResult.AlreadyPresent.class, doSubmitDataVideo(data, null)); // cannot regress video state

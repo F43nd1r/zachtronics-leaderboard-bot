@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,10 +93,9 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
     }
 
     @Override
-    protected boolean alreadyPresent(@NotNull IfSolution candidate, @NotNull IfSolution solution) {
-        return candidate.getScore().equals(solution.getScore()) &&
-               candidate.getDisplayLinks().isEmpty() &&
-               !(candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLinks().isEmpty());
+    protected boolean allowedSameScoreUpdate(@NotNull IfSolution candidate, @NotNull IfSolution solution) {
+        return !candidate.getDisplayLinks().isEmpty() ||
+               (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLinks().isEmpty());
     }
 
     @Override

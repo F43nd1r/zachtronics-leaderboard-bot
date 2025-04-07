@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,6 +101,7 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
                             submitResult.oldRecord.categories.takeIf { it.isNotEmpty() }?.smartFormat(puzzle.supportedCategories) ?: "Pareto"
                         }"
                     )
+                    .url(record.puzzle.link)
                     .color(Colors.SUCCESS)
                     .description(
                         "${record.toDisplayString(DisplayContext(StringFormat.DISCORD, submitResult.oldRecord.categories))} was updated.\nPreviously:"

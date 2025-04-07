@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package com.faendir.zachtronics.bot.repository;
 
 import com.faendir.zachtronics.bot.git.GitRepository;
-import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.model.*;
+import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.utils.Markdown;
@@ -163,7 +163,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
      */
     protected abstract int frontierCompare(@NotNull S s1, @NotNull S s2);
     /** Allow same-score changes if you bring a display link or you are the original author and don't regress the display link state */
-    protected abstract boolean alreadyPresent(@NotNull Sol candidate, @NotNull Sol solution);
+    protected abstract boolean allowedSameScoreUpdate(@NotNull Sol candidate, @NotNull Sol solution);
 
     protected void removeOrReplaceFromIndex(@NotNull Sol candidate, @NotNull Sol solution, @NotNull ListIterator<Sol> it) {
         it.remove();
@@ -180,6 +180,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
 
         List<CategoryRecord<R, C>> beatenCategoryRecords = new ArrayList<>();
         Sol candidate = makeCandidateSolution(submission);
+        boolean submissionIsUpdate = false;
 
         try {
             for (ListIterator<Sol> it = solutions.listIterator(); it.hasNext(); ) {
@@ -194,14 +195,19 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
                     return new SubmitResult.NothingBeaten<>(Collections.singletonList(categoryRecord));
                 }
                 else if (r < 0) {
-                    if (alreadyPresent(candidate, solution)) {
-                        // TODO handle SubmitResult.Updated
-                        return new SubmitResult.AlreadyPresent<>();
+                    Path solutionFile = makeArchivePath(puzzlePath, solution.getScore());
+                    if (candidate.getScore().equals(solution.getScore())) {
+                        if (!Files.exists(solutionFile) || allowedSameScoreUpdate(candidate, solution)) {
+                            submissionIsUpdate = true;
+                        }
+                        else {
+                            return new SubmitResult.AlreadyPresent<>();
+                        }
                     }
 
                     // remove beaten score and get categories
                     candidate.getCategories().addAll(solution.getCategories());
-                    Files.deleteIfExists(makeArchivePath(puzzlePath, solution.getScore()));
+                    Files.deleteIfExists(solutionFile);
                     beatenCategoryRecords.add(solution.extendToCategoryRecord(puzzle, null, null)); // the beaten record has no data anymore
                     removeOrReplaceFromIndex(candidate, solution, it);
                 }
@@ -262,12 +268,18 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         }
 
         if (access.status().isClean()) {
-            // the same exact sol was already archived,
+            // the same exact sol and metadata was already archived
             return new SubmitResult.AlreadyPresent<>();
         }
 
         String result = commit(access, submission, puzzlePath);
-        return new SubmitResult.Success<>(result, null, beatenCategoryRecords);
+        if (submissionIsUpdate) {
+            // update existing score with new solution/metadata
+            return new SubmitResult.Updated<>(result, null, beatenCategoryRecords.get(0));
+        }
+        else {
+            return new SubmitResult.Success<>(result, null, beatenCategoryRecords);
+        }
     }
 
     private @NotNull String makeArchiveLink(String @NotNull ... parts) {

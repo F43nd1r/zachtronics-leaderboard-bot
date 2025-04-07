@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,9 @@ abstract class AbstractSubmitCommand<C : Category, P : Puzzle<C>, S : Submission
                     .color(Colors.SUCCESS)
                     .description(
                         "`${submission.score.toDisplayString(DisplayContext(StringFormat.DISCORD, result.oldRecord.categories))}`"
+                                + submission.author.orEmpty(prefix = " by ")
                                 + (" was updated.")
+                                + (result.message.orEmpty(prefix = "\n"))
                                 + ("\nPreviously:")
                     )
                     .embedCategoryRecords(listOf(result.oldRecord), submission.puzzle.supportedCategories)
