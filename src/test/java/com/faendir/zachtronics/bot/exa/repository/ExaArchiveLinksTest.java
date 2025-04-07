@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @BotTest
 class ExaArchiveLinksTest {
@@ -36,6 +36,6 @@ class ExaArchiveLinksTest {
     @Test
     void encodeArchiveLinks() {
         String encoded = repository.makeArchiveLink(ExaPuzzle.PB007, new ExaScore(0, 0, 0, false));
-        assertTrue(encoded.contains(URLEncoder.encode(ExaPuzzle.PB007.getPrefix(), StandardCharsets.UTF_8)));
+        assertThat(encoded).contains(URLEncoder.encode(ExaPuzzle.PB007.getPrefix(), StandardCharsets.UTF_8));
     }
 }

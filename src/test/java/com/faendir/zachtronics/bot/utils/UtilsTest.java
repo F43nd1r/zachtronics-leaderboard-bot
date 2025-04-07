@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ package com.faendir.zachtronics.bot.utils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UtilsTest {
 
@@ -48,7 +48,7 @@ class UtilsTest {
                       "ex=66b85127&is=66b6ffa7&hm=caf8cd017a68afc109c514c7c10cc16f48605a62d593db87f9b21ec5da1a3e9b&";
         Utils.FileInfo info = Utils.downloadFile(link);
         assertEquals("NEXUS.14.781.3.0.txt", info.getFilename());
-        assertTrue(info.dataAsString().contains("MOV RIGHT,DOWN"));
+        assertThat(info.dataAsString()).contains("MOV RIGHT,DOWN");
     }
 
     private static void assertTransform(String output, String input) {

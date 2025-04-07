@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.Serializable;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @BotTest
 public class FpCommandTest {
@@ -40,7 +40,7 @@ public class FpCommandTest {
         Map<String, String> args = Map.of("solution", "Toronto.Solution.1.2 = eNp7zczAIMDAwMDIAAEgmvE/EDCgC6IwYGxkDooCkBHIgkwcDAjAyDAoOGB3QQUAl6EJHw==",
                                           "author", "testMan");
         String result = runCommand("submit", args);
-        assertTrue(result.contains("1-1") && result.contains("5R/0C/8F/0W"));
+        assertThat(result).contains("1-1", "5R/0C/8F/0W");
     }
 
     @NotNull

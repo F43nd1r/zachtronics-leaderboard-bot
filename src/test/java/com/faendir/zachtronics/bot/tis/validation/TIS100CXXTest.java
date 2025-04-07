@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import com.faendir.zachtronics.bot.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses TIS-100-CXX")
@@ -132,6 +133,7 @@ class TIS100CXXTest {
                 @4
                 
                 @5
+                NOP
                 
                 @6
                 
@@ -143,7 +145,7 @@ class TIS100CXXTest {
             fail("Validation should fail");
         }
         catch (ValidationException e) {
-            assertTrue(e.getMessage().contains("timeout"));
+            assertThat(e.getMessage()).contains("timeout");
         }
     }
 
