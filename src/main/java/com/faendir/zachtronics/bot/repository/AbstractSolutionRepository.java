@@ -17,8 +17,8 @@
 package com.faendir.zachtronics.bot.repository;
 
 import com.faendir.zachtronics.bot.git.GitRepository;
-import com.faendir.zachtronics.bot.model.*;
 import com.faendir.zachtronics.bot.model.Record;
+import com.faendir.zachtronics.bot.model.*;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.utils.Markdown;
@@ -132,7 +132,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
 
         SubmitResult<R, C> submitResult = archiveOne(access, solutions, submission);
 
-        if (submitResult instanceof SubmitResult.Success<R, C>) {
+        if (submitResult instanceof SubmitResult.Success<R, C> || submitResult instanceof SubmitResult.Updated<R, C>) {
             Sol submissionSolution = solutions.stream()
                                               .filter(s -> s.getScore().equals(submission.getScore()))
                                               .findFirst()
