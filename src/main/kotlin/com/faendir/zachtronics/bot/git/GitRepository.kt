@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory
 import java.io.Closeable
 import java.io.File
 import java.nio.file.Files
-import java.util.*
 import java.util.concurrent.locks.Lock
 
 open class GitRepository(private val gitProperties: GitProperties, val name: String, val url: String, branch: String? = null) {
@@ -134,7 +133,7 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
                 val latestCommit = walk.parseCommit(git.repository.resolve(Constants.HEAD))
                 walk.markStart(latestCommit)
                 walk.sort(RevSort.COMMIT_TIME_DESC)
-                walk.revFilter = CommitTimeRevFilter.after(Date.from(instant.toJavaInstant()))
+                walk.revFilter = CommitTimeRevFilter.after(instant.toJavaInstant())
                 val firstCommit = walk.lastOrNull() ?: return@use emptyList()
                 val beforeCommit: RevCommit? = git.repository.resolve(firstCommit.name + "^")?.let { walk.parseCommit(it) }
                 DiffFormatter(null).use { diffFormatter ->
