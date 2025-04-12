@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,10 @@
 package com.faendir.zachtronics.bot.rest.dto
 
 import com.faendir.zachtronics.bot.repository.SubmitResult
-import org.springframework.http.HttpStatus
-import org.springframework.web.server.ResponseStatusException
 
 enum class SubmitResultType {
     ALREADY_PRESENT,
+    FAILURE,
     NOTHING_BEATEN,
     SUCCESS
 }
@@ -31,6 +30,6 @@ fun SubmitResult<*, *>.toType(): SubmitResultType {
         is SubmitResult.Success, is SubmitResult.Updated -> SubmitResultType.SUCCESS
         is SubmitResult.AlreadyPresent -> SubmitResultType.ALREADY_PRESENT
         is SubmitResult.NothingBeaten -> SubmitResultType.NOTHING_BEATEN
-        is SubmitResult.Failure -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, this.message)
+        is SubmitResult.Failure -> SubmitResultType.FAILURE
     }
 }

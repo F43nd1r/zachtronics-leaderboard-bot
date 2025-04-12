@@ -17,7 +17,9 @@
 package com.faendir.zachtronics.bot.tis.rest;
 
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
+import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.rest.GameRestController;
+import com.faendir.zachtronics.bot.rest.dto.SubmitResultTypeKt;
 import com.faendir.zachtronics.bot.tis.model.*;
 import com.faendir.zachtronics.bot.tis.repository.TISSolutionRepository;
 import com.faendir.zachtronics.bot.tis.rest.dto.*;
@@ -37,6 +39,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/tis")
@@ -99,7 +102,8 @@ public class TISController implements GameRestController<TISGroupDTO, TISPuzzleD
         String data = new String(submissionDTO.getData().getBytes());
         TISSubmission submission = TISSubmission.fromData(data, puzzle, submissionDTO.getAuthor(), submissionDTO.getImage());
 
-        return repository.submit(submission);
+        SubmitResult<TISRecord, TISCategory> result = repository.submit(submission);
+        return Map.of("result", SubmitResultTypeKt.toType(result), "data", result);
     }
 
     private static TISPuzzle findPuzzle(String puzzleId) {
