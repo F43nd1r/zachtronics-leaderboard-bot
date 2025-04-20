@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,19 @@
 package com.faendir.zachtronics.bot.tis.repository;
 
 import com.faendir.zachtronics.bot.BotTest;
+import com.faendir.zachtronics.bot.TestConfigurationKt;
+import com.faendir.zachtronics.bot.config.GitProperties;
+import com.faendir.zachtronics.bot.git.GitRepository;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.tis.model.*;
 import com.faendir.zachtronics.bot.tis.validation.TIS100CXX;
 import com.faendir.zachtronics.bot.validation.ValidationException;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -40,11 +46,16 @@ class TISManualTest {
     @Autowired
     private TISSolutionRepository repository;
 
+    @TestConfiguration
+    static class RepositoryConfiguration {
+        @Bean("tisRepository")
+        public static @NotNull GitRepository tisRepository(GitProperties gitProperties) {
+            return TestConfigurationKt.readOnlyLocalClone("../tis100/leaderboard", gitProperties);
+        }
+    }
+
     @Test
     public void testFullIO() throws IOException {
-        /*
-        cp -a ../tis100/leaderboard/* src/test/resources/repositories/tis-leaderboard/
-         */
         for (TISPuzzle p : repository.getTrackedPuzzles()) {
 
             Iterable<TISRecord> records = repository.findCategoryHolders(p, true).stream()
@@ -62,9 +73,7 @@ class TISManualTest {
         }
 
         /*
-        rm -r src/test/resources/repositories/tis-leaderboard/
-        git restore --source=HEAD --staged --worktree -- src/test/resources/repositories/tis-leaderboard/
-        rsync -a --delete --exclude=README.txt $(ls -1dt /tmp/tis-leaderboard* | head -n1)/* ../tis100/leaderboard/
+        rsync -a --delete --exclude=README.txt $(ls -1dt /tmp/leaderboard* | head -n1)/* ../tis100/leaderboard/
          */
 
         System.out.println("Done");
@@ -74,7 +83,7 @@ class TISManualTest {
     public void rebuildAllWiki() {
         repository.rebuildRedditLeaderboard(null);
         String page = repository.getRedditService().getWikiPage(repository.getSubreddit(), repository.wikiPageName(null))
-                                .replaceAll("file:/tmp/tis-leaderboard[0-9]+/",
+                                .replaceAll("file:/tmp/leaderboard[0-9]+/",
                                             "https://raw.githubusercontent.com/12345ieee/tis100-leaderboard/master");
         System.out.println(page);
     }
@@ -139,10 +148,6 @@ class TISManualTest {
 //                                    .toList();
         List<String> authors = List.of("12345ieee");
 
-        /*
-        cp -a ../tis100/leaderboard/* src/test/resources/repositories/tis-leaderboard/
-         */
-
         for (String author : authors) {
             System.out.println("Starting " + author);
             Path savesPath;
@@ -164,8 +169,8 @@ class TISManualTest {
                         catch (Exception e) {
                             if (e instanceof ValidationException) {
                                 String message = e.getMessage();
-                                if (message.startsWith("ERROR: Failed with exception of type")) {
-                                    System.err.print(path + message.substring(36));
+                                if (message.startsWith("ERROR: ")) {
+                                    System.err.print(path + message.substring(7));
                                     continue;
                                 }
                                 if (message.contains("validation failed for fixed test"))
@@ -182,9 +187,7 @@ class TISManualTest {
         }
 
         /*
-        rm -r src/test/resources/repositories/tis-leaderboard/*
-        git restore --source=HEAD --staged --worktree -- src/test/resources/repositories/tis-leaderboard/
-        rsync -a --delete --exclude=README.txt $(ls -1dt /tmp/tis-leaderboard* | head -n1)/* ../tis100/leaderboard/
+        rsync -a --delete --exclude=README.txt $(ls -1dt /tmp/leaderboard* | head -n1)/* ../tis100/leaderboard/
          */
 
         System.out.println("Done");
