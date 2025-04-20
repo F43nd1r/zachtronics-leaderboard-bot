@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,29 @@
 package com.faendir.zachtronics.bot.exa.repository;
 
 import com.faendir.zachtronics.bot.BotTest;
+import com.faendir.zachtronics.bot.TestConfigurationKt;
+import com.faendir.zachtronics.bot.config.GitProperties;
 import com.faendir.zachtronics.bot.exa.model.*;
+import com.faendir.zachtronics.bot.git.GitRepository;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.validation.ValidationException;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,6 +52,14 @@ public class ExaManualTest {
     private ExaSolutionRepository repository;
     @Autowired
     private RedditService redditService;
+
+    @TestConfiguration
+    static class RepositoryConfiguration {
+        @Bean("exaRepository")
+        public static @NotNull GitRepository exaRepository(GitProperties gitProperties) {
+            return TestConfigurationKt.readOnlyLocalClone("../exapunks/leaderboard", gitProperties);
+        }
+    }
 
     @Test
     public void testFullIO() throws IOException {
@@ -69,7 +85,7 @@ public class ExaManualTest {
     public void rebuildRedditWiki() {
         repository.rebuildRedditLeaderboard(null);
         String page = redditService.getWikiPage(Subreddit.EXAPUNKS, "index")
-                                   .replaceAll("file:/tmp/exa-leaderboard[0-9]+/",
+                                   .replaceAll("file:/tmp/leaderboard[0-9]+/",
                                                "https://raw.githubusercontent.com/12345ieee/exapunks-leaderboard/master");
         System.out.println(page);
     }
@@ -144,22 +160,18 @@ public class ExaManualTest {
         List<String> authors = List.of("someGuy");
 //        List<String> authors = Files.list(Paths.get("../exapunks/saves/")).map(p -> p.getFileName().toString()).sorted().toList();
 
-        for (String author: authors) {
-            Path savesPath = Paths.get("../exapunks/saves/" + author);
-            /*
-            cp -a ../exapunks/leaderboard/* src/test/resources/repositories/exa-leaderboard/
-             */
+        for (String author : authors) {
+            Path basePath = Paths.get("../exapunks/saves/" + author);
+            List<Path> savesPaths = Files.exists(basePath.resolve("deleted")) ?
+                                    List.of(basePath, basePath.resolve("deleted")) : List.of(basePath);
 
-            Iterable<String> prefixes = Arrays.stream(ExaPuzzle.values())
-                                              .map(ExaPuzzle::getPrefix)
-                                              .collect(Collectors.toCollection(LinkedHashSet::new));
-            for (String prefix : prefixes) {
-                try (DirectoryStream<Path> paths = Files.newDirectoryStream(savesPath, prefix + "*.solution")) {
+            for (Path savesPath : savesPaths) {
+                try (DirectoryStream<Path> paths = Files.newDirectoryStream(savesPath, "*.solution")) {
                     for (Path path : paths) {
                         byte[] data = Files.readAllBytes(path);
                         ExaSubmission submission;
                         try {
-                            submission = ExaSubmission.fromData(data, false, author, "https://li.nk");
+                            submission = ExaSubmission.fromData(data, false, author, null);
                         }
                         catch (Exception e) {
                             if (e instanceof ValidationException) {
@@ -182,9 +194,7 @@ public class ExaManualTest {
         }
 
         /*
-        rm -r src/test/resources/repositories/exa-leaderboard/*
-        git restore --source=HEAD --staged --worktree -- src/test/resources/repositories/exa-leaderboard/
-        rsync -a --delete --exclude=README.txt $(ls -1dt /tmp/exa-leaderboard* | head -n1)/* ../exapunks/leaderboard/
+        rsync -a --delete --exclude=README.txt $(ls -1dt /tmp/leaderboard* | head -n1)/* ../exapunks/leaderboard/
          */
 
         System.out.println("Done");
