@@ -28,6 +28,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.VisibleForTesting;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -62,6 +63,7 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
         Comparator.comparing(TISSolution::getScore, CN.getScoreComparator()
                                                       .thenComparing(s -> !s.isAchievement())
                                                       .thenComparing(TISScore::isCheating));
+    @Getter(AccessLevel.PUBLIC) @VisibleForTesting
     private final List<TISPuzzle> trackedPuzzles = Arrays.stream(TISPuzzle.values()).filter(p -> p.getType() != TISType.SANDBOX).toList();
 
     @Override
