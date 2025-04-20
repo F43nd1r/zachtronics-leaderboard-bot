@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ public enum ExaPuzzle implements Puzzle<ExaCategory> {
     PB029B(ExaGroup.MAIN_CAMPAIGN, ExaType.STANDARD, 100, "last-stop-snaxnet", "Snaxnet 2"),
     PB030(ExaGroup.MAIN_CAMPAIGN, ExaType.STANDARD, 75, "mitsuzen-hdi10", "Visual Cortex"),
     PB032(ExaGroup.MAIN_CAMPAIGN, ExaType.STANDARD, 150, "holman-dynamics", "Holman"),
-    PB033(ExaGroup.MAIN_CAMPAIGN, ExaType.STANDARD, 150, "us-government", "USGov"),
+    PB033(ExaGroup.MAIN_CAMPAIGN, ExaType.STANDARD, 150, "u.s.-government", "USGov"),
     PB034(ExaGroup.MAIN_CAMPAIGN, ExaType.STANDARD, 75, "unknown-network", "UN2"),
     PB035B(ExaGroup.MAIN_CAMPAIGN, ExaType.STANDARD, 100, "tec-exablaster-modem", "Modem 3"),
     PB036(ExaGroup.MAIN_CAMPAIGN, ExaType.UNCHEESABLE, 150, "mitsuzen-hdi10", "Cerebral Cortex"),
@@ -63,17 +63,17 @@ public enum ExaPuzzle implements Puzzle<ExaCategory> {
     PB053(ExaGroup.BONUS_PUZZLES, ExaType.STANDARD, 100, "motor-vehicle-administration", "NthDimension"),
     PB050(ExaGroup.BONUS_PUZZLES, ExaType.STANDARD, 150, "cybermyth-studios", "Ghast"),
     PB056(ExaGroup.BONUS_PUZZLES, ExaType.STANDARD, 150, "u.s.-department-of-defense", "hydroponix"),
-    PB051(ExaGroup.BONUS_PUZZLES, ExaType.STANDARD, 150, "tec-exablaster-modem", "=plastered"),
+    PB051(ExaGroup.BONUS_PUZZLES, ExaType.STANDARD, 150, "netronics-net40-modem", "=plastered"),
     PB057(ExaGroup.BONUS_PUZZLES, ExaType.STANDARD, 150, "española-valley-high-school", "selenium_wolf"),
     PB052(ExaGroup.BONUS_PUZZLES, ExaType.STANDARD, 150, "mitsuzen-d300n", "x10x10x"),
     PB055(ExaGroup.BONUS_PUZZLES, ExaType.STANDARD, 150, "crystalair-international", "deadlock"),
-    PB058(ExaGroup.BONUS_PUZZLES, ExaType.STANDARD, 100, "archlinux", "Moss");
+    PB058(ExaGroup.BONUS_PUZZLES, ExaType.STANDARD, 100, "localhost" /* changes based on user machine host */, "Moss");
 
     private final ExaGroup group;
     private final ExaType type;
     private final int sizeLimit;
     private final List<ExaCategory> supportedCategories;
-    /* not unique */
+    /** multiple puzzles have the same prefix and some puzzles changed it (so they have 2+) */
     private final String prefix;
     private final String displayName;
     private final String link;
