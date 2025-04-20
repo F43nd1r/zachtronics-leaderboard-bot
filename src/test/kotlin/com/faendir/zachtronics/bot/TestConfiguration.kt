@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,4 +129,9 @@ fun createGitRepositoryFrom(dir: File, gitProperties: GitProperties): GitReposit
         .setMessage("[BOT] initial commit")
         .call()
     return TestGitRepository(gitProperties, dir)
+}
+
+fun readOnlyLocalClone(dir: String, gitProperties: GitProperties): GitRepository {
+    val f = File(dir)
+    return GitRepository(gitProperties.apply { readonlyMode = true }, f.name, f.toURI().toString())
 }
