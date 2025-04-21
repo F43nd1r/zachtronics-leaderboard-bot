@@ -28,33 +28,30 @@ export interface RecordCardProps<RECORD extends RecordDTO<any> = RecordDTO<any>>
     additionalActions?: ReactNode
 }
 
-function isYoutube(gif: string): boolean {
-    return gif.includes("youtu.be") || gif.includes("youtube.com")
+function isYoutube(url: string): boolean {
+    return url.includes("youtu.be") || url.includes("youtube.com")
 }
 
-function isImgur(gif: string): boolean {
-    return gif.includes("imgur")
+function isImgurGif(url: string): boolean {
+    return url.includes("imgur.com") && (url.endsWith(".gif") || url.endsWith(".gifv"))
 }
 
-function isMorsTech(gif: string): boolean {
-    return gif.includes("mors.technology")
+function isMorsTech(url: string): boolean {
+    return url.includes("mors.technology")
 }
 
-function hasMP4(gif: string): boolean {
-    return isImgur(gif) || isMorsTech(gif)
-}
-
-function getVideoType(gif: string): "video" | "iframe" | "img" {
-    if (gif.endsWith(".mp4") || gif.endsWith(".webm") || hasMP4(gif)) {
+function getMediaType(url: string): "video" | "iframe" | "img" {
+    if (url.endsWith(".mp4") || url.endsWith(".webm") || isImgurGif(url) || isMorsTech(url)) {
         return "video"
-    } else if (isYoutube(gif)) {
+    } else if (isYoutube(url)) {
         return "iframe"
     } else {
+        // imgur albums land here, they will not embed
         return "img"
     }
 }
 
-function getVideoUrl(gif: string, appSettings: AppSettings) {
+function getMediaUrl(gif: string, appSettings: AppSettings) {
     if (isYoutube(gif)) {
         const url = new URL(gif)
         let id = url.pathname.substring(1)
@@ -63,7 +60,7 @@ function getVideoUrl(gif: string, appSettings: AppSettings) {
         let result = `https://youtube.com/embed/${id}?playlist=${id}&autoplay=${appSettings.autoPlay ? 1 : 0}&loop=1&controls=${appSettings.showControls ? 1 : 0}`
         if (url.searchParams.has("t")) result += "&start=" + url.searchParams.get("t")
         return result
-    } else if (isImgur(gif)) {
+    } else if (isImgurGif(gif)) {
         return gif.replace(/.+\/(\w+)(\..*)?/, "https://i.imgur.com/$1.mp4")
     } else if (isMorsTech(gif)) {
         return gif.replace(/.+mors\.technology\/(.+)(\..*)/, "https://files.mors.technology/$1.mp4")
@@ -96,14 +93,14 @@ export default function RecordCard(props: RecordCardProps) {
                     }}
                 >
                     <CardMedia
-                        component={getVideoType(props.record.gif)}
+                        component={getMediaType(props.record.gif)}
                         autoPlay={appSettings.autoPlay}
                         controls={appSettings.showControls}
                         loop
                         muted
                         loading="lazy"
                         playsInline
-                        src={inView ? getVideoUrl(props.record.gif, appSettings) : undefined}
+                        src={inView ? getMediaUrl(props.record.gif, appSettings) : undefined}
                         alt="Media not loading"
                         style={{
                             height: "min(70vh, 360px)",
