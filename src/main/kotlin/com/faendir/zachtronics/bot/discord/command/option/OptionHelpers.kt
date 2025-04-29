@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import com.faendir.zachtronics.bot.utils.url
 import discord4j.common.util.Snowflake
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
 import discord4j.core.`object`.command.Interaction
-import discord4j.core.`object`.reaction.ReactionEmoji
+import discord4j.core.`object`.emoji.Emoji
 import reactor.kotlin.core.publisher.toFlux
 import java.time.Instant
 
@@ -68,7 +68,7 @@ fun InteractionCreateEvent.resolveLink(text: String, resolveDiscord: Boolean = t
             val message = interaction.messages().elementAt(num - 1).block()!!
 
             message.attachments.getOrNull(attachment?.minus(1) ?: 0)?.url?.also {
-                message.addReaction(reactionEmoji(interaction)).block()
+                message.addReaction(emoji(interaction)).block()
             }
                 ?: throw IllegalArgumentException("${message.url} had no attachments")
         } ?: link
@@ -87,5 +87,5 @@ private fun Interaction.messages() =
     }
         .filter { it.author.isPresent && it.author.get() == user }
 
-private fun reactionEmoji(interaction: Interaction) =
-    interaction.user.asDiscordUser()?.getSpecialEmoji?.invoke(interaction.guild.block()) ?: ReactionEmoji.unicode("\uD83D\uDC4D"/* 👍 */)
+private fun emoji(interaction: Interaction) =
+    interaction.user.asDiscordUser()?.getSpecialEmoji?.invoke(interaction.guild.block()) ?: Emoji.unicode("\uD83D\uDC4D"/* 👍 */)

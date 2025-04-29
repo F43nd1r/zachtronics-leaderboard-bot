@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import discord4j.core.event.domain.interaction.ComponentInteractionEvent
 import discord4j.core.`object`.component.ActionComponent
 import discord4j.core.`object`.component.Button
 import discord4j.core.`object`.component.MessageComponent
+import discord4j.core.`object`.emoji.Emoji
 import discord4j.core.`object`.entity.User
-import discord4j.core.`object`.reaction.ReactionEmoji
 import discord4j.discordjson.json.ComponentData
 import discord4j.discordjson.json.ImmutableComponentData
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -55,7 +55,7 @@ class DiscordActionCache {
     fun createButton(
         user: User,
         style: Button.Style = Button.Style.PRIMARY,
-        emoji: ReactionEmoji? = null,
+        emoji: Emoji? = null,
         label: String? = null,
         action: suspend (event: ButtonInteractionEvent) -> Unit
     ): ActionComponent {

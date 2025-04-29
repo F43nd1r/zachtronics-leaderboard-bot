@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import discord4j.core.event.domain.interaction.ButtonInteractionEvent
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.`object`.component.ActionComponent
 import discord4j.core.`object`.component.ActionRow
+import discord4j.core.`object`.emoji.Emoji
 import discord4j.core.`object`.entity.User
-import discord4j.core.`object`.reaction.ReactionEmoji
 import discord4j.core.spec.EmbedCreateFields
 import discord4j.core.spec.EmbedCreateSpec
 import discord4j.rest.util.Color
@@ -77,11 +77,11 @@ class PaginatedSafeEmbedMessageBuilder(private val discordActionCache: DiscordAc
         }
 
         val actions = listOf(
-            discordActionCache.createButton(user, emoji = ReactionEmoji.codepoints("U+2B05")) {
+            discordActionCache.createButton(user, emoji = Emoji.codepoints("U+2B05")) {
                 if (--activeIndex < 0) activeIndex = embeds.size - 1
                 it.update()
             },
-            discordActionCache.createButton(user, emoji = ReactionEmoji.codepoints("U+27A1")) {
+            discordActionCache.createButton(user, emoji = Emoji.codepoints("U+27A1")) {
                 if (++activeIndex >= embeds.size) activeIndex = 0
                 it.update()
             }
