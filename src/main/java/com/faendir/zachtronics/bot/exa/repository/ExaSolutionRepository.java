@@ -52,7 +52,7 @@ public class ExaSolutionRepository extends AbstractSolutionRepository<ExaCategor
     private final Class<ExaCategory> categoryClass = ExaCategory.class;
     private final Function<String[], ExaSolution> solUnmarshaller = ExaSolution::unmarshal;
     private final Comparator<ExaSolution> archiveComparator = Comparator.comparing(ExaSolution::getScore, ExaCategory.CS.getScoreComparator());
-    private final List<ExaPuzzle> trackedPuzzles = List.of(ExaPuzzle.values());
+    private final List<ExaPuzzle> trackedPuzzles = Arrays.stream(ExaPuzzle.values()).filter(p -> p.getType() != ExaType.SANDBOX).toList();
 
     @Override
     protected @NotNull String wikiPageName(ExaPuzzle puzzle) {

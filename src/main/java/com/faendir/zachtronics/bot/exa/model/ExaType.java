@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ExaType implements Type {
     STANDARD("standard"),
-    UNCHEESABLE("uncheesable");
+    UNCHEESABLE("uncheesable"),
+    SANDBOX("sandbox");
 
     private final String displayName;
 }

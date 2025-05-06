@@ -20,6 +20,7 @@ import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.TestConfigurationKt;
 import com.faendir.zachtronics.bot.config.GitProperties;
 import com.faendir.zachtronics.bot.exa.model.*;
+import com.faendir.zachtronics.bot.exa.validation.Exapt;
 import com.faendir.zachtronics.bot.git.GitRepository;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
@@ -33,7 +34,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,6 +42,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -161,34 +163,35 @@ public class ExaManualTest {
 //        List<String> authors = Files.list(Paths.get("../exapunks/saves/")).map(p -> p.getFileName().toString()).sorted().toList();
 
         for (String author : authors) {
+            System.out.println("Starting: " + author);
             Path basePath = Paths.get("../exapunks/saves/" + author);
-            List<Path> savesPaths = Files.exists(basePath.resolve("deleted")) ?
-                                    List.of(basePath, basePath.resolve("deleted")) : List.of(basePath);
 
-            for (Path savesPath : savesPaths) {
-                try (DirectoryStream<Path> paths = Files.newDirectoryStream(savesPath, "*.solution")) {
-                    for (Path path : paths) {
-                        byte[] data = Files.readAllBytes(path);
-                        ExaSubmission submission;
-                        try {
-                            submission = ExaSubmission.fromData(data, false, author, null);
-                        }
-                        catch (Exception e) {
-                            if (e instanceof ValidationException) {
-                                String message = e.getMessage();
-                                if (message.equals("Unsolved solution") || message.equals("Corrupted solution") ||
-                                    message.startsWith("Size larger than puzzle limit") ||
-                                    message.startsWith("Actual size different from declared") ||
-                                    message.startsWith("Hacker battles won") ||
-                                    message.startsWith("Sandbox indicator") || message.startsWith("Unknown puzzle"))
-                                    continue;
-                            }
-                            System.err.println(path);
-                            throw e;
-                        }
-
-                        System.out.println(repository.submit(submission));
+            try (Stream<Path> walkStream = Files.walk(basePath, FileVisitOption.FOLLOW_LINKS)) {
+                Iterable<Path> paths = walkStream.filter(p -> p.getFileName().toString().endsWith(".solution"))
+                    ::iterator;
+                for (Path path : paths) {
+                    byte[] data = Files.readAllBytes(path);
+                    ExaSubmission submission;
+                    try {
+//                        submission = ExaSubmission.fromData(data, false, author, null);
+                        submission = Exapt.validateData(data, false, author, null);
                     }
+                    catch (Exception e) {
+                        if (e instanceof ValidationException) {
+                            String message = e.getMessage();
+                            if (message.equals("Unsolved solution") || message.equals("Corrupted solution") ||
+                                message.startsWith("Size larger than puzzle limit") ||
+                                message.startsWith("Actual size different from declared") ||
+                                message.startsWith("Hacker battles won") ||
+                                message.startsWith("Sandbox indicator") || message.startsWith("Unknown puzzle") ||
+                                message.startsWith("Exapt:") || message.startsWith("Error in reading back results"))
+                                continue;
+                        }
+                        System.err.println(path);
+                        throw e;
+                    }
+
+                    System.out.println(repository.submit(submission));
                 }
             }
         }

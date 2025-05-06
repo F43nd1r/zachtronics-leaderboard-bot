@@ -59,6 +59,8 @@ public enum ExaPuzzle implements Puzzle<ExaCategory> {
     PB035B(ExaGroup.MAIN_CAMPAIGN, ExaType.STANDARD, 100, "tec-exablaster-modem", "Modem 3"),
     PB036(ExaGroup.MAIN_CAMPAIGN, ExaType.UNCHEESABLE, 150, "mitsuzen-hdi10", "Cerebral Cortex"),
 
+    PB039(ExaGroup.MAIN_CAMPAIGN, ExaType.SANDBOX, 0, "sandbox", "Sandbox"),
+
     PB054(ExaGroup.BONUS_PUZZLES, ExaType.STANDARD, 150, "bloodlust-online", "mutex8021"),
     PB053(ExaGroup.BONUS_PUZZLES, ExaType.STANDARD, 100, "motor-vehicle-administration", "NthDimension"),
     PB050(ExaGroup.BONUS_PUZZLES, ExaType.STANDARD, 150, "cybermyth-studios", "Ghast"),

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.DataOutput;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
  * <pre>
- *  1 byte: marks an empty EXA if it's 11, appears on version 1007
+ *  1 byte: normally 0xA, 0xB appears on version 1007 and marks an empty EXA
  *  4+N bytes: EXA name (length then string)
  *  4+N bytes: EXA code (length then string)
- *  1 byte: irrelevant
+ *  1 byte: irrelevant (editor display status: 0 unrolled, 1 collapsed)
  *  1 byte: communication mode (0 is GLOBAL, 1 is LOCAL)
  *  100 bytes: irrelevant (image data for sandbox mode)
  * </pre>
@@ -36,7 +38,7 @@ import java.nio.ByteBuffer;
 @Value
 public class ExaChip {
     @NotNull String name;
-    @NotNull String[] lines;
+    @NotNull String code;
     boolean globalCommMode;
 
     @Nullable
@@ -52,15 +54,23 @@ public class ExaChip {
         boolean globalCommMode = byteBuffer.get() == 0;
         byteBuffer.position(byteBuffer.position() + 100);
 
-        String[] lines = code.split("\\r?\\n");
-        return new ExaChip(name, lines, globalCommMode);
+        return new ExaChip(name, code, globalCommMode);
     }
 
-    int size() {
+    void marshal(@NotNull DataOutput out) throws IOException {
+        out.writeByte(0xA);
+        ExaSave.writeString(out, name);
+        ExaSave.writeString(out, code);
+        out.writeByte(0);
+        out.writeByte(globalCommMode ? 0 : 1);
+        out.write(new byte[100]);
+    }
+
+    public int size() {
         int result = 0;
         int repMulti = 1;
 
-        for (String rawLine : lines) {
+        for (String rawLine : code.split("\\r?\\n")) {
             String line = StringUtils.substringBefore(rawLine, ';').trim(); // strip away partial comments
             if (line.isEmpty() || line.startsWith("NOTE")) {
                 // effectively empty lines

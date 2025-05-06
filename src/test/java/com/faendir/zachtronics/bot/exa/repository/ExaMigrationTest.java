@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,16 @@
 package com.faendir.zachtronics.bot.exa.repository;
 
 import com.faendir.zachtronics.bot.BotTest;
-import com.faendir.zachtronics.bot.exa.model.ExaPuzzle;
-import com.faendir.zachtronics.bot.exa.model.ExaScore;
-import com.faendir.zachtronics.bot.exa.model.ExaSubmission;
+import com.faendir.zachtronics.bot.TestConfigurationKt;
+import com.faendir.zachtronics.bot.config.GitProperties;
+import com.faendir.zachtronics.bot.exa.model.*;
+import com.faendir.zachtronics.bot.exa.validation.ExaChip;
+import com.faendir.zachtronics.bot.exa.validation.ExaSave;
+import com.faendir.zachtronics.bot.exa.validation.Exapt;
+import com.faendir.zachtronics.bot.git.GitRepository;
+import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
+import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -29,6 +35,8 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,6 +44,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -52,12 +61,18 @@ class ExaMigrationTest {
     @Autowired
     private ExaSolutionRepository repository;
 
+    @TestConfiguration
+    static class RepositoryConfiguration {
+        @Bean("exaRepository")
+        public static @NotNull GitRepository exaRepository(GitProperties gitProperties) {
+            return TestConfigurationKt.readOnlyLocalClone("../exapunks/leaderboard", gitProperties);
+        }
+    }
+
     @Test
     public void parseWiki() throws IOException {
         Path pagePath = Paths.get("../exapunks/wiki.md");
         List<String> lines = Files.readAllLines(pagePath);
-
-        // cp -a ../exapunks/leaderboard/* src/test/resources/repositories/exa-leaderboard/
 
         Pattern scorePattern = Pattern.compile("^(?<level>[^|]+[^| ])?\\s*\\|\\s*" +
                                                "(?:\\[?(?<score1>\\d+/\\d+/\\d+/?c?)(?:\\]\\((?<link1>[^()]+)\\))?)?\\s*\\|\\s*" +
@@ -90,44 +105,22 @@ class ExaMigrationTest {
             }
         }
 
-        // rsync -a --delete $(ls -1dt /tmp/exa-leaderboard* | head -n1)/* ../exapunks/leaderboard/
+        // rsync -a --delete $(ls -1dt /tmp/leaderboard* | head -n1)/* ../exapunks/leaderboard/
         // find . -size 0 -print -delete
         System.out.println("Done");
     }
 
-    @Test
-    public void parseRepo() throws IOException {
-        Path repoPath = Paths.get("../exapunks/ExapunksRecords");
-
-        // cp -a ../exapunks/leaderboard/* src/test/resources/repositories/exa-leaderboard/
-
-        for (ExaPuzzle puzzle: repository.getTrackedPuzzles()) {
-            Path puzzlePath = repoPath.resolve(repoNames.get(puzzle));
-            try (DirectoryStream<Path> paths = Files.newDirectoryStream(puzzlePath)) {
-                for (Path path : paths) {
-                    String scoreStr = path.getFileName().toString().replace("|old", "").replace('|', '/');
-                    ExaScore score = ExaScore.parseScore(scoreStr);
-                    if (score == null)
-                        throw new IllegalArgumentException(scoreStr);
-                    String link = "https://github.com/ExapunksBacardi/ExapunksRecords/tree/master/" +
-                                  repoPath.relativize(path).toString().replace("|", "%7C");
-                    ExaSubmission submission = new ExaSubmission(puzzle, score, "repoBoy", link, new byte[0]);
-                    repository.submit(submission);
-                }
-            }
-            System.out.println("Done " + puzzle.getDisplayName());
-        }
-
-        // rsync -a --delete $(ls -1dt /tmp/exa-leaderboard* | head -n1)/* ../exapunks/leaderboard/
-        // find . -size 0 -print -delete
-        System.out.println("Done");
+    private static ExaPuzzle findPuzzle(@NotNull String levelName) {
+        List<ExaPuzzle> candidates = UtilsKt.fuzzyMatch(Arrays.asList(ExaPuzzle.values()), levelName, ExaPuzzle::getDisplayName);
+        if (candidates.size() == 1)
+            return candidates.get(0);
+        else
+            throw new IllegalStateException("\"" + levelName + "\" bad");
     }
 
     @Test
-    public void parseScrape() throws IOException {
-        Path scrapePath = Paths.get("../exapunks/scrape.psv");
-
-        // cp -a ../exapunks/leaderboard/* src/test/resources/repositories/exa-leaderboard/
+    public void parseRedditScrape() throws IOException {
+        Path scrapePath = Paths.get("../exapunks/reddit_scrape.psv");
 
         List<ExaSubmission> submissions;
         try (BufferedReader reader = Files.newBufferedReader(scrapePath)) {
@@ -142,7 +135,7 @@ class ExaMigrationTest {
             repository.submit(submission);
         }
 
-        // rsync -a --delete $(ls -1dt /tmp/exa-leaderboard* | head -n1)/* ../exapunks/leaderboard/
+        // rsync -a --delete $(ls -1dt /tmp/leaderboard* | head -n1)/* ../exapunks/leaderboard/
         // find . -size 0 -print -delete
         System.out.println("Done");
     }
@@ -160,7 +153,72 @@ class ExaMigrationTest {
         return new ExaSubmission(puzzle, score, author, link, new byte[0]);
     }
 
-    private static final Map<ExaPuzzle, String> repoNames = Map.ofEntries(
+    @Test
+    public void parseBacardiRepo() throws IOException {
+        Path repoPath = Paths.get("../exapunks/text_saves/Bacardi-ExapunksRecords");
+        Pattern exaSeparator = Pattern.compile("\\n={4,}\\n");
+
+        for (ExaPuzzle puzzle : repository.getTrackedPuzzles()) {
+            Path puzzlePath = repoPath.resolve(bacardiRepoPuzzleNames.get(puzzle));
+            try (DirectoryStream<Path> paths = Files.newDirectoryStream(puzzlePath)) {
+                for (Path path : paths) {
+                    String code;
+                    try {
+                        code = Files.readString(path);
+                    }
+                    catch (IOException e) {
+                        System.err.println(path + ": " + e.getMessage());
+                        continue;
+                    }
+                    boolean cheesy = path.getFileName().toString().endsWith("c");
+                    ExaSave save = hydrateSolution(puzzle, code, exaSeparator);
+                    ExaSubmission submission;
+                    try {
+                        submission = Exapt.validateSave(save, cheesy, "repoBoy", null);
+//                        submission = ExaSubmission.fromData(save.marshal(), cheesy, "repoBoy", null);
+                    }
+                    catch (ValidationException e) {
+                        continue;
+                    }
+
+                    SubmitResult<ExaRecord, ExaCategory> result = repository.submit(submission);
+                    if (result instanceof SubmitResult.Success<ExaRecord, ExaCategory> ||
+                        result instanceof SubmitResult.Updated<ExaRecord, ExaCategory>) {
+                        System.out.println(result);
+                    }
+                }
+            }
+            System.out.println("Done " + puzzle.getDisplayName());
+        }
+
+        // rsync -a --delete $(ls -1dt /tmp/leaderboard* | head -n1)/* ../exapunks/leaderboard/
+        System.out.println("Done");
+    }
+
+    private static @NotNull ExaSave hydrateSolution(@NotNull ExaPuzzle puzzle, @NotNull String text, @NotNull Pattern exaSeparator) {
+        List<ExaChip> exas = new ArrayList<>();
+        char exaLetter = 'A';
+        for (String code : exaSeparator.split(text)) {
+            boolean globalCommMode = true; // hope for the best
+
+            String first = code.substring(0, code.indexOf('\n'));
+            if (first.equalsIgnoreCase("GLOBAL")) {
+                code = code.substring(code.indexOf('\n') + 1);
+            }
+            else if (first.equalsIgnoreCase("LOCAL")) {
+                globalCommMode = false;
+                code = code.substring(code.indexOf('\n') + 1);
+            }
+
+            exas.add(new ExaChip("X" + exaLetter, code, globalCommMode));
+            exaLetter++;
+        }
+        int size = exas.stream().mapToInt(ExaChip::size).sum();
+
+        return new ExaSave(puzzle.name(), "NEW SOLUTION -1", 0, size, 0, exas);
+    }
+
+    private static final Map<ExaPuzzle, String> bacardiRepoPuzzleNames = Map.ofEntries(
         Map.entry(PB000, "TWN1"),
         Map.entry(PB001, "TWN2"),
         Map.entry(PB037, "TWN3"),
@@ -205,12 +263,4 @@ class ExaMigrationTest {
         Map.entry(PB052, "x10x10x"),
         Map.entry(PB055, "AIRPLANES"),
         Map.entry(PB058, "MOSS"));
-
-    private static ExaPuzzle findPuzzle(@NotNull String levelName) {
-        List<ExaPuzzle> candidates = UtilsKt.fuzzyMatch(Arrays.asList(ExaPuzzle.values()), levelName, ExaPuzzle::getDisplayName);
-        if (candidates.size() == 1)
-            return candidates.get(0);
-        else
-            throw new IllegalStateException("\"" + levelName + "\" bad");
-    }
 }

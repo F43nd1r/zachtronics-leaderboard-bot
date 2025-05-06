@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,18 @@
 package com.faendir.zachtronics.bot.exa.validation;
 
 import com.faendir.zachtronics.bot.validation.ValidationException;
-import lombok.Value;
+import com.google.common.io.LittleEndianDataOutputStream;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -46,16 +54,21 @@ import java.util.function.IntFunction;
  * N bytes: EXA data
  * </pre>
  */
-@Value
+@Data
+@AllArgsConstructor
 public class ExaSave {
-    @NotNull String puzzle;
-    @NotNull String name;
+    private final @NotNull String puzzle;
+    private @NotNull String name;
 
-    int cycles;
-    int size;
-    int activity;
+    private int cycles;
+    private int size;
+    private int activity;
 
-    @NotNull List<@NotNull ExaChip> chips;
+    private final @NotNull List<@NotNull ExaChip> chips;
+
+    @Accessors(fluent = true)
+    @Getter(lazy = true)
+    private final int actualSize = chips.stream().mapToInt(ExaChip::size).sum();
 
     @NotNull
     public static ExaSave unmarshal(byte[] solution) {
@@ -101,6 +114,36 @@ public class ExaSave {
         return new ExaSave(puzzle, name, cycles, size, activity, chips);
     }
 
+    public byte @NotNull [] marshal() {
+        ByteArrayOutputStream ba = new ByteArrayOutputStream();
+        try (LittleEndianDataOutputStream out = new LittleEndianDataOutputStream(ba)) {
+            marshal(out);
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        return ba.toByteArray();
+    }
+
+    private void marshal(@NotNull DataOutput out) throws IOException {
+        out.writeInt(1008);
+        writeString(out, puzzle);
+        writeString(out, name);
+        out.writeInt(0); // hacker battles
+        out.writeInt(0); // sandbox mode
+        out.writeInt(3); // metrics
+        out.writeInt(0); // id
+        out.writeInt(cycles);
+        out.writeInt(1); // id
+        out.writeInt(size);
+        out.writeInt(2); // id
+        out.writeInt(activity);
+        out.writeInt(chips.size());
+        for (ExaChip chip : chips) {
+            chip.marshal(out);
+        }
+    }
+
     static @NotNull String readString(@NotNull ByteBuffer byteBuffer) {
         int length = byteBuffer.getInt();
         String result = new String(byteBuffer.array(), byteBuffer.arrayOffset() + byteBuffer.position(), length);
@@ -108,13 +151,15 @@ public class ExaSave {
         return result;
     }
 
+    static void writeString(@NotNull DataOutput out, @NotNull String string) throws IOException {
+        byte[] data = string.getBytes();
+        out.writeInt(data.length);
+        out.write(data);
+    }
+
     static void assertInt(@NotNull ByteBuffer byteBuffer, int value, IntFunction<String> rejectReason) {
         int read = byteBuffer.getInt();
         if (read != value)
             throw new ValidationException(rejectReason.apply(read));
-    }
-
-    int actualSize() {
-        return chips.stream().mapToInt(ExaChip::size).sum();
     }
 }
