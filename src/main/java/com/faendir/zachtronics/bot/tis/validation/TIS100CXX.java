@@ -31,7 +31,7 @@ import java.util.StringJoiner;
 /** Wrapper for a TIS-100-CXX executable installed on the system */
 public class TIS100CXX {
 
-    public static @NotNull TISScore validate(@NotNull String data, @NotNull TISPuzzle puzzle) {
+    public static @NotNull TISScore validate(@NotNull String data, @NotNull TISPuzzle puzzle) throws ValidationException {
         if (puzzle.getType() == TISType.SANDBOX)
             throw new ValidationException("Sandbox levels are not supported");
 
