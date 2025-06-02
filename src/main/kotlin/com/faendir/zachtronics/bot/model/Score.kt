@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,18 @@
 
 package com.faendir.zachtronics.bot.model
 
-interface Score<C: Category> {
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
+
+interface Score<C : Category> {
     fun toDisplayString() = toDisplayString(DisplayContext.plainText())
 
     fun toDisplayString(context: DisplayContext<C>): String
+}
+
+class ScorePlainSerializer : JsonSerializer<Score<*>>() {
+    override fun serialize(value: Score<*>, gen: JsonGenerator, serializers: SerializerProvider?) {
+        gen.writeString(value.toDisplayString())
+    }
 }

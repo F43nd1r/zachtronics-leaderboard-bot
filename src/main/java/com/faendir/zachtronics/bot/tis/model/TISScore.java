@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@ package com.faendir.zachtronics.bot.tis.model;
 
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Score;
+import com.faendir.zachtronics.bot.model.ScorePlainSerializer;
 import com.faendir.zachtronics.bot.utils.Utils;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Value;
 import lombok.With;
 import org.checkerframework.common.value.qual.IntRange;
@@ -29,6 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Value
+@JsonSerialize(using = ScorePlainSerializer.class)
 public class TISScore implements Score<TISCategory> {
     @IntRange(from = 0) int cycles;
     @IntRange(from = 1, to = 4 * 3) int nodes;
@@ -91,3 +94,4 @@ public class TISScore implements Score<TISCategory> {
         else return "";
     }
 }
+
