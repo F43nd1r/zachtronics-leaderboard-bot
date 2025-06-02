@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 package com.faendir.zachtronics.bot.tis.discord;
 
-import com.faendir.zachtronics.bot.discord.command.AbstractFrontierCommand;
+import com.faendir.zachtronics.bot.discord.DiscordActionCache;
+import com.faendir.zachtronics.bot.discord.command.AbstractPaginatedFrontierCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
 import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.tis.TISQualifier;
@@ -31,7 +32,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 @TISQualifier
-public class TISFrontierCommand extends AbstractFrontierCommand<TISCategory, TISPuzzle, TISRecord> {
+public class TISFrontierCommand extends AbstractPaginatedFrontierCommand<TISCategory, TISPuzzle, TISRecord> {
     @Getter
     private final CommandOption<String, TISPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", TISPuzzle.class, TISPuzzle::getDisplayName)
             .description("Puzzle name. Can be shortened or abbreviated. E.g. `SIGN AMPL`, `ITP1`")
@@ -39,4 +40,6 @@ public class TISFrontierCommand extends AbstractFrontierCommand<TISCategory, TIS
             .build();
     @Getter
     private final TISSolutionRepository repository;
+    @Getter
+    private final DiscordActionCache discordActionCache;
 }

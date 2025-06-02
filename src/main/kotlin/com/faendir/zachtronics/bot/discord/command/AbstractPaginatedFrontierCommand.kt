@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +29,14 @@ import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.utils.embedRecords
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 
-abstract class AbstractPaginatedFrontierCommand<C : Category, P : Puzzle<C>, R : Record<C>>(private val discordActionCache: DiscordActionCache) :
-    Command.BasicLeaf() {
+abstract class AbstractPaginatedFrontierCommand<C : Category, P : Puzzle<C>, R : Record<C>> : Command.BasicLeaf() {
     override val name = "frontier"
     override val description = "Displays the whole pareto frontier"
     override val secured = NotSecured
     protected abstract val puzzleOption: CommandOption<String, P>
     override val options: List<CommandOption<*, *>>
         get() = listOf(puzzleOption)
+    abstract val discordActionCache: DiscordActionCache
     abstract val repository: SolutionRepository<C, P, *, R>
 
     override fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder {

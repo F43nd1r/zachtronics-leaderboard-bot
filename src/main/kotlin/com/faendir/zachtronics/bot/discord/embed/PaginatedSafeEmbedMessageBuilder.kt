@@ -112,9 +112,10 @@ class PaginatedSafeEmbedMessageBuilder(private val discordActionCache: DiscordAc
                     url?.let { url(it) }
                     author?.let { author(it.first, it.second, it.third) }
                     color?.let { color(it) }
+                    if (result.size > 1)
+                        footer(EmbedCreateFields.Footer.of("Page ${index + 1} of ${result.size}", null))
                 }
                 .addAllFields(fields)
-                .footer(EmbedCreateFields.Footer.of("Page ${index + 1} of ${result.size}", null))
                 .build()
         }
     }

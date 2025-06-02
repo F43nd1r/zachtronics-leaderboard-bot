@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,9 @@ import org.springframework.stereotype.Component
 
 @OmQualifier
 @Component
-class OmFrontierCommand(override val repository: SolutionRepository<OmCategory, OmPuzzle, *, OmRecord>, discordActionCache: DiscordActionCache) :
-    AbstractPaginatedFrontierCommand<OmCategory, OmPuzzle, OmRecord>(discordActionCache) {
+class OmFrontierCommand(
+    override val repository: SolutionRepository<OmCategory, OmPuzzle, *, OmRecord>,
+    override val discordActionCache: DiscordActionCache
+) : AbstractPaginatedFrontierCommand<OmCategory, OmPuzzle, OmRecord>() {
     override val puzzleOption = omPuzzleOptionBuilder().required().build()
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,9 @@ import org.springframework.stereotype.Component
 
 @Component
 @OmQualifier
-class OmListCommand(override val repository: OmSolutionRepository, discordActionCache: DiscordActionCache) :
-    AbstractPaginatedListCommand<OmCategory, OmPuzzle, OmRecord>(discordActionCache) {
+class OmListCommand(
+    override val repository: OmSolutionRepository, override val discordActionCache: DiscordActionCache
+) : AbstractPaginatedListCommand<OmCategory, OmPuzzle, OmRecord>() {
     override val puzzleOption = omPuzzleOptionBuilder().required().build()
 }
 
