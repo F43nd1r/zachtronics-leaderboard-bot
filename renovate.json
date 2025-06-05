@@ -3,8 +3,8 @@
   "ignoreDeps": [
     "openjdk",
     "gradle",
-    "spring-boot",
-    "discord4j"
+    "org.springframework.boot",
+    "com.discord4j:discord4j-core"
   ],
   "extends": [
     "group:monorepos",
