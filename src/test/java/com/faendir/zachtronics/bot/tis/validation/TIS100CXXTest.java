@@ -133,11 +133,11 @@ class TIS100CXXTest {
                 @4
                 
                 @5
-                NOP
                 
                 @6
                 
                 @7
+                MOV UP DOWN
                 """;
 
         try {
