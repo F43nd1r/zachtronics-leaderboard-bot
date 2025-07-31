@@ -23,7 +23,7 @@
         "react-router-dom": "7.7.1",
         "react-router-hash-link": "2.4.3",
         "react-scripts": "5.0.1",
-        "typescript": "5.8.3"
+        "typescript": "5.9.2"
     },
     "devDependencies": {
         "@simbathesailor/use-what-changed": "2.0.0",
