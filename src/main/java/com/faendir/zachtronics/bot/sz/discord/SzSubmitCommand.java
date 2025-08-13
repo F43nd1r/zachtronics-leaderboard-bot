@@ -18,8 +18,6 @@ package com.faendir.zachtronics.bot.sz.discord;
 
 import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
-import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
@@ -35,21 +33,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt.*;
+
 @RequiredArgsConstructor
 @Component
 @SzQualifier
 public class SzSubmitCommand extends AbstractSubmitCommand<SzCategory, SzPuzzle, SzSubmission, SzRecord> {
-    private final CommandOption<String, String> solutionOption = OptionHelpersKt.dataLinkOptionBuilder("solution")
-            .description("Link to the solution file, can be `m1` to scrape it from your last message")
-            .required()
-            .build();
-    private final CommandOption<String, String> authorOption = CommandOptionBuilder.string("author")
-            .description("Name to appear on the Reddit leaderboard")
-            .required()
-            .build();
-    private final CommandOption<String, String> imageOption = OptionHelpersKt.displayLinkOptionBuilder("image")
-            .description("Link to your image of the solution")
-            .build();
+    private final CommandOption<String, String> solutionOption = solutionOptionBuilder().required().build();
+    private final CommandOption<String, String> authorOption = authorOptionBuilder().required().build();
+    private final CommandOption<String, String> imageOption = imageOptionBuilder().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, imageOption);
     @Getter

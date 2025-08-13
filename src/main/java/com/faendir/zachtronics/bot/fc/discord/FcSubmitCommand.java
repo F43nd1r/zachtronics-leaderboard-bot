@@ -18,8 +18,6 @@ package com.faendir.zachtronics.bot.fc.discord;
 
 import com.faendir.zachtronics.bot.discord.command.AbstractMultiSubmitCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
-import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.fc.FcQualifier;
@@ -39,21 +37,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt.*;
+
 @RequiredArgsConstructor
 @Component
 @FcQualifier
 public class FcSubmitCommand extends AbstractMultiSubmitCommand<FcCategory, FcPuzzle, FcSubmission, FcRecord> {
-    private final CommandOption<String, String> solutionOption = OptionHelpersKt.dataLinkOptionBuilder("solution")
-            .description("Link to the solution file, can be `m1` to scrape it from your last message or single solution text")
-            .required()
-            .build();
-    private final CommandOption<String, String> authorOption = CommandOptionBuilder.string("author")
-            .description("Name to appear on the Reddit leaderboard")
-            .required()
-            .build();
-    private final CommandOption<String, String> imageOption = OptionHelpersKt.displayLinkOptionBuilder("image")
-            .description("Link to your image of the solution, can be `m1` to scrape it from your last message")
-            .build();
+    private final CommandOption<String, String> solutionOption = solutionOptionBuilder().required().build();
+    private final CommandOption<String, String> authorOption = authorOptionBuilder().required().build();
+    private final CommandOption<String, String> imageOption = imageOptionBuilder().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, imageOption);
     @Getter

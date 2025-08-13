@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.exa.discord;
 
 import com.faendir.zachtronics.bot.discord.command.AbstractListCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.exa.ExaQualifier;
 import com.faendir.zachtronics.bot.exa.model.ExaCategory;
 import com.faendir.zachtronics.bot.exa.model.ExaPuzzle;
@@ -33,10 +32,7 @@ import org.springframework.stereotype.Component;
 @ExaQualifier
 public class ExaListCommand extends AbstractListCommand<ExaCategory, ExaPuzzle, ExaRecord> {
     @Getter
-    private final CommandOption<String, ExaPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", ExaPuzzle.class, ExaPuzzle::getDisplayName)
-            .description("Puzzle name. Can be shortened or abbreviated. E.g. `fake surv`, `HD`")
-            .required()
-            .build();
+    private final CommandOption<String, ExaPuzzle> puzzleOption = ExaOptionBuilders.PUZZLE_BUILDER.required().build();
     @Getter
     private final ExaSolutionRepository repository;
 }

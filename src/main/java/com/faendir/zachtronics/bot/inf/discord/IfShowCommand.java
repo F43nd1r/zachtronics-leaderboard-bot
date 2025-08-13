@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.inf.discord;
 
 import com.faendir.zachtronics.bot.discord.command.AbstractShowCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.inf.IfQualifier;
 import com.faendir.zachtronics.bot.inf.model.IfCategory;
 import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
@@ -37,14 +36,8 @@ import java.util.List;
 @Component
 @IfQualifier
 public class IfShowCommand extends AbstractShowCommand<IfCategory, IfPuzzle, IfRecord> {
-    private final CommandOption<String, IfPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", IfPuzzle.class, IfPuzzle::getDisplayName)
-            .description("Puzzle name. Can be shortened or abbreviated. E.g. `Gne ch`, `TBB`")
-            .required()
-            .build();
-    private final CommandOption<String, IfCategory> categoryOption = OptionHelpersKt.enumOptionBuilder("category", IfCategory.class, IfCategory::getDisplayName)
-            .description("Category. E.g. `CNG`, `F`")
-            .required()
-            .build();
+    private final CommandOption<String, IfPuzzle> puzzleOption = IfOptionBuilders.PUZZLE_BUILDER.required().build();
+    private final CommandOption<String, IfCategory> categoryOption = IfOptionBuilders.CATEGORY_BUILDER.required().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(puzzleOption, categoryOption);
     @Getter
@@ -57,7 +50,7 @@ public class IfShowCommand extends AbstractShowCommand<IfCategory, IfPuzzle, IfR
         IfCategory category = categoryOption.get(event);
         if (!puzzle.getSupportedCategories().contains(category))
             throw new IllegalArgumentException(
-                    "Category " + category.getDisplayName() + " does not support " + puzzle.getDisplayName());
+                "Category " + category.getDisplayName() + " does not support " + puzzle.getDisplayName());
         return new Pair<>(puzzle, category);
     }
 }

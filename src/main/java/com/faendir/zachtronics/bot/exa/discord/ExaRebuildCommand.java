@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.exa.discord;
 
 import com.faendir.zachtronics.bot.discord.command.AbstractRebuildCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.exa.ExaQualifier;
 import com.faendir.zachtronics.bot.exa.model.ExaPuzzle;
@@ -32,9 +31,8 @@ import org.springframework.stereotype.Component;
 @ExaQualifier
 public class ExaRebuildCommand extends AbstractRebuildCommand<ExaPuzzle> {
     @Getter
-    private final CommandOption<String, ExaPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", ExaPuzzle.class, ExaPuzzle::getDisplayName)
-            .description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
-            .build();
+    private final CommandOption<String, ExaPuzzle> puzzleOption = ExaOptionBuilders.PUZZLE_BUILDER.build();
+
     @Getter
     private final Secured secured = ExaSecured.WIKI_ADMINS_ONLY;
     @Getter

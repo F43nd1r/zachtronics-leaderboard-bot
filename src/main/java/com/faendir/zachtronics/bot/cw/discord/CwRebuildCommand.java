@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import com.faendir.zachtronics.bot.cw.model.CwPuzzle;
 import com.faendir.zachtronics.bot.cw.repository.CwSolutionRepository;
 import com.faendir.zachtronics.bot.discord.command.AbstractRebuildCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +31,7 @@ import org.springframework.stereotype.Component;
 @CwQualifier
 public class CwRebuildCommand extends AbstractRebuildCommand<CwPuzzle> {
     @Getter
-    private final CommandOption<String, CwPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", CwPuzzle.class, CwPuzzle::getDisplayName)
-            .description("Puzzle name. Can be shortened or abbreviated. E.g. `Sig Cross`, `SNR`")
-            .build();
+    private final CommandOption<String, CwPuzzle> puzzleOption = CwOptionBuilders.PUZZLE_BUILDER.build();
     @Getter
     private final Secured secured = CwSecured.ADMINS_ONLY;
     @Getter

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.sc.discord;
 
 import com.faendir.zachtronics.bot.discord.command.AbstractRebuildCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
@@ -32,9 +31,7 @@ import org.springframework.stereotype.Component;
 @ScQualifier
 public class ScRebuildCommand extends AbstractRebuildCommand<ScPuzzle> {
     @Getter
-    private final CommandOption<String, ScPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", ScPuzzle.class, ScPuzzle::getDisplayName)
-            .description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`")
-            .build();
+    private final CommandOption<String, ScPuzzle> puzzleOption = ScOptionBuilders.PUZZLE_BUILDER.build();
     @Getter
     private final Secured secured = ScSecured.WIKI_ADMINS_ONLY;
     @Getter

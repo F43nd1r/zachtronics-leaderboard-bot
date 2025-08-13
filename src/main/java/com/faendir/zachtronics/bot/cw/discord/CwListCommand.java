@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import com.faendir.zachtronics.bot.cw.model.CwRecord;
 import com.faendir.zachtronics.bot.cw.repository.CwSolutionRepository;
 import com.faendir.zachtronics.bot.discord.command.AbstractListCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -33,10 +32,7 @@ import org.springframework.stereotype.Component;
 @CwQualifier
 public class CwListCommand extends AbstractListCommand<CwCategory, CwPuzzle, CwRecord> {
     @Getter
-    private final CommandOption<String, CwPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", CwPuzzle.class, CwPuzzle::getDisplayName)
-            .description("Puzzle name. Can be shortened or abbreviated. E.g. `Sig Cross`, `SNR`")
-            .required()
-            .build();
+    private final CommandOption<String, CwPuzzle> puzzleOption = CwOptionBuilders.PUZZLE_BUILDER.required().build();
     @Getter
     private final CwSolutionRepository repository;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.sz.discord;
 
 import com.faendir.zachtronics.bot.discord.command.AbstractListCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.sz.SzQualifier;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
@@ -33,10 +32,7 @@ import org.springframework.stereotype.Component;
 @SzQualifier
 public class SzListCommand extends AbstractListCommand<SzCategory, SzPuzzle, SzRecord> {
     @Getter
-    private final CommandOption<String, SzPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", SzPuzzle.class, SzPuzzle::getDisplayName)
-            .description("Puzzle name. Can be shortened or abbreviated. E.g. `fake surv`, `HD`")
-            .required()
-            .build();
+    private final CommandOption<String, SzPuzzle> puzzleOption = SzOptionBuilders.PUZZLE_BUILDER.required().build();
     @Getter
     private final SzSolutionRepository repository;
 }

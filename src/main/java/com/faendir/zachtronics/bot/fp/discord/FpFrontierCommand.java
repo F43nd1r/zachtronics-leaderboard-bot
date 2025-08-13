@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.fp.discord;
 
 import com.faendir.zachtronics.bot.discord.command.AbstractFrontierCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.fp.FpQualifier;
 import com.faendir.zachtronics.bot.fp.model.FpCategory;
 import com.faendir.zachtronics.bot.fp.model.FpPuzzle;
@@ -33,10 +32,7 @@ import org.springframework.stereotype.Component;
 @FpQualifier
 public class FpFrontierCommand extends AbstractFrontierCommand<FpCategory, FpPuzzle, FpRecord> {
     @Getter
-    private final CommandOption<String, FpPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", FpPuzzle.class, FpPuzzle::getDisplayName)
-            .description("Puzzle name. Can be shortened or abbreviated. E.g. `1-1`, `add 2-3`")
-            .required()
-            .build();
+    private final CommandOption<String, FpPuzzle> puzzleOption = FpOptionBuilders.PUZZLE_BUILDER.required().build();
     @Getter
     private final FpSolutionRepository repository;
 }

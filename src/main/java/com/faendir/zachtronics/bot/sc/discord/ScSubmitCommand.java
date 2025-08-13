@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.sc.discord;
 import com.faendir.zachtronics.bot.discord.command.AbstractMultiSubmitCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.sc.ScQualifier;
@@ -39,18 +38,18 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt.*;
+
 @Component
 @RequiredArgsConstructor
 @ScQualifier
 public class ScSubmitCommand extends AbstractMultiSubmitCommand<ScCategory, ScPuzzle, ScSubmission, ScRecord> {
-    private final CommandOption<String, String> exportOption = OptionHelpersKt.dataLinkOptionBuilder("export")
+    private final CommandOption<String, String> exportOption = dataLinkOptionBuilder("export")
             .description("Link or `m1` to scrape it from your last message. Start the solution name with `/B?P?` to set flags")
             .required()
             .build();
-    private final CommandOption<String, String> authorOption = CommandOptionBuilder.string("author")
-            .description("Name to appear on the Reddit leaderboard")
-            .build();
-    private final CommandOption<String, String> videoOption = OptionHelpersKt.displayLinkOptionBuilder("video")
+    private final CommandOption<String, String> authorOption = authorOptionBuilder().build();
+    private final CommandOption<String, String> videoOption = displayLinkOptionBuilder("video")
             .description("Link to your video of the solution")
             .build();
     private final CommandOption<Boolean, Boolean> bypassValidationOption = CommandOptionBuilder.bool("bypass-validation")

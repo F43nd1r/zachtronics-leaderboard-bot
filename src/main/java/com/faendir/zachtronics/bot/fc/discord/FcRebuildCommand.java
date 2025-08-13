@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.fc.discord;
 
 import com.faendir.zachtronics.bot.discord.command.AbstractRebuildCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.fc.FcQualifier;
 import com.faendir.zachtronics.bot.fc.model.FcPuzzle;
@@ -32,9 +31,7 @@ import org.springframework.stereotype.Component;
 @FcQualifier
 public class FcRebuildCommand extends AbstractRebuildCommand<FcPuzzle> {
     @Getter
-    private final CommandOption<String, FcPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", FcPuzzle.class, FcPuzzle::getDisplayName)
-            .description("Puzzle name. Can be shortened or abbreviated. E.g. `1-1`, `add 2-3`")
-            .build();
+    private final CommandOption<String, FcPuzzle> puzzleOption = FcOptionBuilders.PUZZLE_BUILDER.build();
     @Getter
     private final Secured secured = FcSecured.ADMINS_ONLY;
     @Getter

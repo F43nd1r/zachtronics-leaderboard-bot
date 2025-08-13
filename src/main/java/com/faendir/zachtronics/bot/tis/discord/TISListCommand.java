@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.tis.discord;
 import com.faendir.zachtronics.bot.discord.DiscordActionCache;
 import com.faendir.zachtronics.bot.discord.command.AbstractPaginatedListCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.tis.TISQualifier;
 import com.faendir.zachtronics.bot.tis.model.TISCategory;
 import com.faendir.zachtronics.bot.tis.model.TISPuzzle;
@@ -34,10 +33,7 @@ import org.springframework.stereotype.Component;
 @TISQualifier
 public class TISListCommand extends AbstractPaginatedListCommand<TISCategory, TISPuzzle, TISRecord> {
     @Getter
-    private final CommandOption<String, TISPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", TISPuzzle.class, TISPuzzle::getDisplayName)
-            .description("Puzzle name. Can be shortened or abbreviated. E.g. `SIGN AMPL`, `ITP1`")
-            .required()
-            .build();
+    private final CommandOption<String, TISPuzzle> puzzleOption = TISOptionBuilders.PUZZLE_BUILDER.required().build();
     @Getter
     private final TISSolutionRepository repository;
     @Getter

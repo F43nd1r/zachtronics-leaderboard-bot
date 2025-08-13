@@ -52,6 +52,13 @@ fun <T : Enum<T>> enumOptionBuilder(name: String, type: Class<T>, displayName: T
         }
 }
 
+fun authorOptionBuilder() = CommandOptionBuilder.string("author")
+    .description("Solution author, use Community for trivial or collective solutions")
+fun solutionOptionBuilder() = dataLinkOptionBuilder("solution")
+    .description("Link to the solution file, can be `m1` to scrape it from your last message")
+fun imageOptionBuilder() = displayLinkOptionBuilder("image")
+    .description("Link to your image of the solution")
+
 /** does not allow storage of discord links, as they expire shortly */
 fun displayLinkOptionBuilder(name: String) = CommandOptionBuilder.string(name)
     .convert { link -> resolveLink(link, resolveDiscord = false) }

@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.fp.discord;
 import com.faendir.zachtronics.bot.discord.command.AbstractMultiSubmitCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.fp.FpQualifier;
@@ -39,6 +38,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt.*;
+
 @RequiredArgsConstructor
 @Component
 @FpQualifier
@@ -48,15 +49,10 @@ public class FpSubmitCommand extends AbstractMultiSubmitCommand<FpCategory, FpPu
     private final CommandOption<String, String> solutionOption = CommandOptionBuilder.string("solution")
             .description("Link to the solution file, can be `m1` to scrape it from your last message or single solution text")
             .required()
-            .convert((event, link) -> link.startsWith(SOLUTION_PREFIX) ? link : OptionHelpersKt.resolveLink(event, link, true))
+            .convert((event, link) -> link.startsWith(SOLUTION_PREFIX) ? link : resolveLink(event, link, true))
             .build();
-    private final CommandOption<String, String> authorOption = CommandOptionBuilder.string("author")
-            .description("Name to appear on the Reddit leaderboard")
-            .required()
-            .build();
-    private final CommandOption<String, String> imageOption = OptionHelpersKt.displayLinkOptionBuilder("image")
-            .description("Link to your image of the solution")
-            .build();
+    private final CommandOption<String, String> authorOption = authorOptionBuilder().required().build();
+    private final CommandOption<String, String> imageOption = imageOptionBuilder().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, imageOption);
     @Getter

@@ -18,8 +18,6 @@ package com.faendir.zachtronics.bot.tis.discord;
 
 import com.faendir.zachtronics.bot.discord.command.AbstractSubmitCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
-import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.tis.TISQualifier;
@@ -36,24 +34,16 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt.*;
+
 @RequiredArgsConstructor
 @Component
 @TISQualifier
 public class TISSubmitCommand extends AbstractSubmitCommand<TISCategory, TISPuzzle, TISSubmission, TISRecord> {
-    private final CommandOption<String, String> solutionOption = OptionHelpersKt.dataLinkOptionBuilder("solution")
-            .description("Link to the solution file, can be `m1` to scrape it from your last message")
-            .required()
-            .build();
-    private final CommandOption<String, String> authorOption = CommandOptionBuilder.string("author")
-            .description("Name to appear on the Reddit leaderboard")
-            .required()
-            .build();
-    private final CommandOption<String, TISPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", TISPuzzle.class, TISPuzzle::getDisplayName)
-            .description("Puzzle name. Can be shortened or abbreviated. E.g. `SIGN AMPL`, `ITP1`")
-            .build();
-    private final CommandOption<String, String> imageOption = OptionHelpersKt.displayLinkOptionBuilder("image")
-            .description("Link to your image of the solution")
-            .build();
+    private final CommandOption<String, String> solutionOption = solutionOptionBuilder().required().build();
+    private final CommandOption<String, String> authorOption = authorOptionBuilder().required().build();
+    private final CommandOption<String, TISPuzzle> puzzleOption = TISOptionBuilders.PUZZLE_BUILDER.build();
+    private final CommandOption<String, String> imageOption = imageOptionBuilder().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, puzzleOption, imageOption);
     @Getter

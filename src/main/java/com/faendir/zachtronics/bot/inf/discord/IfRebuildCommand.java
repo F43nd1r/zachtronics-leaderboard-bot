@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.inf.discord;
 
 import com.faendir.zachtronics.bot.discord.command.AbstractRebuildCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.inf.IfQualifier;
 import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
@@ -32,9 +31,7 @@ import org.springframework.stereotype.Component;
 @IfQualifier
 public class IfRebuildCommand extends AbstractRebuildCommand<IfPuzzle> {
     @Getter
-    private final CommandOption<String, IfPuzzle> puzzleOption = OptionHelpersKt.enumOptionBuilder("puzzle", IfPuzzle.class, IfPuzzle::getDisplayName)
-            .description("Puzzle name. Can be shortened or abbreviated. E.g. `Gne ch`, `TBB`")
-            .build();
+    private final CommandOption<String, IfPuzzle> puzzleOption = IfOptionBuilders.PUZZLE_BUILDER.build();
     @Getter
     private final Secured secured = IfSecured.WIKI_ADMINS_ONLY;
     @Getter

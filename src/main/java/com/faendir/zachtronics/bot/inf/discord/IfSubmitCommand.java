@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.inf.discord;
 import com.faendir.zachtronics.bot.discord.command.AbstractMultiSubmitCommand;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
-import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import com.faendir.zachtronics.bot.inf.IfQualifier;
 import com.faendir.zachtronics.bot.inf.model.*;
@@ -35,18 +34,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt.*;
+
 @RequiredArgsConstructor
 @Component
 @IfQualifier
 public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPuzzle, IfSubmission, IfRecord> {
-    private final CommandOption<String, String> solutionOption = OptionHelpersKt.dataLinkOptionBuilder("solution")
-            .description("Link or `m1` to scrape it from your last message.")
-            .required()
-            .build();
-    private final CommandOption<String, String> authorOption = CommandOptionBuilder.string("author")
-            .description("Name to appear on the Reddit leaderboard")
-            .required()
-            .build();
+    private final CommandOption<String, String> solutionOption = solutionOptionBuilder().required().build();
+    private final CommandOption<String, String> authorOption = authorOptionBuilder().required().build();
     private final CommandOption<String, IfScore> scoreOption = CommandOptionBuilder.string("score")
             .description("Score of the solution in ccc/fff/bbb[/OGF] format")
             .convert((event, score) -> {
@@ -59,7 +54,7 @@ public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPu
     private final CommandOption<String, List<String>> videosOption = CommandOptionBuilder.string("videos")
             .description("Link(s) to the video(s) of the solution, accepts multiple separated by `,`")
             .convert((event, links) -> Pattern.compile(",").splitAsStream(links)
-                                              .map(l -> OptionHelpersKt.resolveLink(event, l, false))
+                                              .map(l -> resolveLink(event, l, false))
                                               .toList())
             .build();
     @Getter
