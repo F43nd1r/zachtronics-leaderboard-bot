@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,21 +30,21 @@ import static com.faendir.zachtronics.bot.fc.model.FcType.STANDARD;
 
 @Getter
 public enum FcCategory implements CategoryJava<FcCategory, FcScore, FcMetric> {
-    TCS("TCS", List.of(TIME, COST, SUM_TIMES, WIRES), 0b1000),
-    TSW("TSW", List.of(TIME, SUM_TIMES, WIRES, COST), 0b1000),
-    TWC("TWC", List.of(TIME, WIRES, COST, SUM_TIMES), 0b1000),
+    TCS(List.of(TIME, COST, SUM_TIMES, WIRES), 0b1000),
+    TSW(List.of(TIME, SUM_TIMES, WIRES, COST), 0b1000),
+    TWC(List.of(TIME, WIRES, COST, SUM_TIMES), 0b1000),
 
-    CTS("CTS", List.of(COST, TIME, SUM_TIMES, WIRES), 0b0100),
-    CSW("CSW", List.of(COST, SUM_TIMES, WIRES, TIME), 0b0100),
-    CWT("CWT", List.of(COST, WIRES, TIME, SUM_TIMES), 0b0100),
+    CTS(List.of(COST, TIME, SUM_TIMES, WIRES), 0b0100),
+    CSW(List.of(COST, SUM_TIMES, WIRES, TIME), 0b0100),
+    CWT(List.of(COST, WIRES, TIME, SUM_TIMES), 0b0100),
 
-    STC("STC", List.of(SUM_TIMES, TIME, COST, WIRES), 0b0010),
-    SCW("SCW", List.of(SUM_TIMES, COST, WIRES, TIME), 0b0010),
-    SWT("SWT", List.of(SUM_TIMES, WIRES, TIME, COST), 0b0010),
+    STC(List.of(SUM_TIMES, TIME, COST, WIRES), 0b0010),
+    SCW(List.of(SUM_TIMES, COST, WIRES, TIME), 0b0010),
+    SWT(List.of(SUM_TIMES, WIRES, TIME, COST), 0b0010),
 
-    WTC("WTC", List.of(WIRES, TIME, COST, SUM_TIMES), 0b0001),
-    WCS("WCS", List.of(WIRES, COST, SUM_TIMES, TIME), 0b0001),
-    WST("WST", List.of(WIRES, SUM_TIMES, TIME, COST), 0b0001);
+    WTC(List.of(WIRES, TIME, COST, SUM_TIMES), 0b0001),
+    WCS(List.of(WIRES, COST, SUM_TIMES, TIME), 0b0001),
+    WST(List.of(WIRES, SUM_TIMES, TIME, COST), 0b0001);
 
     /** contains <tt>%dT%s%dk%s%dS%s%dW</tt> plus a bunch of <tt>*</tt> most likely */
     static final String[] FORMAT_STRINGS = {"%dT%s%dk%s%dS%s%dW",
@@ -59,8 +59,8 @@ public enum FcCategory implements CategoryJava<FcCategory, FcScore, FcMetric> {
     private final Set<FcType> supportedTypes = Collections.singleton(STANDARD);
     private final int scoreFormatId;
 
-    FcCategory(String displayName, @NotNull List<FcMetric> metrics, int scoreFormatId) {
-        this.displayName = displayName;
+    FcCategory(@NotNull List<FcMetric> metrics, int scoreFormatId) {
+        this.displayName = name();
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
         this.scoreFormatId = scoreFormatId;
