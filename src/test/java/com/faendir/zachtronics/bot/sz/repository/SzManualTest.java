@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
 package com.faendir.zachtronics.bot.sz.repository;
 
 import com.faendir.zachtronics.bot.BotTest;
+import com.faendir.zachtronics.bot.TestConfigurationKt;
+import com.faendir.zachtronics.bot.config.GitProperties;
+import com.faendir.zachtronics.bot.git.GitRepository;
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
@@ -26,9 +29,12 @@ import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -49,6 +55,14 @@ public class SzManualTest {
     private SzSolutionRepository repository;
     @Autowired
     private RedditService redditService;
+
+    @TestConfiguration
+    static class RepositoryConfiguration {
+        @Bean("szRepository")
+        public static @NotNull GitRepository szRepository(GitProperties gitProperties) {
+            return TestConfigurationKt.readOnlyLocalClone("../shenzhenIO/leaderboard", gitProperties);
+        }
+    }
 
     @Test
     public void testFullIO() throws IOException {
@@ -72,7 +86,7 @@ public class SzManualTest {
     public void rebuildRedditWiki() {
         repository.rebuildRedditLeaderboard(null);
         String page = redditService.getWikiPage(Subreddit.SHENZHEN_IO, "index")
-                                   .replaceAll("file:/tmp/sz-leaderboard[0-9]+/",
+                                   .replaceAll("file:[^()]+/leaderboard/",
                                                "https://raw.githubusercontent.com/12345ieee/shenzhenIO-leaderboard/master");
         System.out.println(page);
     }
@@ -123,10 +137,7 @@ public class SzManualTest {
     public void submitSaveFolder() throws IOException {
         String author = "someGuy";
 
-        Path savesPath = Paths.get("../shenzhenIO/other_saves/" + author);
-        /*
-        cp -a ../shenzhenIO/leaderboard/* src/test/resources/repositories/sz-leaderboard/
-         */
+        Path savesPath = Paths.get("../shenzhenIO/saves/" + author);
 
         for (SzPuzzle puzzle : repository.getTrackedPuzzles()) {
             try (DirectoryStream<Path> paths = Files.newDirectoryStream(savesPath, puzzle.getId() + "*")) {
@@ -153,9 +164,7 @@ public class SzManualTest {
         }
 
         /*
-        rm -r src/test/resources/repositories/sz-leaderboard/
-        git restore --source=HEAD --staged --worktree -- src/test/resources/repositories/sz-leaderboard/
-        rsync -a --delete --exclude=README.txt $(ls -1dt /tmp/sz-leaderboard* | head -n1)/* ../shenzhenIO/leaderboard/
+        rsync -a --delete --exclude=README.txt $(ls -1dt /tmp/leaderboard* | head -n1)/* ../shenzhenIO/leaderboard/
          */
 
         System.out.println("Done");
@@ -166,7 +175,7 @@ public class SzManualTest {
         Path repoPath = Paths.get("../shenzhenIO/leaderboard");
 
         for (SzPuzzle puzzle : repository.getTrackedPuzzles()) {
-            Path indexPath = repoPath.resolve(puzzle.getGroup().getRepoFolder()).resolve(puzzle.getId()).resolve("solutions.psv");
+            Path indexPath = repoPath.resolve(repository.relativePuzzlePath(puzzle)).resolve("solutions.psv");
             try (ICSVWriter writer = new CSVWriterBuilder(Files.newBufferedWriter(indexPath)).withSeparator('|').build()) {
 
                 Map<SzScore, CategoryRecord<SzRecord, SzCategory>> scoreMap =
