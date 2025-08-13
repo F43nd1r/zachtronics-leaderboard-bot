@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.fc.validation;
 
-import com.faendir.zachtronics.bot.BotTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.springframework.core.io.ClassPathResource;
@@ -28,7 +27,6 @@ import java.util.Base64;
 import static com.faendir.zachtronics.bot.fc.model.FcPuzzle.TWO_TWELVE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@BotTest
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses FoodCourtSim")
 class FcSimResultTest {
 

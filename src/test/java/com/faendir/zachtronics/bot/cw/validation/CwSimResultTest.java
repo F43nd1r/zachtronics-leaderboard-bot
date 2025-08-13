@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@
 
 package com.faendir.zachtronics.bot.cw.validation;
 
-import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.cw.model.CwPuzzle;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@BotTest
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses ChipWizardSim")
 class CwSimResultTest {
 
