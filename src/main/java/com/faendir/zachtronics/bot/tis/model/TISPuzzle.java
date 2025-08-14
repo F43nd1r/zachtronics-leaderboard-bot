@@ -20,13 +20,16 @@ import com.faendir.zachtronics.bot.model.Puzzle;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static com.faendir.zachtronics.bot.tis.model.TISGroup.TIS_100_SEGMENT_MAP;
-import static com.faendir.zachtronics.bot.tis.model.TISGroup.TIS_NET_DIRECTORY;
+import static com.faendir.zachtronics.bot.tis.model.TISGroup.*;
 import static com.faendir.zachtronics.bot.tis.model.TISType.*;
 
 @Getter
@@ -46,8 +49,8 @@ public enum TISPuzzle implements Puzzle<TISCategory> {
     SEQUENCE_REVERSER(TIS_100_SEGMENT_MAP, "42656", "SEQUENCE REVERSER", WITH_ACHIEVEMENT),
     SIGNAL_MULTIPLIER(TIS_100_SEGMENT_MAP, "43786", "SIGNAL MULTIPLIER", STANDARD),
     STACK_MEMORY_SANDBOX(TIS_100_SEGMENT_MAP, "USEG1", "STACK MEMORY SANDBOX", SANDBOX),
-    IMAGE_TEST_PATTERN_1(TIS_100_SEGMENT_MAP, "50370", "IMAGE TEST PATTERN 1", FIXED_IMAGE),
-    IMAGE_TEST_PATTERN_2(TIS_100_SEGMENT_MAP, "51781", "IMAGE TEST PATTERN 2", FIXED_IMAGE),
+    IMAGE_TEST_PATTERN_1(TIS_100_SEGMENT_MAP, "50370", "IMAGE TEST PATTERN 1", FIXED_OUTPUT),
+    IMAGE_TEST_PATTERN_2(TIS_100_SEGMENT_MAP, "51781", "IMAGE TEST PATTERN 2", FIXED_OUTPUT),
     EXPOSURE_MASK_VIEWER(TIS_100_SEGMENT_MAP, "52544", "EXPOSURE MASK VIEWER", STANDARD, 200014),
     HISTOGRAM_VIEWER(TIS_100_SEGMENT_MAP, "53897", "HISTOGRAM VIEWER", STANDARD),
     IMAGE_CONSOLE_SANDBOX(TIS_100_SEGMENT_MAP, "USEG2", "IMAGE CONSOLE SANDBOX", SANDBOX),
@@ -74,8 +77,8 @@ public enum TISPuzzle implements Puzzle<TISCategory> {
                              200029, 200038, 200385, 201529, 205321, 208015, 210354, 210952),
     SEQUENCE_NORMALIZER(TIS_NET_DIRECTORY, "NEXUS.10.656.5", "SEQUENCE NORMALIZER", STANDARD,
                         200005, 200022, 200122, 200199, 200222, 203080, 205237, 209353, 217852, 224884, 283860, 329689),
-    IMAGE_TEST_PATTERN_3(TIS_NET_DIRECTORY, "NEXUS.11.711.2", "IMAGE TEST PATTERN 3", FIXED_IMAGE),
-    IMAGE_TEST_PATTERN_4(TIS_NET_DIRECTORY, "NEXUS.12.534.4", "IMAGE TEST PATTERN 4", FIXED_IMAGE),
+    IMAGE_TEST_PATTERN_3(TIS_NET_DIRECTORY, "NEXUS.11.711.2", "IMAGE TEST PATTERN 3", FIXED_OUTPUT),
+    IMAGE_TEST_PATTERN_4(TIS_NET_DIRECTORY, "NEXUS.12.534.4", "IMAGE TEST PATTERN 4", FIXED_OUTPUT),
     SPATIAL_PATH_VIEWER(TIS_NET_DIRECTORY, "NEXUS.13.370.9", "SPATIAL PATH VIEWER", STANDARD),
     CHARACTER_TERMINAL(TIS_NET_DIRECTORY, "NEXUS.14.781.3", "CHARACTER TERMINAL", STANDARD),
     BACK_REFERENCE_REIFIER(TIS_NET_DIRECTORY, "NEXUS.15.897.9", "BACK-REFERENCE REIFIER", STANDARD),
@@ -87,7 +90,17 @@ public enum TISPuzzle implements Puzzle<TISCategory> {
     SIGNAL_EXPONENTIATOR(TIS_NET_DIRECTORY, "NEXUS.21.601.6", "SIGNAL EXPONENTIATOR", STANDARD),
     T20_NODE_EMULATOR(TIS_NET_DIRECTORY, "NEXUS.22.280.8", "T20 NODE EMULATOR", STANDARD),
     T31_NODE_EMULATOR(TIS_NET_DIRECTORY, "NEXUS.23.727.9", "T31 NODE EMULATOR", STANDARD, 200119, 200368, 200391, 218959),
-    WAVE_COLLAPSE_SUPERVISOR(TIS_NET_DIRECTORY, "NEXUS.24.511.7", "WAVE COLLAPSE SUPERVISOR", STANDARD, 200009, 200695, 202001);
+    WAVE_COLLAPSE_SUPERVISOR(TIS_NET_DIRECTORY, "NEXUS.24.511.7", "WAVE COLLAPSE SUPERVISOR", STANDARD, 200009, 200695, 202001),
+
+    NUMERAL_AMALGAMATOR(TOURNAMENT_2018, "SPEC49083185", "NUMERAL AMALGAMATOR", STANDARD),
+    IMAGE_TEST_PATTERN_HWAIR(TOURNAMENT_2018, "SPEC65521532", "IMAGE TEST PATTERN: HWAIR", FIXED_OUTPUT),
+    UNDECIMAL_TWIN_ROUNDER(TOURNAMENT_2018, "SPEC44149538", "UNDECIMAL TWIN ROUNDER", STANDARD),
+    TRI_SEQUENCE_IDENTIFIER(TOURNAMENT_2018, "SPEC26159035", "TRI-SEQUENCE IDENTIFIER", STANDARD),
+    STRIATION_PLOTTER(TOURNAMENT_2018, "SPEC35049542", "STRIATION PLOTTER", STANDARD),
+    OUT_OF_RANGE_DIGIT_VIEWER_A(TOURNAMENT_2018, "SPEC28320828", "OUT-OF-RANGE DIGIT VIEWER A", STANDARD),
+    INTERSECTION_IDENTIFIER(TOURNAMENT_2018, "SPEC64160260", "INTERSECTION IDENTIFIER", STANDARD),
+    ERROR_8_79324720(TOURNAMENT_2018, "SPEC79324720", "ERROR: 8 `+.$_ - 79324720", STANDARD),
+    ;
 
     private final TISGroup group;
     private final String id;
@@ -115,13 +128,34 @@ public enum TISPuzzle implements Puzzle<TISCategory> {
                                    .filter(c -> !c.getAdmission().getDisplayName().contains("a"))
                                    .toList();
             case WITH_ACHIEVEMENT -> List.of(TISCategory.values());
-            case FIXED_IMAGE -> Arrays.stream(TISCategory.values())
-                                      .filter(c -> c.getAdmission() == TISMetric.NOT_CHEATING)
-                                      .toList();
+            case FIXED_OUTPUT -> Arrays.stream(TISCategory.values())
+                                       .filter(c -> c.getAdmission() == TISMetric.NOT_CHEATING)
+                                       .toList();
             case SANDBOX -> Collections.emptyList();
         };
         this.extraWitnessSeeds = extraWitnessSeeds;
         this.link = "https://zlbb.faendir.com/tis/" + id;
+    }
+
+    private static Path customSpecDir = null;
+
+    public boolean isCustomSpec() {
+        return id.startsWith("SPEC");
+    }
+
+    public synchronized @NotNull Path extractCustomSpec() throws IOException {
+        assert isCustomSpec();
+        if (customSpecDir == null) {
+            customSpecDir = Files.createTempDirectory("tis_custom_specs");
+            customSpecDir.toFile().deleteOnExit();
+        }
+        String specFileName = id.replace("SPEC", "") + ".lua";
+        Path specPath = customSpecDir.resolve(specFileName);
+        if (!Files.exists(specPath)) {
+            ClassPathResource resource = new ClassPathResource("tis/custom/" + specFileName);
+            Files.copy(resource.getInputStream(), specPath);
+        }
+        return specPath;
     }
 
 }

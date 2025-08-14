@@ -21,6 +21,10 @@ import com.faendir.zachtronics.bot.tis.model.TISScore;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import org.springframework.core.io.ClassPathResource;
+
+import java.io.IOException;
+import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,32 +32,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses TIS-100-CXX")
 class TIS100CXXTest {
     @Test
-    public void good() {
-        String solution = """
-                @0
-                MOV UP, DOWN
-                
-                @1
-                MOV RIGHT, DOWN
-                
-                @2
-                MOV UP, LEFT
-                
-                @3
-                MOV UP, DOWN
-                
-                @4
-                MOV UP, DOWN
-                
-                @5
-                MOV UP, DOWN
-                
-                @6
-                MOV UP, RIGHT
-                
-                @7
-                MOV LEFT, DOWN
-                """;
+    public void good() throws IOException {
+        ClassPathResource resource = new ClassPathResource(
+            "repositories/tis-leaderboard/TIS_100_SEGMENT_MAP/00150/00150.83-8-8.txt");
+        String solution = Files.readString(resource.getFile().toPath());
 
         TISScore expected = new TISScore(83, 8, 8, false, false, false);
         TISScore result = TIS100CXX.validate(solution, TISPuzzle.SELF_TEST_DIAGNOSTIC);
@@ -158,5 +140,17 @@ class TIS100CXXTest {
 
         assertThrows(ValidationException.class,
                      () -> TIS100CXX.validate(solution, TISPuzzle.SELF_TEST_DIAGNOSTIC));
+    }
+
+    @Test
+    public void custom() throws IOException {
+        // also a fixed image
+        ClassPathResource resource = new ClassPathResource(
+            "repositories/tis-leaderboard/TOURNAMENT_2018/SPEC65521532/SPEC65521532.1623-6-62.txt");
+        String solution = Files.readString(resource.getFile().toPath());
+
+        TISScore expected = new TISScore(1623, 6, 62, false, false, false);
+        TISScore result = TIS100CXX.validate(solution, TISPuzzle.IMAGE_TEST_PATTERN_HWAIR);
+        assertEquals(expected, result);
     }
 }

@@ -22,29 +22,52 @@ import com.faendir.zachtronics.bot.tis.model.TISScore;
 import com.faendir.zachtronics.bot.tis.model.TISType;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationUtils;
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 /** Wrapper for a TIS-100-CXX executable installed on the system */
 public class TIS100CXX {
 
+    @SneakyThrows(IOException.class)
     public static @NotNull TISScore validate(@NotNull String data, @NotNull TISPuzzle puzzle) throws ValidationException {
         if (puzzle.getType() == TISType.SANDBOX)
             throw new ValidationException("Sandbox levels are not supported");
 
-        StringJoiner seedJoiner = new StringJoiner(",");
-        Arrays.stream(puzzle.getExtraWitnessSeeds()).mapToObj(Integer::toString).forEach(seedJoiner::add);
-        seedJoiner.add("100000.." + (200000 - 1 - puzzle.getExtraWitnessSeeds().length));
-        String seeds = seedJoiner.toString();
+        List<String> command = new ArrayList<>(Arrays.asList("TIS-100-CXX", "-q", "--limit", "150k", "--total-limit", "100M"));
+        if (puzzle.getExtraWitnessSeeds().length != 0) {
+            command.add("--seeds");
+            command.add(Arrays.stream(puzzle.getExtraWitnessSeeds()).mapToObj(Integer::toString).collect(Collectors.joining(",")));
+        }
+        command.add("--seeds");
+        command.add("100000.." + (200000 - 1 - puzzle.getExtraWitnessSeeds().length));
 
-        List<String> command = List.of("TIS-100-CXX",
-                                       "-q", "--seeds", seeds, "--limit", "120k", "--total-limit", "100M", "-l", puzzle.getId(),
-                                       "-");
+        Path customSpecPath = null;
+        if (puzzle.isCustomSpec()) {
+            customSpecPath = puzzle.extractCustomSpec();
+            command.add("-L");
+            command.add(customSpecPath.toString());
+        }
+        else {
+            command.add("-l");
+            command.add(puzzle.getId());
+        }
+        command.add("-");
+
         byte[] result = ValidationUtils.callValidator(data.getBytes(), command);
         String simResult = new String(result).trim();
+
+        if (puzzle.isCustomSpec()) {
+            assert customSpecPath != null;
+            Files.deleteIfExists(customSpecPath);
+        }
 
         TISScore score = TISScore.parseScore(simResult);
         if (score == null)

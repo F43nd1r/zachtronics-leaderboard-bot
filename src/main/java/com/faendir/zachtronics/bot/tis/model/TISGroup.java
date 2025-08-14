@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum TISGroup implements Group {
     TIS_100_SEGMENT_MAP("TIS-100 SEGMENT MAP"),
-    TIS_NET_DIRECTORY("TIS-NET DIRECTORY");
+    TIS_NET_DIRECTORY("TIS-NET DIRECTORY"),
+    TOURNAMENT_2018("2018 Tournament");
 
     private final String displayName;
 }

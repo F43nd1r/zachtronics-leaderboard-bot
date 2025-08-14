@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 public enum TISType implements Type {
     STANDARD("standard"),
     WITH_ACHIEVEMENT("achievement"),
-    FIXED_IMAGE("fixed image"),
+    FIXED_OUTPUT("fixed output"),
     SANDBOX("sandbox");
 
     private final String displayName;
