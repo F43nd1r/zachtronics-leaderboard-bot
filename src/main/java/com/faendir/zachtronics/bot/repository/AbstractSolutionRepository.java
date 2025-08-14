@@ -17,8 +17,8 @@
 package com.faendir.zachtronics.bot.repository;
 
 import com.faendir.zachtronics.bot.git.GitRepository;
-import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.model.*;
+import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.utils.Markdown;
@@ -360,7 +360,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
 
     /** @return mutable list of wiki lines */
     @NotNull
-    protected List<String> readRedditWiki(String page) {
+    protected List<String> readRedditWiki(@NotNull String page) {
         return Pattern.compile("\\r?\\n")
                       .splitAsStream(getRedditService().getWikiPage(getSubreddit(), page))
                       .collect(Collectors.toList());
@@ -446,7 +446,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         }
     }
 
-    protected List<String> rebuildRedditPage(String page, GitRepository.ReadWriteAccess access)
+    protected @NotNull List<String> rebuildRedditPage(@NotNull String page, GitRepository.ReadWriteAccess access)
     throws IOException {
         List<String> lines = readRedditWiki(page);
         List<P> puzzles = getTrackedPuzzles().stream().filter(p -> wikiPageName(p).equals(page)).toList();

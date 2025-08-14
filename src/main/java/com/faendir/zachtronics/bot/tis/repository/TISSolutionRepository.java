@@ -117,7 +117,7 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
     }
 
     @Override
-    protected List<String> rebuildRedditPage(String page, GitRepository.ReadWriteAccess access) throws IOException {
+    protected @NotNull List<String> rebuildRedditPage(@NotNull String page, GitRepository.ReadWriteAccess access) throws IOException {
         final String anchorPoint = "# TIS-100 SEGMENT MAP";
         List<String> lines = readRedditWiki(page).stream()
                                                  .takeWhile(l -> !l.equals(anchorPoint))

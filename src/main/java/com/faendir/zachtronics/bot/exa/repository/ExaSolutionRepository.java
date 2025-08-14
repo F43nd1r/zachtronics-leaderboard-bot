@@ -98,7 +98,7 @@ public class ExaSolutionRepository extends AbstractSolutionRepository<ExaCategor
     }
     
     @Override
-    protected List<String> rebuildRedditPage(String page, GitRepository.ReadWriteAccess access) throws IOException {
+    protected @NotNull List<String> rebuildRedditPage(@NotNull String page, GitRepository.ReadWriteAccess access) throws IOException {
         List<String> lines = readRedditWiki(page);
         for (ExaPuzzle puzzle : trackedPuzzles) {
             Path puzzlePath = getPuzzlePath(access, puzzle);
