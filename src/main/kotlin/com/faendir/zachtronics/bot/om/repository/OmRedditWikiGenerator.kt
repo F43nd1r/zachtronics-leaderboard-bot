@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.om.repository
 
-import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.om.model.OmCategory
@@ -30,7 +29,7 @@ import com.faendir.zachtronics.bot.reddit.RedditService
 import com.faendir.zachtronics.bot.reddit.Subreddit.OPUS_MAGNUM
 import com.faendir.zachtronics.bot.utils.Markdown
 import org.springframework.stereotype.Component
-import java.io.File
+import org.springframework.util.ResourceUtils
 
 @Component
 class OmRedditWikiGenerator(private val reddit: RedditService) {
@@ -57,10 +56,10 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
         return "${Markdown.linkOrText(score, first.displayLink)}${if (second.any { it.name.contains("X") }) "*" else ""}"
     }
 
-    internal fun update(readAccess: GitRepository.ReadAccess, categories: List<OmCategory>, data: Map<OmPuzzle, Set<OmMemoryRecord>>) {
+    internal fun update(categories: List<OmCategory>, data: Map<OmPuzzle, Set<OmMemoryRecord>>) {
         if (categories.any { this.categories.contains(it) }) {
-            val prefix = File(readAccess.repo, "reddit/prefix.md").readText()
-            val suffix = File(readAccess.repo, "reddit/suffix.md").readText()
+            val prefix = ResourceUtils.getFile("classpath:om/reddit/prefix.md").readText()
+            val suffix = ResourceUtils.getFile("classpath:om/reddit/suffix.md").readText()
             var table = ""
             for (group in OmGroup.entries) {
                 table += "## ${group.displayName}\n\n"

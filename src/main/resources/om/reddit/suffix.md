@@ -1,6 +1,5 @@
 
-
-#Theoretical limits
+# Theoretical limits
 
 Below are tables listing the known record and the theoretical limit for each metric individually.
 

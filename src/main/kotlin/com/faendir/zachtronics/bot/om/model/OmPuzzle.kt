@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -219,5 +219,5 @@ enum class OmPuzzle(
     override val supportedCategories: List<OmCategory> = OmCategory.entries.filter { it.supportsPuzzle(this) }
     override val link: String = "https://zlbb.faendir.com/puzzles/$id"
 
-    val file: File by lazy { ResourceUtils.getFile("classpath:puzzle/$id.puzzle") }
+    val file: File by lazy { ResourceUtils.getFile("classpath:om/puzzle/$id.puzzle") }
 }

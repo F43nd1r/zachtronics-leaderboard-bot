@@ -18,7 +18,14 @@ package com.faendir.zachtronics.bot.om.repository
 
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.om.model.*
+import com.faendir.zachtronics.bot.om.model.OmCategory
+import com.faendir.zachtronics.bot.om.model.OmMetric
+import com.faendir.zachtronics.bot.om.model.OmMetrics
+import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.om.model.OmScore
+import com.faendir.zachtronics.bot.om.model.OmScoreManifold
+import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
@@ -65,7 +72,7 @@ class OmSolutionRepository(
     fun init() {
         leaderboard.acquireReadAccess().use { leaderboardScope ->
             loadData(leaderboardScope)
-            pageGenerator.update(leaderboardScope, OmCategory.entries, immutableData)
+            pageGenerator.update(OmCategory.entries, immutableData)
         }
     }
 
@@ -144,7 +151,7 @@ class OmSolutionRepository(
                 else -> null
             }
             if (beatenRecords != null) {
-                pageGenerator.update(leaderboardScope, beatenRecords.flatMap { it.categories }, data)
+                pageGenerator.update(beatenRecords.flatMap { it.categories }, immutableData)
                 val rev = leaderboardScope.commit(
                     submission.author,
                     submission.puzzle,
@@ -287,7 +294,7 @@ class OmSolutionRepository(
             }
             leaderboardScope.commitAndPush("Score overrides (metadata)")
             loadData(leaderboardScope)
-            pageGenerator.update(leaderboardScope, OmCategory.entries, immutableData)
+            pageGenerator.update(OmCategory.entries, immutableData)
         }
     }
 
@@ -298,7 +305,7 @@ class OmSolutionRepository(
             leaderboardScope.rm(File(dir, "${record.toFileStem()}.json"))
             leaderboardScope.commitAndPush(null, record.puzzle, record.score, listOf("DELETE"))
             loadData(leaderboardScope)
-            pageGenerator.update(leaderboardScope, OmCategory.entries, immutableData)
+            pageGenerator.update(OmCategory.entries, immutableData)
         }
     }
 
