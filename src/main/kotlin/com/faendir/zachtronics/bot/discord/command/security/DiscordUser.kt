@@ -40,7 +40,8 @@ enum class DiscordUser(val id: Long, val getSpecialEmoji: (Guild?) -> Emoji? = {
     PANIC(146143003822522368),
     SYX(206689051028357121),
     A_SNOWBALL(136186716334587904),
-    ROLAMNI(177824842370777088)
+    ROLAMNI(177824842370777088),
+    HUETOBI(229031957445476352),
     ;
 
     companion object {

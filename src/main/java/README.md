@@ -4,18 +4,25 @@
 
 ### JVM
 
-Using `fp` -> `cw` as an example
+Using `sz` -> `cw` as an example
 ```shell
 cd src/main/java/com/faendir/zachtronics/bot/
-cp -r fp cw
-find cw -name 'Fp*' | xargs file-rename 's/Fp/Cw/' {}
-find cw -type f | xargs rpl 'Fp' 'Cw' {}
-find cw -type f | xargs rpl '\.fp' '.cw' {}
-find cw -type f | xargs rpl '/fp' '/cw' {}
+cp -r sz cw
+find cw -name 'Sz*' | xargs file-rename 's/Sz/Cw/' {}
+find cw -type f | xargs rpl 'Sz' 'Cw' {}
+find cw -type f | xargs rpl '\.sz' '.cw' {}
+find cw -type f | xargs rpl '/sz' '/cw' {}
+find cw -type f | xargs rpl '"sz"' '"cw"' {}
+cd -
+cd src/test/java/com/faendir/zachtronics/bot/
+cp -r sz cw
+find cw -name 'Sz*' | xargs file-rename 's/Sz/Cw/' {}
+find cw -type f | xargs rpl 'Sz' 'Cw' {}
+find cw -type f | xargs rpl '\.sz' '.cw' {}
 ```
 
 Edit:
-* `discord/CwCommandGroup`
+* `discord/CwOptionBuilders`
 * `model/*`
 * `repository/*`
 * `rest/dto/*`
@@ -31,7 +38,7 @@ Create git repo in game org.
 Add the push webhook:
 * Payload URL: https://zlbb.faendir.com/push
 * Content type: `application/json`
-* Secret: GPG-encoded file
+* Secret: GPG-encoded file at https://discord.com/channels/747474678498721994/747474678498721997/885673075255943198
 
 Give `F43nd1r` Write permissions if he's not an admin of the particular org.
 
@@ -40,13 +47,12 @@ Give `F43nd1r` Write permissions if he's not an admin of the particular org.
 * Add to the `GitConfiguration` class.
 * Add skeleton to `test/resources`, and add to the `TestConfiguration` class for tests.
 * Create a submit test that exercises the sim
+* Update `/Readme.md` with the new game
 
 #### Repo
 
-Add README
-
-After levels are filled, run:  
-`find . -name 'solutions.psv' -execdir ln -s solutions.psv README.txt \;`
+Add README and LICENSE
+Fill levels with the `initLeaderboard()` test.
 
 ### Docker
 
@@ -61,7 +67,7 @@ Add simulator (if any) to `/Dockerfile`
 ### Reddit
 
 * Take hold of the subreddit wiki, map it in `Subreddit.kt`
-* Create `test/src/resources/reddit/<subreddit>/wiki/<page>.md`
+* Create `src/test/resources/reddit/<subreddit>/wiki/<page>.md`
 * Copy the prefix from an existing lb, tweak as desired
 * Generate an empty table via `createWiki` test method
 * Create the wiki page on reddit

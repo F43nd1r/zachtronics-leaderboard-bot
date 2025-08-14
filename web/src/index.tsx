@@ -34,6 +34,7 @@ const ExaPuzzleVisualizerView = lazy(() => import("./views/exa/ExaPuzzleVisualiz
 const FcPuzzleVisualizerView = lazy(() => import("./views/fc/FcPuzzleVisualizerView"))
 const FpPuzzleVisualizerView = lazy(() => import("./views/fp/FpPuzzleVisualizerView"))
 const IfPuzzleVisualizerView = lazy(() => import("./views/if/IfPuzzleVisualizerView"))
+const KzPuzzleVisualizerView = lazy(() => import("./views/kz/KzPuzzleVisualizerView"))
 const ScPuzzleVisualizerView = lazy(() => import("./views/sc/ScPuzzleVisualizerView"))
 const SzPuzzleVisualizerView = lazy(() => import("./views/sz/SzPuzzleVisualizerView"))
 const TISPuzzleVisualizerView = lazy(() => import("./views/tis/TISPuzzleVisualizerView"))
@@ -61,6 +62,7 @@ createRoot(document.getElementById("root")!).render(
                         <Route path="fc/:puzzleId" element={<FcPuzzleVisualizerView />} />
                         <Route path="fp/:puzzleId" element={<FpPuzzleVisualizerView />} />
                         <Route path="if/:puzzleId" element={<IfPuzzleVisualizerView />} />
+                        <Route path="kz/:puzzleId" element={<KzPuzzleVisualizerView />} />
                         <Route path="sc/:puzzleId" element={<ScPuzzleVisualizerView />} />
                         <Route path="sz/:puzzleId" element={<SzPuzzleVisualizerView />} />
                         <Route path="tis/:puzzleId" element={<TISPuzzleVisualizerView />} />

@@ -64,6 +64,11 @@ class TestConfiguration(private val gitProperties: GitProperties) {
         return createTestGitRepository("repositories/if-leaderboard")
     }
 
+    @Bean("kzRepository")
+    fun kzRepository(): GitRepository {
+        return createTestGitRepository("repositories/kz-leaderboard")
+    }
+
     @Bean("omLeaderboardRepository")
     fun omLeaderboardRepository(): GitRepository {
         return createTestGitRepository("repositories/om-leaderboard")

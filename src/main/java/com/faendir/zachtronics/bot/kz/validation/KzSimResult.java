@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.kz.validation;
 
-enum class Subreddit(val id: String) {
-    EXAPUNKS("exapunks"),
-    INFINIFACTORY("infinifactory"),
-    KAIZEN("kaizen"),
-    LASTCALLBBS("lastcallbbs"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
-    TIS100("tis100")
+import lombok.Value;
+import org.jetbrains.annotations.Nullable;
+
+/**
+ <pre>{"level": 6, "time": 4, "cost": 38, "area": 130, "manipulated": false}</pre> or
+ <pre>{"error": "SolutionIncomplete"}</pre>
+ */
+@Value
+public class KzSimResult {
+    @Nullable Integer time;
+    @Nullable Integer cost;
+    @Nullable Integer area;
+    @Nullable Integer level;
+    @Nullable Boolean manipulated;
+
+    @Nullable String error;
 }

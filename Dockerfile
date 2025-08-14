@@ -16,6 +16,8 @@ COPY --from=builder /python /root/.local
 COPY --from=builder /xbpgh-sim/xbpgh_sim /root/.local/lib/python3.9/site-packages/xbpgh_sim
 COPY --from=builder /chipwizard-sim/chipwizard_sim /root/.local/lib/python3.9/site-packages/chipwizard_sim
 COPY --from=builder /foodcourt-sim/foodcourt_sim /root/.local/lib/python3.9/site-packages/foodcourt_sim
+RUN wget -q https://github.com/wl-gha/kaizensim/releases/download/v0.2.1/kaizensim -P /usr/local/bin
+RUN chmod +x /usr/local/bin/kaizensim
 RUN wget -q https://github.com/killerbee13/TIS-100-CXX/releases/download/v1.8/TIS-100-CXX -P /usr/local/bin
 RUN chmod +x /usr/local/bin/TIS-100-CXX
 RUN true

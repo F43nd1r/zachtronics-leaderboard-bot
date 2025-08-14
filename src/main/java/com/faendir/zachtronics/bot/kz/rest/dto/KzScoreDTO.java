@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.kz.rest.dto;
 
-enum class Subreddit(val id: String) {
-    EXAPUNKS("exapunks"),
-    INFINIFACTORY("infinifactory"),
-    KAIZEN("kaizen"),
-    LASTCALLBBS("lastcallbbs"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
-    TIS100("tis100")
+import com.faendir.zachtronics.bot.kz.model.KzScore;
+import lombok.Value;
+import org.jetbrains.annotations.NotNull;
+
+@Value
+public class KzScoreDTO {
+    int time;
+    int cost;
+    int area;
+
+    @NotNull
+    public static KzScoreDTO fromScore(@NotNull KzScore score) {
+        return new KzScoreDTO(score.getTime(), score.getCost(), score.getArea());
+    }
 }
+

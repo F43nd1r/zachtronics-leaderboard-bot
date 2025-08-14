@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,9 @@ class GitConfiguration(private val gitProperties: GitProperties) {
 
     @Bean("ifRepository")
     fun ifRepository() = GitRepository(gitProperties, "infinifactory-leaderboard", "https://github.com/12345ieee/infinifactory-leaderboard.git")
+
+    @Bean("kzRepository")
+    fun kzRepository() = GitRepository(gitProperties, "kaizen-leaderboard", "https://github.com/12345ieee/kaizen-leaderboard.git")
 
     @Bean("omLeaderboardRepository")
     fun omLeaderboardRepository() = GitRepository(gitProperties, "om-leaderboard", "https://github.com/F43nd1r/om-leaderboard.git")

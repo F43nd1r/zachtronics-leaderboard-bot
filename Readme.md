@@ -1,6 +1,7 @@
 # Zachtronics Leaderboard Bot
 
-A discord & reddit bot for automating solution submission/display for [Zachtronics](http://www.zachtronics.com/) games.
+A discord & reddit bot for automating solution submission/display for
+[Zachtronics](http://www.zachtronics.com/) & [Coincidence](https://coincidence.games/) games.
 
 Currently included:
  - [Opus Magnum](https://www.zachtronics.com/opus-magnum/)
@@ -10,6 +11,7 @@ Currently included:
  - [Shenzhen I/O](https://www.zachtronics.com/shenzhen-io/)
  - [Exapunks](https://www.zachtronics.com/exapunks/)
  - [Last Call BBS](https://www.zachtronics.com/last-call-bbs/)
+ - [Kaizen](https://coincidence.games/kaizen/)
  
 ## Use
 The bot runs in the [unofficial Zachtronics Discord Server](https://discord.gg/98QNzdJ), usable from slash commands.  

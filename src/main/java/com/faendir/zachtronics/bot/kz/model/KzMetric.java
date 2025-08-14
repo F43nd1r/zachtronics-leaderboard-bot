@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.reddit
+package com.faendir.zachtronics.bot.kz.model;
 
-enum class Subreddit(val id: String) {
-    EXAPUNKS("exapunks"),
-    INFINIFACTORY("infinifactory"),
-    KAIZEN("kaizen"),
-    LASTCALLBBS("lastcallbbs"),
-    OPUS_MAGNUM("opus_magnum"),
-    SHENZHEN_IO("shenzhenIO"),
-    SPACECHEM("spacechem"),
-    TIS100("tis100")
+import com.faendir.zachtronics.bot.model.MetricJava;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Function;
+
+@Getter
+@RequiredArgsConstructor
+public enum KzMetric implements MetricJava<KzScore, Integer> {
+    TIME("T", KzScore::getTime),
+    COST("C", KzScore::getCost),
+    AREA("A", KzScore::getArea);
+
+    @NotNull private final String displayName;
+    @NotNull private final Function<KzScore, Integer> extract;
 }
