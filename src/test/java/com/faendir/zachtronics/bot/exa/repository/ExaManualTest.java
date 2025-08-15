@@ -87,7 +87,7 @@ public class ExaManualTest {
     public void rebuildRedditWiki() {
         repository.rebuildRedditLeaderboard(null);
         String page = redditService.getWikiPage(Subreddit.EXAPUNKS, "index")
-                                   .replaceAll("file:/tmp/leaderboard[0-9]+/",
+                                   .replaceAll("file:[^()]+/leaderboard/",
                                                "https://raw.githubusercontent.com/12345ieee/exapunks-leaderboard/master");
         System.out.println(page);
     }
