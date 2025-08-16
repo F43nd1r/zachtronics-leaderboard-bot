@@ -32,7 +32,10 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.FileVisitOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
@@ -150,21 +153,16 @@ class TISManualTest {
 
         for (String author : authors) {
             System.out.println("Starting " + author);
-            Path savesPath;
-            try (Stream<Path> walk = Files.walk(savesRoot.resolve(author), FileVisitOption.FOLLOW_LINKS)) {
-                savesPath = walk.filter(p -> Files.isRegularFile(p) && p.getFileName().toString().matches("\\d{5}\\..*txt"))
-                                .findFirst()
-                                .orElseThrow()
-                                .getParent();
-            }
 
             for (TISPuzzle puzzle : repository.getTrackedPuzzles()) {
-                try (DirectoryStream<Path> paths = Files.newDirectoryStream(savesPath, puzzle.getId() + "*.*txt")) {
+                try (Stream<Path> walkStream = Files.walk(savesRoot.resolve(author), FileVisitOption.FOLLOW_LINKS)) {
+                    Iterable<Path> paths = walkStream.filter(p -> p.getFileName().toString().matches(puzzle.getId() + ".*\\..*txt"))
+                        ::iterator;
                     for (Path path : paths) {
                         String data = Files.readString(path).replace("\r\n", "\n");
                         TISSubmission submission;
                         try {
-                            submission = TISSubmission.fromData(data, puzzle, author, "http://li.nk");
+                            submission = TISSubmission.fromData(data, puzzle, author, null);
                         }
                         catch (Exception e) {
                             if (e instanceof ValidationException) {
