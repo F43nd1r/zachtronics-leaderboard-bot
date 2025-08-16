@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.fp.rest.dto;
 
 import com.faendir.zachtronics.bot.fp.model.FpPuzzle;
+import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,11 +25,11 @@ import org.jetbrains.annotations.NotNull;
 public class FpPuzzleDTO {
     @NotNull String name;
     @NotNull String displayName;
-    @NotNull FpGroupDTO group;
+    @NotNull GroupDTO group;
     @NotNull String type;
 
     @NotNull
     public static FpPuzzleDTO fromPuzzle(@NotNull FpPuzzle puzzle) {
-        return new FpPuzzleDTO(puzzle.name(), puzzle.getDisplayName(), FpGroupDTO.fromGroup(puzzle.getGroup()), puzzle.getType().name());
+        return new FpPuzzleDTO(puzzle.name(), puzzle.getDisplayName(), GroupDTO.fromGroup(puzzle.getGroup()), puzzle.getType().getDisplayName());
     }
 }

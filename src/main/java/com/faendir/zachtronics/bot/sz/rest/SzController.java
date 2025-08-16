@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package com.faendir.zachtronics.bot.sz.rest;
 
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.GameRestController;
+import com.faendir.zachtronics.bot.rest.dto.CategoryDTO;
+import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzGroup;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.sz.repository.SzSolutionRepository;
-import com.faendir.zachtronics.bot.sz.rest.dto.SzCategoryDTO;
-import com.faendir.zachtronics.bot.sz.rest.dto.SzGroupDTO;
 import com.faendir.zachtronics.bot.sz.rest.dto.SzPuzzleDTO;
 import com.faendir.zachtronics.bot.sz.rest.dto.SzRecordDTO;
 import lombok.Getter;
@@ -42,12 +42,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/sz")
 @RequiredArgsConstructor
-public class SzController implements GameRestController<SzGroupDTO, SzPuzzleDTO, SzCategoryDTO, SzRecordDTO> {
+public class SzController implements GameRestController<GroupDTO, SzPuzzleDTO, CategoryDTO, SzRecordDTO> {
     
     private final SzSolutionRepository repository;
     
     @Getter
-    private final List<SzGroupDTO> groups = Arrays.stream(SzGroup.values()).map(SzGroupDTO::fromGroup).toList();
+    private final List<GroupDTO> groups = Arrays.stream(SzGroup.values()).map(GroupDTO::fromGroup).toList();
 
     @Getter
     private final List<SzPuzzleDTO> puzzles = Arrays.stream(SzPuzzle.values()).map(SzPuzzleDTO::fromPuzzle).toList();
@@ -65,11 +65,11 @@ public class SzController implements GameRestController<SzGroupDTO, SzPuzzleDTO,
     }
 
     @Getter
-    private final List<SzCategoryDTO> categories = Arrays.stream(SzCategory.values()).map(SzCategoryDTO::fromCategory).toList();
+    private final List<CategoryDTO> categories = Arrays.stream(SzCategory.values()).map(CategoryDTO::fromCategory).toList();
 
     @Override
-    public SzCategoryDTO getCategory(@NotNull String categoryId) {
-        return SzCategoryDTO.fromCategory(findCategory(categoryId));
+    public CategoryDTO getCategory(@NotNull String categoryId) {
+        return CategoryDTO.fromCategory(findCategory(categoryId));
     }
 
     @Override

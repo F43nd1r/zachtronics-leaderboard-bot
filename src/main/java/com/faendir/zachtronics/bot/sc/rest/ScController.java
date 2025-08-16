@@ -18,10 +18,14 @@ package com.faendir.zachtronics.bot.sc.rest;
 
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.GameRestController;
+import com.faendir.zachtronics.bot.rest.dto.CategoryDTO;
+import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import com.faendir.zachtronics.bot.rest.dto.SubmitResultTypeKt;
 import com.faendir.zachtronics.bot.sc.model.*;
 import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
-import com.faendir.zachtronics.bot.sc.rest.dto.*;
+import com.faendir.zachtronics.bot.sc.rest.dto.ScPuzzleDTO;
+import com.faendir.zachtronics.bot.sc.rest.dto.ScRecordDTO;
+import com.faendir.zachtronics.bot.sc.rest.dto.ScSubmissionDTO;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Getter;
@@ -41,12 +45,12 @@ import java.util.*;
 @RestController
 @RequestMapping("/sc")
 @RequiredArgsConstructor
-public class ScController implements GameRestController<ScGroupDTO, ScPuzzleDTO, ScCategoryDTO, ScRecordDTO> {
+public class ScController implements GameRestController<GroupDTO, ScPuzzleDTO, CategoryDTO, ScRecordDTO> {
     
     private final ScSolutionRepository repository;
     
     @Getter
-    private final List<ScGroupDTO> groups = Arrays.stream(ScGroup.values()).map(ScGroupDTO::fromGroup).toList();
+    private final List<GroupDTO> groups = Arrays.stream(ScGroup.values()).map(GroupDTO::fromGroup).toList();
 
     @Getter
     private final List<ScPuzzleDTO> puzzles = Arrays.stream(ScPuzzle.values()).map(ScPuzzleDTO::fromPuzzle).toList();
@@ -64,11 +68,11 @@ public class ScController implements GameRestController<ScGroupDTO, ScPuzzleDTO,
     }
 
     @Getter
-    private final List<ScCategoryDTO> categories = Arrays.stream(ScCategory.values()).map(ScCategoryDTO::fromCategory).toList();
+    private final List<CategoryDTO> categories = Arrays.stream(ScCategory.values()).map(CategoryDTO::fromCategory).toList();
 
     @Override
-    public ScCategoryDTO getCategory(@NotNull String categoryId) {
-        return ScCategoryDTO.fromCategory(findCategory(categoryId));
+    public CategoryDTO getCategory(@NotNull String categoryId) {
+        return CategoryDTO.fromCategory(findCategory(categoryId));
     }
 
     @Override

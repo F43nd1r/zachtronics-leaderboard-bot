@@ -19,10 +19,14 @@ package com.faendir.zachtronics.bot.tis.rest;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.rest.GameRestController;
+import com.faendir.zachtronics.bot.rest.dto.CategoryDTO;
+import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import com.faendir.zachtronics.bot.rest.dto.SubmitResultTypeKt;
 import com.faendir.zachtronics.bot.tis.model.*;
 import com.faendir.zachtronics.bot.tis.repository.TISSolutionRepository;
-import com.faendir.zachtronics.bot.tis.rest.dto.*;
+import com.faendir.zachtronics.bot.tis.rest.dto.TISPuzzleDTO;
+import com.faendir.zachtronics.bot.tis.rest.dto.TISRecordDTO;
+import com.faendir.zachtronics.bot.tis.rest.dto.TISSubmissionDTO;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -44,12 +48,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/tis")
 @RequiredArgsConstructor
-public class TISController implements GameRestController<TISGroupDTO, TISPuzzleDTO, TISCategoryDTO, TISRecordDTO> {
+public class TISController implements GameRestController<GroupDTO, TISPuzzleDTO, CategoryDTO, TISRecordDTO> {
     
     private final TISSolutionRepository repository;
     
     @Getter
-    private final List<TISGroupDTO> groups = Arrays.stream(TISGroup.values()).map(TISGroupDTO::fromGroup).toList();
+    private final List<GroupDTO> groups = Arrays.stream(TISGroup.values()).map(GroupDTO::fromGroup).toList();
 
     @Getter
     private final List<TISPuzzleDTO> puzzles = Arrays.stream(TISPuzzle.values()).map(TISPuzzleDTO::fromPuzzle).toList();
@@ -67,11 +71,11 @@ public class TISController implements GameRestController<TISGroupDTO, TISPuzzleD
     }
 
     @Getter
-    private final List<TISCategoryDTO> categories = Arrays.stream(TISCategory.values()).map(TISCategoryDTO::fromCategory).toList();
+    private final List<CategoryDTO> categories = Arrays.stream(TISCategory.values()).map(CategoryDTO::fromCategory).toList();
 
     @Override
-    public TISCategoryDTO getCategory(@NotNull String categoryId) {
-        return TISCategoryDTO.fromCategory(findCategory(categoryId));
+    public CategoryDTO getCategory(@NotNull String categoryId) {
+        return CategoryDTO.fromCategory(findCategory(categoryId));
     }
 
     @Override

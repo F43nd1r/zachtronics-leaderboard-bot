@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ import com.faendir.zachtronics.bot.fc.model.FcGroup;
 import com.faendir.zachtronics.bot.fc.model.FcPuzzle;
 import com.faendir.zachtronics.bot.fc.model.FcRecord;
 import com.faendir.zachtronics.bot.fc.repository.FcSolutionRepository;
-import com.faendir.zachtronics.bot.fc.rest.dto.FcCategoryDTO;
-import com.faendir.zachtronics.bot.fc.rest.dto.FcGroupDTO;
 import com.faendir.zachtronics.bot.fc.rest.dto.FcPuzzleDTO;
 import com.faendir.zachtronics.bot.fc.rest.dto.FcRecordDTO;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.GameRestController;
+import com.faendir.zachtronics.bot.rest.dto.CategoryDTO;
+import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -42,12 +42,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/fc")
 @RequiredArgsConstructor
-public class FcController implements GameRestController<FcGroupDTO, FcPuzzleDTO, FcCategoryDTO, FcRecordDTO> {
+public class FcController implements GameRestController<GroupDTO, FcPuzzleDTO, CategoryDTO, FcRecordDTO> {
     
     private final FcSolutionRepository repository;
     
     @Getter
-    private final List<FcGroupDTO> groups = Arrays.stream(FcGroup.values()).map(FcGroupDTO::fromGroup).toList();
+    private final List<GroupDTO> groups = Arrays.stream(FcGroup.values()).map(GroupDTO::fromGroup).toList();
 
     @Getter
     private final List<FcPuzzleDTO> puzzles = Arrays.stream(FcPuzzle.values()).map(FcPuzzleDTO::fromPuzzle).toList();
@@ -65,11 +65,11 @@ public class FcController implements GameRestController<FcGroupDTO, FcPuzzleDTO,
     }
 
     @Getter
-    private final List<FcCategoryDTO> categories = Arrays.stream(FcCategory.values()).map(FcCategoryDTO::fromCategory).toList();
+    private final List<CategoryDTO> categories = Arrays.stream(FcCategory.values()).map(CategoryDTO::fromCategory).toList();
 
     @Override
-    public FcCategoryDTO getCategory(@NotNull String categoryId) {
-        return FcCategoryDTO.fromCategory(findCategory(categoryId));
+    public CategoryDTO getCategory(@NotNull String categoryId) {
+        return CategoryDTO.fromCategory(findCategory(categoryId));
     }
 
     @Override

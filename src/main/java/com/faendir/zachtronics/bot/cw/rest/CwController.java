@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ import com.faendir.zachtronics.bot.cw.model.CwGroup;
 import com.faendir.zachtronics.bot.cw.model.CwPuzzle;
 import com.faendir.zachtronics.bot.cw.model.CwRecord;
 import com.faendir.zachtronics.bot.cw.repository.CwSolutionRepository;
-import com.faendir.zachtronics.bot.cw.rest.dto.CwCategoryDTO;
-import com.faendir.zachtronics.bot.cw.rest.dto.CwGroupDTO;
 import com.faendir.zachtronics.bot.cw.rest.dto.CwPuzzleDTO;
 import com.faendir.zachtronics.bot.cw.rest.dto.CwRecordDTO;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.GameRestController;
+import com.faendir.zachtronics.bot.rest.dto.CategoryDTO;
+import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -42,12 +42,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/cw")
 @RequiredArgsConstructor
-public class CwController implements GameRestController<CwGroupDTO, CwPuzzleDTO, CwCategoryDTO, CwRecordDTO> {
+public class CwController implements GameRestController<GroupDTO, CwPuzzleDTO, CategoryDTO, CwRecordDTO> {
     
     private final CwSolutionRepository repository;
     
     @Getter
-    private final List<CwGroupDTO> groups = Arrays.stream(CwGroup.values()).map(CwGroupDTO::fromGroup).toList();
+    private final List<GroupDTO> groups = Arrays.stream(CwGroup.values()).map(GroupDTO::fromGroup).toList();
 
     @Getter
     private final List<CwPuzzleDTO> puzzles = Arrays.stream(CwPuzzle.values()).map(CwPuzzleDTO::fromPuzzle).toList();
@@ -65,11 +65,11 @@ public class CwController implements GameRestController<CwGroupDTO, CwPuzzleDTO,
     }
 
     @Getter
-    private final List<CwCategoryDTO> categories = Arrays.stream(CwCategory.values()).map(CwCategoryDTO::fromCategory).toList();
+    private final List<CategoryDTO> categories = Arrays.stream(CwCategory.values()).map(CategoryDTO::fromCategory).toList();
 
     @Override
-    public CwCategoryDTO getCategory(@NotNull String categoryId) {
-        return CwCategoryDTO.fromCategory(findCategory(categoryId));
+    public CategoryDTO getCategory(@NotNull String categoryId) {
+        return CategoryDTO.fromCategory(findCategory(categoryId));
     }
 
     @Override

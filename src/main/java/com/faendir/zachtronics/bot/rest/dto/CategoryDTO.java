@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,28 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.fc.rest.dto;
+package com.faendir.zachtronics.bot.rest.dto;
 
-import com.faendir.zachtronics.bot.fc.model.FcCategory;
+import com.faendir.zachtronics.bot.model.Category;
 import com.faendir.zachtronics.bot.model.Metric;
+import com.faendir.zachtronics.bot.model.Type;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 @Value
-public class FcCategoryDTO {
+public class CategoryDTO {
     @NotNull String id;
     @NotNull String displayName;
     @NotNull List<String> metrics;
     @NotNull List<String> puzzleTypes;
 
     @NotNull
-    public static FcCategoryDTO fromCategory(@NotNull FcCategory category) {
-        return new FcCategoryDTO(category.name(),
-                                 category.getDisplayName(),
-                                 category.getMetrics().stream().map(Metric::getDisplayName).toList(),
-                                 category.getSupportedTypes().stream().map(Enum::name).toList());
+    public static <C extends Enum<C> & Category> CategoryDTO fromCategory(@NotNull C category) {
+        return new CategoryDTO(category.name(),
+                               category.getDisplayName(),
+                               category.getMetrics().stream().map(Metric::getDisplayName).toList(),
+                               category.getSupportedTypes().stream().map(Type::getDisplayName).toList());
     }
 }

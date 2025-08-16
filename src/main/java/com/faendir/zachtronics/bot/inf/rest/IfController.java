@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ import com.faendir.zachtronics.bot.inf.model.IfGroup;
 import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
 import com.faendir.zachtronics.bot.inf.model.IfRecord;
 import com.faendir.zachtronics.bot.inf.repository.IfSolutionRepository;
-import com.faendir.zachtronics.bot.inf.rest.dto.IfCategoryDTO;
-import com.faendir.zachtronics.bot.inf.rest.dto.IfGroupDTO;
 import com.faendir.zachtronics.bot.inf.rest.dto.IfPuzzleDTO;
 import com.faendir.zachtronics.bot.inf.rest.dto.IfRecordDTO;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.GameRestController;
+import com.faendir.zachtronics.bot.rest.dto.CategoryDTO;
+import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -42,12 +42,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/if")
 @RequiredArgsConstructor
-public class IfController implements GameRestController<IfGroupDTO, IfPuzzleDTO, IfCategoryDTO, IfRecordDTO> {
+public class IfController implements GameRestController<GroupDTO, IfPuzzleDTO, CategoryDTO, IfRecordDTO> {
     
     private final IfSolutionRepository repository;
     
     @Getter
-    private final List<IfGroupDTO> groups = Arrays.stream(IfGroup.values()).map(IfGroupDTO::fromGroup).toList();
+    private final List<GroupDTO> groups = Arrays.stream(IfGroup.values()).map(GroupDTO::fromGroup).toList();
 
     @Getter
     private final List<IfPuzzleDTO> puzzles = Arrays.stream(IfPuzzle.values()).map(IfPuzzleDTO::fromPuzzle).toList();
@@ -65,11 +65,11 @@ public class IfController implements GameRestController<IfGroupDTO, IfPuzzleDTO,
     }
 
     @Getter
-    private final List<IfCategoryDTO> categories = Arrays.stream(IfCategory.values()).map(IfCategoryDTO::fromCategory).toList();
+    private final List<CategoryDTO> categories = Arrays.stream(IfCategory.values()).map(CategoryDTO::fromCategory).toList();
 
     @Override
-    public IfCategoryDTO getCategory(@NotNull String categoryId) {
-        return IfCategoryDTO.fromCategory(findCategory(categoryId));
+    public CategoryDTO getCategory(@NotNull String categoryId) {
+        return CategoryDTO.fromCategory(findCategory(categoryId));
     }
 
     @Override

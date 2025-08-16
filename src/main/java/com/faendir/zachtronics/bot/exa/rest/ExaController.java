@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ import com.faendir.zachtronics.bot.exa.model.ExaGroup;
 import com.faendir.zachtronics.bot.exa.model.ExaPuzzle;
 import com.faendir.zachtronics.bot.exa.model.ExaRecord;
 import com.faendir.zachtronics.bot.exa.repository.ExaSolutionRepository;
-import com.faendir.zachtronics.bot.exa.rest.dto.ExaCategoryDTO;
-import com.faendir.zachtronics.bot.exa.rest.dto.ExaGroupDTO;
 import com.faendir.zachtronics.bot.exa.rest.dto.ExaPuzzleDTO;
 import com.faendir.zachtronics.bot.exa.rest.dto.ExaRecordDTO;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.GameRestController;
+import com.faendir.zachtronics.bot.rest.dto.CategoryDTO;
+import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -42,12 +42,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/exa")
 @RequiredArgsConstructor
-public class ExaController implements GameRestController<ExaGroupDTO, ExaPuzzleDTO, ExaCategoryDTO, ExaRecordDTO> {
+public class ExaController implements GameRestController<GroupDTO, ExaPuzzleDTO, CategoryDTO, ExaRecordDTO> {
     
     private final ExaSolutionRepository repository;
     
     @Getter
-    private final List<ExaGroupDTO> groups = Arrays.stream(ExaGroup.values()).map(ExaGroupDTO::fromGroup).toList();
+    private final List<GroupDTO> groups = Arrays.stream(ExaGroup.values()).map(GroupDTO::fromGroup).toList();
 
     @Getter
     private final List<ExaPuzzleDTO> puzzles = Arrays.stream(ExaPuzzle.values()).map(ExaPuzzleDTO::fromPuzzle).toList();
@@ -65,11 +65,11 @@ public class ExaController implements GameRestController<ExaGroupDTO, ExaPuzzleD
     }
 
     @Getter
-    private final List<ExaCategoryDTO> categories = Arrays.stream(ExaCategory.values()).map(ExaCategoryDTO::fromCategory).toList();
+    private final List<CategoryDTO> categories = Arrays.stream(ExaCategory.values()).map(CategoryDTO::fromCategory).toList();
 
     @Override
-    public ExaCategoryDTO getCategory(@NotNull String categoryId) {
-        return ExaCategoryDTO.fromCategory(findCategory(categoryId));
+    public CategoryDTO getCategory(@NotNull String categoryId) {
+        return CategoryDTO.fromCategory(findCategory(categoryId));
     }
 
     @Override

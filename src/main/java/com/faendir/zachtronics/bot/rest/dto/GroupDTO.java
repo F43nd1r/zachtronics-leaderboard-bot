@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.fp.rest.dto;
+package com.faendir.zachtronics.bot.rest.dto;
 
-import com.faendir.zachtronics.bot.fp.model.FpGroup;
+import com.faendir.zachtronics.bot.model.Group;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 
 @Value
-public class FpGroupDTO {
+public class GroupDTO {
     @NotNull String id;
     @NotNull String displayName;
 
     @NotNull
-    public static FpGroupDTO fromGroup(@NotNull FpGroup group) {
-        return new FpGroupDTO(group.name(), group.getDisplayName());
+    public static <G extends Enum<G> & Group> GroupDTO fromGroup(@NotNull G group) {
+        return new GroupDTO(group.name(), group.getDisplayName());
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.sz.rest.dto;
 
+import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
@@ -24,11 +25,11 @@ import org.jetbrains.annotations.NotNull;
 public class SzPuzzleDTO {
     @NotNull String id;
     @NotNull String displayName;
-    @NotNull SzGroupDTO group;
+    @NotNull GroupDTO group;
     @NotNull String type;
 
     @NotNull
     public static SzPuzzleDTO fromPuzzle(@NotNull SzPuzzle puzzle) {
-        return new SzPuzzleDTO(puzzle.getId(), puzzle.getDisplayName(), SzGroupDTO.fromGroup(puzzle.getGroup()), puzzle.getType().name());
+        return new SzPuzzleDTO(puzzle.getId(), puzzle.getDisplayName(), GroupDTO.fromGroup(puzzle.getGroup()), puzzle.getType().getDisplayName());
     }
 }
