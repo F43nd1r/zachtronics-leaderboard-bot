@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,10 @@ object Markdown {
 
     @JvmStatic
     @JvmOverloads
-    fun link(text: String, link: String, embed: Boolean = true) = "[$text](${if (embed) link else "<$link>"})"
+    fun link(text: String, link: String, embed: Boolean = true): String {
+        val escapedLink = link.replace(")", "\\)")
+        return "[$text](${if (embed) escapedLink else "<$escapedLink>"})"
+    }
 
     @JvmStatic
     @JvmOverloads
