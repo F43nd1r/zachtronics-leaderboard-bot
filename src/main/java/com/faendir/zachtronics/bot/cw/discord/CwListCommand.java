@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @CwQualifier
 public class CwListCommand extends AbstractListCommand<CwCategory, CwPuzzle, CwRecord> {
     @Getter
-    private final CommandOption<String, CwPuzzle> puzzleOption = CwOptionBuilders.PUZZLE_BUILDER.required().build();
+    private final CommandOption<String, CwPuzzle> puzzleOption = CwOptionBuilders.puzzleOptionBuilder().required().build();
     @Getter
     private final CwSolutionRepository repository;
 }

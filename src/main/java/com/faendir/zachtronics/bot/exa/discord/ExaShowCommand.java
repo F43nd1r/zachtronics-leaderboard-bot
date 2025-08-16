@@ -36,8 +36,8 @@ import java.util.List;
 @Component
 @ExaQualifier
 public class ExaShowCommand extends AbstractShowCommand<ExaCategory, ExaPuzzle, ExaRecord> {
-    private final CommandOption<String, ExaPuzzle> puzzleOption = ExaOptionBuilders.PUZZLE_BUILDER.required().build();
-    private final CommandOption<String, ExaCategory> categoryOption = ExaOptionBuilders.CATEGORY_BUILDER.required().build();
+    private final CommandOption<String, ExaPuzzle> puzzleOption = ExaOptionBuilders.puzzleOptionBuilder().required().build();
+    private final CommandOption<String, ExaCategory> categoryOption = ExaOptionBuilders.categoryOptionBuilder().required().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(puzzleOption, categoryOption);
     @Getter

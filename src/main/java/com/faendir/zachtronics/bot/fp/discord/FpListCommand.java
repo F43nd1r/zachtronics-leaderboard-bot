@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @FpQualifier
 public class FpListCommand extends AbstractListCommand<FpCategory, FpPuzzle, FpRecord> {
     @Getter
-    private final CommandOption<String, FpPuzzle> puzzleOption = FpOptionBuilders.PUZZLE_BUILDER.required().build();
+    private final CommandOption<String, FpPuzzle> puzzleOption = FpOptionBuilders.puzzleOptionBuilder().required().build();
     @Getter
     private final FpSolutionRepository repository;
 }

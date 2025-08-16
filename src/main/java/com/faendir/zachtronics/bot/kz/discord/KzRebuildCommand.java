@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 @KzQualifier
 public class KzRebuildCommand extends AbstractRebuildCommand<KzPuzzle> {
     @Getter
-    private final CommandOption<String, KzPuzzle> puzzleOption = KzOptionBuilders.PUZZLE_BUILDER.build();
+    private final CommandOption<String, KzPuzzle> puzzleOption = KzOptionBuilders.puzzleOptionBuilder().build();
     @Getter
     private final Secured secured = KzSecured.WIKI_ADMINS_ONLY;
     @Getter

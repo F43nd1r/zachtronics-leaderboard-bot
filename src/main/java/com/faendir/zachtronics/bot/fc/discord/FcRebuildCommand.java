@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 @FcQualifier
 public class FcRebuildCommand extends AbstractRebuildCommand<FcPuzzle> {
     @Getter
-    private final CommandOption<String, FcPuzzle> puzzleOption = FcOptionBuilders.PUZZLE_BUILDER.build();
+    private final CommandOption<String, FcPuzzle> puzzleOption = FcOptionBuilders.puzzleOptionBuilder().build();
     @Getter
     private final Secured secured = FcSecured.ADMINS_ONLY;
     @Getter

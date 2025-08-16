@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 @TISQualifier
 public class TISListCommand extends AbstractPaginatedListCommand<TISCategory, TISPuzzle, TISRecord> {
     @Getter
-    private final CommandOption<String, TISPuzzle> puzzleOption = TISOptionBuilders.PUZZLE_BUILDER.required().build();
+    private final CommandOption<String, TISPuzzle> puzzleOption = TISOptionBuilders.puzzleOptionBuilder().required().build();
     @Getter
     private final TISSolutionRepository repository;
     @Getter

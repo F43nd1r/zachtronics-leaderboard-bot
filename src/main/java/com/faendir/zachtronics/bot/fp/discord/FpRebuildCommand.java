@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 @FpQualifier
 public class FpRebuildCommand extends AbstractRebuildCommand<FpPuzzle> {
     @Getter
-    private final CommandOption<String, FpPuzzle> puzzleOption = FpOptionBuilders.PUZZLE_BUILDER.build();
+    private final CommandOption<String, FpPuzzle> puzzleOption = FpOptionBuilders.puzzleOptionBuilder().build();
     @Getter
     private final Secured secured = FpSecured.ADMINS_ONLY;
     @Getter

@@ -36,8 +36,8 @@ import java.util.List;
 @Component
 @ScQualifier
 public class ScShowCommand extends AbstractShowCommand<ScCategory, ScPuzzle, ScRecord> {
-    private final CommandOption<String, ScPuzzle> puzzleOption = ScOptionBuilders.PUZZLE_BUILDER.required().build();
-    private final CommandOption<String, ScCategory> categoryOption = ScOptionBuilders.CATEGORY_BUILDER.required().build();
+    private final CommandOption<String, ScPuzzle> puzzleOption = ScOptionBuilders.puzzleOptionBuilder().required().build();
+    private final CommandOption<String, ScCategory> categoryOption = ScOptionBuilders.categoryOptionBuilder().required().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(puzzleOption, categoryOption);
     @Getter

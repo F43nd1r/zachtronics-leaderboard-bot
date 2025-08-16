@@ -20,15 +20,18 @@ import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
 import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.inf.model.IfCategory;
 import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
+import org.jetbrains.annotations.NotNull;
 
 public class IfOptionBuilders {
-    public static final CommandOptionBuilder<String, IfPuzzle> PUZZLE_BUILDER =
-        OptionHelpersKt.enumOptionBuilder("puzzle", IfPuzzle.class, IfPuzzle::getDisplayName)
-                       .description("Puzzle name. Can be shortened or abbreviated. E.g. `Gne ch`, `TBB`");
+    public static @NotNull CommandOptionBuilder<String, IfPuzzle> puzzleOptionBuilder() {
+        return OptionHelpersKt.enumOptionBuilder("puzzle", IfPuzzle.class, IfPuzzle::getDisplayName)
+                              .description("Puzzle name. Can be shortened or abbreviated. E.g. `Gne ch`, `TBB`");
+    }
 
-    public static final CommandOptionBuilder<String, IfCategory> CATEGORY_BUILDER =
-        OptionHelpersKt.enumOptionBuilder("category", IfCategory.class, IfCategory::getDisplayName)
-                       .description("Category. E.g. `CNG`, `F`");
+    public static @NotNull CommandOptionBuilder<String, IfCategory> categoryOptionBuilder() {
+        return OptionHelpersKt.enumOptionBuilder("category", IfCategory.class, IfCategory::getDisplayName)
+                              .description("Category. E.g. `CNG`, `F`");
+    }
 
     private IfOptionBuilders() {}
 }

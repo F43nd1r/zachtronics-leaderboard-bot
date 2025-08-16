@@ -20,15 +20,18 @@ import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
 import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.tis.model.TISCategory;
 import com.faendir.zachtronics.bot.tis.model.TISPuzzle;
+import org.jetbrains.annotations.NotNull;
 
 public class TISOptionBuilders {
-    public static final CommandOptionBuilder<String, TISPuzzle> PUZZLE_BUILDER =
-        OptionHelpersKt.enumOptionBuilder("puzzle", TISPuzzle.class, TISPuzzle::getDisplayName)
-                       .description("Puzzle name. Can be shortened or abbreviated. E.g. `SIGN AMPL`, `ITP1`");
+    public static @NotNull CommandOptionBuilder<String, TISPuzzle> puzzleOptionBuilder() {
+        return OptionHelpersKt.enumOptionBuilder("puzzle", TISPuzzle.class, TISPuzzle::getDisplayName)
+                              .description("Puzzle name. Can be shortened or abbreviated. E.g. `SIGN AMPL`, `ITP1`");
+    }
 
-    public static final CommandOptionBuilder<String, TISCategory> CATEGORY_BUILDER =
-        OptionHelpersKt.enumOptionBuilder("category", TISCategory.class, TISCategory::getDisplayName)
-                       .description("Category. E.g. `CN`, `IC`");
+    public static @NotNull CommandOptionBuilder<String, TISCategory> categoryOptionBuilder() {
+        return OptionHelpersKt.enumOptionBuilder("category", TISCategory.class, TISCategory::getDisplayName)
+                              .description("Category. E.g. `CN`, `IC`");
+    }
 
     private TISOptionBuilders() {}
 }

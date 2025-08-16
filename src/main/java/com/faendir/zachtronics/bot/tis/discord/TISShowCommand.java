@@ -36,8 +36,8 @@ import java.util.List;
 @Component
 @TISQualifier
 public class TISShowCommand extends AbstractShowCommand<TISCategory, TISPuzzle, TISRecord> {
-    private final CommandOption<String, TISPuzzle> puzzleOption = TISOptionBuilders.PUZZLE_BUILDER.required().build();
-    private final CommandOption<String, TISCategory> categoryOption = TISOptionBuilders.CATEGORY_BUILDER.required().build();
+    private final CommandOption<String, TISPuzzle> puzzleOption = TISOptionBuilders.puzzleOptionBuilder().required().build();
+    private final CommandOption<String, TISCategory> categoryOption = TISOptionBuilders.categoryOptionBuilder().required().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(puzzleOption, categoryOption);
     @Getter

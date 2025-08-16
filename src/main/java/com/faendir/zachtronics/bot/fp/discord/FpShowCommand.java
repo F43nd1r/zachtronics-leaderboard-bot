@@ -36,8 +36,8 @@ import java.util.List;
 @Component
 @FpQualifier
 public class FpShowCommand extends AbstractShowCommand<FpCategory, FpPuzzle, FpRecord> {
-    private final CommandOption<String, FpPuzzle> puzzleOption = FpOptionBuilders.PUZZLE_BUILDER.required().build();
-    private final CommandOption<String, FpCategory> categoryOption = FpOptionBuilders.CATEGORY_BUILDER.required().build();
+    private final CommandOption<String, FpPuzzle> puzzleOption = FpOptionBuilders.puzzleOptionBuilder().required().build();
+    private final CommandOption<String, FpCategory> categoryOption = FpOptionBuilders.categoryOptionBuilder().required().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(puzzleOption, categoryOption);
     @Getter

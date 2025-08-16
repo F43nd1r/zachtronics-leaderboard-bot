@@ -42,7 +42,7 @@ import static com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt
 public class TISSubmitCommand extends AbstractSubmitCommand<TISCategory, TISPuzzle, TISSubmission, TISRecord> {
     private final CommandOption<String, String> solutionOption = solutionOptionBuilder().required().build();
     private final CommandOption<String, String> authorOption = authorOptionBuilder().required().build();
-    private final CommandOption<String, TISPuzzle> puzzleOption = TISOptionBuilders.PUZZLE_BUILDER.build();
+    private final CommandOption<String, TISPuzzle> puzzleOption = TISOptionBuilders.puzzleOptionBuilder().build();
     private final CommandOption<String, String> imageOption = imageOptionBuilder().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, puzzleOption, imageOption);

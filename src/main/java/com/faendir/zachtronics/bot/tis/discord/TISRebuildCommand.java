@@ -33,7 +33,7 @@ import java.util.List;
 @TISQualifier
 public class TISRebuildCommand extends AbstractRebuildCommand<TISPuzzle> {
     @Getter
-    private final CommandOption<String, TISPuzzle> puzzleOption = TISOptionBuilders.PUZZLE_BUILDER.build();
+    private final CommandOption<String, TISPuzzle> puzzleOption = TISOptionBuilders.puzzleOptionBuilder().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
     @Getter

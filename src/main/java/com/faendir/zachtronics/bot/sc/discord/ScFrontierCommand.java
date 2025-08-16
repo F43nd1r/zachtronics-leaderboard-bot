@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @ScQualifier
 public class ScFrontierCommand extends AbstractFrontierCommand<ScCategory, ScPuzzle, ScRecord> {
     @Getter
-    private final CommandOption<String, ScPuzzle> puzzleOption = ScOptionBuilders.PUZZLE_BUILDER.required().build();
+    private final CommandOption<String, ScPuzzle> puzzleOption = ScOptionBuilders.puzzleOptionBuilder().required().build();
     @Getter
     private final ScSolutionRepository repository;
 }

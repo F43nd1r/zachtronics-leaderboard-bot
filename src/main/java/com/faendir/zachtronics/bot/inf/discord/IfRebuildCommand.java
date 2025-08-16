@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 @IfQualifier
 public class IfRebuildCommand extends AbstractRebuildCommand<IfPuzzle> {
     @Getter
-    private final CommandOption<String, IfPuzzle> puzzleOption = IfOptionBuilders.PUZZLE_BUILDER.build();
+    private final CommandOption<String, IfPuzzle> puzzleOption = IfOptionBuilders.puzzleOptionBuilder().build();
     @Getter
     private final Secured secured = IfSecured.WIKI_ADMINS_ONLY;
     @Getter

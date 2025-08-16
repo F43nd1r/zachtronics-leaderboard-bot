@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 @ExaQualifier
 public class ExaRebuildCommand extends AbstractRebuildCommand<ExaPuzzle> {
     @Getter
-    private final CommandOption<String, ExaPuzzle> puzzleOption = ExaOptionBuilders.PUZZLE_BUILDER.build();
+    private final CommandOption<String, ExaPuzzle> puzzleOption = ExaOptionBuilders.puzzleOptionBuilder().build();
 
     @Getter
     private final Secured secured = ExaSecured.WIKI_ADMINS_ONLY;

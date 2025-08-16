@@ -36,8 +36,8 @@ import java.util.List;
 @Component
 @IfQualifier
 public class IfShowCommand extends AbstractShowCommand<IfCategory, IfPuzzle, IfRecord> {
-    private final CommandOption<String, IfPuzzle> puzzleOption = IfOptionBuilders.PUZZLE_BUILDER.required().build();
-    private final CommandOption<String, IfCategory> categoryOption = IfOptionBuilders.CATEGORY_BUILDER.required().build();
+    private final CommandOption<String, IfPuzzle> puzzleOption = IfOptionBuilders.puzzleOptionBuilder().required().build();
+    private final CommandOption<String, IfCategory> categoryOption = IfOptionBuilders.categoryOptionBuilder().required().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(puzzleOption, categoryOption);
     @Getter

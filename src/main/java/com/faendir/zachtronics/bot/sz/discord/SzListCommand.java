@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @SzQualifier
 public class SzListCommand extends AbstractListCommand<SzCategory, SzPuzzle, SzRecord> {
     @Getter
-    private final CommandOption<String, SzPuzzle> puzzleOption = SzOptionBuilders.PUZZLE_BUILDER.required().build();
+    private final CommandOption<String, SzPuzzle> puzzleOption = SzOptionBuilders.puzzleOptionBuilder().required().build();
     @Getter
     private final SzSolutionRepository repository;
 }

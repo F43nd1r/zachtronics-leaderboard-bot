@@ -36,8 +36,8 @@ import java.util.List;
 @Component
 @CwQualifier
 public class CwShowCommand extends AbstractShowCommand<CwCategory, CwPuzzle, CwRecord> {
-    private final CommandOption<String, CwPuzzle> puzzleOption = CwOptionBuilders.PUZZLE_BUILDER.required().build();
-    private final CommandOption<String, CwCategory> categoryOption = CwOptionBuilders.CATEGORY_BUILDER.required().build();
+    private final CommandOption<String, CwPuzzle> puzzleOption = CwOptionBuilders.puzzleOptionBuilder().required().build();
+    private final CommandOption<String, CwCategory> categoryOption = CwOptionBuilders.categoryOptionBuilder().required().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(puzzleOption, categoryOption);
     @Getter

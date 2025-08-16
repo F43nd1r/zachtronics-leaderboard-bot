@@ -20,15 +20,18 @@ import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
 import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.fc.model.FcCategory;
 import com.faendir.zachtronics.bot.fc.model.FcPuzzle;
+import org.jetbrains.annotations.NotNull;
 
 public class FcOptionBuilders {
-    public static final CommandOptionBuilder<String, FcPuzzle> PUZZLE_BUILDER =
-        OptionHelpersKt.enumOptionBuilder("puzzle", FcPuzzle.class, FcPuzzle::getDisplayName)
-                       .description("Puzzle name. Can be shortened or abbreviated. E.g. `2T`, `OHPE`");
+    public static @NotNull CommandOptionBuilder<String, FcPuzzle> puzzleOptionBuilder() {
+        return OptionHelpersKt.enumOptionBuilder("puzzle", FcPuzzle.class, FcPuzzle::getDisplayName)
+                              .description("Puzzle name. Can be shortened or abbreviated. E.g. `2T`, `OHPE`");
+    }
 
-    public static final CommandOptionBuilder<String, FcCategory> CATEGORY_BUILDER =
-        OptionHelpersKt.enumOptionBuilder("category", FcCategory.class, FcCategory::getDisplayName)
-                       .description("Category. E.g. `TCS`, `WST`");
+    public static @NotNull CommandOptionBuilder<String, FcCategory> categoryOptionBuilder() {
+        return OptionHelpersKt.enumOptionBuilder("category", FcCategory.class, FcCategory::getDisplayName)
+                              .description("Category. E.g. `TCS`, `WST`");
+    }
 
     private FcOptionBuilders() {}
 }

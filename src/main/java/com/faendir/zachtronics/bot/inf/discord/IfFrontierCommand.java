@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @IfQualifier
 public class IfFrontierCommand extends AbstractFrontierCommand<IfCategory, IfPuzzle, IfRecord> {
     @Getter
-    private final CommandOption<String, IfPuzzle> puzzleOption = IfOptionBuilders.PUZZLE_BUILDER.required().build();
+    private final CommandOption<String, IfPuzzle> puzzleOption = IfOptionBuilders.puzzleOptionBuilder().required().build();
     @Getter
     private final IfSolutionRepository repository;
 }

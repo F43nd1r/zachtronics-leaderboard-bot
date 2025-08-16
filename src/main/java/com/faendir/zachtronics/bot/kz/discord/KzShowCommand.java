@@ -36,8 +36,8 @@ import java.util.List;
 @Component
 @KzQualifier
 public class KzShowCommand extends AbstractShowCommand<KzCategory, KzPuzzle, KzRecord> {
-    private final CommandOption<String, KzPuzzle> puzzleOption = KzOptionBuilders.PUZZLE_BUILDER.required().build();
-    private final CommandOption<String, KzCategory> categoryOption = KzOptionBuilders.CATEGORY_BUILDER.required().build();
+    private final CommandOption<String, KzPuzzle> puzzleOption = KzOptionBuilders.puzzleOptionBuilder().required().build();
+    private final CommandOption<String, KzCategory> categoryOption = KzOptionBuilders.categoryOptionBuilder().required().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(puzzleOption, categoryOption);
     @Getter

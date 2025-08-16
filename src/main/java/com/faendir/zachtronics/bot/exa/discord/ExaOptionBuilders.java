@@ -20,15 +20,18 @@ import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
 import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.exa.model.ExaCategory;
 import com.faendir.zachtronics.bot.exa.model.ExaPuzzle;
+import org.jetbrains.annotations.NotNull;
 
 public class ExaOptionBuilders {
-    public static final CommandOptionBuilder<String, ExaPuzzle> PUZZLE_BUILDER =
-        OptionHelpersKt.enumOptionBuilder("puzzle", ExaPuzzle.class, ExaPuzzle::getDisplayName)
-                       .description("Puzzle name. Can be shortened or abbreviated. E.g. `Sawa`, `TW1`");
+    public static @NotNull CommandOptionBuilder<String, ExaPuzzle> puzzleOptionBuilder() {
+        return OptionHelpersKt.enumOptionBuilder("puzzle", ExaPuzzle.class, ExaPuzzle::getDisplayName)
+                              .description("Puzzle name. Can be shortened or abbreviated. E.g. `Sawa`, `TW1`");
+    }
 
-    public static final CommandOptionBuilder<String, ExaCategory> CATEGORY_BUILDER =
-        OptionHelpersKt.enumOptionBuilder("category", ExaCategory.class, ExaCategory::getDisplayName)
-                       .description("Category. E.g. `CS`, `cAC`");
+    public static @NotNull CommandOptionBuilder<String, ExaCategory> categoryOptionBuilder() {
+        return OptionHelpersKt.enumOptionBuilder("category", ExaCategory.class, ExaCategory::getDisplayName)
+                              .description("Category. E.g. `CS`, `cAC`");
+    }
 
     private ExaOptionBuilders() {}
 }

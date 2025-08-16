@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @ExaQualifier
 public class ExaFrontierCommand extends AbstractFrontierCommand<ExaCategory, ExaPuzzle, ExaRecord> {
     @Getter
-    private final CommandOption<String, ExaPuzzle> puzzleOption = ExaOptionBuilders.PUZZLE_BUILDER.required().build();
+    private final CommandOption<String, ExaPuzzle> puzzleOption = ExaOptionBuilders.puzzleOptionBuilder().required().build();
     @Getter
     private final ExaSolutionRepository repository;
 }

@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 @CwQualifier
 public class CwRebuildCommand extends AbstractRebuildCommand<CwPuzzle> {
     @Getter
-    private final CommandOption<String, CwPuzzle> puzzleOption = CwOptionBuilders.PUZZLE_BUILDER.build();
+    private final CommandOption<String, CwPuzzle> puzzleOption = CwOptionBuilders.puzzleOptionBuilder().build();
     @Getter
     private final Secured secured = CwSecured.ADMINS_ONLY;
     @Getter

@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @FcQualifier
 public class FcListCommand extends AbstractListCommand<FcCategory, FcPuzzle, FcRecord> {
     @Getter
-    private final CommandOption<String, FcPuzzle> puzzleOption = FcOptionBuilders.PUZZLE_BUILDER.required().build();
+    private final CommandOption<String, FcPuzzle> puzzleOption = FcOptionBuilders.puzzleOptionBuilder().required().build();
     @Getter
     private final FcSolutionRepository repository;
 }
