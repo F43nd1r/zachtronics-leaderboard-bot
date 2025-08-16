@@ -133,5 +133,5 @@ fun createGitRepositoryFrom(dir: File, gitProperties: GitProperties): GitReposit
 
 fun readOnlyLocalClone(dir: String, gitProperties: GitProperties): GitRepository {
     val f = File(dir)
-    return GitRepository(gitProperties.apply { readonlyMode = true }, f.name, f.toURI().toString())
+    return GitRepository(gitProperties.apply { readonlyMode = true }, f.name, f.toURI().toString(), deleteOnClose = false)
 }

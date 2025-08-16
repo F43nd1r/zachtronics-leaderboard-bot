@@ -43,7 +43,13 @@ import java.io.File
 import java.nio.file.Files
 import java.util.concurrent.locks.Lock
 
-open class GitRepository(private val gitProperties: GitProperties, val name: String, val url: String, branch: String? = null) {
+open class GitRepository(
+    private val gitProperties: GitProperties,
+    val name: String,
+    val url: String,
+    branch: String? = null,
+    private val deleteOnClose: Boolean = true,
+) {
     companion object {
         private val logger = LoggerFactory.getLogger(GitRepository::class.java)
     }
@@ -215,7 +221,7 @@ open class GitRepository(private val gitProperties: GitProperties, val name: Str
     @PreDestroy
     open fun cleanup() {
         git.close()
-        repo.deleteRecursively()
+        if (deleteOnClose) repo.deleteRecursively()
     }
 }
 
