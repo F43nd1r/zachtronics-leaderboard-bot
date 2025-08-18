@@ -92,7 +92,7 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
     @Override
     @NotNull
     protected Path relativePuzzlePath(@NotNull SzPuzzle puzzle) {
-        return Paths.get(puzzle.getGroup().getRepoFolder()).resolve(puzzle.getId());
+        return Paths.get(puzzle.getGroup().name()).resolve(puzzle.getId());
     }
 
     @NotNull

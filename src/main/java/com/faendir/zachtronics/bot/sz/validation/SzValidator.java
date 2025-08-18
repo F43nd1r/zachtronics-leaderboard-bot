@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,8 @@ public class SzValidator {
         SzScore score = new SzScore(save.cost(), save.getPowerUsage(), save.lines());
 
         String title = save.getName().replace(" (Copy)", ""); // try to cut down on duplicate churn
+        if (title.length() > 100)
+            title = title.substring(0, 100) + "...";
         data = data.replaceFirst("^\n*\\[name] .*", "[name] " + title);
 
         return new SzSubmission(puzzle, score, author, displayLink, data);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum SzGroup implements Group {
-    FIRST_CAMPAIGN("First Campaign", "first_campaign"),
-    SECOND_CAMPAIGN("Second Campaign", "second_campaign"),
-    BONUS_PUZZLES("Bonus Puzzles", "bonus_puzzles");
+    FIRST_CAMPAIGN("First Campaign"),
+    SECOND_CAMPAIGN("Second Campaign"),
+    BONUS_PUZZLES("Bonus Puzzles");
 
     private final String displayName;
-    private final String repoFolder;
 }

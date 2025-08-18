@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ class SzSaveTest {
     @Test
     void unmarshalGood() throws IOException {
         ClassPathResource resource = new ClassPathResource(
-                "repositories/sz-leaderboard/first_campaign/fake-surveillance-camera/fake-surveillance-camera-6-57-8.txt");
+                "repositories/sz-leaderboard/FIRST_CAMPAIGN/fake-surveillance-camera/fake-surveillance-camera-6-57-8.txt");
         String solution = Files.readString(resource.getFile().toPath());
         SzSave save = SzSave.unmarshal(solution);
 
