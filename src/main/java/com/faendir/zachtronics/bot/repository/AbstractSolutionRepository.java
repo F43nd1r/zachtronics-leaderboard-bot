@@ -320,6 +320,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         catch (NoSuchFileException e) {
             Files.createDirectories(puzzlePath);
             Files.createFile(indexPath);
+            Files.createSymbolicLink(puzzlePath.resolve("README.txt"), Path.of("solutions.psv"));
             return new ArrayList<>();
         }
     }
