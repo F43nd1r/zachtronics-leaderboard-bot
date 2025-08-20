@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,16 +47,16 @@ public enum FcPuzzle implements Puzzle<FcCategory> {
     SUSHI_YEAH(21, "sushi-yeah!", FcGroup.CAMPAIGN, FcType.STANDARD, "Sushi Yeah!");
 
     private final int number;
-    private final String internalName;
+    private final String id;
     private final FcGroup group;
     private final FcType type;
     private final String displayName;
     private final List<FcCategory> supportedCategories;
     private final String link;
 
-    FcPuzzle(int number, String internalName, FcGroup group, FcType type, String displayName) {
+    FcPuzzle(int number, String id, FcGroup group, FcType type, String displayName) {
         this.number = number;
-        this.internalName = internalName;
+        this.id = id;
         this.group = group;
         this.type = type;
         this.displayName = displayName;

@@ -95,7 +95,7 @@ public class FcSolutionRepository extends AbstractSolutionRepository<FcCategory,
     @Override
     @NotNull
     protected Path relativePuzzlePath(@NotNull FcPuzzle puzzle) {
-        return Paths.get(puzzle.getGroup().name()).resolve(puzzle.getInternalName());
+        return Paths.get(puzzle.getGroup().name()).resolve(puzzle.getId());
     }
 
     @NotNull
@@ -106,7 +106,7 @@ public class FcSolutionRepository extends AbstractSolutionRepository<FcCategory,
     @NotNull
     @Override
     protected String makeArchiveLink(@NotNull FcPuzzle puzzle, @NotNull FcScore score) {
-        return makeArchiveLink(puzzle, makeFilename(puzzle.getInternalName(), score));
+        return makeArchiveLink(puzzle, makeFilename(puzzle.getId(), score));
     }
 
     @Override
