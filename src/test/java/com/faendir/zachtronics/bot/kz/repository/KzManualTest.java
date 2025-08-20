@@ -24,6 +24,7 @@ import com.faendir.zachtronics.bot.kz.model.*;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
+import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Disabled;
@@ -37,9 +38,12 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -208,6 +212,39 @@ public class KzManualTest {
          */
 
         System.out.println("Done");
+    }
+
+    @Test
+    public void importFromObsoleteLb() throws IOException {
+        // Portable Radio     | [(1/10/18) Community](https://imgur.com/a/xI5sG3k)
+        Pattern pattern = Pattern.compile("\\[?\\(" + KzScore.REGEX_SCORE + "\\) (?<author>[^]]+)(?:\\]\\((?<displayLink>[^)]+)\\))?");
+        Path obsoletePath = Paths.get("../kaizen/Obsolete_Kaizen_Leaderboard.md");
+        List<String> lines = Files.readAllLines(obsoletePath);
+        for (String line : lines) {
+            String[] fields = line.split(" *\\| *");
+            KzPuzzle puzzle = findPuzzle(fields[0]);
+            for (int i = 1; i < fields.length; i++) {
+                Matcher m = pattern.matcher(fields[i]);
+                if (!m.matches()) {
+                    System.err.println("Failed to parse: " + fields[i]);
+                    continue;
+                }
+                String author = m.group("author");
+                String displayLink = m.group("displayLink");
+                KzScore score = KzScore.parseScore(m);
+                KzSubmission submission = new KzSubmission(puzzle, score, author + "@" + displayLink, null, new byte[0]);
+                repository.submit(submission);
+            }
+        }
+        // find . -size 0 -print -delete
+    }
+
+    private static KzPuzzle findPuzzle(@NotNull String levelName) {
+        List<KzPuzzle> candidates = UtilsKt.fuzzyMatch(Arrays.asList(KzPuzzle.values()), levelName, KzPuzzle::getDisplayName);
+        if (candidates.size() == 1)
+            return candidates.get(0);
+        else
+            throw new IllegalStateException("\"" + levelName + "\" bad");
     }
 
 }

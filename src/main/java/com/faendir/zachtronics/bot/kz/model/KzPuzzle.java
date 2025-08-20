@@ -31,7 +31,7 @@ public enum KzPuzzle implements Puzzle<KzCategory> {
     PORTABLE_RADIO(2, NORMAL_CAMPAIGN, "Portable radio"),
     WORLD_CLOCK(1, NORMAL_CAMPAIGN, "World clock"),
     SPORT_WATCH(3, NORMAL_CAMPAIGN, "Sport watch"),
-    FIELD_BINOCULAR(4, NORMAL_CAMPAIGN, "Field binocular"),
+    FIELD_BINOCULARS(4, NORMAL_CAMPAIGN, "Field binoculars"),
     DEFENDER_BOT(5, NORMAL_CAMPAIGN, "Defender bot"),
 
     ONIGIRI(11, NORMAL_CAMPAIGN, "Onigiri"),

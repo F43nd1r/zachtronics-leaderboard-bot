@@ -25,6 +25,7 @@ import lombok.Value;
 import lombok.With;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Objects;
@@ -41,7 +42,7 @@ public class KzSolution implements Solution<KzCategory, KzPuzzle, KzScore, KzRec
 
     @Override
     public KzRecord extendToRecord(KzPuzzle puzzle, String dataLink, Path dataPath) {
-        if (dataPath != null)
+        if (dataPath != null && Files.exists(dataPath))
             return new KzRecord(puzzle, score, author, displayLink, dataLink, dataPath);
         else
             return new KzRecord(puzzle, score, author, displayLink, null, null);

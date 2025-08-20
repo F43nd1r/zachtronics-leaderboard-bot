@@ -43,7 +43,7 @@ public class KzScore implements Score<KzCategory> {
     }
 
     /** tt/cc/aa */
-    private static final Pattern REGEX_SCORE = Pattern.compile(
+    public static final Pattern REGEX_SCORE = Pattern.compile(
             "\\**(?<time>\\d+)\\**/\\**(?<cost>\\d+)\\**/\\**(?<area>\\d+)\\**");
 
     /** <tt>tt/cc/aa</tt>, tolerates extra <tt>*</tt> */
