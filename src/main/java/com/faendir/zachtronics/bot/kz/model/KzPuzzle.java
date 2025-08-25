@@ -72,6 +72,7 @@ public enum KzPuzzle implements Puzzle<KzCategory> {
     ARCHERY_TARGET(109, BONUS_CAMPAIGN, "Archery target"),
     ELECTRIC_GUITAR(103, BONUS_CAMPAIGN, "Electric guitar"),
     CHESS_COMPUTER(107, BONUS_CAMPAIGN, "Chess computer"),
+    BOOMBOX(102, BONUS_CAMPAIGN, "Boombox"),
     ;
 
     private final int id;
