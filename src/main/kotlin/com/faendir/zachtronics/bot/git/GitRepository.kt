@@ -47,7 +47,7 @@ open class GitRepository(
     private val gitProperties: GitProperties,
     val name: String,
     val url: String,
-    branch: String? = null,
+    private val branch: String = "master",
     private val deleteOnClose: Boolean = true,
 ) {
     companion object {
@@ -55,7 +55,7 @@ open class GitRepository(
     }
 
     val rawFilesUrl = Regex("github.com/([^/]+)/([^/.]+)(?:.git)?")
-        .replaceFirst(url, "raw.githubusercontent.com/$1/$2/${branch ?: "master"}")
+        .replaceFirst(url, "raw.githubusercontent.com/$1/$2/$branch")
     private val repo = Files.createTempDirectory(name).toFile()
     private val git: Git
     private val lock = CycleDetectingLockFactory.newInstance(CycleDetectingLockFactory.Policies.WARN).newReentrantReadWriteLock(name)
@@ -89,7 +89,9 @@ open class GitRepository(
         var write: ReadWriteAccess? = null
         try {
             write = ReadWriteAccess(writeLock, repo)
-            git.pull().setTimeout(120).call()
+            git.fetch().setTimeout(120).call()
+            git.reset().setMode(ResetCommand.ResetType.HARD).setRef("origin/$branch").call()
+            updateRemoteHash(write.currentHash())
         } catch (t: Throwable) {
             write?.close()
             throw t
@@ -116,6 +118,7 @@ open class GitRepository(
     }
 
     fun updateRemoteHash(remoteHash: String) {
+        // there are all sort of race conditions here, we just don't care
         this.remoteHash = remoteHash
     }
 
@@ -210,6 +213,7 @@ open class GitRepository(
                 git.push().setCredentialsProvider(UsernamePasswordCredentialsProvider(gitProperties.username, gitProperties.accessToken))
                     .setTimeout(120).call()
             }
+            updateRemoteHash(currentHash())
         }
 
         fun resetAndClean(file: File) {
