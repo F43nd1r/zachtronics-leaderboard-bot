@@ -39,7 +39,7 @@ allprojects {
 
     tasks.withType<KotlinCompile> {
         compilerOptions {
-            jvmTarget = JvmTarget.JVM_17
+            jvmTarget = JvmTarget.JVM_24
             freeCompilerArgs = listOf("-Xjvm-default=all", "-Xjsr305=strict")
         }
     }
@@ -67,11 +67,15 @@ dependencies {
     implementation(libs.guava)
     implementation(libs.opencsv)
     implementation(libs.ffmpeg)
+    implementation(libs.annotations)
+    implementation(libs.checker)
 
     testImplementation(libs.spring.boot.test)
     testImplementation(libs.trove4j)
     testImplementation(libs.springmockk)
     testImplementation(libs.strikt)
+
+    testRuntimeOnly(libs.junit.launcher)
 }
 
 tasks.withType<Test> {
@@ -92,11 +96,12 @@ tasks.withType<Test> {
             }
         }
     })
+    jvmArgs = jvmArgs + "-XX:+EnableDynamicAgentLoading" // see https://github.com/mockito/mockito/issues/3037
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_24
+    targetCompatibility = JavaVersion.VERSION_24
 }
 
 tasks.getByName<Jar>("jar") {
@@ -109,15 +114,14 @@ kotlinLombok {
 
 frontend {
     nodeVersion.set(libs.versions.nodejs)
-    nodeInstallDirectory.set(file("${project.buildDir}/nodejs"))
+    nodeInstallDirectory.set(layout.buildDirectory.file("nodejs").get().asFile)
     packageJsonDirectory.set(file("web"))
     assembleScript.set("build")
-    cleanScript.set("clean")
 }
 
 tasks.installNode {
     inputs.property("nodejsVersion", libs.versions.nodejs)
-    outputs.dir("${project.buildDir}/nodejs")
+    outputs.dir(layout.buildDirectory.dir("nodejs"))
 }
 
 tasks.installFrontend {
@@ -150,7 +154,7 @@ tasks.assembleFrontend {
 val copyWebApp = tasks.register<Copy>("copyWebApp") {
     group = "frontend"
     from("web/build")
-    into("${project.buildDir}/resources/main/static/")
+    into(layout.buildDirectory.dir("resources/main/static/"))
     dependsOn(tasks.assembleFrontend)
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,17 @@ import java.io.InputStream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class JNISolutionVerifierTest {
+public class OmSolutionVerifierTest {
 
     @Test
     void goodAndBad() throws IOException {
         try (InputStream puzzle = getClass().getClassLoader().getResource("P009.puzzle").openStream();
              InputStream solution = getClass().getClassLoader().getResource("Face_Powder_Height_1.solution").openStream();
-             JNISolutionVerifier verifier = JNISolutionVerifier.open(puzzle.readAllBytes(), solution.readAllBytes())) {
+
+             OmSolutionVerifier verifier = new OmSolutionVerifier(puzzle.readAllBytes(), solution.readAllBytes())) {
             // good
             assertEquals(1, verifier.getMetric(OmSimMetric.HEIGHT.INSTANCE));
+            assertEquals(0, verifier.getApproximateMetric(OmSimMetric.PER_REPETITION_SQUARED_AREA.INSTANCE));
             // bad on purpose
             assertThrows(OmSimException.class, () -> verifier.getMetric(new OmSimMetric.INSTRUCTIONS_WITH_HOTKEY("wrong!")));
             // ensure error is reset

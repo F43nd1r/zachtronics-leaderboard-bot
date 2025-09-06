@@ -24,7 +24,7 @@ import com.faendir.zachtronics.bot.discord.command.security.DiscordUserSecured
 import com.faendir.zachtronics.bot.discord.embed.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.discord.embed.SafeMessageBuilder
 import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.om.JNISolutionVerifier
+import com.faendir.zachtronics.bot.om.OmSolutionVerifier
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.MeasurePoint
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
@@ -78,7 +78,7 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.
                 }
 
             for ((record, _) in records) {
-                val newScore = JNISolutionVerifier.open(puzzleFile.readBytes(), record.dataPath.readBytes())
+                val newScore = OmSolutionVerifier(puzzleFile.readBytes(), record.dataPath.readBytes())
                     .use { verifier -> verifier.getScore(puzzle.type) }
                 if (newScore != record.score) {
                     overrideRecords.add(record to newScore)

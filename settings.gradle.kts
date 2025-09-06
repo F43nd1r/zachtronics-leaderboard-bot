@@ -26,7 +26,5 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         mavenCentral() //required for ksp
-        maven { url = uri("https://repo.nokee.dev/release") }
-        maven { url = uri("https://repo.nokee.dev/snapshot") }
     }
 }
