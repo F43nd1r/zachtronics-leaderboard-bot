@@ -31,12 +31,12 @@ public class NativeLoader {
             System.loadLibrary(libName);
         } catch (UnsatisfiedLinkError ex) {
             String filename = "lib" + libName + ".so";
-            URL url = classLoader.getResource(filename);
+            URL url = classLoader.getResource("lib/" + filename);
             if (url == null) {
                 throw new IllegalArgumentException("Failed to find shared library " + filename);
             }
             try {
-                File file = Files.createTempFile("jni", filename).toFile();
+                File file = Files.createTempFile("load", filename).toFile();
                 file.deleteOnExit();
                 try (InputStream in = url.openStream()) {
                     Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);

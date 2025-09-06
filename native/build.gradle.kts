@@ -13,34 +13,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import org.gradle.internal.os.OperatingSystem
+import java.net.URI
+
 plugins {
     java
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.nokee.jni)
-    alias(libs.plugins.nokee.c.language)
     alias(libs.plugins.gradle.lombok)
 }
 
 group = ""
 
-sourceSets {
-    create("omsim")
+
+val omsimUrl =
+    "https://github.com/ianh/omsim/releases/download/libverify-${OperatingSystem.current().familyName}-x86_64/libverify.so"
+val omsimLib = layout.buildDirectory.file("downloaded/libverify-om.so")
+
+val downloadFile by tasks.registering {
+    outputs.file(omsimLib)
+    doLast {
+        val target = omsimLib.get().asFile
+        target.parentFile.mkdirs()
+        if (!target.exists()) {
+            URI(omsimUrl).toURL().openStream().use { input ->
+                target.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+        }
+    }
 }
 
-library {
-    targetMachines.set(listOf(machines.linux.x86_64))
-
-    val grabFiles = { type: String -> // this is megabrittle
-        file("src/omsim/c/Makefile").readLines().first { it.startsWith("$type=") }.removePrefix("$type=").split(" ")
-            .map { file("src/omsim/c/$it") }
+tasks.processResources {
+    dependsOn(downloadFile)
+    from(omsimLib) {
+        into("lib")
     }
-
-    cSources.from(grabFiles("SOURCE"))
-    privateHeaders.from(grabFiles("HEADER"))
 }
 
 dependencies {
+    implementation(libs.annotations)
     testImplementation(libs.junit)
+    testRuntimeOnly(libs.junit.launcher)
 }
 
 tasks {
@@ -49,8 +64,5 @@ tasks {
     }
     withType<Jar> {
         duplicatesStrategy = DuplicatesStrategy.WARN // TODO
-    }
-    withType<CCompile> {
-        isOptimized = true
     }
 }
