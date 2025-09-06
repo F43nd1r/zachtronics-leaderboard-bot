@@ -2,8 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "ignoreDeps": [
     "openjdk",
-    "gradle",
-    "org.springframework.boot",
+    "org.jetbrains.kotlinx:kotlinx-datetime",
     "com.discord4j:discord4j-core"
   ],
   "extends": [
@@ -32,8 +31,5 @@
         "/^com\\.google\\.devtools\\.ksp/"
       ]
     }
-  ],
-  "git-submodules": {
-    "enabled": true
-  }
+  ]
 }

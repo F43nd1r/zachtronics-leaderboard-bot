@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.faendir.zachtronics.bot.om
+package com.faendir.zachtronics.bot.om.validation
 
 /** see http://events.critelli.technology/static/metrics.html */
 @Suppress("ClassName", "Unused")

@@ -26,9 +26,7 @@ import org.springframework.http.ContentDisposition;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.util.EnumSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,7 +67,7 @@ public final class Utils {
 
     public static @NotNull FileInfo downloadFile(@NotNull String link) {
         try {
-            URLConnection connection = new URL(Utils.rawContentURL(link)).openConnection();
+            URLConnection connection = new URI(Utils.rawContentURL(link)).toURL().openConnection();
             try (InputStream is = connection.getInputStream()) { // we're connected now
                 String filename = null;
                 String cdHeader = connection.getHeaderField("content-disposition");
@@ -77,7 +75,7 @@ public final class Utils {
                     filename = ContentDisposition.parse(cdHeader).getFilename();
                 return new FileInfo(filename, is.readAllBytes());
             }
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | URISyntaxException e) {
             throw new IllegalArgumentException("Could not parse your link");
         } catch (IOException e) {
             throw new IllegalArgumentException("Could not read your solution");

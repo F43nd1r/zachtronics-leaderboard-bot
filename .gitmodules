@@ -1,3 +1,0 @@
-[submodule "native/src/omsim/c"]
-	path = native/src/omsim/c
-	url = https://github.com/ianh/omsim.git

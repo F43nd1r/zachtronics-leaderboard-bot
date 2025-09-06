@@ -23,9 +23,6 @@ import com.faendir.om.parser.solution.model.part.ArmType
 import com.faendir.om.parser.solution.model.part.Glyph
 import com.faendir.om.parser.solution.model.part.GlyphType
 import com.faendir.om.parser.solution.model.part.IO
-import com.faendir.zachtronics.bot.om.JNISolutionVerifier
-import com.faendir.zachtronics.bot.om.OmSimException
-import com.faendir.zachtronics.bot.om.OmSimMetric
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmSubmission
@@ -42,13 +39,7 @@ import kotlin.math.abs
 import kotlin.math.ceil
 
 
-private fun JNISolutionVerifier.getMetricSafe(metric: OmSimMetric) = try {
-    getMetric(metric)
-} catch (e: OmSimException) {
-    null
-}
-
-private fun JNISolutionVerifier.getAreaINF(outputsAtINF: Int?): LevelValue? {
+private fun OmSolutionVerifier.getAreaINF(outputsAtINF: Int?): LevelValue? {
     if (outputsAtINF == null)
         return null
     val a2 = getApproximateMetric(OmSimMetric.PER_REPETITION_SQUARED_AREA)
@@ -59,7 +50,7 @@ private fun JNISolutionVerifier.getAreaINF(outputsAtINF: Int?): LevelValue? {
     return LevelValue(0, a0.toDouble())
 }
 
-fun JNISolutionVerifier.getScore(type: OmType): OmScore {
+fun OmSolutionVerifier.getScore(type: OmType): OmScore {
     // null or 0 PER_REPETITION_OUTPUTS means the solution doesn't output infinite products, hence cannot have a @INF point
     val outputsAtINF: Int? = getMetricSafe(OmSimMetric.PER_REPETITION_OUTPUTS)?.takeIf { it != 0 }
 
@@ -136,7 +127,7 @@ fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSub
         }
         ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
     val puzzleFile = puzzle.file
-    JNISolutionVerifier.open(puzzleFile.readBytes(), solutionBytes).use { verifier ->
+    OmSolutionVerifier(puzzleFile.readBytes(), solutionBytes).use { verifier ->
         if (verifier.getMetric(OmSimMetric.MAXIMUM_TRACK_GAP_POW_2) > 1) {
             throw IllegalArgumentException("Quantum Tracks are banned.")
         }
