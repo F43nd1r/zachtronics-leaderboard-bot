@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import com.faendir.zachtronics.bot.om.model.MeasurePoint.*
 import com.faendir.zachtronics.bot.om.model.OmMetric.*
 import com.faendir.zachtronics.bot.om.model.OmType.*
 import com.faendir.zachtronics.bot.utils.newEnumSet
-import java.util.*
 
 private val FREESPACE_TYPES = setOf(NORMAL, POLYMER)
 

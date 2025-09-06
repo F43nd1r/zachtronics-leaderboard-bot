@@ -25,7 +25,6 @@ import com.faendir.zachtronics.bot.kz.model.KzPuzzle;
 import com.faendir.zachtronics.bot.kz.model.KzRecord;
 import com.faendir.zachtronics.bot.kz.model.KzSubmission;
 import com.faendir.zachtronics.bot.kz.repository.KzSolutionRepository;
-import com.faendir.zachtronics.bot.sz.discord.SzSecured;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

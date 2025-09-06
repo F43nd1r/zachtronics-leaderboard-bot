@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@ import java.time.Duration
 class MorsService(private val morsProperties: MorsProperties, restTemplateBuilder: RestTemplateBuilder) {
     private val rootUrl = "https://${morsProperties.region}.storage.bunnycdn.com/${morsProperties.storageZone}"
     private val restTemplate = restTemplateBuilder
-        .setReadTimeout(Duration.ofMinutes(5))
-        .setConnectTimeout(Duration.ofMinutes(5))
+        .readTimeout(Duration.ofMinutes(5))
+        .connectTimeout(Duration.ofMinutes(5))
         .build()
 
     private val ffmpeg = FFmpegExecutor(FFmpeg("/usr/bin/ffmpeg"), FFprobe("/usr/bin/ffprobe"))

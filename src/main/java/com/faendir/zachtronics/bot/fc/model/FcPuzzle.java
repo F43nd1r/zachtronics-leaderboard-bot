@@ -24,27 +24,27 @@ import java.util.List;
 
 @Getter
 public enum FcPuzzle implements Puzzle<FcCategory> {
-    TWO_TWELVE(1, "2twelve", FcGroup.CAMPAIGN, FcType.STANDARD, "2Twelve"),
-    HOT_POCKET(2, "original-hot-pocket-experience", FcGroup.CAMPAIGN, FcType.STANDARD, "Original Hot Pocket Experience"),
-    WINE_OCLOCK(3, "wine-oclock", FcGroup.CAMPAIGN, FcType.STANDARD, "Wine O'Clock"),
-    MUMBAI_CHAAT(4, "mumbai-chaat", FcGroup.CAMPAIGN, FcType.STANDARD, "Mumbai Chaat"),
-    MR_CHILLY(5, "mr.-chilly", FcGroup.CAMPAIGN, FcType.STANDARD, "Mr. Chilly"),
-    KAZAN(6, "kazan", FcGroup.CAMPAIGN, FcType.STANDARD, "KAZAN"),
-    SODA_TRENCH(7, "soda-trench", FcGroup.CAMPAIGN, FcType.STANDARD, "Soda Trench"),
-    ROSIES_DOUGHNUTS(8, "rosies-doughnuts", FcGroup.CAMPAIGN, FcType.STANDARD, "Rosie's Doughnuts"),
-    ON_THE_FRIED_SIDE(9, "on-the-fried-side", FcGroup.CAMPAIGN, FcType.STANDARD, "On the Fried Side"),
-    SWEET_HEAT_BBQ(10, "sweet-heat-bbq", FcGroup.CAMPAIGN, FcType.STANDARD, "Sweet Heat BBQ"),
-    THE_WALRUS(11, "the-walrus", FcGroup.CAMPAIGN, FcType.STANDARD, "The Walrus"),
-    MEAT_3(12, "meat+3", FcGroup.CAMPAIGN, FcType.STANDARD, "Meat+3"),
-    CAFE_TRISTE(13, "cafe-triste", FcGroup.CAMPAIGN, FcType.STANDARD, "Cafe Triste"),
-    THE_COMMISSARY(14, "the-commissary", FcGroup.CAMPAIGN, FcType.STANDARD, "The Commissary"),
-    DA_WINGS(15, "da-wings", FcGroup.CAMPAIGN, FcType.STANDARD, "Da Wings"),
-    BREAKSIDE_GRILL(16, "breakside-grill", FcGroup.CAMPAIGN, FcType.STANDARD, "Breakside Grill"),
-    CHAZ_CHEDDAR(17, "chaz-cheddar", FcGroup.CAMPAIGN, FcType.STANDARD, "Chaz Cheddar"),
-    HALF_CAFF_COFFEE(18, "half-caff-coffee", FcGroup.CAMPAIGN, FcType.STANDARD, "Half Caff Coffee"),
-    MILDREDS_NOOK(19, "mildreds-nook", FcGroup.CAMPAIGN, FcType.STANDARD, "Mildred's Nook"),
-    BELLYS(20, "bellys", FcGroup.CAMPAIGN, FcType.STANDARD, "Belly's"),
-    SUSHI_YEAH(21, "sushi-yeah!", FcGroup.CAMPAIGN, FcType.STANDARD, "Sushi Yeah!");
+    TWO_TWELVE(1, "2twelve", "2Twelve"),
+    HOT_POCKET(2, "original-hot-pocket-experience", "Original Hot Pocket Experience"),
+    WINE_OCLOCK(3, "wine-oclock", "Wine O'Clock"),
+    MUMBAI_CHAAT(4, "mumbai-chaat", "Mumbai Chaat"),
+    MR_CHILLY(5, "mr.-chilly", "Mr. Chilly"),
+    KAZAN(6, "kazan", "KAZAN"),
+    SODA_TRENCH(7, "soda-trench", "Soda Trench"),
+    ROSIES_DOUGHNUTS(8, "rosies-doughnuts", "Rosie's Doughnuts"),
+    ON_THE_FRIED_SIDE(9, "on-the-fried-side", "On the Fried Side"),
+    SWEET_HEAT_BBQ(10, "sweet-heat-bbq", "Sweet Heat BBQ"),
+    THE_WALRUS(11, "the-walrus", "The Walrus"),
+    MEAT_3(12, "meat+3", "Meat+3"),
+    CAFE_TRISTE(13, "cafe-triste", "Cafe Triste"),
+    THE_COMMISSARY(14, "the-commissary", "The Commissary"),
+    DA_WINGS(15, "da-wings", "Da Wings"),
+    BREAKSIDE_GRILL(16, "breakside-grill", "Breakside Grill"),
+    CHAZ_CHEDDAR(17, "chaz-cheddar", "Chaz Cheddar"),
+    HALF_CAFF_COFFEE(18, "half-caff-coffee", "Half Caff Coffee"),
+    MILDREDS_NOOK(19, "mildreds-nook", "Mildred's Nook"),
+    BELLYS(20, "bellys", "Belly's"),
+    SUSHI_YEAH(21, "sushi-yeah!", "Sushi Yeah!");
 
     private final int number;
     private final String id;
@@ -54,11 +54,11 @@ public enum FcPuzzle implements Puzzle<FcCategory> {
     private final List<FcCategory> supportedCategories;
     private final String link;
 
-    FcPuzzle(int number, String id, FcGroup group, FcType type, String displayName) {
+    FcPuzzle(int number, String id, String displayName) {
         this.number = number;
         this.id = id;
-        this.group = group;
-        this.type = type;
+        this.group = FcGroup.CAMPAIGN;
+        this.type = FcType.STANDARD;
         this.displayName = displayName;
         this.supportedCategories = Arrays.stream(FcCategory.values())
                                          .filter(c -> c.getSupportedTypes().contains(type))
