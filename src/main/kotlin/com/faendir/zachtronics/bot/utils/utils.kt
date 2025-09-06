@@ -32,7 +32,7 @@ import discord4j.core.spec.EmbedCreateFields
 import discord4j.core.spec.EmbedCreateSpec
 import discord4j.core.spec.InteractionReplyEditMono
 import java.net.HttpURLConnection
-import java.net.URL
+import java.net.URI
 import java.util.*
 
 private val wordSeparator = Regex("[\\s-/,:]+")
@@ -120,7 +120,7 @@ inline fun <reified T : Enum<T>> newEnumSet(): EnumSet<T> = EnumSet.noneOf(T::cl
 
 fun isValidLink(string: String): Boolean {
     return try {
-        val url = URL(string)
+        val url = URI(string).toURL()
         if (url.host.contains("reddit.com")) // the bot IP has been banned from reddit crawling, we just accept them
             return true
         val connection = url.openConnection() as HttpURLConnection

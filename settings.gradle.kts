@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,13 @@
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 rootProject.name = "zachtronics-leaderboard-bot"
-rootDir.listFiles()?.forEach {
-    if(it.isDirectory && it.list()?.contains("build.gradle.kts") == true) {
-        include(it.name)
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        google()
+        maven { setUrl("https://oss.sonatype.org/content/repositories/snapshots") }
+        mavenLocal()
     }
 }
 
@@ -26,7 +30,5 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         mavenCentral() //required for ksp
-        maven { url = uri("https://repo.nokee.dev/release") }
-        maven { url = uri("https://repo.nokee.dev/snapshot") }
     }
 }

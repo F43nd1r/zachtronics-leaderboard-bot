@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
+import de.undercouch.gradle.tasks.download.Download
+import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    java
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.plugin.serialization)
     alias(libs.plugins.kotlin.plugin.lombok)
@@ -27,22 +30,7 @@ plugins {
     alias(libs.plugins.gradle.lombok)
     alias(libs.plugins.gradle.gitProperties)
     alias(libs.plugins.gradle.frontend)
-}
-
-allprojects {
-    repositories {
-        mavenCentral()
-        google()
-        maven { setUrl("https://oss.sonatype.org/content/repositories/snapshots") }
-        mavenLocal()
-    }
-
-    tasks.withType<KotlinCompile> {
-        compilerOptions {
-            jvmTarget = JvmTarget.JVM_17
-            freeCompilerArgs = listOf("-Xjvm-default=all", "-Xjsr305=strict")
-        }
-    }
+    alias(libs.plugins.gradle.download)
 }
 
 dependencies {
@@ -59,7 +47,6 @@ dependencies {
     implementation(libs.jraw)
     implementation(libs.om.dsl)
     implementation(libs.om.parser)
-    implementation(projects.native)
     implementation(libs.jackson.databind)
     implementation(libs.jackson.kotlin)
     implementation(libs.jackson.jsr310)
@@ -67,11 +54,22 @@ dependencies {
     implementation(libs.guava)
     implementation(libs.opencsv)
     implementation(libs.ffmpeg)
+    implementation(libs.annotations)
+    implementation(libs.checker)
 
     testImplementation(libs.spring.boot.test)
     testImplementation(libs.trove4j)
     testImplementation(libs.springmockk)
     testImplementation(libs.strikt)
+
+    testRuntimeOnly(libs.junit.launcher)
+}
+
+tasks.withType<KotlinCompile> {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_24
+        freeCompilerArgs = listOf("-Xjvm-default=all", "-Xjsr305=strict", "-Xannotation-default-target=param-property")
+    }
 }
 
 tasks.withType<Test> {
@@ -92,11 +90,13 @@ tasks.withType<Test> {
             }
         }
     })
+    jvmArgs = jvmArgs + "-XX:+EnableDynamicAgentLoading" // see https://github.com/mockito/mockito/issues/3037
+    jvmArgs = jvmArgs + "--enable-native-access=ALL-UNNAMED" // FFM API
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_24
+    targetCompatibility = JavaVersion.VERSION_24
 }
 
 tasks.getByName<Jar>("jar") {
@@ -109,15 +109,14 @@ kotlinLombok {
 
 frontend {
     nodeVersion.set(libs.versions.nodejs)
-    nodeInstallDirectory.set(file("${project.buildDir}/nodejs"))
+    nodeInstallDirectory.set(layout.buildDirectory.file("nodejs").get().asFile)
     packageJsonDirectory.set(file("web"))
     assembleScript.set("build")
-    cleanScript.set("clean")
 }
 
 tasks.installNode {
     inputs.property("nodejsVersion", libs.versions.nodejs)
-    outputs.dir("${project.buildDir}/nodejs")
+    outputs.dir(layout.buildDirectory.dir("nodejs"))
 }
 
 tasks.installFrontend {
@@ -141,7 +140,7 @@ tasks.assembleFrontend {
     }
     outputs.dir("web/build")
     doLast {
-        if(outputs.files.asFileTree.none { it.isFile }) {
+        if (outputs.files.asFileTree.none { it.isFile }) {
             throw GradleException("Failed to build frontend")
         }
     }
@@ -150,10 +149,26 @@ tasks.assembleFrontend {
 val copyWebApp = tasks.register<Copy>("copyWebApp") {
     group = "frontend"
     from("web/build")
-    into("${project.buildDir}/resources/main/static/")
+    into(layout.buildDirectory.dir("resources/main/static/"))
     dependsOn(tasks.assembleFrontend)
 }
 
 tasks.processResources.configure {
     dependsOn(copyWebApp)
+}
+
+val omsimLibDest = layout.buildDirectory.file("downloaded/libverify-om.so")
+
+val downloadOmsim by tasks.registering(Download::class) {
+    src("https://github.com/ianh/omsim/releases/download/libverify-${OperatingSystem.current().familyName}-x86_64/libverify.so")
+    dest(omsimLibDest)
+    onlyIfModified(true)
+    useETag(true)
+}
+
+tasks.processResources.configure {
+    dependsOn(downloadOmsim)
+    from(omsimLibDest) {
+        into("lib")
+    }
 }

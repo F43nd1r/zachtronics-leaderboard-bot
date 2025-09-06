@@ -187,7 +187,7 @@ class OmLeaderboardFixer {
     fun `fix data links`() {
         val root = File("../opus_magnum/leaderboard")
         val mapper = OmUrlMapper()
-        val exec = Runtime.getRuntime().exec("git rev-parse --short HEAD", null, root)
+        val exec = ProcessBuilder("git", "rev-parse", "--short", "HEAD").directory(root).start()
         exec.waitFor()
         val commitHash = exec.inputStream.bufferedReader().readText().trim().substring(0, 8)
         getAllRecordFiles(root).asStream().parallel()

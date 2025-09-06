@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,38 +14,43 @@
  * limitations under the License.
  */
 
-package com.faendir.zachtronics.bot.om;
+package com.faendir.zachtronics.bot.validation;
 
-import java.io.File;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.lang.foreign.Arena;
+import java.lang.foreign.SymbolLookup;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 public class NativeLoader {
 
-    public static void loadLibrary(ClassLoader classLoader, String libName) {
+    public static @NotNull SymbolLookup loadLibrary(@NotNull String libName, Arena arena) {
         try {
-            System.loadLibrary(libName);
-        } catch (UnsatisfiedLinkError ex) {
+            return SymbolLookup.libraryLookup(libName, arena);
+        }
+        catch (IllegalArgumentException ex) {
             String filename = "lib" + libName + ".so";
-            URL url = classLoader.getResource(filename);
+            URL url = NativeLoader.class.getClassLoader().getResource("lib/" + filename);
             if (url == null) {
                 throw new IllegalArgumentException("Failed to find shared library " + filename);
             }
             try {
-                File file = Files.createTempFile("jni", filename).toFile();
-                file.deleteOnExit();
+                Path lib = Files.createTempFile("load", filename);
+                lib.toFile().deleteOnExit();
                 try (InputStream in = url.openStream()) {
-                    Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(in, lib, StandardCopyOption.REPLACE_EXISTING);
                 }
-                System.load(file.getCanonicalPath());
-            } catch (IOException e) {
+                return SymbolLookup.libraryLookup(lib, arena);
+            }
+            catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
         }
     }
-
 }
