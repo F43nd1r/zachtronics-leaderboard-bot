@@ -58,7 +58,7 @@ class OmSolutionVerifier(puzzle: ByteArray, solution: ByteArray) : Closeable {
     fun getMetricSafe(metric: OmSimMetric): Int? {
         val result = OmSimWrapper.verifier_evaluate_metric(verifier, toMemorySegment(metric.id))
         val error = OmSimWrapper.verifier_error(verifier)
-        if (error == MemorySegment.NULL) {
+        if (error != MemorySegment.NULL) {
             OmSimWrapper.verifier_error_clear(verifier)
             return null
         } else {
