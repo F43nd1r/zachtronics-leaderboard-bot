@@ -146,29 +146,18 @@ tasks.assembleFrontend {
     }
 }
 
-val copyWebApp = tasks.register<Copy>("copyWebApp") {
-    group = "frontend"
-    from("web/build")
-    into(layout.buildDirectory.dir("resources/main/static/"))
-    dependsOn(tasks.assembleFrontend)
-}
-
-tasks.processResources.configure {
-    dependsOn(copyWebApp)
-}
-
-val omsimLibDest = layout.buildDirectory.file("downloaded/libverify-om.so")
-
 val downloadOmsim by tasks.registering(Download::class) {
     src("https://github.com/ianh/omsim/releases/download/libverify-${OperatingSystem.current().familyName}-x86_64/libverify.so")
-    dest(omsimLibDest)
+    dest(layout.buildDirectory.file("downloaded/libverify-om.so"))
     onlyIfModified(true)
     useETag(true)
 }
 
 tasks.processResources.configure {
-    dependsOn(downloadOmsim)
-    from(omsimLibDest) {
+    from(tasks.assembleFrontend) {
+        into("static")
+    }
+    from(downloadOmsim) {
         into("lib")
     }
 }
