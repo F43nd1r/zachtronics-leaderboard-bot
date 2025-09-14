@@ -35,7 +35,7 @@ public class NativeLoader {
             return SymbolLookup.libraryLookup(libName, arena);
         }
         catch (IllegalArgumentException ex) {
-            String filename = "lib" + libName + ".so";
+            String filename = System.mapLibraryName(libName);
             URL url = NativeLoader.class.getClassLoader().getResource("lib/" + filename);
             if (url == null) {
                 throw new IllegalArgumentException("Failed to find shared library " + filename);

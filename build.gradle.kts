@@ -147,8 +147,9 @@ tasks.assembleFrontend {
 }
 
 val downloadOmsim by tasks.registering(Download::class) {
-    src("https://github.com/ianh/omsim/releases/download/libverify-${OperatingSystem.current().familyName}-x86_64/libverify.so")
-    dest(layout.buildDirectory.file("downloaded/libverify-om.so"))
+    val os = OperatingSystem.current()
+    src("https://github.com/ianh/omsim/releases/download/libverify-${os.familyName}-x86_64/${os.getSharedLibraryName("verify")}")
+    dest(layout.buildDirectory.dir("downloaded/"))
     onlyIfModified(true)
     useETag(true)
 }

@@ -28,7 +28,7 @@ import static java.lang.foreign.ValueLayout.JAVA_BYTE;
  * Omsim FFM wrapper, regenerate if omsim changes its public API via:
  * * download jextract from <a href="https://jdk.java.net/jextract/">here</a>
  * * run `./jextract omsim/verifier.h`
- * * replace the default `SYMBOL_LOOKUP` with `NativeLoader.loadLibrary("verify-om", LIBRARY_ARENA);`
+ * * replace the default `SYMBOL_LOOKUP` with `NativeLoader.loadLibrary("verify", LIBRARY_ARENA);`
  * * remove the unused downcall tracer (optional)
  * * add `@SuppressWarnings("unused")` (optional)
  */
@@ -40,7 +40,7 @@ public class OmSimWrapper {
     }
 
     static final Arena LIBRARY_ARENA = Arena.ofAuto();
-    static final SymbolLookup SYMBOL_LOOKUP = NativeLoader.loadLibrary("verify-om", LIBRARY_ARENA);
+    static final SymbolLookup SYMBOL_LOOKUP = NativeLoader.loadLibrary("verify", LIBRARY_ARENA);
 
     static MemorySegment findOrThrow(String symbol) {
         return SYMBOL_LOOKUP.find(symbol).orElseThrow(() -> new UnsatisfiedLinkError("unresolved symbol: " + symbol));
