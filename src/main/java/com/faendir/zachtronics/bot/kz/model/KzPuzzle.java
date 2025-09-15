@@ -75,6 +75,7 @@ public enum KzPuzzle implements Puzzle<KzCategory> {
     BOOMBOX(102, BONUS_CAMPAIGN, "Boombox"),
     DOLLHOUSE_KITCHEN(108, BONUS_CAMPAIGN, "Dollhouse kitchen"),
     SLOT_CAR_TRACK(105, BONUS_CAMPAIGN, "Slot car track"),
+    TOY_CASH_REGISTER(106, BONUS_CAMPAIGN, "Toy cash register"),
     ;
 
     private final int id;
