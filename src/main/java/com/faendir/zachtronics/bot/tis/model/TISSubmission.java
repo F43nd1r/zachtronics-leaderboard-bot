@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.tis.model;
 
 import com.faendir.zachtronics.bot.model.Submission;
-import com.faendir.zachtronics.bot.tis.validation.TIS100CXX;
+import com.faendir.zachtronics.bot.tis.validation.TISValidator;
 import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
@@ -39,7 +39,7 @@ public class TISSubmission implements Submission<TISCategory, TISPuzzle> {
     @NotNull
     public static TISSubmission fromData(@NotNull String data, @NotNull TISPuzzle puzzle, @NotNull String author, String displayLink)
     throws ValidationException {
-        TISScore score = TIS100CXX.validate(data, puzzle);
+        TISScore score = TISValidator.validate(data, puzzle);
         return new TISSubmission(puzzle, score, author, displayLink, data);
     }
 

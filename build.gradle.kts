@@ -146,9 +146,17 @@ tasks.assembleFrontend {
     }
 }
 
-val downloadOmsim by tasks.registering(Download::class) {
+val downloadLibraries by tasks.registering(Download::class) {
     val os = OperatingSystem.current()
-    src("https://github.com/ianh/omsim/releases/download/libverify-${os.familyName}-x86_64/${os.getSharedLibraryName("verify")}")
+    val omsimLib = os.getSharedLibraryName("verify")
+    val tisLib = os.getSharedLibraryName("TIS100")
+    src(
+        listOf(
+            "https://github.com/ianh/omsim/releases/download/libverify-${os.familyName}-x86_64/$omsimLib",
+            "https://github.com/killerbee13/TIS-100-CXX/releases/latest/download/$tisLib",
+//            "file:///home/andreas/Progetti/tis100/TIS-100-CXX/build/$tisLib",
+        )
+    )
     dest(layout.buildDirectory.dir("downloaded/"))
     onlyIfModified(true)
     useETag(true)
@@ -158,7 +166,7 @@ tasks.processResources.configure {
     from(tasks.assembleFrontend) {
         into("static")
     }
-    from(downloadOmsim) {
+    from(downloadLibraries) {
         into("lib")
     }
 }

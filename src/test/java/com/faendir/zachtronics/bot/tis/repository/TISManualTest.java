@@ -22,7 +22,7 @@ import com.faendir.zachtronics.bot.config.GitProperties;
 import com.faendir.zachtronics.bot.git.GitRepository;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.tis.model.*;
-import com.faendir.zachtronics.bot.tis.validation.TIS100CXX;
+import com.faendir.zachtronics.bot.tis.validation.TISValidator;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Disabled;
@@ -125,7 +125,7 @@ class TISManualTest {
                 Path dataPath = repository.makeArchivePath(puzzlePath, solution.getScore());
                 if (Files.exists(dataPath)) {
                     String data = Files.readString(dataPath);
-                    TISScore newScore = TIS100CXX.validate(data, puzzle);
+                    TISScore newScore = TISValidator.validate(data, puzzle);
                     if (!newScore.equals(solution.getScore())) {
                         it.set(new TISSolution(newScore, solution.getAuthor(), solution.getDisplayLink()));
                         Files.move(dataPath, repository.makeArchivePath(puzzlePath, newScore));
@@ -166,13 +166,11 @@ class TISManualTest {
                         }
                         catch (Exception e) {
                             if (e instanceof ValidationException) {
-                                String message = e.getMessage();
-                                if (message.startsWith("ERROR: ")) {
-                                    System.err.print(path + message.substring(7));
-                                    continue;
+                                String message = e.getMessage().replace("```", "");
+                                if (!message.contains("validation failure for output ")) {
+                                    System.err.print(path + message);
                                 }
-                                if (message.contains("validation failed for fixed test"))
-                                    continue;
+                                continue;
                             }
                             System.err.println(path);
                             throw e;
