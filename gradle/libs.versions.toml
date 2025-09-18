@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.2.20"
-spring-boot = "3.5.5"
+spring-boot = "3.5.6"
 spring-dependencyManagement = "1.1.7"
 spring-cloud = "4.3.0"
 gradle-lombok = "8.14.2"
