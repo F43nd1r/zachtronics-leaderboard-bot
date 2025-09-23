@@ -20,6 +20,7 @@ import com.faendir.zachtronics.bot.model.Puzzle;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.List;
 
 import static com.faendir.zachtronics.bot.kz.model.KzGroup.BONUS_CAMPAIGN;
@@ -76,6 +77,19 @@ public enum KzPuzzle implements Puzzle<KzCategory> {
     DOLLHOUSE_KITCHEN(108, BONUS_CAMPAIGN, "Dollhouse kitchen"),
     SLOT_CAR_TRACK(105, BONUS_CAMPAIGN, "Slot car track"),
     TOY_CASH_REGISTER(106, BONUS_CAMPAIGN, "Toy cash register"),
+
+    SANDWICH_ALT(213, BONUS_CAMPAIGN, "Sandwich (Alt)"),
+    POCKET_CALCULATOR_ALT(221, BONUS_CAMPAIGN, "Pocket Calculator (Alt)"),
+    HANDHELD_GAME_ALT(223, BONUS_CAMPAIGN, "Handheld Game (Alt)"),
+    VIDEO_RECORDER_ALT(235, BONUS_CAMPAIGN, "Video Recorder (Alt)"),
+    BIDET_SEAT_ALT(236, BONUS_CAMPAIGN, "Bidet Seat (Alt)"),
+    TUBE_SOCK_ALT(241, BONUS_CAMPAIGN, "Tube Sock (Alt)"),
+    ELEGANT_HANDBAG_ALT(242, BONUS_CAMPAIGN, "Elegant Handbag (Alt)"),
+    ATHLETIC_SHIRT_ALT(243, BONUS_CAMPAIGN, "Athletic Shirt (Alt)"),
+    SPRING_OUTFIT_ALT(245, BONUS_CAMPAIGN, "Spring Outfit (Alt)"),
+    ARCADE_CONTROLS_ALT(254, BONUS_CAMPAIGN, "Arcade Controls (Alt)"),
+    PACHINKO_MACHINE_ALT(255, BONUS_CAMPAIGN, "Pachinko Machine (Alt)"),
+    CHESS_COMPUTER_ALT(307, BONUS_CAMPAIGN, "Chess Computer (Alt)"),
     ;
 
     private final int id;
