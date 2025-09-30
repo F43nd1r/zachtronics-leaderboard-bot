@@ -16,20 +16,18 @@
 
 package com.faendir.zachtronics.bot.kz.validation;
 
+import com.faendir.zachtronics.bot.kz.model.KzScore;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 import java.nio.file.Files;
 
-import static com.faendir.zachtronics.bot.kz.model.KzPuzzle.CORPORATE_BINDER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses kaizensim")
-class KaizenSimTest {
+class KzValidatorTest {
 
     @Test
     void good() throws IOException {
@@ -37,19 +35,15 @@ class KaizenSimTest {
             "repositories/kz-leaderboard/NORMAL_CAMPAIGN/CORPORATE_BINDER/corporate-binder-4-38-130.solution");
         byte[] data = Files.readAllBytes(resource.getFile().toPath());
 
-        KzSimResult result = KaizenSim.validate(data);
-        KzSimResult expected = new KzSimResult(4, 38, 130, CORPORATE_BINDER.getId(), false, null);
+        KzScore result = KzValidator.validate(data, "someGuy", null).getScore();
+        KzScore expected = new KzScore(4, 38, 130);
         assertEquals(expected, result);
     }
 
     @Test
     void bad() {
         byte[] nonsense = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-        KzSimResult result = KaizenSim.validate(nonsense);
-        KzSimResult expected = new KzSimResult(null, null, null, null, null, "UnknownVersion(50462976)");
-        assertEquals(expected, result);
-
-        assertThrows(ValidationException.class, () -> KaizenSim.validate(nonsense, "someGuy", null));
+        assertThrows(ValidationException.class, () -> KzValidator.validate(nonsense, "someGuy", null));
     }
 
 }

@@ -195,7 +195,7 @@ public class KzManualTest {
                     catch (Exception e) {
                         if (e instanceof ValidationException) {
                             String message = e.getMessage();
-                            if (message.equals("SolutionIncomplete") || message.startsWith("Solution was manipulated"))
+                            if (message.equals("Solution incomplete") || message.startsWith("Solution was manipulated"))
                                 continue;
                         }
                         System.err.println(path);

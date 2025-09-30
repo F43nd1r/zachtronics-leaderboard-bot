@@ -16,7 +16,7 @@
 
 package com.faendir.zachtronics.bot.kz.model;
 
-import com.faendir.zachtronics.bot.kz.validation.KaizenSim;
+import com.faendir.zachtronics.bot.kz.validation.KzValidator;
 import com.faendir.zachtronics.bot.model.Submission;
 import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationException;
@@ -37,7 +37,7 @@ public class KzSubmission implements Submission<KzCategory, KzPuzzle> {
      */
     @NotNull
     public static KzSubmission fromData(byte @NotNull [] data, @NotNull String author, String displayLink) throws ValidationException {
-        return KaizenSim.validate(data, author, displayLink);
+        return KzValidator.validate(data, author, displayLink);
     }
 
     @NotNull

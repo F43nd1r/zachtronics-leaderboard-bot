@@ -150,11 +150,14 @@ val downloadLibraries by tasks.registering(Download::class) {
     val os = OperatingSystem.current()
     val omsimLib = os.getSharedLibraryName("verify")
     val tisLib = os.getSharedLibraryName("TIS100")
+    val kaizenLib = os.getSharedLibraryName("kaizensim")
     src(
         listOf(
             "https://github.com/ianh/omsim/releases/download/libverify-${os.familyName}-x86_64/$omsimLib",
             "https://github.com/killerbee13/TIS-100-CXX/releases/latest/download/$tisLib",
 //            "file:///home/andreas/Progetti/tis100/TIS-100-CXX/build/$tisLib",
+            "https://github.com/wl-gha/kaizensim/releases/latest/download/$kaizenLib",
+//            "file:///home/andreas/Progetti/kaizen/kaizensim/target/release/$kaizenLib",
         )
     )
     dest(layout.buildDirectory.dir("downloaded/"))

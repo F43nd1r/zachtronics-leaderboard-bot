@@ -16,8 +16,6 @@ COPY --from=builder /python /root/.local/lib/python3.13/site-packages
 COPY --from=builder /xbpgh-sim/xbpgh_sim /root/.local/lib/python3.13/site-packages/xbpgh_sim
 COPY --from=builder /chipwizard-sim/chipwizard_sim /root/.local/lib/python3.13/site-packages/chipwizard_sim
 COPY --from=builder /foodcourt-sim/foodcourt_sim /root/.local/lib/python3.13/site-packages/foodcourt_sim
-RUN wget -q https://github.com/wl-gha/kaizensim/releases/download/v0.2.1/kaizensim -P /usr/local/bin
-RUN chmod +x /usr/local/bin/kaizensim
 RUN true
 WORKDIR application
 COPY --from=builder application/dependencies/ ./
