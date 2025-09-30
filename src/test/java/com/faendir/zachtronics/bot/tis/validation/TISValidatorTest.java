@@ -20,6 +20,7 @@ import com.faendir.zachtronics.bot.tis.model.TISPuzzle;
 import com.faendir.zachtronics.bot.tis.model.TISScore;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
@@ -30,6 +31,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "libTIS100 doesn't load without lua")
 class TISValidatorTest {
     @Test
     public void good() throws IOException {
