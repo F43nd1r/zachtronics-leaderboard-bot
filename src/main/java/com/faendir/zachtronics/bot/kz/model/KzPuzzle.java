@@ -20,7 +20,6 @@ import com.faendir.zachtronics.bot.model.Puzzle;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.util.List;
 
 import static com.faendir.zachtronics.bot.kz.model.KzGroup.BONUS_CAMPAIGN;
@@ -103,7 +102,7 @@ public enum KzPuzzle implements Puzzle<KzCategory> {
     KzPuzzle(int id, KzGroup group, @NotNull String displayName) {
         this.id = id;
         this.group = group;
-        this.prefix = displayName.toLowerCase().replace(' ', '-');
+        this.prefix = displayName.toLowerCase().replace(' ', '-').replaceAll("[()]", "");
         this.displayName = displayName;
         this.link = "https://zlbb.faendir.com/kz/" + name();
     }
