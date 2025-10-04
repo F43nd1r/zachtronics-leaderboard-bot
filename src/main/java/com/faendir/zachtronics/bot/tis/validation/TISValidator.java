@@ -50,8 +50,8 @@ public class TISValidator {
             }
             TISFFISim.tis_sim_add_seed_range(sim, 100000, 100000 + RANDOM_TESTS - puzzle.getExtraWitnessSeeds().length);
 
-            if (puzzle.isCustomSpec()) {
-                String specName = puzzle.getId().replace("SPEC", "");
+            if (puzzle.getId().startsWith("SPEC")) {
+                String specName = puzzle.getId().replaceFirst("^SPEC", "");
                 ClassPathResource resource = new ClassPathResource("tis/custom/" + specName + ".lua");
                 // do not cheat via a byte[], it needs to be null terminated
                 String customSpec = new String(resource.getInputStream().readAllBytes());

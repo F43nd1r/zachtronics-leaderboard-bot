@@ -20,11 +20,7 @@ import com.faendir.zachtronics.bot.model.Puzzle;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.core.io.ClassPathResource;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -72,7 +68,7 @@ public enum TISPuzzle implements Puzzle<TISCategory> {
     SUBSEQUENCE_EXTRACTOR(TIS_NET_DIRECTORY, "NEXUS.04.340.5", "SUBSEQUENCE EXTRACTOR", STANDARD),
     SIGNAL_PRESCALER(TIS_NET_DIRECTORY, "NEXUS.05.647.1", "SIGNAL PRESCALER", STANDARD, 270276),
     SIGNAL_AVERAGER(TIS_NET_DIRECTORY, "NEXUS.06.786.0", "SIGNAL AVERAGER", STANDARD, 202116, 203279, 203483, 211527, 212654),
-    SUBMAXIMUM_SELECTOR(TIS_NET_DIRECTORY, "NEXUS.07.050.0", "SUBMAXIMUM SELECTOR", STANDARD, 200009, 200031, 200713, 201163),
+    SUBMAXIMUM_SELECTOR(TIS_NET_DIRECTORY, "NEXUS.07.050.0", "SUBMAXIMUM SELECTOR", STANDARD, 200009, 200031, 200713, 201163, 204958),
     DECIMAL_DECOMPOSER(TIS_NET_DIRECTORY, "NEXUS.08.633.9", "DECIMAL DECOMPOSER", STANDARD, 200006, 200030, 200053, 204958),
     SEQUENCE_MODE_CALCULATOR(TIS_NET_DIRECTORY, "NEXUS.09.904.9", "SEQUENCE MODE CALCULATOR", STANDARD,
                              200029, 200038, 200385, 201529, 201550, 205321, 208015, 210354, 210952, 291947),
@@ -136,27 +132,6 @@ public enum TISPuzzle implements Puzzle<TISCategory> {
         };
         this.extraWitnessSeeds = extraWitnessSeeds;
         this.link = "https://zlbb.faendir.com/tis/" + id;
-    }
-
-    private static Path customSpecDir = null;
-
-    public boolean isCustomSpec() {
-        return id.startsWith("SPEC");
-    }
-
-    public synchronized @NotNull Path extractCustomSpec() throws IOException {
-        assert isCustomSpec();
-        if (customSpecDir == null) {
-            customSpecDir = Files.createTempDirectory("tis_custom_specs");
-            customSpecDir.toFile().deleteOnExit();
-        }
-        String specFileName = id.replace("SPEC", "") + ".lua";
-        Path specPath = customSpecDir.resolve(specFileName);
-        if (!Files.exists(specPath)) {
-            ClassPathResource resource = new ClassPathResource("tis/custom/" + specFileName);
-            Files.copy(resource.getInputStream(), specPath);
-        }
-        return specPath;
     }
 
 }
