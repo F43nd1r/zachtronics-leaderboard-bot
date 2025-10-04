@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2025
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.springframework.boot.info.GitProperties
 import org.springframework.cloud.context.restart.RestartEndpoint
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import java.time.Duration
 
 @Service
 class DiscordService(
@@ -119,8 +120,6 @@ class DiscordService(
 
     @PreDestroy
     fun preDestroy() {
-        discordClient.logout().block()
+        discordClient.logout().block(Duration.ofMinutes(1))
     }
 }
-
-
