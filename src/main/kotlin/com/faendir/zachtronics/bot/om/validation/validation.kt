@@ -103,8 +103,8 @@ fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSub
     if (solution !is SolvedSolution) {
         throw IllegalArgumentException("Only solved solutions are accepted")
     }
-    if (solution.instructions >= 32768) {
-        throw IllegalArgumentException("Using more than 2^15 instructions is banned.")
+    if (solution.instructions >= 16384) {
+        throw IllegalArgumentException("Using more than 2^14 instructions is banned.")
     }
     if (solution.parts.count { it is Arm && it.type == ArmType.VAN_BERLOS_WHEEL } > 1) {
         throw IllegalArgumentException("Multiple Van Berlo's Wheels are banned.")
@@ -115,8 +115,8 @@ fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSub
     if (solution.parts.filterIsInstance<IO>().groupBy { it.type to it.index }.values.any { it.size > 1 }) {
         throw IllegalArgumentException("Duplicated Inputs or Outputs are banned.")
     }
-    if (solution.parts.any { (abs(it.position.x) >= 32768) or (abs(it.position.y) >= 32768) }) {
-        throw IllegalArgumentException("Parts farther than 2^15 from the origin are banned.")
+    if (solution.parts.any { (abs(it.position.x) >= 16384) or (abs(it.position.y) >= 16384) }) {
+        throw IllegalArgumentException("Parts farther than 2^14 from the origin are banned.")
     }
     val (puzzle, solutionBytes) = OmPuzzle.entries.find { it.id == solution.puzzle }?.let { it to inputBytes }
         ?: OmPuzzle.entries.find { it.altIds.contains(solution.puzzle) }?.let {
