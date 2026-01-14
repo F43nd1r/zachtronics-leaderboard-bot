@@ -11,7 +11,7 @@
         "@mui/material": "7.3.7",
         "@mui/styles": "6.4.8",
         "@sinclair/typebox": "0.34.47",
-        "d3-format": "3.1.1",
+        "d3-format": "3.1.2",
         "deep-object-diff": "1.1.9",
         "plotly.js-gl3d-dist-min": "3.3.1",
         "react": "19.2.3",
