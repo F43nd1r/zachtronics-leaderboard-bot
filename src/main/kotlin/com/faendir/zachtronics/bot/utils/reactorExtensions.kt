@@ -25,8 +25,6 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import reactor.util.function.Tuple2
 
-fun <T> Mono<T>.throwIfEmpty(message: () -> String): Mono<T> = switchIfEmpty { throw IllegalArgumentException(message()) }.map { it as T }
-
 fun <T : Any, U : Any, R : Any> Mono<Tuple2<T, U>>.flatMapFirst(map: (T, U) -> Mono<R>): Mono<Tuple2<R, U>> =
     flatMap { (t, u) -> map(t, u).zipWith(u.toMono()) }
 
