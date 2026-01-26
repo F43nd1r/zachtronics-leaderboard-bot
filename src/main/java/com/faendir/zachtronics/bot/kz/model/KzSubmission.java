@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public class KzSubmission implements Submission<KzCategory, KzPuzzle> {
      */
     @NotNull
     public static KzSubmission fromData(byte @NotNull [] data, @NotNull String author, String displayLink) throws ValidationException {
-        return KzValidator.validate(data, author, displayLink);
+        return KzValidator.validateZach(data, author, displayLink);
     }
 
     @NotNull

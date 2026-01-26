@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ import java.lang.invoke.MethodHandle;
 
 import static java.lang.foreign.ValueLayout.*;
 
-public class KaizenSimFFI {
-    private KaizenSimFFI() {}
+public class KzSimFFIWrapper {
+    private KzSimFFIWrapper() {}
 
     private static final AddressLayout C_POINTER = ValueLayout.ADDRESS
         .withTargetLayout(MemoryLayout.sequenceLayout(Long.MAX_VALUE, JAVA_BYTE));
@@ -68,7 +68,7 @@ public class KaizenSimFFI {
     public static MemorySegment scoreCreate(@NotNull Arena arena, byte @NotNull [] data) {
         MemorySegment ffiData = arena.allocateFrom(ValueLayout.JAVA_BYTE, data);
         return ((MemorySegment) SCORE_CREATE.invokeExact(ffiData, (long) data.length))
-            .reinterpret(SCORE_RESULT_LAYOUT.byteSize(), arena, KaizenSimFFI::scoreDestroy);
+            .reinterpret(SCORE_RESULT_LAYOUT.byteSize(), arena, KzSimFFIWrapper::scoreDestroy);
     }
 
     private static final long ERROR_OFFSET = SCORE_RESULT_LAYOUT.byteOffset(PathElement.groupElement("error"));

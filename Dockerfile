@@ -12,7 +12,9 @@ COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
 
 FROM eclipse-temurin:25-jre
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg libluajit-*.so
+RUN apt-get update && apt-get install -y --no-install-recommends wget ffmpeg libluajit-*.so
+RUN wget -q https://github.com/zachbarth/kaizen-sim/raw/refs/heads/main/kaizen-sim -P /usr/local/bin/
+RUN chmod +x /usr/local/bin/kaizen-sim
 COPY --from=builder /python /root/.local/lib/python3.12/site-packages
 COPY --from=builder /xbpgh-sim/xbpgh_sim /root/.local/lib/python3.12/site-packages/xbpgh_sim
 COPY --from=builder /chipwizard-sim/chipwizard_sim /root/.local/lib/python3.12/site-packages/chipwizard_sim

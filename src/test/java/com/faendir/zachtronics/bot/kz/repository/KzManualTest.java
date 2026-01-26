@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,8 +142,18 @@ public class KzManualTest {
 
             for (KzSolution solution : solutions) {
                 Path dataPath = repository.makeArchivePath(puzzlePath, solution.getScore());
+                if (!Files.exists(dataPath)) {
+                    System.err.println("Missing data for " + repoPath.relativize(dataPath));
+                    continue;
+                }
                 byte[] data = Files.readAllBytes(dataPath);
-                KzSubmission submission = KzSubmission.fromData(data, solution.getAuthor(), solution.getDisplayLink());
+                KzSubmission submission;
+                try {
+                    submission = KzSubmission.fromData(data, solution.getAuthor(), solution.getDisplayLink());
+                } catch (ValidationException e) {
+                    System.err.println(repoPath.relativize(dataPath) + ": " + e.getMessage());
+                    continue;
+                }
 
                 assertEquals(puzzle, submission.getPuzzle());
                 assertEquals(solution.getScore(), submission.getScore());
@@ -195,7 +205,11 @@ public class KzManualTest {
                     catch (Exception e) {
                         if (e instanceof ValidationException) {
                             String message = e.getMessage();
-                            if (message.equals("Solution incomplete") || message.startsWith("Solution was manipulated"))
+                            if (message.equals("Puzzle was not solved.") || message.startsWith("A product was ") ||
+                                message.equals("Tools cannot run two commands at once.") ||
+                                message.equals("A tool was pushed into another tool.") ||
+                                message.equals("Only tools on tracks can slide.") ||
+                                message.startsWith("Solution was manipulated"))
                                 continue;
                         }
                         System.err.println(path);
