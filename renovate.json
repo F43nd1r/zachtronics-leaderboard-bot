@@ -1,7 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "ignoreDeps": [
-    "openjdk",
     "org.jetbrains.kotlinx:kotlinx-datetime",
     "com.discord4j:discord4j-core"
   ],
@@ -30,6 +29,11 @@
         "/^org\\.jetbrains\\.kotlin/",
         "/^com\\.google\\.devtools\\.ksp/"
       ]
+    },
+    {
+      "matchManagers": ["dockerfile"],
+      "enabled": true,
+      "updateTypes": ["major"]
     }
   ]
 }
