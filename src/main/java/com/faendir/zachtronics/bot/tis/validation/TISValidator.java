@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,16 @@ import com.faendir.zachtronics.bot.tis.model.TISPuzzle;
 import com.faendir.zachtronics.bot.tis.model.TISScore;
 import com.faendir.zachtronics.bot.tis.model.TISType;
 import com.faendir.zachtronics.bot.validation.ValidationException;
-import lombok.SneakyThrows;
 import org.checkerframework.checker.signedness.qual.Unsigned;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
+import java.util.EnumMap;
+import java.util.Map;
 
 /** Wrapper for libTIS100 from the TIS-100-CXX project */
 public class TISValidator {
@@ -36,7 +38,10 @@ public class TISValidator {
     private static final int TOTAL_CYCLES_LIMIT = 100_000_000;
     private static final int RANDOM_TESTS = 100_000;
 
-    @SneakyThrows(IOException.class)
+    private static final Map<TISPuzzle, String> CUSTOM_SPEC_CACHE = new EnumMap<>(TISPuzzle.class);
+
+    private TISValidator() {}
+
     public static @NotNull TISScore validate(@NotNull String data, @NotNull TISPuzzle puzzle) throws ValidationException {
         if (puzzle.getType() == TISType.SANDBOX)
             throw new ValidationException("Sandbox levels are not supported");
@@ -52,9 +57,16 @@ public class TISValidator {
 
             if (puzzle.getId().startsWith("SPEC")) {
                 String specName = puzzle.getId().replaceFirst("^SPEC", "");
-                ClassPathResource resource = new ClassPathResource("tis/custom/" + specName + ".lua");
-                // do not cheat via a byte[], it needs to be null terminated
-                String customSpec = new String(resource.getInputStream().readAllBytes());
+                String customSpec = CUSTOM_SPEC_CACHE.computeIfAbsent(puzzle, _ -> {
+                    ClassPathResource resource = new ClassPathResource("tis/custom/" + specName + ".lua");
+                    try {
+                        // do not cheat via a byte[], it needs to be null terminated
+                        return new String(resource.getInputStream().readAllBytes());
+                    }
+                    catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                });
                 @Unsigned int baseSeed = specName.matches("\\d+") ? Integer.parseUnsignedInt(specName) : 0;
                 TISFFISim.tis_sim_set_custom_spec_code(sim, arena.allocateFrom(customSpec), baseSeed);
             }
