@@ -1,4 +1,4 @@
-FROM eclipse-temurin:25-jre AS builder
+FROM eclipse-temurin:25.0.1_8-jre AS builder
 RUN apt-get update && apt-get install -y --no-install-recommends git curl
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && mv $HOME/.local/bin/uv /usr/local/bin/
 RUN uv pip install --target=/python -r https://raw.githubusercontent.com/spacechem-community-developers/SChem/main/schem/minimal-requirements.txt
@@ -11,7 +11,7 @@ ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
 
-FROM eclipse-temurin:25-jre
+FROM eclipse-temurin:25.0.1_8-jre
 RUN apt-get update && apt-get install -y --no-install-recommends wget ffmpeg libluajit-*.so
 RUN wget -q https://github.com/zachbarth/kaizen-sim/raw/refs/heads/main/kaizen-sim -P /usr/local/bin/
 RUN chmod +x /usr/local/bin/kaizen-sim
