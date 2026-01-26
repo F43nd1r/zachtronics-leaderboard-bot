@@ -5,7 +5,7 @@ function get_name()
 end
 
 -- The function get_description() should return an array of strings, where each string is
--- a line of description for the puzzle. The text you return from get_description() will 
+-- a line of description for the puzzle. The text you return from get_description() will
 -- be automatically formatted and wrapped to fit inside the puzzle information box.
 --
 function get_description()
@@ -42,45 +42,75 @@ function get_streams()
 	inputA = {}
 	inputB = {}
 	output = {}
+
 	for i = 1,13 do
 		if i == my0 then
+			-- force this output to be 0
 			for j = 0,2 do
-				inputA[(3*i)-j] =  math.random(2, 3)
-				inputB[(3*i)-j] = math.floor(math.sqrt(10*math.random(10,640)))
-				if inputA[(3*i)-j] == 3 then
-					inputB[(3*i)-j] = inputB[(3*i)-j] * 10
+				p = math.random(2, 3)
+				d = decompose(randomInput())
+				inputA[3*i-j] = p
+				if p == 3 then
+					inputB[3*i-j] = amalgamate(d[1], d[2], 0)
 				else
-					inputB[(3*i)-j] = (math.floor(inputB[(3*i)-j] / 10) * 100 + (inputB[(3*i)-j] % 10))
+					inputB[3*i-j] = amalgamate(d[1], 0, d[2])
 				end
 			end
 			output[i] = 0
 		elseif i == my999 then
+			-- force this output to be 999
 			for j = 0,2 do
-				inputA[(3*i)-j] =  math.random(2, 3)
-				inputB[(3*i)-j] = math.floor(math.sqrt(10*math.random(10,640)))
-				if inputA[(3*i)-j] == 3 then
-					inputB[(3*i)-j] = inputB[(3*i)-j] * 10 + 9
+				p = math.random(2, 3)
+				d = decompose(randomInput())
+				inputA[3*i-j] = p
+				-- avoid input going above 800
+				if d[1] == 8 then d[1] = 7 end
+				if p == 3 then
+					inputB[3*i-j] = amalgamate(d[1], d[2], 9)
 				else
-					inputB[(3*i)-j] = (math.floor(inputB[(3*i)-j] / 10) * 100 + (inputB[(3*i)-j] % 10) + 90)
+					inputB[3*i-j] = amalgamate(d[1], 9, d[2])
 				end
 			end
 			output[i] = 999
 		else
-			inputA[(3*i)-2] = math.random(1, 3)
-			inputA[(3*i)-1] = math.random(1, 3)
-			inputA[(3*i)] = math.random(1, 3)
-			inputB[(3*i)-2] = math.floor(math.sqrt(1000*math.random(10,640)))
-			inputB[(3*i)-1] = math.floor(math.sqrt(1000*math.random(10,640)))
-			inputB[(3*i)] = math.floor(math.sqrt(1000*math.random(10,640)))
-			output[i] = 100*math.floor((inputB[(3*i)-2]/math.pow(10, 3-inputA[(3*i)-2]))%10)
-			output[i] = output[i] + 10*math.floor((inputB[(3*i)-1]/math.pow(10, 3-inputA[(3*i)-1]))%10)
-			output[i] = output[i] + math.floor((inputB[(3*i)]/math.pow(10, 3-inputA[(3*i)]))%10)
+			p1 = math.random(1, 3)
+			p2 = math.random(1, 3)
+			p3 = math.random(1, 3)
+			v1 = randomInput()
+			v2 = randomInput()
+			v3 = randomInput()
+
+			inputA[3*i-2] = p1
+			inputA[3*i-1] = p2
+			inputA[3*i] = p3
+			inputB[3*i-2] = v1
+			inputB[3*i-1] = v2
+			inputB[3*i] = v3
+			output[i] = amalgamate(decompose(v1)[p1], decompose(v2)[p2], decompose(v3)[p3])
 		end
 	end
+
 	return {
 		{ STREAM_INPUT, "IN.DI", 1, inputA },
 		{ STREAM_INPUT, "IN.NU", 2, inputB },
 		{ STREAM_OUTPUT, "OUT.AM", 2, output },
+	}
+end
+
+function randomInput()
+	-- generate random value between 100 and 800, biased toward bigger numbers
+	return math.floor(math.sqrt(1000*math.random(10,640)))
+end
+
+function amalgamate(d1, d2, d3)
+	return 100*d1+10*d2+d3
+end
+
+function decompose(v)
+	return {
+		(math.floor(v/100)) % 10,
+		(math.floor(v/10)) % 10,
+		(math.floor(v)) % 10,
 	}
 end
 
@@ -92,7 +122,7 @@ end
 -- TILE_DAMAGED: A damaged execution node, which acts as an obstacle.
 --
 function get_layout()
-	return { 
+	return {
 		TILE_COMPUTE, 	TILE_COMPUTE, 	TILE_COMPUTE, 	TILE_DAMAGED,
 		TILE_COMPUTE, 	TILE_COMPUTE,	TILE_COMPUTE, 	TILE_COMPUTE,
 		TILE_MEMORY, 	TILE_COMPUTE,	TILE_COMPUTE, 	TILE_COMPUTE,
