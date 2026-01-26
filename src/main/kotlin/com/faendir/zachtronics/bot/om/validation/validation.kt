@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ fun OmSolutionVerifier.getScore(type: OmType): OmScore {
                 throw IllegalArgumentException("Stored area value does not match simulation. Run your solution to completion before submitting.")
         },
         height = if (type != OmType.PRODUCTION) getMetric(OmSimMetric.HEIGHT) else null,
-        width = if (type == OmType.NORMAL) getMetric(OmSimMetric.WIDTH_TIMES_TWO).toDouble() / 2 else null,
+        width = if (type == OmType.NORMAL) getApproximateMetric(OmSimMetric.WIDTH) else null,
         boundingHex = if (type == OmType.NORMAL) getMetric(OmSimMetric.MINIMUM_HEXAGON) else null,
 
         rate = outputsAtINF?.run {
@@ -87,8 +87,7 @@ fun OmSolutionVerifier.getScore(type: OmType): OmScore {
         heightINF = if (outputsAtINF == null || type == OmType.PRODUCTION) null
         else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.HEIGHT))?.toInfinInt() ?: InfinInt.INFINITY,
         widthINF = if (outputsAtINF == null || type != OmType.NORMAL) null
-        else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.WIDTH_TIMES_TWO))?.toDouble()?.div(2)
-            ?: Double.POSITIVE_INFINITY,
+        else getApproximateMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.WIDTH)) ?: Double.POSITIVE_INFINITY,
         boundingHexINF = if (outputsAtINF == null || type != OmType.NORMAL) null
         else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.MINIMUM_HEXAGON))?.toInfinInt() ?: InfinInt.INFINITY,
     )

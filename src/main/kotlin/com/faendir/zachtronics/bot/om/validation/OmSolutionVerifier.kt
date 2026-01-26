@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,13 +49,19 @@ class OmSolutionVerifier(puzzle: ByteArray, solution: ByteArray) : Closeable {
         }
     }
 
-    fun getMetric(metric: OmSimMetric): Int {
+    fun getMetric(metric: OmSimMetric<Int>): Int {
         val result = OmSimWrapper.verifier_evaluate_metric(verifier, toMemorySegment(metric.id))
         throwIfError(verifier)
         return result
     }
 
-    fun getMetricSafe(metric: OmSimMetric): Int? {
+    fun getApproximateMetric(metric: OmSimMetric<*>): Double {
+        val result = OmSimWrapper.verifier_evaluate_approximate_metric(verifier, toMemorySegment(metric.id))
+        throwIfError(verifier)
+        return result
+    }
+
+    fun getMetricSafe(metric: OmSimMetric<Int>): Int? {
         val result = OmSimWrapper.verifier_evaluate_metric(verifier, toMemorySegment(metric.id))
         val error = OmSimWrapper.verifier_error(verifier)
         if (error != MemorySegment.NULL) {
@@ -66,10 +72,15 @@ class OmSolutionVerifier(puzzle: ByteArray, solution: ByteArray) : Closeable {
         }
     }
 
-    fun getApproximateMetric(metric: OmSimMetric): Double {
+    fun getApproximateMetricSafe(metric: OmSimMetric<*>): Double? {
         val result = OmSimWrapper.verifier_evaluate_approximate_metric(verifier, toMemorySegment(metric.id))
-        throwIfError(verifier)
-        return result
+        val error = OmSimWrapper.verifier_error(verifier)
+        if (error != MemorySegment.NULL) {
+            OmSimWrapper.verifier_error_clear(verifier)
+            return null
+        } else {
+            return result
+        }
     }
 
     override fun close() {

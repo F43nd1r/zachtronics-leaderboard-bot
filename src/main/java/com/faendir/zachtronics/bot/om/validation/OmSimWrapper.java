@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -718,59 +718,6 @@ public class OmSimWrapper {
         var mh$ = verifier_wrong_output_clear.HANDLE;
         try {
             mh$.invokeExact(verifier);
-        }
-        catch (Throwable ex$) {
-            throw new AssertionError("should not reach here", ex$);
-        }
-    }
-
-    private static class verifier_set_throughput_margin {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(OmSimWrapper.C_POINTER, OmSimWrapper.C_INT);
-
-        public static final MemorySegment ADDR = OmSimWrapper.findOrThrow("verifier_set_throughput_margin");
-
-        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
-    }
-
-    /**
-     * Function descriptor for:
-     * {@snippet lang = c:
-     * void verifier_set_throughput_margin(void *verifier, int margin)
-     *}
-     */
-    public static FunctionDescriptor verifier_set_throughput_margin$descriptor() {
-        return verifier_set_throughput_margin.DESC;
-    }
-
-    /**
-     * Downcall method handle for:
-     * {@snippet lang = c:
-     * void verifier_set_throughput_margin(void *verifier, int margin)
-     *}
-     */
-    public static MethodHandle verifier_set_throughput_margin$handle() {
-        return verifier_set_throughput_margin.HANDLE;
-    }
-
-    /**
-     * Address for:
-     * {@snippet lang = c:
-     * void verifier_set_throughput_margin(void *verifier, int margin)
-     *}
-     */
-    public static MemorySegment verifier_set_throughput_margin$address() {
-        return verifier_set_throughput_margin.ADDR;
-    }
-
-    /**
-     * {@snippet lang = c:
-     * void verifier_set_throughput_margin(void *verifier, int margin)
-     *}
-     */
-    public static void verifier_set_throughput_margin(MemorySegment verifier, int margin) {
-        var mh$ = verifier_set_throughput_margin.HANDLE;
-        try {
-            mh$.invokeExact(verifier, margin);
         }
         catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
