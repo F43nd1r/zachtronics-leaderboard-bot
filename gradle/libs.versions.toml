@@ -27,7 +27,7 @@ nodejs = "18.17.0"
 ffmpeg = "0.8.0"
 annotations = "26.0.2-1"
 checker = "3.53.1"
-gradle-download = "5.6.0"
+gradle-download = "5.7.0"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
