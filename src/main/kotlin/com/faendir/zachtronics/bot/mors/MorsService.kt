@@ -39,11 +39,7 @@ import java.time.Duration
  * Interface to Syx's gif storage CDN at https://files.mors.technology/$name
  */
 @Service
-class MorsService(
-    private val morsProperties: MorsProperties,
-    private val gifValidationService: GifValidationService,
-    restTemplateBuilder: RestTemplateBuilder,
-) {
+class MorsService(private val morsProperties: MorsProperties, restTemplateBuilder: RestTemplateBuilder) {
     private val rootUrl = "https://${morsProperties.region}.storage.bunnycdn.com/${morsProperties.storageZone}"
     private val restTemplate = restTemplateBuilder
         .readTimeout(Duration.ofMinutes(5))
@@ -57,7 +53,6 @@ class MorsService(
      * @return (gif_url, video_url)
      */
     fun uploadGif(gif: ByteArray, path: String, stem: String): Pair<String, String> {
-        gifValidationService.validate(gif)
         return upload(gif, "$path/$stem.gif") to upload(convertToVideo(gif), "$path/$stem.mp4")
     }
 

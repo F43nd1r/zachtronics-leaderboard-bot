@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.mors
 import net.bramp.ffmpeg.FFprobe
 import net.bramp.ffmpeg.probe.FFmpegProbeResult
 import net.bramp.ffmpeg.probe.FFmpegStream
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.File
 
@@ -29,7 +30,9 @@ import java.io.File
 class GifValidationService(private val ffprobe: FFprobe = FFprobe("/usr/bin/ffprobe")) {
 
     companion object {
-        private const val MIN_GIF_SIZE = 10 * 1024L   // 10 KB
+        private val logger = LoggerFactory.getLogger(GifValidationService::class.java)
+
+        private const val MIN_GIF_SIZE = 10 * 1024   // 10 KB
         private const val MIN_DURATION_SECS = 0.5
         private const val EXPECTED_WIDTH = 826
         private const val EXPECTED_HEIGHT = 647
@@ -62,7 +65,10 @@ class GifValidationService(private val ffprobe: FFprobe = FFprobe("/usr/bin/ffpr
         val tempFile = File.createTempFile("probe", ".gif")
         try {
             tempFile.writeBytes(gif)
-            return ffprobe.probe(tempFile.canonicalPath)
+            return ffprobe.probe(tempFile.absolutePath)
+        } catch (e: Exception) {
+            logger.warn("Failed to probe GIF", e)
+            throw IllegalArgumentException("Could not read GIF metadata.", e)
         } finally {
             tempFile.delete()
         }

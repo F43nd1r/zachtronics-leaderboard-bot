@@ -16,6 +16,7 @@
 
 package com.faendir.zachtronics.bot.om.rest
 
+import com.faendir.zachtronics.bot.mors.GifValidationService
 import com.faendir.zachtronics.bot.mors.MorsService
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmCollection
@@ -75,6 +76,7 @@ import kotlin.time.Duration.Companion.minutes
 class OmController(
     private val repository: OmSolutionRepository,
     private val morsService: MorsService,
+    private val gifValidationService: GifValidationService,
     private val discordClient: GatewayDiscordClient
 ) : GameRestController<OmGroupDTO, OmPuzzleDTO, OmCategoryDTO, OmRecordDTO> {
     companion object {
@@ -190,6 +192,7 @@ class OmController(
                 if (gifData == null) {
                     throw IllegalArgumentException("Failed to generate gif for your solution.")
                 }
+                gifValidationService.validate(gifData)
                 val (gif, video) = morsService.uploadGif(
                     gifData,
                     submission.puzzle.name,

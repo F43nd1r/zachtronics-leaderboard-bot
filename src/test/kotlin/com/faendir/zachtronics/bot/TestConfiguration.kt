@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot
 
 import com.faendir.zachtronics.bot.config.GitProperties
 import com.faendir.zachtronics.bot.git.GitRepository
+import com.faendir.zachtronics.bot.mors.GifValidationService
 import com.faendir.zachtronics.bot.mors.MorsService
 import com.faendir.zachtronics.bot.reddit.RedditService
 import com.faendir.zachtronics.bot.testutils.JGitNoExternalConfigReader
@@ -105,6 +106,9 @@ class TestConfiguration(private val gitProperties: GitProperties) {
 
     @Bean
     fun morsService(): MorsService = mockk<MorsService>(relaxed = true)
+
+    @Bean
+    fun gifValidationService(): GifValidationService = mockk<GifValidationService>(relaxed = true)
 
     @Bean
     fun restartEndpoint() = mockk<RestartEndpoint>(relaxed = true)

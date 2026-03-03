@@ -27,6 +27,9 @@ jobs:
           path: 'web/node_modules'
           key: ${{ runner.os }}-node-modules-${{ hashFiles('web/yarn.lock') }}
 
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
       - name: Gradle Tests
         run: ./gradlew test
         env:
