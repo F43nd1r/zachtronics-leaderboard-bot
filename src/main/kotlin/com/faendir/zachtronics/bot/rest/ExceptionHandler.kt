@@ -27,6 +27,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 class ExceptionHandler(private val objectMapper: ObjectMapper) : ResponseEntityExceptionHandler() {
 
+    @ExceptionHandler(IllegalArgumentException::class)
+    fun handleBadRequest(e: IllegalArgumentException, request: WebRequest): ResponseEntity<Any>? {
+        return ResponseEntity(objectMapper.writeValueAsString(e.message), HttpStatus.BAD_REQUEST)
+    }
+
     @ExceptionHandler(RuntimeException::class)
     fun handle(e: RuntimeException, request: WebRequest): ResponseEntity<Any>? {
         return ResponseEntity(objectMapper.writeValueAsString(e.message), HttpStatus.INTERNAL_SERVER_ERROR)
