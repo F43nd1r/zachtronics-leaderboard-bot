@@ -27,7 +27,7 @@ import java.io.File
  * Validates that uploaded GIFs match the Opus Magnum game recorder output.
  */
 @Service
-class GifValidationService(private val ffprobe: FFprobe = FFprobe("/usr/bin/ffprobe")) {
+class GifValidationService(private val ffprobe: FFprobe = FFprobe()) {
 
     companion object {
         private val logger = LoggerFactory.getLogger(GifValidationService::class.java)
