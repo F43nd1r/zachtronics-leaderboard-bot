@@ -27,7 +27,7 @@ internal class MorsServiceTest {
 
     private val morsService = MorsService(MorsProperties().apply {
         apiKey = ""
-    }, RestTemplateBuilder())
+    }, GifValidationService(), RestTemplateBuilder())
 
     @Test
     fun upload() {
