@@ -38,6 +38,7 @@ import com.faendir.zachtronics.bot.om.validation.OmSolutionVerifier
 import com.faendir.zachtronics.bot.om.validation.getScore
 import com.faendir.zachtronics.bot.utils.Markdown
 import com.faendir.zachtronics.bot.utils.orEmpty
+import com.faendir.zachtronics.bot.validation.ValidationException
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import org.springframework.stereotype.Component
 import kotlin.io.path.readBytes
@@ -68,6 +69,7 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.
         }
 
         val overrideRecords = mutableListOf<Pair<OmRecord, OmScore>>()
+        val invalidRecords = mutableListOf<Pair<OmRecord, String>>()
         for (puzzle in puzzles) {
             val puzzleFile = puzzle.file
             val records = repository.immutableData.getValue(puzzle)
@@ -78,15 +80,22 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.
                 }
 
             for ((record, _) in records) {
-                val newScore = OmSolutionVerifier(puzzleFile.readBytes(), record.dataPath.readBytes())
-                    .use { verifier -> verifier.getScore(puzzle.type) }
-                if (newScore != record.score) {
-                    overrideRecords.add(record to newScore)
+                try {
+                    val newScore = OmSolutionVerifier(puzzleFile.readBytes(), record.dataPath.readBytes())
+                        .use { verifier -> verifier.getScore(puzzle.type) }
+                    if (newScore != record.score) {
+                        overrideRecords.add(record to newScore)
+                    }
+                } catch (e: ValidationException) {
+                    invalidRecords.add(record to (e.message ?: "unknown error"))
                 }
             }
         }
         if (overrideRecords.isNotEmpty()) {
             repository.overrideScores(overrideRecords)
+        }
+        if (invalidRecords.isNotEmpty()) {
+            repository.deleteAll(invalidRecords.map { (record, _) -> record })
         }
         return MultiMessageSafeEmbedMessageBuilder().title(
                 "Reverify" + type?.displayName.orEmpty(" ") + manifold?.displayName.orEmpty(" ") +
@@ -99,6 +108,13 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.
                     **Changed Scores:**
                     ${overrideRecords.joinToString("\n") { (record, newScore) ->
                         Markdown.linkOrText(newScore.toDisplayString(DisplayContext.discord()), record.displayLink) }
+                    }
+                    
+                    **Removed Invalid Records:** ${invalidRecords.size}
+                    
+                    **Invalid Solutions:**
+                    ${invalidRecords.joinToString("\n") { (record, reason) ->
+                        "${Markdown.linkOrText(record.score.toDisplayString(DisplayContext.discord()), record.displayLink)}: $reason" }
                     }
                     """.trimIndent()
             )

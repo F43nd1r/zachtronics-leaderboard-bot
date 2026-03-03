@@ -309,6 +309,20 @@ class OmSolutionRepository(
         }
     }
 
+    fun deleteAll(records: List<OmRecord>) {
+        if (records.isEmpty()) return
+        leaderboard.acquireWriteAccess().use { leaderboardScope ->
+            for (record in records) {
+                val dir = leaderboardScope.getPuzzleDir(record.puzzle)
+                leaderboardScope.rm(record.dataPath.toFile())
+                leaderboardScope.rm(File(dir, "${record.toFileStem()}.json"))
+            }
+            leaderboardScope.commitAndPush("Reverify invalid solutions (DELETE)")
+            loadData(leaderboardScope)
+            pageGenerator.update(OmCategory.entries, immutableData)
+        }
+    }
+
     fun computeChangesSince(instant: Instant): List<OmRecordChange> {
         return leaderboard.acquireReadAccess().use { leaderboardScope ->
             leaderboardScope.changesSince(instant).mapNotNull { change ->
