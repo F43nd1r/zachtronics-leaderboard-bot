@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
  <pre>{"error": "SolutionIncomplete"}</pre>
  */
 @Value
-public class KzSimZachResult {
+public class KzSimResult {
     @Nullable Integer time;
     @Nullable Integer cost;
     @Nullable Integer area;

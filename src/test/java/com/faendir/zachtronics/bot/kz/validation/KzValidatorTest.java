@@ -17,7 +17,6 @@
 package com.faendir.zachtronics.bot.kz.validation;
 
 import com.faendir.zachtronics.bot.kz.model.KzScore;
-import com.faendir.zachtronics.bot.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.springframework.core.io.ClassPathResource;
@@ -26,7 +25,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisabledIfEnvironmentVariable(named = "CI", matches = "true", disabledReason = "Uses kaizen-sim")
 class KzValidatorTest {
@@ -38,10 +36,7 @@ class KzValidatorTest {
         byte[] data = Files.readAllBytes(resource.getFile().toPath());
         KzScore expected = new KzScore(4, 38, 130);
 
-        KzScore result = KzValidator.validateFFI(data, "someGuy", null).getScore();
-        assertEquals(expected, result);
-
-        result = KzValidator.validateZach(data, "someGuy", null).getScore();
+        KzScore result = KzValidator.validate(data, "someGuy", null).getScore();
         assertEquals(expected, result);
     }
 
@@ -49,10 +44,8 @@ class KzValidatorTest {
     void bad() {
         byte[] nonsense = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-        assertThrows(ValidationException.class, () -> KzValidator.validateFFI(nonsense, "someGuy", null));
-
-        KzSimZachResult result = KzValidator.validateZach(nonsense);
-        KzSimZachResult expected = new KzSimZachResult(null, null, null, null, null, null, "Invalid puzzle ID: 117835012");
+        KzSimResult result = KzValidator.validate(nonsense);
+        KzSimResult expected = new KzSimResult(null, null, null, null, null, null, "Invalid puzzle ID: 117835012");
         assertEquals(expected, result);
     }
 

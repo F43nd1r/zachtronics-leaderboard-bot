@@ -37,7 +37,7 @@ public class KzSubmission implements Submission<KzCategory, KzPuzzle> {
      */
     @NotNull
     public static KzSubmission fromData(byte @NotNull [] data, @NotNull String author, String displayLink) throws ValidationException {
-        return KzValidator.validateZach(data, author, displayLink);
+        return KzValidator.validate(data, author, displayLink);
     }
 
     @NotNull

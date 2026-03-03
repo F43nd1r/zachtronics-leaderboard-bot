@@ -23,49 +23,16 @@ import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.foreign.Arena;
-import java.lang.foreign.MemorySegment;
 import java.util.Arrays;
 import java.util.List;
 
 public class KzValidator {
     private KzValidator() {}
 
-    /** wrapper for libkaizensim, WL's sim */
-    public static @NotNull KzSubmission validateFFI(byte @NotNull [] data, @NotNull String author, String displayLink)
-    throws ValidationException {
-        try (Arena arena = Arena.ofConfined()) {
-            MemorySegment ffiScore = KzSimFFIWrapper.scoreCreate(arena, data);
-
-            String error = KzSimFFIWrapper.error(ffiScore);
-            if (error != null) {
-                throw new ValidationException(error);
-            }
-
-            // l33t h4x0rs
-            if (KzSimFFIWrapper.manipulated(ffiScore)) {
-                throw new ValidationException("Solution was manipulated using an external editor");
-            }
-
-            // puzzle
-            int level = KzSimFFIWrapper.level(ffiScore);
-            KzPuzzle puzzle = Arrays.stream(KzPuzzle.values())
-                                    .filter(p -> p.getId() == level)
-                                    .findFirst()
-                                    .orElseThrow();
-
-            KzScore score = new KzScore(KzSimFFIWrapper.time(ffiScore),
-                                        KzSimFFIWrapper.cost(ffiScore),
-                                        KzSimFFIWrapper.area(ffiScore));
-
-            return new KzSubmission(puzzle, score, author, displayLink, data);
-        }
-    }
-
     /** wrapper for kaizen-sim, Zach's sim */
-    public static @NotNull KzSubmission validateZach(byte @NotNull [] data, @NotNull String author, String displayLink)
+    public static @NotNull KzSubmission validate(byte @NotNull [] data, @NotNull String author, String displayLink)
     throws ValidationException {
-        KzSimZachResult result = validateZach(data);
+        KzSimResult result = validate(data);
         if (result.getError() != null) {
             throw new ValidationException(result.getError());
         }
@@ -93,8 +60,8 @@ public class KzValidator {
         return new KzSubmission(puzzle, score, author, displayLink, result.getNormalized());
     }
 
-    static @NotNull KzSimZachResult validateZach(byte @NotNull [] data) throws ValidationException {
+    static @NotNull KzSimResult validate(byte @NotNull [] data) throws ValidationException {
         List<String> command = List.of("kaizen-sim", "--normalize", "-");
-        return ValidationUtils.callValidator(KzSimZachResult.class, data, command);
+        return ValidationUtils.callValidator(KzSimResult.class, data, command);
     }
 }
