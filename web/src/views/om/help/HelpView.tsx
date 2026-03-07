@@ -17,6 +17,7 @@
 import { Card, CardContent, CardHeader, CardMedia, styled, useTheme } from "@mui/material"
 import heightExplanation from "./height_explanation.jpg"
 import widthExplanation from "./width_explanation.jpg"
+import boundingHexagonExplanation from "./bounding_hexagon_explanation.jpg"
 import overlapExplanation from "./overlap_tutorial.mp4"
 import { LinkOutlined } from "@mui/icons-material"
 import { ReactNode, useMemo, useState } from "react"
@@ -74,6 +75,16 @@ export default function HelpView() {
                     </>
                 }
                 image={{ location: widthExplanation, alt: "Width Explanation" }}
+            />
+            <HelpCard
+                id="boundinghexagon"
+                title="Bounding Hexagon (b)"
+                description={
+                    <>
+                        Side length of the smallest regular hexagon that can fully contain the area footprint of the solution.
+                    </>
+                }
+                image={{ location: boundingHexagonExplanation, alt: "Bounding Hexagon Explanation" }}
             />
             <HelpCard
                 id="rate"
