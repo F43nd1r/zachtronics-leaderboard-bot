@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.Group
 import com.faendir.zachtronics.bot.om.model.OmCollection.CAMPAIGN
+import com.faendir.zachtronics.bot.om.model.OmCollection.DRM
 import com.faendir.zachtronics.bot.om.model.OmCollection.COMMUNITY
 import com.faendir.zachtronics.bot.om.model.OmCollection.JOURNAL
 
