@@ -39,9 +39,8 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
-          junit_files: |
+          files: |
             build/test-results/**/*.xml
-            native/build/test-results/**/*.xml
 
   publish:
     runs-on: ubuntu-latest
@@ -87,7 +86,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish release
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: "."
           push: true
