@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,8 @@ package com.faendir.zachtronics.bot.om.repository
 
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.StringFormat
-import com.faendir.zachtronics.bot.om.model.OmCategory
+import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.om.model.OmCategory.*
-import com.faendir.zachtronics.bot.om.model.OmGroup
-import com.faendir.zachtronics.bot.om.model.OmPuzzle
-import com.faendir.zachtronics.bot.om.model.OmRecord
-import com.faendir.zachtronics.bot.om.model.OmType
 import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
 import com.faendir.zachtronics.bot.reddit.RedditService
 import com.faendir.zachtronics.bot.reddit.Subreddit.OPUS_MAGNUM
@@ -60,37 +56,41 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
         if (categories.any { this.categories.contains(it) }) {
             val prefix = ResourceUtils.getFile("classpath:om/reddit/prefix.md").readText()
             val suffix = ResourceUtils.getFile("classpath:om/reddit/suffix.md").readText()
-            var table = ""
-            for (group in OmGroup.entries) {
-                table += "## ${group.displayName}\n\n"
-                val puzzles = OmPuzzle.entries.filter { it.group == group }
-                val thirdCategory = puzzles.map {
-                    when (it.type) {
-                        OmType.NORMAL, OmType.POLYMER -> "Area"
-                        PRODUCTION -> "Instructions"
-                    }
-                }.distinct().joinToString("/")
-                table += "Name|Cost|Cycles|${thirdCategory}|Sum\n:-|:-|:-|:-|:-\n"
-                for (puzzle in puzzles) {
-                    table += "[**${puzzle.displayName}**](${puzzle.link})"
+            val content = buildString {
+                append(prefix)
+                append("\n")
+                for (group in OmGroup.entries) {
+                    append("## ${group.displayName}\n\n")
+                    val puzzles = OmPuzzle.entries.filter { it.group == group }
+                    val thirdCategory = puzzles.map {
+                        when (it.type) {
+                            OmType.NORMAL, OmType.POLYMER -> "Area"
+                            PRODUCTION -> "Instructions"
+                        }
+                    }.distinct().joinToString("/")
+                    append("Name|Cost|Cycles|${thirdCategory}|Sum\n:-|:-|:-|:-|:-\n")
+                    for (puzzle in puzzles) {
+                        append("[**${puzzle.displayName}**](${puzzle.link})")
 
-                    val entry = data[puzzle] ?: emptySet()
-                    val costScores = filterRecords(entry, costCategories)
-                    val cycleScores = filterRecords(entry, cycleCategories)
-                    val areaInstructionScores = filterRecords(entry, areaInstructionCategories)
-                    val sumScores = filterRecords(entry, sumCategories)
-                    while (costScores.isNotEmpty() || cycleScores.isNotEmpty() || areaInstructionScores.isNotEmpty() || sumScores.isNotEmpty()) {
-                        table += "|${costScores.removeFirstOrNull().toMarkdown()}|${
-                            cycleScores.removeFirstOrNull().toMarkdown()
-                        }|${areaInstructionScores.removeFirstOrNull().toMarkdown()}|${
-                            sumScores.removeFirstOrNull().toMarkdown()
-                        }|\n|"
+                        val entry = data[puzzle] ?: emptySet()
+                        val costScores = filterRecords(entry, costCategories)
+                        val cycleScores = filterRecords(entry, cycleCategories)
+                        val areaInstructionScores = filterRecords(entry, areaInstructionCategories)
+                        val sumScores = filterRecords(entry, sumCategories)
+                        while (costScores.isNotEmpty() || cycleScores.isNotEmpty() || areaInstructionScores.isNotEmpty() || sumScores.isNotEmpty()) {
+                            append("|${costScores.removeFirstOrNull().toMarkdown()}|${
+                                cycleScores.removeFirstOrNull().toMarkdown()
+                            }|${areaInstructionScores.removeFirstOrNull().toMarkdown()}|${
+                                sumScores.removeFirstOrNull().toMarkdown()
+                            }|\n|")
+                        }
+                        append("\n")
                     }
-                    table += "\n"
+                    append("\n")
                 }
-                table += "\n"
+                append("\n")
+                append(suffix)
             }
-            val content = "$prefix\n$table\n$suffix".trim()
             if (content.lines() != reddit.getWikiPage(OPUS_MAGNUM, wikiPage).lines()) {
                 reddit.updateWikiPage(OPUS_MAGNUM, wikiPage, content, "bot update")
             }
