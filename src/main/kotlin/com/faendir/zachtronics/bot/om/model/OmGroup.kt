@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,18 @@
 package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.Group
-import com.faendir.zachtronics.bot.om.model.OmCollection.CAMPAIGN
-import com.faendir.zachtronics.bot.om.model.OmCollection.COMMUNITY
-import com.faendir.zachtronics.bot.om.model.OmCollection.JOURNAL
+import com.faendir.zachtronics.bot.om.model.OmCollection.*
 
 enum class OmGroup(val collection: OmCollection, override val displayName: String) : Group {
-    CHAPTER_1(CAMPAIGN, "Chapter 1"),
-    CHAPTER_2(CAMPAIGN, "Chapter 2"),
-    CHAPTER_3(CAMPAIGN, "Chapter 3"),
-    CHAPTER_4(CAMPAIGN, "Chapter 4"),
-    CHAPTER_5(CAMPAIGN, "Chapter 5"),
-    CHAPTER_PRODUCTION(CAMPAIGN, "Production Alchemy"),
+    CHAPTER_1(CAMPAIGN, "Chapter I"),
+    CHAPTER_2(CAMPAIGN, "Chapter II"),
+    CHAPTER_3(CAMPAIGN, "Chapter III"),
+    CHAPTER_4(CAMPAIGN, "Chapter IV"),
+    CHAPTER_5(CAMPAIGN, "Chapter V"),
+    CHAPTER_PRODUCTION(CAMPAIGN, "Appendix"),
+    CHAPTER_DRM_1(DRM, "Chapter I"),
+    CHAPTER_DRM_2(DRM, "Chapter II"),
+    CHAPTER_DRM_3(DRM, "Chapter III"),
     JOURNAL_I(JOURNAL, "Journal I"),
     JOURNAL_II(JOURNAL, "Journal II"),
     JOURNAL_III(JOURNAL, "Journal III"),
@@ -37,6 +38,9 @@ enum class OmGroup(val collection: OmCollection, override val displayName: Strin
     JOURNAL_VII(JOURNAL, "Journal VII"),
     JOURNAL_VIII(JOURNAL, "Journal VIII"),
     JOURNAL_IX(JOURNAL, "Journal IX"),
+    JOURNAL_X(JOURNAL, "Journal X"),
+    JOURNAL_XI(JOURNAL, "Journal XI"),
+    JOURNAL_XII(JOURNAL, "Journal XII"),
     TOURNAMENT_2019(COMMUNITY, "Tournament 2019"),
     TOURNAMENT_2020(COMMUNITY, "Tournament 2020"),
     TOURNAMENT_2021(COMMUNITY, "Tournament 2021"),

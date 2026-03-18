@@ -50,7 +50,7 @@ function Groups() {
                     groupPuzzles(puzzles).map((collection, groups) => (
                         <ExpandableListItem
                             key={collection.id}
-                            title={`${collection.displayName} Puzzles`}
+                            title={`${collection.displayName}`}
                             icon={<Extension />}
                             content={groups.map((group, puzzles) => (
                                 <Puzzles group={group} puzzles={puzzles} key={group.id} selectedPuzzleId={puzzleId} />
