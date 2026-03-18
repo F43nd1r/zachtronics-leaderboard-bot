@@ -43,9 +43,9 @@ sealed class OmSimMetric<T: Number>(val id: String) {
     object WIDTH_TIMES_TWO_AT_60_DEGREES : OmSimMetric<Int>("width*2 at 60 degrees")
     object WIDTH_TIMES_TWO_AT_120_DEGREES : OmSimMetric<Int>("width*2 at 120 degrees")
     object MINIMUM_HEXAGON : OmSimMetric<Int>("minimum hexagon")
-//    object THROUGHPUT_CYCLES : OmSimMetric<Int("throughput cycles")
+//    object THROUGHPUT_CYCLES : OmSimMetric<Int>("throughput cycles")
     object PER_REPETITION_CYCLES : OmSimMetric<Int>("per repetition cycles")
-//    object THROUGHPUT_OUTPUTS : OmSimMetric<Int("throughput outputs")
+//    object THROUGHPUT_OUTPUTS : OmSimMetric<Int>("throughput outputs")
     object PER_REPETITION_OUTPUTS : OmSimMetric<Int>("per repetition outputs")
     object PER_REPETITION_AREA : OmSimMetric<Int>("per repetition area")
     object PER_REPETITION_SQUARED_AREA : OmSimMetric<Double>("per repetition^2 area")
@@ -95,7 +95,12 @@ enum class PartType(val id: String) {
     OUTPUT("out-std"),
     POLYMER("out-rep"),
     TRACK("track"),
-    CONDUIT("pipe")
+    CONDUIT("pipe"),
+    //DLC
+    REJECTION("glyph-rejection"),
+    DIVISION("glyph-division"),
+    PROLIFERATION("glyph-proliferation"),
+    RAVARI_WHEEL("ravari"),
 }
 
 @Suppress("Unused")
