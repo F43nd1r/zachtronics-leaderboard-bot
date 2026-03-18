@@ -101,7 +101,7 @@ enum class OmPuzzle(
     VIA_QUICKSILVER(CHAPTER_DRM_3, NORMAL, "Via Quicksilver", "P216")
     EX_MATERIA(CHAPTER_DRM_3, PRODUCTION, "Ex Materia", "P217")
     EXPERIMENTAL_CATALYST(CHAPTER_DRM_3, NORMAL, "Experimental Catalyst", "P220")
-    PATTERN_METAL(CHAPTER_DRM_3, NORMAL, "Invariant Metal", "P221")
+    PATTERN_METAL(CHAPTER_DRM_3, NORMAL, "Pattern Metal", "P221")
 
     VAN_BERLO_S_WHEEL(JOURNAL_I, NORMAL, "Van Berlo's Wheel", "P054"),
     VAN_BERLO_S_CHAIN(JOURNAL_I, POLYMER, "Van Berlo's Chain", "P055"),
