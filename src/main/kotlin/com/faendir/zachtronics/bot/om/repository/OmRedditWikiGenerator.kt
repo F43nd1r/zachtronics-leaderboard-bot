@@ -70,7 +70,7 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
                     }.distinct().joinToString("/")
                     append("Name|Cost|Cycles|${thirdCategory}|Sum\n:-|:-|:-|:-|:-\n")
                     for (puzzle in puzzles) {
-                        append("[**${puzzle.displayName}**](${puzzle.link})")
+                        append("|[**${puzzle.displayName}**](${puzzle.link})")
 
                         val entry = data[puzzle] ?: emptySet()
                         val costScores = filterRecords(entry, costCategories)
