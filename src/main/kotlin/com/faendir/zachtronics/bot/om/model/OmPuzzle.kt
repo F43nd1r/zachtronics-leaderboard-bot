@@ -170,7 +170,7 @@ enum class OmPuzzle(
 
     SOPHICK_MERCURY(JOURNAL_XII, NORMAL, "Sophick Mercury", "P250"),	
     RECLAIMED_GOLD(JOURNAL_XII, NORMAL, "Reclaimed Gold", "P254"),	
-    DENTAL_AMALGAM(JOURNAL_XII, NORMAL, "Dental Amalgam", "P252"),	
+    DENTAL_AMALGAM(JOURNAL_XII, PRODUCTION, "Dental Amalgam", "P252"),	
     CUPRITE(JOURNAL_XII, NORMAL, "Cuprite", "P253"),	
     EXPLOSIVE_ALLOY(JOURNAL_XII, NORMAL, "Explosive Alloy", "P251"),	
 
