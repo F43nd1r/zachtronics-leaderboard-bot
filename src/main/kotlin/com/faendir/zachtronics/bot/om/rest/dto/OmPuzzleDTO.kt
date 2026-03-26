@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,14 @@
 package com.faendir.zachtronics.bot.om.rest.dto
 
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.fasterxml.jackson.annotation.JsonInclude
 
-data class OmPuzzleDTO(val id: String, val displayName: String, val group: OmGroupDTO, val type: String)
+data class OmPuzzleDTO(
+    val id: String,
+    val displayName: String,
+    val group: OmGroupDTO,
+    val type: String,
+    @JsonInclude(JsonInclude.Include.NON_EMPTY) val altIds: List<String>
+)
 
-fun OmPuzzle.toDTO() = OmPuzzleDTO(id, displayName, group.toDTO(), type.displayName)
+fun OmPuzzle.toDTO() = OmPuzzleDTO(id, displayName, group.toDTO(), type.displayName, altIds.toList())

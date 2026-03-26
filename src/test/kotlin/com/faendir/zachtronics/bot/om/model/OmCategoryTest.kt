@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,11 +42,9 @@ class OmCategoryTest {
     @Test
     fun `ensure ingame metrics are shown for each category`() {
         for (cat in OmCategory.entries) {
-            for (type in cat.supportedTypes) {
-                expectThat(cat) {
-                    get { requiredParts }.contains(OmMetric.OVERLAP)
-                    get { requiredParts }.contains(cat.manifold.ingameMetrics)
-                }
+            expectThat(cat) {
+                get { requiredParts }.contains(OmMetric.OVERLAP)
+                get { requiredParts }.contains(cat.manifold.ingameMetrics)
             }
         }
     }
