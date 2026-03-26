@@ -18,11 +18,7 @@ package com.faendir.zachtronics.bot.om.validation
 
 import com.faendir.om.parser.solution.SolutionParser
 import com.faendir.om.parser.solution.model.SolvedSolution
-import com.faendir.om.parser.solution.model.part.Arm
-import com.faendir.om.parser.solution.model.part.ArmType
-import com.faendir.om.parser.solution.model.part.Glyph
-import com.faendir.om.parser.solution.model.part.GlyphType
-import com.faendir.om.parser.solution.model.part.IO
+import com.faendir.om.parser.solution.model.part.*
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmSubmission
@@ -108,8 +104,14 @@ fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSub
     if (solution.parts.count { it is Arm && it.type == ArmType.VAN_BERLOS_WHEEL } > 1) {
         throw IllegalArgumentException("Multiple Van Berlo's Wheels are banned.")
     }
+    if (solution.parts.count { it is Arm && it.type == ArmType.RAVARIS_WHEEL } > 1) {
+        throw IllegalArgumentException("Multiple Ravari's Wheels are banned.")
+    }
     if (solution.parts.count { it is Glyph && it.type == GlyphType.DISPOSAL } > 1) {
         throw IllegalArgumentException("Multiple Disposal glyphs are banned.")
+    }
+    if (solution.parts.count { it is Glyph && it.type == GlyphType.PROLIFERATION } > 1) {
+        throw IllegalArgumentException("Multiple Proliferation glyphs are banned.")
     }
     if (solution.parts.filterIsInstance<IO>().groupBy { it.type to it.index }.values.any { it.size > 1 }) {
         throw IllegalArgumentException("Duplicated Inputs or Outputs are banned.")
@@ -130,8 +132,8 @@ fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSub
         if (verifier.getMetric(OmSimMetric.MAXIMUM_TRACK_GAP_POW_2) > 1) {
             throw IllegalArgumentException("Quantum Tracks are banned.")
         }
-        if (verifier.getMetric(OmSimMetric.MAXIMUM_ABSOLUTE_ARM_ROTATION) >= 4096) {
-            throw IllegalArgumentException("Maximum arm rotations over 4096 are banned.")
+        if (verifier.getMetric(OmSimMetric.MAXIMUM_ABSOLUTE_ARM_ROTATION) >= 8192) {
+            throw IllegalArgumentException("Maximum arm rotations over 8192 are banned.")
         }
         return OmSubmission(
             puzzle,
