@@ -52,6 +52,16 @@ export default function HelpView() {
                     </>
                 }
             />
+            <HelpCard
+                id="multiplication"
+                title="Multiplication (x)"
+                description={
+                    <>
+                        This is always a secondary metric. It indicates the multiplication of the remaining two metrics.
+                        For instance, GX in a normal puzzle indicates Cost followed by Cycles * Area.
+                    </>
+                }
+            />
             <HelpCard id="sum" title="Sum (g+c+a / g+c+i)" description={<>Sum of cost, cycles and area (or instructions in production puzzles).</>} />
             <HelpCard id="sum4" title="Sum4 (g+c+a+i)" description={<>Sum of cost, cycles, area and instructions.</>} />
             <HelpCard
@@ -120,7 +130,14 @@ export default function HelpView() {
                     alt: "Overlap Explanation",
                 }}
             />
-            <HelpCard id="trackless" title="Trackless (T)" description={<>Solutions containing no tracks are classified as trackless.</>} />
+            <HelpCard id="trackless" title="Trackless (T)" description={
+                <>
+                    Solutions containing no tracks are classified as trackless.
+                    <p>
+                        Note that Trackless is only considered "interesting" for certain metric combinations, so you won't see a full set of T metrics in the categories.
+                    </p>
+                </>
+            } />
             <HelpCard
                 id="pareto"
                 title="Pareto Frontier"
