@@ -17,28 +17,21 @@
 package com.faendir.zachtronics.bot.inf.validation;
 
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This class holds the properties of a specific save slot, custom extensions included
  */
 @Data
 class IfSolutionInfo {
-    Integer inputRate;
-    Integer blocks;
-    Integer cycles;
-    Integer footprint;
-    String solution;
+    @Nullable Integer inputRate;
+    @Nullable Integer blocks;
+    @Nullable Integer cycles;
+    @Nullable Integer footprint;
+    @Nullable String solution;
 
-    String flags;
+    @Nullable String flags;
 
-    String author;
-    String videos;
-
-    boolean hasData() {
-        return inputRate != null && solution != null;
-    }
-
-    boolean hasScore() {
-        return blocks != null && cycles != null && footprint != null;
-    }
+    @Nullable String author;
+    @Nullable String videos;
 }

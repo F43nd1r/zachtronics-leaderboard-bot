@@ -68,7 +68,7 @@ public class IfValidator {
                                                                               boolean isAdmin) {
         Map<String, IfSolutionInfo> infosByIdSlot = new LinkedHashMap<>(); // 1-1.0 -> {...}
         Function<String[], IfSolutionInfo> find =
-            keyParts -> infosByIdSlot.computeIfAbsent(keyParts[1] + "." + keyParts[2], p -> new IfSolutionInfo());
+            keyParts -> infosByIdSlot.computeIfAbsent(keyParts[1] + "." + keyParts[2], _ -> new IfSolutionInfo());
 
         for (String line: Pattern.compile("\r?\n").split(data)) {
             if (!line.contains("=")) continue;
@@ -100,7 +100,7 @@ public class IfValidator {
                 }
             }
         }
-        infosByIdSlot.entrySet().removeIf(e -> !e.getKey().matches("1?\\d-\\db?\\.\\d")); // main game puzzles only
+        infosByIdSlot.keySet().removeIf(k -> !k.matches("1?\\d-\\db?\\.\\d")); // main game puzzles only
 
         if ((videos != null || score != null) && infosByIdSlot.size() != 1)
             throw new IllegalArgumentException("Only one solution can be paired with videos or explicit score");
@@ -116,8 +116,10 @@ public class IfValidator {
     @NotNull
     private static ValidationResult<IfSubmission> validateOne(@NotNull String idSlot, @NotNull IfSolutionInfo info, @NotNull String author,
                                                               @Nullable IfScore score, @Nullable List<String> videos, boolean isAdmin) {
-        if (!info.hasData())
+        if (info.getInputRate() == null || info.getSolution() == null)
             return new ValidationResult.Unparseable<>("Incomplete necessary data for idSlot: " + idSlot);
+        if (info.getSolution().isEmpty())
+            return new ValidationResult.Unparseable<>("Empty solution for idSlot: " + idSlot);
         IfSave save;
         try {
             save = IfSave.unmarshal(info.getSolution());
@@ -136,7 +138,7 @@ public class IfValidator {
         // if we have no score we load it from the file
         // users must give the flags explicitly, admins can deduce the flags from the solution
         if (score == null) {
-            if (!info.hasScore())
+            if (info.getCycles() == null || info.getFootprint() == null || info.getBlocks() == null)
                 return new ValidationResult.Unparseable<>("Incomplete score data for idSlot: " + idSlot);
 
             boolean outOfBounds;
