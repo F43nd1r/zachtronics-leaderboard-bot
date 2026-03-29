@@ -139,9 +139,11 @@ class OmSolutionRepositoryTest {
         repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score, displayLink = "https://bad.gif"))
 
         val gif = "https://better.gif"
-        val result = repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score, displayLink = gif))
+        val resultNo = repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score, displayLink = gif))
+        expectThat(resultNo).isA<SubmitResult.AlreadyPresent<OmRecord, OmCategory>>()
+        val resultYes = repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score, displayLink = gif, allowGifUpdate = true))
+        expectThat(resultYes).isA<SubmitResult.Updated<OmRecord, OmCategory>>()
 
-        expectThat(result).isA<SubmitResult.Updated<OmRecord, OmCategory>>()
         expectThat(repository.findCategoryHolders(OmPuzzle.STABILIZED_WATER, true)) {
             hasSize(1)
             first().get { record.displayLink }.isEqualTo(gif)

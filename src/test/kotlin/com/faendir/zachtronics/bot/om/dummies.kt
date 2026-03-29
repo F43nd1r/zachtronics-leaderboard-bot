@@ -48,8 +48,9 @@ fun dummyOmSubmission(
     score: OmScore = dummyOmScore,
     author: String? = null,
     displayLink: String = "https://no.link",
-    data: ByteArray = ByteArray(0)
-) = OmSubmission(puzzle, score, author, displayLink, data)
+    data: ByteArray = ByteArray(0),
+    allowGifUpdate: Boolean = false,
+) = OmSubmission(puzzle, score, author, displayLink, data, allowGifUpdate)
 
 fun omSolutionRepoFor(repo: GitRepository) =
     OmSolutionRepository(repo, mockk(relaxed = true), OmUrlMapper(), mockk(relaxed = true), mockk(relaxed = true))
