@@ -89,9 +89,10 @@ fun OmSolutionVerifier.getScore(type: OmType): OmScore {
     )
 }
 
-fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSubmission {
+fun createSubmission(inputSolData: ByteArray, author: String, allowGifUpdate: Boolean = false,
+                     gif: String? = null, gifData: ByteArray? = null): OmSubmission {
     val solution = try {
-        SolutionParser.parse(ByteArrayInputStream(inputBytes).source().buffer())
+        SolutionParser.parse(ByteArrayInputStream(inputSolData).source().buffer())
     } catch (e: Exception) {
         throw IllegalArgumentException("I could not parse your solution", e)
     }
@@ -119,7 +120,7 @@ fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSub
     if (solution.parts.any { (abs(it.position.x) >= 16384) or (abs(it.position.y) >= 16384) }) {
         throw IllegalArgumentException("Parts farther than 2^14 from the origin are banned.")
     }
-    val (puzzle, solutionBytes) = OmPuzzle.entries.find { it.id == solution.puzzle }?.let { it to inputBytes }
+    val (puzzle, solutionData) = OmPuzzle.entries.find { it.id == solution.puzzle }?.let { it to inputSolData }
         ?: OmPuzzle.entries.find { it.altIds.contains(solution.puzzle) }?.let {
             solution.puzzle = it.id
             val out = ByteArrayOutputStream()
@@ -128,7 +129,7 @@ fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSub
         }
         ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
     val puzzleFile = puzzle.file
-    OmSolutionVerifier(puzzleFile.readBytes(), solutionBytes).use { verifier ->
+    OmSolutionVerifier(puzzleFile.readBytes(), solutionData).use { verifier ->
         if (verifier.getMetric(OmSimMetric.MAXIMUM_TRACK_GAP_POW_2) > 1) {
             throw IllegalArgumentException("Quantum Tracks are banned.")
         }
@@ -140,7 +141,9 @@ fun createSubmission(gif: String?, author: String, inputBytes: ByteArray): OmSub
             verifier.getScore(puzzle.type),
             author,
             gif,
-            solutionBytes
+            solutionData,
+            allowGifUpdate,
+            gifData,
         )
     }
 }

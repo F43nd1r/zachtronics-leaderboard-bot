@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,7 +122,7 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
             getValueFrom(score)?.let { "$description=${numberFormat.format(it)}" }
     }
 
-    sealed class Not(final override val displayName: String, private val modifier: Modifier) : Computed<Boolean> {
+    sealed class Not(final override val displayName: String, modifier: Modifier) : Computed<Boolean> {
         override val collapsible: Boolean = modifier.collapsible
         override val subMetrics: Array<out ScorePart<*>> = arrayOf(modifier)
         override val getValueFrom = { score: OmScore -> !modifier.getValueFrom(score) }

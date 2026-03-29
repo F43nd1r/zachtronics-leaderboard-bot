@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.om.discord
 
 import com.faendir.zachtronics.bot.discord.Colors
 import com.faendir.zachtronics.bot.discord.command.Command
+import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.option.displayLinkOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured
 import com.faendir.zachtronics.bot.discord.command.security.Secured
@@ -30,10 +31,10 @@ import com.faendir.zachtronics.bot.om.omSolutionOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.om.validation.createSubmission
 import com.faendir.zachtronics.bot.repository.SubmitResult
+import com.faendir.zachtronics.bot.utils.Utils
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.url
 import com.faendir.zachtronics.bot.utils.user
-import com.roxstudio.utils.CUrl
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -47,11 +48,14 @@ class OmSubmitCommand(private val repository: OmSolutionRepository, private val 
     override val description = "Submit a solution"
     override val ephemeral = true
     private val solutionOption = omSolutionOptionBuilder().required().build()
-    private val gifOption = displayLinkOptionBuilder("gif")
-        .required()
+    private val allowGifUpdateOption = CommandOptionBuilder.boolean("allow-gif-update").build()
+    private val gifLinkOption = displayLinkOptionBuilder("gif-link")
         .description("Link to your solution gif/mp4")
         .build()
-    override val options = listOf(solutionOption, gifOption)
+    private val gifDataOption = CommandOptionBuilder.attachment("gif-data")
+        .description("Your solution gif")
+        .build()
+    override val options = listOf(solutionOption, allowGifUpdateOption, gifLinkOption, gifDataOption)
     override val secured: Secured = NotSecured
     override fun handle(event: ChatInputInteractionEvent) = mono {
         val submission = parseSubmission(event)
@@ -91,12 +95,10 @@ class OmSubmitCommand(private val repository: OmSolutionRepository, private val 
     }
 
     fun parseSubmission(event: ChatInputInteractionEvent): OmSubmission {
-        val gif = gifOption.get(event)
-        val bytes = try {
-            CUrl(solutionOption.get(event).url).exec()
-        } catch (e: Exception) {
-            throw IllegalArgumentException("Could not load your solution file")
-        }
-        return createSubmission(gif, event.user().username, bytes)
+        val data = Utils.downloadFile(solutionOption.get(event).url).data
+        val allowGifUpdate = allowGifUpdateOption.get(event) ?: false
+        val gifLink = gifLinkOption.get(event)
+        val gifData = gifDataOption.get(event)?.run { Utils.downloadFile(url).data }
+        return createSubmission(data, event.user().username, allowGifUpdate, gifLink, gifData)
     }
 }

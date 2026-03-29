@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { Grid } from "@mui/material"
+import {Grid} from "@mui/material"
 import OmRecordCard from "./OmRecordCard"
-import { OmRecord } from "../model/om/OmRecord"
-import { ReactNode } from "react"
+import {OmRecord} from "../model/om/OmRecord"
+import {ReactNode} from "react"
 
 interface RecordGridProps {
     records: OmRecord[]
@@ -29,7 +29,7 @@ export default function OmRecordGrid(props: RecordGridProps) {
     return (
         <Grid container spacing={3}>
             {props.records.map((record, index) => (
-                <Grid item xs key={index}>
+                <Grid key={index}>
                     <OmRecordCard record={record} title={props.getTitle(record)} score={props.getScore(record)} />
                 </Grid>
             ))}

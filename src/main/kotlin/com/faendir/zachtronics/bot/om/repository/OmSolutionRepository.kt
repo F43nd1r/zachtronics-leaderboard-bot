@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,15 @@ package com.faendir.zachtronics.bot.om.repository
 
 import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.om.model.OmCategory
-import com.faendir.zachtronics.bot.om.model.OmMetric
-import com.faendir.zachtronics.bot.om.model.OmMetrics
-import com.faendir.zachtronics.bot.om.model.OmPuzzle
-import com.faendir.zachtronics.bot.om.model.OmRecord
-import com.faendir.zachtronics.bot.om.model.OmScore
-import com.faendir.zachtronics.bot.om.model.OmScoreManifold
-import com.faendir.zachtronics.bot.om.model.OmSubmission
+import com.faendir.zachtronics.bot.mors.GifValidationService
+import com.faendir.zachtronics.bot.mors.MorsService
+import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.utils.newEnumSet
+import com.google.common.hash.Hashing
 import jakarta.annotation.PostConstruct
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -50,6 +46,8 @@ class OmSolutionRepository(
     @Qualifier("omLeaderboardRepository") private val leaderboard: GitRepository,
     private val pageGenerator: OmRedditWikiGenerator,
     private val omUrlMapper: OmUrlMapper,
+    private val morsService: MorsService,
+    private val gifValidationService: GifValidationService,
 ) : SolutionRepository<OmCategory, OmPuzzle, OmSubmission, OmRecord> {
     companion object {
         private val json = Json {
@@ -123,16 +121,36 @@ class OmSolutionRepository(
     }
 
     override fun submit(submission: OmSubmission): SubmitResult<OmRecord, OmCategory> {
-        if (submission.displayLink == null) {
-            throw IllegalArgumentException("Missing gif link.")
+        if (submission.displayLink == null && submission.gifData == null)
+            throw IllegalArgumentException("Must provide a gif link or file")
+        if (submission.displayLink != null) {
+            if (submission.displayLink!!.endsWith(".solution")) {
+                throw IllegalArgumentException("Missing gif info")
+            }
         }
-        if (submission.displayLink!!.endsWith(".solution")) {
-            throw IllegalArgumentException("You cannot use solution files as gifs.")
+        if (submission.gifData != null) {
+            if (submission.gifData.isEmpty())
+                throw IllegalArgumentException("Gif is empty")
         }
+
         return leaderboard.acquireWriteAccess().use { leaderboardScope ->
             val records by lazy { data.getValue(submission.puzzle) }
-            val newMRecord by lazy { submission.createMRecord(leaderboardScope) }
-            val result = submit(leaderboardScope, submission) { beatenMRecord, beatenCategories, lostManifolds ->
+            val newMRecord by lazy {
+                if (submission.displayLink == null) {
+                    gifValidationService.validate(submission.gifData!!)
+                    val (gif, video) = morsService.uploadGif(
+                        submission.gifData,
+                        submission.puzzle.name,
+                        "${submission.score.toMorsString()}-${
+                            Hashing.sha256().hashBytes(submission.data).toString().substring(0, 8)
+                        }"
+                    )
+                    submission.displayLinkEmbed = gif
+                    submission.displayLink = video
+                }
+                submission.createMRecord(leaderboardScope)
+            }
+            val result = submitImpl(leaderboardScope, submission) { beatenMRecord, beatenCategories, lostManifolds ->
                 if (beatenMRecord != null) {
                     beatenMRecord.frontierManifolds -= lostManifolds
                     if (beatenMRecord.frontierManifolds.isNotEmpty()) {
@@ -171,10 +189,10 @@ class OmSolutionRepository(
     }
 
     fun submitDryRun(submission: OmSubmission): SubmitResult<OmRecord, OmCategory> {
-        return leaderboard.acquireReadAccess().use { leaderboardScope -> submit(leaderboardScope, submission) { _, _, _ -> } }
+        return leaderboard.acquireReadAccess().use { leaderboardScope -> submitImpl(leaderboardScope, submission) { _, _, _ -> } }
     }
 
-    private fun submit(
+    private fun submitImpl(
         leaderboardScope: GitRepository.ReadAccess,
         submission: OmSubmission,
         handleBeatenRecord: (beatenMRecord: OmMemoryRecord?, beatenCategories: Set<OmCategory>, lostManifolds: Set<OmScoreManifold>) -> Unit
@@ -193,8 +211,7 @@ class OmSolutionRepository(
             val fullCompares = OmMetrics.FULL_SCORE.map { it.comparator.compare(submission.score, record.score) }
 
             if (fullCompares.all { it == 0 }) { // candidate is identical to record
-                @Suppress("LiftReturnOrAssignment")
-                if (submission.displayLink != record.displayLink || record.displayLink == null) {
+                if (submission.allowGifUpdate && (submission.displayLink != record.displayLink || submission.gifData != null)) {
                     // copies are needed or they'll edit themselves in the handler
                     handleBeatenRecord(mRecord, mRecord.categories.toSet(), mRecord.frontierManifolds.toSet())
                     return SubmitResult.Updated(null, null, mRecord.toCategoryRecord())
@@ -238,15 +255,13 @@ class OmSolutionRepository(
                 }
 
                 if (!strictlyWorse) {
-                    val beatenCategories = mRecord.categories.filter { category ->
-                        category.manifold == manifold && category.supportsScore(submission.score) &&
-                                category.scoreComparator.compare(submission.score, record.score)
-                                    .let {
-                                        // for scores that are exactly equal in this manifold we choose the first in the data order
-                                        // which is exactly the same choice the data loader makes, so there are no edit wars
-                                        it < 0 || it == 0 && dataOrder.compare(submission.score, record.score) < 0
-                                    }
-                    }.toSet()
+                    val beatenCategories = mRecord.categories.filterTo(newEnumSet()) {
+                        it.manifold == manifold && it.supportsScore(submission.score) &&
+                                // for scores that are exactly equal in this manifold we choose the first in the data order
+                                // which is exactly the same choice the data loader makes, so there are no edit wars
+                                it.scoreComparator.thenComparing(dataOrder)
+                                    .compare(submission.score, record.score) < 0
+                    }
 
                     val strictlyBetter = !identical && compares.all { it <= 0 } // exactly equal is taken by the branch above
                     if (strictlyBetter || beatenCategories.isNotEmpty()) {
@@ -349,7 +364,6 @@ class OmSolutionRepository(
             }
         }
     }
-
 
     private fun OmSubmission.createMRecord(leaderboardScope: GitRepository.ReadWriteAccess): OmMemoryRecord {
         val name = fileStemOf(puzzle, score)

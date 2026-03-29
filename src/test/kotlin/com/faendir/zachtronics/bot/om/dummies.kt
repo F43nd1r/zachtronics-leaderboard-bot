@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,13 @@
 
 package com.faendir.zachtronics.bot.om
 
+import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmSubmission
+import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
+import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
+import io.mockk.mockk
 
 val dummyOmScore = OmScore(
     cost = 0,
@@ -46,3 +50,6 @@ fun dummyOmSubmission(
     displayLink: String = "https://no.link",
     data: ByteArray = ByteArray(0)
 ) = OmSubmission(puzzle, score, author, displayLink, data)
+
+fun omSolutionRepoFor(repo: GitRepository) =
+    OmSolutionRepository(repo, mockk(relaxed = true), OmUrlMapper(), mockk(relaxed = true), mockk(relaxed = true))

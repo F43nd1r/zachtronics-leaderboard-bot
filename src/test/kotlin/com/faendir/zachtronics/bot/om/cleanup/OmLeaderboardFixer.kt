@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmSubmission
+import com.faendir.zachtronics.bot.om.omSolutionRepoFor
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
 import com.faendir.zachtronics.bot.om.validation.createSubmission
@@ -69,7 +70,7 @@ class OmLeaderboardFixer {
             accessToken = ""
             username = "zachtronics-leaderboard-bot"
         }, repo)
-        val repository = OmSolutionRepository(gitRepo, mockk(relaxed = true), OmUrlMapper())
+        val repository = OmSolutionRepository(gitRepo, mockk(relaxed = true), OmUrlMapper(), mockk(relaxed = true), mockk(relaxed = true))
 
         for (puzzle in OmPuzzle.entries) {
             println("Doing ${puzzle.name}")
@@ -102,7 +103,7 @@ class OmLeaderboardFixer {
             accessToken = ""
             username = "zachtronics-leaderboard-bot"
         })
-        val repository = OmSolutionRepository(newRepo, mockk(relaxed = true), OmUrlMapper())
+        val repository = OmSolutionRepository(newRepo, mockk(relaxed = true), OmUrlMapper(), mockk(relaxed = true), mockk(relaxed = true))
 
         for (file in getAllRecordFiles(repo)) {
             println("${file.name} is being processed")
@@ -110,7 +111,7 @@ class OmLeaderboardFixer {
             val displayLink = oldRecord["displayLink"]!!.jsonPrimitive.content
             val solution: File = file.resolveSibling(file.name.replace(".json", ".solution"))
             val bytes = solution.readBytes()
-            val submission = createSubmission(displayLink, "Manifoldius", bytes)
+            val submission = createSubmission(bytes, "Manifoldius", gif = displayLink)
             val result = repository.submit(submission)
             println(result)
         }
@@ -125,13 +126,13 @@ class OmLeaderboardFixer {
             accessToken = ""
             username = "zachtronics-leaderboard-bot"
         }, repoFile)
-        val repository = OmSolutionRepository(repo, mockk(relaxed = true), OmUrlMapper())
+        val repository = omSolutionRepoFor(repo)
 
         for (solution in folder.listFiles()!!.sorted()) {
             println("${solution.name} is being processed")
             val bytes = solution.readBytes()
             val submission = try {
-                createSubmission("https://new.cool.score", "Folderius", bytes)
+                createSubmission(bytes, "Folderius", gif = "https://new.cool.score")
             }
             catch (e: Exception) {
                 e.printStackTrace()

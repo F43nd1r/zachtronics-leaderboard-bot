@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,5 +24,8 @@ data class OmSubmission(
     override val author: String?,
     override var displayLink: String?,
     override val data: ByteArray,
+
+    val allowGifUpdate: Boolean = false,
+    val gifData: ByteArray? = null,
     var displayLinkEmbed: String? = null,
 ) : Submission<OmCategory, OmPuzzle>

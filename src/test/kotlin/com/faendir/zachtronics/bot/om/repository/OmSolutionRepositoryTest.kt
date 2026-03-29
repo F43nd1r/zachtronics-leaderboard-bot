@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,22 +24,15 @@ import com.faendir.zachtronics.bot.om.dummyOmSubmission
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.om.omSolutionRepoFor
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.testutils.TestGitRepository
-import io.mockk.mockk
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import strikt.api.expectThat
-import strikt.assertions.any
-import strikt.assertions.containsExactlyInAnyOrder
-import strikt.assertions.first
-import strikt.assertions.hasSize
-import strikt.assertions.isA
-import strikt.assertions.isEmpty
-import strikt.assertions.isEqualTo
-import strikt.assertions.none
+import strikt.assertions.*
 import java.io.File
 
 class OmSolutionRepositoryTest {
@@ -58,7 +51,7 @@ class OmSolutionRepositoryTest {
     @BeforeEach
     internal fun setUp() {
         leaderboard = createGitRepositoryFrom(leaderboardDir, gitProperties)
-        repository = OmSolutionRepository(leaderboard, mockk(relaxed = true), mockk(relaxed = true))
+        repository = omSolutionRepoFor(leaderboard)
     }
 
     @AfterEach
@@ -202,7 +195,7 @@ class OmSolutionRepositoryTest {
         val data = repository.findCategoryHolders(OmPuzzle.STABILIZED_WATER, true)
 
         val newLeaderboard = TestGitRepository(gitProperties, leaderboardDir)
-        val newRepository = OmSolutionRepository(newLeaderboard, mockk(relaxed = true), mockk(relaxed = true))
+        val newRepository = omSolutionRepoFor(newLeaderboard)
 
         expectThat(newRepository.findCategoryHolders(OmPuzzle.STABILIZED_WATER, true)) {
             hasSize(data.size)

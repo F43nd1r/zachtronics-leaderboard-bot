@@ -8,10 +8,9 @@ gradle-gitProperties = "2.5.7"
 kotlinx-json = "1.10.0"
 kotlinx-datetime = "0.6.2"
 kotlinx-coroutines = "1.10.2"
-discord4j = "3.3.0-RC2"
+discord4j = "3.3.1"
 reactor-kotlin = "1.3.0"
 jgit = "7.6.0.202603022253-r"
-java-curl = "1.2.2.2"
 jraw = "1.2.0"
 om-dsl = "1.5.5"
 om-parser = "2.2.1"
@@ -56,7 +55,6 @@ spring-cloud = { module = "org.springframework.cloud:spring-cloud-starter", vers
 discord4j = { module = "com.discord4j:discord4j-core", version.ref = "discord4j" }
 reactor-kotlin = { module = "io.projectreactor.kotlin:reactor-kotlin-extensions", version.ref = "reactor-kotlin" }
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
-java-curl = { module = "com.github.rockswang:java-curl", version.ref = "java-curl" }
 jraw = { module = "com.faendir.jraw:JRAW", version.ref = "jraw" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin" }

@@ -43,7 +43,6 @@ dependencies {
     implementation(libs.discord4j)
     implementation(libs.reactor.kotlin)
     implementation(libs.jgit)
-    implementation(libs.java.curl)
     implementation(libs.jraw)
     implementation(libs.om.dsl)
     implementation(libs.om.parser)

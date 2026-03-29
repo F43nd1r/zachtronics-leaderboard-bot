@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,61 +14,71 @@
  * limitations under the License.
  */
 
-import { Alert, Backdrop, Box, CircularProgress, Grow, TextField } from "@mui/material"
-import { DropzoneAreaBase, FileObject } from "react-mui-dropzone"
-import { useEffect, useState } from "react"
-import { fetchFromApiRaw } from "../../../utils/fetchFromApi"
-import { CheckCircle } from "@mui/icons-material"
-import { usePersistedState } from "../../../utils/usePersistedState"
-import { Type } from "@sinclair/typebox"
+import {
+    Alert,
+    Backdrop,
+    Box,
+    Button,
+    Checkbox,
+    CircularProgress,
+    FormControlLabel,
+    Grow,
+    TextField
+} from "@mui/material"
+import {DropzoneAreaBase, FileObject} from "react-mui-dropzone"
+import {useState} from "react"
+import {fetchFromApiRaw} from "../../../utils/fetchFromApi"
+import {CheckCircle} from "@mui/icons-material"
+import {usePersistedState} from "../../../utils/usePersistedState"
+import {Type} from "@sinclair/typebox"
 
 export default function UploadView() {
-    const [files, setFiles] = useState<FileObject[]>([])
+    const [solutionFile, setSolutionFile] = useState<FileObject | undefined>(undefined)
+    const [gifFile, setGifFile] = useState<FileObject | undefined>(undefined)
     const [author, setAuthor] = usePersistedState("om-upload-author", Type.String(), "")
+    const [allowGifUpdate, setAllowGifUpdate] = useState<boolean>(false)
     const [error, setError] = useState<string>()
     const [isUploading, setIsUploading] = useState<boolean>(false)
     const [success, setSuccess] = useState<boolean>(false)
-    useEffect(() => {
-        const processFiles = async () => {
-            setError(undefined)
-            if (files.length === 2) {
-                const solution = files.find((fileObject) => fileObject.file.name.endsWith(".solution"))
-                if (!author) {
-                    setError("You need to enter your name.")
-                    return
-                }
-                if (!solution) {
-                    setError("One of your files must be a solution file.")
-                    return
-                }
-                const gif = files.find((fileObject) => fileObject.file.name.endsWith(".gif"))
-                if (!gif) {
-                    setError("One of your files must be a gif.")
-                    return
-                }
-                setIsUploading(true)
-                const formData = new FormData()
-                formData.append("author", author)
-                formData.append("solution", new Blob([await solution.file.arrayBuffer()]))
-                formData.append("gifData", new Blob([await gif.file.arrayBuffer()]))
-                const response = await fetchFromApiRaw("/om/submit", {
-                    method: "POST",
-                    body: formData,
-                })
-                const result = await response.json()
-                if (!response.ok || result !== "SUCCESS") {
-                    setError(`Upload failed: ${JSON.stringify(result)}`)
-                } else {
-                    setSuccess(true)
-                    await new Promise((resolve) => setTimeout(resolve, 2000))
-                    setFiles([])
-                    setSuccess(false)
-                }
-                setIsUploading(false)
-            }
+
+    const handleUpload = async () => {
+        setError(undefined)
+        if (!solutionFile) {
+            setError("Please drop your solution file.")
+            return
         }
-        processFiles().then()
-    }, [author, files])
+        if (!gifFile) {
+            setError("Please drop your GIF file.")
+            return
+        }
+        if (!author) {
+            setError("You need to enter your name.")
+            return
+        }
+
+        setIsUploading(true)
+        const formData = new FormData()
+        formData.append("author", author)
+        formData.append("solution", new Blob([await solutionFile.file.arrayBuffer()]))
+        formData.append("gifData", new Blob([await gifFile.file.arrayBuffer()]))
+        formData.append("allowGifUpdate", allowGifUpdate.toString());
+        const response = await fetchFromApiRaw("/om/submit", {
+            method: "POST",
+            body: formData,
+        })
+        const result = await response.json()
+        if (!response.ok || result !== "SUCCESS") {
+            setError(`Upload failed: ${JSON.stringify(result)}`)
+        } else {
+            setSuccess(true)
+            await new Promise((resolve) => setTimeout(resolve, 2000))
+            setSolutionFile(undefined)
+            setGifFile(undefined)
+            setSuccess(false)
+        }
+        setIsUploading(false)
+    }
+
     return (
         <div
             style={{
@@ -81,7 +91,7 @@ export default function UploadView() {
             <Box
                 sx={{
                     padding: 4,
-                    maxWidth: "800px",
+                    maxWidth: "1000px",
                     display: "flex",
                     flexDirection: "column",
                     minHeight: 0,
@@ -90,33 +100,72 @@ export default function UploadView() {
                     gap: "1em",
                 }}
             >
-                <TextField
-                    id="author"
-                    label="Author"
-                    variant="outlined"
-                    fullWidth
-                    autoFocus
-                    onChange={(e) => setAuthor(e.target.value)}
-                    defaultValue={author}
-                />
-                <DropzoneAreaBase
-                    fileObjects={files}
-                    onAdd={(newFiles) => {
-                        setFiles([...files, ...newFiles])
-                    }}
-                    onDelete={(removeFile) => {
-                        setFiles(files.filter((file) => file !== removeFile))
-                    }}
-                    filesLimit={2}
-                    maxFileSize={104857600}
-                    dropzoneText="Drop your solution and gif here"
-                    showPreviews={true}
-                    showPreviewsInDropzone={false}
-                    previewText="Files:"
-                    showFileNames={true}
-                    showFileNamesInPreview={true}
-                    useChipsForPreview={true}
-                />
+                <Box sx={{ display: "flex", alignItems: "center", gap: "1em" }}>
+                    <TextField
+                        id="author"
+                        label="Author"
+                        variant="outlined"
+                        fullWidth
+                        autoFocus
+                        onChange={(e) => setAuthor(e.target.value)}
+                        defaultValue={author}
+                    />
+                    <FormControlLabel
+                        sx={{ whiteSpace: 'nowrap' }}
+                        control={
+                            <Checkbox
+                                checked={allowGifUpdate}
+                                onChange={(e) => setAllowGifUpdate(e.target.checked)}
+                                name="allowGifUpdate"
+                                color="primary"
+                            />
+                        }
+                        label="Allow GIF Update"
+                    />
+                </Box>
+                <Box sx={{ display: "flex", gap: "1em" }}>
+                    <DropzoneAreaBase
+                        fileObjects={solutionFile ? [solutionFile] : []}
+                        onAdd={(newFiles) => {
+                            if (newFiles.length > 0) setSolutionFile(newFiles[0])
+                        }}
+                        onDelete={() => {
+                            setSolutionFile(undefined)
+                        }}
+                        filesLimit={1}
+                        acceptedFiles={[".solution"]}
+                        maxFileSize={1024*1024}
+                        dropzoneText="Drop your solution file here"
+                        showPreviewsInDropzone={true}
+                        useChipsForPreview={true}
+                        showFileNames={true}
+                    />
+                    <DropzoneAreaBase
+                        fileObjects={gifFile ? [gifFile] : []}
+                        onAdd={(newFiles) => {
+                            if (newFiles.length > 0) setGifFile(newFiles[0])
+                        }}
+                        onDelete={() => {
+                            setGifFile(undefined)
+                        }}
+                        filesLimit={1}
+                        acceptedFiles={[".gif"]}
+                        maxFileSize={100*1024*1024}
+                        dropzoneText="Drop your GIF file here"
+                        showPreviewsInDropzone={true}
+                        useChipsForPreview={true}
+                        showFileNames={true}
+                    />
+                </Box>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleUpload}
+                    disabled={isUploading || !solutionFile || !gifFile || !author}
+                    type="submit"
+                >
+                    Upload
+                </Button>
                 {error ? <Alert severity="error">{error}</Alert> : undefined}
                 <Backdrop open={isUploading} color={"#000000"}>
                     {success ? (

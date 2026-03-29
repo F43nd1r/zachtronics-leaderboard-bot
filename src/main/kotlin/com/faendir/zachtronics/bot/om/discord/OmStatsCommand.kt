@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,10 @@ import com.faendir.zachtronics.bot.om.omSolutionOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.om.validation.createSubmission
 import com.faendir.zachtronics.bot.repository.SubmitResult
+import com.faendir.zachtronics.bot.utils.Utils
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
 import com.faendir.zachtronics.bot.utils.smartFormat
 import com.faendir.zachtronics.bot.utils.user
-import com.roxstudio.utils.CUrl
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import org.springframework.stereotype.Component
 import kotlin.jvm.optionals.getOrNull
@@ -88,11 +88,7 @@ class OmStatsCommand(private val repository: OmSolutionRepository) : Command.Bas
     }
 
     fun parseSubmission(event: ChatInputInteractionEvent): OmSubmission {
-        val bytes = try {
-            CUrl(solutionOption.get(event).url).exec()
-        } catch (e: Exception) {
-            throw IllegalArgumentException("Could not load your solution file")
-        }
-        return createSubmission(null, event.user().let { it.globalName.getOrNull() ?: it.username }, bytes)
+        val data = Utils.downloadFile(solutionOption.get(event).url).data
+        return createSubmission(data, event.user().let { it.globalName.getOrNull() ?: it.username })
     }
 }

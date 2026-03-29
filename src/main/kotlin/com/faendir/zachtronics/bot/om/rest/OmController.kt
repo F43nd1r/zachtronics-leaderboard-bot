@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,67 +16,35 @@
 
 package com.faendir.zachtronics.bot.om.rest
 
-import com.faendir.zachtronics.bot.mors.GifValidationService
-import com.faendir.zachtronics.bot.mors.MorsService
-import com.faendir.zachtronics.bot.om.model.OmCategory
-import com.faendir.zachtronics.bot.om.model.OmCollection
-import com.faendir.zachtronics.bot.om.model.OmGroup
-import com.faendir.zachtronics.bot.om.model.OmPuzzle
-import com.faendir.zachtronics.bot.om.model.OmScoreManifold
-import com.faendir.zachtronics.bot.om.model.OmSubmission
+import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.om.notifyOf
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
-import com.faendir.zachtronics.bot.om.rest.dto.OmCategoryDTO
-import com.faendir.zachtronics.bot.om.rest.dto.OmCollectionDTO
-import com.faendir.zachtronics.bot.om.rest.dto.OmGroupDTO
-import com.faendir.zachtronics.bot.om.rest.dto.OmPuzzleDTO
-import com.faendir.zachtronics.bot.om.rest.dto.OmRecordChangeDTO
-import com.faendir.zachtronics.bot.om.rest.dto.OmRecordDTO
-import com.faendir.zachtronics.bot.om.rest.dto.OmScoreManifoldDTO
-import com.faendir.zachtronics.bot.om.rest.dto.OmSubmissionDTO
-import com.faendir.zachtronics.bot.om.rest.dto.emptyRecord
-import com.faendir.zachtronics.bot.om.rest.dto.id
-import com.faendir.zachtronics.bot.om.rest.dto.toDTO
+import com.faendir.zachtronics.bot.om.rest.dto.*
 import com.faendir.zachtronics.bot.om.validation.createSubmission
 import com.faendir.zachtronics.bot.om.withCategory
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.rest.GameRestController
 import com.faendir.zachtronics.bot.rest.dto.SubmitResultType
 import com.faendir.zachtronics.bot.utils.isValidLink
-import com.google.common.hash.Hashing
 import discord4j.core.GatewayDiscordClient
 import jakarta.annotation.PreDestroy
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.*
 import kotlinx.datetime.toKotlinInstant
 import org.slf4j.LoggerFactory
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.ModelAttribute
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.io.path.readBytes
-import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.minutes
 
 @RestController
 @RequestMapping("/om")
 class OmController(
     private val repository: OmSolutionRepository,
-    private val morsService: MorsService,
-    private val gifValidationService: GifValidationService,
     private val discordClient: GatewayDiscordClient
 ) : GameRestController<OmGroupDTO, OmPuzzleDTO, OmCategoryDTO, OmRecordDTO> {
     companion object {
@@ -152,10 +120,18 @@ class OmController(
 
     @PostMapping(path = ["/submit"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun submit(@ModelAttribute submissionDTO: OmSubmissionDTO): SubmitResultType {
-        if (submissionDTO.gif != null && !isValidLink(submissionDTO.gif)) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid gif")
-        if (submissionDTO.gif == null && submissionDTO.gifData == null) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "no gif")
-        val submission = createSubmission(submissionDTO.gif, submissionDTO.author, submissionDTO.solution.bytes)
-        return runBlocking { doSubmit(submission, submissionDTO.gifData?.bytes, setOf(SubmitResult.Success::class, SubmitResult.Updated::class)) }
+        if (submissionDTO.gif != null && !isValidLink(submissionDTO.gif))
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid gif URL")
+        if (submissionDTO.gif == null && submissionDTO.gifData == null)
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "no gif")
+        val submission = createSubmission(
+            submissionDTO.solution.bytes,
+            submissionDTO.author,
+            allowGifUpdate = submissionDTO.allowGifUpdate ?: false,
+            gif = submissionDTO.gif,
+            gifData = submissionDTO.gifData?.bytes
+        )
+        return runBlocking { doSubmit(submission) }
     }
 
     /** game calls this every time a level is solved */
@@ -171,8 +147,8 @@ class OmController(
         gameUploadScope.launch {
             try {
                 withTimeout(15.minutes) {
-                    val submission = createSubmission(null, user, Base64.decode(solution))
-                    val result = doSubmit(submission, Base64.decode(gif), setOf(SubmitResult.Success::class))
+                    val submission = createSubmission(Base64.decode(solution), user, gifData = Base64.decode(gif))
+                    val result = doSubmit(submission)
                     logger.info("Received game api submission for ${submission.puzzle.name} from $user. Result: $result")
                 }
             } catch (e: Exception) {
@@ -182,37 +158,17 @@ class OmController(
         return "Thank you for your submission. It is being processed asynchronously."
     }
 
-    private suspend fun doSubmit(
-        submission: OmSubmission, gifData: ByteArray?, allowedResults: Collection<KClass<out SubmitResult<*, *>>>
-    ): SubmitResultType {
+    private suspend fun doSubmit(submission: OmSubmission): SubmitResultType {
 
-        val result = if (submission.displayLink == null) {
-            val dryRunResult = repository.submitDryRun(submission)
-            if (dryRunResult::class in allowedResults) {
-                if (gifData == null) {
-                    throw IllegalArgumentException("Failed to generate gif for your solution.")
-                }
-                gifValidationService.validate(gifData)
-                val (gif, video) = morsService.uploadGif(
-                    gifData,
-                    submission.puzzle.name,
-                    "${submission.score.toMorsString()}-${Hashing.sha256().hashBytes(submission.data).toString().substring(0, 8)}"
-                )
-                submission.displayLinkEmbed = gif
-                submission.displayLink = video
-                repository.submit(submission)
-            } else {
-                dryRunResult
-            }
-        } else repository.submit(submission)
-
+        val result = repository.submit(submission)
         discordClient.notifyOf(result)
 
-        return if (result::class in allowedResults) SubmitResultType.SUCCESS
-        else when (result) {
-            is SubmitResult.Failure -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, result.message)
+        return when (result) {
+            is SubmitResult.Success -> SubmitResultType.SUCCESS
+            is SubmitResult.Updated -> SubmitResultType.SUCCESS
+            is SubmitResult.AlreadyPresent -> SubmitResultType.ALREADY_PRESENT
             is SubmitResult.NothingBeaten -> SubmitResultType.NOTHING_BEATEN
-            else -> SubmitResultType.ALREADY_PRESENT
+            is SubmitResult.Failure -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, result.message)
         }
     }
 
