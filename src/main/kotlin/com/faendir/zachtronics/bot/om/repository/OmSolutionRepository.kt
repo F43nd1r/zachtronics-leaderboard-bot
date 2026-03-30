@@ -25,6 +25,7 @@ import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
+import com.faendir.zachtronics.bot.utils.allMinsWith
 import com.faendir.zachtronics.bot.utils.newEnumSet
 import com.google.common.hash.Hashing
 import jakarta.annotation.PostConstruct
@@ -39,6 +40,8 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import java.io.File
 import java.util.*
+import kotlin.collections.map
+import kotlin.comparisons.then
 
 @OptIn(ExperimentalSerializationApi::class)
 @Component
@@ -421,6 +424,15 @@ class OmSolutionRepository(
         leaderboard.acquireReadAccess().use { l -> loadDataIfNecessary(l) }
         return data.entries.filter { category.supportsPuzzle(it.key) }
             .associate { it.key to it.value.find { mr -> category in mr.categories }?.record }
+    }
+
+    fun findBestByMetrics(puzzle: OmPuzzle, metrics: List<OmMetric<*>>): List<CategoryRecord<OmRecord, OmCategory>> {
+        leaderboard.acquireReadAccess().use { l -> loadDataIfNecessary(l) }
+        val comparator = compareBy(metrics.map { it.comparator }.reduce(Comparator<OmScore>::then)) { r: OmMemoryRecord -> r.record.score }
+        return data[puzzle]
+            ?.allMinsWith(comparator)
+            ?.map(OmMemoryRecord::toCategoryRecord)
+            ?: emptyList()
     }
 
     val records: List<CategoryRecord<OmRecord, OmCategory>>

@@ -18,8 +18,10 @@ package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.Metric
 import com.faendir.zachtronics.bot.model.StringFormat
+import com.faendir.zachtronics.bot.om.model.MeasurePoint.START
 import com.faendir.zachtronics.bot.utils.InfinInt
 import com.faendir.zachtronics.bot.utils.LevelValue
+import com.faendir.zachtronics.bot.utils.newEnumSet
 import com.faendir.zachtronics.bot.utils.runIf
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -29,6 +31,7 @@ import java.util.*
 sealed interface OmMetric<T> : Metric where T : Comparable<T> {
     val description: String
     val scoreParts: Collection<ScorePart<*>>
+    val measurePoint: MeasurePoint
     val getValueFrom: (OmScore) -> T?
 
     /** `34c` or `O` or `g+c+a=215`, no spaces/separators */
@@ -43,15 +46,13 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
 
     /** Values and modifiers */
     sealed interface ScorePart<T: Comparable<T>> : OmMetric<T> {
-        val measurePoint: MeasurePoint
-
         override val scoreParts
             get() = listOf(this)
     }
 
     sealed class Value<T>(
-        override val displayName: String,
-        private val scoreId: Char,
+        override val displayName: String, // X
+        private val scoreId: Char, // x
         override val measurePoint: MeasurePoint,
         final override val getValueFrom: (OmScore) -> T?,
         private val describer: Value<T>.(T, StringFormat) -> String
@@ -95,6 +96,8 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
     /** functions of other [OmMetric]s */
     sealed interface Computed<T : Comparable<T>> : OmMetric<T> {
         val subMetrics: Array<out OmMetric<*>>
+        override val measurePoint
+            get() = subMetrics.mapTo(newEnumSet()) { it.measurePoint }.single { it != START }!!
         override val scoreParts
             get() = subMetrics.flatMap { it.scoreParts }
     }
@@ -121,11 +124,12 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
             getValueFrom(score)?.let { "$description=${numberFormat.format(it)}" }
     }
 
-    sealed class Not(final override val displayName: String, modifier: Modifier) : Computed<Boolean> {
+    sealed class Not(final override val displayName: String, private val modifier: Modifier) : Computed<Boolean> {
         override val collapsible: Boolean = modifier.collapsible
+        override val measurePoint = modifier.measurePoint
         override val subMetrics: Array<out ScorePart<*>> = arrayOf(modifier)
         override val getValueFrom = { score: OmScore -> !modifier.getValueFrom(score) }
-        override val comparator: Comparator<OmScore> = modifier.comparator.reversed()
+        override val comparator: Comparator<OmScore> = modifier.comparator
         override val description = displayName
 
         override fun describe(score: OmScore, format: StringFormat): String? = null
@@ -147,6 +151,7 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
         val value: T,
     ) : OmMetric<T> {
         override val collapsible: Boolean = false
+        override val measurePoint = MeasurePoint.START
         override val getValueFrom: (OmScore) -> T = { value }
         override val scoreParts: Collection<ScorePart<*>> = listOf()
         override val description: String = displayName
@@ -192,6 +197,9 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
     data object PRODUCT_GI : Product(COST, INSTRUCTIONS)
     data object PRODUCT_CA : Product(CYCLES, AREA)
     data object PRODUCT_CI : Product(CYCLES, INSTRUCTIONS)
+
+    data object PRODUCT_GCA : Product(COST, CYCLES, AREA)
+    data object PRODUCT_GCI : Product(COST, CYCLES, INSTRUCTIONS)
 }
 
 /**
@@ -222,6 +230,24 @@ object OmMetrics {
     )
     val MODIFIER = listOf(OmMetric.OVERLAP, OmMetric.TRACKLESS, OmMetric.LOOPING)
     val FULL_SCORE = VALUE + MODIFIER
+
+    val COMPUTED_BY_TYPE = mapOf(
+        OmType.NORMAL to listOf(
+            OmMetric.SUM3A,
+            OmMetric.SUM4,
+            OmMetric.PRODUCT_GCA
+        ),
+        OmType.POLYMER to listOf(
+            OmMetric.SUM3A,
+            OmMetric.SUM4,
+            OmMetric.PRODUCT_GCA
+        ),
+        OmType.PRODUCTION to listOf(
+            OmMetric.SUM3I,
+            OmMetric.SUM4,
+            OmMetric.PRODUCT_GCI
+        )
+    )
 
     /** Score printing order for humans */
     val BY_MEASURE_POINT = mapOf(

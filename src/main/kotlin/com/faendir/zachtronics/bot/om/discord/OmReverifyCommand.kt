@@ -25,12 +25,12 @@ import com.faendir.zachtronics.bot.discord.embed.MultiMessageSafeEmbedMessageBui
 import com.faendir.zachtronics.bot.discord.embed.SafeMessageBuilder
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.OmQualifier
-import com.faendir.zachtronics.bot.om.model.MeasurePoint
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmScoreManifold
 import com.faendir.zachtronics.bot.om.model.OmType
+import com.faendir.zachtronics.bot.om.omMeasurePointOptionBuilder
 import com.faendir.zachtronics.bot.om.omPuzzleOptionBuilder
 import com.faendir.zachtronics.bot.om.omScoreOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
@@ -52,7 +52,7 @@ class OmReverifyCommand(private val repository: OmSolutionRepository) : Command.
     private val typeOption = enumOptionBuilder<OmType>("type") { displayName }.build()
     private val puzzleOption = omPuzzleOptionBuilder().build()
     private val manifoldOption = enumOptionBuilder<OmScoreManifold>("manifold") { name }.build()
-    private val measurePointOption = enumOptionBuilder<MeasurePoint>("measure-point") { name }.build()
+    private val measurePointOption = omMeasurePointOptionBuilder().build()
     private val scoreOption = omScoreOptionBuilder().build()
     override val options = listOf(typeOption, puzzleOption, manifoldOption, measurePointOption, scoreOption)
 

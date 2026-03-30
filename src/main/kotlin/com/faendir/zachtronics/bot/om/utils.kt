@@ -24,6 +24,7 @@ import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.om.discord.Channel
 import com.faendir.zachtronics.bot.om.discord.SendToMainChannelButton
+import com.faendir.zachtronics.bot.om.model.MeasurePoint
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
@@ -49,10 +50,13 @@ fun omPuzzleOptionBuilder() = enumOptionBuilder<OmPuzzle>("puzzle") { displayNam
     .description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")
 
 fun omScoreOptionBuilder() = CommandOptionBuilder.string("score")
-    .description("full score of the submission, e.g. 100g/35c/9a/12i/2h/3w/T/L@V 100g/6r/9a/12i/2h/3w/T@∞")
+    .description("Full score of the submission, e.g. 100g/35c/9a/12i/2h/3w/T/L@V 100g/6r/9a/12i/2h/3w/T@∞")
     .convert { it.replace("\\u200B".toRegex(), "").trim() }
 
 fun omSolutionOptionBuilder() = CommandOptionBuilder.attachment("solution").description("Your solution file")
+
+fun omMeasurePointOptionBuilder() = enumOptionBuilder<MeasurePoint>("measure-point") { name }
+    .description("Stats at victory or infinity")
 
 suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, OmCategory>): List<Message> {
     return when (submitResult) {

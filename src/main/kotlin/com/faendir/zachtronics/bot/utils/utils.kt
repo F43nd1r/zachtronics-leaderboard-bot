@@ -113,6 +113,24 @@ fun String?.orEmpty(prefix: String = "", suffix: String = "") = this?.let { pref
 
 inline fun <T> T.runIf(condition: Boolean, transform: T.() -> T): T = if (condition) transform() else this
 
+fun <T> Iterable<T>.allMinsWith(comparator: Comparator<in T>): List<T> {
+    val iterator = iterator()
+    if (!iterator.hasNext()) return emptyList()
+
+    val result = mutableListOf(iterator.next())
+    while (iterator.hasNext()) {
+        val next = iterator.next()
+        val comparison = comparator.compare(next, result[0])
+        if (comparison < 0) {
+            result.clear()
+            result.add(next)
+        } else if (comparison == 0) {
+            result.add(next)
+        }
+    }
+    return result
+}
+
 inline fun <reified T : Enum<T>> newEnumSet(): EnumSet<T> = EnumSet.noneOf(T::class.java)
 
 fun isValidLink(string: String): Boolean {
