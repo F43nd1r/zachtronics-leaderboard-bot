@@ -35,7 +35,7 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
     fun describe(score: OmScore, format: StringFormat): String?
 
     val comparator: Comparator<OmScore>
-        get() = Comparator.comparing(getValueFrom, Comparator.nullsLast<T>(Comparator.naturalOrder()))
+        get() = compareBy(nullsLast(naturalOrder()), getValueFrom)
 
     companion object {
         private val numberFormat = DecimalFormat("0.###", DecimalFormatSymbols(Locale.ENGLISH))
@@ -85,8 +85,7 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
         final override val getValueFrom: (OmScore) -> Boolean,
         reverseOrder: Boolean = false
     ) : ScorePart<Boolean> {
-        override val comparator: Comparator<OmScore> =
-            Comparator.comparing(getValueFrom).let { if (reverseOrder) it.reversed() else it }
+        override val comparator: Comparator<OmScore> = compareBy(getValueFrom).runIf(reverseOrder) { reversed() }
         override val description: String = displayName
         override val collapsible: Boolean = false
 

@@ -57,8 +57,8 @@ class OmSolutionRepository(
         /** overlap scores last, trackless in the mix */
         private val dataOrder = (listOf(OmMetric.OVERLAP) + OmMetrics.VALUE)
             .map { it.comparator }
-            .reduce(Comparator<OmScore>::thenComparing)
-        private val memoryRecordOrder = Comparator.comparing({ r: OmMemoryRecord -> r.record.score }, dataOrder)!!
+            .reduce(Comparator<OmScore>::then)
+        private val memoryRecordOrder = compareBy(dataOrder) { r: OmMemoryRecord -> r.record.score }
     }
 
     private lateinit var data: Map<OmPuzzle, SortedSet<OmMemoryRecord>>
@@ -104,7 +104,7 @@ class OmSolutionRepository(
                 for (category in OmCategory.entries.filter { it.supportsPuzzle(puzzle) }) {
                     memoryRecords
                         .filter { category.supportsScore(it.record.score) }
-                        .minWithOrNull(Comparator.comparing({ it.record.score }, category.scoreComparator))
+                        .minWithOrNull(compareBy(category.scoreComparator) { it.record.score })
                         ?.categories
                         ?.add(category)
                 }
@@ -259,7 +259,7 @@ class OmSolutionRepository(
                         it.manifold == manifold && it.supportsScore(submission.score) &&
                                 // for scores that are exactly equal in this manifold we choose the first in the data order
                                 // which is exactly the same choice the data loader makes, so there are no edit wars
-                                it.scoreComparator.thenComparing(dataOrder)
+                                it.scoreComparator.then(dataOrder)
                                     .compare(submission.score, record.score) < 0
                     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,7 +104,7 @@ enum class OmCategory(
     override val metrics: List<OmMetric<*>> = listOf(admission) + metricsVararg
     val requiredParts: Set<ScorePart<*>> = metrics.flatMapTo(HashSet()) { it.scoreParts }
     val scoreComparator: Comparator<OmScore> =
-        (metrics + (manifold.scoreParts - metrics)).map(OmMetric<*>::comparator).reduce(Comparator<OmScore>::thenComparing)
+        (metrics + (manifold.scoreParts - metrics)).map(OmMetric<*>::comparator).reduce(Comparator<OmScore>::then)
 
     fun supportsPuzzle(puzzle: OmPuzzle) = supportedTypes.contains(puzzle.type)
 

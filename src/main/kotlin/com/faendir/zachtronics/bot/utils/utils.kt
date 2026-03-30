@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,10 +68,7 @@ fun <B : SafeEmbedMessageBuilder<B>, R : Record<C>?, C : Category> B.embedCatego
     return embedRecords(
         records = records.map { cr -> cr.copy(categories = cr.categories.sortedBy { it as? Comparable<Any> }.toCollection(LinkedHashSet())) }
             .sortedWith(
-                Comparator.comparing(
-                    { it.categories.firstOrNull() as? Comparable<Any> },
-                    Comparator.nullsLast(Comparator.naturalOrder<Comparable<Any>>())
-                )
+                compareBy(nullsLast(naturalOrder())) { it.categories.firstOrNull() as? Comparable<Any> }
             ),
         supportedCategories = supportedCategories,
         formatCategorySpecific = true
