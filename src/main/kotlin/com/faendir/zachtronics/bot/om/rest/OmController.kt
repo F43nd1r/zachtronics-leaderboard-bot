@@ -22,10 +22,10 @@ import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.om.rest.dto.*
 import com.faendir.zachtronics.bot.om.validation.createSubmission
 import com.faendir.zachtronics.bot.om.withCategory
-import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.rest.GameRestController
-import com.faendir.zachtronics.bot.rest.dto.SubmitResultType
+import com.faendir.zachtronics.bot.rest.dto.toType
 import com.faendir.zachtronics.bot.utils.isValidLink
+import com.faendir.zachtronics.bot.utils.url
 import discord4j.core.GatewayDiscordClient
 import jakarta.annotation.PreDestroy
 import kotlinx.coroutines.*
@@ -119,7 +119,7 @@ class OmController(
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Record $recordId not found.")
 
     @PostMapping(path = ["/submit"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun submit(@ModelAttribute submissionDTO: OmSubmissionDTO): SubmitResultType {
+    fun submit(@ModelAttribute submissionDTO: OmSubmissionDTO): OmSubmitResultDTO {
         if (submissionDTO.gif != null && !isValidLink(submissionDTO.gif))
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid gif URL")
         if (submissionDTO.gif == null && submissionDTO.gifData == null)
@@ -158,18 +158,10 @@ class OmController(
         return "Thank you for your submission. It is being processed asynchronously."
     }
 
-    private suspend fun doSubmit(submission: OmSubmission): SubmitResultType {
-
+    private suspend fun doSubmit(submission: OmSubmission): OmSubmitResultDTO {
         val result = repository.submit(submission)
-        discordClient.notifyOf(result)
-
-        return when (result) {
-            is SubmitResult.Success -> SubmitResultType.SUCCESS
-            is SubmitResult.Updated -> SubmitResultType.SUCCESS
-            is SubmitResult.AlreadyPresent -> SubmitResultType.ALREADY_PRESENT
-            is SubmitResult.NothingBeaten -> SubmitResultType.NOTHING_BEATEN
-            is SubmitResult.Failure -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, result.message)
-        }
+        val messages = discordClient.notifyOf(result)
+        return OmSubmitResultDTO(result.toType(), messages.firstOrNull()?.url)
     }
 
     @GetMapping(path = ["/records/changes/{since}"], produces = [MediaType.APPLICATION_JSON_VALUE])

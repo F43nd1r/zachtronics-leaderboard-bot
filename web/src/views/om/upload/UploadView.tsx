@@ -23,7 +23,8 @@ import {
     CircularProgress,
     FormControlLabel,
     Grow,
-    TextField
+    TextField,
+    Typography
 } from "@mui/material"
 import {DropzoneAreaBase, FileObject} from "react-mui-dropzone"
 import {useState} from "react"
@@ -39,7 +40,7 @@ export default function UploadView() {
     const [allowGifUpdate, setAllowGifUpdate] = useState<boolean>(false)
     const [error, setError] = useState<string>()
     const [isUploading, setIsUploading] = useState<boolean>(false)
-    const [success, setSuccess] = useState<boolean>(false)
+    const [successUrl, setSuccessUrl] = useState<string>()
 
     const handleUpload = async () => {
         setError(undefined)
@@ -67,14 +68,14 @@ export default function UploadView() {
             body: formData,
         })
         const result = await response.json()
-        if (!response.ok || result !== "SUCCESS") {
-            setError(`Upload failed: ${JSON.stringify(result)}`)
+        if (!response.ok || result.result !== "SUCCESS") {
+            setError(`Upload failed: ${JSON.stringify(result.result)}`)
         } else {
-            setSuccess(true)
-            await new Promise((resolve) => setTimeout(resolve, 2000))
+            setSuccessUrl(result.message)
+            await new Promise((resolve) => setTimeout(resolve, 5000))
             setSolutionFile(undefined)
             setGifFile(undefined)
-            setSuccess(false)
+            setSuccessUrl(undefined)
         }
         setIsUploading(false)
     }
@@ -168,9 +169,17 @@ export default function UploadView() {
                 </Button>
                 {error ? <Alert severity="error">{error}</Alert> : undefined}
                 <Backdrop open={isUploading} color={"#000000"}>
-                    {success ? (
-                        <Grow in {...(success ? { timeout: 1000 } : {})}>
-                            <CheckCircle color={"success"} sx={{ fontSize: 200 }} />
+                    {successUrl ? (
+                        <Grow in {...(successUrl ? { timeout: 1000 } : {})}>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <CheckCircle color={"success"} sx={{ fontSize: 200 }} />
+                                <Typography variant="h6" sx={{ mt: 2, textAlign: 'center' }}>
+                                    Your solution has been added, see details in the{' '}
+                                    <a href={successUrl} target="_blank" rel="noopener noreferrer">
+                                        Discord Post
+                                    </a>
+                                </Typography>
+                            </Box>
                         </Grow>
                     ) : (
                         <CircularProgress color={"inherit"} size={"50px"} />
