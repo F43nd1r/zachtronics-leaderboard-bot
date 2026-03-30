@@ -25,14 +25,16 @@ import com.faendir.zachtronics.bot.discord.command.security.Secured
 import com.faendir.zachtronics.bot.discord.embed.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.OmQualifier
+import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.notifyOf
 import com.faendir.zachtronics.bot.om.omSolutionOptionBuilder
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.om.validation.createSubmission
 import com.faendir.zachtronics.bot.repository.SubmitResult
-import com.faendir.zachtronics.bot.utils.Utils
+import com.faendir.zachtronics.bot.utils.Utils.downloadFile
 import com.faendir.zachtronics.bot.utils.embedCategoryRecords
+import com.faendir.zachtronics.bot.utils.smartFormat
 import com.faendir.zachtronics.bot.utils.url
 import com.faendir.zachtronics.bot.utils.user
 import discord4j.core.GatewayDiscordClient
@@ -45,8 +47,9 @@ import org.springframework.stereotype.Component
 @OmQualifier
 class OmSubmitCommand(private val repository: OmSolutionRepository, private val discordClient: GatewayDiscordClient) : Command.Leaf() {
     override val name = "submit"
-    override val description = "Submit a solution"
+    override val description = "Submit a solution, checks only if there is no gif"
     override val ephemeral = true
+
     private val solutionOption = omSolutionOptionBuilder().required().build()
     private val allowGifUpdateOption = CommandOptionBuilder.boolean("allow-gif-update").build()
     private val gifLinkOption = displayLinkOptionBuilder("gif-link")
@@ -56,20 +59,31 @@ class OmSubmitCommand(private val repository: OmSolutionRepository, private val 
         .description("Your solution gif")
         .build()
     override val options = listOf(solutionOption, allowGifUpdateOption, gifLinkOption, gifDataOption)
+
     override val secured: Secured = NotSecured
+
     override fun handle(event: ChatInputInteractionEvent) = mono {
-        val submission = parseSubmission(event)
-        submitToRepository(submission).send(event).awaitSingleOrNull()
+        val data = downloadFile(solutionOption.get(event).url).data
+        val allowGifUpdate = allowGifUpdateOption.get(event) ?: false
+        val gifLink = gifLinkOption.get(event)
+        val gifData = gifDataOption.get(event)?.run { downloadFile(this.url).data }
+
+        val submission = createSubmission(data, event.user().username, allowGifUpdate, gifLink, gifData)
+        if (gifLink != null || gifData != null)
+            submitToRepository(submission).send(event).awaitSingleOrNull()
+        else
+            checkStats(submission).send(event).awaitSingleOrNull()
     }
 
-    protected suspend fun submitToRepository(submission: OmSubmission): MultiMessageSafeEmbedMessageBuilder {
+    private suspend fun submitToRepository(submission: OmSubmission): MultiMessageSafeEmbedMessageBuilder {
         val result = repository.submit(submission)
         val messages = discordClient.notifyOf(result)
         return when (result) {
-            is SubmitResult.Success -> MultiMessageSafeEmbedMessageBuilder()
-               .title("Successfully submitted!")
-               .color(Colors.SUCCESS)
-               .description("I have posted about your solution ${messages.firstOrNull()?.url?.let { "[here]($it)" } ?: "nowhere :thinking:"}")
+            is SubmitResult.Success ->
+                MultiMessageSafeEmbedMessageBuilder()
+                    .title("Successfully submitted!")
+                    .color(Colors.SUCCESS)
+                    .description("I have posted about your solution ${messages.firstOrNull()?.url?.let { "[here]($it)" } ?: "nowhere :thinking:"}")
 
             is SubmitResult.Updated ->
                 MultiMessageSafeEmbedMessageBuilder()
@@ -94,11 +108,40 @@ class OmSubmitCommand(private val repository: OmSolutionRepository, private val 
         }
     }
 
-    fun parseSubmission(event: ChatInputInteractionEvent): OmSubmission {
-        val data = Utils.downloadFile(solutionOption.get(event).url).data
-        val allowGifUpdate = allowGifUpdateOption.get(event) ?: false
-        val gifLink = gifLinkOption.get(event)
-        val gifData = gifDataOption.get(event)?.run { Utils.downloadFile(url).data }
-        return createSubmission(data, event.user().username, allowGifUpdate, gifLink, gifData)
+    private fun checkStats(submission: OmSubmission): MultiMessageSafeEmbedMessageBuilder {
+        when (val result = repository.submitDryRun(submission)) {
+            is SubmitResult.Success -> {
+                val beatenCategories: List<OmCategory> = result.beatenRecords.flatMap { it.categories }
+                return MultiMessageSafeEmbedMessageBuilder()
+                    .title("Stats: *${submission.puzzle.displayName}*")
+                    .url(submission.puzzle.link)
+                    .color(Colors.SUCCESS)
+                    .description(
+                        "`${submission.score.toDisplayString(DisplayContext.discord())}`"
+                                + (if (beatenCategories.isEmpty()) " would be included in the pareto frontier."
+                        else " would be ${beatenCategories.smartFormat(submission.puzzle.supportedCategories)}")
+                                + "\nRecord a gif and call submit with it."
+                                + (if (result.beatenRecords.isNotEmpty()) "\nWould beat:" else "")
+                    )
+                    .embedCategoryRecords(result.beatenRecords, submission.puzzle.supportedCategories)
+            }
+
+            is SubmitResult.AlreadyPresent, is SubmitResult.Updated ->
+                return MultiMessageSafeEmbedMessageBuilder()
+                    .title("Stats: *${submission.puzzle.displayName}*")
+                    .url(submission.puzzle.link)
+                    .color(Colors.UNCHANGED)
+                    .description("`${submission.score.toDisplayString(DisplayContext.discord())}` was already submitted.")
+
+            is SubmitResult.NothingBeaten ->
+                return MultiMessageSafeEmbedMessageBuilder()
+                    .title("Stats: *${submission.puzzle.displayName}*")
+                    .url(submission.puzzle.link)
+                    .color(Colors.UNCHANGED)
+                    .description("`${submission.score.toDisplayString(DisplayContext.discord())}` is beaten by:")
+                    .embedCategoryRecords(result.records, submission.puzzle.supportedCategories)
+
+            is SubmitResult.Failure -> throw IllegalArgumentException(result.message)
+        }
     }
 }
