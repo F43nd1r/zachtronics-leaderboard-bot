@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.om.repository
 
 import com.faendir.zachtronics.bot.om.model.OmCategory
+import com.faendir.zachtronics.bot.om.model.OmMetric
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmScoreManifold
 import com.faendir.zachtronics.bot.repository.CategoryRecord
@@ -26,11 +27,31 @@ import java.nio.file.Path
 internal data class OmMemoryRecord(
     val record: OmRecord,
     val frontierManifolds: MutableSet<OmScoreManifold> = newEnumSet<OmScoreManifold>(),
-    val categories: MutableSet<OmCategory> = newEnumSet<OmCategory>()
+    val categories: MutableSet<OmCategory> = newEnumSet<OmCategory>(),
+    val names: MutableSet<OmParetoName> = mutableSetOf(),
 ) {
+
     fun toCategoryRecord() = CategoryRecord(record, categories)
+
+    override fun hashCode(): Int = record.hashCode()
+    override fun equals(other: Any?): Boolean = other is OmMemoryRecord && record == other.record
 }
 
 internal fun OmRecord.toMemoryRecord(repoPath: Path) =
     OmMemoryRecord(this.copy(dataPath = repoPath.resolve(this.dataPath)))
 
+data class OmParetoNamePart(val value: Set<OmMetric.Value<*>>) {
+    override fun toString() = when (value.size) {
+        0 -> throw IllegalStateException()
+        1 -> value.first().displayName
+        else -> value.joinToString("", "(", ")") { it.displayName }
+    }
+}
+
+data class OmParetoName(val value: List<OmParetoNamePart>) {
+    override fun toString(): String {
+        return value.joinToString("")
+    }
+}
+
+operator fun OmParetoName.plus(element: OmParetoName) = OmParetoName(value.plus(element.value))

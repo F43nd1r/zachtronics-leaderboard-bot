@@ -16,13 +16,7 @@
 
 package com.faendir.zachtronics.bot.om.repository
 
-import com.faendir.zachtronics.bot.om.model.OmCategory
-import com.faendir.zachtronics.bot.om.model.OmMetric
-import com.faendir.zachtronics.bot.om.model.OmMetrics
-import com.faendir.zachtronics.bot.om.model.OmPuzzle
-import com.faendir.zachtronics.bot.om.model.OmRecord
-import com.faendir.zachtronics.bot.om.model.OmScore
-import com.faendir.zachtronics.bot.om.model.OmScoreManifold
+import com.faendir.zachtronics.bot.om.model.*
 import com.google.common.collect.Sets
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -32,6 +26,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable
 import java.io.File
 import java.util.*
+import kotlin.system.measureTimeMillis
 
 class Labeler {
     private fun <T> Set<T>.isSupersetOfAny(sets: Iterable<Set<T>>) = sets.any { this.containsAll(it) }
@@ -142,14 +137,151 @@ class Labeler {
         val data = loadData()
         assertEquals(18311, data.values.sumOf { it.size })
         val puzzleData = data[OmPuzzle.STABILIZED_WATER]!!
-        val scoresByManifold = puzzleData
-            .flatMap { mr -> mr.frontierManifolds.associateWith { mr.record.score }.entries }
-            .groupBy({ it.key }, { it.value })
-        val labeled = puzzleData.associateWith { mr ->
-            scoresByManifold.entries.flatMap { (m, s) ->
-                realNames(mr.record.score, m.scoreParts.toSet(), s)
+        val labeled1: Map<OmMemoryRecord, List<String>>
+        println(
+            "Time to label ieee: ${
+                measureTimeMillis {
+                    val scoresByManifold = puzzleData
+                        .flatMap { mr -> mr.frontierManifolds.associateWith { mr.record.score }.entries }
+                        .groupBy({ it.key }, { it.value })
+                    labeled1 = puzzleData.associateWith { mr ->
+                        scoresByManifold.entries.flatMap { (m, s) ->
+                            realNames(mr.record.score, m.scoreParts.toSet(), s)
+                        }
+                    }
+                }
+            }"
+        )
+        val labeled2: MutableMap<OmMemoryRecord, MutableSet<String>>
+        println(
+            "Time to label F43nd1r: ${
+                measureTimeMillis {
+                    val recordsByManifold = puzzleData
+                        .flatMap { mr -> mr.frontierManifolds.associateWith { mr }.entries }
+                        .groupBy({ it.key }, { it.value })
+                    labeled2 = mutableMapOf()
+                    for ((manifold, records) in recordsByManifold) {
+                        val modifiers = manifold.scoreParts.filterIsInstance<OmMetric.Modifier>().toSet()
+                        val values = manifold.scoreParts.filterIsInstance<OmMetric.Value<*>>().toSet()
+                        for (modifierCombination in Sets.powerSet(modifiers)) {
+                            val tree = OmLabellingTree(
+                                records = records.filterTo(mutableSetOf()) { record ->
+                                    (OmMetric.OVERLAP in modifierCombination || !record.record.score.overlap) &&
+                                            (OmMetric.TRACKLESS !in modifierCombination || record.record.score.trackless) &&
+                                            (OmMetric.LOOPING !in modifierCombination || record.record.score.looping)
+                                },
+                                metrics = values
+                            )
+                            for (record in records) {
+                                labeled2.getOrPut(record) { mutableSetOf() }
+                                    .addAll(tree.namesOf(record).map { modifierCombination.joinToString("") { m -> m.displayName } + it })
+                            }
+                        }
+                    }
+                }
+            }"
+        )
+        puzzleData.take(1000).forEach {
+            println("Score:   ${it.record.score.toDisplayString()} ${it.frontierManifolds}")
+            println("ieee:    ${labeled1[it]!!.toSet().sorted()}")
+            println("F43nd1r: ${labeled2[it]!!.sorted()}")
+            println()
+        }
+    }
+}
+
+private fun <T : Comparable<T>> Set<OmMemoryRecord>.sortIntoBuckets(metric: OmMetric.ScorePart<T>): List<Set<OmMemoryRecord>> {
+    return groupBy { metric.getValueFrom(it.record.score) }.values.sortedWith { a, b ->
+        metric.comparator.compare(
+            a.first().record.score,
+            b.first().record.score
+        )
+    }.map { it.toSet() }
+}
+
+internal class OmLabellingTree(
+    private val records: MutableSet<OmMemoryRecord>,
+    private val metrics: Set<OmMetric.Value<*>>,
+    sortedRecordsByMetric: Map<OmMetric.Value<*>, List<Set<OmMemoryRecord>>> = metrics.associateWith { records.sortIntoBuckets(it) },
+) {
+    private val children = mutableMapOf<OmParetoNamePart, OmLabellingTree>()
+
+    init {
+        if (records.size > 1 && metrics.isNotEmpty()) {
+
+            for (key in Sets.powerSet(metrics).minusElement(emptySet()).sortedBy { it.size }) {
+                val potentialRecords =
+                    records - Sets.powerSet(key).minusElement(emptySet()).flatMapTo(mutableSetOf()) { children[OmParetoNamePart(it)]?.records ?: emptySet() }
+                if (potentialRecords.isEmpty()) continue
+
+                val namePart = OmParetoNamePart(key)
+                val remainingMetrics = metrics - key
+                when (key.size) {
+                    1 -> {
+                        sortedRecordsByMetric.getValue(key.first()).firstOrNull()
+                            ?.let { best ->
+                                children[namePart] = OmLabellingTree(
+                                    records = best.toMutableSet(),
+                                    metrics = remainingMetrics,
+                                    sortedRecordsByMetric = sortedRecordsByMetric.filterKeys { it in remainingMetrics }
+                                        .mapValues { (_, value) -> value.map { it.intersect(best) } }
+                                )
+                            }
+                    }
+
+                    2 -> {
+                        val (part1, part2) = key.toList()
+                        val sortedRecords = sortedRecordsByMetric.getValue(part1).flatMap { it.sortIntoBuckets(part2) }
+                        var min2: OmScore = sortedRecords.first().first().record.score
+                        val best = sortedRecords.first().intersect(potentialRecords).toMutableSet()
+                        for (recordBucket in sortedRecords.drop(1)) {
+                            val compare2 = part2.comparator.compare(recordBucket.first().record.score, min2)
+                            if (compare2 < 0) {
+                                min2 = recordBucket.first().record.score
+                                best.addAll(recordBucket.intersect(potentialRecords))
+                            }
+                        }
+                        if (best.isNotEmpty()) {
+                            children[namePart] = OmLabellingTree(
+                                records = best,
+                                metrics = remainingMetrics,
+                                sortedRecordsByMetric = sortedRecordsByMetric.filterKeys { it in remainingMetrics }
+                                    .mapValues { (_, value) -> value.map { it.intersect(best) } }
+                            )
+                        }
+                    }
+
+                    else -> {
+                        val comparators = key.map { it.comparator }
+                        val best = potentialRecords.filter { potentialRecord ->
+                            records.none { record ->
+                                if (record == potentialRecord) return@none false
+                                val compares = comparators.map { it.compare(record.record.score, potentialRecord.record.score) }
+                                compares.all { it <= 0 } && compares.any { it < 0 }
+                            }
+                        }.toMutableSet()
+                        if (best.isNotEmpty()) {
+                            children[namePart] = OmLabellingTree(
+                                records = best,
+                                metrics = remainingMetrics,
+                                sortedRecordsByMetric = sortedRecordsByMetric.filterKeys { it in remainingMetrics }
+                                    .mapValues { (_, value) -> value.map { it.intersect(best) } }
+                            )
+                        }
+                    }
+                }
             }
         }
-        println(labeled)
+    }
+
+    fun namesOf(record: OmMemoryRecord): Set<OmParetoName> {
+        if (record !in records) return emptySet()
+        if (children.isEmpty()) return setOf(OmParetoName(listOf()))
+        val names = mutableSetOf<OmParetoName>()
+        for ((namePart, child) in children) {
+            val name = OmParetoName(listOf(namePart))
+            child.namesOf(record).forEach { names.add(name + it) }
+        }
+        return names
     }
 }
