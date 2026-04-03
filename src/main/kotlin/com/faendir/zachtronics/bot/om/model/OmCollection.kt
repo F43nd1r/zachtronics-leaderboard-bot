@@ -21,6 +21,7 @@ import com.faendir.zachtronics.bot.model.Group
 enum class OmCollection(override val displayName: String): Group {
     CAMPAIGN("Campaign"),
     DRM("De Re Metallica"),
-    JOURNAL("Journal"),
+    JOURNAL("Journal Volume XCIX"),
+    JOURNAL_CVIII("Journal Volume CVIII"),
     COMMUNITY("Community"),
 }
