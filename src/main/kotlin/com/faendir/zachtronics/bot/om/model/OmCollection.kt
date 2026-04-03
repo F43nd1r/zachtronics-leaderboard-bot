@@ -22,6 +22,6 @@ enum class OmCollection(override val displayName: String): Group {
     CAMPAIGN("Campaign"),
     DRM("De Re Metallica"),
     JOURNAL("Journal Volume XCIX"),
-    JOURNAL_CVIII("Journal Volume CVIII"),
+    JOURNAL_VOLUME_CVIII("Journal Volume CVIII"),
     COMMUNITY("Community"),
 }
