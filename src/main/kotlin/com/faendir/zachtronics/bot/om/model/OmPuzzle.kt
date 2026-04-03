@@ -174,6 +174,9 @@ enum class OmPuzzle(
     CUPRITE(JOURNAL_XII, NORMAL, "Cuprite", "P253"),	
     EXPLOSIVE_ALLOY(JOURNAL_XII, NORMAL, "Explosive Alloy", "P251"),	
 
+    LODESTONE(JOURNAL_VOLUME_CVIII_Issue_I, NORMAL, "Lodestone", "P256"),
+    
+
     UNWINDING(TOURNAMENT_2019, NORMAL, "Unwinding", "w1611998067", "week1"),
     WIRE_FORMING_AND_UNFORMING(TOURNAMENT_2019, POLYMER, "Wire Forming and Unforming", "w1698784331", "week2"),
     // CREATIVE_ACCOUNTING(TOURNAMENT_2019, NORMAL, "Creative Accounting", "w1698785633", "week3"),
