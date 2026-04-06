@@ -21,19 +21,19 @@ import com.faendir.zachtronics.bot.model.Submission;
 import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
 
 @Value
 public class IfSubmission implements Submission<IfCategory, IfPuzzle> {
-    @NotNull IfPuzzle puzzle;
-    @NotNull IfScore score;
-    @NotNull String author;
-    @NotNull List<String> displayLinks;
-    @NotNull String data;
+    @NonNull IfPuzzle puzzle;
+    @NonNull IfScore score;
+    @NonNull String author;
+    @NonNull List<String> displayLinks;
+    @NonNull String data;
 
     @Nullable
     @Override
@@ -41,14 +41,14 @@ public class IfSubmission implements Submission<IfCategory, IfPuzzle> {
         return displayLinks.isEmpty() ? null : displayLinks.get(0);
     }
 
-    @NotNull
-    public static Collection<ValidationResult<IfSubmission>> fromData(@NotNull String data, @NotNull String author, IfScore score,
+    @NonNull
+    public static Collection<ValidationResult<IfSubmission>> fromData(@NonNull String data, @NonNull String author, IfScore score,
                                                                       List<String> videos, boolean isAdmin) {
         return IfValidator.validateSavefile(data, author, score, videos, isAdmin);
     }
 
-    @NotNull
-    public static Collection<ValidationResult<IfSubmission>> fromLink(@NotNull String link, @NotNull String author, IfScore score,
+    @NonNull
+    public static Collection<ValidationResult<IfSubmission>> fromLink(@NonNull String link, @NonNull String author, IfScore score,
                                                                       List<String> videos, boolean isAdmin) {
         String data = Utils.downloadFile(link).dataAsString();
         return fromData(data, author, score, videos, isAdmin);

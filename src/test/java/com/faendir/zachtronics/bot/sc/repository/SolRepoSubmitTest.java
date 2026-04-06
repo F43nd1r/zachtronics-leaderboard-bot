@@ -20,7 +20,7 @@ import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.sc.model.*;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -105,18 +105,18 @@ public class SolRepoSubmitTest {
         assertInstanceOf(SubmitResult.AlreadyPresent.class, doSubmitDataVideo(data, null)); // cannot regress video state
     }
 
-    @NotNull
-    private SubmitResult<ScRecord, ScCategory> doSubmitScore(@NotNull ScScore score) {
+    @NonNull
+    private SubmitResult<ScRecord, ScCategory> doSubmitScore(@NonNull ScScore score) {
         String data = "SOLUTION:A Most Unfortunate Malfunction,12345ieee," + score.toExportString();
         return doSubmitData(data);
     }
 
-    @NotNull
+    @NonNull
     private SubmitResult<ScRecord, ScCategory> doSubmitData(String data) {
         return doSubmitDataVideo(data, null);
     }
 
-    @NotNull
+    @NonNull
     private SubmitResult<ScRecord, ScCategory> doSubmitDataVideo(String data, String displayLink) {
         return repository.submit(ScSubmission.fromDataNoValidation(data, null, displayLink));
     }

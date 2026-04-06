@@ -22,7 +22,7 @@ import com.faendir.zachtronics.bot.fc.model.FcSubmission;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.faendir.zachtronics.bot.validation.ValidationUtils;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,8 +35,8 @@ public class FoodCourtSim {
      * @param data content to check
      * @param author author to override all imports
      */
-    @NotNull
-    public static Collection<ValidationResult<FcSubmission>> validateMultiExport(byte @NotNull [] data, @NotNull String author) {
+    @NonNull
+    public static Collection<ValidationResult<FcSubmission>> validateMultiExport(byte @NonNull [] data, @NonNull String author) {
         FcSimResult[] results = validate(data);
         if (results.length == 0)
             throw new ValidationException("No valid solution provided");
@@ -44,8 +44,8 @@ public class FoodCourtSim {
                      .map(r -> validationResultFrom(r, author))
                      .collect(Collectors.toCollection(LinkedHashSet::new));    }
 
-    @NotNull
-    static ValidationResult<FcSubmission> validationResultFrom(@NotNull FcSimResult result, @NotNull String author)
+    @NonNull
+    static ValidationResult<FcSubmission> validationResultFrom(@NonNull FcSimResult result, @NonNull String author)
     throws ValidationException {
         // check the solution was parseable
         if (result.getErrorMessage() != null) {
@@ -81,8 +81,8 @@ public class FoodCourtSim {
      * @return results, arrays of size 1 are correctly generated
      * @throws ValidationException if there is a communication error, solution errors are handled in the onject
      */
-    @NotNull
-    static FcSimResult[] validate(byte @NotNull [] data) throws ValidationException {
+    @NonNull
+    static FcSimResult[] validate(byte @NonNull [] data) throws ValidationException {
         List<String> command = List.of("python3", "-m", "foodcourt_sim", "simulate", "--json", "--include-solution", "-");
         return ValidationUtils.callValidator(FcSimResult[].class, data, command);
     }

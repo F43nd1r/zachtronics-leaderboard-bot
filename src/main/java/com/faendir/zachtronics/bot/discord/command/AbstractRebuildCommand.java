@@ -24,7 +24,7 @@ import com.faendir.zachtronics.bot.model.Puzzle;
 import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,9 +37,9 @@ public abstract class AbstractRebuildCommand<P extends Puzzle<?>> extends Comman
 
     protected abstract AbstractSolutionRepository<?, P, ?, ?, ?, ?> getRepository();
 
-    @NotNull
+    @NonNull
     @Override
-    public SafeMessageBuilder handleEvent(@NotNull ChatInputInteractionEvent event) {
+    public SafeMessageBuilder handleEvent(@NonNull ChatInputInteractionEvent event) {
         P maybePuzzle = getPuzzleOption().get(event);
         getRepository().rebuildRedditLeaderboard(maybePuzzle);
         return new MultiMessageSafeEmbedMessageBuilder()
@@ -47,10 +47,10 @@ public abstract class AbstractRebuildCommand<P extends Puzzle<?>> extends Comman
             .color(Colors.SUCCESS);
     }
 
-    @NotNull
+    @NonNull
     protected abstract CommandOption<String, P> getPuzzleOption();
 
-    @NotNull
+    @NonNull
     @Override
     public List<CommandOption<?, ?>> getOptions() {
         return Collections.singletonList(getPuzzleOption());

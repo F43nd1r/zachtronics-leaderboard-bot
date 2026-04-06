@@ -24,37 +24,37 @@ import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Value;
 import lombok.With;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 
 /** Archive-only submissions have a <tt>null</tt> {@link #displayLink} */
 @Value
 public class ScSubmission implements Submission<ScCategory, ScPuzzle> {
-    @NotNull ScPuzzle puzzle;
-    @NotNull ScScore score;
-    @NotNull String author;
+    @NonNull ScPuzzle puzzle;
+    @NonNull ScScore score;
+    @NonNull String author;
     @With String displayLink;
-    @NotNull String data;
+    @NonNull String data;
 
     /**
      * @throws ValidationException if we can't correctly parse metadata
      */
-    @NotNull
-    public static ScSubmission fromDataNoValidation(@NotNull String data, @Nullable ScPuzzle puzzle, @Nullable String displayLink)
+    @NonNull
+    public static ScSubmission fromDataNoValidation(@NonNull String data, @Nullable ScPuzzle puzzle, @Nullable String displayLink)
     throws ValidationException {
         return ScMetadataReader.fromHeader(data, puzzle, displayLink);
     }
 
-    @NotNull
-    public static Collection<ValidationResult<ScSubmission>> fromData(@NotNull String export, boolean bypassValidation,
+    @NonNull
+    public static Collection<ValidationResult<ScSubmission>> fromData(@NonNull String export, boolean bypassValidation,
                                                                       String author) {
         return SChem.validateMultiExport(export, bypassValidation, author);
     }
 
-    @NotNull
-    public static Collection<ValidationResult<ScSubmission>> fromExportLink(@NotNull String exportLink, boolean bypassValidation,
+    @NonNull
+    public static Collection<ValidationResult<ScSubmission>> fromExportLink(@NonNull String exportLink, boolean bypassValidation,
                                                                             String author) {
         String export = Utils.downloadFile(exportLink).dataAsString();
         return fromData(export, bypassValidation, author);

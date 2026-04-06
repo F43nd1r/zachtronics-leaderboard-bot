@@ -23,22 +23,22 @@ import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 @Value
 public class ScRecordDTO implements RecordDTO<ScScoreDTO> {
-    @NotNull ScScoreDTO score;
-    @NotNull String fullFormattedScore;
-    @NotNull String author;
+    @NonNull ScScoreDTO score;
+    @NonNull String fullFormattedScore;
+    @NonNull String author;
     @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
 
-    @NotNull
-    public static ScRecordDTO fromCategoryRecord(@NotNull CategoryRecord<ScRecord, ScCategory> categoryRecord) {
+    @NonNull
+    public static ScRecordDTO fromCategoryRecord(@NonNull CategoryRecord<ScRecord, ScCategory> categoryRecord) {
         ScRecord record = categoryRecord.getRecord();
         Set<ScCategory> categories = categoryRecord.getCategories();
         return new ScRecordDTO(
@@ -51,8 +51,8 @@ public class ScRecordDTO implements RecordDTO<ScScoreDTO> {
         );
     }
 
-    @NotNull
-    public static ScRecordDTO fromRecord(@NotNull ScRecord record) {
+    @NonNull
+    public static ScRecordDTO fromRecord(@NonNull ScRecord record) {
         return new ScRecordDTO(ScScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
                                record.getAuthor(),

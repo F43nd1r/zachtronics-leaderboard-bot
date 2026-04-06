@@ -20,15 +20,15 @@ import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
 import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.tis.model.TISCategory;
 import com.faendir.zachtronics.bot.tis.model.TISPuzzle;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public class TISOptionBuilders {
-    public static @NotNull CommandOptionBuilder<String, TISPuzzle> puzzleOptionBuilder() {
+    public static @NonNull CommandOptionBuilder<String, TISPuzzle> puzzleOptionBuilder() {
         return OptionHelpersKt.enumOptionBuilder("puzzle", TISPuzzle.class, TISPuzzle::getDisplayName)
                               .description("Puzzle name. Can be shortened or abbreviated. E.g. `SIGN AMPL`, `ITP1`");
     }
 
-    public static @NotNull CommandOptionBuilder<String, TISCategory> categoryOptionBuilder() {
+    public static @NonNull CommandOptionBuilder<String, TISCategory> categoryOptionBuilder() {
         return OptionHelpersKt.enumOptionBuilder("category", TISCategory.class, TISCategory::getDisplayName)
                               .description("Category. E.g. `CN`, `IC`");
     }

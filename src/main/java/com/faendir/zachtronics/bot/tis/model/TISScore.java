@@ -24,8 +24,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Value;
 import lombok.With;
 import org.checkerframework.common.value.qual.IntRange;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,9 +43,9 @@ public class TISScore implements Score<TISCategory> {
     @With boolean hardcoded;
 
     /** ccc/nn/ii[/ach] */
-    @NotNull
+    @NonNull
     @Override
-    public String toDisplayString(@NotNull DisplayContext<TISCategory> context) {
+    public String toDisplayString(@NonNull DisplayContext<TISCategory> context) {
         String separator = context.getSeparator();
         int formatId = Utils.getScoreFormatId(context);
 
@@ -60,14 +60,14 @@ public class TISScore implements Score<TISCategory> {
 
     /** <tt>ccc/nn/ii[/ach]</tt>, tolerates extra <tt>*</tt> */
     @Nullable
-    public static TISScore parseScore(@NotNull String string) {
+    public static TISScore parseScore(@NonNull String string) {
         Matcher m = REGEX_SCORE.matcher(string);
         return m.matches() ? parseScore(m) : null;
     }
 
     /** we assume m matches */
-    @NotNull
-    public static TISScore parseScore(@NotNull Matcher m) {
+    @NonNull
+    public static TISScore parseScore(@NonNull Matcher m) {
         int cycles = Integer.parseInt(m.group("cycles"));
         int nodes = Integer.parseInt(m.group("nodes"));
         int instructions = Integer.parseInt(m.group("instructions"));
@@ -82,7 +82,7 @@ public class TISScore implements Score<TISCategory> {
     /**
      * @return <tt>""</tt> or <tt>"/a"</tt> or <tt>"/c"</tt> or <tt>"/h"</tt> or <tt>"/ac"</tt> or <tt>"/ah"</tt>
      */
-    @NotNull
+    @NonNull
     public static String sepFlags(String separator, boolean achievement, boolean cheating, boolean hardcoded) {
         if (achievement || cheating) {
             String result = separator;
@@ -94,4 +94,3 @@ public class TISScore implements Score<TISCategory> {
         else return "";
     }
 }
-

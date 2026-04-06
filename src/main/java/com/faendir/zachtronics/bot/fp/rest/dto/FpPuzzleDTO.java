@@ -19,17 +19,17 @@ package com.faendir.zachtronics.bot.fp.rest.dto;
 import com.faendir.zachtronics.bot.fp.model.FpPuzzle;
 import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Value
 public class FpPuzzleDTO {
-    @NotNull String name;
-    @NotNull String displayName;
-    @NotNull GroupDTO group;
-    @NotNull String type;
+    @NonNull String name;
+    @NonNull String displayName;
+    @NonNull GroupDTO group;
+    @NonNull String type;
 
-    @NotNull
-    public static FpPuzzleDTO fromPuzzle(@NotNull FpPuzzle puzzle) {
+    @NonNull
+    public static FpPuzzleDTO fromPuzzle(@NonNull FpPuzzle puzzle) {
         return new FpPuzzleDTO(puzzle.name(), puzzle.getDisplayName(), GroupDTO.fromGroup(puzzle.getGroup()), puzzle.getType().getDisplayName());
     }
 }

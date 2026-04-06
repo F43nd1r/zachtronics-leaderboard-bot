@@ -21,7 +21,7 @@ import com.faendir.zachtronics.bot.exa.model.ExaSubmission;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationUtils;
 import lombok.SneakyThrows;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,7 +35,7 @@ public class Exapt {
     /**
      * @param untrustedData the score is assumed to be potentially wrong and will be patched
      */
-    public static @NotNull ExaSubmission validateData(byte @NotNull [] untrustedData, boolean cheesy, String author, String displayLink) {
+    public static @NonNull ExaSubmission validateData(byte @NonNull [] untrustedData, boolean cheesy, String author, String displayLink) {
         ExaSave save = ExaSave.unmarshal(untrustedData);
         return validateImpl(save, untrustedData, cheesy, author, displayLink);
     }
@@ -43,12 +43,12 @@ public class Exapt {
     /**
      * @param save the score is assumed to be potentially wrong and will be patched
      */
-    public static @NotNull ExaSubmission validateSave(@NotNull ExaSave save, boolean cheesy, String author, String displayLink) {
-        byte @NotNull [] untrustedData = save.marshal();
+    public static @NonNull ExaSubmission validateSave(@NonNull ExaSave save, boolean cheesy, String author, String displayLink) {
+        byte @NonNull [] untrustedData = save.marshal();
         return validateImpl(save, untrustedData, cheesy, author, displayLink);
     }
 
-    static @NotNull ExaSubmission validateImpl(@NotNull ExaSave save, byte @NotNull [] untrustedData, boolean cheesy, String author,
+    static @NonNull ExaSubmission validateImpl(@NonNull ExaSave save, byte @NonNull [] untrustedData, boolean cheesy, String author,
                                                String displayLink) {
         ExaptResult.ExaptStatistics stats = validate(untrustedData);
 
@@ -67,7 +67,7 @@ public class Exapt {
     }
 
     @SneakyThrows
-    static @NotNull ExaptResult.ExaptStatistics validate(byte @NotNull [] data) {
+    static ExaptResult.@NonNull ExaptStatistics validate(byte @NonNull [] data) {
         Path f = Files.createTempFile("exafile", ".solution");
         Files.write(f, data);
         List<String> command = List.of(exaptPath, "-e", gameDir, "-t", "500000", f.toString());

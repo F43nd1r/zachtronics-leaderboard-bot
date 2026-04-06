@@ -19,19 +19,19 @@ package com.faendir.zachtronics.bot.validation;
 
 import com.faendir.zachtronics.bot.model.Submission;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public sealed interface ValidationResult<S extends Submission<?, ?>> permits ValidationResult.Valid,
                                                                              ValidationResult.Invalid,
                                                                              ValidationResult.Unparseable {
-    @NotNull S getSubmission();
-    @NotNull String getMessage();
+    @NonNull S getSubmission();
+    @NonNull String getMessage();
 
     @Value
     class Valid<S extends Submission<?, ?>> implements ValidationResult<S> {
-        @NotNull S submission;
+        @NonNull S submission;
 
-        @NotNull
+        @NonNull
         @Override
         public String getMessage() {
             throw new IllegalArgumentException();
@@ -40,20 +40,18 @@ public sealed interface ValidationResult<S extends Submission<?, ?>> permits Val
 
     @Value
     class Invalid<S extends Submission<?, ?>> implements ValidationResult<S> {
-        @NotNull S submission;
-        @NotNull String message;
+        @NonNull S submission;
+        @NonNull String message;
     }
 
     @Value
     class Unparseable<S extends Submission<?, ?>> implements ValidationResult<S> {
-        @NotNull String message;
+        @NonNull String message;
 
-        @NotNull
+        @NonNull
         @Override
         public S getSubmission() {
             throw new IllegalArgumentException(message);
         }
     }
 }
-
-

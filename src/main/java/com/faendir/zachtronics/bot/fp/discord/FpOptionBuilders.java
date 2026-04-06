@@ -20,15 +20,15 @@ import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
 import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.fp.model.FpCategory;
 import com.faendir.zachtronics.bot.fp.model.FpPuzzle;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public class FpOptionBuilders {
-    public static @NotNull CommandOptionBuilder<String, FpPuzzle> puzzleOptionBuilder() {
+    public static @NonNull CommandOptionBuilder<String, FpPuzzle> puzzleOptionBuilder() {
         return OptionHelpersKt.enumOptionBuilder("puzzle", FpPuzzle.class, FpPuzzle::getDisplayName)
                               .description("Puzzle name. Can be shortened or abbreviated. E.g. `1-1`, `add 2-3`");
     }
 
-    public static @NotNull CommandOptionBuilder<String, FpCategory> categoryOptionBuilder() {
+    public static @NonNull CommandOptionBuilder<String, FpCategory> categoryOptionBuilder() {
         return OptionHelpersKt.enumOptionBuilder("category", FpCategory.class, FpCategory::getDisplayName)
                               .description("Category. E.g. `RCF`, `WFRC`");
     }

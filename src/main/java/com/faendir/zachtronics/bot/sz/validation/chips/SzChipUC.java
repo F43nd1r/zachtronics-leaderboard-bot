@@ -18,8 +18,8 @@ package com.faendir.zachtronics.bot.sz.validation.chips;
 
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,17 +45,17 @@ public interface SzChipUC extends SzChip {
 
     @Value
     class SzCodeLine {
-        @NotNull String rawLine;
+        @NonNull String rawLine;
 
         @Nullable String label;
         @Nullable String code;
         @Nullable String comment;
     }
 
-    @NotNull List<SzCodeLine> getLines();
+    @NonNull List<SzCodeLine> getLines();
 
-    @NotNull
-    static List<SzCodeLine> readLines(@NotNull Map<String, String> chipMap, int limit) {
+    @NonNull
+    static List<SzCodeLine> readLines(@NonNull Map<String, String> chipMap, int limit) {
         String[] rawLines = chipMap.get("code").split("\\n");
         if (rawLines.length > limit)
             throw new ValidationException("UC has " + rawLines.length + " LOC when the limit is " + limit);

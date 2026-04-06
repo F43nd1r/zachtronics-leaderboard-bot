@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.fc.rest.dto;
 
 import com.faendir.zachtronics.bot.fc.model.FcScore;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Value
 public class FcScoreDTO {
@@ -27,9 +27,8 @@ public class FcScoreDTO {
     int sumTimes;
     int wires;
 
-    @NotNull
-    public static FcScoreDTO fromScore(@NotNull FcScore score) {
+    @NonNull
+    public static FcScoreDTO fromScore(@NonNull FcScore score) {
         return new FcScoreDTO(score.getCost(), score.getTime(), score.getSumTimes(), score.getWires());
     }
 }
-

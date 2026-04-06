@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.tis.ai;
 
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,14 +68,14 @@ class TISSave {
     static final int MAX_NODES = 12;
     static final int MAX_NODE_INSTR = 15;
 
-    @NotNull List<TISNode> nodes;
+    @NonNull List<TISNode> nodes;
     int instructions;
 
     Stream<TISLine> codeAsStream() {
         return nodes.stream().flatMap(node -> node.getCodeLines().stream());
     }
 
-    static @NotNull TISSave unmarshal(@NotNull String solution) {
+    static @NonNull TISSave unmarshal(@NonNull String solution) {
         List<TISNode> nodes = new ArrayList<>(Collections.nCopies(MAX_NODES, null));
 
         TISNode currentNode = null;
@@ -111,7 +111,7 @@ class TISSave {
         return new TISSave(nodes, instructions);
     }
 
-    @NotNull String marshal() {
+    @NonNull String marshal() {
         StringBuilder sb = new StringBuilder();
         for (TISNode node : nodes) {
             node.marshalInto(sb);

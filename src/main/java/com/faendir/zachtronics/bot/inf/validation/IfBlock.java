@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.inf.validation;
 
 import lombok.Value;
 import org.checkerframework.common.value.qual.IntRange;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.ByteBuffer;
 
@@ -45,10 +45,10 @@ class IfBlock {
     short positionZ;
     @IntRange(from = 0, to = 3) byte facing;
     byte toggleState;
-    @NotNull IfDecal[] decals;
+    @NonNull IfDecal[] decals;
 
-    @NotNull
-    static IfBlock unmarshal(@NotNull ByteBuffer byteBuffer) {
+    @NonNull
+    static IfBlock unmarshal(@NonNull ByteBuffer byteBuffer) {
         short type = byteBuffer.getShort();
         short positionX = byteBuffer.getShort();
         short positionY = byteBuffer.getShort();

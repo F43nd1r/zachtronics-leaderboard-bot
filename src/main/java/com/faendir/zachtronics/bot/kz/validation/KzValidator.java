@@ -21,7 +21,7 @@ import com.faendir.zachtronics.bot.kz.model.KzScore;
 import com.faendir.zachtronics.bot.kz.model.KzSubmission;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationUtils;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,7 +30,7 @@ public class KzValidator {
     private KzValidator() {}
 
     /** wrapper for kaizen-sim, Zach's sim */
-    public static @NotNull KzSubmission validate(byte @NotNull [] data, @NotNull String author, String displayLink)
+    public static @NonNull KzSubmission validate(byte @NonNull [] data, @NonNull String author, String displayLink)
     throws ValidationException {
         KzSimResult result = validate(data);
         if (result.getError() != null) {
@@ -60,7 +60,7 @@ public class KzValidator {
         return new KzSubmission(puzzle, score, author, displayLink, result.getNormalized());
     }
 
-    static @NotNull KzSimResult validate(byte @NotNull [] data) throws ValidationException {
+    static @NonNull KzSimResult validate(byte @NonNull [] data) throws ValidationException {
         List<String> command = List.of("kaizen-sim", "--normalize", "-");
         return ValidationUtils.callValidator(KzSimResult.class, data, command);
     }

@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.cw.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -43,7 +43,7 @@ public enum CwCategory implements CategoryJava<CwCategory, CwScore, CwMetric> {
     private final Set<CwType> supportedTypes = Collections.singleton(STANDARD);
     private final int scoreFormatId;
 
-    CwCategory(String displayName, @NotNull List<CwMetric> metrics, int scoreFormatId) {
+    CwCategory(String displayName, @NonNull List<CwMetric> metrics, int scoreFormatId) {
         this.displayName = displayName;
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
@@ -51,7 +51,7 @@ public enum CwCategory implements CategoryJava<CwCategory, CwScore, CwMetric> {
     }
 
     @Override
-    public boolean supportsScore(@NotNull CwScore score) {
+    public boolean supportsScore(@NonNull CwScore score) {
         return true;
     }
 }

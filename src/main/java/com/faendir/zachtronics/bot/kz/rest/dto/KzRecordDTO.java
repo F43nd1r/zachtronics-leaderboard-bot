@@ -23,22 +23,22 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.dto.RecordDTO;
 import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 @Value
 public class KzRecordDTO implements RecordDTO<KzScoreDTO> {
-    @NotNull KzScoreDTO score;
-    @NotNull String fullFormattedScore;
-    @NotNull String author;
+    @NonNull KzScoreDTO score;
+    @NonNull String fullFormattedScore;
+    @NonNull String author;
     @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
 
-    @NotNull
-    public static KzRecordDTO fromCategoryRecord(@NotNull CategoryRecord<KzRecord, KzCategory> categoryRecord) {
+    @NonNull
+    public static KzRecordDTO fromCategoryRecord(@NonNull CategoryRecord<KzRecord, KzCategory> categoryRecord) {
         KzRecord record = categoryRecord.getRecord();
         Set<KzCategory> categories = categoryRecord.getCategories();
         return new KzRecordDTO(
@@ -51,8 +51,8 @@ public class KzRecordDTO implements RecordDTO<KzScoreDTO> {
         );
     }
 
-    @NotNull
-    public static KzRecordDTO fromRecord(@NotNull KzRecord record) {
+    @NonNull
+    public static KzRecordDTO fromRecord(@NonNull KzRecord record) {
         return new KzRecordDTO(KzScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
                                record.getAuthor(),

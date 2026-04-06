@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.cw.rest.dto;
 
 import com.faendir.zachtronics.bot.cw.model.CwScore;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Value
 public class CwScoreDTO {
@@ -26,9 +26,8 @@ public class CwScoreDTO {
     int height;
     int footprint;
 
-    @NotNull
-    public static CwScoreDTO fromScore(@NotNull CwScore score) {
+    @NonNull
+    public static CwScoreDTO fromScore(@NonNull CwScore score) {
         return new CwScoreDTO(score.getWidth(), score.getHeight(), score.getFootprint());
     }
 }
-

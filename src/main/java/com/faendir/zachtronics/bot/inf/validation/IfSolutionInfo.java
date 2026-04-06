@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.inf.validation;
 
 import lombok.Data;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class holds the properties of a specific save slot, custom extensions included

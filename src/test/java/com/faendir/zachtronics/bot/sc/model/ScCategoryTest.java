@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -48,7 +48,7 @@ class ScCategoryTest {
         assertTrue(supportsFlags(RCNBP, false, false));
     }
 
-    private static boolean supportsFlags(@NotNull ScCategory category, boolean bugged, boolean precognitive) {
+    private static boolean supportsFlags(@NonNull ScCategory category, boolean bugged, boolean precognitive) {
         return category.supportsScore(new ScScore(1, 1, 1, bugged, precognitive));
     }
 }

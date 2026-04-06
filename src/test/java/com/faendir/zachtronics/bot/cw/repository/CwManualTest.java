@@ -21,7 +21,7 @@ import com.faendir.zachtronics.bot.cw.model.*;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.utils.LambdaUtils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,8 +60,8 @@ class CwManualTest {
         System.out.println("Done");
     }
 
-    @NotNull
-    private static CwSubmission recordToSubmissions(@NotNull CwRecord record) {
+    @NonNull
+    private static CwSubmission recordToSubmissions(@NonNull CwRecord record) {
         assert record.getDataPath() != null;
         String data = LambdaUtils.<Path, String>uncheckIOException(Files::readString).apply(record.getDataPath());
         return new CwSubmission(record.getPuzzle(), record.getScore(), record.getAuthor(),

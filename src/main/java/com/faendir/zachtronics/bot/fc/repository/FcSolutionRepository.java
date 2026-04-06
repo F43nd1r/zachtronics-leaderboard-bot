@@ -25,7 +25,7 @@ import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -56,17 +56,17 @@ public class FcSolutionRepository extends AbstractSolutionRepository<FcCategory,
     private final List<FcPuzzle> trackedPuzzles = List.of(FcPuzzle.values());
 
     @Override
-    protected @NotNull String wikiPageName(FcPuzzle puzzle) {
+    protected @NonNull String wikiPageName(FcPuzzle puzzle) {
         return "foodcourt";
     }
 
     @Override
-    protected FcSolution makeCandidateSolution(@NotNull FcSubmission submission) {
+    protected FcSolution makeCandidateSolution(@NonNull FcSubmission submission) {
         return new FcSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
     }
 
     @Override
-    protected int frontierCompare(@NotNull FcScore s1, @NotNull FcScore s2) {
+    protected int frontierCompare(@NonNull FcScore s1, @NonNull FcScore s2) {
         int r1 = Integer.compare(s1.getCost(), s2.getCost());
         int r2 = Integer.compare(s1.getTime(), s2.getTime());
         int r3 = Integer.compare(s1.getSumTimes(), s2.getSumTimes());
@@ -87,31 +87,31 @@ public class FcSolutionRepository extends AbstractSolutionRepository<FcCategory,
     }
 
     @Override
-    protected boolean allowedSameScoreUpdate(@NotNull FcSolution candidate, @NotNull FcSolution solution) {
+    protected boolean allowedSameScoreUpdate(@NonNull FcSolution candidate, @NonNull FcSolution solution) {
         return candidate.getDisplayLink() != null ||
                (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
 
     @Override
-    @NotNull
-    protected Path relativePuzzlePath(@NotNull FcPuzzle puzzle) {
+    @NonNull
+    protected Path relativePuzzlePath(@NonNull FcPuzzle puzzle) {
         return Paths.get(puzzle.getGroup().name()).resolve(puzzle.getId());
     }
 
-    @NotNull
-    static String makeFilename(@NotNull String puzzleName, @NotNull FcScore score) {
+    @NonNull
+    static String makeFilename(@NonNull String puzzleName, @NonNull FcScore score) {
         return puzzleName + "-" + score.toDisplayString(DisplayContext.fileName()) + ".solution";
     }
 
-    @NotNull
+    @NonNull
     @Override
-    protected String makeArchiveLink(@NotNull FcPuzzle puzzle, @NotNull FcScore score) {
+    protected String makeArchiveLink(@NonNull FcPuzzle puzzle, @NonNull FcScore score) {
         return makeArchiveLink(puzzle, makeFilename(puzzle.getId(), score));
     }
 
     @Override
-    @NotNull
-    protected Path makeArchivePath(@NotNull Path puzzlePath, FcScore score) {
+    @NonNull
+    protected Path makeArchivePath(@NonNull Path puzzlePath, FcScore score) {
         return puzzlePath.resolve(makeFilename(puzzlePath.getFileName().toString(), score));
     }
 }

@@ -27,7 +27,7 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -43,9 +43,9 @@ public class IfShowCommand extends AbstractShowCommand<IfCategory, IfPuzzle, IfR
     @Getter
     private final IfSolutionRepository repository;
 
-    @NotNull
+    @NonNull
     @Override
-    public Pair<IfPuzzle, IfCategory> findPuzzleAndCategory(@NotNull ChatInputInteractionEvent event) {
+    public Pair<IfPuzzle, IfCategory> findPuzzleAndCategory(@NonNull ChatInputInteractionEvent event) {
         IfPuzzle puzzle = puzzleOption.get(event);
         IfCategory category = categoryOption.get(event);
         if (!puzzle.getSupportedCategories().contains(category))

@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.tis.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -101,7 +101,7 @@ public enum TISCategory implements CategoryJava<TISCategory, TISScore, TISMetric
     private final Set<TISType> supportedTypes;
     private final int scoreFormatId;
 
-    TISCategory(@NotNull TISMetric<Boolean> admission, @NotNull List<TISMetric<?>> metrics, int scoreFormatId) {
+    TISCategory(@NonNull TISMetric<Boolean> admission, @NonNull List<TISMetric<?>> metrics, int scoreFormatId) {
         this.displayName = name();
         this.admission = admission;
         this.metrics = metrics;
@@ -111,7 +111,7 @@ public enum TISCategory implements CategoryJava<TISCategory, TISScore, TISMetric
     }
 
     @Override
-    public boolean supportsScore(@NotNull TISScore score) {
+    public boolean supportsScore(@NonNull TISScore score) {
         return admission.get(score);
     }
 }

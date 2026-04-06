@@ -21,27 +21,27 @@ import com.faendir.zachtronics.bot.sz.validation.SzValidator;
 import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 @Value
 public class SzSubmission implements Submission<SzCategory, SzPuzzle> {
-    @NotNull SzPuzzle puzzle;
-    @NotNull SzScore score;
-    @NotNull String author;
+    @NonNull SzPuzzle puzzle;
+    @NonNull SzScore score;
+    @NonNull String author;
     @Nullable String displayLink;
-    @NotNull String data;
+    @NonNull String data;
 
     /**
      * @throws ValidationException if we can't correctly parse metadata
      */
-    @NotNull
-    public static SzSubmission fromData(@NotNull String data, @NotNull String author, String displayLink) throws ValidationException {
+    @NonNull
+    public static SzSubmission fromData(@NonNull String data, @NonNull String author, String displayLink) throws ValidationException {
         return SzValidator.validate(data, author, displayLink);
     }
 
-    @NotNull
-    public static SzSubmission fromLink(@NotNull String link, String author, String displayLink) {
+    @NonNull
+    public static SzSubmission fromLink(@NonNull String link, String author, String displayLink) {
         String data = Utils.downloadFile(link).dataAsString();
         return fromData(data, author, displayLink);
     }

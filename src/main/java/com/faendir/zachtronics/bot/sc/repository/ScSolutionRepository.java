@@ -29,7 +29,7 @@ import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -61,9 +61,9 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                                                                    .thenComparing(ScScore::isPrecognitive));
     private final List<ScPuzzle> trackedPuzzles = Arrays.stream(ScPuzzle.values()).filter(p -> p.getType() != ScType.BOSS_RANDOM).toList();
 
-    @NotNull
+    @NonNull
     @Override
-    public SubmitResult<ScRecord, ScCategory> submit(@NotNull ScSubmission submission) {
+    public SubmitResult<ScRecord, ScCategory> submit(@NonNull ScSubmission submission) {
         try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
             BiConsumer<ScSubmission, Collection<ScCategory>> successCallback = (sub, wonCategories) -> {
                 access.push();
@@ -77,14 +77,14 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     }
 
     @Override
-    protected @NotNull String wikiPageName(ScPuzzle puzzle) {
+    protected @NonNull String wikiPageName(ScPuzzle puzzle) {
         return puzzle.getGroup().getWikiPage();
     }
 
-    @NotNull
+    @NonNull
     @Override
     public List<SubmitResult<ScRecord, ScCategory>> submitAll(
-            @NotNull Collection<? extends ValidationResult<ScSubmission>> validationResults) {
+            @NonNull Collection<? extends ValidationResult<ScSubmission>> validationResults) {
         try (GitRepository.ReadWriteAccess access = gitRepo.acquireWriteAccess()) {
             List<SubmitResult<ScRecord, ScCategory>> submitResults = new ArrayList<>();
             StringJoiner redditAnnouncement = new StringJoiner("  \n");
@@ -112,8 +112,8 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     }
 
     @Override
-    protected void updateRedditLeaderboard(@NotNull List<String> lines, @NotNull ScPuzzle puzzle,
-                                           GitRepository.@NotNull ReadWriteAccess access, @NotNull List<ScSolution> solutions) {
+    protected void updateRedditLeaderboard(@NonNull List<String> lines, @NonNull ScPuzzle puzzle,
+                                           GitRepository.@NonNull ReadWriteAccess access, @NonNull List<ScSolution> solutions) {
 
         Map<ScCategory, ScRecord> recordMap = new EnumMap<>(ScCategory.class);
         Map<ScCategory, ScRecord> videoRecordMap = new EnumMap<>(ScCategory.class);
@@ -205,8 +205,8 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         }
     }
 
-    @NotNull
-    private static String makeLeaderboardCell(ScRecord @NotNull [] blockRecords, int i, int minReactors,
+    @NonNull
+    private static String makeLeaderboardCell(ScRecord @NonNull [] blockRecords, int i, int minReactors,
                                               DisplayContext<ScCategory> displayContext) {
         ScRecord record = blockRecords[i];
         for (int prev = 0; prev < i; prev++) {
@@ -219,8 +219,8 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
         return record.toDisplayString(displayContext, reactorPrefix);
     }
 
-    @NotNull
-    private String makeRedditAnnouncement(@NotNull ScSubmission submission, Collection<ScCategory> wonCategories) {
+    @NonNull
+    private String makeRedditAnnouncement(@NonNull ScSubmission submission, Collection<ScCategory> wonCategories) {
         DisplayContext<ScCategory> context = new DisplayContext<>(StringFormat.REDDIT, wonCategories);
         return "Added " + Markdown.fileLinkOrEmpty(makeArchiveLink(submission.getPuzzle(), submission.getScore())) +
                Markdown.linkOrText(submission.getPuzzle().getDisplayName() +
@@ -229,19 +229,19 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
                " by " + submission.getAuthor();
     }
 
-    private void postAnnouncementToReddit(@NotNull String content) {
+    private void postAnnouncementToReddit(@NonNull String content) {
         // see: https://www.reddit.com/r/spacechem/comments/mmcuzb
         if (!content.isEmpty())
             redditService.postInSubmission("mmcuzb", content);
     }
 
     @Override
-    protected ScSolution makeCandidateSolution(@NotNull ScSubmission submission) {
+    protected ScSolution makeCandidateSolution(@NonNull ScSubmission submission) {
         return new ScSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink(), false);
     }
 
     @Override
-    protected int frontierCompare(@NotNull ScScore s1, @NotNull ScScore s2) {
+    protected int frontierCompare(@NonNull ScScore s1, @NonNull ScScore s2) {
         int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
         int r2 = Integer.compare(s1.getReactors(), s2.getReactors());
         int r3 = Integer.compare(s1.getSymbols(), s2.getSymbols());
@@ -263,14 +263,14 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     }
 
     @Override
-    protected boolean allowedSameScoreUpdate(@NotNull ScSolution candidate, @NotNull ScSolution solution) {
+    protected boolean allowedSameScoreUpdate(@NonNull ScSolution candidate, @NonNull ScSolution solution) {
         return candidate.getDisplayLink() != null ||
                (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
 
     @Override
-    protected void removeOrReplaceFromIndex(@NotNull ScSolution candidate, @NotNull ScSolution solution,
-                                            @NotNull ListIterator<ScSolution> it) {
+    protected void removeOrReplaceFromIndex(@NonNull ScSolution candidate, @NonNull ScSolution solution,
+                                            @NonNull ListIterator<ScSolution> it) {
         if (candidate.getDisplayLink() == null && solution.getDisplayLink() != null) {
             // we beat the solution, but we can't replace the video, we keep the solution entry as a video-only
             it.set(solution.withVideoOnly(true)); // empty categories
@@ -281,25 +281,25 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     }
 
     @Override
-    @NotNull
-    protected Path relativePuzzlePath(@NotNull ScPuzzle puzzle) {
+    @NonNull
+    protected Path relativePuzzlePath(@NonNull ScPuzzle puzzle) {
         return Paths.get(puzzle.getGroup().name(), puzzle.name());
     }
 
-    @NotNull
-    static String makeScoreFilename(@NotNull ScScore score) {
+    @NonNull
+    static String makeScoreFilename(@NonNull ScScore score) {
         return score.toDisplayString(DisplayContext.fileName()) + ".txt";
     }
 
-    @NotNull
+    @NonNull
     @Override
-    protected String makeArchiveLink(@NotNull ScPuzzle puzzle, @NotNull ScScore score) {
+    protected String makeArchiveLink(@NonNull ScPuzzle puzzle, @NonNull ScScore score) {
         return makeArchiveLink(puzzle, makeScoreFilename(score));
     }
 
     @Override
-    @NotNull
-    protected Path makeArchivePath(@NotNull Path puzzlePath, ScScore score) {
+    @NonNull
+    protected Path makeArchivePath(@NonNull Path puzzlePath, ScScore score) {
         return puzzlePath.resolve(makeScoreFilename(score));
     }
 }

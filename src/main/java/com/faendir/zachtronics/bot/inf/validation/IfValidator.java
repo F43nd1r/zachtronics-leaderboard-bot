@@ -19,8 +19,8 @@ package com.faendir.zachtronics.bot.inf.validation;
 import com.faendir.zachtronics.bot.inf.model.*;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -63,7 +63,7 @@ import java.util.stream.Collectors;
  */
 public class IfValidator {
 
-    public static Collection<ValidationResult<IfSubmission>> validateSavefile(@NotNull String data, @NotNull String author,
+    public static Collection<ValidationResult<IfSubmission>> validateSavefile(@NonNull String data, @NonNull String author,
                                                                               @Nullable IfScore score, @Nullable List<String> videos,
                                                                               boolean isAdmin) {
         Map<String, IfSolutionInfo> infosByIdSlot = new LinkedHashMap<>(); // 1-1.0 -> {...}
@@ -113,8 +113,8 @@ public class IfValidator {
 
     private static final Pattern FLAGS_REGEX = Pattern.compile("/?" + IfScore.FLAGS_REGEX);
 
-    @NotNull
-    private static ValidationResult<IfSubmission> validateOne(@NotNull String idSlot, @NotNull IfSolutionInfo info, @NotNull String author,
+    @NonNull
+    private static ValidationResult<IfSubmission> validateOne(@NonNull String idSlot, @NonNull IfSolutionInfo info, @NonNull String author,
                                                               @Nullable IfScore score, @Nullable List<String> videos, boolean isAdmin) {
         if (info.getInputRate() == null || info.getSolution() == null)
             return new ValidationResult.Unparseable<>("Incomplete necessary data for idSlot: " + idSlot);
@@ -224,7 +224,7 @@ public class IfValidator {
      * <li>rotating the whole assembly</li>
      * <li>detaching the input blocks by teleporter or by eviscerating/lasering some connecting input blocks</li>
      */
-    public static boolean couldHaveGRA(@NotNull IfSave save, @NotNull IfPuzzle puzzle) {
+    public static boolean couldHaveGRA(@NonNull IfSave save, @NonNull IfPuzzle puzzle) {
         Set<Short> types = Arrays.stream(save.getBlocks())
                                  .map(IfBlock::getType)
                                  .collect(Collectors.toSet());

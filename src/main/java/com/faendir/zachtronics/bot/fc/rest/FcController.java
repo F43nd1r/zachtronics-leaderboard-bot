@@ -29,7 +29,7 @@ import com.faendir.zachtronics.bot.rest.dto.CategoryDTO;
 import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,13 +53,13 @@ public class FcController implements GameRestController<GroupDTO, FcPuzzleDTO, C
     private final List<FcPuzzleDTO> puzzles = Arrays.stream(FcPuzzle.values()).map(FcPuzzleDTO::fromPuzzle).toList();
 
     @Override
-    public FcPuzzleDTO getPuzzle(@NotNull String puzzleId) {
+    public FcPuzzleDTO getPuzzle(@NonNull String puzzleId) {
         return FcPuzzleDTO.fromPuzzle(findPuzzle(puzzleId));
     }
 
     @Override
-    @NotNull
-    public List<FcPuzzleDTO> listPuzzlesByGroup(@NotNull String groupId) {
+    @NonNull
+    public List<FcPuzzleDTO> listPuzzlesByGroup(@NonNull String groupId) {
         FcGroup group = findGroup(groupId);
         return Arrays.stream(FcPuzzle.values()).filter(p -> p.getGroup() == group).map(FcPuzzleDTO::fromPuzzle).toList();
     }
@@ -68,13 +68,13 @@ public class FcController implements GameRestController<GroupDTO, FcPuzzleDTO, C
     private final List<CategoryDTO> categories = Arrays.stream(FcCategory.values()).map(CategoryDTO::fromCategory).toList();
 
     @Override
-    public CategoryDTO getCategory(@NotNull String categoryId) {
+    public CategoryDTO getCategory(@NonNull String categoryId) {
         return CategoryDTO.fromCategory(findCategory(categoryId));
     }
 
     @Override
-    @NotNull
-    public List<FcRecordDTO> listRecords(@NotNull String puzzleId, Boolean includeFrontier) {
+    @NonNull
+    public List<FcRecordDTO> listRecords(@NonNull String puzzleId, Boolean includeFrontier) {
         FcPuzzle puzzle = findPuzzle(puzzleId);
         return repository.findCategoryHolders(puzzle, includeFrontier != null && includeFrontier).stream()
                          .map(FcRecordDTO::fromCategoryRecord)
@@ -82,7 +82,7 @@ public class FcController implements GameRestController<GroupDTO, FcPuzzleDTO, C
     }
 
     @Override
-    public FcRecordDTO getRecord(@NotNull String puzzleId, @NotNull String categoryId) {
+    public FcRecordDTO getRecord(@NonNull String puzzleId, @NonNull String categoryId) {
         FcPuzzle puzzle = findPuzzle(puzzleId);
         FcCategory category = findCategory(categoryId);
         FcRecord record = repository.find(puzzle, category);

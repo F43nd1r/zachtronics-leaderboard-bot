@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.sz.validation.chips;
 
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Map;
 
@@ -42,16 +42,16 @@ class SzChipPGA implements SzChip {
     int x;
     int y;
     boolean arraySwitch;
-    @NotNull String arrayData;
+    @NonNull String arrayData;
 
-    static @NotNull SzChipPGA unmarshal(@NotNull Map<String, String> chipMap) {
+    static @NonNull SzChipPGA unmarshal(@NonNull Map<String, String> chipMap) {
         return new SzChipPGA(getInt(chipMap, "x"),
                              getInt(chipMap, "y"),
                              getBoolean(chipMap, "array-switch"),
                              chipMap.get("array-data"));
     }
 
-    @NotNull
+    @NonNull
     @Override
     public SzChipType getType() {
         return type;

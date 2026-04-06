@@ -19,7 +19,7 @@ package com.faendir.zachtronics.bot.fp.model;
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
@@ -32,6 +32,6 @@ public enum FpMetric implements MetricJava<FpScore, Integer> {
     WASTE("W", FpScore::getWaste),
     MOST_WASTE("w", s -> -s.getWaste());
 
-    @NotNull private final String displayName;
-    @NotNull private final Function<FpScore, Integer> extract;
+    @NonNull private final String displayName;
+    @NonNull private final Function<FpScore, Integer> extract;
 }

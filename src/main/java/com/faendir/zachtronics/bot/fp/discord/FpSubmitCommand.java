@@ -31,7 +31,7 @@ import com.faendir.zachtronics.bot.validation.ValidationResult;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -60,9 +60,9 @@ public class FpSubmitCommand extends AbstractMultiSubmitCommand<FpCategory, FpPu
     @Getter
     private final FpSolutionRepository repository;
 
-    @NotNull
+    @NonNull
     @Override
-    public Collection<ValidationResult<FpSubmission>> parseSubmissions(@NotNull ChatInputInteractionEvent event) {
+    public Collection<ValidationResult<FpSubmission>> parseSubmissions(@NonNull ChatInputInteractionEvent event) {
         String solution = solutionOption.get(event);
         String author = authorOption.get(event);
         String image = imageOption.get(event);

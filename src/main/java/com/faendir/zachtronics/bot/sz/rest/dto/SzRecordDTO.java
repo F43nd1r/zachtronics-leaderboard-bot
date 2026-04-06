@@ -23,22 +23,22 @@ import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 @Value
 public class SzRecordDTO implements RecordDTO<SzScoreDTO> {
-    @NotNull SzScoreDTO score;
-    @NotNull String fullFormattedScore;
-    @NotNull String author;
+    @NonNull SzScoreDTO score;
+    @NonNull String fullFormattedScore;
+    @NonNull String author;
     @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
 
-    @NotNull
-    public static SzRecordDTO fromCategoryRecord(@NotNull CategoryRecord<SzRecord, SzCategory> categoryRecord) {
+    @NonNull
+    public static SzRecordDTO fromCategoryRecord(@NonNull CategoryRecord<SzRecord, SzCategory> categoryRecord) {
         SzRecord record = categoryRecord.getRecord();
         Set<SzCategory> categories = categoryRecord.getCategories();
         return new SzRecordDTO(
@@ -51,8 +51,8 @@ public class SzRecordDTO implements RecordDTO<SzScoreDTO> {
         );
     }
 
-    @NotNull
-    public static SzRecordDTO fromRecord(@NotNull SzRecord record) {
+    @NonNull
+    public static SzRecordDTO fromRecord(@NonNull SzRecord record) {
         return new SzRecordDTO(SzScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
                                record.getAuthor(),

@@ -20,8 +20,8 @@ import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Score;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,9 +33,9 @@ public class SzScore implements Score<SzCategory> {
     int lines;
 
     /** cc/ppp/ll */
-    @NotNull
+    @NonNull
     @Override
-    public String toDisplayString(@NotNull DisplayContext<SzCategory> context) {
+    public String toDisplayString(@NonNull DisplayContext<SzCategory> context) {
         String separator = context.getSeparator();
         int formatId = Utils.getScoreFormatId(context);
 
@@ -48,14 +48,14 @@ public class SzScore implements Score<SzCategory> {
 
     /** <tt>cc/ppp/ll</tt>, tolerates extra <tt>*</tt> */
     @Nullable
-    public static SzScore parseScore(@NotNull String string) {
+    public static SzScore parseScore(@NonNull String string) {
         Matcher m = REGEX_SCORE.matcher(string);
         return m.matches() ? parseScore(m) : null;
     }
 
     /** we assume m matches */
-    @NotNull
-    public static SzScore parseScore(@NotNull Matcher m) {
+    @NonNull
+    public static SzScore parseScore(@NonNull Matcher m) {
         int cost = Integer.parseInt(m.group("cost"));
         int power = Integer.parseInt(m.group("power"));
         int lines = Integer.parseInt(m.group("lines"));

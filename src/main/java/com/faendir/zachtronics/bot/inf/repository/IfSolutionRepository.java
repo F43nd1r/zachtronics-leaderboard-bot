@@ -25,7 +25,7 @@ import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -61,17 +61,17 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
     private final List<IfPuzzle> trackedPuzzles = List.of(IfPuzzle.values());
 
     @Override
-    protected @NotNull String wikiPageName(IfPuzzle puzzle) {
+    protected @NonNull String wikiPageName(IfPuzzle puzzle) {
         return "index";
     }
 
     @Override
-    protected IfSolution makeCandidateSolution(@NotNull IfSubmission submission) {
+    protected IfSolution makeCandidateSolution(@NonNull IfSubmission submission) {
         return new IfSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLinks());
     }
 
     @Override
-    protected int frontierCompare(@NotNull IfScore s1, @NotNull IfScore s2) {
+    protected int frontierCompare(@NonNull IfScore s1, @NonNull IfScore s2) {
         int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
         int r2 = Integer.compare(s1.getFootprint(), s2.getFootprint());
         int r3 = Integer.compare(s1.getBlocks(), s2.getBlocks());
@@ -93,31 +93,31 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
     }
 
     @Override
-    protected boolean allowedSameScoreUpdate(@NotNull IfSolution candidate, @NotNull IfSolution solution) {
+    protected boolean allowedSameScoreUpdate(@NonNull IfSolution candidate, @NonNull IfSolution solution) {
         return !candidate.getDisplayLinks().isEmpty() ||
                (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLinks().isEmpty());
     }
 
     @Override
-    @NotNull
-    protected Path relativePuzzlePath(@NotNull IfPuzzle puzzle) {
+    @NonNull
+    protected Path relativePuzzlePath(@NonNull IfPuzzle puzzle) {
         return Paths.get(puzzle.getGroup().name(), puzzle.getId());
     }
 
-    @NotNull
-    static String makeScoreFilename(@NotNull IfScore score) {
+    @NonNull
+    static String makeScoreFilename(@NonNull IfScore score) {
         return score.toDisplayString(DisplayContext.fileName()) + ".txt";
     }
 
-    @NotNull
+    @NonNull
     @Override
-    protected String makeArchiveLink(@NotNull IfPuzzle puzzle, @NotNull IfScore score) {
+    protected String makeArchiveLink(@NonNull IfPuzzle puzzle, @NonNull IfScore score) {
         return makeArchiveLink(puzzle, makeScoreFilename(score));
     }
 
     @Override
-    @NotNull
-    protected Path makeArchivePath(@NotNull Path puzzlePath, IfScore score) {
+    @NonNull
+    protected Path makeArchivePath(@NonNull Path puzzlePath, IfScore score) {
         return puzzlePath.resolve(makeScoreFilename(score));
     }
 }

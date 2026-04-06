@@ -21,7 +21,7 @@ import com.faendir.zachtronics.bot.fp.model.*;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.utils.LambdaUtils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,8 +61,8 @@ class FpManualTest {
         System.out.println("Done");
     }
 
-    @NotNull
-    private static FpSubmission recordToSubmissions(@NotNull FpRecord record) {
+    @NonNull
+    private static FpSubmission recordToSubmissions(@NonNull FpRecord record) {
         assert record.getDataPath() != null;
         String data = LambdaUtils.<Path, String>uncheckIOException(Files::readString).apply(record.getDataPath());
         return new FpSubmission(record.getPuzzle(), record.getScore(), record.getAuthor(),

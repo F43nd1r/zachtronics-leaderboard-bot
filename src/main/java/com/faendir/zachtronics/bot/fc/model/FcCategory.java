@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.fc.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -59,7 +59,7 @@ public enum FcCategory implements CategoryJava<FcCategory, FcScore, FcMetric> {
     private final Set<FcType> supportedTypes = Collections.singleton(STANDARD);
     private final int scoreFormatId;
 
-    FcCategory(@NotNull List<FcMetric> metrics, int scoreFormatId) {
+    FcCategory(@NonNull List<FcMetric> metrics, int scoreFormatId) {
         this.displayName = name();
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
@@ -67,7 +67,7 @@ public enum FcCategory implements CategoryJava<FcCategory, FcScore, FcMetric> {
     }
 
     @Override
-    public boolean supportsScore(@NotNull FcScore score) {
+    public boolean supportsScore(@NonNull FcScore score) {
         return true;
     }
 }

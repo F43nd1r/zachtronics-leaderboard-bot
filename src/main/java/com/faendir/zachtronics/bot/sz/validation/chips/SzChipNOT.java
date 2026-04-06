@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.sz.validation.chips;
 
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Map;
 
@@ -43,13 +43,13 @@ class SzChipNOT implements SzChip {
     int y;
     boolean rotated;
 
-    static @NotNull SzChipNOT unmarshal(@NotNull Map<String, String> chipMap) {
+    static @NonNull SzChipNOT unmarshal(@NonNull Map<String, String> chipMap) {
         return new SzChipNOT(getInt(chipMap, "x"),
                              getInt(chipMap, "y"),
                              getBoolean(chipMap, "rotated"));
     }
 
-    @NotNull
+    @NonNull
     @Override
     public SzChipType getType() {
         return type;

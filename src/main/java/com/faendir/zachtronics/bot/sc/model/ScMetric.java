@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
@@ -33,6 +33,6 @@ public class ScMetric<T extends Comparable<T>> implements MetricJava<ScScore, T>
     public static final ScMetric<Boolean> NO_PRECOG = new ScMetric<>("NP", ScScore::isPrecognitive);
     public static final ScMetric<Boolean> NO_FLAGS = new ScMetric<>("NBP", s -> s.isBugged() || s.isPrecognitive());
 
-    @NotNull String displayName;
-    @NotNull Function<ScScore, T> extract;
+    @NonNull String displayName;
+    @NonNull Function<ScScore, T> extract;
 }

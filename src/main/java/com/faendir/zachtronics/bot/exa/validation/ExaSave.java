@@ -22,8 +22,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutput;
@@ -57,26 +57,26 @@ import java.util.function.IntFunction;
 @Data
 @AllArgsConstructor
 public class ExaSave {
-    private final @NotNull String puzzle;
-    private @NotNull String name;
+    private final @NonNull String puzzle;
+    private @NonNull String name;
 
     private int cycles;
     private int size;
     private int activity;
 
-    private final @NotNull List<@NotNull ExaChip> chips;
+    private final @NonNull List<@NonNull ExaChip> chips;
 
     @Accessors(fluent = true)
     @Getter(lazy = true)
     private final int actualSize = chips.stream().mapToInt(ExaChip::size).sum();
 
-    @NotNull
+    @NonNull
     public static ExaSave unmarshal(byte[] solution) {
         ByteBuffer byteBuffer = ByteBuffer.wrap(solution).order(ByteOrder.LITTLE_ENDIAN);
         return unmarshal(byteBuffer);
     }
 
-    static @NotNull ExaSave unmarshal(@NotNull ByteBuffer byteBuffer) {
+    static @NonNull ExaSave unmarshal(@NonNull ByteBuffer byteBuffer) {
         int version = byteBuffer.getInt();
         if (version < 1006 || version > 1008)
             throw new IllegalStateException("Invalid version: " + version);
@@ -114,7 +114,7 @@ public class ExaSave {
         return new ExaSave(puzzle, name, cycles, size, activity, chips);
     }
 
-    public byte @NotNull [] marshal() {
+    public byte @NonNull [] marshal() {
         ByteArrayOutputStream ba = new ByteArrayOutputStream();
         try (LittleEndianDataOutputStream out = new LittleEndianDataOutputStream(ba)) {
             marshal(out);
@@ -125,7 +125,7 @@ public class ExaSave {
         return ba.toByteArray();
     }
 
-    private void marshal(@NotNull DataOutput out) throws IOException {
+    private void marshal(@NonNull DataOutput out) throws IOException {
         out.writeInt(1008);
         writeString(out, puzzle);
         writeString(out, name);
@@ -144,20 +144,20 @@ public class ExaSave {
         }
     }
 
-    static @NotNull String readString(@NotNull ByteBuffer byteBuffer) {
+    static @NonNull String readString(@NonNull ByteBuffer byteBuffer) {
         int length = byteBuffer.getInt();
         String result = new String(byteBuffer.array(), byteBuffer.arrayOffset() + byteBuffer.position(), length);
         byteBuffer.position(byteBuffer.position() + length);
         return result;
     }
 
-    static void writeString(@NotNull DataOutput out, @NotNull String string) throws IOException {
+    static void writeString(@NonNull DataOutput out, @NonNull String string) throws IOException {
         byte[] data = string.getBytes();
         out.writeInt(data.length);
         out.write(data);
     }
 
-    static void assertInt(@NotNull ByteBuffer byteBuffer, int value, IntFunction<String> rejectReason) {
+    static void assertInt(@NonNull ByteBuffer byteBuffer, int value, IntFunction<String> rejectReason) {
         int read = byteBuffer.getInt();
         if (read != value)
             throw new ValidationException(rejectReason.apply(read));

@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.tis.ai;
 
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
@@ -26,8 +26,8 @@ import java.util.List;
 @Value
 class TISNode {
     int id;
-    @NotNull List<TISLine> lines = new ArrayList<>();
-    @NotNull List<TISLine> codeLines = new ArrayList<>();
+    @NonNull List<TISLine> lines = new ArrayList<>();
+    @NonNull List<TISLine> codeLines = new ArrayList<>();
 
     void marshalInto(@NonNull StringBuilder sb) {
         sb.append('@').append(id).append('\n');

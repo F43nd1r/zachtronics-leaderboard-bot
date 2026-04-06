@@ -27,7 +27,7 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -43,9 +43,9 @@ public class CwShowCommand extends AbstractShowCommand<CwCategory, CwPuzzle, CwR
     @Getter
     private final CwSolutionRepository repository;
 
-    @NotNull
+    @NonNull
     @Override
-    public Pair<CwPuzzle, CwCategory> findPuzzleAndCategory(@NotNull ChatInputInteractionEvent event) {
+    public Pair<CwPuzzle, CwCategory> findPuzzleAndCategory(@NonNull ChatInputInteractionEvent event) {
         CwPuzzle puzzle = puzzleOption.get(event);
         CwCategory category = categoryOption.get(event);
         if (!puzzle.getSupportedCategories().contains(category))

@@ -29,7 +29,7 @@ import com.faendir.zachtronics.bot.rest.dto.CategoryDTO;
 import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,13 +53,13 @@ public class KzController implements GameRestController<GroupDTO, KzPuzzleDTO, C
     private final List<KzPuzzleDTO> puzzles = Arrays.stream(KzPuzzle.values()).map(KzPuzzleDTO::fromPuzzle).toList();
 
     @Override
-    public KzPuzzleDTO getPuzzle(@NotNull String puzzleId) {
+    public KzPuzzleDTO getPuzzle(@NonNull String puzzleId) {
         return KzPuzzleDTO.fromPuzzle(findPuzzle(puzzleId));
     }
 
     @Override
-    @NotNull
-    public List<KzPuzzleDTO> listPuzzlesByGroup(@NotNull String groupId) {
+    @NonNull
+    public List<KzPuzzleDTO> listPuzzlesByGroup(@NonNull String groupId) {
         KzGroup group = findGroup(groupId);
         return Arrays.stream(KzPuzzle.values()).filter(p -> p.getGroup() == group).map(KzPuzzleDTO::fromPuzzle).toList();
     }
@@ -68,13 +68,13 @@ public class KzController implements GameRestController<GroupDTO, KzPuzzleDTO, C
     private final List<CategoryDTO> categories = Arrays.stream(KzCategory.values()).map(CategoryDTO::fromCategory).toList();
 
     @Override
-    public CategoryDTO getCategory(@NotNull String categoryId) {
+    public CategoryDTO getCategory(@NonNull String categoryId) {
         return CategoryDTO.fromCategory(findCategory(categoryId));
     }
 
     @Override
-    @NotNull
-    public List<KzRecordDTO> listRecords(@NotNull String puzzleId, Boolean includeFrontier) {
+    @NonNull
+    public List<KzRecordDTO> listRecords(@NonNull String puzzleId, Boolean includeFrontier) {
         KzPuzzle puzzle = findPuzzle(puzzleId);
         return repository.findCategoryHolders(puzzle, includeFrontier != null && includeFrontier).stream()
                          .map(KzRecordDTO::fromCategoryRecord)
@@ -82,7 +82,7 @@ public class KzController implements GameRestController<GroupDTO, KzPuzzleDTO, C
     }
 
     @Override
-    public KzRecordDTO getRecord(@NotNull String puzzleId, @NotNull String categoryId) {
+    public KzRecordDTO getRecord(@NonNull String puzzleId, @NonNull String categoryId) {
         KzPuzzle puzzle = findPuzzle(puzzleId);
         KzCategory category = findCategory(categoryId);
         KzRecord record = repository.find(puzzle, category);

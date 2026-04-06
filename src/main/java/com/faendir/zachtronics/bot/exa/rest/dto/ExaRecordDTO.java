@@ -23,22 +23,22 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.dto.RecordDTO;
 import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 @Value
 public class ExaRecordDTO implements RecordDTO<ExaScoreDTO> {
-    @NotNull ExaScoreDTO score;
-    @NotNull String fullFormattedScore;
-    @NotNull String author;
+    @NonNull ExaScoreDTO score;
+    @NonNull String fullFormattedScore;
+    @NonNull String author;
     @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
 
-    @NotNull
-    public static ExaRecordDTO fromCategoryRecord(@NotNull CategoryRecord<ExaRecord, ExaCategory> categoryRecord) {
+    @NonNull
+    public static ExaRecordDTO fromCategoryRecord(@NonNull CategoryRecord<ExaRecord, ExaCategory> categoryRecord) {
         ExaRecord record = categoryRecord.getRecord();
         Set<ExaCategory> categories = categoryRecord.getCategories();
         return new ExaRecordDTO(
@@ -51,8 +51,8 @@ public class ExaRecordDTO implements RecordDTO<ExaScoreDTO> {
         );
     }
 
-    @NotNull
-    public static ExaRecordDTO fromRecord(@NotNull ExaRecord record) {
+    @NonNull
+    public static ExaRecordDTO fromRecord(@NonNull ExaRecord record) {
         return new ExaRecordDTO(ExaScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
                                record.getAuthor(),

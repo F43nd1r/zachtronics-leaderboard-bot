@@ -26,8 +26,8 @@ import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.opencsv.*;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -63,11 +63,11 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
     protected abstract Comparator<Sol> getArchiveComparator();
     protected abstract List<P> getTrackedPuzzles();
 
-    protected abstract @NotNull String wikiPageName(P puzzle);
+    protected abstract @NonNull String wikiPageName(P puzzle);
 
-    @NotNull
+    @NonNull
     @Override
-    public List<CategoryRecord<R, C>> findCategoryHolders(@NotNull P puzzle, boolean includeFrontier) {
+    public List<CategoryRecord<R, C>> findCategoryHolders(@NonNull P puzzle, boolean includeFrontier) {
         try (GitRepository.ReadAccess access = getGitRepo().acquireReadAccess()) {
             Path puzzlePath = getPuzzlePath(access, puzzle);
 
@@ -88,9 +88,9 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public List<SubmitResult<R, C>> submitAll(@NotNull Collection<? extends ValidationResult<Sub>> validationResults) {
+    public List<SubmitResult<R, C>> submitAll(@NonNull Collection<? extends ValidationResult<Sub>> validationResults) {
         try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
             List<SubmitResult<R, C>> submitResults = new ArrayList<>();
 
@@ -109,16 +109,16 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         }
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public SubmitResult<R, C> submit(@NotNull Sub submission) {
+    public SubmitResult<R, C> submit(@NonNull Sub submission) {
         try (GitRepository.ReadWriteAccess access = getGitRepo().acquireWriteAccess()) {
             return submitOne(access, submission, (s, c) -> access.push());
         }
     }
 
-    @NotNull
-    protected SubmitResult<R, C> submitOne(@NotNull GitRepository.ReadWriteAccess access, @NotNull Sub submission,
+    @NonNull
+    protected SubmitResult<R, C> submitOne(@NonNull GitRepository.ReadWriteAccess access, @NonNull Sub submission,
                                            BiConsumer<Sub, Collection<C>> successCallback) {
         P puzzle = submission.getPuzzle();
         Path puzzlePath = getPuzzlePath(access, puzzle);
@@ -153,7 +153,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         return submitResult;
     }
 
-    protected abstract Sol makeCandidateSolution(@NotNull Sub submission);
+    protected abstract Sol makeCandidateSolution(@NonNull Sub submission);
     /**
      * <ul>
      *  <li>-1: s1 is strictly better OR equal
@@ -161,20 +161,20 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
      *  <li>+1: s2 is strictly better
      *  </ul>
      */
-    protected abstract int frontierCompare(@NotNull S s1, @NotNull S s2);
+    protected abstract int frontierCompare(@NonNull S s1, @NonNull S s2);
     /** Allow same-score changes if you bring a display link or you are the original author and don't regress the display link state */
-    protected abstract boolean allowedSameScoreUpdate(@NotNull Sol candidate, @NotNull Sol solution);
+    protected abstract boolean allowedSameScoreUpdate(@NonNull Sol candidate, @NonNull Sol solution);
 
-    protected void removeOrReplaceFromIndex(@NotNull Sol candidate, @NotNull Sol solution, @NotNull ListIterator<Sol> it) {
+    protected void removeOrReplaceFromIndex(@NonNull Sol candidate, @NonNull Sol solution, @NonNull ListIterator<Sol> it) {
         it.remove();
     }
 
     /**
      * @param solutions the list is modified with the updated state
      */
-    protected SubmitResult<R, C> archiveOne(@NotNull GitRepository.ReadWriteAccess access,
-                                            @NotNull List<Sol> solutions,
-                                            @NotNull Sub submission) {
+    protected SubmitResult<R, C> archiveOne(@NonNull GitRepository.ReadWriteAccess access,
+                                            @NonNull List<Sol> solutions,
+                                            @NonNull Sub submission) {
         P puzzle = submission.getPuzzle();
         Path puzzlePath = getPuzzlePath(access, puzzle);
 
@@ -282,15 +282,15 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         }
     }
 
-    private @NotNull String makeArchiveLink(String @NotNull ... parts) {
+    private @NonNull String makeArchiveLink(String @NonNull ... parts) {
         return Arrays.stream(parts)
                      .flatMap(p -> Arrays.stream(p.split("/")))
                      .map(s -> URLEncoder.encode(s, StandardCharsets.UTF_8))
                      .collect(Collectors.joining("/", getGitRepo().getRawFilesUrl() + "/", ""));
     }
 
-    @NotNull
-    protected String commit(@NotNull GitRepository.ReadWriteAccess access, @NotNull Sub submission, @NotNull Path puzzlePath) {
+    @NonNull
+    protected String commit(@NonNull GitRepository.ReadWriteAccess access, @NonNull Sub submission, @NonNull Path puzzlePath) {
         access.addAll(puzzlePath.toFile());
         String result = Stream.concat(access.status().getChanged().stream(),
                                       access.status().getAdded().stream())
@@ -307,7 +307,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
     /**
      * @return a mutable list
      */
-    public List<Sol> unmarshalSolutions(@NotNull Path puzzlePath) throws IOException {
+    public List<Sol> unmarshalSolutions(@NonNull Path puzzlePath) throws IOException {
         Path indexPath = puzzlePath.resolve("solutions.psv");
         try (BufferedReader reader = Files.newBufferedReader(indexPath)) {
 
@@ -325,7 +325,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         }
     }
 
-    public void marshalSolutions(@NotNull List<Sol> solutions, @NotNull Path puzzlePath) throws IOException {
+    public void marshalSolutions(@NonNull List<Sol> solutions, @NonNull Path puzzlePath) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(puzzlePath.resolve("solutions.psv"),
                                                              StandardOpenOption.TRUNCATE_EXISTING)) {
             ICSVWriter csvWriter = new CSVWriterBuilder(writer).withSeparator('|').build();
@@ -360,16 +360,16 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
     }
 
     /** @return mutable list of wiki lines */
-    @NotNull
-    protected List<String> readRedditWiki(@NotNull String page) {
+    @NonNull
+    protected List<String> readRedditWiki(@NonNull String page) {
         return Pattern.compile("\\r?\\n")
                       .splitAsStream(getRedditService().getWikiPage(getSubreddit(), page))
                       .collect(Collectors.toList());
     }
 
     /** @param lines mutable list of wiki lines, it will be updated in place */
-    protected void updateRedditLeaderboard(@NotNull List<String> lines, @NotNull P puzzle, GitRepository.@NotNull ReadWriteAccess access,
-                                           @NotNull List<Sol> solutions) {
+    protected void updateRedditLeaderboard(@NonNull List<String> lines, @NonNull P puzzle, GitRepository.@NonNull ReadWriteAccess access,
+                                           @NonNull List<Sol> solutions) {
         Pattern puzzleRegex = Pattern.compile("^\\| \\[" + Pattern.quote(puzzle.getDisplayName()) + "]");
 
         ListIterator<String> it = lines.listIterator();
@@ -407,7 +407,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         addPuzzleLines(it, puzzle, getWikiCategories(), recordMap, Markdown.link(puzzle.getDisplayName(), puzzle.getLink()));
     }
 
-    protected void addPuzzleLines(ListIterator<String> it, @NotNull P puzzle, C[][] categories, @NotNull Map<C, R> recordMap,
+    protected void addPuzzleLines(ListIterator<String> it, @NonNull P puzzle, C[][] categories, @NonNull Map<C, R> recordMap,
                                   String puzzleHeader) {
         List<List<R>> recordsByColumn = Arrays.stream(categories)
                                               .map(a -> Arrays.stream(a)
@@ -447,7 +447,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         }
     }
 
-    protected @NotNull List<String> rebuildRedditPage(@NotNull String page, GitRepository.ReadWriteAccess access)
+    protected @NonNull List<String> rebuildRedditPage(@NonNull String page, GitRepository.ReadWriteAccess access)
     throws IOException {
         List<String> lines = readRedditWiki(page);
         List<P> puzzles = getTrackedPuzzles().stream().filter(p -> wikiPageName(p).equals(page)).toList();
@@ -459,21 +459,21 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         return lines;
     }
 
-    @NotNull
-    protected Path getPuzzlePath(@NotNull GitRepository.ReadAccess access, P puzzle) {
+    @NonNull
+    protected Path getPuzzlePath(@NonNull GitRepository.ReadAccess access, P puzzle) {
         return access.getRepo().toPath().resolve(relativePuzzlePath(puzzle));
     }
 
-    @NotNull
-    protected abstract Path relativePuzzlePath(@NotNull P puzzle);
+    @NonNull
+    protected abstract Path relativePuzzlePath(@NonNull P puzzle);
 
-    @NotNull
-    protected abstract String makeArchiveLink(@NotNull P puzzle, @NotNull S score);
+    @NonNull
+    protected abstract String makeArchiveLink(@NonNull P puzzle, @NonNull S score);
 
-    @NotNull
-    protected abstract Path makeArchivePath(@NotNull Path puzzlePath, S score);
+    @NonNull
+    protected abstract Path makeArchivePath(@NonNull Path puzzlePath, S score);
 
-    protected String makeArchiveLink(@NotNull P puzzle, @NotNull String filename) {
+    protected String makeArchiveLink(@NonNull P puzzle, @NonNull String filename) {
         return makeArchiveLink(relativePuzzlePath(puzzle).toString(), filename);
     }
 }

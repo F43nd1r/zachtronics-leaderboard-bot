@@ -21,8 +21,8 @@ import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSubmission;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,8 +48,8 @@ public class ScMetadataReader {
      * @param data is the whole export, the first <tt>SOLUTION:</tt> match will dictate the metadata line
      * @throws ValidationException if we can't correctly parse metadata
      */
-    @NotNull
-    public static ScSubmission fromHeader(@NotNull String data, @Nullable ScPuzzle puzzle, String displayLink)
+    @NonNull
+    public static ScSubmission fromHeader(@NonNull String data, @Nullable ScPuzzle puzzle, String displayLink)
     throws ValidationException {
         Matcher m = SOLUTION_HEADER.matcher(data);
         if (!m.find()) {
@@ -72,8 +72,8 @@ public class ScMetadataReader {
         return createSubmission(puzzle, author, score, description, displayLink, data);
     }
 
-    @NotNull
-    public static ScSubmission createSubmission(@NotNull ScPuzzle puzzle, String author, ScScore score, String description,
+    @NonNull
+    public static ScSubmission createSubmission(@NonNull ScPuzzle puzzle, String author, ScScore score, String description,
                                                 String displayLink, String data) {
         String commaDescr = "";
         if (description != null) {
@@ -94,8 +94,8 @@ public class ScMetadataReader {
             return field;
     }
 
-    @NotNull
-    private static String encode(@NotNull String field) {
+    @NonNull
+    private static String encode(@NonNull String field) {
         if (field.contains(","))
             return "'" + field.replace("'", "''") + "'";
         else
@@ -107,8 +107,8 @@ public class ScMetadataReader {
      * @param description must be decoded
      * @return normalized and cleaned description, not including comma
      */
-    @NotNull
-    private static String normalizeDescription(@NotNull String description) {
+    @NonNull
+    private static String normalizeDescription(@NonNull String description) {
         String descr = description.replace(" (copy)", ""); // try to cut down on duplicate churn
         if (descr.length() > 100) {
             descr = descr.substring(0, 100) + "...";

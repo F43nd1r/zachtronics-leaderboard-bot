@@ -21,8 +21,8 @@ import com.faendir.zachtronics.bot.exa.model.ExaScore;
 import com.faendir.zachtronics.bot.exa.model.ExaSubmission;
 import com.faendir.zachtronics.bot.exa.model.ExaType;
 import com.faendir.zachtronics.bot.validation.ValidationException;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.VisibleForTesting;
+import org.jspecify.annotations.NonNull;
 
 import java.util.regex.Pattern;
 
@@ -31,13 +31,13 @@ public class ExaValidator {
 
     private static final Pattern CHEESE_REGEX = Pattern.compile("(?:/C|\\bchees[ey])\\b", Pattern.CASE_INSENSITIVE);
 
-    public static @NotNull ExaSubmission validate(byte[] data, boolean cheesy, String author, String displayLink) {
+    public static @NonNull ExaSubmission validate(byte[] data, boolean cheesy, String author, String displayLink) {
         ExaSave save = ExaSave.unmarshal(data);
         return validateImpl(data, save, cheesy, author, displayLink);
     }
 
     @VisibleForTesting
-    public static @NotNull ExaSubmission validateImpl(byte[] data, @NotNull ExaSave save, boolean cheesy, String author, String displayLink) {
+    public static @NonNull ExaSubmission validateImpl(byte[] data, @NonNull ExaSave save, boolean cheesy, String author, String displayLink) {
         ExaPuzzle puzzle;
         try {
             puzzle = ExaPuzzle.valueOf(save.getPuzzle());

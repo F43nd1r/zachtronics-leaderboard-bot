@@ -27,7 +27,7 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -43,9 +43,9 @@ public class FcShowCommand extends AbstractShowCommand<FcCategory, FcPuzzle, FcR
     @Getter
     private final FcSolutionRepository repository;
 
-    @NotNull
+    @NonNull
     @Override
-    public Pair<FcPuzzle, FcCategory> findPuzzleAndCategory(@NotNull ChatInputInteractionEvent event) {
+    public Pair<FcPuzzle, FcCategory> findPuzzleAndCategory(@NonNull ChatInputInteractionEvent event) {
         FcPuzzle puzzle = puzzleOption.get(event);
         FcCategory category = categoryOption.get(event);
         if (!puzzle.getSupportedCategories().contains(category))

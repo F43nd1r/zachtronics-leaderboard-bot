@@ -26,7 +26,7 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.utils.LambdaUtils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,7 @@ class FcManualTest {
     @TestConfiguration
     static class RepositoryConfiguration {
         @Bean("fcRepository")
-        public static @NotNull GitRepository tisRepository(GitProperties gitProperties) {
+        public static @NonNull GitRepository tisRepository(GitProperties gitProperties) {
             return TestConfigurationKt.readOnlyLocalClone("../bbs/foodcourt-leaderboard", gitProperties);
         }
     }
@@ -76,8 +76,8 @@ class FcManualTest {
         System.out.println("Done");
     }
 
-    @NotNull
-    private static FcSubmission recordToSubmissions(@NotNull FcRecord record) {
+    @NonNull
+    private static FcSubmission recordToSubmissions(@NonNull FcRecord record) {
         assert record.getDataPath() != null;
         byte[] data = LambdaUtils.uncheckIOException(Files::readAllBytes).apply(record.getDataPath());
         return new FcSubmission(record.getPuzzle(), record.getScore(), record.getAuthor(),

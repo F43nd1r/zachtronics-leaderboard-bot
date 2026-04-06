@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.sz.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -48,7 +48,7 @@ public enum SzCategory implements CategoryJava<SzCategory, SzScore, SzMetric> {
     private final Set<SzType> supportedTypes = Collections.singleton(STANDARD);
     private final int scoreFormatId;
 
-    SzCategory(@NotNull List<SzMetric> metrics, int scoreFormatId) {
+    SzCategory(@NonNull List<SzMetric> metrics, int scoreFormatId) {
         this.displayName = name();
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
@@ -56,7 +56,7 @@ public enum SzCategory implements CategoryJava<SzCategory, SzScore, SzMetric> {
     }
 
     @Override
-    public boolean supportsScore(@NotNull SzScore score) {
+    public boolean supportsScore(@NonNull SzScore score) {
         return true;
     }
 }

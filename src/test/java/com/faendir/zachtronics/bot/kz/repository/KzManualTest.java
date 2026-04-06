@@ -26,7 +26,7 @@ import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.faendir.zachtronics.bot.validation.ValidationException;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +61,7 @@ public class KzManualTest {
     @TestConfiguration
     static class RepositoryConfiguration {
         @Bean("kzRepository")
-        public static @NotNull GitRepository kzRepository(GitProperties gitProperties) {
+        public static @NonNull GitRepository kzRepository(GitProperties gitProperties) {
             return TestConfigurationKt.readOnlyLocalClone("../kaizen/leaderboard", gitProperties);
         }
     }
@@ -253,7 +253,7 @@ public class KzManualTest {
         // find . -size 0 -print -delete
     }
 
-    private static KzPuzzle findPuzzle(@NotNull String levelName) {
+    private static KzPuzzle findPuzzle(@NonNull String levelName) {
         List<KzPuzzle> candidates = UtilsKt.fuzzyMatch(Arrays.asList(KzPuzzle.values()), levelName, KzPuzzle::getDisplayName);
         if (candidates.size() == 1)
             return candidates.get(0);

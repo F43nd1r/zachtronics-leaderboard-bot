@@ -22,25 +22,25 @@ import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Value;
 import lombok.With;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collection;
 
 @Value
 public class CwSubmission implements Submission<CwCategory, CwPuzzle> {
-    @NotNull CwPuzzle puzzle;
-    @NotNull CwScore score;
-    @NotNull String author;
+    @NonNull CwPuzzle puzzle;
+    @NonNull CwScore score;
+    @NonNull String author;
     @With String displayLink;
-    @NotNull String data;
+    @NonNull String data;
 
-    @NotNull
-    public static Collection<ValidationResult<CwSubmission>> fromData(@NotNull String data, String author) {
+    @NonNull
+    public static Collection<ValidationResult<CwSubmission>> fromData(@NonNull String data, String author) {
         return ChipWizardSim.validateMultiExport(data, author);
     }
 
-    @NotNull
-    public static Collection<ValidationResult<CwSubmission>> fromLink(@NotNull String link, String author) {
+    @NonNull
+    public static Collection<ValidationResult<CwSubmission>> fromLink(@NonNull String link, String author) {
         String data = Utils.downloadFile(link).dataAsString();
         return fromData(data, author);
     }

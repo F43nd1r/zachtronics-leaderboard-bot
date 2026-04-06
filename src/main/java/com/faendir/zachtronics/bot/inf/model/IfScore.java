@@ -22,8 +22,8 @@ import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
 import lombok.With;
 import lombok.experimental.Accessors;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,9 +40,9 @@ public class IfScore implements Score<IfCategory> {
     @With boolean finite;
 
     /** ccc/ff/bb[/OGF] */
-    @NotNull
+    @NonNull
     @Override
-    public String toDisplayString(@NotNull DisplayContext<IfCategory> context) {
+    public String toDisplayString(@NonNull DisplayContext<IfCategory> context) {
         String separator = context.getSeparator();
         int formatId = Utils.getScoreFormatId(context);
 
@@ -59,14 +59,14 @@ public class IfScore implements Score<IfCategory> {
 
     /** <tt>ccc/ff/bb[/OGF]</tt>, tolerates extra <tt>*</tt> */
     @Nullable
-    public static IfScore parseScore(@NotNull String string) {
+    public static IfScore parseScore(@NonNull String string) {
         Matcher m = REGEX_SCORE.matcher(string);
         return m.matches() ? parseScore(m) : null;
     }
 
     /** we assume m matches */
-    @NotNull
-    public static IfScore parseScore(@NotNull Matcher m) {
+    @NonNull
+    public static IfScore parseScore(@NonNull Matcher m) {
         int cycles = Integer.parseInt(m.group("cycles"));
         int footprint = Integer.parseInt(m.group("footprint"));
         int blocks = Integer.parseInt(m.group("blocks"));
@@ -81,7 +81,7 @@ public class IfScore implements Score<IfCategory> {
     /**
      * @return <tt>""</tt> or <tt>"/[O][G][F]"</tt>
      */
-    @NotNull
+    @NonNull
     public static String sepFlags(String separator, boolean outOfBounds, boolean usesGRA, boolean finite) {
         if (outOfBounds || usesGRA || finite) {
             String result = separator;

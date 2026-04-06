@@ -19,8 +19,8 @@ package com.faendir.zachtronics.bot.tis.ai;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.StringJoiner;
@@ -40,7 +40,7 @@ class TISLine {
         "(?:[\\s,!]+(?<arg2>[^#:\\s,!]+))?)?" +
         "[\\s,!]*(?:#(?<comment>.*))?");
 
-    @NotNull String rawLine;
+    @NonNull String rawLine;
 
     @Nullable String label;
     @Nullable String comment;
@@ -52,7 +52,7 @@ class TISLine {
     @Nullable TISPort port2;
 
     /** we assume m matches */
-    static @NotNull TISLine unmarshal(@NotNull String line) {
+    static @NonNull TISLine unmarshal(@NonNull String line) {
         Matcher m = LINE_REGEX.matcher(line);
         if (m.matches()) {
             String label = m.group("label");
@@ -121,7 +121,7 @@ class TISLine {
         return port2.name();
     }
 
-    @NotNull String code() {
+    @NonNull String code() {
         assert op != null;
         return op + (port1 == null ? "" : " " + arg1()) + (port2 == null ? "" : " " + arg2());
     }
@@ -144,11 +144,11 @@ class TISLine {
         return op != null;
     }
 
-    boolean is(@NotNull TISOperation op) {
+    boolean is(@NonNull TISOperation op) {
         return op == this.op;
     }
 
-    boolean is(TISOperation op, @NotNull TISPort port1) {
+    boolean is(TISOperation op, @NonNull TISPort port1) {
         return (op == null || op == this.op) &&
                port1 == this.port1;
     }

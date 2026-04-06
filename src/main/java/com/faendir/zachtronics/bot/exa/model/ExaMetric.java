@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.exa.model;
 
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
@@ -31,6 +31,6 @@ public class ExaMetric<T extends Comparable<T>> implements MetricJava<ExaScore, 
     public static final ExaMetric<Boolean> LEGIT = new ExaMetric<>("", s -> !s.isCheesy());
     public static final ExaMetric<Boolean> CAN_CHEESE = new ExaMetric<>("c", s -> true);
 
-    @NotNull String displayName;
-    @NotNull Function<ExaScore, T> extract;
+    @NonNull String displayName;
+    @NonNull Function<ExaScore, T> extract;
 }

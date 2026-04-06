@@ -19,17 +19,17 @@ package com.faendir.zachtronics.bot.sz.model;
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
-public enum SzMetric implements MetricJava<SzScore, @NotNull Integer> {
+public enum SzMetric implements MetricJava<SzScore, @NonNull Integer> {
     COST("C", SzScore::getCost),
     POWER("P", SzScore::getPower),
     LINES("L", SzScore::getLines);
 
-    @NotNull private final String displayName;
-    @NotNull private final Function<SzScore, @NotNull Integer> extract;
+    @NonNull private final String displayName;
+    @NonNull private final Function<SzScore, @NonNull Integer> extract;
 }

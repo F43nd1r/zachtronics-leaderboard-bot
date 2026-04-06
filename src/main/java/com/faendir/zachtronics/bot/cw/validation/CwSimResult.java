@@ -19,7 +19,7 @@ package com.faendir.zachtronics.bot.cw.validation;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  <pre>  {
@@ -51,11 +51,11 @@ import org.jetbrains.annotations.NotNull;
 @Value
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CwSimResult {
-    @NotNull String levelName;
+    @NonNull String levelName;
     int levelId;
     int slotId;
     /** present only if <tt>--include-solution</tt> is given */
-    @NotNull String solution;
+    @NonNull String solution;
     boolean isCorrect;
     boolean isUnstable;
     int numMetal;

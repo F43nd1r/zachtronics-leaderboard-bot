@@ -23,22 +23,22 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.dto.RecordDTO;
 import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 @Value
 public class IfRecordDTO implements RecordDTO<IfScoreDTO> {
-    @NotNull IfScoreDTO score;
-    @NotNull String fullFormattedScore;
-    @NotNull String author;
+    @NonNull IfScoreDTO score;
+    @NonNull String fullFormattedScore;
+    @NonNull String author;
     @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
 
-    @NotNull
-    public static IfRecordDTO fromCategoryRecord(@NotNull CategoryRecord<IfRecord, IfCategory> categoryRecord) {
+    @NonNull
+    public static IfRecordDTO fromCategoryRecord(@NonNull CategoryRecord<IfRecord, IfCategory> categoryRecord) {
         IfRecord record = categoryRecord.getRecord();
         Set<IfCategory> categories = categoryRecord.getCategories();
         return new IfRecordDTO(
@@ -51,8 +51,8 @@ public class IfRecordDTO implements RecordDTO<IfScoreDTO> {
         );
     }
 
-    @NotNull
-    public static IfRecordDTO fromRecord(@NotNull IfRecord record) {
+    @NonNull
+    public static IfRecordDTO fromRecord(@NonNull IfRecord record) {
         return new IfRecordDTO(IfScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
                                record.getAuthor(),

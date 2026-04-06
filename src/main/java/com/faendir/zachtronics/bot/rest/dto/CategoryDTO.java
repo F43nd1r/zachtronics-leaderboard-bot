@@ -20,19 +20,19 @@ import com.faendir.zachtronics.bot.model.Category;
 import com.faendir.zachtronics.bot.model.Metric;
 import com.faendir.zachtronics.bot.model.Type;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
 @Value
 public class CategoryDTO {
-    @NotNull String id;
-    @NotNull String displayName;
-    @NotNull List<String> metrics;
-    @NotNull List<String> puzzleTypes;
+    @NonNull String id;
+    @NonNull String displayName;
+    @NonNull List<String> metrics;
+    @NonNull List<String> puzzleTypes;
 
-    @NotNull
-    public static <C extends Enum<C> & Category> CategoryDTO fromCategory(@NotNull C category) {
+    @NonNull
+    public static <C extends Enum<C> & Category> CategoryDTO fromCategory(@NonNull C category) {
         return new CategoryDTO(category.name(),
                                category.getDisplayName(),
                                category.getMetrics().stream().map(Metric::getDisplayName).toList(),

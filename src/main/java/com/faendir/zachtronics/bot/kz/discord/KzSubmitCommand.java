@@ -28,7 +28,7 @@ import com.faendir.zachtronics.bot.kz.repository.KzSolutionRepository;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -49,9 +49,9 @@ public class KzSubmitCommand extends AbstractSubmitCommand<KzCategory, KzPuzzle,
     @Getter
     private final KzSolutionRepository repository;
 
-    @NotNull
+    @NonNull
     @Override
-    public KzSubmission parseSubmission(@NotNull ChatInputInteractionEvent event) {
+    public KzSubmission parseSubmission(@NonNull ChatInputInteractionEvent event) {
         return KzSubmission.fromLink(solutionOption.get(event), authorOption.get(event), imageOption.get(event));
     }
 }

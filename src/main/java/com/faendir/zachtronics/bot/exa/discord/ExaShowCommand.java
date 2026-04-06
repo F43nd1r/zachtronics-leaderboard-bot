@@ -27,7 +27,7 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -43,9 +43,9 @@ public class ExaShowCommand extends AbstractShowCommand<ExaCategory, ExaPuzzle, 
     @Getter
     private final ExaSolutionRepository repository;
 
-    @NotNull
+    @NonNull
     @Override
-    public Pair<ExaPuzzle, ExaCategory> findPuzzleAndCategory(@NotNull ChatInputInteractionEvent event) {
+    public Pair<ExaPuzzle, ExaCategory> findPuzzleAndCategory(@NonNull ChatInputInteractionEvent event) {
         ExaPuzzle puzzle = puzzleOption.get(event);
         ExaCategory category = categoryOption.get(event);
         if (!puzzle.getSupportedCategories().contains(category))

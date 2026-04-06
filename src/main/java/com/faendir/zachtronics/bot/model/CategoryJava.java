@@ -16,18 +16,18 @@
 
 package com.faendir.zachtronics.bot.model;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Comparator;
 import java.util.List;
 
 public interface CategoryJava<C extends Enum<C> & Category, S extends Score<C>, M extends MetricJava<S, ?>> extends Category {
-    @NotNull Comparator<S> getScoreComparator();
+    @NonNull Comparator<S> getScoreComparator();
     int getScoreFormatId();
 
-    boolean supportsScore(@NotNull S score);
+    boolean supportsScore(@NonNull S score);
 
-    default Comparator<S> makeCategoryComparator(@NotNull List<M> metrics) {
+    default Comparator<S> makeCategoryComparator(@NonNull List<M> metrics) {
         return metrics.stream()
                       .map(M::comparator)
                       .reduce(Comparator::thenComparing)

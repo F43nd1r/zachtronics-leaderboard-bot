@@ -23,7 +23,7 @@ import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.sz.model.SzScore;
 import lombok.Value;
 import lombok.With;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
@@ -33,8 +33,8 @@ import java.util.stream.Collectors;
 
 @Value
 public class SzSolution implements Solution<SzCategory, SzPuzzle, SzScore, SzRecord> {
-    @NotNull SzScore score;
-    @NotNull String author;
+    @NonNull SzScore score;
+    @NonNull String author;
     @With String displayLink;
     /** empty if it holds no categories */
     EnumSet<SzCategory> categories = EnumSet.noneOf(SzCategory.class);
@@ -47,8 +47,8 @@ public class SzSolution implements Solution<SzCategory, SzPuzzle, SzScore, SzRec
             return new SzRecord(puzzle, score, author, displayLink, null, null);
     }
 
-    @NotNull
-    public static SzSolution unmarshal(String @NotNull [] fields) {
+    @NonNull
+    public static SzSolution unmarshal(String @NonNull [] fields) {
         assert fields.length == 4;
         SzScore score = Objects.requireNonNull(SzScore.parseScore(fields[0]));
         String author = fields[1];
@@ -62,7 +62,7 @@ public class SzSolution implements Solution<SzCategory, SzPuzzle, SzScore, SzRec
     }
 
     @Override
-    public String @NotNull [] marshal() {
+    public String @NonNull [] marshal() {
         return new String[]{
                 score.toDisplayString(),
                 author,

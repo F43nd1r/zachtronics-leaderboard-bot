@@ -17,14 +17,14 @@
 package com.faendir.zachtronics.bot.tis.rest.dto;
 
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 @Value
 public class TISSubmissionDTO {
-    @NotNull String puzzleId;
-    @NotNull String author;
+    @NonNull String puzzleId;
+    @NonNull String author;
     @Nullable String image;
-    @NotNull MultipartFile data;
+    @NonNull MultipartFile data;
 }

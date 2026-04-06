@@ -30,7 +30,7 @@ import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -56,13 +56,13 @@ public class ScController implements GameRestController<GroupDTO, ScPuzzleDTO, C
     private final List<ScPuzzleDTO> puzzles = Arrays.stream(ScPuzzle.values()).map(ScPuzzleDTO::fromPuzzle).toList();
 
     @Override
-    public ScPuzzleDTO getPuzzle(@NotNull String puzzleId) {
+    public ScPuzzleDTO getPuzzle(@NonNull String puzzleId) {
         return ScPuzzleDTO.fromPuzzle(findPuzzle(puzzleId));
     }
 
     @Override
-    @NotNull
-    public List<ScPuzzleDTO> listPuzzlesByGroup(@NotNull String groupId) {
+    @NonNull
+    public List<ScPuzzleDTO> listPuzzlesByGroup(@NonNull String groupId) {
         ScGroup group = findGroup(groupId);
         return Arrays.stream(ScPuzzle.values()).filter(p -> p.getGroup() == group).map(ScPuzzleDTO::fromPuzzle).toList();
     }
@@ -71,13 +71,13 @@ public class ScController implements GameRestController<GroupDTO, ScPuzzleDTO, C
     private final List<CategoryDTO> categories = Arrays.stream(ScCategory.values()).map(CategoryDTO::fromCategory).toList();
 
     @Override
-    public CategoryDTO getCategory(@NotNull String categoryId) {
+    public CategoryDTO getCategory(@NonNull String categoryId) {
         return CategoryDTO.fromCategory(findCategory(categoryId));
     }
 
     @Override
-    @NotNull
-    public List<ScRecordDTO> listRecords(@NotNull String puzzleId, Boolean includeFrontier) {
+    @NonNull
+    public List<ScRecordDTO> listRecords(@NonNull String puzzleId, Boolean includeFrontier) {
         ScPuzzle puzzle = findPuzzle(puzzleId);
         return repository.findCategoryHolders(puzzle, includeFrontier != null && includeFrontier).stream()
                          .filter(cr -> cr.getRecord().getDataLink() != null)
@@ -86,7 +86,7 @@ public class ScController implements GameRestController<GroupDTO, ScPuzzleDTO, C
     }
 
     @Override
-    public ScRecordDTO getRecord(@NotNull String puzzleId, @NotNull String categoryId) {
+    public ScRecordDTO getRecord(@NonNull String puzzleId, @NonNull String categoryId) {
         ScPuzzle puzzle = findPuzzle(puzzleId);
         ScCategory category = findCategory(categoryId);
         ScRecord record = repository.find(puzzle, category);
@@ -97,7 +97,7 @@ public class ScController implements GameRestController<GroupDTO, ScPuzzleDTO, C
     }
 
     @PostMapping(path = "/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Map<String, Object>> submit(@NotNull @ModelAttribute ScSubmissionDTO submissionDTO) throws IOException {
+    public List<Map<String, Object>> submit(@NonNull @ModelAttribute ScSubmissionDTO submissionDTO) throws IOException {
         if (submissionDTO.getVideo() != null && !UtilsKt.isValidLink(submissionDTO.getVideo()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid video link");
         String export = new String(submissionDTO.getExport().getBytes());

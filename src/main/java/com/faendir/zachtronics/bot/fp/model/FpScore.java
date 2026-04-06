@@ -20,8 +20,8 @@ import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Score;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,9 +34,9 @@ public class FpScore implements Score<FpCategory> {
     int waste;
 
     /** rr/cr/ff/w */
-    @NotNull
+    @NonNull
     @Override
-    public String toDisplayString(@NotNull DisplayContext<FpCategory> context) {
+    public String toDisplayString(@NonNull DisplayContext<FpCategory> context) {
         String separator = context.getSeparator();
         int formatId = Utils.getScoreFormatId(context);
 
@@ -49,14 +49,14 @@ public class FpScore implements Score<FpCategory> {
 
     /** <tt>rr/cr/ff/w</tt>, tolerates extra <tt>*</tt> */
     @Nullable
-    public static FpScore parseScore(@NotNull String string) {
+    public static FpScore parseScore(@NonNull String string) {
         Matcher m = REGEX_SCORE.matcher(string);
         return m.matches() ? parseScore(m) : null;
     }
 
     /** we assume m matches */
-    @NotNull
-    public static FpScore parseScore(@NotNull Matcher m) {
+    @NonNull
+    public static FpScore parseScore(@NonNull Matcher m) {
         int rules = Integer.parseInt(m.group("rules"));
         int conditionalRules = Integer.parseInt(m.group("conditionalRules"));
         int frames = Integer.parseInt(m.group("frames"));

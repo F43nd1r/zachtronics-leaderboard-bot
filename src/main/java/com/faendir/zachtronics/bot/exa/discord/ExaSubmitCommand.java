@@ -29,7 +29,7 @@ import com.faendir.zachtronics.bot.exa.repository.ExaSolutionRepository;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -54,9 +54,9 @@ public class ExaSubmitCommand extends AbstractSubmitCommand<ExaCategory, ExaPuzz
     @Getter
     private final ExaSolutionRepository repository;
 
-    @NotNull
+    @NonNull
     @Override
-    public ExaSubmission parseSubmission(@NotNull ChatInputInteractionEvent event) {
+    public ExaSubmission parseSubmission(@NonNull ChatInputInteractionEvent event) {
         return ExaSubmission.fromLink(solutionOption.get(event), cheesyOption.get(event), authorOption.get(event), imageOption.get(event));
     }
 }

@@ -18,15 +18,15 @@ package com.faendir.zachtronics.bot.rest.dto;
 
 import com.faendir.zachtronics.bot.model.Group;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Value
 public class GroupDTO {
-    @NotNull String id;
-    @NotNull String displayName;
+    @NonNull String id;
+    @NonNull String displayName;
 
-    @NotNull
-    public static <G extends Enum<G> & Group> GroupDTO fromGroup(@NotNull G group) {
+    @NonNull
+    public static <G extends Enum<G> & Group> GroupDTO fromGroup(@NonNull G group) {
         return new GroupDTO(group.name(), group.getDisplayName());
     }
 }

@@ -29,7 +29,7 @@ import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
 import org.apache.commons.text.StringEscapeUtils;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,8 +72,8 @@ class ScManualTest {
         System.out.println("Done");
     }
 
-    @NotNull
-    private static ScSubmission recordToSubmissions(@NotNull ScRecord record) {
+    @NonNull
+    private static ScSubmission recordToSubmissions(@NonNull ScRecord record) {
         assert record.getDataPath() != null;
         String data = LambdaUtils.<Path, String>uncheckIOException(Files::readString).apply(record.getDataPath());
         return new ScSubmission(record.getPuzzle(), record.getScore(), record.getAuthor(),
@@ -244,8 +244,8 @@ class ScManualTest {
         }
     }
 
-    @NotNull
-    private static ScSubmission fromSolnetData(@NotNull String[] fields) {
+    @NonNull
+    private static ScSubmission fromSolnetData(@NonNull String[] fields) {
         // Username,Level Category,Level Number,Level Name,Reactor Count,Cycle Count,Symbol Count,Upload Time,Youtube Link
         // Iridium,63corvi,1,QT-1,1,20,5,2011-07-09 07:51:58.320983,https://www.youtube.com/watch?v=hRM5IpSv5aU
         // ToughThought,researchnet,1-7-2,Glyoxylic Acid,1,167,23,2014-01-17 09:32:10.854625,https://youtu.be/GUz4sihkigQ

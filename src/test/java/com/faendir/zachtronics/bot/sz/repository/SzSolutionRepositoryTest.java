@@ -22,7 +22,7 @@ import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.sz.model.SzSubmission;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -70,7 +70,7 @@ public class SzSolutionRepositoryTest {
         assertThrows(RuntimeException.class, () -> doSubmit(finalContent)); // nonsensical
     }
 
-    @NotNull
+    @NonNull
     private SubmitResult<SzRecord, SzCategory> doSubmit(String content) {
         return repository.submit(SzSubmission.fromData(content, "someguy", null));
     }

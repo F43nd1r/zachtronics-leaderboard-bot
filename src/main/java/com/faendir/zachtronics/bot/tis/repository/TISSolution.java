@@ -23,7 +23,7 @@ import com.faendir.zachtronics.bot.tis.model.TISRecord;
 import com.faendir.zachtronics.bot.tis.model.TISScore;
 import lombok.Value;
 import lombok.With;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,8 +34,8 @@ import java.util.stream.Collectors;
 
 @Value
 public class TISSolution implements Solution<TISCategory, TISPuzzle, TISScore, TISRecord> {
-    @NotNull TISScore score;
-    @NotNull String author;
+    @NonNull TISScore score;
+    @NonNull String author;
     @With String displayLink;
     /** empty if it holds no categories */
     EnumSet<TISCategory> categories = EnumSet.noneOf(TISCategory.class);
@@ -48,8 +48,8 @@ public class TISSolution implements Solution<TISCategory, TISPuzzle, TISScore, T
             return new TISRecord(puzzle, score, author, displayLink, null, null);
     }
 
-    @NotNull
-    public static TISSolution unmarshal(String @NotNull [] fields) {
+    @NonNull
+    public static TISSolution unmarshal(String @NonNull [] fields) {
         assert fields.length == 4;
         TISScore score = Objects.requireNonNull(TISScore.parseScore(fields[0]));
         String author = fields[1];
@@ -63,7 +63,7 @@ public class TISSolution implements Solution<TISCategory, TISPuzzle, TISScore, T
     }
 
     @Override
-    public String @NotNull [] marshal() {
+    public String @NonNull [] marshal() {
         return new String[]{
                 score.toDisplayString(),
                 author,

@@ -28,7 +28,7 @@ import com.faendir.zachtronics.bot.sz.repository.SzSolutionRepository;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -49,9 +49,9 @@ public class SzSubmitCommand extends AbstractSubmitCommand<SzCategory, SzPuzzle,
     @Getter
     private final SzSolutionRepository repository;
 
-    @NotNull
+    @NonNull
     @Override
-    public SzSubmission parseSubmission(@NotNull ChatInputInteractionEvent event) {
+    public SzSubmission parseSubmission(@NonNull ChatInputInteractionEvent event) {
         return SzSubmission.fromLink(solutionOption.get(event), authorOption.get(event), imageOption.get(event));
     }
 }

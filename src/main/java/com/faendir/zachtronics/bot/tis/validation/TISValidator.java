@@ -22,7 +22,7 @@ import com.faendir.zachtronics.bot.tis.model.TISScore;
 import com.faendir.zachtronics.bot.tis.model.TISType;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import org.checkerframework.checker.signedness.qual.Unsigned;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class TISValidator {
 
     private TISValidator() {}
 
-    public static @NotNull TISScore validate(@NotNull String data, @NotNull TISPuzzle puzzle) throws ValidationException {
+    public static @NonNull TISScore validate(@NonNull String data, @NonNull TISPuzzle puzzle) throws ValidationException {
         if (puzzle.getType() == TISType.SANDBOX)
             throw new ValidationException("Sandbox levels are not supported");
 

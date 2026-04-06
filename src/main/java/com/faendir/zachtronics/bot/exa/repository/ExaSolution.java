@@ -23,7 +23,7 @@ import com.faendir.zachtronics.bot.exa.model.ExaScore;
 import com.faendir.zachtronics.bot.repository.Solution;
 import lombok.Value;
 import lombok.With;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,8 +34,8 @@ import java.util.stream.Collectors;
 
 @Value
 public class ExaSolution implements Solution<ExaCategory, ExaPuzzle, ExaScore, ExaRecord> {
-    @NotNull ExaScore score;
-    @With @NotNull String author;
+    @NonNull ExaScore score;
+    @With @NonNull String author;
     @With String displayLink;
     /** empty if it holds no categories */
     EnumSet<ExaCategory> categories = EnumSet.noneOf(ExaCategory.class);
@@ -48,8 +48,8 @@ public class ExaSolution implements Solution<ExaCategory, ExaPuzzle, ExaScore, E
             return new ExaRecord(puzzle, score, author, displayLink, null, null);
     }
 
-    @NotNull
-    public static ExaSolution unmarshal(String @NotNull [] fields) {
+    @NonNull
+    public static ExaSolution unmarshal(String @NonNull [] fields) {
         assert fields.length == 4;
         ExaScore score = Objects.requireNonNull(ExaScore.parseScore(fields[0]));
         String author = fields[1];
@@ -63,7 +63,7 @@ public class ExaSolution implements Solution<ExaCategory, ExaPuzzle, ExaScore, E
     }
 
     @Override
-    public String @NotNull [] marshal() {
+    public String @NonNull [] marshal() {
         return new String[]{
                 score.toDisplayString(),
                 author,

@@ -16,7 +16,7 @@
 
 package com.faendir.zachtronics.bot.validation;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +30,7 @@ import java.nio.file.StandardCopyOption;
 
 public class NativeLoader {
 
-    public static @NotNull SymbolLookup loadLibrary(@NotNull String libName, Arena arena) {
+    public static @NonNull SymbolLookup loadLibrary(@NonNull String libName, Arena arena) {
         try {
             return SymbolLookup.libraryLookup(libName, arena);
         }

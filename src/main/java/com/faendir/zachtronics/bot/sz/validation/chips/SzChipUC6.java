@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.sz.validation.chips;
 
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Map;
@@ -42,15 +42,15 @@ class SzChipUC6 implements SzChipUC {
 
     int x;
     int y;
-    @NotNull List<SzCodeLine> lines;
+    @NonNull List<SzCodeLine> lines;
 
-    static @NotNull SzChipUC6 unmarshal(@NotNull Map<String, String> chipMap) {
+    static @NonNull SzChipUC6 unmarshal(@NonNull Map<String, String> chipMap) {
         return new SzChipUC6(getInt(chipMap, "x"),
                              getInt(chipMap, "y"),
                              SzChipUC.readLines(chipMap, 14));
     }
 
-    @NotNull
+    @NonNull
     @Override
     public SzChipType getType() {
         return type;

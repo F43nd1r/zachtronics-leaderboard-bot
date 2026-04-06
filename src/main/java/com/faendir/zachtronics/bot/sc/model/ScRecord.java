@@ -20,32 +20,32 @@ import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.utils.Markdown;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 
 @Value
 public class ScRecord implements Record<ScCategory> {
-    @NotNull ScPuzzle puzzle;
-    @NotNull ScScore score;
-    @NotNull String author;
+    @NonNull ScPuzzle puzzle;
+    @NonNull ScScore score;
+    @NonNull String author;
     String displayLink;
     /** <tt>null</tt> if the solution holds a video spot but has since been out-pareto'd */
     String dataLink;
     /** <tt>null</tt> if the solution holds a video spot but has since been out-pareto'd */
     Path dataPath;
 
-    @NotNull
+    @NonNull
     @Override
-    public String toDisplayString(@NotNull DisplayContext<ScCategory> context) {
+    public String toDisplayString(@NonNull DisplayContext<ScCategory> context) {
         return toDisplayString(context, "");
     }
 
     /**
      * @param reactorPrefix will be put between the archive and the video link
      */
-    @NotNull
-    public String toDisplayString(@NotNull DisplayContext<ScCategory> context, String reactorPrefix) {
+    @NonNull
+    public String toDisplayString(@NonNull DisplayContext<ScCategory> context, String reactorPrefix) {
         String scoreAuthor = "(" + score.toDisplayString(context) + ") " + Markdown.escape(author);
         return Markdown.fileLinkOrEmpty(dataLink) +
                reactorPrefix + Markdown.linkOrText(scoreAuthor, displayLink);

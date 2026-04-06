@@ -22,7 +22,7 @@ import com.faendir.zachtronics.bot.inf.model.IfRecord;
 import com.faendir.zachtronics.bot.inf.model.IfScore;
 import com.faendir.zachtronics.bot.repository.Solution;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 import java.util.Collections;
@@ -34,9 +34,9 @@ import java.util.stream.Collectors;
 
 @Value
 public class IfSolution implements Solution<IfCategory, IfPuzzle, IfScore, IfRecord> {
-    @NotNull IfScore score;
-    @NotNull String author;
-    @NotNull List<String> displayLinks;
+    @NonNull IfScore score;
+    @NonNull String author;
+    @NonNull List<String> displayLinks;
     /** empty if it holds no categories */
     EnumSet<IfCategory> categories = EnumSet.noneOf(IfCategory.class);
 
@@ -48,8 +48,8 @@ public class IfSolution implements Solution<IfCategory, IfPuzzle, IfScore, IfRec
             return new IfRecord(puzzle, score, author, displayLinks, null, null);
     }
 
-    @NotNull
-    public static IfSolution unmarshal(String @NotNull [] fields) {
+    @NonNull
+    public static IfSolution unmarshal(String @NonNull [] fields) {
         assert fields.length == 4;
         IfScore score = Objects.requireNonNull(IfScore.parseScore(fields[0]));
         String author = fields[1];
@@ -65,7 +65,7 @@ public class IfSolution implements Solution<IfCategory, IfPuzzle, IfScore, IfRec
     }
 
     @Override
-    public String @NotNull [] marshal() {
+    public String @NonNull [] marshal() {
         return new String[]{
                 score.toDisplayString(),
                 author,

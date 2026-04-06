@@ -22,7 +22,7 @@ import com.faendir.zachtronics.bot.inf.model.IfScore;
 import com.faendir.zachtronics.bot.inf.model.IfSubmission;
 import com.faendir.zachtronics.bot.inf.model.IfType;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -157,7 +157,7 @@ class IfRedditMigrationTest {
                                                                  "(?: *\\[\\^\\[2\\]\\]\\((?<link2>[^)]+)\\))?" +
                                                                  "(?: *\\[\\^\\[3\\]\\]\\((?<link3>[^)]+)\\))?" +
                                                                  "(?: *\\[\\^\\[4\\]\\]\\((?<link4>[^)]+)\\))?");
-    private void loadCylesSol(IfPuzzle puzzle, @NotNull String piece1, String piece2, boolean usesGRA) {
+    private void loadCylesSol(IfPuzzle puzzle, @NonNull String piece1, String piece2, boolean usesGRA) {
         Matcher ma = LINKS_PATTERN.matcher(piece2);
         if (piece1.matches("\\d+") && ma.matches()) {
             int cycles = Integer.parseInt(piece1);
@@ -221,7 +221,7 @@ class IfRedditMigrationTest {
     }
 
     private static boolean terrestrialSurveySeen = false;
-    private static IfPuzzle findPuzzle(@NotNull String levelName) {
+    private static IfPuzzle findPuzzle(@NonNull String levelName) {
         if (levelName.equals("Terrestrial Surveyor")) { // same name, 2 levels
             if (!terrestrialSurveySeen) {
                 terrestrialSurveySeen = true;

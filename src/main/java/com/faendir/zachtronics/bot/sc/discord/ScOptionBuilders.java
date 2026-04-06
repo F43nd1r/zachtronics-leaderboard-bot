@@ -20,15 +20,15 @@ import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
 import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public class ScOptionBuilders {
-    public static @NotNull CommandOptionBuilder<String, ScPuzzle> puzzleOptionBuilder() {
+    public static @NonNull CommandOptionBuilder<String, ScPuzzle> puzzleOptionBuilder() {
         return OptionHelpersKt.enumOptionBuilder("puzzle", ScPuzzle.class, ScPuzzle::getDisplayName)
                               .description("Puzzle name. Can be shortened or abbreviated. E.g. `sus beha`, `OPAS`");
     }
 
-    public static @NotNull CommandOptionBuilder<String, ScCategory> categoryOptionBuilder() {
+    public static @NonNull CommandOptionBuilder<String, ScCategory> categoryOptionBuilder() {
         return OptionHelpersKt.enumOptionBuilder("category", ScCategory.class, ScCategory::getDisplayName)
                               .description("Category. E.g. `C`, `RS`");
     }

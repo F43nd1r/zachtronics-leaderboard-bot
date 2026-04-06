@@ -23,7 +23,7 @@ import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import lombok.Value;
 import lombok.With;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
@@ -33,8 +33,8 @@ import java.util.stream.Collectors;
 
 @Value
 public class ScSolution implements Solution<ScCategory, ScPuzzle, ScScore, ScRecord> {
-    @NotNull ScScore score;
-    @NotNull String author;
+    @NonNull ScScore score;
+    @NonNull String author;
     @With String displayLink;
     @With boolean videoOnly;
     /** empty if it holds no categories */
@@ -48,8 +48,8 @@ public class ScSolution implements Solution<ScCategory, ScPuzzle, ScScore, ScRec
             return new ScRecord(puzzle, score, author, displayLink, dataLink, dataPath);
     }
 
-    @NotNull
-    public static ScSolution unmarshal(String @NotNull [] fields) {
+    @NonNull
+    public static ScSolution unmarshal(String @NonNull [] fields) {
         assert fields.length == 5;
         ScScore score = Objects.requireNonNull(ScScore.parseScore(fields[0]));
         String author = fields[1];
@@ -64,7 +64,7 @@ public class ScSolution implements Solution<ScCategory, ScPuzzle, ScScore, ScRec
     }
 
     @Override
-    public String @NotNull [] marshal() {
+    public String @NonNull [] marshal() {
         return new String[]{
                 score.toDisplayString(),
                 author,

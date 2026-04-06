@@ -23,7 +23,7 @@ import com.faendir.zachtronics.bot.fp.model.FpType;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.faendir.zachtronics.bot.validation.ValidationUtils;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,8 +39,8 @@ public class XBPGHSim {
      * @param data content to check
      * @param author author to override all imports
      */
-    @NotNull
-    public static Collection<ValidationResult<FpSubmission>> validateMultiExport(@NotNull String data, @NotNull String author) {
+    @NonNull
+    public static Collection<ValidationResult<FpSubmission>> validateMultiExport(@NonNull String data, @NonNull String author) {
         FpSimResult[] results = validate(data);
         if (results.length == 0)
             throw new ValidationException("No valid solution provided");
@@ -49,8 +49,8 @@ public class XBPGHSim {
                      .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    @NotNull
-    static ValidationResult<FpSubmission> validationResultFrom(@NotNull FpSimResult result, @NotNull String author) throws ValidationException {
+    @NonNull
+    static ValidationResult<FpSubmission> validationResultFrom(@NonNull FpSimResult result, @NonNull String author) throws ValidationException {
         // puzzle
         FpPuzzle puzzle = Arrays.stream(FpPuzzle.values())
                                 .filter(p -> p.getId() == result.getLevelId())
@@ -84,8 +84,8 @@ public class XBPGHSim {
      * @return results, arrays of size 1 are correctly generated
      * @throws ValidationException if there is a communication error, solution errors are handled in the onject
      */
-    @NotNull
-    static FpSimResult[] validate(@NotNull String data) throws ValidationException {
+    @NonNull
+    static FpSimResult[] validate(@NonNull String data) throws ValidationException {
         List<String> command = List.of("python3", "-m", "xbpgh_sim", "validate_all", "--json", "--include-solution", "-");
         return ValidationUtils.callValidator(FpSimResult[].class, data.getBytes(), command);
     }

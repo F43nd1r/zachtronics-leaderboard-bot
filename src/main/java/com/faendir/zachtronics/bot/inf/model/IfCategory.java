@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.inf.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
@@ -52,7 +52,7 @@ public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric<?>>
     private final Set<IfType> supportedTypes;
     private final int scoreFormatId;
 
-    IfCategory(@NotNull IfMetric<Boolean> admission, @NotNull List<IfMetric<?>> metrics, int scoreFormatId) {
+    IfCategory(@NonNull IfMetric<Boolean> admission, @NonNull List<IfMetric<?>> metrics, int scoreFormatId) {
         this.admission = admission;
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
@@ -62,7 +62,7 @@ public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric<?>>
     }
 
     @Override
-    public boolean supportsScore(@NotNull IfScore score) {
+    public boolean supportsScore(@NonNull IfScore score) {
         return !admission.get(score);
     }
 }

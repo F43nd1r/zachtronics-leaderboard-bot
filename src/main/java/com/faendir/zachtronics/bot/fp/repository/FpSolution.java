@@ -23,7 +23,7 @@ import com.faendir.zachtronics.bot.fp.model.FpScore;
 import com.faendir.zachtronics.bot.repository.Solution;
 import lombok.Value;
 import lombok.With;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
@@ -33,8 +33,8 @@ import java.util.stream.Collectors;
 
 @Value
 public class FpSolution implements Solution<FpCategory, FpPuzzle, FpScore, FpRecord> {
-    @NotNull FpScore score;
-    @NotNull String author;
+    @NonNull FpScore score;
+    @NonNull String author;
     @With String displayLink;
     /** empty if it holds no categories */
     EnumSet<FpCategory> categories = EnumSet.noneOf(FpCategory.class);
@@ -47,8 +47,8 @@ public class FpSolution implements Solution<FpCategory, FpPuzzle, FpScore, FpRec
             return new FpRecord(puzzle, score, author, displayLink, null, null);
     }
 
-    @NotNull
-    public static FpSolution unmarshal(String @NotNull [] fields) {
+    @NonNull
+    public static FpSolution unmarshal(String @NonNull [] fields) {
         assert fields.length == 4;
         FpScore score = Objects.requireNonNull(FpScore.parseScore(fields[0]));
         String author = fields[1];
@@ -62,7 +62,7 @@ public class FpSolution implements Solution<FpCategory, FpPuzzle, FpScore, FpRec
     }
 
     @Override
-    public String @NotNull [] marshal() {
+    public String @NonNull [] marshal() {
         return new String[]{
                 score.toDisplayString(),
                 author,

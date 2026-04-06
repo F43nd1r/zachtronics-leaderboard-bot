@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.exa.rest.dto;
 
 import com.faendir.zachtronics.bot.exa.model.ExaScore;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Value
 public class ExaScoreDTO {
@@ -28,9 +28,8 @@ public class ExaScoreDTO {
 
     boolean cheesy;
 
-    @NotNull
-    public static ExaScoreDTO fromScore(@NotNull ExaScore score) {
+    @NonNull
+    public static ExaScoreDTO fromScore(@NonNull ExaScore score) {
         return new ExaScoreDTO(score.getCycles(), score.getSize(), score.getActivity(), score.isCheesy());
     }
 }
-

@@ -23,7 +23,7 @@ import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,7 +156,7 @@ class TISMigrationTest {
         System.out.println("Done");
     }
 
-    private static TISPuzzle findPuzzle(@NotNull String levelName) {
+    private static TISPuzzle findPuzzle(@NonNull String levelName) {
         List<TISPuzzle> candidates = UtilsKt.fuzzyMatch(Arrays.asList(TISPuzzle.values()), levelName, TISPuzzle::getDisplayName);
         if (candidates.size() == 1)
             return candidates.get(0);

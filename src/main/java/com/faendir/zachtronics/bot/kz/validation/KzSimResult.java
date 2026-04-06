@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.kz.validation;
 
 import lombok.Value;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  <pre>{"level": 6, "time": 4, "cost": 38, "area": 130, "manipulated": false, "normalized": "base64" }</pre> or

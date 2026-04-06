@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.sz.rest.dto;
 
 import com.faendir.zachtronics.bot.sz.model.SzScore;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Value
 public class SzScoreDTO {
@@ -26,9 +26,8 @@ public class SzScoreDTO {
     int power;
     int lines;
 
-    @NotNull
-    public static SzScoreDTO fromScore(@NotNull SzScore score) {
+    @NonNull
+    public static SzScoreDTO fromScore(@NonNull SzScore score) {
         return new SzScoreDTO(score.getCost(), score.getPower(), score.getLines());
     }
 }
-

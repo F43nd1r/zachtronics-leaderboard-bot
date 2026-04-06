@@ -33,7 +33,7 @@ import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import lombok.SneakyThrows;
 import org.apache.commons.io.file.PathUtils;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +61,7 @@ class TISAIRevolutionTest {
     @TestConfiguration
     static class RepositoryConfiguration {
         @Bean("tisRepository")
-        public static @NotNull GitRepository tisRepository(GitProperties gitProperties) {
+        public static @NonNull GitRepository tisRepository(GitProperties gitProperties) {
             return TestConfigurationKt.readOnlyLocalClone("../tis100/leaderboard", gitProperties);
         }
     }
@@ -264,7 +264,7 @@ class TISAIRevolutionTest {
         }
     }
 
-    private void genReplace(@NotNull TISSave save, TISPuzzle puzzle, String baseDescr, int replAmount, String replaceStr) {
+    private void genReplace(@NonNull TISSave save, TISPuzzle puzzle, String baseDescr, int replAmount, String replaceStr) {
         main:
         for (int replStart = 0; replStart + replAmount - 1 < save.getInstructions(); replStart++) {
             int codeCount = 0;
@@ -299,7 +299,7 @@ class TISAIRevolutionTest {
         }
     }
 
-    private void genSwap(@NotNull TISSave save, TISPuzzle puzzle, String baseDescr, int swapSize, int swapDist) {
+    private void genSwap(@NonNull TISSave save, TISPuzzle puzzle, String baseDescr, int swapSize, int swapDist) {
         for (int codeLineIdx = 0; codeLineIdx + swapSize + swapDist < save.getInstructions(); codeLineIdx++) {
             int codeCount = 0;
             List<TISLine> swappedLines = new ArrayList<>();
@@ -337,7 +337,7 @@ class TISAIRevolutionTest {
         }
     }
 
-    private void genDupe(@NotNull TISSave save, TISPuzzle puzzle, String baseDescr, int dupeAmount, int dupeDistance) {
+    private void genDupe(@NonNull TISSave save, TISPuzzle puzzle, String baseDescr, int dupeAmount, int dupeDistance) {
         for (int dupeStart = 0; dupeStart + dupeAmount + dupeDistance - 1 < save.getInstructions(); dupeStart++) {
             int codeCount = 0;
             StringBuilder data = new StringBuilder();
@@ -371,7 +371,7 @@ class TISAIRevolutionTest {
         }
     }
 
-    private void genRotateNodes(@NotNull TISSave save, TISPuzzle puzzle, String baseDescr, int rotateAmount) {
+    private void genRotateNodes(@NonNull TISSave save, TISPuzzle puzzle, String baseDescr, int rotateAmount) {
         Predicate<TISNode> isRotatable = n -> n.getCodeLines().size() > rotateAmount;
         long rotatableNodes = save.getNodes().stream().filter(isRotatable).count();
         int maxKey = 1 << rotatableNodes;
@@ -405,7 +405,7 @@ class TISAIRevolutionTest {
         }
     }
 
-    private void genJumpReplacer(@NotNull TISSave save, TISPuzzle puzzle, String baseDescr, TISOperation newJump) {
+    private void genJumpReplacer(@NonNull TISSave save, TISPuzzle puzzle, String baseDescr, TISOperation newJump) {
         for (int jumpPoint = 0; jumpPoint < TISSave.MAX_NODE_INSTR; jumpPoint++) {
             int foundLine = 0;
             boolean found = true;
@@ -507,7 +507,7 @@ class TISAIRevolutionTest {
             StringBuilder data = new StringBuilder();
             for (TISNode node: save.getNodes()) {
                 data.append('@').append(node.getId()).append('\n');
-                @NotNull List<TISLine> lines = node.getLines();
+                @NonNull List<TISLine> lines = node.getLines();
                 linesLoop:
                 for (int i = 0; i < lines.size(); i++) {
                     TISLine line = lines.get(i);
@@ -556,7 +556,7 @@ class TISAIRevolutionTest {
             StringBuilder data = new StringBuilder();
             for (TISNode node: save.getNodes()) {
                 data.append('@').append(node.getId()).append('\n');
-                @NotNull List<TISLine> lines = node.getLines();
+                @NonNull List<TISLine> lines = node.getLines();
                 linesLoop:
                 for (int i = 0; i < lines.size(); i++) {
                     TISLine line = lines.get(i);
@@ -659,7 +659,7 @@ class TISAIRevolutionTest {
             StringBuilder data = new StringBuilder();
             for (TISNode node: save.getNodes()) {
                 data.append('@').append(node.getId()).append('\n');
-                @NotNull List<TISLine> lines = node.getLines();
+                @NonNull List<TISLine> lines = node.getLines();
                 linesLoop:
                 for (int i = 0; i < lines.size(); i++) {
                     TISLine line = lines.get(i);
@@ -716,7 +716,7 @@ class TISAIRevolutionTest {
             StringBuilder data = new StringBuilder();
             for (TISNode node: save.getNodes()) {
                 data.append('@').append(node.getId()).append('\n');
-                @NotNull List<TISLine> lines = node.getLines();
+                @NonNull List<TISLine> lines = node.getLines();
                 linesLoop:
                 for (int i = 0; i < lines.size(); i++) {
                     TISLine line = lines.get(i);
@@ -869,7 +869,7 @@ class TISAIRevolutionTest {
         }
     }
 
-    private void genFuzzTries(@NotNull TISSave save, TISPuzzle puzzle, String baseDescr) {
+    private void genFuzzTries(@NonNull TISSave save, TISPuzzle puzzle, String baseDescr) {
         SplittableRandom rng = new SplittableRandom();
         long nums = save.codeAsStream()
                         .filter(TISAIRevolutionTest::hasFuzzableArg).count();
@@ -898,18 +898,18 @@ class TISAIRevolutionTest {
         }
     }
 
-    private static boolean hasFuzzableArg(@NotNull TISLine line) {
+    private static boolean hasFuzzableArg(@NonNull TISLine line) {
         return line.is(ADD, IMMEDIATE) || line.is(SUB, IMMEDIATE) || line.is(MOV, IMMEDIATE, ACC);
 //        return line.getPort1() == IMMEDIATE;
     }
 
-    private static void writeLabel(@NotNull StringBuilder data, @NotNull TISLine line) {
+    private static void writeLabel(@NonNull StringBuilder data, @NonNull TISLine line) {
         if (line.getLabel() != null)
             data.append(line.getLabel()).append(": ");
     }
 
     @SneakyThrows
-    private void submit(@NotNull CharSequence data, @NotNull TISPuzzle puzzle, String descr, String link) {
+    private void submit(@NonNull CharSequence data, @NonNull TISPuzzle puzzle, String descr, String link) {
         tries++;
 
         String solution = data.toString().replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end

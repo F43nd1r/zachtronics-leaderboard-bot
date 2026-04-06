@@ -16,7 +16,7 @@
 
 package com.faendir.zachtronics.bot.utils;
 
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -30,8 +30,8 @@ public final class LambdaUtils {
         R apply(T t) throws IOException;
     }
 
-    @NotNull
-    public static <T, R> Function<T, R> uncheckIOException(@NotNull FunctionIOException<T, R> excFunction) {
+    @NonNull
+    public static <T, R> Function<T, R> uncheckIOException(@NonNull FunctionIOException<T, R> excFunction) {
         return t -> {
             try {
                 return excFunction.apply(t);

@@ -19,8 +19,8 @@ package com.faendir.zachtronics.bot.sc.model;
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.StringFormat;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
@@ -52,7 +52,7 @@ class ScScoreTest {
         assertBoldMetrics(score, 0, null);
     }
 
-    private static void assertBoldMetrics(@NotNull ScScore score, int number, @Nullable Collection<ScCategory> categories) {
+    private static void assertBoldMetrics(@NonNull ScScore score, int number, @Nullable Collection<ScCategory> categories) {
         String result = score.toDisplayString(new DisplayContext<>(StringFormat.REDDIT, categories));
         assertEquals(number, StringUtils.countMatches(result, "**") / 2);
     }

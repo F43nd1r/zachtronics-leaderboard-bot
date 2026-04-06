@@ -21,8 +21,8 @@ import com.faendir.zachtronics.bot.model.Score;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
 import org.checkerframework.common.value.qual.IntRange;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,9 +39,9 @@ public class CwScore implements Score<CwCategory> {
     }
 
     /** WxH/FF */
-    @NotNull
+    @NonNull
     @Override
-    public String toDisplayString(@NotNull DisplayContext<CwCategory> context) {
+    public String toDisplayString(@NonNull DisplayContext<CwCategory> context) {
         String separator = context.getSeparator();
         int formatId = Utils.getScoreFormatId(context);
 
@@ -54,14 +54,14 @@ public class CwScore implements Score<CwCategory> {
 
     /** <tt>WxH/FF</tt>, tolerates extra <tt>*</tt> */
     @Nullable
-    public static CwScore parseScore(@NotNull String string) {
+    public static CwScore parseScore(@NonNull String string) {
         Matcher m = REGEX_SCORE.matcher(string);
         return m.matches() ? parseScore(m) : null;
     }
 
     /** we assume m matches */
-    @NotNull
-    public static CwScore parseScore(@NotNull Matcher m) {
+    @NonNull
+    public static CwScore parseScore(@NonNull Matcher m) {
         int width = Integer.parseInt(m.group("width"));
         int height = Integer.parseInt(m.group("height"));
         int footprint = Integer.parseInt(m.group("footprint"));

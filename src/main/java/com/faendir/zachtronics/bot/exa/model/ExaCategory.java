@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.exa.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -61,7 +61,7 @@ public enum ExaCategory implements CategoryJava<ExaCategory, ExaScore, ExaMetric
     private final Set<ExaType> supportedTypes;
     private final int scoreFormatId;
 
-    ExaCategory(@NotNull ExaMetric<Boolean> admission, @NotNull List<ExaMetric<?>> metrics, Set<ExaType> supportedTypes, int scoreFormatId) {
+    ExaCategory(@NonNull ExaMetric<Boolean> admission, @NonNull List<ExaMetric<?>> metrics, Set<ExaType> supportedTypes, int scoreFormatId) {
         this.supportedTypes = supportedTypes;
         this.displayName = name();
         this.admission = admission;
@@ -71,7 +71,7 @@ public enum ExaCategory implements CategoryJava<ExaCategory, ExaScore, ExaMetric
     }
 
     @Override
-    public boolean supportsScore(@NotNull ExaScore score) {
+    public boolean supportsScore(@NonNull ExaScore score) {
         return admission.get(score);
     }
 }

@@ -24,7 +24,7 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.tis.model.*;
 import com.faendir.zachtronics.bot.tis.validation.TISValidator;
 import com.faendir.zachtronics.bot.validation.ValidationException;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +52,7 @@ class TISManualTest {
     @TestConfiguration
     static class RepositoryConfiguration {
         @Bean("tisRepository")
-        public static @NotNull GitRepository tisRepository(GitProperties gitProperties) {
+        public static @NonNull GitRepository tisRepository(GitProperties gitProperties) {
             return TestConfigurationKt.readOnlyLocalClone("../tis100/leaderboard", gitProperties);
         }
     }

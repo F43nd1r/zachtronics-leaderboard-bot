@@ -27,7 +27,7 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -43,9 +43,9 @@ public class KzShowCommand extends AbstractShowCommand<KzCategory, KzPuzzle, KzR
     @Getter
     private final KzSolutionRepository repository;
 
-    @NotNull
+    @NonNull
     @Override
-    public Pair<KzPuzzle, KzCategory> findPuzzleAndCategory(@NotNull ChatInputInteractionEvent event) {
+    public Pair<KzPuzzle, KzCategory> findPuzzleAndCategory(@NonNull ChatInputInteractionEvent event) {
         KzPuzzle puzzle = puzzleOption.get(event);
         KzCategory category = categoryOption.get(event);
         if (!puzzle.getSupportedCategories().contains(category))

@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.sz.validation.chips;
 
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Map;
 
@@ -39,15 +39,15 @@ class SzChipBANK implements SzChip {
 
     int x;
     int y;
-    @NotNull String rom;
+    @NonNull String rom;
 
-    static @NotNull SzChipBANK unmarshal(@NotNull Map<String, String> chipMap) {
+    static @NonNull SzChipBANK unmarshal(@NonNull Map<String, String> chipMap) {
         return new SzChipBANK(getInt(chipMap, "x"),
                               getInt(chipMap, "y"),
                               chipMap.get("rom"));
     }
 
-    @NotNull
+    @NonNull
     @Override
     public SzChipType getType() {
         return type;

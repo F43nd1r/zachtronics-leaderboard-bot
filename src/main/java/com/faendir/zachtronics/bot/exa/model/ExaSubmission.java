@@ -21,29 +21,29 @@ import com.faendir.zachtronics.bot.model.Submission;
 import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 @Value
 public class ExaSubmission implements Submission<ExaCategory, ExaPuzzle> {
-    @NotNull ExaPuzzle puzzle;
-    @NotNull ExaScore score;
-    @NotNull String author;
+    @NonNull ExaPuzzle puzzle;
+    @NonNull ExaScore score;
+    @NonNull String author;
     @Nullable String displayLink;
-    byte @NotNull [] data;
+    byte @NonNull [] data;
 
     /**
      * @throws ValidationException if we can't correctly parse metadata
      */
-    @NotNull
-    public static ExaSubmission fromData(byte @NotNull [] data, boolean cheesy, @NotNull String author, String displayLink)
+    @NonNull
+    public static ExaSubmission fromData(byte @NonNull [] data, boolean cheesy, @NonNull String author, String displayLink)
     throws ValidationException {
         return ExaValidator.validate(data, cheesy, author, displayLink);
     }
 
-    @NotNull
-    public static ExaSubmission fromLink(@NotNull String link, boolean cheesy, String author, String displayLink) {
-        byte @NotNull [] data = Utils.downloadFile(link).getData();
+    @NonNull
+    public static ExaSubmission fromLink(@NonNull String link, boolean cheesy, String author, String displayLink) {
+        byte @NonNull [] data = Utils.downloadFile(link).getData();
         return fromData(data, cheesy, author, displayLink);
     }
 }

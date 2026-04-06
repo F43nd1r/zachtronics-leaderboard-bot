@@ -27,7 +27,7 @@ import com.faendir.zachtronics.bot.validation.ValidationResult;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -64,9 +64,9 @@ public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPu
     @Getter
     private final IfSolutionRepository repository;
 
-    @NotNull
+    @NonNull
     @Override
-    public Collection<ValidationResult<IfSubmission>> parseSubmissions(@NotNull ChatInputInteractionEvent event) {
+    public Collection<ValidationResult<IfSubmission>> parseSubmissions(@NonNull ChatInputInteractionEvent event) {
         IfScore score = scoreOption.get(event);
         List<String> videos = videosOption.get(event);
         boolean isAdmin = IfSecured.WIKI_ADMINS_ONLY.hasExecutionPermission(event);

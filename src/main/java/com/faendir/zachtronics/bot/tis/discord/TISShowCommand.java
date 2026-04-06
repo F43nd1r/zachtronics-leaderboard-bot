@@ -27,7 +27,7 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -43,9 +43,9 @@ public class TISShowCommand extends AbstractShowCommand<TISCategory, TISPuzzle, 
     @Getter
     private final TISSolutionRepository repository;
 
-    @NotNull
+    @NonNull
     @Override
-    public Pair<TISPuzzle, TISCategory> findPuzzleAndCategory(@NotNull ChatInputInteractionEvent event) {
+    public Pair<TISPuzzle, TISCategory> findPuzzleAndCategory(@NonNull ChatInputInteractionEvent event) {
         TISPuzzle puzzle = puzzleOption.get(event);
         TISCategory category = categoryOption.get(event);
         if (!puzzle.getSupportedCategories().contains(category))

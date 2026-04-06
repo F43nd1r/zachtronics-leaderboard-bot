@@ -19,7 +19,7 @@ package com.faendir.zachtronics.bot.fp.validation;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 /**
  <pre>{
@@ -39,11 +39,11 @@ import org.jetbrains.annotations.NotNull;
 @Value
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class FpSimResult {
-    @NotNull String levelName;
+    @NonNull String levelName;
     int levelId;
     int slotId;
     /** present only if <tt>--include-solution</tt> is given */
-    @NotNull String solution;
+    @NonNull String solution;
     boolean isCorrect;
     int numRules;
     int numRulesConditional;

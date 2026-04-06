@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.fp.rest.dto;
 
 import com.faendir.zachtronics.bot.fp.model.FpScore;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Value
 public class FpScoreDTO {
@@ -27,9 +27,8 @@ public class FpScoreDTO {
     int frames;
     int waste;
 
-    @NotNull
-    public static FpScoreDTO fromScore(@NotNull FpScore score) {
+    @NonNull
+    public static FpScoreDTO fromScore(@NonNull FpScore score) {
         return new FpScoreDTO(score.getRules(), score.getConditionalRules(), score.getFrames(), score.getWaste());
     }
 }
-

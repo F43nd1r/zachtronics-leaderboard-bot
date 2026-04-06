@@ -27,7 +27,7 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -43,9 +43,9 @@ public class ScShowCommand extends AbstractShowCommand<ScCategory, ScPuzzle, ScR
     @Getter
     private final ScSolutionRepository repository;
 
-    @NotNull
+    @NonNull
     @Override
-    public Pair<ScPuzzle, ScCategory> findPuzzleAndCategory(@NotNull ChatInputInteractionEvent event) {
+    public Pair<ScPuzzle, ScCategory> findPuzzleAndCategory(@NonNull ChatInputInteractionEvent event) {
         ScPuzzle puzzle = puzzleOption.get(event);
         ScCategory category = categoryOption.get(event);
         if (!puzzle.getSupportedCategories().contains(category))

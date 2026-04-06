@@ -19,7 +19,7 @@ package com.faendir.zachtronics.bot.sc.discord;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.testutils.RunCommandKt;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,8 +129,8 @@ public class ScCommandTest {
         assertThat(result).contains("Passivation", "`156/1/45/B`");
     }
 
-    @NotNull
-    private String runCommand(String commandName, @NotNull Map<String, ? extends Serializable> args) {
+    @NonNull
+    private String runCommand(String commandName, @NonNull Map<String, ? extends Serializable> args) {
         return RunCommandKt.mockGameCommandRun(scCommand, commandName, args);
     }
 

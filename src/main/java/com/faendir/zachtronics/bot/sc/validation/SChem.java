@@ -24,8 +24,8 @@ import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.faendir.zachtronics.bot.validation.ValidationUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,8 +43,8 @@ public class SChem {
      * @param bypassValidation only check it imports
      * @param author author to override all imports
      */
-    @NotNull
-    public static Collection<ValidationResult<ScSubmission>> validateMultiExport(@NotNull String export, boolean bypassValidation,
+    @NonNull
+    public static Collection<ValidationResult<ScSubmission>> validateMultiExport(@NonNull String export, boolean bypassValidation,
                                                                                  @Nullable String author) {
         int solutionsNumber = StringUtils.countMatches(export, "SOLUTION:");
         if (solutionsNumber > 50 && !bypassValidation) {
@@ -57,8 +57,8 @@ public class SChem {
                      .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    @NotNull
-    static ValidationResult<ScSubmission> validationResultFrom(@NotNull SChemResult result, boolean bypassValidation, String author)
+    @NonNull
+    static ValidationResult<ScSubmission> validationResultFrom(@NonNull SChemResult result, boolean bypassValidation, String author)
     throws ValidationException {
 
         if (result.getLevelName() == null || result.getAuthor() == null) {
@@ -156,8 +156,8 @@ public class SChem {
      * @return results, arrays of size 1 are correctly generated
      * @throws ValidationException if there is a communication error, solution errors are handled in the onject
      */
-    @NotNull
-    static SChemResult[] validate(@NotNull String export, boolean onlyImport) throws ValidationException {
+    @NonNull
+    static SChemResult[] validate(@NonNull String export, boolean onlyImport) throws ValidationException {
         String runFlag = onlyImport ? "--no-run" : "--check-precog";
         List<String> command = List.of("python3", "-m", "schem", "--json", "--export", runFlag);
         return ValidationUtils.callValidator(SChemResult[].class, export.getBytes(), command);

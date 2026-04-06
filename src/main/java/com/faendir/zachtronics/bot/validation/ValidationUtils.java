@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.validation;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,7 +30,7 @@ public class ValidationUtils {
 
     private ValidationUtils() {}
 
-    public static byte @NotNull [] callValidator(byte[] data, List<String> command) {
+    public static byte @NonNull [] callValidator(byte[] data, List<String> command) {
         ProcessBuilder builder = new ProcessBuilder(command);
 
         try {

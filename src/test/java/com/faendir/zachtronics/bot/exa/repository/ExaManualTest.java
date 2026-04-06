@@ -26,7 +26,7 @@ import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.validation.ValidationException;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +58,7 @@ public class ExaManualTest {
     @TestConfiguration
     static class RepositoryConfiguration {
         @Bean("exaRepository")
-        public static @NotNull GitRepository exaRepository(GitProperties gitProperties) {
+        public static @NonNull GitRepository exaRepository(GitProperties gitProperties) {
             return TestConfigurationKt.readOnlyLocalClone("../exapunks/leaderboard", gitProperties);
         }
     }

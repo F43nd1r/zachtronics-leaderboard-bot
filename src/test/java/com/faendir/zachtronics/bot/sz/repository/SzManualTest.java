@@ -29,7 +29,7 @@ import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +59,7 @@ public class SzManualTest {
     @TestConfiguration
     static class RepositoryConfiguration {
         @Bean("szRepository")
-        public static @NotNull GitRepository szRepository(GitProperties gitProperties) {
+        public static @NonNull GitRepository szRepository(GitProperties gitProperties) {
             return TestConfigurationKt.readOnlyLocalClone("../shenzhenIO/leaderboard", gitProperties);
         }
     }

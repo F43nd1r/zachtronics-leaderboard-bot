@@ -20,8 +20,8 @@ import com.faendir.zachtronics.bot.model.CategoryJava;
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.StringFormat;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.ContentDisposition;
 
 import java.io.IOException;
@@ -36,8 +36,8 @@ public final class Utils {
 
     private static final Pattern PASTEBIN_PATTERN = Pattern.compile("(?:https?://)?pastebin.com/(?:(?:raw|dl)/)?(\\w+)");
     private static final Pattern GDOCS_PATTERN = Pattern.compile("(?:https?://)?docs.google.com/document/d/([\\w-]+)(?:/.*)?");
-    @NotNull
-    public static String rawContentURL(@NotNull String link) {
+    @NonNull
+    public static String rawContentURL(@NonNull String link) {
         Matcher m = PASTEBIN_PATTERN.matcher(link);
         if (m.matches()) { // pastebin has an easy way to get raw text
             return "https://pastebin.com/raw/" + m.group(1);
@@ -54,9 +54,9 @@ public final class Utils {
     @Value
     public static class FileInfo {
         @Nullable String filename;
-        byte @NotNull [] data;
+        byte @NonNull [] data;
 
-        public @NotNull String dataAsString() {
+        public @NonNull String dataAsString() {
             String content = new String(data).replace("\r\n", "\n");
             content = content.replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
             if (!content.isEmpty() && content.charAt(0) == '\uFEFF') // remove BOM
@@ -65,7 +65,7 @@ public final class Utils {
         }
     }
 
-    public static @NotNull FileInfo downloadFile(@NotNull String link) {
+    public static @NonNull FileInfo downloadFile(@NonNull String link) {
         try {
             URLConnection connection = new URI(Utils.rawContentURL(link)).toURL().openConnection();
             try (InputStream is = connection.getInputStream()) { // we're connected now
@@ -82,14 +82,14 @@ public final class Utils {
         }
     }
 
-    @NotNull
+    @NonNull
     public static <T extends Enum<T>> EnumSet<T> enumSetUnion(EnumSet<T> s1, EnumSet<T> s2) {
         EnumSet<T> res = EnumSet.copyOf(s1);
         res.addAll(s2);
         return res;
     }
 
-    public static <Cat extends CategoryJava<?, ?, ?>> int getScoreFormatId(@NotNull DisplayContext<Cat> context) {
+    public static <Cat extends CategoryJava<?, ?, ?>> int getScoreFormatId(@NonNull DisplayContext<Cat> context) {
         int formatId = 0b000;
         if (context.getFormat() == StringFormat.REDDIT && context.getCategories() != null) {
             formatId = context.getCategories().stream()

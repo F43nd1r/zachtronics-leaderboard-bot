@@ -21,18 +21,18 @@ import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.model.StringFormat;
 import com.faendir.zachtronics.bot.utils.Markdown;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.List;
 
 @Value
 public class IfRecord implements Record<IfCategory> {
-    @NotNull IfPuzzle puzzle;
-    @NotNull IfScore score;
-    @NotNull String author;
-    @NotNull List<String> displayLinks;
+    @NonNull IfPuzzle puzzle;
+    @NonNull IfScore score;
+    @NonNull String author;
+    @NonNull List<String> displayLinks;
     String dataLink;
     Path dataPath;
 
@@ -42,9 +42,9 @@ public class IfRecord implements Record<IfCategory> {
         return displayLinks.isEmpty() ? null : displayLinks.get(0);
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public String toDisplayString(@NotNull DisplayContext<IfCategory> context) {
+    public String toDisplayString(@NonNull DisplayContext<IfCategory> context) {
         String result = Markdown.fileLinkOrEmpty(dataLink) +
                         Markdown.linkOrText(score.toDisplayString(context) + " " + Markdown.escape(author), getDisplayLink());
         if (displayLinks.size() > 1) {

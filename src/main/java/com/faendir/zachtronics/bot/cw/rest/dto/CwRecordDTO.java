@@ -23,22 +23,22 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.dto.RecordDTO;
 import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 @Value
 public class CwRecordDTO implements RecordDTO<CwScoreDTO> {
-    @NotNull CwScoreDTO score;
-    @NotNull String fullFormattedScore;
-    @NotNull String author;
+    @NonNull CwScoreDTO score;
+    @NonNull String fullFormattedScore;
+    @NonNull String author;
     @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
 
-    @NotNull
-    public static CwRecordDTO fromCategoryRecord(@NotNull CategoryRecord<CwRecord, CwCategory> categoryRecord) {
+    @NonNull
+    public static CwRecordDTO fromCategoryRecord(@NonNull CategoryRecord<CwRecord, CwCategory> categoryRecord) {
         CwRecord record = categoryRecord.getRecord();
         Set<CwCategory> categories = categoryRecord.getCategories();
         return new CwRecordDTO(
@@ -51,8 +51,8 @@ public class CwRecordDTO implements RecordDTO<CwScoreDTO> {
         );
     }
 
-    @NotNull
-    public static CwRecordDTO fromRecord(@NotNull CwRecord record) {
+    @NonNull
+    public static CwRecordDTO fromRecord(@NonNull CwRecord record) {
         return new CwRecordDTO(CwScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
                                record.getAuthor(),

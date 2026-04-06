@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.kz.rest.dto;
 
 import com.faendir.zachtronics.bot.kz.model.KzScore;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Value
 public class KzScoreDTO {
@@ -26,9 +26,8 @@ public class KzScoreDTO {
     int cost;
     int area;
 
-    @NotNull
-    public static KzScoreDTO fromScore(@NotNull KzScore score) {
+    @NonNull
+    public static KzScoreDTO fromScore(@NonNull KzScore score) {
         return new KzScoreDTO(score.getTime(), score.getCost(), score.getArea());
     }
 }
-

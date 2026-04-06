@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.fc.discord;
 
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.testutils.RunCommandKt;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +43,8 @@ public class FcCommandTest {
         assertThat(result).contains("2Twelve", "8T/65k/16S/4W");
     }
 
-    @NotNull
-    private String runCommand(String commandName, @NotNull Map<String, ? extends Serializable> args) {
+    @NonNull
+    private String runCommand(String commandName, @NonNull Map<String, ? extends Serializable> args) {
         return RunCommandKt.mockGameCommandRun(fcCommand, commandName, args);
     }
 

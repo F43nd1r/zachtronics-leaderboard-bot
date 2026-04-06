@@ -19,18 +19,18 @@ package com.faendir.zachtronics.bot.fc.model;
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
-public enum FcMetric implements MetricJava<FcScore, @NotNull Integer> {
+public enum FcMetric implements MetricJava<FcScore, @NonNull Integer> {
     TIME("T", FcScore::getTime),
     COST("C", FcScore::getCost),
     SUM_TIMES("S", FcScore::getSumTimes),
     WIRES("W", FcScore::getWires);
 
-    @NotNull private final String displayName;
-    @NotNull private final Function<FcScore, @NotNull Integer> extract;
+    @NonNull private final String displayName;
+    @NonNull private final Function<FcScore, @NonNull Integer> extract;
 }

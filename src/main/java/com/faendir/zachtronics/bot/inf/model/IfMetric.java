@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.inf.model;
 
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
@@ -35,6 +35,6 @@ public class IfMetric<T extends Comparable<T>> implements MetricJava<IfScore, T>
     public static final IfMetric<Boolean> NO_OOB_GRA = new IfMetric<>("N", s -> s.isOutOfBounds() || s.usesGRA());
     public static final IfMetric<Boolean> NO_FLAGS = new IfMetric<>("N", s -> s.isOutOfBounds() || s.usesGRA() || s.isFinite());
 
-    @NotNull String displayName;
-    @NotNull Function<IfScore, T> extract;
+    @NonNull String displayName;
+    @NonNull Function<IfScore, T> extract;
 }

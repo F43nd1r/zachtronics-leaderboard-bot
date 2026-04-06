@@ -23,22 +23,22 @@ import com.faendir.zachtronics.bot.tis.model.TISCategory;
 import com.faendir.zachtronics.bot.tis.model.TISRecord;
 import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 @Value
 public class TISRecordDTO implements RecordDTO<TISScoreDTO> {
-    @NotNull TISScoreDTO score;
-    @NotNull String fullFormattedScore;
-    @NotNull String author;
+    @NonNull TISScoreDTO score;
+    @NonNull String fullFormattedScore;
+    @NonNull String author;
     @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
 
-    @NotNull
-    public static TISRecordDTO fromCategoryRecord(@NotNull CategoryRecord<TISRecord, TISCategory> categoryRecord) {
+    @NonNull
+    public static TISRecordDTO fromCategoryRecord(@NonNull CategoryRecord<TISRecord, TISCategory> categoryRecord) {
         TISRecord record = categoryRecord.getRecord();
         Set<TISCategory> categories = categoryRecord.getCategories();
         return new TISRecordDTO(
@@ -51,8 +51,8 @@ public class TISRecordDTO implements RecordDTO<TISScoreDTO> {
         );
     }
 
-    @NotNull
-    public static TISRecordDTO fromRecord(@NotNull TISRecord record) {
+    @NonNull
+    public static TISRecordDTO fromRecord(@NonNull TISRecord record) {
         return new TISRecordDTO(TISScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
                                record.getAuthor(),

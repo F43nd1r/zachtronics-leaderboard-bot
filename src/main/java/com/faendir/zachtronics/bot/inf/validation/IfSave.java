@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.inf.validation;
 
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -57,17 +57,17 @@ import java.util.Base64;
 @Value
 public class IfSave {
     int version;
-    @NotNull IfBlock[] blocks;
+    @NonNull IfBlock[] blocks;
 
-    @NotNull
+    @NonNull
     public static IfSave unmarshal(String solution) {
         byte[] bytes = Base64.getDecoder().decode(solution);
         ByteBuffer byteBuffer = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
         return unmarshal(byteBuffer);
     }
 
-    @NotNull
-    static IfSave unmarshal(@NotNull ByteBuffer byteBuffer) {
+    @NonNull
+    static IfSave unmarshal(@NonNull ByteBuffer byteBuffer) {
         int version = byteBuffer.getInt();
         if (version != 3)
             throw new IllegalStateException("Version is not 3");

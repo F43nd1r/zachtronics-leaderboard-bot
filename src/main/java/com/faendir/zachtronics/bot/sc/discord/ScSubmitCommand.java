@@ -31,7 +31,7 @@ import com.faendir.zachtronics.bot.validation.ValidationResult;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -68,9 +68,9 @@ public class ScSubmitCommand extends AbstractMultiSubmitCommand<ScCategory, ScPu
     @Getter
     private final ScSolutionRepository repository;
 
-    @NotNull
+    @NonNull
     @Override
-    public Collection<ValidationResult<ScSubmission>> parseSubmissions(@NotNull ChatInputInteractionEvent event) {
+    public Collection<ValidationResult<ScSubmission>> parseSubmissions(@NonNull ChatInputInteractionEvent event) {
         String export = exportOption.get(event);
         String video = videoOption.get(event);
         String author = authorOption.get(event);

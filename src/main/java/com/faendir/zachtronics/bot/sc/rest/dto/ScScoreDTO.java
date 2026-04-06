@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.sc.rest.dto;
 
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Value
 public class ScScoreDTO {
@@ -29,9 +29,8 @@ public class ScScoreDTO {
     boolean bugged;
     boolean precognitive;
 
-    @NotNull
-    public static ScScoreDTO fromScore(@NotNull ScScore score) {
+    @NonNull
+    public static ScScoreDTO fromScore(@NonNull ScScore score) {
         return new ScScoreDTO(score.getCycles(), score.getReactors(), score.getSymbols(), score.isBugged(), score.isPrecognitive());
     }
 }
-

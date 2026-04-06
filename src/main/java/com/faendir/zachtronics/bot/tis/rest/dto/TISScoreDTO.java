@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.tis.rest.dto;
 
 import com.faendir.zachtronics.bot.tis.model.TISScore;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Value
 public class TISScoreDTO {
@@ -30,10 +30,9 @@ public class TISScoreDTO {
     boolean cheating;
     boolean hardcoded;
 
-    @NotNull
-    public static TISScoreDTO fromScore(@NotNull TISScore score) {
+    @NonNull
+    public static TISScoreDTO fromScore(@NonNull TISScore score) {
         return new TISScoreDTO(score.getCycles(), score.getNodes(), score.getInstructions(),
                                score.isAchievement(), score.isCheating(), score.isHardcoded());
     }
 }
-

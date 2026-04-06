@@ -25,7 +25,7 @@ import com.faendir.zachtronics.bot.sz.model.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -54,17 +54,17 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
     private final List<SzPuzzle> trackedPuzzles = Arrays.stream(SzPuzzle.values()).filter(p -> p.getType() != SzType.SANDBOX).toList();
 
     @Override
-    protected @NotNull String wikiPageName(SzPuzzle puzzle) {
+    protected @NonNull String wikiPageName(SzPuzzle puzzle) {
         return "index";
     }
 
     @Override
-    protected SzSolution makeCandidateSolution(@NotNull SzSubmission submission) {
+    protected SzSolution makeCandidateSolution(@NonNull SzSubmission submission) {
         return new SzSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
     }
 
     @Override
-    protected int frontierCompare(@NotNull SzScore s1, @NotNull SzScore s2) {
+    protected int frontierCompare(@NonNull SzScore s1, @NonNull SzScore s2) {
         int r1 = Integer.compare(s1.getCost(), s2.getCost());
         int r2 = Integer.compare(s1.getPower(), s2.getPower());
         int r3 = Integer.compare(s1.getLines(), s2.getLines());
@@ -84,31 +84,31 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
 
     /** allow same-score solution changes only if you are the original author */
     @Override
-    protected boolean allowedSameScoreUpdate(@NotNull SzSolution candidate, @NotNull SzSolution solution) {
+    protected boolean allowedSameScoreUpdate(@NonNull SzSolution candidate, @NonNull SzSolution solution) {
         return candidate.getDisplayLink() != null ||
                (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
     
     @Override
-    @NotNull
-    protected Path relativePuzzlePath(@NotNull SzPuzzle puzzle) {
+    @NonNull
+    protected Path relativePuzzlePath(@NonNull SzPuzzle puzzle) {
         return Paths.get(puzzle.getGroup().name()).resolve(puzzle.getId());
     }
 
-    @NotNull
-    static String makeFilename(@NotNull String puzzleId, @NotNull SzScore score) {
+    @NonNull
+    static String makeFilename(@NonNull String puzzleId, @NonNull SzScore score) {
         return puzzleId + "-" + score.toDisplayString(DisplayContext.fileName()) + ".txt";
     }
 
-    @NotNull
+    @NonNull
     @Override
-    protected String makeArchiveLink(@NotNull SzPuzzle puzzle, @NotNull SzScore score) {
+    protected String makeArchiveLink(@NonNull SzPuzzle puzzle, @NonNull SzScore score) {
         return makeArchiveLink(puzzle, makeFilename(puzzle.getId(), score));
     }
 
     @Override
-    @NotNull
-    protected Path makeArchivePath(@NotNull Path puzzlePath, SzScore score) {
+    @NonNull
+    protected Path makeArchivePath(@NonNull Path puzzlePath, SzScore score) {
         return puzzlePath.resolve(makeFilename(puzzlePath.getFileName().toString(), score));
     }
 }

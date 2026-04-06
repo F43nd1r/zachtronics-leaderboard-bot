@@ -23,7 +23,7 @@ import com.faendir.zachtronics.bot.cw.model.CwScore;
 import com.faendir.zachtronics.bot.repository.Solution;
 import lombok.Value;
 import lombok.With;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
@@ -33,8 +33,8 @@ import java.util.stream.Collectors;
 
 @Value
 public class CwSolution implements Solution<CwCategory, CwPuzzle, CwScore, CwRecord> {
-    @NotNull CwScore score;
-    @NotNull String author;
+    @NonNull CwScore score;
+    @NonNull String author;
     @With String displayLink;
     /** empty if it holds no categories */
     EnumSet<CwCategory> categories = EnumSet.noneOf(CwCategory.class);
@@ -47,8 +47,8 @@ public class CwSolution implements Solution<CwCategory, CwPuzzle, CwScore, CwRec
             return new CwRecord(puzzle, score, author, displayLink, null, null);
     }
 
-    @NotNull
-    public static CwSolution unmarshal(String @NotNull [] fields) {
+    @NonNull
+    public static CwSolution unmarshal(String @NonNull [] fields) {
         assert fields.length == 4;
         CwScore score = Objects.requireNonNull(CwScore.parseScore(fields[0]));
         String author = fields[1];
@@ -62,7 +62,7 @@ public class CwSolution implements Solution<CwCategory, CwPuzzle, CwScore, CwRec
     }
 
     @Override
-    public String @NotNull [] marshal() {
+    public String @NonNull [] marshal() {
         return new String[]{
                 score.toDisplayString(),
                 author,

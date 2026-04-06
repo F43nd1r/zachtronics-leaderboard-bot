@@ -19,18 +19,18 @@ package com.faendir.zachtronics.bot.cw.model;
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
-public enum CwMetric implements MetricJava<CwScore, @NotNull Integer> {
+public enum CwMetric implements MetricJava<CwScore, @NonNull Integer> {
     WIDTH("W", CwScore::getWidth),
     HEIGHT("H", CwScore::getHeight),
     SIZE("S", CwScore::getSize),
     FOOTPRINT("F", CwScore::getFootprint);
 
-    @NotNull private final String displayName;
-    @NotNull private final Function<CwScore, @NotNull Integer> extract;
+    @NonNull private final String displayName;
+    @NonNull private final Function<CwScore, @NonNull Integer> extract;
 }

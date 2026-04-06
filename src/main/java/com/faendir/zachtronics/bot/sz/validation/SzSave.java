@@ -21,8 +21,8 @@ import com.faendir.zachtronics.bot.sz.validation.chips.SzChipType;
 import com.faendir.zachtronics.bot.sz.validation.chips.SzChipUC;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -33,21 +33,21 @@ public class SzSave {
     private static final int BOARD_SIZE_Y = 14;
     private static final Pattern TRACES_REGEX = Pattern.compile("(?:[.0-9A-Z]{22}\\n){14}");
 
-    @NotNull String name;
-    @NotNull String puzzle;
+    @NonNull String name;
+    @NonNull String puzzle;
     /** in Yen cents */
     @Nullable Integer productionCost;
     @Nullable Integer powerUsage;
     @Nullable Integer linesOfCode;
 
-    @NotNull String traces;
+    @NonNull String traces;
 
-    @NotNull List<SzChip> chips;
+    @NonNull List<SzChip> chips;
 
     /**
      * @param solution UNIX newlines only
      */
-    @NotNull
+    @NonNull
     public static SzSave unmarshal(String solution) {
         List<String> blocks = Arrays.asList(Pattern.compile("(?<=\\n)\\n+(?=\\[|$)").split(solution));
         String metadataBlock = blocks.get(0);
@@ -79,7 +79,7 @@ public class SzSave {
                           chips);
     }
 
-    private static void fillOccupancy(int[][] occupancy, @NotNull SzChip chip, int chipIndex) {
+    private static void fillOccupancy(int[][] occupancy, @NonNull SzChip chip, int chipIndex) {
         for (int dx = 0; dx < chip.getType().getSizeX(); dx++) {
             for (int dy = 0; dy < chip.getType().getSizeY(); dy++) {
                 int x = chip.getX() + dx;
@@ -98,8 +98,8 @@ public class SzSave {
         }
     }
 
-    @NotNull
-    private static String readTag(@NotNull String block, @NotNull String tag) {
+    @NonNull
+    private static String readTag(@NonNull String block, @NonNull String tag) {
         if (block.startsWith("[" + tag + "]")) {
             int headerLength = tag.length() + 2;
             return block.substring(headerLength).stripLeading();
@@ -108,8 +108,8 @@ public class SzSave {
             throw new ValidationException("No [" + tag + "] in \"" + block + "\"");
     }
 
-    @NotNull
-    private static Map<String, String> readAllTags(@NotNull String lines) {
+    @NonNull
+    private static Map<String, String> readAllTags(@NonNull String lines) {
         String[] blocks = Pattern.compile("\\n(?:(?=\\[)|$)").split(lines);
         Map<String, String> result = new HashMap<>();
         for (String block : blocks) {
@@ -121,7 +121,7 @@ public class SzSave {
     }
 
     /** absent = exception */
-    public static int getInt(@NotNull Map<String, String> map, @NotNull String tag) {
+    public static int getInt(@NonNull Map<String, String> map, @NonNull String tag) {
         String candidate = map.get(tag);
         if (candidate != null)
             return Integer.parseInt(candidate);
@@ -131,13 +131,13 @@ public class SzSave {
 
     /** absent = null */
     @Nullable
-    public static Integer getIntOrNull(@NotNull Map<String, String> map, @NotNull String tag) {
+    public static Integer getIntOrNull(@NonNull Map<String, String> map, @NonNull String tag) {
         String candidate = map.get(tag);
         return candidate == null ? null : Integer.valueOf(candidate);
     }
 
     /** absent = false */
-    public static boolean getBoolean(@NotNull Map<String, String> map, @NotNull String tag) {
+    public static boolean getBoolean(@NonNull Map<String, String> map, @NonNull String tag) {
         return Boolean.parseBoolean(map.get(tag));
     }
 

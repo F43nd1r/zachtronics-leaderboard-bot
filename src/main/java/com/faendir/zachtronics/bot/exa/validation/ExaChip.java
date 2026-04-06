@@ -18,8 +18,8 @@ package com.faendir.zachtronics.bot.exa.validation;
 
 import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.DataOutput;
 import java.io.IOException;
@@ -37,12 +37,12 @@ import java.nio.ByteBuffer;
  */
 @Value
 public class ExaChip {
-    @NotNull String name;
-    @NotNull String code;
+    @NonNull String name;
+    @NonNull String code;
     boolean globalCommMode;
 
     @Nullable
-    static ExaChip unmarshal(@NotNull ByteBuffer byteBuffer) {
+    static ExaChip unmarshal(@NonNull ByteBuffer byteBuffer) {
         if (byteBuffer.get() == 0xB) {
             // empty EXA of some sort, burn 4B and go on
             byteBuffer.position(byteBuffer.position() + 4);
@@ -57,7 +57,7 @@ public class ExaChip {
         return new ExaChip(name, code, globalCommMode);
     }
 
-    void marshal(@NotNull DataOutput out) throws IOException {
+    void marshal(@NonNull DataOutput out) throws IOException {
         out.writeByte(0xA);
         ExaSave.writeString(out, name);
         ExaSave.writeString(out, code);

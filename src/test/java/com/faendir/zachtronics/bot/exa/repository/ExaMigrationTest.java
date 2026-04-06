@@ -31,7 +31,7 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +64,7 @@ class ExaMigrationTest {
     @TestConfiguration
     static class RepositoryConfiguration {
         @Bean("exaRepository")
-        public static @NotNull GitRepository exaRepository(GitProperties gitProperties) {
+        public static @NonNull GitRepository exaRepository(GitProperties gitProperties) {
             return TestConfigurationKt.readOnlyLocalClone("../exapunks/leaderboard", gitProperties);
         }
     }
@@ -110,7 +110,7 @@ class ExaMigrationTest {
         System.out.println("Done");
     }
 
-    private static ExaPuzzle findPuzzle(@NotNull String levelName) {
+    private static ExaPuzzle findPuzzle(@NonNull String levelName) {
         List<ExaPuzzle> candidates = UtilsKt.fuzzyMatch(Arrays.asList(ExaPuzzle.values()), levelName, ExaPuzzle::getDisplayName);
         if (candidates.size() == 1)
             return candidates.get(0);
@@ -140,7 +140,7 @@ class ExaMigrationTest {
         System.out.println("Done");
     }
 
-    private static @NotNull ExaSubmission submissionFromScrape(String @NotNull [] fields) {
+    private static @NonNull ExaSubmission submissionFromScrape(String @NonNull [] fields) {
         // PB050|887/106/4|mplain|https://i.imgur.com/bEOwU81.gifv|AS,cAS
         assert fields.length == 5;
 
@@ -195,7 +195,7 @@ class ExaMigrationTest {
         System.out.println("Done");
     }
 
-    private static @NotNull ExaSave hydrateSolution(@NotNull ExaPuzzle puzzle, @NotNull String text, @NotNull Pattern exaSeparator) {
+    private static @NonNull ExaSave hydrateSolution(@NonNull ExaPuzzle puzzle, @NonNull String text, @NonNull Pattern exaSeparator) {
         List<ExaChip> exas = new ArrayList<>();
         char exaLetter = 'A';
         for (String code : exaSeparator.split(text)) {

@@ -29,7 +29,7 @@ import com.faendir.zachtronics.bot.sz.rest.dto.SzPuzzleDTO;
 import com.faendir.zachtronics.bot.sz.rest.dto.SzRecordDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,9 +43,9 @@ import java.util.List;
 @RequestMapping("/sz")
 @RequiredArgsConstructor
 public class SzController implements GameRestController<GroupDTO, SzPuzzleDTO, CategoryDTO, SzRecordDTO> {
-    
+
     private final SzSolutionRepository repository;
-    
+
     @Getter
     private final List<GroupDTO> groups = Arrays.stream(SzGroup.values()).map(GroupDTO::fromGroup).toList();
 
@@ -53,13 +53,13 @@ public class SzController implements GameRestController<GroupDTO, SzPuzzleDTO, C
     private final List<SzPuzzleDTO> puzzles = Arrays.stream(SzPuzzle.values()).map(SzPuzzleDTO::fromPuzzle).toList();
 
     @Override
-    public SzPuzzleDTO getPuzzle(@NotNull String puzzleId) {
+    public SzPuzzleDTO getPuzzle(@NonNull String puzzleId) {
         return SzPuzzleDTO.fromPuzzle(findPuzzle(puzzleId));
     }
 
     @Override
-    @NotNull
-    public List<SzPuzzleDTO> listPuzzlesByGroup(@NotNull String groupId) {
+    @NonNull
+    public List<SzPuzzleDTO> listPuzzlesByGroup(@NonNull String groupId) {
         SzGroup group = findGroup(groupId);
         return Arrays.stream(SzPuzzle.values()).filter(p -> p.getGroup() == group).map(SzPuzzleDTO::fromPuzzle).toList();
     }
@@ -68,13 +68,13 @@ public class SzController implements GameRestController<GroupDTO, SzPuzzleDTO, C
     private final List<CategoryDTO> categories = Arrays.stream(SzCategory.values()).map(CategoryDTO::fromCategory).toList();
 
     @Override
-    public CategoryDTO getCategory(@NotNull String categoryId) {
+    public CategoryDTO getCategory(@NonNull String categoryId) {
         return CategoryDTO.fromCategory(findCategory(categoryId));
     }
 
     @Override
-    @NotNull
-    public List<SzRecordDTO> listRecords(@NotNull String puzzleId, Boolean includeFrontier) {
+    @NonNull
+    public List<SzRecordDTO> listRecords(@NonNull String puzzleId, Boolean includeFrontier) {
         SzPuzzle puzzle = findPuzzle(puzzleId);
         return repository.findCategoryHolders(puzzle, includeFrontier != null && includeFrontier).stream()
                          .map(SzRecordDTO::fromCategoryRecord)
@@ -82,7 +82,7 @@ public class SzController implements GameRestController<GroupDTO, SzPuzzleDTO, C
     }
 
     @Override
-    public SzRecordDTO getRecord(@NotNull String puzzleId, @NotNull String categoryId) {
+    public SzRecordDTO getRecord(@NonNull String puzzleId, @NonNull String categoryId) {
         SzPuzzle puzzle = findPuzzle(puzzleId);
         SzCategory category = findCategory(categoryId);
         SzRecord record = repository.find(puzzle, category);
@@ -105,7 +105,7 @@ public class SzController implements GameRestController<GroupDTO, SzPuzzleDTO, C
                      .findFirst()
                      .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category " + categoryId + " not found."));
     }
-    
+
     private static SzGroup findGroup(String groupId) {
         return Arrays.stream(SzGroup.values())
                      .filter(g -> g.name().equalsIgnoreCase(groupId))

@@ -29,7 +29,7 @@ import com.faendir.zachtronics.bot.rest.dto.CategoryDTO;
 import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,13 +53,13 @@ public class CwController implements GameRestController<GroupDTO, CwPuzzleDTO, C
     private final List<CwPuzzleDTO> puzzles = Arrays.stream(CwPuzzle.values()).map(CwPuzzleDTO::fromPuzzle).toList();
 
     @Override
-    public CwPuzzleDTO getPuzzle(@NotNull String puzzleId) {
+    public CwPuzzleDTO getPuzzle(@NonNull String puzzleId) {
         return CwPuzzleDTO.fromPuzzle(findPuzzle(puzzleId));
     }
 
     @Override
-    @NotNull
-    public List<CwPuzzleDTO> listPuzzlesByGroup(@NotNull String groupId) {
+    @NonNull
+    public List<CwPuzzleDTO> listPuzzlesByGroup(@NonNull String groupId) {
         CwGroup group = findGroup(groupId);
         return Arrays.stream(CwPuzzle.values()).filter(p -> p.getGroup() == group).map(CwPuzzleDTO::fromPuzzle).toList();
     }
@@ -68,13 +68,13 @@ public class CwController implements GameRestController<GroupDTO, CwPuzzleDTO, C
     private final List<CategoryDTO> categories = Arrays.stream(CwCategory.values()).map(CategoryDTO::fromCategory).toList();
 
     @Override
-    public CategoryDTO getCategory(@NotNull String categoryId) {
+    public CategoryDTO getCategory(@NonNull String categoryId) {
         return CategoryDTO.fromCategory(findCategory(categoryId));
     }
 
     @Override
-    @NotNull
-    public List<CwRecordDTO> listRecords(@NotNull String puzzleId, Boolean includeFrontier) {
+    @NonNull
+    public List<CwRecordDTO> listRecords(@NonNull String puzzleId, Boolean includeFrontier) {
         CwPuzzle puzzle = findPuzzle(puzzleId);
         return repository.findCategoryHolders(puzzle, includeFrontier != null && includeFrontier).stream()
                          .map(CwRecordDTO::fromCategoryRecord)
@@ -82,7 +82,7 @@ public class CwController implements GameRestController<GroupDTO, CwPuzzleDTO, C
     }
 
     @Override
-    public CwRecordDTO getRecord(@NotNull String puzzleId, @NotNull String categoryId) {
+    public CwRecordDTO getRecord(@NonNull String puzzleId, @NonNull String categoryId) {
         CwPuzzle puzzle = findPuzzle(puzzleId);
         CwCategory category = findCategory(categoryId);
         CwRecord record = repository.find(puzzle, category);

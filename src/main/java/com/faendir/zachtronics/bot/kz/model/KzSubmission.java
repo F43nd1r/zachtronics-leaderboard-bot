@@ -21,28 +21,28 @@ import com.faendir.zachtronics.bot.model.Submission;
 import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 @Value
 public class KzSubmission implements Submission<KzCategory, KzPuzzle> {
-    @NotNull KzPuzzle puzzle;
-    @NotNull KzScore score;
-    @NotNull String author;
+    @NonNull KzPuzzle puzzle;
+    @NonNull KzScore score;
+    @NonNull String author;
     @Nullable String displayLink;
-    byte @NotNull [] data;
+    byte @NonNull [] data;
 
     /**
      * @throws ValidationException if we can't correctly parse metadata
      */
-    @NotNull
-    public static KzSubmission fromData(byte @NotNull [] data, @NotNull String author, String displayLink) throws ValidationException {
+    @NonNull
+    public static KzSubmission fromData(byte @NonNull [] data, @NonNull String author, String displayLink) throws ValidationException {
         return KzValidator.validate(data, author, displayLink);
     }
 
-    @NotNull
-    public static KzSubmission fromLink(@NotNull String link, String author, String displayLink) {
-        byte @NotNull [] data = Utils.downloadFile(link).getData();
+    @NonNull
+    public static KzSubmission fromLink(@NonNull String link, String author, String displayLink) {
+        byte @NonNull [] data = Utils.downloadFile(link).getData();
         return fromData(data, author, displayLink);
     }
 }

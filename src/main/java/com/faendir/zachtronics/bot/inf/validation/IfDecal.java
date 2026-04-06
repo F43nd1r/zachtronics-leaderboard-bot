@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.inf.validation;
 
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.ByteBuffer;
 
@@ -35,8 +35,8 @@ class IfDecal {
     byte facing;
     short type;
 
-    @NotNull
-    static IfDecal unmarshal(@NotNull ByteBuffer byteBuffer) {
+    @NonNull
+    static IfDecal unmarshal(@NonNull ByteBuffer byteBuffer) {
         return new IfDecal(byteBuffer.get(), byteBuffer.getShort());
     }
 }

@@ -25,7 +25,7 @@ import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -53,17 +53,17 @@ public class KzSolutionRepository extends AbstractSolutionRepository<KzCategory,
     private final List<KzPuzzle> trackedPuzzles = List.of(KzPuzzle.values());
 
     @Override
-    protected @NotNull String wikiPageName(KzPuzzle puzzle) {
+    protected @NonNull String wikiPageName(KzPuzzle puzzle) {
         return "index";
     }
 
     @Override
-    protected KzSolution makeCandidateSolution(@NotNull KzSubmission submission) {
+    protected KzSolution makeCandidateSolution(@NonNull KzSubmission submission) {
         return new KzSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
     }
 
     @Override
-    protected int frontierCompare(@NotNull KzScore s1, @NotNull KzScore s2) {
+    protected int frontierCompare(@NonNull KzScore s1, @NonNull KzScore s2) {
         int r1 = Integer.compare(s1.getTime(), s2.getTime());
         int r2 = Integer.compare(s1.getCost(), s2.getCost());
         int r3 = Integer.compare(s1.getArea(), s2.getArea());
@@ -83,31 +83,31 @@ public class KzSolutionRepository extends AbstractSolutionRepository<KzCategory,
     }
 
     @Override
-    protected boolean allowedSameScoreUpdate(@NotNull KzSolution candidate, @NotNull KzSolution solution) {
+    protected boolean allowedSameScoreUpdate(@NonNull KzSolution candidate, @NonNull KzSolution solution) {
         return candidate.getDisplayLink() != null ||
                (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
 
     @Override
-    @NotNull
-    protected Path relativePuzzlePath(@NotNull KzPuzzle puzzle) {
+    @NonNull
+    protected Path relativePuzzlePath(@NonNull KzPuzzle puzzle) {
         return Paths.get(puzzle.getGroup().name()).resolve(puzzle.name());
     }
 
-    @NotNull
-    static String makeFilename(@NotNull KzPuzzle puzzle, @NotNull KzScore score) {
+    @NonNull
+    static String makeFilename(@NonNull KzPuzzle puzzle, @NonNull KzScore score) {
         return puzzle.getPrefix() + "-" + score.toDisplayString(DisplayContext.fileName()) + ".solution";
     }
 
-    @NotNull
+    @NonNull
     @Override
-    protected String makeArchiveLink(@NotNull KzPuzzle puzzle, @NotNull KzScore score) {
+    protected String makeArchiveLink(@NonNull KzPuzzle puzzle, @NonNull KzScore score) {
         return makeArchiveLink(puzzle, makeFilename(puzzle, score));
     }
 
     @Override
-    @NotNull
-    protected Path makeArchivePath(@NotNull Path puzzlePath, KzScore score) {
+    @NonNull
+    protected Path makeArchivePath(@NonNull Path puzzlePath, KzScore score) {
         KzPuzzle puzzle = KzPuzzle.valueOf(puzzlePath.getFileName().toString());
         return puzzlePath.resolve(makeFilename(puzzle, score));
     }

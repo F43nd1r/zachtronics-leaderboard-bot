@@ -20,22 +20,22 @@ import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.utils.Markdown;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 
 @Value
 public class FpRecord implements Record<FpCategory> {
-    @NotNull FpPuzzle puzzle;
-    @NotNull FpScore score;
-    @NotNull String author;
+    @NonNull FpPuzzle puzzle;
+    @NonNull FpScore score;
+    @NonNull String author;
     String displayLink;
     String dataLink;
     Path dataPath;
 
-    @NotNull
+    @NonNull
     @Override
-    public String toDisplayString(@NotNull DisplayContext<FpCategory> context) {
+    public String toDisplayString(@NonNull DisplayContext<FpCategory> context) {
         return Markdown.fileLinkOrEmpty(dataLink) +
                Markdown.linkOrText(score.toDisplayString(context) + " " + Markdown.escape(author), displayLink);
     }

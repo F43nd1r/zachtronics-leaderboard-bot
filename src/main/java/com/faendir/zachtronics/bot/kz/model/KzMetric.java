@@ -19,7 +19,7 @@ package com.faendir.zachtronics.bot.kz.model;
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
@@ -30,6 +30,6 @@ public enum KzMetric implements MetricJava<KzScore, Integer> {
     COST("C", KzScore::getCost),
     AREA("A", KzScore::getArea);
 
-    @NotNull private final String displayName;
-    @NotNull private final Function<KzScore, Integer> extract;
+    @NonNull private final String displayName;
+    @NonNull private final Function<KzScore, Integer> extract;
 }

@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.sz.validation.chips;
 
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Map;
@@ -38,19 +38,19 @@ import static com.faendir.zachtronics.bot.sz.validation.SzSave.getInt;
  */
 @Value
 class SzChipUC4 implements SzChipUC {
-    @NotNull SzChipType type;
+    @NonNull SzChipType type;
     int x;
     int y;
-    @NotNull List<SzCodeLine> lines;
+    @NonNull List<SzCodeLine> lines;
 
-    static @NotNull SzChipUC4 unmarshal(@NotNull SzChipType type, @NotNull Map<String, String> chipMap) {
+    static @NonNull SzChipUC4 unmarshal(@NonNull SzChipType type, @NonNull Map<String, String> chipMap) {
         return new SzChipUC4(type,
                              getInt(chipMap, "x"),
                              getInt(chipMap, "y"),
                              SzChipUC.readLines(chipMap, 9));
     }
 
-    @NotNull
+    @NonNull
     @Override
     public SzChipType getType() {
         return type;

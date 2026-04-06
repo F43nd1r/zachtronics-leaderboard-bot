@@ -21,8 +21,8 @@ import com.faendir.zachtronics.bot.model.Score;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
 import lombok.With;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,9 +36,9 @@ public class ExaScore implements Score<ExaCategory> {
     @With boolean cheesy;
 
     /** cc/ss/aa[/c] */
-    @NotNull
+    @NonNull
     @Override
-    public String toDisplayString(@NotNull DisplayContext<ExaCategory> context) {
+    public String toDisplayString(@NonNull DisplayContext<ExaCategory> context) {
         String separator = context.getSeparator();
         int formatId = Utils.getScoreFormatId(context);
 
@@ -53,14 +53,14 @@ public class ExaScore implements Score<ExaCategory> {
 
     /** <tt>cc/ss/aa[/c]</tt>, tolerates extra <tt>*</tt> */
     @Nullable
-    public static ExaScore parseScore(@NotNull String string) {
+    public static ExaScore parseScore(@NonNull String string) {
         Matcher m = REGEX_SCORE.matcher(string);
         return m.matches() ? parseScore(m) : null;
     }
 
     /** we assume m matches */
-    @NotNull
-    public static ExaScore parseScore(@NotNull Matcher m) {
+    @NonNull
+    public static ExaScore parseScore(@NonNull Matcher m) {
         int cycles = Integer.parseInt(m.group("cycles"));
         int size = Integer.parseInt(m.group("size"));
         int activity = Integer.parseInt(m.group("activity"));
@@ -74,7 +74,7 @@ public class ExaScore implements Score<ExaCategory> {
     /**
      * @return <tt>""</tt> or <tt>"/c"</tt>
      */
-    @NotNull
+    @NonNull
     public static String sepFlags(String separator, boolean cheesy) {
         return cheesy ? separator + "c" : "";
     }

@@ -26,7 +26,7 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -55,9 +55,9 @@ public class RestartCommand extends Command.Single {
     @Getter
     private final List<CommandOption<?,?>> options = List.of(sudoOption);
 
-    @NotNull
+    @NonNull
     @Override
-    public Mono<Void> handle(@NotNull ChatInputInteractionEvent event) {
+    public Mono<Void> handle(@NonNull ChatInputInteractionEvent event) {
         Boolean sudo = sudoOption.get(event);
         if (sudo == null || !sudo) {
             // acquire and hold all the repo write locks, which ensures no write operations are concurrently running

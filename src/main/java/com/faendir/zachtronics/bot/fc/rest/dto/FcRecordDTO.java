@@ -23,22 +23,22 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.dto.RecordDTO;
 import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 @Value
 public class FcRecordDTO implements RecordDTO<FcScoreDTO> {
-    @NotNull FcScoreDTO score;
-    @NotNull String fullFormattedScore;
-    @NotNull String author;
+    @NonNull FcScoreDTO score;
+    @NonNull String fullFormattedScore;
+    @NonNull String author;
     @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
 
-    @NotNull
-    public static FcRecordDTO fromCategoryRecord(@NotNull CategoryRecord<FcRecord, FcCategory> categoryRecord) {
+    @NonNull
+    public static FcRecordDTO fromCategoryRecord(@NonNull CategoryRecord<FcRecord, FcCategory> categoryRecord) {
         FcRecord record = categoryRecord.getRecord();
         Set<FcCategory> categories = categoryRecord.getCategories();
         return new FcRecordDTO(
@@ -51,8 +51,8 @@ public class FcRecordDTO implements RecordDTO<FcScoreDTO> {
         );
     }
 
-    @NotNull
-    public static FcRecordDTO fromRecord(@NotNull FcRecord record) {
+    @NonNull
+    public static FcRecordDTO fromRecord(@NonNull FcRecord record) {
         return new FcRecordDTO(FcScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
                                record.getAuthor(),

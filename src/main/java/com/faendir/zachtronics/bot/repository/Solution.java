@@ -20,15 +20,15 @@ import com.faendir.zachtronics.bot.model.Category;
 import com.faendir.zachtronics.bot.model.Puzzle;
 import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.model.Score;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
 
 public interface Solution<C extends Enum<C> & Category, P extends Puzzle<C>, S extends Score<C>, R extends Record<C>> {
-    @NotNull S getScore();
+    @NonNull S getScore();
     String getAuthor();
-    @NotNull EnumSet<C> getCategories();
+    @NonNull EnumSet<C> getCategories();
 
     R extendToRecord(P puzzle, String dataLink, Path dataPath);
 
@@ -36,5 +36,5 @@ public interface Solution<C extends Enum<C> & Category, P extends Puzzle<C>, S e
         return new CategoryRecord<>(extendToRecord(puzzle, dataLink, dataPath), getCategories());
     }
 
-    String @NotNull [] marshal();
+    String @NonNull [] marshal();
 }

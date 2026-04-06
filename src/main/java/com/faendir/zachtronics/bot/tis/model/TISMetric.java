@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.tis.model;
 
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
@@ -38,6 +38,6 @@ public class TISMetric<T extends Comparable<T>> implements MetricJava<TISScore, 
     public static final TISMetric<Boolean> NOT_HARDCODED = new TISMetric<>("c", s -> !s.isHardcoded());
     public static final TISMetric<Boolean> CAN_HARDCODE = new TISMetric<>("h", s -> true);
 
-    @NotNull String displayName;
-    @NotNull Function<TISScore, T> extract;
+    @NonNull String displayName;
+    @NonNull Function<TISScore, T> extract;
 }

@@ -19,17 +19,17 @@ package com.faendir.zachtronics.bot.exa.rest.dto;
 import com.faendir.zachtronics.bot.exa.model.ExaPuzzle;
 import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Value
 public class ExaPuzzleDTO {
-    @NotNull String id;
-    @NotNull String displayName;
-    @NotNull GroupDTO group;
-    @NotNull String type;
+    @NonNull String id;
+    @NonNull String displayName;
+    @NonNull GroupDTO group;
+    @NonNull String type;
 
-    @NotNull
-    public static ExaPuzzleDTO fromPuzzle(@NotNull ExaPuzzle puzzle) {
+    @NonNull
+    public static ExaPuzzleDTO fromPuzzle(@NonNull ExaPuzzle puzzle) {
         return new ExaPuzzleDTO(puzzle.name(), puzzle.getDisplayName(), GroupDTO.fromGroup(puzzle.getGroup()), puzzle.getType().getDisplayName());
     }
 }

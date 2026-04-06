@@ -21,7 +21,7 @@ import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSubmission;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 
@@ -165,7 +165,7 @@ class ValidationResultTest {
         assertEquals(expected, result);
     }
 
-    @NotNull
+    @NonNull
     private static ValidationResult<ScSubmission> validateSingle(String export) {
         return SChem.validationResultFrom(SChem.validate(export, false)[0], false, null);
     }

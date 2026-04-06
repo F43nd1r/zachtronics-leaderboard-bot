@@ -29,7 +29,7 @@ import com.faendir.zachtronics.bot.tis.repository.TISSolutionRepository;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -51,9 +51,9 @@ public class TISSubmitCommand extends AbstractSubmitCommand<TISCategory, TISPuzz
     @Getter
     private final TISSolutionRepository repository;
 
-    @NotNull
+    @NonNull
     @Override
-    public TISSubmission parseSubmission(@NotNull ChatInputInteractionEvent event) {
+    public TISSubmission parseSubmission(@NonNull ChatInputInteractionEvent event) {
         return TISSubmission.fromLink(solutionOption.get(event), puzzleOption.get(event), authorOption.get(event), imageOption.get(event));
     }
 }

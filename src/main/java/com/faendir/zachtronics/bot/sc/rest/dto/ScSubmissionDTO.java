@@ -17,13 +17,13 @@
 package com.faendir.zachtronics.bot.sc.rest.dto;
 
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 @Value
 public class ScSubmissionDTO {
-    @NotNull MultipartFile export;
+    @NonNull MultipartFile export;
     @Nullable String author;
     @Nullable String video;
 }

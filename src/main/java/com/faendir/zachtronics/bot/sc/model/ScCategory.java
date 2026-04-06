@@ -19,7 +19,7 @@ package com.faendir.zachtronics.bot.sc.model;
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -64,7 +64,7 @@ public enum ScCategory implements CategoryJava<ScCategory, ScScore, ScMetric<?>>
     private final Set<ScType> supportedTypes;
     private final int scoreFormatId;
 
-    ScCategory(@NotNull ScMetric<Boolean> admission, @NotNull List<ScMetric<?>> metrics, Set<ScType> supportedTypes, int scoreFormatId) {
+    ScCategory(@NonNull ScMetric<Boolean> admission, @NonNull List<ScMetric<?>> metrics, Set<ScType> supportedTypes, int scoreFormatId) {
         this.displayName = name();
         this.admission = admission;
         this.metrics = metrics;
@@ -74,7 +74,7 @@ public enum ScCategory implements CategoryJava<ScCategory, ScScore, ScMetric<?>>
     }
 
     @Override
-    public boolean supportsScore(@NotNull ScScore score) {
+    public boolean supportsScore(@NonNull ScScore score) {
         return !admission.get(score);
     }
 

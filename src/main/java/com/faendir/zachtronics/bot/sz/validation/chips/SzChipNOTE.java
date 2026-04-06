@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.sz.validation.chips;
 
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Map;
 
@@ -42,9 +42,9 @@ public class SzChipNOTE implements SzChip {
 
     int x;
     int y;
-    @NotNull String[] lines;
+    @NonNull String[] lines;
 
-    static @NotNull SzChipNOTE unmarshal(@NotNull Map<String, String> chipMap) {
+    static @NonNull SzChipNOTE unmarshal(@NonNull Map<String, String> chipMap) {
         String[] lines = chipMap.get("code").split("\\n");
         if (lines.length > 9)
             throw new ValidationException("NOTE has " + lines.length + " LOC when the limit is 9");
@@ -54,7 +54,7 @@ public class SzChipNOTE implements SzChip {
                               lines);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public SzChipType getType() {
         return type;

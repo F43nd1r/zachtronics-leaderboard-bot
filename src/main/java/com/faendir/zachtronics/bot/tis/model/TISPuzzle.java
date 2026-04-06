@@ -18,8 +18,8 @@ package com.faendir.zachtronics.bot.tis.model;
 
 import com.faendir.zachtronics.bot.model.Puzzle;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -108,7 +108,7 @@ public enum TISPuzzle implements Puzzle<TISCategory> {
     private final int[] extraWitnessSeeds;
     private final String link;
 
-    TISPuzzle(@NotNull TISGroup group, @NotNull String id, @NotNull String displayName, @NotNull TISType type, int... extraWitnessSeeds) {
+    TISPuzzle(@NonNull TISGroup group, @NonNull String id, @NonNull String displayName, @NonNull TISType type, int... extraWitnessSeeds) {
         this.group = group;
         this.id = id;
         this.displayName = displayName;

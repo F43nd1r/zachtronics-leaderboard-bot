@@ -20,12 +20,12 @@ import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzScore;
 import com.faendir.zachtronics.bot.sz.model.SzSubmission;
 import com.faendir.zachtronics.bot.validation.ValidationException;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 public class SzValidator {
     private SzValidator() {}
 
-    public static @NotNull SzSubmission validate(String data, String author, String displayLink) {
+    public static @NonNull SzSubmission validate(String data, String author, String displayLink) {
         SzSave save = SzSave.unmarshal(data);
 
         SzPuzzle puzzle;

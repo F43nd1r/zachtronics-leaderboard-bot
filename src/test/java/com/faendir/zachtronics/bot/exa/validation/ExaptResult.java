@@ -17,8 +17,8 @@
 package com.faendir.zachtronics.bot.exa.validation;
 
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  <pre> {
@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
  */
 @Value
 public class ExaptResult {
-    @NotNull String puzzleId;
+    @NonNull String puzzleId;
     /** true IFF {@link #statistics} is present */
     boolean completed;
     @Nullable ExaptStatistics statistics;

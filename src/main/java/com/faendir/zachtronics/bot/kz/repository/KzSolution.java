@@ -23,7 +23,7 @@ import com.faendir.zachtronics.bot.kz.model.KzScore;
 import com.faendir.zachtronics.bot.repository.Solution;
 import lombok.Value;
 import lombok.With;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,8 +34,8 @@ import java.util.stream.Collectors;
 
 @Value
 public class KzSolution implements Solution<KzCategory, KzPuzzle, KzScore, KzRecord> {
-    @NotNull KzScore score;
-    @NotNull String author;
+    @NonNull KzScore score;
+    @NonNull String author;
     @With String displayLink;
     /** empty if it holds no categories */
     EnumSet<KzCategory> categories = EnumSet.noneOf(KzCategory.class);
@@ -48,8 +48,8 @@ public class KzSolution implements Solution<KzCategory, KzPuzzle, KzScore, KzRec
             return new KzRecord(puzzle, score, author, displayLink, null, null);
     }
 
-    @NotNull
-    public static KzSolution unmarshal(String @NotNull [] fields) {
+    @NonNull
+    public static KzSolution unmarshal(String @NonNull [] fields) {
         assert fields.length == 4;
         KzScore score = Objects.requireNonNull(KzScore.parseScore(fields[0]));
         String author = fields[1];
@@ -63,7 +63,7 @@ public class KzSolution implements Solution<KzCategory, KzPuzzle, KzScore, KzRec
     }
 
     @Override
-    public String @NotNull [] marshal() {
+    public String @NonNull [] marshal() {
         return new String[]{
                 score.toDisplayString(),
                 author,

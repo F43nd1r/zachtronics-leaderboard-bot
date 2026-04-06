@@ -17,7 +17,7 @@
 package com.faendir.zachtronics.bot.sz.validation.chips;
 
 import lombok.Value;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Map;
 
@@ -39,12 +39,12 @@ class SzChipBRIDGE implements SzChip {
     int x;
     int y;
 
-    static @NotNull SzChipBRIDGE unmarshal(@NotNull Map<String, String> chipMap) {
+    static @NonNull SzChipBRIDGE unmarshal(@NonNull Map<String, String> chipMap) {
         return new SzChipBRIDGE(getInt(chipMap, "x"),
                                 getInt(chipMap, "y"));
     }
 
-    @NotNull
+    @NonNull
     @Override
     public SzChipType getType() {
         return type;

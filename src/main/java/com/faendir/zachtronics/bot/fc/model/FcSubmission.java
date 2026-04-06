@@ -22,25 +22,25 @@ import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Value;
 import lombok.With;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collection;
 
 @Value
 public class FcSubmission implements Submission<FcCategory, FcPuzzle> {
-    @NotNull FcPuzzle puzzle;
-    @NotNull FcScore score;
-    @NotNull String author;
+    @NonNull FcPuzzle puzzle;
+    @NonNull FcScore score;
+    @NonNull String author;
     @With String displayLink;
-    byte @NotNull [] data;
+    byte @NonNull [] data;
 
-    @NotNull
-    public static Collection<ValidationResult<FcSubmission>> fromData(byte @NotNull [] data, String author) {
+    @NonNull
+    public static Collection<ValidationResult<FcSubmission>> fromData(byte @NonNull [] data, String author) {
         return FoodCourtSim.validateMultiExport(data, author);
     }
 
-    @NotNull
-    public static Collection<ValidationResult<FcSubmission>> fromLink(@NotNull String link, String author) {
+    @NonNull
+    public static Collection<ValidationResult<FcSubmission>> fromLink(@NonNull String link, String author) {
         byte[] data = Utils.downloadFile(link).getData();
         return fromData(data, author);
     }
