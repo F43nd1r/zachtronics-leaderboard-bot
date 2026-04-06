@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.om.model
 
 import com.faendir.zachtronics.bot.model.Metric
 import com.faendir.zachtronics.bot.model.StringFormat
-import com.faendir.zachtronics.bot.om.model.MeasurePoint.START
 import com.faendir.zachtronics.bot.utils.InfinInt
 import com.faendir.zachtronics.bot.utils.LevelValue
 import com.faendir.zachtronics.bot.utils.newEnumSet
@@ -38,7 +37,7 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
     fun describe(score: OmScore, format: StringFormat): String?
 
     val comparator: Comparator<OmScore>
-        get() = compareBy(nullsLast(naturalOrder()), getValueFrom)
+        get() = compareBy(nullsLast(), getValueFrom)
 
     companion object {
         private val numberFormat = DecimalFormat("0.###", DecimalFormatSymbols(Locale.ENGLISH))
@@ -94,12 +93,15 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
     }
 
     /** functions of other [OmMetric]s */
-    sealed interface Computed<T : Comparable<T>> : OmMetric<T> {
+    interface Computed<T : Comparable<T>> : OmMetric<T> {
         val subMetrics: Array<out OmMetric<*>>
         override val measurePoint
-            get() = subMetrics.mapTo(newEnumSet()) { it.measurePoint }.single { it != START }!!
+            get() = subMetrics.asIterable().findMeasurePoint()
         override val scoreParts
             get() = subMetrics.flatMap { it.scoreParts }
+
+        override fun describe(score: OmScore, format: StringFormat): String? =
+            getValueFrom(score)?.let { "$description=${numberFormat.format(it)}" }
     }
 
     sealed class Sum(override val displayName: String, final override vararg val subMetrics: OmMetric<Int>) : Computed<Int> {
@@ -108,20 +110,17 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
         }
 
         override val description: String = subMetrics.joinToString("+") { it.description }
-
-        override fun describe(score: OmScore, format: StringFormat): String? =
-            getValueFrom(score)?.let { "$description=$it" }
     }
 
-    sealed class Product(final override vararg val subMetrics: OmMetric<Int>) : Computed<Double> {
+    sealed class Product(final override vararg val subMetrics: OmMetric<*>) : Computed<Double> {
         override val getValueFrom = l@{ score: OmScore ->
-            subMetrics.fold(1.0) { acc, part -> acc * (part.getValueFrom(score) ?: return@l null) }
+            subMetrics.fold(1.0) { acc, part ->
+                val value = (part.getValueFrom(score) as? Number)?.toDouble() ?: return@l null
+                acc * value
+            }
         }
         override val displayName = "X"
         override val description: String = subMetrics.joinToString("·") { it.description }
-
-        override fun describe(score: OmScore, format: StringFormat): String? =
-            getValueFrom(score)?.let { "$description=${numberFormat.format(it)}" }
     }
 
     sealed class Not(final override val displayName: String, private val modifier: Modifier) : Computed<Boolean> {
@@ -146,8 +145,8 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
     }
 
     /** true constants */
-    sealed class Constant<T : Comparable<T>>(
-        final override val displayName: String,
+    open class Constant<T : Comparable<T>>(
+        override val displayName: String,
         val value: T,
     ) : OmMetric<T> {
         override val collapsible: Boolean = false
@@ -200,6 +199,7 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
 
     data object PRODUCT_GCA : Product(COST, CYCLES, AREA)
     data object PRODUCT_GCI : Product(COST, CYCLES, INSTRUCTIONS)
+    data object PRODUCT_INF : Product(COST, RATE, INSTRUCTIONS)
 }
 
 /**
@@ -210,6 +210,19 @@ enum class MeasurePoint(val displayName: String) {
     VICTORY("@V"),
     INFINITY("@∞")
 }
+
+fun Iterable<OmMetric<*>>.findMeasurePoint(): MeasurePoint {
+    val points = mapTo(newEnumSet()) { it.measurePoint }
+    if (points.size == 1) {
+        return points.first()
+    }
+    if (points.size == 2 && points.contains(MeasurePoint.START)) {
+        return points.find { it != MeasurePoint.START  }!!
+    }
+    throw IllegalStateException("Incoherent metric set")
+}
+
+operator fun <T : Comparable<T>> OmScore.get(metric: OmMetric<T>): T? = metric.getValueFrom(this)
 
 // https://youtrack.jetbrains.com/issue/KT-8970 stops us from doing some nice reflectivy thingy
 object OmMetrics {
@@ -235,22 +248,31 @@ object OmMetrics {
         OmType.NORMAL to listOf(
             OmMetric.SUM3A,
             OmMetric.SUM4,
-            OmMetric.PRODUCT_GCA
+            OmMetric.PRODUCT_GCA,
+            OmMetric.PRODUCT_INF,
         ),
         OmType.POLYMER to listOf(
             OmMetric.SUM3A,
             OmMetric.SUM4,
-            OmMetric.PRODUCT_GCA
+            OmMetric.PRODUCT_GCA,
+            OmMetric.PRODUCT_INF,
         ),
         OmType.PRODUCTION to listOf(
             OmMetric.SUM3I,
             OmMetric.SUM4,
-            OmMetric.PRODUCT_GCI
+            OmMetric.PRODUCT_GCI,
+            OmMetric.PRODUCT_INF,
         )
     )
 
     /** Score printing order for humans */
     val BY_MEASURE_POINT = mapOf(
+        MeasurePoint.START to listOf(
+            OmMetric.COST,
+            OmMetric.INSTRUCTIONS,
+            OmMetric.OVERLAP,
+            OmMetric.TRACKLESS,
+        ),
         MeasurePoint.VICTORY to listOf(
             OmMetric.COST,
             OmMetric.CYCLES,

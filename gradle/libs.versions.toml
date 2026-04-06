@@ -46,6 +46,7 @@ gradle-frontend = { id = "org.siouan.frontend-jdk21", version.ref = "gradle-fron
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-json" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor", version.ref = "kotlinx-coroutines" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
 spring-boot-web = { module = "org.springframework.boot:spring-boot-starter-web" }
 spring-boot-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }

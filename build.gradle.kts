@@ -34,6 +34,7 @@ plugins {
 }
 
 dependencies {
+    implementation(libs.kotlin.reflect)
     implementation(libs.kotlinx.json)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.coroutines.reactor)
