@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.om.model
 import com.faendir.zachtronics.bot.om.model.MeasurePoint.*
 import com.faendir.zachtronics.bot.om.model.OmMetric.*
 import com.faendir.zachtronics.bot.om.model.OmType.*
-import com.faendir.zachtronics.bot.utils.newEnumSet
 
 private val FREESPACE_TYPES = setOf(NORMAL, POLYMER)
 
@@ -46,7 +45,7 @@ enum class OmScoreManifold(
     /** rest of the metrics after [OVERLAP] and [ingameMetrics] */
     val tiebreakers = scoreParts.subList(4, scoreParts.size)
     /** Either [VICTORY] or [INFINITY] */
-    val measurePoint: MeasurePoint = scoreParts.mapTo(newEnumSet(), ScorePart<*>::measurePoint).single { it != START }
+    val measurePoint: MeasurePoint = scoreParts.findMeasurePoint()
 
     /**
      *  list of metric-by-metric comparation results, with meaning:

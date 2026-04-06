@@ -40,11 +40,12 @@ import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.slf4j.LoggerFactory
+import java.util.EnumSet
 
 
 private val logger = LoggerFactory.getLogger("OM Utils")
 
-fun OmRecord.withCategory(category: OmCategory) = CategoryRecord(this, setOf(category))
+fun OmRecord.withCategory(category: OmCategory) = CategoryRecord(this, EnumSet.of(category))
 
 fun omPuzzleOptionBuilder() = enumOptionBuilder<OmPuzzle>("puzzle") { displayName }
     .description("Puzzle name. Can be shortened or abbreviated. E.g. `stab water`, `PMO`")

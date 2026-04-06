@@ -66,10 +66,9 @@ fun <B : SafeEmbedMessageBuilder<B>, R : Record<C>?, C : Category> B.embedCatego
     supportedCategories: Collection<C> = emptyList()
 ): B {
     return embedRecords(
-        records = records.map { cr -> cr.copy(categories = cr.categories.sortedBy { it as? Comparable<Any> }.toCollection(LinkedHashSet())) }
-            .sortedWith(
-                compareBy(nullsLast(naturalOrder())) { it.categories.firstOrNull() as? Comparable<Any> }
-            ),
+        records = records.sortedWith(
+            compareBy(nullsLast()) { it.categories.minByOrNull { c -> c as Comparable<Any> } as? Comparable<Any> }
+        ),
         supportedCategories = supportedCategories,
         formatCategorySpecific = true
     )
@@ -129,6 +128,29 @@ fun <T> Iterable<T>.allMinsWith(comparator: Comparator<in T>): List<T> {
         }
     }
     return result
+}
+
+fun <T> Iterable<T>.paretoFrontierWith(comparators: Collection<Comparator<in T>>): List<T> {
+    val frontier = mutableListOf<T>()
+    candidates@ for (candidate in this) {
+        val iter = frontier.listIterator()
+        while (iter.hasNext()) {
+            val point = iter.next()
+            val compares = comparators.map { it.compare(candidate, point) }
+            val identical = compares.all { it == 0 }
+            if (identical) {
+                break
+            }
+            if (compares.all { it <= 0 }) {
+                iter.remove()
+            }
+            else if (compares.all { it >= 0 }) {
+                continue@candidates
+            }
+        }
+        frontier.add(candidate)
+    }
+    return frontier
 }
 
 inline fun <reified T : Enum<T>> newEnumSet(): EnumSet<T> = EnumSet.noneOf(T::class.java)
