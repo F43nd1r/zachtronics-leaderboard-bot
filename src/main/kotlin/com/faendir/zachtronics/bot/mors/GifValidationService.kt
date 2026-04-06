@@ -18,7 +18,7 @@ package com.faendir.zachtronics.bot.mors
 
 import net.bramp.ffmpeg.FFprobe
 import net.bramp.ffmpeg.probe.FFmpegProbeResult
-import net.bramp.ffmpeg.probe.FFmpegStream
+import net.bramp.ffmpeg.shared.CodecType
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.File
@@ -54,7 +54,7 @@ class GifValidationService(private val ffprobe: FFprobe = FFprobe()) {
 
         val probe = probe(gif)
         val format = probe.format
-        val stream = probe.streams?.firstOrNull { it.codec_type == FFmpegStream.CodecType.VIDEO }
+        val stream = probe.streams?.firstOrNull { it.codec_type == CodecType.VIDEO }
 
         if (format == null || stream == null) {
             logger.debug("GIF rejected: missing format or video stream")

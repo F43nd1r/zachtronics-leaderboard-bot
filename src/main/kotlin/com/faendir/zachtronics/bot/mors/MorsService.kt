@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,7 @@ import net.bramp.ffmpeg.builder.FFmpegBuilder
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
+import org.springframework.http.*
 import org.springframework.stereotype.Service
 import org.springframework.web.client.exchange
 import java.io.File
@@ -87,7 +83,8 @@ class MorsService(private val morsProperties: MorsProperties, restTemplateBuilde
         input.writeBytes(gif)
         val output = File.createTempFile("output", ".mp4")
         val builder = FFmpegBuilder()
-            .setInput(input.canonicalPath)
+            .addInput(input.canonicalPath)
+            .done()
             .overrideOutputFiles(true)
             .addOutput(output.canonicalPath)
             .setVideoMovFlags("faststart")
