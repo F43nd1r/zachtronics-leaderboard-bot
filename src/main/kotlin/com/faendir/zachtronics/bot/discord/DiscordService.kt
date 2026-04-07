@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.discord
 
 import com.faendir.zachtronics.bot.discord.command.Command
+import com.faendir.zachtronics.bot.utils.completeName
 import com.faendir.zachtronics.bot.utils.editReplyWithFailure
 import com.fasterxml.jackson.databind.ObjectMapper
 import discord4j.core.GatewayDiscordClient
@@ -68,7 +69,7 @@ class DiscordService(
                 throw IllegalArgumentException("sorry, you do not have the permission to use this command.")
             }
             command.handle(event).awaitSingleOrNull()
-            logger.info("Handled ${event.commandName} by ${event.interaction.user.username}")
+            logger.info("Handled \"${event.completeName}\" by ${event.interaction.user.username}")
         }
         discordClient.on(ChatInputAutoCompleteEvent::class.java) { event ->
             mono {

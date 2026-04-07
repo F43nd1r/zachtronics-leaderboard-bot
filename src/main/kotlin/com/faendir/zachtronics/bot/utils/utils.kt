@@ -24,8 +24,10 @@ import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.repository.CategoryRecord
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
 import discord4j.core.event.domain.interaction.InteractionCreateEvent
+import discord4j.core.`object`.command.ApplicationCommandOption
 import discord4j.core.`object`.entity.Message
 import discord4j.core.`object`.entity.User
 import discord4j.core.spec.EmbedCreateFields
@@ -103,6 +105,17 @@ fun DeferrableInteractionEvent.editReplyWithFailure(message: String?) =
             .description(message?.truncateWithEllipsis(EmbedLimits.DESCRIPTION) ?: "Something went wrong")
             .build()
     ).then()
+
+val ChatInputInteractionEvent.completeName: String
+    get() {
+        var ret = commandName
+        var opt = options.singleOrNull { it.type == ApplicationCommandOption.Type.SUB_COMMAND }
+        while (opt != null) {
+            ret += " ${opt.name}"
+            opt = opt.options.singleOrNull { it.type == ApplicationCommandOption.Type.SUB_COMMAND }
+        }
+        return ret
+    }
 
 fun String.truncateWithEllipsis(maxLength: Int) = if (length > maxLength) substring(0, maxLength - 1) + "…" else this
 
