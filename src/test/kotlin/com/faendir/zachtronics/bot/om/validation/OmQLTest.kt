@@ -21,6 +21,9 @@ import com.faendir.zachtronics.bot.om.model.OmMetrics
 import com.faendir.zachtronics.bot.om.validation.OmQL.QueryElement
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
+import strikt.api.expectDoesNotThrow
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.contains
@@ -32,10 +35,11 @@ class OmQLTest {
 
     private val possibleMetrics = OmMetrics.FULL_SCORE + OmMetrics.COMPUTED_BY_TYPE.values.flatten()
 
+    private fun parse(query: String): List<QueryElement> = OmQL.parseQuery(query, possibleMetrics)
+
     @Test
     fun `valid C`() {
-        val query = "C"
-        val elements = OmQL.parseQuery(query, possibleMetrics)
+        val elements = parse("C")
         expectThat(elements).hasSize(2) // NOVERLAP + C
         expectThat(elements[0]).isA<QueryElement.Constraint>()
         expectThat((elements[0] as QueryElement.Constraint).metric).isEqualTo(NOVERLAP)
@@ -45,8 +49,7 @@ class OmQLTest {
 
     @Test
     fun `valid O`() {
-        val query = "O"
-        val elements = OmQL.parseQuery(query, possibleMetrics)
+        val elements = parse("O")
         expectThat(elements).hasSize(1) // OVERLAP
         expectThat(elements[0]).isA<QueryElement.Min>()
         expectThat((elements[0] as QueryElement.Min).metric).isEqualTo(OVERLAP)
@@ -54,8 +57,7 @@ class OmQLTest {
 
     @Test
     fun `valid CA`() {
-        val query = "CA"
-        val elements = OmQL.parseQuery(query, possibleMetrics)
+        val elements = parse("CA")
         expectThat(elements).hasSize(3) // NOVERLAP + C + A
         expectThat(elements[1]).isA<QueryElement.Min>()
         expectThat((elements[1] as QueryElement.Min).metric).isEqualTo(CYCLES)
@@ -65,8 +67,7 @@ class OmQLTest {
 
     @Test
     fun `valid {C=3}`() {
-        val query = "{C=3}"
-        val elements = OmQL.parseQuery(query, possibleMetrics)
+        val elements = parse("{C=3}")
         expectThat(elements).hasSize(2) // NOVERLAP + {C=3}
         expectThat(elements[1]).isA<QueryElement.Constraint>()
         expectThat((elements[1] as QueryElement.Constraint).metric.scoreParts).contains(CYCLES)
@@ -74,8 +75,7 @@ class OmQLTest {
 
     @Test
     fun `valid (CA)`() {
-        val query = "(CA)"
-        val elements = OmQL.parseQuery(query, possibleMetrics)
+        val elements = parse("(CA)")
         expectThat(elements).hasSize(2) // NOVERLAP + (CA)
         expectThat(elements[1]).isA<QueryElement.Pareto>()
         expectThat((elements[1] as QueryElement.Pareto).metrics).isEqualTo(listOf(CYCLES, AREA))
@@ -83,8 +83,7 @@ class OmQLTest {
 
     @Test
     fun `valid C{A=3}(BH)`() {
-        val query = "C{A=3}(BH)"
-        val elements = OmQL.parseQuery(query, possibleMetrics)
+        val elements = parse("C{A=3}(BH)")
         expectThat(elements).hasSize(4) // NOVERLAP + C + {A=3} + (BH)
         expectThat(elements[1]).isA<QueryElement.Min>()
         expectThat((elements[1] as QueryElement.Min).metric).isEqualTo(CYCLES)
@@ -97,8 +96,7 @@ class OmQLTest {
     @Test
     @DisplayName("valid {W<=3.5}")
     fun `non integer constraint`() {
-        val query = "{W<=3.5}"
-        val elements = OmQL.parseQuery(query, possibleMetrics)
+        val elements = parse("{W<=3.5}")
         expectThat(elements).hasSize(2) // NOVERLAP + {W<=3.5}
         expectThat(elements[1]).isA<QueryElement.Constraint>()
         expectThat((elements[1] as QueryElement.Constraint).metric).isA<Computed<*>>()
@@ -108,8 +106,7 @@ class OmQLTest {
     @Test
     @DisplayName("valid [C*A]")
     fun `valid square 1`() {
-        val query = "[C*A]"
-        val elements = OmQL.parseQuery(query, possibleMetrics)
+        val elements = parse("[C*A]")
         expectThat(elements).hasSize(2) // NOVERLAP + [C*A]
         expectThat(elements[1]).isA<QueryElement.Min>()
         expectThat((elements[1] as QueryElement.Min).metric).isA<Computed<*>>()
@@ -119,8 +116,7 @@ class OmQLTest {
     @Test
     @DisplayName("valid [C+[A*B]]")
     fun `valid square 2`() {
-        val query = "[C+[A*B]]"
-        val elements = OmQL.parseQuery(query, possibleMetrics)
+        val elements = parse("[C+[A*B]]")
         expectThat(elements).hasSize(2) // NOVERLAP + [C+A]
         expectThat(elements[1]).isA<QueryElement.Min>()
         expectThat((elements[1] as QueryElement.Min).metric).isA<Computed<*>>()
@@ -130,8 +126,7 @@ class OmQLTest {
     @Test
     @DisplayName("valid {[A*B]<=30}")
     fun `nested custom metric in constraint`() {
-        val query = "{[A*B]<=30}"
-        val elements = OmQL.parseQuery(query, possibleMetrics)
+        val elements = parse("{[A*B]<=30}")
         expectThat(elements).hasSize(2) // NOVERLAP + {[A*B]<=30}
         expectThat(elements[1]).isA<QueryElement.Constraint>()
         expectThat((elements[1] as QueryElement.Constraint).metric).isA<Computed<*>>()
@@ -141,8 +136,7 @@ class OmQLTest {
     @Test
     @DisplayName("valid ([[A*B]+C]HW)")
     fun `nested custom metric in pareto`() {
-        val query = "([[A*B]+C]HW)"
-        val elements = OmQL.parseQuery(query, possibleMetrics)
+        val elements = parse("([[A*B]+C]HW)")
         expectThat(elements).hasSize(2) // NOVERLAP + ([C+[A*B]]HW)
         expectThat(elements[1]).isA<QueryElement.Pareto>()
         expectThat((elements[1] as QueryElement.Pareto).metrics[0]).isA<Computed<*>>()
@@ -151,28 +145,27 @@ class OmQLTest {
         expectThat((elements[1] as QueryElement.Pareto).metrics[2]).isEqualTo(WIDTH)
     }
 
-    @Test
-    @DisplayName("throws [C*A")
-    fun `throws missing square bracket`() {
-        val query = "[C*A"
-        expectThrows<IllegalArgumentException> {
-            OmQL.parseQuery(query, possibleMetrics)
+    @ParameterizedTest(name = "{0}")
+    @ValueSource(strings = ["[0-C]", "(CGAI)", "[C]", "[!T]", "[!!T]"])
+    fun `valid stuff`(query: String) {
+        expectDoesNotThrow {
+            parse(query)
         }
     }
 
-    @Test
-    fun `throws (CA`() {
-        val query = "(CA"
+    @ParameterizedTest(name = "{0}")
+    @ValueSource(strings = ["[C*A", "(CA", "U", "{CG}", "}", "{C}"])
+    fun `invalid stuff`(query: String) {
         expectThrows<IllegalArgumentException> {
-            OmQL.parseQuery(query, possibleMetrics)
-        }
+            parse(query)
+        }.subject.printStackTrace()
     }
 
-    @Test
-    fun `throws U`() {
-        val query = "U"
+    @ParameterizedTest(name = "[{0}]")
+    @ValueSource(strings = ["", "*", "+", "+T", "!C", "C+"])
+    fun `invalid expressions`(query: String) {
         expectThrows<IllegalArgumentException> {
-            OmQL.parseQuery(query, possibleMetrics)
-        }
+            parse("[$query]")
+        }.subject.printStackTrace()
     }
 }

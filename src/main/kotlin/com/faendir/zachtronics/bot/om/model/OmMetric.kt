@@ -123,7 +123,10 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
         override val description: String = subMetrics.joinToString("·") { it.description }
     }
 
-    sealed class Not(final override val displayName: String, private val modifier: Modifier) : Computed<Boolean> {
+    sealed class Not(
+        private val modifier: Modifier,
+        final override val displayName: String = "!${modifier.displayName}"
+    ) : Computed<Boolean> {
         override val collapsible: Boolean = modifier.collapsible
         override val measurePoint = modifier.measurePoint
         override val subMetrics: Array<out ScorePart<*>> = arrayOf(modifier)
@@ -184,7 +187,7 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
     data object LOOPING : Modifier("L", MeasurePoint.VICTORY, OmScore::looping, reverseOrder = true)
 
     data object ANYTHING_GOES : Constant<Boolean>("O", true)
-    data object NOVERLAP : Not("", OVERLAP)
+    data object NOVERLAP : Not(OVERLAP, displayName = "")
     data object NOVERLAP_TRACKLESS : And(NOVERLAP, TRACKLESS)
 
     data object SUM3A : Sum("Sum", COST, CYCLES, AREA)
@@ -217,7 +220,7 @@ fun Iterable<OmMetric<*>>.findMeasurePoint(): MeasurePoint {
         return points.first()
     }
     if (points.size == 2 && points.contains(MeasurePoint.START)) {
-        return points.find { it != MeasurePoint.START  }!!
+        return points.find { it != MeasurePoint.START }!!
     }
     throw IllegalStateException("Incoherent metric set")
 }

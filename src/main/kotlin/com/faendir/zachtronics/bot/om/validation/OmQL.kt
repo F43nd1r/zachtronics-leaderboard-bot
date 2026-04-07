@@ -19,14 +19,12 @@ package com.faendir.zachtronics.bot.om.validation
 import com.faendir.zachtronics.bot.om.model.OmMetric
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.repository.OmMemoryRecord
-import com.faendir.zachtronics.bot.utils.InfinInt
-import com.faendir.zachtronics.bot.utils.LevelValue
-import com.faendir.zachtronics.bot.utils.allMinsWith
-import com.faendir.zachtronics.bot.utils.paretoFrontierWith
+import com.faendir.zachtronics.bot.utils.*
+import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
+import java.text.NumberFormat
+import java.text.ParsePosition
+import java.util.*
 import kotlin.math.pow
-import kotlin.reflect.KType
-import kotlin.reflect.jvm.ExperimentalReflectionOnLambdas
-import kotlin.reflect.jvm.reflect
 
 
 /**
@@ -36,7 +34,7 @@ import kotlin.reflect.jvm.reflect
  * - `X`: Select records with the minimum value of metric `X`.
  * - `(XYZ)`: Select records on the Pareto frontier of metrics `X`, `Y`, and `Z`.
  * - `{X=val}`: Filter records where metric `X` equals `val`. Supports `==`, `!=`, `<`, `>`, `<=`, `>=`, `&&`.
- * - `[A*B]`: Define a computed metric. Can be used inside other constructs, e.g., `{[A+B]<100}` or `[A*B]` (to minimize the product).
+ * - `[A*B]`: Define a custom metric. Can be used inside other constructs, e.g., `{[A+B]<100}` or `[A*B]` (to minimize the product).
  * - `true`/`false`: Boolean constants.
  * - `123`: Numeric constants.
  *
@@ -44,7 +42,7 @@ import kotlin.reflect.jvm.reflect
  * If no overlap-related constraint or minimization is specified, `{O=false}` is added automatically.
  *
  * Examples:
- * - `CG{A<3}`: Among records with Area < 3, find the minimum Cost, then minimum Cycles.
+ * - `CG{A<8}`: Among records with minimum Cost then minimum Cycles, filter for Area < 8.
  * - `(CSum)`: Find the Pareto frontier of Cycles and Sum.
  * - `{[C+G]<500}A`: Among records where Cost + Cycles < 500, find the minimum Area.
  * - `[C*G]`: Find the record(s) with the minimum product of Cost and Cycles.
@@ -64,7 +62,7 @@ internal object OmQL {
             }
 
             override fun toString() =
-                if (metric.displayName.length <= 1) metric.displayName else "[${metric.description}]"
+                if (metric.displayName.length <= 1) metric.displayName else "[${metric.displayName}]"
         }
 
         class Pareto(override val metrics: List<OmMetric<*>>) : QueryElement {
@@ -72,15 +70,16 @@ internal object OmQL {
                 return records.paretoFrontierWith(metrics.map { m -> compareBy(m.comparator) { it.record.score } })
             }
 
-            override fun toString() = metrics.joinToString("", "(", ")") { it.displayName }
+            override fun toString() =
+                metrics.joinToString("", "(", ")") { it.displayName.runIf(it is OmMetric.Computed<*>) { "[$this]" } }
         }
 
-        class Constraint(val metric: OmMetric<*>) : QueryElement {
+        class Constraint(val metric: OmMetric<Boolean>) : QueryElement {
             override val metrics: Collection<OmMetric<*>>
                 get() = listOf(metric)
 
             override fun filter(records: Collection<OmMemoryRecord>): List<OmMemoryRecord> {
-                return records.filter { r -> metric.getValueAsDouble(r.record.score)?.let { it != 0.0 } ?: false }
+                return records.filter { r -> metric.getValueFrom(r.record.score) ?: false }
             }
 
             override fun toString() = if (metric.description.isNotEmpty()) "{${metric.description}}" else ""
@@ -90,7 +89,7 @@ internal object OmQL {
     internal fun parseQuery(query: String, possibleMetrics: List<OmMetric<*>>): List<QueryElement> {
         val elements = mutableListOf<QueryElement>()
         var idx = 0
-        val stack = ArrayDeque<Char>() // contains close brackets
+        var inPareto = false
 
         val currMetrics = mutableListOf<OmMetric<*>>()
         fun unloadMetrics() {
@@ -102,43 +101,35 @@ internal object OmQL {
             when (query[idx]) {
                 '{' -> { // {X=val} or {X <= val}
                     unloadMetrics()
-                    stack.addLast('}')
-                    idx++
-                }
-
-                '}' -> {
-                    if (stack.lastOrNull() != '}')
-                        throw IllegalArgumentException("Missing opening } in query: $query")
-                    stack.removeLast()
-                    currMetrics.forEach { elements.add(QueryElement.Constraint(it)) }
-                    currMetrics.clear()
-                    idx++
+                    val (foundMetric, size) = parseCustomMetric(query, idx + 1, '}', possibleMetrics)
+                    elements.add(QueryElement.Constraint(foundMetric.asComputed<Boolean>(context = "Constraint")))
+                    idx += size + 2
                 }
 
                 '(' -> { // (AB) as pareto
                     unloadMetrics()
-                    stack.addLast(')')
+                    inPareto = true
                     idx++
                 }
 
                 ')' -> {
-                    if (stack.lastOrNull() != ')')
+                    if (!inPareto)
                         throw IllegalArgumentException("Missing opening ) in query: $query")
-                    stack.removeLast()
+                    inPareto = false
                     elements.add(QueryElement.Pareto(currMetrics.toList()))
                     currMetrics.clear()
                     idx++
                 }
 
                 else -> { // XYZ or [A*B] as computed metric
-                    val (foundMetric, end) = parseMetric(query.substring(idx), possibleMetrics, stack)
+                    val (foundMetric, size) = parseMetric(query, idx, possibleMetrics)
                     currMetrics.add(foundMetric)
-                    idx += end
+                    idx += size
                 }
             }
         }
-        if (stack.isNotEmpty())
-            throw IllegalArgumentException("Missing closing ${stack.joinToString("")} in query: $query")
+        if (inPareto)
+            throw IllegalArgumentException("Missing closing ) in query: $query")
         unloadMetrics()
 
         if (elements.none { qe -> OmMetric.OVERLAP in qe.metrics.flatMap { it.scoreParts } }) {
@@ -148,106 +139,218 @@ internal object OmQL {
     }
 
     private fun parseMetric(
-        query: String, possibleMetrics: List<OmMetric<*>>, stack: ArrayDeque<Char>
+        query: String, idx: Int, possibleMetrics: List<OmMetric<*>>
     ): Pair<OmMetric<*>, Int> {
-        val last = stack.lastOrNull()
-        if (last == ']' || last == '}') {
-            var (m, end) = parseCustomMetric(query, possibleMetrics, last)
-            if (last == ']') {
-                stack.removeLast()
-                end++
-            }
-            return m to end
+        if (query[idx] == '[') {
+            return parseCustomMetric(query, idx + 1, ']', possibleMetrics).let { (m, s) -> m to s + 2 }
         }
-        if (query[0] == '[') {
-            stack.addLast(']')
-            return parseMetric(query.substring(1), possibleMetrics, stack).let { (m, s) -> m to s + 1 }
-        }
-        return parseSingleMetric(query, possibleMetrics)
+        return parseSingleMetric(query.substring(idx), possibleMetrics)
     }
+
+    private val TRUE = OmMetric.Constant("true", true)
+    private val FALSE = OmMetric.Constant("false", false)
+    private val NUMBER_FORMAT = NumberFormat.getInstance(Locale.ENGLISH)
 
     private fun parseSingleMetric(
         query: String, possibleMetrics: List<OmMetric<*>>
     ): Pair<OmMetric<*>, Int> {
         if (query.startsWith("false", ignoreCase = true)) {
-            return OmMetric.Constant("false", false) to "false".length
+            return FALSE to "false".length
         }
         if (query.startsWith("true", ignoreCase = true)) {
-            return OmMetric.Constant("true", true) to "true".length
+            return TRUE to "true".length
         }
         val metric = possibleMetrics.firstOrNull { query.startsWith(it.displayName, ignoreCase = true) }
         if (metric != null) {
             return metric to metric.displayName.length
         }
-        val match = Regex("""^[-+\d.]+""").find(query)
-        if (match != null) {
-            return OmMetric.Constant(match.value, match.value.toDouble()) to match.range.last + 1
+        val pp = ParsePosition(0)
+        val number = NUMBER_FORMAT.parse(query, pp)
+        if (number != null) {
+            return OmMetric.Constant(number.toString(), number.toDouble()) to pp.index
         }
         throw IllegalArgumentException("Unknown metric(s): $query")
     }
 
-    private fun parseCustomMetric(
-        query: String, possibleMetrics: List<OmMetric<*>>, boundary: Char
-    ): Pair<OmMetric.Computed<Double>, Int> {
-        var idx = 0
-        val metrics = mutableListOf<OmMetric<*>>()
-        val operators = mutableListOf<(Double, Double) -> Double>()
-        while (idx < query.length) {
-            val (metric, size) = parseMetric(query.substring(idx), possibleMetrics, ArrayDeque())
-            idx += size
-            metrics.add(metric)
-            if (idx >= query.length) throw IllegalArgumentException("Missing closing $boundary in query: $query")
-            if (query[idx] == boundary) break
+    private sealed interface Operator {
+        sealed interface Unary<T : Comparable<T>> : Operator {
+            val func: (T) -> T
 
-            fun load(op: (Double, Double) -> Double, size: Int) {
-                operators.add(op)
-                idx += size
+            sealed class UnaryBoolean(override val func: (Boolean) -> Boolean) : Unary<Boolean> {
+                data object NOT : UnaryBoolean(Boolean::not)
             }
-            when {
-                query.startsWith("==", idx) -> load({ a, b -> if (a == b) 1.0 else 0.0 }, 2)
-                query.startsWith("!=", idx) -> load({ a, b -> if (a != b) 1.0 else 0.0 }, 2)
-                query.startsWith("<=", idx) -> load({ a, b -> if (a <= b) 1.0 else 0.0 }, 2)
-                query.startsWith(">=", idx) -> load({ a, b -> if (a >= b) 1.0 else 0.0 }, 2)
-                query.startsWith("&&", idx) -> load({ a, b -> if (a != 0.0 && b != 0.0) 1.0 else 0.0 }, 2)
-                query.startsWith("=", idx) -> load({ a, b -> if (a == b) 1.0 else 0.0 }, 1)
-                query.startsWith("<", idx) -> load({ a, b -> if (a < b) 1.0 else 0.0 }, 1)
-                query.startsWith(">", idx) -> load({ a, b -> if (a > b) 1.0 else 0.0 }, 1)
-                query.startsWith("+", idx) -> load(Double::plus, 1)
-                query.startsWith("-", idx) -> load(Double::minus, 1)
-                query.startsWith("*", idx) -> load(Double::times, 1)
-                query.startsWith("/", idx) -> load(Double::div, 1)
-                else -> throw IllegalArgumentException("Invalid operator")
+
+            sealed class UnaryDouble(override val func: (Double) -> Double) : Unary<Double> {
+                data object PLUS : UnaryDouble(Double::unaryPlus)
+                data object MINUS : UnaryDouble(Double::unaryMinus)
             }
         }
 
-        val descr = query.substring(0, idx)
-        return object : OmMetric.Computed<Double> {
+        sealed interface Binary<I> : Operator {
+            val func: (I, I) -> Comparable<*>
+
+            sealed class BinaryAny(override val func: (Any, Any) -> Boolean) : Binary<Any> {
+                data object EQ : BinaryAny(Any::equals)
+                data object NE : BinaryAny({ a, b -> a != b })
+            }
+
+            sealed class BinaryBoolean(override val func: (Boolean, Boolean) -> Boolean) : Binary<Boolean> {
+                data object AND : BinaryBoolean(Boolean::and)
+                data object OR : BinaryBoolean(Boolean::or)
+            }
+
+            sealed class BinaryDouble(override val func: (Double, Double) -> Comparable<*>) : Binary<Double> {
+                data object LT : BinaryDouble({ a, b -> a < b })
+                data object GT : BinaryDouble({ a, b -> a > b })
+                data object LE : BinaryDouble({ a, b -> a <= b })
+                data object GE : BinaryDouble({ a, b -> a >= b })
+
+                data object PLUS : BinaryDouble(Double::plus)
+                data object MINUS : BinaryDouble(Double::minus)
+                data object TIMES : BinaryDouble(Double::times)
+                data object DIV : BinaryDouble(Double::div)
+                data object REM : BinaryDouble(Double::rem)
+                data object POW : BinaryDouble(Double::pow)
+            }
+        }
+    }
+
+    private enum class Token {
+        METRIC, UNARY_OP, BINARY_OP,
+    }
+
+    private fun parseCustomMetric(
+        query: String, startIdx: Int, boundary: Char, possibleMetrics: List<OmMetric<*>>
+    ): Pair<OmMetric.Computed<*>, Int> {
+        var idx = startIdx
+        val operators = mutableListOf<Operator>()
+        val metrics = mutableListOf<OmMetric<*>>()
+
+        fun tryReadUnary(): Boolean {
+            val op = when (query[idx]) {
+                '+' -> Operator.Unary.UnaryDouble.PLUS
+                '-' -> Operator.Unary.UnaryDouble.MINUS
+                '!' -> Operator.Unary.UnaryBoolean.NOT
+                else -> return false
+            }
+            idx += 1
+            operators.add(op)
+            return true
+        }
+
+        fun tryReadBinary(): Boolean {
+            val op = when {
+                query.startsWith("==", idx) -> { idx += 2; Operator.Binary.BinaryAny.EQ }
+                query.startsWith("!=", idx) -> { idx += 2; Operator.Binary.BinaryAny.NE }
+                query.startsWith("<=", idx) -> { idx += 2; Operator.Binary.BinaryDouble.LE }
+                query.startsWith(">=", idx) -> { idx += 2; Operator.Binary.BinaryDouble.GE }
+                query.startsWith("**", idx) -> { idx += 2; Operator.Binary.BinaryDouble.POW }
+                query.startsWith("&&", idx) -> { idx += 2; Operator.Binary.BinaryBoolean.AND }
+                query.startsWith("||", idx) -> { idx += 2; Operator.Binary.BinaryBoolean.OR }
+                query.startsWith("=", idx) -> { idx += 1; Operator.Binary.BinaryAny.EQ }
+                query.startsWith("<", idx) -> { idx += 1; Operator.Binary.BinaryDouble.LT }
+                query.startsWith(">", idx) -> { idx += 1; Operator.Binary.BinaryDouble.GT }
+                query.startsWith("+", idx) -> { idx += 1; Operator.Binary.BinaryDouble.PLUS }
+                query.startsWith("-", idx) -> { idx += 1; Operator.Binary.BinaryDouble.MINUS }
+                query.startsWith("*", idx) -> { idx += 1; Operator.Binary.BinaryDouble.TIMES }
+                query.startsWith("/", idx) -> { idx += 1; Operator.Binary.BinaryDouble.DIV }
+                query.startsWith("%", idx) -> { idx += 1; Operator.Binary.BinaryDouble.REM }
+                else -> return false
+            }
+            operators.add(op)
+            return true
+        }
+
+        var allowedTokens = EnumSet.of(Token.METRIC, Token.UNARY_OP)
+
+        while (true) {
+            if (allowedTokens.contains(Token.UNARY_OP)) {
+                if (tryReadUnary()) {
+                    allowedTokens = EnumSet.of(Token.METRIC, Token.UNARY_OP)
+                    continue
+                }
+            }
+            if (allowedTokens.contains(Token.BINARY_OP)) {
+                if (tryReadBinary()) {
+                    allowedTokens = EnumSet.of(Token.METRIC, Token.UNARY_OP)
+                    continue
+                }
+            }
+            if (allowedTokens.contains(Token.METRIC)) {
+                // either works or we throw
+                val (metric, size) = parseMetric(query, idx, possibleMetrics)
+                idx += size
+                metrics.add(metric)
+                allowedTokens = EnumSet.of(Token.BINARY_OP)
+                if (idx >= query.length)
+                    throw IllegalArgumentException("Missing closing $boundary in query: $query")
+                if (query[idx] == boundary)
+                    break
+                continue
+            }
+            throw IllegalArgumentException("Unknown token in query: $query")
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        val expression: (OmScore) -> Comparable<Any>? = l@{ s ->
+            val metricIt = metrics.iterator()
+            var res = metricIt.next().getValueFrom(s) ?: return@l null
+            for (op in operators) {
+                val context = op::class.simpleName
+                res = when (op) {
+                    is Operator.Unary.UnaryBoolean -> op.func(res.booleanOrBust(context))
+                    is Operator.Unary.UnaryDouble -> op.func(res.doubleOrBust(context))
+                    is Operator.Binary<*> -> {
+                        val next = metricIt.next().getValueFrom(s) ?: return@l null
+                        when (op) {
+                            is Operator.Binary.BinaryBoolean -> op.func(res.booleanOrBust(context), next.booleanOrBust(context))
+                            is Operator.Binary.BinaryDouble -> op.func(res.doubleOrBust(context), next.doubleOrBust(context))
+                            is Operator.Binary.BinaryAny -> op.func(res, next)
+                        }
+                    }
+                }
+            }
+            res as Comparable<Any>
+        }
+        // if it throws it throws here
+        expression(allOnes)
+
+        val descr = query.substring(startIdx, idx)
+        return object : OmMetric.Computed<Comparable<Any>> {
             override val subMetrics: Array<out OmMetric<*>> = metrics.toTypedArray()
             override val description = descr
-            override val getValueFrom: (OmScore) -> Double? = l@{ s ->
-                var ret = metrics[0].getValueAsDouble(s) ?: return@l null
-                for (i in operators.indices) {
-                    val next = metrics[i + 1].getValueAsDouble(s) ?: return@l null
-                    ret = operators[i](ret, next)
-                }
-                ret
-            }
             override val displayName = descr
-        } to idx
+            override val getValueFrom = expression
+        } to idx - startIdx
     }
 
-    private fun OmMetric<*>.getValueAsDouble(score: OmScore): Double? {
-        val value = getValueFrom(score) ?: return null
-        return when (value) {
-            is Boolean -> if (value) 1.0 else 0.0
-            is Number -> value.toDouble()
-            is InfinInt -> value.toDouble()
-            is LevelValue -> value.level * 10.0.pow(5) + value.value
-            else -> throw IllegalArgumentException("Wat is $value")
+    private fun Any.booleanOrBust(context: String? = null): Boolean {
+        return when (this) {
+            is Boolean -> this
+            else -> throw IllegalArgumentException("Invalid type: ${this::class.simpleName}" + (context?.let { " for $it" } ?: ""))
         }
     }
 
-    @OptIn(ExperimentalReflectionOnLambdas::class)
-    private val OmMetric<*>.type: KType
-        get() = getValueFrom.reflect()!!.returnType
+    private fun Any.doubleOrBust(context: String? = null): Double {
+        return when (this) {
+            is Number -> toDouble()
+            is InfinInt -> toDouble()
+            is LevelValue -> 10.0.pow(5 * level) + value
+            else -> throw IllegalArgumentException("Invalid type: ${this::class.simpleName}" + (context?.let { " for $it" } ?: ""))
+        }
+    }
+
+    private val allOnes = OmScore(
+        1, 1, overlap = true, trackless = true,
+        1, 1, 1, 1.0, 1,
+        1.0, 1.toLevelValue(), 1.toInfinInt(), 1.0, 1.toInfinInt()
+    )
+
+    private inline fun <reified T : Comparable<T>> OmMetric.Computed<*>.asComputed(context: String? = null): OmMetric.Computed<T> {
+        @Suppress("UNCHECKED_CAST")
+        when (val v = getValueFrom(allOnes)!!) {
+            is T -> return this as OmMetric.Computed<T>
+            else -> throw IllegalArgumentException("Invalid type: ${v::class.simpleName}" + (context?.let { " for $it" } ?: ""))
+        }
+    }
 }
