@@ -6,9 +6,9 @@
     "dependencies": {
         "@emotion/react": "11.14.0",
         "@emotion/styled": "11.14.1",
-        "@mui/icons-material": "7.3.9",
+        "@mui/icons-material": "7.3.10",
         "@mui/lab": "7.0.0",
-        "@mui/material": "7.3.9",
+        "@mui/material": "7.3.10",
         "@mui/styles": "6.4.8",
         "@sinclair/typebox": "0.34.49",
         "d3-format": "3.1.2",
