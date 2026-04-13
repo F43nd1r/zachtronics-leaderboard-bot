@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.git
 
-import com.faendir.zachtronics.bot.testutils.expectRuns
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.google.common.hash.Hashing
 import io.mockk.every
@@ -25,6 +24,7 @@ import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
+import strikt.api.expectDoesNotThrow
 import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
 
@@ -57,7 +57,9 @@ class GithubWebhookControllerTest {
 
     @Test
     fun `should accept ping`() {
-        expectRuns { githubWebhookController.reportPush("", "sha256=${hashFunction.hashString("", Charsets.UTF_8)}", "ping") }
+        expectDoesNotThrow {
+            githubWebhookController.reportPush("", "sha256=${hashFunction.hashString("", Charsets.UTF_8)}", "ping")
+        }
     }
 
     @Test
