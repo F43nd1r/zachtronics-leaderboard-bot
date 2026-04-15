@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.model
 
-import java.io.InputStream
 import java.nio.file.Path
 
 /** Read interface, used to store data from the repositories that needs to be displayed */
@@ -35,7 +34,4 @@ interface Record<C : Category> {
     val dataPath: Path?
 
     fun toDisplayString(context: DisplayContext<C>): String
-
-    /** Override for games whose [displayLink] does not embed on Discord, to add an attachment to show */
-    fun attachments(): List<Pair<String, InputStream>> = emptyList()
 }

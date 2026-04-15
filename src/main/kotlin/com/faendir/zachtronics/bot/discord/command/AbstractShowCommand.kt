@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,7 @@ import com.faendir.zachtronics.bot.discord.command.security.NotSecured
 import com.faendir.zachtronics.bot.discord.embed.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.discord.embed.SafeMessageBuilder
 import com.faendir.zachtronics.bot.discord.embed.SafePlainMessageBuilder
-import com.faendir.zachtronics.bot.model.Category
-import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.model.Puzzle
-import com.faendir.zachtronics.bot.model.Record
-import com.faendir.zachtronics.bot.model.StringFormat
+import com.faendir.zachtronics.bot.model.*
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.utils.Markdown
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
@@ -53,11 +49,10 @@ abstract class AbstractShowCommand<C : Category, P : Puzzle<C>, R : Record<C>> :
             }
             SafePlainMessageBuilder()
                 .content(lines.joinToString("\n"))
-                .files(record.attachments())
         } else {
             MultiMessageSafeEmbedMessageBuilder()
-                .title("No score")
-                .description("sorry, there is no score for ${puzzle.displayName} ${category.displayName}.")
+                .title("No solution")
+                .description("sorry, there is no solution for ${puzzle.displayName} ${category.displayName}.")
                 .color(Colors.UNCHANGED)
         }
     }
