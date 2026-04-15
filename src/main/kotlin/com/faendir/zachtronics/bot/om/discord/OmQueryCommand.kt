@@ -23,6 +23,8 @@ import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured
 import com.faendir.zachtronics.bot.discord.embed.PaginatedSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.discord.embed.SafeMessageBuilder
+import com.faendir.zachtronics.bot.discord.embed.SafePlainMessageBuilder
+import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.OmMetrics
 import com.faendir.zachtronics.bot.om.omMeasurePointOptionBuilder
@@ -32,8 +34,10 @@ import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.om.validation.OmQL
 import com.faendir.zachtronics.bot.utils.Markdown
 import com.faendir.zachtronics.bot.utils.embedRecords
+import com.faendir.zachtronics.bot.utils.smartFormat
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 @OmQualifier
@@ -63,10 +67,22 @@ class OmQueryCommand(private val repository: OmSolutionRepository, val discordAc
 
         val queryElements = OmQL.parseQuery(query.replace(" ", ""), possibleMetrics)
         val records = queryElements.fold(data) { acc, el -> el.filter(acc) }
-        val name = Markdown.escape(queryElements.joinToString(""))
+        val name = Markdown.escape(queryElements.joinToString("")) + measurePoint.displayName
 
-        return PaginatedSafeEmbedMessageBuilder(discordActionCache)
-            .title("*${puzzle.displayName}* $name${measurePoint.displayName}")
+        return if (records.size == 1) {
+            val record = records.first().record
+            val categories = records.first().categories
+
+            val lines = StringJoiner("\n")
+            lines.add(Markdown.linkOrText("***${puzzle.displayName}***", puzzle.link, embed = false) + " **$name**")
+            if (categories.isNotEmpty())
+                lines.add("**${categories.smartFormat(puzzle.supportedCategories)}**")
+            lines.add(record.toDisplayString(DisplayContext.discord()))
+            SafePlainMessageBuilder()
+                .content(lines.toString())
+        }
+        else PaginatedSafeEmbedMessageBuilder(discordActionCache)
+            .title("*${puzzle.displayName}* $name")
             .url(puzzle.link)
             .color(Colors.READ)
             .embedRecords(records.map { it.toCategoryRecord() }, puzzle.supportedCategories)

@@ -89,7 +89,7 @@ internal object OmQL {
     internal fun parseQuery(query: String, possibleMetrics: List<OmMetric<*>>): List<QueryElement> {
         val elements = mutableListOf<QueryElement>()
         var idx = 0
-        var inPareto = false
+        var paretoContext = 0
 
         val currMetrics = mutableListOf<OmMetric<*>>()
         fun unloadMetrics() {
@@ -108,14 +108,14 @@ internal object OmQL {
 
                 '(' -> { // (AB) as pareto
                     unloadMetrics()
-                    inPareto = true
+                    paretoContext++
                     idx++
                 }
 
                 ')' -> {
-                    if (!inPareto)
-                        throw IllegalArgumentException("Missing opening ) in query: $query")
-                    inPareto = false
+                    if (paretoContext != 1)
+                        throw IllegalArgumentException("Missing/extra opening ( in query: $query")
+                    paretoContext--
                     elements.add(QueryElement.Pareto(currMetrics.toList()))
                     currMetrics.clear()
                     idx++
@@ -128,7 +128,7 @@ internal object OmQL {
                 }
             }
         }
-        if (inPareto)
+        if (paretoContext != 0)
             throw IllegalArgumentException("Missing closing ) in query: $query")
         unloadMetrics()
 
@@ -305,7 +305,12 @@ internal object OmQL {
                         when (op) {
                             is Operator.Binary.BinaryBoolean -> op.func(res.booleanOrBust(context), next.booleanOrBust(context))
                             is Operator.Binary.BinaryDouble -> op.func(res.doubleOrBust(context), next.doubleOrBust(context))
-                            is Operator.Binary.BinaryAny -> op.func(res, next)
+                            is Operator.Binary.BinaryAny -> {
+                                if (res is Boolean)
+                                    op.func(res, next.booleanOrBust(context))
+                                else
+                                    op.func(res.doubleOrBust(context), next.doubleOrBust(context))
+                            }
                         }
                     }
                 }
@@ -335,7 +340,7 @@ internal object OmQL {
         return when (this) {
             is Number -> toDouble()
             is InfinInt -> toDouble()
-            is LevelValue -> 10.0.pow(5 * level) + value
+            is LevelValue -> 100_000.0.pow(level) * value
             else -> throw IllegalArgumentException("Invalid type: ${this::class.simpleName}" + (context?.let { " for $it" } ?: ""))
         }
     }
