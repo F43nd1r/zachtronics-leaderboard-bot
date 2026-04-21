@@ -69,7 +69,7 @@ export default function UploadView() {
         })
         const result = await response.json()
         if (!response.ok || result.result !== "SUCCESS") {
-            setError(`Upload failed: ${JSON.stringify(result.result)}`)
+            setError(`Upload failed: ${JSON.stringify(result.result ?? result)}`)
         } else {
             setSuccessUrl(result.message)
             await new Promise((resolve) => setTimeout(resolve, 5000))
