@@ -58,7 +58,7 @@ class OmSolutionRepository(
         private val dataOrder = (listOf(OmMetric.OVERLAP) + OmMetrics.VALUE)
             .map { it.comparator }
             .reduce(Comparator<OmScore>::then)
-        private val memoryRecordOrder = compareBy(dataOrder) { r: OmMemoryRecord -> r.record.score }
+        private val memoryRecordOrder = compareBy(dataOrder) { r: OmMemoryRecord -> r.score }
     }
 
     private lateinit var data: Map<OmPuzzle, SortedSet<OmMemoryRecord>>
@@ -89,9 +89,9 @@ class OmSolutionRepository(
             // fill valid manifolds
             val possibleManifolds = OmScoreManifold.entries.filter { it.supportedTypes.contains(puzzle.type) }
             for (mRecord in memoryRecords) {
-                manifolds@ for (manifold in possibleManifolds.filter { it.supportsScore(mRecord.record.score) }) {
+                manifolds@ for (manifold in possibleManifolds.filter { it.supportsScore(mRecord.score) }) {
                     for (otherMRecord in memoryRecords) {
-                        val compares = manifold.frontierCompare(mRecord.record.score, otherMRecord.record.score)
+                        val compares = manifold.frontierCompare(mRecord.score, otherMRecord.score)
                         if (compares.all { it >= 0 } && compares.any { it > 0 })
                             continue@manifolds
                     }
@@ -103,8 +103,8 @@ class OmSolutionRepository(
             if (memoryRecords.isNotEmpty()) {
                 for (category in OmCategory.entries.filter { it.supportsPuzzle(puzzle) }) {
                     memoryRecords
-                        .filter { category.supportsScore(it.record.score) }
-                        .minWithOrNull(compareBy(category.scoreComparator) { it.record.score })
+                        .filter { category.supportsScore(it.score) }
+                        .minWithOrNull(compareBy(category.scoreComparator) { it.score })
                         ?.categories
                         ?.add(category)
                 }
@@ -151,16 +151,23 @@ class OmSolutionRepository(
                 submission.createMRecord(leaderboardScope)
             }
             val result = submitImpl(leaderboardScope, submission) { beatenMRecord, beatenCategories, lostManifolds ->
+                // operate on the new record first thing, so if there is a creation error we don't dirty the lb
+                // also so that we don't alter the beatenMRecord sets before we add them to the new record
+                newMRecord.frontierManifolds += lostManifolds
+                newMRecord.categories += beatenCategories
+
                 if (beatenMRecord != null) {
                     beatenMRecord.frontierManifolds -= lostManifolds
                     if (beatenMRecord.frontierManifolds.isNotEmpty()) {
                         beatenMRecord.categories -= beatenCategories
                     } else {
-                        beatenMRecord.remove(leaderboardScope)
+                        val beatenRecord = beatenMRecord.record
+                        leaderboardScope.rm(beatenRecord.dataPath.toFile())
+                        leaderboardScope.rm(beatenRecord.dataPath.resolveSibling("${beatenRecord.fileStem()}.json").toFile())
+                        records.remove(beatenMRecord)
                     }
                 }
-                newMRecord.frontierManifolds += lostManifolds
-                newMRecord.categories += beatenCategories
+                // add only after eventual deletion of the old, in case of update
                 records.add(newMRecord)
             }
             val beatenRecords = when (result) {
@@ -212,8 +219,7 @@ class OmSolutionRepository(
 
             if (fullCompares.all { it == 0 }) { // candidate is identical to record
                 if (submission.allowGifUpdate && (submission.displayLink != record.displayLink || submission.gifData != null)) {
-                    // copies are needed or they'll edit themselves in the handler
-                    handleBeatenRecord(mRecord, mRecord.categories.toSet(), mRecord.frontierManifolds.toSet())
+                    handleBeatenRecord(mRecord, mRecord.categories, mRecord.frontierManifolds)
                     return SubmitResult.Updated(null, null, mRecord.toCategoryRecord())
                 } else {
                     return SubmitResult.AlreadyPresent()
@@ -224,8 +230,7 @@ class OmSolutionRepository(
             }
             unclaimedCategories -= mRecord.categories
             if (fullCompares.all { it <= 0 }) { // candidate beats the old record all around, use that and skip the details
-                // copies are needed or they'll edit themselves in the handler
-                handleBeatenRecord(mRecord, mRecord.categories.toSet(), mRecord.frontierManifolds.toSet())
+                handleBeatenRecord(mRecord, mRecord.categories, mRecord.frontierManifolds)
                 beatenCR.add(CategoryRecord(record, mRecord.categories))
                 continue
             }
@@ -251,7 +256,7 @@ class OmSolutionRepository(
                     beatingWitnesses[manifold] = mRecord
                     if (beatingWitnesses.keys.containsAll(possibleManifolds))
                         return SubmitResult.NothingBeaten(
-                            beatingWitnesses.values.distinctBy { it.record.score }.map { it.toCategoryRecord() })
+                            beatingWitnesses.values.distinctBy { it.score }.map { it.toCategoryRecord() })
                 }
 
                 if (!strictlyWorse) {
@@ -295,7 +300,7 @@ class OmSolutionRepository(
             for ((record, newScore) in overrides) {
                 val puzzle = record.puzzle
                 val dir = leaderboardScope.getPuzzleDir(puzzle)
-                leaderboardScope.rm(File(dir, "${record.toFileStem()}.json"))
+                leaderboardScope.rm(File(dir, "${record.fileStem()}.json"))
                 val newName = fileStemOf(puzzle, newScore)
                 val leaderboardFile = File(dir, "$newName.json")
                 val newPath = File(dir, "$newName.solution").relativeTo(leaderboardScope.repo).toPath()
@@ -317,7 +322,7 @@ class OmSolutionRepository(
         leaderboard.acquireWriteAccess().use { leaderboardScope ->
             val dir = leaderboardScope.getPuzzleDir(record.puzzle)
             leaderboardScope.rm(record.dataPath.toFile())
-            leaderboardScope.rm(File(dir, "${record.toFileStem()}.json"))
+            leaderboardScope.rm(File(dir, "${record.fileStem()}.json"))
             leaderboardScope.commitAndPush(null, record.puzzle, record.score, listOf("DELETE"))
             loadData(leaderboardScope)
             pageGenerator.update(OmCategory.entries, immutableData)
@@ -330,7 +335,7 @@ class OmSolutionRepository(
             for (record in records) {
                 val dir = leaderboardScope.getPuzzleDir(record.puzzle)
                 leaderboardScope.rm(record.dataPath.toFile())
-                leaderboardScope.rm(File(dir, "${record.toFileStem()}.json"))
+                leaderboardScope.rm(File(dir, "${record.fileStem()}.json"))
             }
             leaderboardScope.commitAndPush("Reverify invalid solutions (DELETE)")
             loadData(leaderboardScope)
@@ -393,16 +398,10 @@ class OmSolutionRepository(
     private fun createLink(leaderboardScope: GitRepository.ReadAccess, puzzle: OmPuzzle, score: OmScore) =
         omUrlMapper.createShortUrl(leaderboardScope.shortCurrentHash(), puzzle, score)
 
-    private fun OmMemoryRecord.remove(leaderboardScope: GitRepository.ReadWriteAccess) {
-        leaderboardScope.rm(record.dataPath.toFile())
-        leaderboardScope.rm(record.dataPath.resolveSibling("${record.toFileStem()}.json").toFile())
-        data[record.puzzle]!!.remove(this)
-    }
-
     private fun GitRepository.ReadAccess.getPuzzleDir(puzzle: OmPuzzle): File = File(repo, "${puzzle.group.name}/${puzzle.name}")
 
     private fun fileStemOf(puzzle: OmPuzzle, score: OmScore) = "${score.toDisplayString(DisplayContext.fileName())}_${puzzle.name}"
-    private fun OmRecord.toFileStem() = fileStemOf(puzzle, score)
+    private fun OmRecord.fileStem() = fileStemOf(puzzle, score)
 
     override fun find(puzzle: OmPuzzle, category: OmCategory): OmRecord? {
         leaderboard.acquireReadAccess().use { l -> loadDataIfNecessary(l) }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,9 @@ internal data class OmMemoryRecord(
     val frontierManifolds: MutableSet<OmScoreManifold> = newEnumSet<OmScoreManifold>(),
     val categories: MutableSet<OmCategory> = newEnumSet<OmCategory>()
 ) {
+    val score by record::score
     fun toCategoryRecord() = CategoryRecord(record, categories)
 }
 
 internal fun OmRecord.toMemoryRecord(repoPath: Path) =
     OmMemoryRecord(this.copy(dataPath = repoPath.resolve(this.dataPath)))
-
