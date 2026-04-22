@@ -61,7 +61,6 @@ sealed class OmSimMetric<T: Number>(val id: String) {
     class NUMBER_OF_ATOMS_OF_TYPE(atomType: AtomType) : OmSimMetric<Int>("number of atoms of type ${atomType.id}")
     object NUMBER_OF_TRACK_SEGMENTS : OmSimMetric<Int>("number of track segments")
     object NUMBER_OF_ARMS : OmSimMetric<Int>("number of arms")
-    object MAXIMUM_ABSOLUTE_ARM_ROTATION : OmSimMetric<Int>("maximum absolute arm rotation")
     object OVERLAP : OmSimMetric<Int>("overlap")
     object DUPLICATE_REAGENTS : OmSimMetric<Int>("duplicate reagents")
     object DUPLICATE_PRODUCTS : OmSimMetric<Int>("duplicate products")
