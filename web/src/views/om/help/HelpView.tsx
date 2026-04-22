@@ -29,22 +29,22 @@ export default function HelpView() {
     document.title = "Help - Opus Magnum Leaderboards"
     return (
         <Masonry spacing={3} columns={{ xs: 1, sm: 2, md: 2, lg: 2, xl: 3, xxl: 3, xxxl: 4 }}>
-            <HelpCard id="cost" title="Cost (g)" description={<>Cost of all parts in the solution, as defined by the game.</>} />
-            <HelpCard id="cycles" title="Cycles (c)" description={<>Cycles needed to run the solution to completion, as defined by the game.</>} />
+            <HelpCard id="cost" title="Cost (G)" description={<>Cost of all parts in the solution, as defined by the game.</>} />
+            <HelpCard id="cycles" title="Cycles (C)" description={<>Cycles needed to run the solution to completion, as defined by the game.</>} />
             <HelpCard
                 id="area"
-                title="Area (a)"
+                title="Area (A)"
                 description={
                     <>
                         Area used by the solution when running to completion, as defined by the game.
                         <p>Production puzzles don't show this value in game, but it is computed in the same way. The walls always count as area, so all solutions have a big number than it seems like they should.</p>
-                        <p>If a solution has infinitely growing chains (whether polymer or waste), a<HL to="measure" text="@∞" /> can be expressed as a' or a''. a' is the average amount the area increases per output in the steady state. a'' is used when increasingly long chains get swung/rotated in the steady state, and is normalized such that a chain that grows 1 atom longer every output which swings across 60 degrees has a''=1.</p>
+                        <p>If a solution has infinitely growing chains (whether polymer or waste), A<HL to="measure" text="@∞" /> can be expressed as A' or A''. A' is the average amount the area increases per output in the steady state. A'' is used when increasingly long chains get swung/rotated in the steady state, and is normalized such that a chain that grows 1 atom longer every output which swings across 60 degrees has A''=1.</p>
                     </>
                 }
             />
             <HelpCard
                 id="instructions"
-                title="Instructions (i)"
+                title="Instructions (I)"
                 description={
                     <>
                         Instructions on all arms, as defined by the game.
@@ -55,7 +55,7 @@ export default function HelpView() {
             />
             <HelpCard
                 id="height"
-                title="Height (h)"
+                title="Height (H)"
                 description={
                     <>
                         Number of rows in the area footprint of the solution.
@@ -66,7 +66,7 @@ export default function HelpView() {
             />
             <HelpCard
                 id="width"
-                title="Width (w)"
+                title="Width (W)"
                 description={
                     <>
                         Number of columns in the area footprint of the solution. Note that half hexes are possible in this metric (see image).
@@ -78,7 +78,7 @@ export default function HelpView() {
             />
             <HelpCard
                 id="boundinghexagon"
-                title="Bounding Hexagon (b)"
+                title="Bounding Hexagon (B)"
                 description={
                     <>
                         Side length of the smallest regular hexagon that can fully contain the area footprint of the solution. Also commonly called Bestagon.
@@ -92,7 +92,7 @@ export default function HelpView() {
             />
             <HelpCard
                 id="rate"
-                title="Rate (r)"
+                title="Rate (R)"
                 description={
                     <>
                         Average cycles between outputs in the steady state. A solution which does not run indefinitely has no rate.
@@ -160,12 +160,12 @@ export default function HelpView() {
                 title="Measure Points"
                 description={
                     <>
-                        Certain metrics (<HL to="cycles" text="c" />/<HL to="rate" text="r" />, <HL to="area" text="a" />, <HL to="boundinghexagon" text="b" />, <HL to="height" text="h" />, <HL to="width" text="w" />) are evaluated at different measure points, which influences how long the solution must run before the value is checked.
+                        Certain metrics (<HL to="cycles" text="C" />/<HL to="rate" text="R" />, <HL to="area" text="A" />, <HL to="boundinghexagon" text="B" />, <HL to="height" text="H" />, <HL to="width" text="W" />) are evaluated at different measure points, which influences how long the solution must run before the value is checked.
                         <p>@V means the value at victory. At the point the final output is produced and the solution is solved, the value is checked and everything beyond that point is ignored.</p>
                         <p>@∞ means the value at infinity. This is only measured for <HL to="looping" text="Looping" /> solutions, and measures the value at the end of the steady state.</p>
-                        <p>b@∞, h@∞, and w@∞ can have a score of ∞, but a@∞ has more precision if it would be infinite (see <HL to="area" text="its entry" />).</p>
-                        <p>Some metrics, like r and a', depend on the number of outputs that occur in the steady state loop; this is measured as an extrapolation of what counts for victory for @V puzzles, taking the amount of full output sets that are performed in the loop. For polymer puzzles with an output multiplier, such as Electrum Separation, one monomer added to the polymer counts as multiple outputs, to maintain the ratio required to reach victory.</p>
-                        <p><HL to="cycles" text="Cycles" /> is only measured @V and <HL to="rate" text="rate" /> is only measured @∞. Rate can be seen as c', given a different name due to common usage.</p>
+                        <p>B@∞, H@∞, and W@∞ can have a score of ∞, but A@∞ has more precision if it would be infinite (see <HL to="area" text="its entry" />).</p>
+                        <p>Some metrics, like R and A', depend on the number of outputs that occur in the steady state loop; this is measured as an extrapolation of what counts for victory for @V puzzles, taking the amount of full output sets that are performed in the loop. For polymer puzzles with an output multiplier, such as Electrum Separation, one monomer added to the polymer counts as multiple outputs, to maintain the ratio required to reach victory.</p>
+                        <p><HL to="cycles" text="Cycles" /> is only measured @V and <HL to="rate" text="rate" /> is only measured @∞. Rate can be seen as C', given a different name due to common usage.</p>
                     </>
                 }
             />
@@ -175,10 +175,10 @@ export default function HelpView() {
                 description={
                     <>
                         Metrics are measured on several different manifolds, which each measure different metrics.
-                        <p><HL to="area" text="a" />/<HL to="boundinghexagon" text="b" />/<HL to="height" text="h" />/<HL to="width" text="w" />: This determines which of the four arealike metrics are measured in this manifold. The other three are excluded. In production puzzles, these do not exist, instead having only the single manifold i.</p>
+                        <p><HL to="area" text="A" />/<HL to="boundinghexagon" text="B" />/<HL to="height" text="H" />/<HL to="width" text="W" />: This determines which of the four arealike metrics are measured in this manifold. The other three are excluded. In production puzzles, these do not exist, instead having only the single manifold I.</p>
                         <p>V/∞: This determines the <HL to="measure" text="measure point" /> of the manifold. Only the metrics in the specified measure point are included in the manifold, with the exception of Looping being in @V. The metrics that do not have a metric point are included in both. A solution that is not Looping is not included in @∞ manifolds.</p>
                         <p>
-                            For example, the manifold @bV measures g, c, i, b@V, L, T, and O. The main consequence of this system is that solutions that optimize metric combinations that never exist in the same manifold (such as c and r, or a@V and h@V) are not included on the leaderboard.
+                            For example, the manifold @BV measures G, C, I, B@V, L, T, and O. The main consequence of this system is that solutions that optimize metric combinations that never exist in the same manifold (such as C and R, or A@V and H@V) are not included on the leaderboard.
                         </p>
                     </>
                 }
@@ -189,8 +189,8 @@ export default function HelpView() {
                 description={
                     <>
                         Some metrics are computed based on the values of several other metrics, to be used in categories.
-                        <p>Sum and Sum4 refer to <HL to="gold" text="g" />+<HL to="cycles" text="c" />+<HL to="area" text="a" /> and g+c+a+i respectively. In production puzzles, Sum is instead g+c+<HL to="instructions" text="i" />.</p>
-                        <p>X means product. In the @V <HL to="measure" text="measure point" />, it is g*c*a, or g*c*i in production. In the @∞ measure point, it is <HL to="rate" text="r" />*g*i.</p>
+                        <p>Sum and Sum4 refer to <HL to="gold" text="G" />+<HL to="cycles" text="C" />+<HL to="area" text="A" /> and G+C+A+I respectively. In production puzzles, Sum is instead G+C+<HL to="instructions" text="I" />.</p>
+                        <p>X means product. In the @V <HL to="measure" text="measure point" />, it is G*C*A, or G*C*I in production. In the @∞ measure point, it is <HL to="rate" text="R" />*G*I.</p>
                     </>
                 }
             />
@@ -231,7 +231,7 @@ export default function HelpView() {
                             Displaying the full pareto frontier is not possible, as each metric would require a separate axis, but the visualizer allows you to view and filter 2D or 3D projections of it.
                         </p>
                         <p>If you enable "Show only frontier" you can view the pareto frontier as it would look like if only the selected metrics existed.</p>
-                        <p><HL to="area" text="a'" /> is counted as 1000000 of that metric for the visualization, and a'' as 1e12. For example, a solution with 4/3 a' is shown as 1333333a. If a metric is ∞, it does not appear on the visualizer set to that metric at all.</p>
+                        <p><HL to="area" text="A'" /> is counted as 1000000 of that metric for the visualization, and A'' as 1e12. For example, a solution with 4/3 A' is shown as 1333333A. If a metric is ∞, it does not appear on the visualizer set to that metric at all.</p>
                         <p>Note that the pareto visualizer allows selecting conflicting metrics which are never present in the same <HL to="manifold" text="manifold" />. If this is done, there may be gaps that a solution could fit into which are not accepted onto the leaderboard.</p>
                     </>
                 }
