@@ -69,7 +69,7 @@ export default function UploadView() {
         if (gifFile) {
             formData.append("gifData", new Blob([await gifFile.file.arrayBuffer()]))
         } else {
-            formData.append("gif", gifLink)
+            formData.append("gif", gifLink!)
         }
         formData.append("allowGifUpdate", allowGifUpdate.toString());
         const response = await fetchFromApiRaw("/om/submit", {
