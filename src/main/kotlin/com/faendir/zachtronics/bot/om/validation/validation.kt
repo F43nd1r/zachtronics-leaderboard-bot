@@ -133,9 +133,6 @@ fun createSubmission(inputSolData: ByteArray, author: String, allowGifUpdate: Bo
         if (verifier.getMetric(OmSimMetric.MAXIMUM_TRACK_GAP_POW_2) > 1) {
             throw IllegalArgumentException("Quantum Tracks are banned.")
         }
-        if (verifier.getMetric(OmSimMetric.MAXIMUM_ABSOLUTE_ARM_ROTATION) >= 8192) {
-            throw IllegalArgumentException("Maximum arm rotations over 8192 are banned.")
-        }
         return OmSubmission(
             puzzle,
             verifier.getScore(puzzle.type),

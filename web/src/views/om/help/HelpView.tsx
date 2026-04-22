@@ -138,7 +138,6 @@ export default function HelpView() {
                             <li> Adding conduits that are not part of the puzzle, or removing or moving to the wrong chamber for ones that are part of the puzzle. </li>
                             <li> Having more than 16384 <HL to="instructions" text="instructions" />. </li>
                             <li> Placing parts too far away (16384 tiles) from the origin (the hex with the "critelli" symbol). (This is based on coordinates rather than distance; the allowed area is a parallelogram.) </li>
-                            <li> Having an arm's rotation value get too high (8192) before victory. Rotating in the same direction repeatedly, without turning back, over an extremely long solution could do this. </li>
                             <li> Using parts or instructions that are not enabled in the puzzle. </li>
                             <li> Placing duplicate (by ID) inputs or outputs. </li>
                             <li> Placing more than one berlo/disposal/proliferation/ravari. </li>
