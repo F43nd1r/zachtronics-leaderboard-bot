@@ -106,14 +106,14 @@ function Categories() {
                     groupCategories(categories).map((manifold, categories) => (
                         <ExpandableListItem
                             key={manifold.id}
-                            title={`Categories ${manifold.displayName}`}
+                            title={`Categories ${manifold.displayName.toLocaleUpperCase()}`}
                             icon={<CategoryIcon />}
                             content={categories
                                 .sort((a, b) => (b.puzzleTypes.length - a.puzzleTypes.length)) // all then freespace then prods
                                 .map((category) => (
                                     <LinkListItem sx={{ pl: 4 }} key={category.id} to={`/categories/${category.id}`} selected={categoryId === category.id}>
                                         <ListItemText
-                                            primary={`${category.displayName} (${category.metrics.filter(Boolean).map(cat => cat.toUpperCase()).join("→")})${
+                                            primary={`${category.displayName} (${category.metrics.filter(Boolean).map(cat => cat.toLocaleUpperCase()).join("→")})${
                                                 {'["NORMAL"]':' (Normal)',
                                                  '["PRODUCTION"]':' (Production)',
                                                  '["NORMAL","POLYMER"]':' (Freespace)'
