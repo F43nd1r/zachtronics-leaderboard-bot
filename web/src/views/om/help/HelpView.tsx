@@ -25,6 +25,19 @@ import { HashLink } from "react-router-hash-link"
 import { useLocation } from "react-router-dom"
 import { Masonry } from "@mui/lab"
 
+const G = () => (<HL to="cost" title="cost" text="G"/>);
+const C = () => (<HL to="cycles" title="cycles" text="C" />);
+const A = () => (<HL to="area" title="area" text="A" />);
+const I = () => (<HL to="instructions" title="instructions" text="I" />);
+const B = () => (<HL to="boundinghexagon" title="bounding hexagon" text="B" />);
+const H = () => (<HL to="height" title="height" text="H" />);
+const W = () => (<HL to="width" title="width" text="W" />);
+const T = () => (<HL to="trackless" title="trackless" text="T" />);
+const R = () => (<HL to="rate" title="rate" text="R" />);
+const O = () => (<HL to="overlap" title="overlap" text="O" />);
+const L = () => (<HL to="looping" title="looping" text="L" />);
+
+
 export default function HelpView() {
     document.title = "Help - Opus Magnum Leaderboards"
     return (
@@ -38,7 +51,7 @@ export default function HelpView() {
                     <>
                         Area used by the solution when running to completion, as defined by the game.
                         <p>Production puzzles don't show this value in game, but it is computed in the same way. The walls always count as area, so all solutions have a big number than it seems like they should.</p>
-                        <p>If a solution has infinitely growing chains (whether polymer or waste), A<HL to="measure" text="@∞" /> can be expressed as A' or A''. A' is the average amount the area increases per output in the steady state. A'' is used when increasingly long chains get swung/rotated in the steady state, and is normalized such that a chain that grows 1 atom longer every output which swings across 60 degrees has A''=1.</p>
+                        <p>If a solution has infinitely growing chains (whether polymer or waste), <A /><HL to="measure" text="@∞" /> can be expressed as <A />' or <A />''. <A />' is the average amount the area increases per output in the steady state. <A />'' is used when increasingly long chains get swung/rotated in the steady state, and is normalized such that a chain that grows 1 atom longer every output which swings across 60 degrees has <A />''=1.</p>
                     </>
                 }
             />
@@ -119,7 +132,7 @@ export default function HelpView() {
                         <p>
                             When running solutions with this exploit, it is <b>highly encouraged to enable Hermit Mode</b> in the options, so as not to overwrite your existing scores.
                         </p>
-                        <p>When solution scores are displayed on the leaderboard or adjacent tools, an O indicates that it does have overlap while a lack of O indicates that it does not. Having overlap makes a solution considered worse than one that doesn't (all else equal).</p>
+                        <p>When solution scores are displayed on the leaderboard or adjacent tools, an <O /> indicates that it does have overlap while a lack of <O /> indicates that it does not. Having overlap makes a solution considered worse than one that doesn't (all else equal).</p>
                     </>
                 }
                 image={{
@@ -160,12 +173,12 @@ export default function HelpView() {
                 title="Measure Points"
                 description={
                     <>
-                        Certain metrics (<HL to="cycles" text="C" />/<HL to="rate" text="R" />, <HL to="area" text="A" />, <HL to="boundinghexagon" text="B" />, <HL to="height" text="H" />, <HL to="width" text="W" />) are evaluated at different measure points, which influences how long the solution must run before the value is checked.
+                        Certain metrics (<C />/<R />, <A />, <B />, <H />, <W />) are evaluated at different measure points, which influences how long the solution must run before the value is checked.
                         <p>@V means the value at victory. At the point the final output is produced and the solution is solved, the value is checked and everything beyond that point is ignored.</p>
                         <p>@∞ means the value at infinity. This is only measured for <HL to="looping" text="Looping" /> solutions, and measures the value at the end of the steady state.</p>
-                        <p>B@∞, H@∞, and W@∞ can have a score of ∞, but A@∞ has more precision if it would be infinite (see <HL to="area" text="its entry" />).</p>
-                        <p>Some metrics, like R and A', depend on the number of outputs that occur in the steady state loop; this is measured as an extrapolation of what counts for victory for @V puzzles, taking the amount of full output sets that are performed in the loop. For polymer puzzles with an output multiplier, such as Electrum Separation, one monomer added to the polymer counts as multiple outputs, to maintain the ratio required to reach victory.</p>
-                        <p><HL to="cycles" text="Cycles" /> is only measured @V and <HL to="rate" text="rate" /> is only measured @∞. Rate can be seen as C', given a different name due to common usage.</p>
+                        <p><B />@∞, <H />@∞, and <W />@∞ can have a score of ∞, but <A />@∞ has more precision if it would be infinite (see <HL to="area" text="its entry" />).</p>
+                        <p>Some metrics, like <R /> and <A />', depend on the number of outputs that occur in the steady state loop; this is measured as an extrapolation of what counts for victory for @V puzzles, taking the amount of full output sets that are performed in the loop. For polymer puzzles with an output multiplier, such as Electrum Separation, one monomer added to the polymer counts as multiple outputs, to maintain the ratio required to reach victory.</p>
+                        <p><HL to="cycles" text="Cycles" /> is only measured @V and <HL to="rate" text="rate" /> is only measured @∞. Rate can be seen as <C />', given a different name due to common usage.</p>
                     </>
                 }
             />
@@ -175,10 +188,10 @@ export default function HelpView() {
                 description={
                     <>
                         Metrics are measured on several different manifolds, which each measure different metrics.
-                        <p><HL to="area" text="A" />/<HL to="boundinghexagon" text="B" />/<HL to="height" text="H" />/<HL to="width" text="W" />: This determines which of the four arealike metrics are measured in this manifold. The other three are excluded. In production puzzles, these do not exist, instead having only the single manifold I.</p>
+                        <p><A />/<B />/<H />/<W />: This determines which of the four arealike metrics are measured in this manifold. The other three are excluded. In production puzzles, these do not exist, instead having only the single manifold <I />.</p>
                         <p>V/∞: This determines the <HL to="measure" text="measure point" /> of the manifold. Only the metrics in the specified measure point are included in the manifold, with the exception of Looping being in @V. The metrics that do not have a metric point are included in both. A solution that is not Looping is not included in @∞ manifolds.</p>
                         <p>
-                            For example, the manifold @BV measures G, C, I, B@V, L, T, and O. The main consequence of this system is that solutions that optimize metric combinations that never exist in the same manifold (such as C and R, or A@V and H@V) are not included on the leaderboard.
+                            For example, the manifold @<B />V measures <G />, <C />, <I />, <B />@V, <L />, <T />, and <O />. The main consequence of this system is that solutions that optimize metric combinations that never exist in the same manifold (such as <C /> and <R />, or <A />@V and <H />@V) are not included on the leaderboard.
                         </p>
                     </>
                 }
@@ -189,8 +202,8 @@ export default function HelpView() {
                 description={
                     <>
                         Some metrics are computed based on the values of several other metrics, to be used in categories.
-                        <p>Sum and Sum4 refer to <HL to="gold" text="G" />+<HL to="cycles" text="C" />+<HL to="area" text="A" /> and G+C+A+I respectively. In production puzzles, Sum is instead G+C+<HL to="instructions" text="I" />.</p>
-                        <p>X means product. In the @V <HL to="measure" text="measure point" />, it is G*C*A, or G*C*I in production. In the @∞ measure point, it is <HL to="rate" text="R" />*G*I.</p>
+                        <p>Sum and Sum4 refer to <G />+<C />+<A /> and <G />+<C />+<A />+<I /> respectively. In production puzzles, Sum is instead <G />+<C />+<I />.</p>
+                        <p>X means product. In the @V <HL to="measure" text="measure point" />, it is <G />*<C />*<A />, or <G />*<C />*<I /> in production. In the @∞ measure point, it is <R />*<G />*<I />.</p>
                     </>
                 }
             />
@@ -200,10 +213,10 @@ export default function HelpView() {
                 description={
                     <>
                         A category name contains several letters in a row. The first letter is the primary metric that is trying to be minimized; the second letter is used as a tiebreaker, and the third is a tiebreaker for that one, and so on.
-                        <p>Each category belongs in a specific <HL to="manifold" text="manifold" />, although they may still use solutions that are only outside that manifold. More important is the <HL to="measure" text="measure point" /> (determining whether <HL to="looping" text="L" /> is required for a solution or not), which can usually be determined by whether the solution uses <HL to="cycles" text="C" /> or <HL to="rate" text="R" /> in its title (defaulting to @V when unclear). Note that TIA is @∞, and thus may have a higher instructions score than a solution in TIG, which is @V.</p>
+                        <p>Each category belongs in a specific <HL to="manifold" text="manifold" />, although they may still use solutions that are only outside that manifold. More important is the <HL to="measure" text="measure point" /> (determining whether <L /> is required for a solution or not), which can usually be determined by whether the solution uses <C /> or <R /> in its title (defaulting to @V when unclear). Note that <T /><I /><A /> is @∞, and thus may have a higher instructions score than a solution in <T /><I /><G />, which is @V.</p>
                         <p>A full list of categories, grouped by manifold, can be found in the sidebar on the main page. Next to the category also specifies additional tiebreakers beyond the letters. (Aside from Overlap, these correspond exactly to the rule below.)</p>
-                        <p>Beyond the specified letters for each category, the default tiebreaker order is <HL to="overlap" text="O" /><HL to="gold" text="G" />[CR][<HL to="area" text="A" /><HL to="boundinghexagon" text="B" /><HL to="height" text="H" /><HL to="width" text="W" />]L<HL to="instructions" text="I" /><HL to="trackless" text="T" />, or OG[CR]ILAT for production, only counting the metrics that are in the category's manifold. If there is a tie in the entire manifold, the additional tiebreaker is CAHWB@V then RAHWB@∞, although only solutions which are accepted on any <HL to="pareto" text="pareto frontier" /> are counted.</p>
-                        <p>Overlap is treated specially, in that it is normally not allowed and the O in the category title indicates that it is allowed, as an overlap solution is considered worse than one that does not overlap. In tiebreakers, it follows the order specified in the category list (excluding the O) before O is checked. For example, OIC (@aV) specifies ICGA, so its full order is ICGA OLT HWB@V RAHWB@∞.</p>
+                        <p>Beyond the specified letters for each category, the default tiebreaker order is <O /><G />[<C /><R />][<A /><B /><H /><W />]<L /><I /><T />, or <O /><G />[<C /><R />]<I /><L /><A /><T /> for production, only counting the metrics that are in the category's manifold. If there is a tie in the entire manifold, the additional tiebreaker is <C /><A /><H /><W /><B />@V then <R /><A /><H /><W /><B />@∞, although only solutions which are accepted on any <HL to="pareto" text="pareto frontier" /> are counted.</p>
+                        <p>Overlap is treated specially, in that it is normally not allowed and the <O /> in the category title indicates that it is allowed, as an overlap solution is considered worse than one that does not overlap. In tiebreakers, it follows the order specified in the category list (excluding the <O />) before <O /> is checked. For example, <O /><I /><C /> (@<A />V) specifies <I /><C /><G /><A />, so its full order is <I /><C /><G /><A /> <O /><L /><T /> <H /><W /><B />@V <R /><A /><H /><W /><B />@∞.</p>
                     </>
                 }
             />
@@ -231,7 +244,7 @@ export default function HelpView() {
                             Displaying the full pareto frontier is not possible, as each metric would require a separate axis, but the visualizer allows you to view and filter 2D or 3D projections of it.
                         </p>
                         <p>If you enable "Show only frontier" you can view the pareto frontier as it would look like if only the selected metrics existed.</p>
-                        <p><HL to="area" text="A'" /> is counted as 1000000 of that metric for the visualization, and A'' as 1e12. For example, a solution with 4/3 A' is shown as 1333333A. If a metric is ∞, it does not appear on the visualizer set to that metric at all.</p>
+                        <p><A />' is counted as 1000000 of that metric for the visualization, and <A />'' as 1e12. For example, a solution with 4/3 <A />' is shown as 1333333<A />. If a metric is ∞, it does not appear on the visualizer set to that metric at all.</p>
                         <p>Note that the pareto visualizer allows selecting conflicting metrics which are never present in the same <HL to="manifold" text="manifold" />. If this is done, there may be gaps that a solution could fit into which are not accepted onto the leaderboard.</p>
                     </>
                 }
@@ -348,11 +361,12 @@ function HelpCard(props: MetricCardProps) {
 interface HLProps {
     to: string
     text: string
+    title?: string
 }
 function HL(props: HLProps) {
     const theme = useTheme()
     return (
-        <HashLink smooth to={`#${props.to}`} style={{ visibility: "visible", color: theme.palette.text.primary}}>{props.text}</HashLink>
+        <HashLink smooth to={`#${props.to}`} style={{ visibility: "visible", color: theme.palette.text.primary}} title={props.title}>{props.text}</HashLink>
     )
 }
 
