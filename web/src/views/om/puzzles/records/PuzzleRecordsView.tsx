@@ -26,7 +26,6 @@ export default function PuzzleRecordsView() {
             element={(records) => (
                 <OmRecordGrid
                     records={records}
-                    getTitle={(record) => record.smartFormattedCategories || "Pareto Frontier"}
                     getScore={(record) => record.smartFormattedScore ?? record.fullFormattedScore ?? "None"}
                 />
             )}
