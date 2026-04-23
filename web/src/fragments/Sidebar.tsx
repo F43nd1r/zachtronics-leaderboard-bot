@@ -113,7 +113,7 @@ function Categories() {
                                 .map((category) => (
                                     <LinkListItem sx={{ pl: 4 }} key={category.id} to={`/categories/${category.id}`} selected={categoryId === category.id}>
                                         <ListItemText
-                                            primary={`${category.displayName} (${category.metrics.filter(Boolean).join("→")})${
+                                            primary={`${category.displayName} (${category.metrics.filter(Boolean).map(cat => cat.toUpperCase()).join("→")})${
                                                 {'["NORMAL"]':' (Normal)',
                                                  '["PRODUCTION"]':' (Production)',
                                                  '["NORMAL","POLYMER"]':' (Freespace)'
