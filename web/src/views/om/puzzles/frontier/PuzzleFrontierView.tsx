@@ -24,7 +24,7 @@ export default function PuzzleFrontierView() {
         <ApiResource<OmRecord[]>
             url={`/om/puzzle/${useParams().puzzleId}/records?includeFrontier=true`}
             element={(records) => (
-                <OmRecordGrid records={records} getTitle={(record) => record.smartFormattedCategories || "Pareto Frontier"} getScore={(record) => record.fullFormattedScore ?? "None"} />
+                <OmRecordGrid records={records} getScore={(record) => record.fullFormattedScore ?? "None"} />
             )}
         />
     )
