@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.om.validation
 
 import com.faendir.om.parser.solution.SolutionParser
+import com.faendir.om.parser.solution.model.Position
 import com.faendir.om.parser.solution.model.SolvedSolution
 import com.faendir.om.parser.solution.model.part.*
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
@@ -117,7 +118,7 @@ fun createSubmission(inputSolData: ByteArray, author: String, allowGifUpdate: Bo
     if (solution.parts.filterIsInstance<IO>().groupBy { it.type to it.index }.values.any { it.size > 1 }) {
         throw IllegalArgumentException("Duplicated Inputs or Outputs are banned.")
     }
-    if (solution.parts.any { (abs(it.position.x) >= 16384) or (abs(it.position.y) >= 16384) }) {
+    if (solution.parts.any { (abs(it.position.x) >= 16384) or (abs(it.position.y) >= 16384) or (abs(it.position.z) >= 16384) }) {
         throw IllegalArgumentException("Parts farther than 2^14 from the origin are banned.")
     }
     val (puzzle, solutionData) = OmPuzzle.entries.find { it.id == solution.puzzle }?.let { it to inputSolData }
@@ -144,3 +145,5 @@ fun createSubmission(inputSolData: ByteArray, author: String, allowGifUpdate: Bo
         )
     }
 }
+
+val Position.z get() = -x - y

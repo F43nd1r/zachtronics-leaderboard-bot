@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import { Card, CardContent, CardHeader, CardMedia, styled, useTheme } from "@mui/material"
+import {Card, CardContent, CardHeader, CardMedia, styled, useTheme} from "@mui/material"
 import heightExplanation from "./height_explanation.jpg"
 import widthExplanation from "./width_explanation.jpg"
 import boundingHexagonExplanation from "./bounding_hexagon_explanation.jpg"
 import overlapExplanation from "./overlap_tutorial.mp4"
-import { LinkOutlined } from "@mui/icons-material"
-import { ReactNode, useMemo, useState } from "react"
-import { HashLink } from "react-router-hash-link"
-import { useLocation } from "react-router-dom"
-import { Masonry } from "@mui/lab"
+import {LinkOutlined} from "@mui/icons-material"
+import {ReactNode, useMemo, useState} from "react"
+import {HashLink} from "react-router-hash-link"
+import {useLocation} from "react-router-dom"
+import {Masonry} from "@mui/lab"
 
 export default function HelpView() {
     document.title = "Help - Opus Magnum Leaderboards"
@@ -137,7 +137,7 @@ export default function HelpView() {
                             <li> In production puzzles, having parts or arm grabbers not inside a chamber, or breaking isolation mode. </li>
                             <li> Adding conduits that are not part of the puzzle, or removing or moving to the wrong chamber for ones that are part of the puzzle. </li>
                             <li> Having more than 16384 <HL to="instructions" text="instructions" />. </li>
-                            <li> Placing parts too far away (16384 tiles) from the origin (the hex with the "critelli" symbol). (This is based on coordinates rather than distance; the allowed area is a parallelogram.) </li>
+                            <li> Placing parts too far away (16384 tiles) from the origin (the hex with the "critelli" symbol). (The allowed area is a hexagon.) </li>
                             <li> Using parts or instructions that are not enabled in the puzzle. </li>
                             <li> Placing duplicate (by ID) inputs or outputs. </li>
                             <li> Placing more than one berlo/disposal/proliferation/ravari. </li>
@@ -272,7 +272,7 @@ export default function HelpView() {
                             To browse records, use either <Code>/om list puzzle:&lt;puzzle name&gt;</Code> if you're looking for only category records, or <Code>/om frontier puzzle:&lt;puzzle name&gt;</Code> if you're looking for the full pareto frontier. It is generally recommended to do this exclusively in DMs as the message is public.
                         </p>
                         <p>A subset of the pareto frontier can be found by using <Code>/om query puzzle:&lt;puzzle name&gt; measure-point:&lt;VICTORY/INFINITY&gt; query:&lt;query&gt;</Code>. Queries work the same way as categories, but have no additional tiebreakers beyond the end of the query, simply showing every solution that's left. <HL to="computed" text="Computed metrics" /> are also usable here, and cross-<HL to="manifold" text="manifold" /> (but not across <HL to="measure" text="measure points" />) queries can be made, although submitting an improvement might not be accepted in that case.</p>
-                        <p>(The discord bot has additional commands, but they are either for otther Zachtronics game leaderboards or are privledged actions not available to the public.)</p>
+                        <p>(The discord bot has additional commands, but they are either for other Zachtronics game leaderboards or are privileged actions not available to the public.)</p>
                     </>
                 }
             />
