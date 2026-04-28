@@ -26,6 +26,14 @@ data class LevelValue(val level: Int, val value: Double) : Comparable<LevelValue
         if (l != 0) return l
         return value.compareTo(other.value)
     }
+
+    operator fun get(i: Int): Double {
+        return when {
+            i < level -> Double.POSITIVE_INFINITY
+            i == level -> return value
+            else -> return 0.0
+        }
+    }
 }
 
 fun Number.toLevelValue() = LevelValue(0, toDouble())

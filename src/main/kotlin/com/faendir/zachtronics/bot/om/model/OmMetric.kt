@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.om.model
 import com.faendir.zachtronics.bot.model.Metric
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.utils.InfinInt
+import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
 import com.faendir.zachtronics.bot.utils.LevelValue
 import com.faendir.zachtronics.bot.utils.newEnumSet
 import com.faendir.zachtronics.bot.utils.runIf
@@ -26,6 +27,10 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
 
+/**
+ * @property displayName `C` or `T` or `Sum`
+ * @property description `c` or `T` or `g+c+a`
+ */
 @Suppress("ClassName")
 sealed interface OmMetric<T> : Metric where T : Comparable<T> {
     val description: String
@@ -51,31 +56,28 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
 
     sealed class Value<T>(
         override val displayName: String, // X
-        private val scoreId: Char, // x
         override val measurePoint: MeasurePoint,
-        final override val getValueFrom: (OmScore) -> T?,
-        private val describer: Value<T>.(T, StringFormat) -> String
+        override val getValueFrom: (OmScore) -> T?,
+        val alias: String? = null
     ) : ScorePart<T> where T : Comparable<T> {
-        override val description: String = scoreId.toString()
+        override val description: String = displayName.lowercase()
+
         override fun describe(score: OmScore, format: StringFormat): String? =
-            getValueFrom(score)?.let { describer(it, format) }
-
-        internal fun describeInt(value: Int, format: StringFormat): String = "$value$scoreId"
-
-        internal fun describeInfinInt(value: InfinInt, format: StringFormat): String =
-            when (format) {
-                StringFormat.FILE_NAME -> "${value.toLatinString()}$scoreId"
-                else -> "$value$scoreId"
-            }
-
-        internal fun describeDouble(value: Double, format: StringFormat): String =
-            numberFormat.format(value).runIf(format == StringFormat.FILE_NAME) { replace("∞", "INF") } + scoreId
-
-        /** `1.23a1` and `1.23a'` */
-        internal fun describeLevelValue(lv: LevelValue, format: StringFormat): String =
-            when (format) {
-                StringFormat.FILE_NAME -> "${numberFormat.format(lv.value)}$scoreId${lv.level}"
-                else -> "${numberFormat.format(lv.value)}$scoreId" + "'".repeat(lv.level)
+            when (val v = getValueFrom(score)) {
+                null -> null
+                is Int -> "$v$description"
+                is Double -> {
+                    numberFormat.format(v).runIf(format == StringFormat.FILE_NAME) { replace("∞", "INF") } + description
+                }
+                is InfinInt -> when (format) {
+                    StringFormat.FILE_NAME -> "${v.toLatinString()}$description"
+                    else -> "$v$description"
+                }
+                is LevelValue -> when (format) { // `1.23a1` and `1.23a'`
+                    StringFormat.FILE_NAME -> "${numberFormat.format(v.value)}$description${v.level}"
+                    else -> "${numberFormat.format(v.value)}$description" + "'".repeat(v.level)
+                }
+                else -> throw IllegalArgumentException("Invalid type: ${v::class.simpleName}")
             }
     }
 
@@ -93,7 +95,7 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
     }
 
     /** functions of other [OmMetric]s */
-    interface Computed<T : Comparable<T>> : OmMetric<T> {
+    sealed interface Computed<T : Comparable<T>> : OmMetric<T> {
         val subMetrics: Array<out OmMetric<*>>
         override val measurePoint
             get() = subMetrics.asIterable().findMeasurePoint()
@@ -147,6 +149,13 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
         override fun describe(score: OmScore, format: StringFormat): String? = null
     }
 
+    open class Custom<T : Comparable<T>>(
+        override val subMetrics: Array<OmMetric<*>>,
+        override val description: String,
+        override val displayName: String,
+        override val getValueFrom: (OmScore) -> T?
+    ) : Computed<T>
+
     /** true constants */
     open class Constant<T : Comparable<T>>(
         override val displayName: String,
@@ -160,26 +169,31 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
         override fun describe(score: OmScore, format: StringFormat): String? = null
     }
 
-    data object COST : Value<Int>("G", 'g', MeasurePoint.START, OmScore::cost, Value<*>::describeInt)
-    data object INSTRUCTIONS : Value<Int>("I", 'i', MeasurePoint.START, OmScore::instructions, Value<*>::describeInt)
+    data object COST : Value<Int>("G", MeasurePoint.START, OmScore::cost)
+    data object INSTRUCTIONS : Value<Int>("I", MeasurePoint.START, OmScore::instructions)
 
-    data object CYCLES : Value<Int>("C", 'c', MeasurePoint.VICTORY, OmScore::cycles, Value<*>::describeInt)
-    data object AREA : Value<Int>("A", 'a', MeasurePoint.VICTORY, OmScore::area, Value<*>::describeInt)
-    data object HEIGHT : Value<Int>("H", 'h', MeasurePoint.VICTORY, OmScore::height, Value<*>::describeInt)
-    data object WIDTH : Value<Double>("W", 'w', MeasurePoint.VICTORY, OmScore::width, Value<*>::describeDouble)
-    data object BOUNDING_HEX : Value<Int>("B", 'b', MeasurePoint.VICTORY, OmScore::boundingHex, Value<*>::describeInt)
+    data object CYCLES : Value<Int>("C", MeasurePoint.VICTORY, OmScore::cycles)
+    data object AREA : Value<Int>("A", MeasurePoint.VICTORY, OmScore::area)
+    data object HEIGHT : Value<Int>("H", MeasurePoint.VICTORY, OmScore::height)
+    data object WIDTH : Value<Double>("W", MeasurePoint.VICTORY, OmScore::width)
+    data object BOUNDING_HEX : Value<Int>("B", MeasurePoint.VICTORY, OmScore::boundingHex)
 
-    data object RATE : Value<Double>("R", 'r', MeasurePoint.INFINITY, OmScore::rate, Value<*>::describeDouble)
-    data object AREA_INF : Value<LevelValue>("A", 'a', MeasurePoint.INFINITY, OmScore::areaINF, Value<*>::describeLevelValue)
-    data object HEIGHT_INF : Value<InfinInt>("H", 'h', MeasurePoint.INFINITY, OmScore::heightINF, Value<*>::describeInfinInt) {
+    data object RATE : Value<Double>("R", MeasurePoint.INFINITY, OmScore::rate, alias = "C'")
+    data object AREA_INF : Value<LevelValue>("A", MeasurePoint.INFINITY, OmScore::areaINF)
+    data object HEIGHT_INF : Value<InfinInt>("H", MeasurePoint.INFINITY, OmScore::heightINF) {
         override val collapsible: Boolean = false
     }
-    data object WIDTH_INF : Value<Double>("W", 'w', MeasurePoint.INFINITY, OmScore::widthINF, Value<*>::describeDouble) {
+    data object WIDTH_INF : Value<Double>("W", MeasurePoint.INFINITY, OmScore::widthINF) {
         override val collapsible: Boolean = false
     }
-    data object BOUNDING_HEX_INF : Value<InfinInt>("B", 'b', MeasurePoint.INFINITY, OmScore::boundingHexINF, Value<*>::describeInfinInt) {
+    data object BOUNDING_HEX_INF : Value<InfinInt>("B", MeasurePoint.INFINITY, OmScore::boundingHexINF) {
         override val collapsible: Boolean = false
     }
+
+    // convenience
+    data object A0_INF : Value<InfinInt>("A0", MeasurePoint.INFINITY, { it.areaINF?.get(0)?.toInfinInt() })
+    data object A1_INF : Value<Double>("A1", MeasurePoint.INFINITY, { it.areaINF?.get(1) }, alias = "A'")
+    data object A2_INF : Value<Double>("A2", MeasurePoint.INFINITY, { it.areaINF?.get(2) }, alias = "A''")
 
     data object OVERLAP : Modifier("O", MeasurePoint.START, OmScore::overlap)
     data object TRACKLESS : Modifier("T", MeasurePoint.START, OmScore::trackless, reverseOrder = true)
@@ -247,26 +261,30 @@ object OmMetrics {
     val MODIFIER = listOf(OmMetric.OVERLAP, OmMetric.TRACKLESS, OmMetric.LOOPING)
     val FULL_SCORE = VALUE + MODIFIER
 
-    val COMPUTED_BY_TYPE = mapOf(
-        OmType.NORMAL to listOf(
+    private val ALL_SCORE_PARTS = FULL_SCORE + listOf(OmMetric.A0_INF, OmMetric.A1_INF, OmMetric.A2_INF)
+
+    fun userFacing(type: OmType? = null) = ALL_SCORE_PARTS + when (type) {
+        OmType.NORMAL, OmType.POLYMER -> listOf(
             OmMetric.SUM3A,
             OmMetric.SUM4,
             OmMetric.PRODUCT_GCA,
             OmMetric.PRODUCT_INF,
-        ),
-        OmType.POLYMER to listOf(
-            OmMetric.SUM3A,
-            OmMetric.SUM4,
-            OmMetric.PRODUCT_GCA,
-            OmMetric.PRODUCT_INF,
-        ),
-        OmType.PRODUCTION to listOf(
+        )
+        OmType.PRODUCTION -> listOf(
             OmMetric.SUM3I,
             OmMetric.SUM4,
             OmMetric.PRODUCT_GCI,
             OmMetric.PRODUCT_INF,
         )
-    )
+        null -> listOf(
+            OmMetric.SUM3A,
+            OmMetric.SUM3I,
+            OmMetric.SUM4,
+            OmMetric.PRODUCT_GCA,
+            OmMetric.PRODUCT_GCI,
+            OmMetric.PRODUCT_INF,
+        )
+    }
 
     /** Score printing order for humans */
     val BY_MEASURE_POINT = mapOf(

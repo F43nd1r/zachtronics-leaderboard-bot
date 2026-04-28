@@ -21,6 +21,7 @@ import com.faendir.zachtronics.bot.discord.DiscordActionCache
 import com.faendir.zachtronics.bot.discord.command.Command
 import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder
 import com.faendir.zachtronics.bot.discord.command.security.NotSecured
+import com.faendir.zachtronics.bot.discord.embed.MultiMessageSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.discord.embed.PaginatedSafeEmbedMessageBuilder
 import com.faendir.zachtronics.bot.discord.embed.SafeMessageBuilder
 import com.faendir.zachtronics.bot.discord.embed.SafePlainMessageBuilder
@@ -48,43 +49,48 @@ class OmQueryCommand(private val repository: OmSolutionRepository, val discordAc
     override val secured = NotSecured
 
     val puzzleOption = omPuzzleOptionBuilder().required().build()
-    val measurePointOption = omMeasurePointOptionBuilder().required().build()
     val queryOption = CommandOptionBuilder.string("query")
-        .description("Query string in the form A{B=3}[C*D]E(FG), O is false unless specified")
+        .description("Query string in the form A{B=3}[C*D]E(FG)[H@V], O is false unless specified")
         .required().build()
+    val measurePointOption = omMeasurePointOptionBuilder().build()
 
-    override val options = listOf(puzzleOption, measurePointOption, queryOption)
+    override val options = listOf(puzzleOption, queryOption, measurePointOption)
 
     override fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder {
         val puzzle = puzzleOption.get(event)
-        val measurePoint = measurePointOption.get(event)
         val query = queryOption.get(event)
+        val measurePoint = measurePointOption.get(event)
+
+        val possibleMetrics = OmMetrics.userFacing(puzzle.type)
+        val queryElements = OmQL(possibleMetrics, measurePoint).parseQuery(query)
+        val name = Markdown.escape(queryElements.joinToString("", "", measurePoint?.displayName.orEmpty()))
 
         val data: Collection<OmMemoryRecord> = repository.immutableData[puzzle]!!
-        val possibleMetrics = (OmMetrics.BY_MEASURE_POINT[measurePoint]!! +
-                OmMetrics.COMPUTED_BY_TYPE[puzzle.type]!!.filter { it.measurePoint == measurePoint })
-            .sortedByDescending { it.displayName.length }
-
-        val queryElements = OmQL.parseQuery(query.replace(" ", ""), possibleMetrics)
         val records = queryElements.fold(data) { acc, el -> el.filter(acc) }
-        val name = Markdown.escape(queryElements.joinToString("")) + measurePoint.displayName
 
-        return if (records.size == 1) {
-            val record = records.first().record
-            val categories = records.first().categories
+        return when (records.size) {
+            0 -> MultiMessageSafeEmbedMessageBuilder()
+                .title("*${puzzle.displayName}* $name")
+                .url(puzzle.link)
+                .color(Colors.UNCHANGED)
+                .description("*You stare into the abyss*\n*The abyss can't stare back, as it has no eyes*")
+            1 -> {
+                val record = records.first().record
+                val categories = records.first().categories
 
-            val lines = StringJoiner("\n")
-            lines.add(Markdown.linkOrText("***${puzzle.displayName}***", puzzle.link, embed = false) + " **$name**")
-            if (categories.isNotEmpty())
-                lines.add("**${categories.smartFormat(puzzle.supportedCategories)}**")
-            lines.add(record.toDisplayString(DisplayContext.discord()))
-            SafePlainMessageBuilder()
-                .content(lines.toString())
+                val lines = StringJoiner("\n")
+                lines.add(Markdown.linkOrText("***${puzzle.displayName}***", puzzle.link, embed = false) + " **$name**")
+                if (categories.isNotEmpty())
+                    lines.add("**${categories.smartFormat(puzzle.supportedCategories)}**")
+                lines.add(record.toDisplayString(DisplayContext.discord()))
+                SafePlainMessageBuilder()
+                    .content(lines.toString())
+            }
+            else -> PaginatedSafeEmbedMessageBuilder(discordActionCache)
+                .title("*${puzzle.displayName}* $name")
+                .url(puzzle.link)
+                .color(Colors.READ)
+                .embedRecords(records.map { it.toCategoryRecord() }, puzzle.supportedCategories)
         }
-        else PaginatedSafeEmbedMessageBuilder(discordActionCache)
-            .title("*${puzzle.displayName}* $name")
-            .url(puzzle.link)
-            .color(Colors.READ)
-            .embedRecords(records.map { it.toCategoryRecord() }, puzzle.supportedCategories)
     }
 }

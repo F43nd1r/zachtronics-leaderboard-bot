@@ -85,6 +85,9 @@ class OmController(
 
     override fun getCategory(categoryId: String): OmCategoryDTO = findCategory(categoryId).toDTO()
 
+    @get:GetMapping("/metrics", produces = [MediaType.APPLICATION_JSON_VALUE])
+    val metrics: List<OmMetricDTO> = OmMetrics.userFacing().map { it.toDTO() }
+
     @get:GetMapping("/manifolds", produces = [MediaType.APPLICATION_JSON_VALUE])
     val manifolds: List<OmScoreManifoldDTO> = OmScoreManifold.entries.map { it.toDTO() }
 

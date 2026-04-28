@@ -230,7 +230,7 @@ export default function HelpView() {
                             Displaying the full pareto frontier is not possible, as each metric would require a separate axis, but the visualizer allows you to view and filter 2D or 3D projections of it.
                         </p>
                         <p>If you enable "Show only frontier" you can view the pareto frontier as it would look like if only the selected metrics existed.</p>
-                        <p><HL to="area" text="a'" /> is counted as 1000000 of that metric for the visualization, and a'' as 1e12. For example, a solution with 4/3 a' is shown as 1333333a. If a metric is ∞, it does not appear on the visualizer set to that metric at all.</p>
+                        <p><HL to="area" text="a'" /> is counted as 100000 of that metric for the visualization, and a'' as 1e10. For example, a solution with 4/3 a' is shown as 133333a. If a metric is ∞, it does not appear on the visualizer set to that metric at all.</p>
                         <p>Note that the pareto visualizer allows selecting conflicting metrics which are never present in the same <HL to="manifold" text="manifold" />. If this is done, there may be gaps that a solution could fit into which are not accepted onto the leaderboard.</p>
                     </>
                 }
