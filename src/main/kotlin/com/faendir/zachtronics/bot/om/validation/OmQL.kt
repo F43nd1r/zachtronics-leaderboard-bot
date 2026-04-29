@@ -278,7 +278,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
                 data object TIMES : BinaryDouble(Double::times, 6)
                 data object DIV : BinaryDouble(Double::div, 6)
                 data object REM : BinaryDouble(Double::rem, 6)
-                data object POW : BinaryDouble(Double::pow, 7, true)
+                data object POW : BinaryDouble(Double::pow, 101, true)
             }
         }
     }
