@@ -294,7 +294,6 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
         val opStack = ArrayDeque<Operator>()
         val metrics = mutableListOf<OmMetric<*>>()
         val valueStack = ArrayDeque<(OmScore) -> Comparable<Any>?>()
-        val debugStack = ArrayDeque<String>()
 
         var allowedTokens = EnumSet.of(Token.METRIC, Token.UNARY_OP)
 
@@ -305,7 +304,6 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
             when (op) {
                 is Operator.Unary<*> -> {
                     val value = valueStack.removeLast()
-                    val valueStr = debugStack.removeLast()
                     valueStack.addLast {
                         val v = value(it) ?: return@addLast null
                         when (op) {
@@ -315,14 +313,11 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
                                 op.func(v.doubleOrBust(context))
                         } as Comparable<Any>
                     }
-                    debugStack.addLast("(${op::class.simpleName} $valueStr)")
                 }
 
                 is Operator.Binary<*> -> {
                     val right = valueStack.removeLast()
                     val left = valueStack.removeLast()
-                    val rightStr = debugStack.removeLast()
-                    val leftStr = debugStack.removeLast()
 
                     valueStack.addLast {
                         val l = left(it) ?: return@addLast null
@@ -341,7 +336,6 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
                             }
                         } as Comparable<Any>
                     }
-                    debugStack.addLast("($leftStr ${op::class.simpleName} $rightStr)")
                 }
             }
         }
@@ -396,7 +390,6 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
                 metrics.add(metric)
                 @Suppress("UNCHECKED_CAST")
                 valueStack.addLast { metric.getValueFrom(it) as Comparable<Any>? }
-                debugStack.addLast(metric.displayName)
                 allowedTokens = EnumSet.of(Token.BINARY_OP)
                 if (idx >= query.length)
                     throw IllegalArgumentException("Missing closing $boundary in query: $query")
@@ -415,9 +408,6 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
 
         // if it throws it throws here
         expression(allOnes)
-
-        // debug print the parsed formula
-        println(debugStack.removeLast())
 
         val descr = query.substring(startIdx, idx)
         return OmMetric.Custom(
