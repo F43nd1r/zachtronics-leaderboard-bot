@@ -19,9 +19,13 @@ package com.faendir.zachtronics.bot.om.validation
 import com.faendir.zachtronics.bot.om.model.MeasurePoint
 import com.faendir.zachtronics.bot.om.model.OmMetric.*
 import com.faendir.zachtronics.bot.om.model.OmMetrics
+import com.faendir.zachtronics.bot.om.model.OmScore
+import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
+import com.faendir.zachtronics.bot.utils.toLevelValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
 import strikt.api.expectDoesNotThrow
 import strikt.api.expectThat
@@ -169,5 +173,60 @@ class OmQLTest {
         expectThrows<IllegalArgumentException> {
             parser.parseQuery("[$query]")
         }.subject.printStackTrace()
+    }
+
+    @ParameterizedTest(name = "[{index}] input={0}, expected={1}")
+    @CsvSource(
+        // + - (higher: *, lower: <)
+        "'2*3+5*7', '41'",
+        "'2+3<5+7', 'true'",
+        "'2*3-5*7', '-29'",
+        "'2-3<5-7', 'false'",
+        // * / % (higher: **, lower: +)
+        "'2**3*5**2', '200'",
+        "'2*3+5*7', '41'",
+        "'10**2/5**1', '20'",
+        "'10/2+5/1', '10'",
+        "'10**2%6**1', '4'",
+        "'10%3+5%2', '2'",
+        // unary - and **
+        "'-2**2', '-4'",
+        // ** (lower: *)
+        "'2**3*5**2', '200'",
+        // ** right associativity
+        "'2**3**2', '512'",
+        // < > <= >= (higher: +, lower: =)
+        "'2+3<5+7', 'true'",
+        "'2<3=5<7', 'true'",
+        "'2+3>5+7', 'false'",
+        "'2>3=5>7', 'true'",
+        "'2+3<=5+7', 'true'",
+        "'2<=3=5<=7', 'true'",
+        "'2+3>=5+7', 'false'",
+        "'2>=3=5>=7', 'true'",
+        // = != (higher: <, lower: &&)
+        "'2<3=5<7', 'true'",
+        "'true&&false=true&&true', 'false'",
+        "'2<3!=5<7', 'false'",
+        "'true&&false!=true&&true', 'true'",
+        // left associativity
+        "'2=3=false', 'true'",
+        // && || (higher: =)
+        "'true=true&&false=false', 'true'",
+        "'false&&false||true', 'true'",
+    )
+    fun `custom metric operator precedence`(query: String, expected: String) {
+        val allOnes = OmScore(
+            1, 1, overlap = true, trackless = true,
+            1, 1, 1, 1.0, 1,
+            1.0, 1.toLevelValue(), 1.toInfinInt(), 1.0, 1.toInfinInt()
+        )
+        val elements = parser.parseQuery("[$query]")
+        val customMetric = elements[1].metrics.first() as Custom<*>
+        val result = customMetric.getValueFrom(allOnes)
+        if (result is Double)
+            expectThat(result).isEqualTo(expected.toDouble())
+        else
+            expectThat(result).isEqualTo(expected.toBoolean())
     }
 }
