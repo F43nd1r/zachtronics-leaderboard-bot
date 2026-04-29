@@ -340,11 +340,22 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
             }
         }
 
-        fun shouldApply(top: Operator, incoming: Operator): Boolean {
-            return if (incoming.rightAssociative)
-                top.precedence > incoming.precedence
-            else
-                top.precedence >= incoming.precedence
+        fun shouldReduce(incoming: Operator?): Boolean {
+            if (opStack.isEmpty())
+                return false
+            // null is treated as minimum precedence -> reduce everything
+            if (incoming == null)
+                return true
+            if (incoming.rightAssociative)
+                return opStack.last().precedence > incoming.precedence
+            return opStack.last().precedence >= incoming.precedence
+        }
+
+        fun pushOperator(op: Operator?) {
+            while (shouldReduce(op))
+                applyOperator(opStack.removeLast())
+            if (op != null)
+                opStack.addLast(op)
         }
 
         while (true) {
@@ -361,9 +372,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
                 }
                 if (op != null) {
                     idx += 1
-                    while (opStack.isNotEmpty() && shouldApply(opStack.last(), op))
-                        applyOperator(opStack.removeLast())
-                    opStack.addLast(op)
+                    pushOperator(op)
                     allowedTokens = EnumSet.of(Token.METRIC, Token.UNARY_OP)
                     continue
                 }
@@ -374,9 +383,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
                     0 -> {}
                     1 -> {
                         idx = end
-                        while (opStack.isNotEmpty() && shouldApply(opStack.last(), ops[0]))
-                            applyOperator(opStack.removeLast())
-                        opStack.addLast(ops[0])
+                        pushOperator(ops[0])
                         allowedTokens = EnumSet.of(Token.METRIC, Token.UNARY_OP)
                         continue
                     }
@@ -401,8 +408,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
         }
 
         // final reduction
-        while (opStack.isNotEmpty())
-            applyOperator(opStack.removeLast())
+        pushOperator(null)
 
         val expression = valueStack.removeLast()
 
