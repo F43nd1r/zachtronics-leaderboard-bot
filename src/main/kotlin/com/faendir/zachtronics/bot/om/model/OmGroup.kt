@@ -45,6 +45,7 @@ enum class OmGroup(val collection: OmCollection, override val displayName: Strin
     JOURNAL_CVIII_II(JOURNAL_CVIII, "CVIII Issue II"),
     JOURNAL_CVIII_III(JOURNAL_CVIII, "CVIII Issue III"),
     JOURNAL_CVIII_IV(JOURNAL_CVIII, "CVIII Issue IV"),
+    JOURNAL_CVIII_V(JOURNAL_CVIII, "CVIII Issue V"),
     TOURNAMENT_2019(COMMUNITY, "Tournament 2019"),
     TOURNAMENT_2020(COMMUNITY, "Tournament 2020"),
     TOURNAMENT_2021(COMMUNITY, "Tournament 2021"),
