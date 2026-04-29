@@ -226,8 +226,14 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
     }
 
     private sealed interface Operator {
+        val precedence: Int
+        val rightAssociative: Boolean
         sealed interface Unary<T : Comparable<T>> : Operator {
             val func: (T) -> T
+            override val precedence: Int
+                get() = 100
+            override val rightAssociative: Boolean
+                get() = true
 
             sealed class UnaryBoolean(override val func: (Boolean) -> Boolean) : Unary<Boolean> {
                 data object NOT : UnaryBoolean(Boolean::not)
@@ -242,28 +248,37 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
         sealed interface Binary<I> : Operator {
             val func: (I, I) -> Comparable<*>
 
-            sealed class BinaryAny(override val func: (Any, Any) -> Boolean) : Binary<Any> {
-                data object EQ : BinaryAny(Any::equals)
-                data object NE : BinaryAny({ a, b -> a != b })
+            sealed class BinaryAny(override val func: (Any, Any) -> Boolean,
+                                   override val precedence: Int,
+                                   override val rightAssociative: Boolean = false
+            ) : Binary<Any> {
+                data object EQ : BinaryAny(Any::equals, 3)
+                data object NE : BinaryAny({ a, b -> a != b }, 3)
             }
 
-            sealed class BinaryBoolean(override val func: (Boolean, Boolean) -> Boolean) : Binary<Boolean> {
-                data object AND : BinaryBoolean(Boolean::and)
-                data object OR : BinaryBoolean(Boolean::or)
+            sealed class BinaryBoolean(override val func: (Boolean, Boolean) -> Boolean,
+                                       override val precedence: Int,
+                                       override val rightAssociative: Boolean = false
+            ) : Binary<Boolean> {
+                data object AND : BinaryBoolean(Boolean::and, 2)
+                data object OR : BinaryBoolean(Boolean::or, 1)
             }
 
-            sealed class BinaryDouble(override val func: (Double, Double) -> Comparable<*>) : Binary<Double> {
-                data object LT : BinaryDouble({ a, b -> a < b })
-                data object GT : BinaryDouble({ a, b -> a > b })
-                data object LE : BinaryDouble({ a, b -> a <= b })
-                data object GE : BinaryDouble({ a, b -> a >= b })
+            sealed class BinaryDouble(override val func: (Double, Double) -> Comparable<*>,
+                                      override val precedence: Int,
+                                      override val rightAssociative: Boolean = false
+            ) : Binary<Double> {
+                data object LT : BinaryDouble({ a, b -> a < b }, 4)
+                data object GT : BinaryDouble({ a, b -> a > b }, 4)
+                data object LE : BinaryDouble({ a, b -> a <= b }, 4)
+                data object GE : BinaryDouble({ a, b -> a >= b }, 4)
 
-                data object PLUS : BinaryDouble(Double::plus)
-                data object MINUS : BinaryDouble(Double::minus)
-                data object TIMES : BinaryDouble(Double::times)
-                data object DIV : BinaryDouble(Double::div)
-                data object REM : BinaryDouble(Double::rem)
-                data object POW : BinaryDouble(Double::pow)
+                data object PLUS : BinaryDouble(Double::plus, 5)
+                data object MINUS : BinaryDouble(Double::minus, 5)
+                data object TIMES : BinaryDouble(Double::times, 6)
+                data object DIV : BinaryDouble(Double::div, 6)
+                data object REM : BinaryDouble(Double::rem, 6)
+                data object POW : BinaryDouble(Double::pow, 7, true)
             }
         }
     }
@@ -276,10 +291,67 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
         query: String, startIdx: Int, boundary: Char
     ): Pair<OmMetric.Computed<*>, Int> {
         var idx = startIdx
-        val operators = mutableListOf<Operator>()
+        val opStack = ArrayDeque<Operator>()
         val metrics = mutableListOf<OmMetric<*>>()
+        val valueStack = ArrayDeque<(OmScore) -> Comparable<Any>?>()
+        val debugStack = ArrayDeque<String>()
 
         var allowedTokens = EnumSet.of(Token.METRIC, Token.UNARY_OP)
+
+        fun applyOperator(op: Operator) {
+            val context = op::class.simpleName
+
+            @Suppress("UNCHECKED_CAST")
+            when (op) {
+                is Operator.Unary<*> -> {
+                    val value = valueStack.removeLast()
+                    val valueStr = debugStack.removeLast()
+                    valueStack.addLast {
+                        val v = value(it) ?: return@addLast null
+                        when (op) {
+                            is Operator.Unary.UnaryBoolean ->
+                                op.func(v.booleanOrBust(context))
+                            is Operator.Unary.UnaryDouble ->
+                                op.func(v.doubleOrBust(context))
+                        } as Comparable<Any>
+                    }
+                    debugStack.addLast("(${op::class.simpleName} $valueStr)")
+                }
+
+                is Operator.Binary<*> -> {
+                    val right = valueStack.removeLast()
+                    val left = valueStack.removeLast()
+                    val rightStr = debugStack.removeLast()
+                    val leftStr = debugStack.removeLast()
+
+                    valueStack.addLast {
+                        val l = left(it) ?: return@addLast null
+                        val r = right(it) ?: return@addLast null
+
+                        when (op) {
+                            is Operator.Binary.BinaryBoolean ->
+                                op.func(l.booleanOrBust(context), r.booleanOrBust(context))
+                            is Operator.Binary.BinaryDouble ->
+                                op.func(l.doubleOrBust(context), r.doubleOrBust(context))
+                            is Operator.Binary.BinaryAny -> {
+                                if (l::class == r::class)
+                                    op.func(l, r)
+                                else
+                                    op.func(l.doubleOrBust(context), r.doubleOrBust(context))
+                            }
+                        } as Comparable<Any>
+                    }
+                    debugStack.addLast("($leftStr ${op::class.simpleName} $rightStr)")
+                }
+            }
+        }
+
+        fun shouldApply(top: Operator, incoming: Operator): Boolean {
+            return if (incoming.rightAssociative)
+                top.precedence > incoming.precedence
+            else
+                top.precedence >= incoming.precedence
+        }
 
         while (true) {
             if (query[idx] == ' ') {
@@ -295,7 +367,9 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
                 }
                 if (op != null) {
                     idx += 1
-                    operators.add(op)
+                    while (opStack.isNotEmpty() && shouldApply(opStack.last(), op))
+                        applyOperator(opStack.removeLast())
+                    opStack.addLast(op)
                     allowedTokens = EnumSet.of(Token.METRIC, Token.UNARY_OP)
                     continue
                 }
@@ -306,7 +380,9 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
                     0 -> {}
                     1 -> {
                         idx = end
-                        operators.add(ops[0])
+                        while (opStack.isNotEmpty() && shouldApply(opStack.last(), ops[0]))
+                            applyOperator(opStack.removeLast())
+                        opStack.addLast(ops[0])
                         allowedTokens = EnumSet.of(Token.METRIC, Token.UNARY_OP)
                         continue
                     }
@@ -318,6 +394,9 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
                 val (metric, end) = parseMetric(query, idx)
                 idx = end
                 metrics.add(metric)
+                @Suppress("UNCHECKED_CAST")
+                valueStack.addLast { metric.getValueFrom(it) as Comparable<Any>? }
+                debugStack.addLast(metric.displayName)
                 allowedTokens = EnumSet.of(Token.BINARY_OP)
                 if (idx >= query.length)
                     throw IllegalArgumentException("Missing closing $boundary in query: $query")
@@ -328,34 +407,17 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
             throw IllegalArgumentException("Unknown token in query: $query")
         }
 
-        @Suppress("UNCHECKED_CAST")
-        val expression: (OmScore) -> Comparable<Any>? = l@{ s ->
-            val metricIt = metrics.iterator()
-            var res = metricIt.next().getValueFrom(s) ?: return@l null
-            for (op in operators) {
-                val context = op::class.simpleName
-                res = when (op) {
-                    is Operator.Unary.UnaryBoolean -> op.func(res.booleanOrBust(context))
-                    is Operator.Unary.UnaryDouble -> op.func(res.doubleOrBust(context))
-                    is Operator.Binary<*> -> {
-                        val next = metricIt.next().getValueFrom(s) ?: return@l null
-                        when (op) {
-                            is Operator.Binary.BinaryBoolean -> op.func(res.booleanOrBust(context), next.booleanOrBust(context))
-                            is Operator.Binary.BinaryDouble -> op.func(res.doubleOrBust(context), next.doubleOrBust(context))
-                            is Operator.Binary.BinaryAny -> {
-                                if (res::class == next::class)
-                                    op.func(res, next)
-                                else // the only funnel conversion is to double, hope for the best
-                                    op.func(res.doubleOrBust(context), next.doubleOrBust(context))
-                            }
-                        }
-                    }
-                }
-            }
-            res as Comparable<Any>
-        }
+        // final reduction
+        while (opStack.isNotEmpty())
+            applyOperator(opStack.removeLast())
+
+        val expression = valueStack.removeLast()
+
         // if it throws it throws here
         expression(allOnes)
+
+        // debug print the parsed formula
+        println(debugStack.removeLast())
 
         val descr = query.substring(startIdx, idx)
         return OmMetric.Custom(
