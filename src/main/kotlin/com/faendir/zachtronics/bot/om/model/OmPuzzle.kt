@@ -269,7 +269,7 @@ enum class OmPuzzle(
     MATERIAL_SALVAGE(TOURNAMENT_2025, NORMAL, "Material Salvage", "w3446276940", "OM2025_break_Material Salvage"),
     CRYSTALLIZED_AIR(TOURNAMENT_2025, NORMAL, "Crystallized Air", "w3446278612", "OM2025_5_Crystallized_Air"),
     BULK_TRANSMUTATION(TOURNAMENT_2025, NORMAL, "Bulk Transmutation", "w3446278995", "OM2025_6_Bulk_Transmutation"),
-    //PASS_THROUGH_ALLOY(TOURNAMENT_2025, NORMAL, "Pass-Through Alloy", "w3446279881", "OM2025_7_Pass-Through_Alloy"),
+    PASS_THROUGH_ALLOY(TOURNAMENT_2025, NORMAL, "Pass-Through Alloy", "w3446279881", "OM2025_7_Pass-Through_Alloy"),
 
     HORN_SILVER(WEEKLIES_1, NORMAL, "Horn Silver", "w2513871683", "OM2021Demo_HornSilver"),
     // GREEN_VITRIOL(WEEKLIES_1, NORMAL, "Green Vitriol", "w2539581468", "OM2021Demo_GreenVitriol"),
