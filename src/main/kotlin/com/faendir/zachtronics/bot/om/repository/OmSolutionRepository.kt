@@ -134,6 +134,7 @@ class OmSolutionRepository(
         }
 
         return leaderboard.acquireWriteAccess().use { leaderboardScope ->
+            var displayLinkEmbed: String? = null
             val records by lazy { data.getValue(submission.puzzle) }
             val newMRecord by lazy {
                 if (submission.displayLink == null) {
@@ -145,8 +146,8 @@ class OmSolutionRepository(
                             Hashing.sha256().hashBytes(submission.data).toString().substring(0, 8)
                         }"
                     )
-                    submission.displayLinkEmbed = gif
                     submission.displayLink = video
+                    displayLinkEmbed = gif
                 }
                 submission.createMRecord(leaderboardScope)
             }
@@ -162,8 +163,12 @@ class OmSolutionRepository(
                         beatenMRecord.categories -= beatenCategories
                     } else {
                         val beatenRecord = beatenMRecord.record
-                        leaderboardScope.rm(beatenRecord.dataPath.toFile())
-                        leaderboardScope.rm(beatenRecord.dataPath.resolveSibling("${beatenRecord.fileStem()}.json").toFile())
+                        if (beatenRecord.dataPath != newMRecord.record.dataPath) {
+                            leaderboardScope.rm(beatenRecord.dataPath.toFile())
+                            leaderboardScope.rm(
+                                beatenRecord.dataPath.resolveSibling("${beatenRecord.fileStem()}.json").toFile()
+                            )
+                        }
                         records.remove(beatenMRecord)
                     }
                 }
@@ -186,7 +191,7 @@ class OmSolutionRepository(
                 leaderboardScope.push()
             }
             fun patchedUpRecord() = // add transient fields from submission
-                newMRecord.record.copy(author = submission.author, displayLinkEmbed = submission.displayLinkEmbed)
+                newMRecord.record.copy(author = submission.author, displayLinkEmbed = displayLinkEmbed)
             when (result) {
                 is SubmitResult.Success -> result.copy(record = patchedUpRecord())
                 is SubmitResult.Updated -> result.copy(record = patchedUpRecord())
@@ -370,6 +375,7 @@ class OmSolutionRepository(
         }
     }
 
+    /** also creates the files on disk */
     private fun OmSubmission.createMRecord(leaderboardScope: GitRepository.ReadWriteAccess): OmMemoryRecord {
         val name = fileStemOf(puzzle, score)
         val dir = leaderboardScope.getPuzzleDir(puzzle)

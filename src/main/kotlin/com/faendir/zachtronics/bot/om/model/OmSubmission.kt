@@ -27,5 +27,4 @@ data class OmSubmission(
 
     val allowGifUpdate: Boolean = false,
     val gifData: ByteArray? = null,
-    var displayLinkEmbed: String? = null,
 ) : Submission<OmCategory, OmPuzzle>
