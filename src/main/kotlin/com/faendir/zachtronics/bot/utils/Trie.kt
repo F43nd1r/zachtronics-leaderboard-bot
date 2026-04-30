@@ -27,10 +27,10 @@ class Trie<T> {
 
     private val root = TrieNode<T>()
 
-    fun get(word: CharSequence): List<T>? {
+    fun get(word: CharSequence): List<T> {
         var current = root
         for (c in word) {
-            current = current.children[c.uppercaseChar()] ?: return null
+            current = current.children[c.uppercaseChar()] ?: return emptyList()
         }
         return current.data
     }

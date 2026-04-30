@@ -91,7 +91,7 @@ class OmQLTest {
         val elements = parser.parseQuery("{W<=3.5}")
         expectThat(elements).hasSize(2) // NOVERLAP + {W<=3.5}
         expectThat(elements[1]).isA<OmQL.Constraint>()
-            .get { metric }.isA<Computed<*>>()
+            .get { metric }.isA<Custom<*>>()
             .get { displayName }.isEqualTo("W<=3.5")
     }
 
@@ -101,7 +101,7 @@ class OmQLTest {
         val elements = parser.parseQuery("[C*A]")
         expectThat(elements).hasSize(2) // NOVERLAP + [C*A]
         expectThat(elements[1]).isA<OmQL.Min>()
-            .get { metric }.isA<Computed<*>>()
+            .get { metric }.isA<Custom<*>>()
             .get { displayName }.isEqualTo("C*A")
     }
 
@@ -111,7 +111,7 @@ class OmQLTest {
         val elements = parser.parseQuery("[C+[A*B]]")
         expectThat(elements).hasSize(2) // NOVERLAP + [C+A]
         expectThat(elements[1]).isA<OmQL.Min>()
-            .get { metric }.isA<Computed<*>>()
+            .get { metric }.isA<Custom<*>>()
             .get { displayName }.isEqualTo("C+[A*B]")
     }
 
@@ -121,7 +121,7 @@ class OmQLTest {
         val elements = parser.parseQuery("{[A*B] <= 30}")
         expectThat(elements).hasSize(2) // NOVERLAP + {[A*B]<=30}
         expectThat(elements[1]).isA<OmQL.Constraint>()
-            .get { metric }.isA<Computed<*>>()
+            .get { metric }.isA<Custom<*>>()
             .get { displayName }.isEqualTo("[A*B] <= 30")
     }
 
@@ -132,7 +132,7 @@ class OmQLTest {
         expectThat(elements).hasSize(2) // NOVERLAP + ([C+[A*B]]HW)
         expectThat(elements[1]).isA<OmQL.Pareto>()
             .get { metrics }.and {
-                get { elementAt(0) }.isA<Computed<*>>()
+                get { elementAt(0) }.isA<Custom<*>>()
                     .get { displayName }.isEqualTo("[A*B]+C")
                 get { elementAt(1) }.isEqualTo(HEIGHT)
                 get { elementAt(2) }.isEqualTo(WIDTH)
@@ -216,14 +216,9 @@ class OmQLTest {
         "'false&&false||true', 'true'",
     )
     fun `custom metric operator precedence`(query: String, expected: String) {
-        val allOnes = OmScore(
-            1, 1, overlap = true, trackless = true,
-            1, 1, 1, 1.0, 1,
-            1.0, 1.toLevelValue(), 1.toInfinInt(), 1.0, 1.toInfinInt()
-        )
         val elements = parser.parseQuery("[$query]")
-        val customMetric = elements[1].metrics.first() as Custom<*>
-        val result = customMetric.getValueFrom(allOnes)
+        val customMetric = elements[1].metrics.first()
+        val result = customMetric.getValueFrom(OmQL.allOnes)
         if (result is Double)
             expectThat(result).isEqualTo(expected.toDouble())
         else

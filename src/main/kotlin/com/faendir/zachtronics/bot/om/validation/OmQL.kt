@@ -49,7 +49,7 @@ import kotlin.math.pow
  * - `{[C+G]<500}A`: Among records where Cost + Cycles < 500, find the minimum Area.
  * - `[C*G]`: Find the record(s) with the minimum product of Cost and Cycles.
  */
-internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint: MeasurePoint? = null) {
+internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoint? = null) {
     companion object {
         private val TRUE = OmMetric.Constant("true", true)
         private val FALSE = OmMetric.Constant("false", false)
@@ -73,6 +73,12 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
             put("%", Operator.Binary.BinaryDouble.REM)
             put("**", Operator.Binary.BinaryDouble.POW)
         }
+
+        val allOnes = OmScore(
+            1, 1, overlap = true, trackless = true,
+            1, 1, 1, 1.0, 1,
+            1.0, 1.toLevelValue(), 1.toInfinInt(), 1.0, 1.toInfinInt()
+        )
     }
 
     private val metricTrie = Trie<OmMetric<*>>().apply {
@@ -94,12 +100,13 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
 
     val OmMetric<*>.unambiguousName: String
         get() {
+            if (this is OmMetric.Custom<*> || this is OmMetric.Constant)
+                return displayName
             val metrics = metricTrie.get(displayName)
-            return when {
-                metrics == null -> displayName
-                metrics.size == 1 -> displayName
-                metrics.size >= 2 -> displayName + measurePoint.displayName
-                else -> throw IllegalArgumentException("Unknown metric: $displayName")
+            return when (metrics.size) {
+                0 -> throw IllegalArgumentException("Unknown metric: $displayName")
+                1 -> displayName
+                else -> displayName + measurePoint.displayName
             }
         }
 
@@ -161,7 +168,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
                 '{' -> { // {X=val} or {[bool expr]}
                     unloadMetrics()
                     val (foundMetric, end) = parseCustomMetric(query, idx + 1, '}')
-                    elements.add(Constraint(foundMetric.asComputed<Boolean>(context = "Constraint")))
+                    elements.add(Constraint(foundMetric.asCustom<Boolean>(context = "Constraint")))
                     idx = end
                 }
 
@@ -180,7 +187,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
                     idx++
                 }
 
-                else -> { // XYZ or [A*B] as computed metric
+                else -> { // XYZ or [A*B] as custom metric
                     val (foundMetric, end) = parseMetric(query, idx)
                     currMetrics.add(foundMetric)
                     idx = end
@@ -225,6 +232,9 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
         throw IllegalArgumentException("Unknown metric(s): ${query.substring(idx)}")
     }
 
+    /**
+     * @property precedence higher is more precedence-y, models python's rules
+     */
     private sealed interface Operator {
         val precedence: Int
         val rightAssociative: Boolean
@@ -287,31 +297,26 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
         METRIC, UNARY_OP, BINARY_OP,
     }
 
-    private fun parseCustomMetric(
-        query: String, startIdx: Int, boundary: Char
-    ): Pair<OmMetric.Computed<*>, Int> {
+    private fun parseCustomMetric(query: String, startIdx: Int, boundary: Char): Pair<OmMetric.Custom<*>, Int> {
         var idx = startIdx
         val opStack = ArrayDeque<Operator>()
         val metrics = mutableListOf<OmMetric<*>>()
-        val valueStack = ArrayDeque<(OmScore) -> Comparable<Any>?>()
+        val valueStack = ArrayDeque<(OmScore) -> Comparable<*>?>()
 
         var allowedTokens = EnumSet.of(Token.METRIC, Token.UNARY_OP)
 
         fun applyOperator(op: Operator) {
             val context = op::class.simpleName
 
-            @Suppress("UNCHECKED_CAST")
             when (op) {
                 is Operator.Unary<*> -> {
                     val value = valueStack.removeLast()
                     valueStack.addLast {
                         val v = value(it) ?: return@addLast null
                         when (op) {
-                            is Operator.Unary.UnaryBoolean ->
-                                op.func(v.booleanOrBust(context))
-                            is Operator.Unary.UnaryDouble ->
-                                op.func(v.doubleOrBust(context))
-                        } as Comparable<Any>
+                            is Operator.Unary.UnaryBoolean -> op.func(v.booleanOrBust(context))
+                            is Operator.Unary.UnaryDouble -> op.func(v.doubleOrBust(context))
+                        }
                     }
                 }
 
@@ -331,10 +336,10 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
                             is Operator.Binary.BinaryAny -> {
                                 if (l::class == r::class)
                                     op.func(l, r)
-                                else
+                                else // the only funnel conversion is to double, hope for the best
                                     op.func(l.doubleOrBust(context), r.doubleOrBust(context))
                             }
-                        } as Comparable<Any>
+                        }
                     }
                 }
             }
@@ -346,9 +351,10 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
             // null is treated as minimum precedence -> reduce everything
             if (incoming == null)
                 return true
-            if (incoming.rightAssociative)
-                return opStack.last().precedence > incoming.precedence
-            return opStack.last().precedence >= incoming.precedence
+            return if (incoming.rightAssociative)
+                opStack.peekLast().precedence > incoming.precedence
+            else
+                opStack.peekLast().precedence >= incoming.precedence
         }
 
         fun pushOperator(op: Operator?) {
@@ -395,8 +401,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
                 val (metric, end) = parseMetric(query, idx)
                 idx = end
                 metrics.add(metric)
-                @Suppress("UNCHECKED_CAST")
-                valueStack.addLast { metric.getValueFrom(it) as Comparable<Any>? }
+                valueStack.addLast(metric.getValueFrom)
                 allowedTokens = EnumSet.of(Token.BINARY_OP)
                 if (idx >= query.length)
                     throw IllegalArgumentException("Missing closing $boundary in query: $query")
@@ -410,7 +415,8 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
         // final reduction
         pushOperator(null)
 
-        val expression = valueStack.removeLast()
+        @Suppress("UNCHECKED_CAST")
+        val expression = valueStack.removeLast() as (OmScore) -> Comparable<Any>
 
         // if it throws it throws here
         expression(allOnes)
@@ -440,16 +446,10 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
         }
     }
 
-    private val allOnes = OmScore(
-        1, 1, overlap = true, trackless = true,
-        1, 1, 1, 1.0, 1,
-        1.0, 1.toLevelValue(), 1.toInfinInt(), 1.0, 1.toInfinInt()
-    )
-
-    private inline fun <reified T : Comparable<T>> OmMetric.Computed<*>.asComputed(context: String? = null): OmMetric.Computed<T> {
+    private inline fun <reified T : Comparable<T>> OmMetric.Custom<*>.asCustom(context: String? = null): OmMetric.Custom<T> {
         @Suppress("UNCHECKED_CAST")
         when (val v = getValueFrom(allOnes)!!) {
-            is T -> return this as OmMetric.Computed<T>
+            is T -> return this as OmMetric.Custom<T>
             else -> throw IllegalArgumentException("Invalid type: ${v::class.simpleName}" + (context?.let { " for $it" } ?: ""))
         }
     }
