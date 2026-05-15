@@ -84,6 +84,7 @@ export default function UploadView() {
             await new Promise((resolve) => setTimeout(resolve, 5000))
             setSolutionFile(undefined)
             setGifFile(undefined)
+            setGifLink("")
             setSuccessUrl(undefined)
         }
         setIsUploading(false)
