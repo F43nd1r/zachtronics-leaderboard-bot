@@ -36,6 +36,7 @@ import {Type} from "@sinclair/typebox"
 export default function UploadView() {
     const [solutionFile, setSolutionFile] = useState<FileObject | undefined>(undefined)
     const [gifFile, setGifFile] = useState<FileObject | undefined>(undefined)
+    const [gifLink, setGifLink] = useState<string>()
     const [author, setAuthor] = usePersistedState("om-upload-author", Type.String(), "")
     const [allowGifUpdate, setAllowGifUpdate] = useState<boolean>(false)
     const [error, setError] = useState<string>()
@@ -48,8 +49,12 @@ export default function UploadView() {
             setError("Please drop your solution file.")
             return
         }
-        if (!gifFile) {
-            setError("Please drop your GIF file.")
+        if (!gifFile && !gifLink) {
+            setError("Please drop your GIF file (or GIF link).")
+            return
+        }
+        if (gifFile && gifLink) {
+            setError("Enter only one of GIF file or GIF link.")
             return
         }
         if (!author) {
@@ -61,7 +66,11 @@ export default function UploadView() {
         const formData = new FormData()
         formData.append("author", author)
         formData.append("solution", new Blob([await solutionFile.file.arrayBuffer()]))
-        formData.append("gifData", new Blob([await gifFile.file.arrayBuffer()]))
+        if (gifFile) {
+            formData.append("gifData", new Blob([await gifFile.file.arrayBuffer()]))
+        } else {
+            formData.append("gif", gifLink)
+        }
         formData.append("allowGifUpdate", allowGifUpdate.toString());
         const response = await fetchFromApiRaw("/om/submit", {
             method: "POST",
@@ -141,28 +150,37 @@ export default function UploadView() {
                         useChipsForPreview={true}
                         showFileNames={true}
                     />
-                    <DropzoneAreaBase
-                        fileObjects={gifFile ? [gifFile] : []}
-                        onAdd={(newFiles) => {
-                            if (newFiles.length > 0) setGifFile(newFiles[0])
-                        }}
-                        onDelete={() => {
-                            setGifFile(undefined)
-                        }}
-                        filesLimit={1}
-                        acceptedFiles={[".gif"]}
-                        maxFileSize={100*1024*1024}
-                        dropzoneText="Drop your GIF file here"
-                        showPreviewsInDropzone={true}
-                        useChipsForPreview={true}
-                        showFileNames={true}
-                    />
+                    <Box sx={{ display: "flex", gap: "1em", flexDirection: "column", minWidth: "40%" }}>
+                        <DropzoneAreaBase
+                            fileObjects={gifFile ? [gifFile] : []}
+                            onAdd={(newFiles) => {
+                                if (newFiles.length > 0) setGifFile(newFiles[0])
+                            }}
+                            onDelete={() => {
+                                setGifFile(undefined)
+                            }}
+                            filesLimit={1}
+                            acceptedFiles={[".gif"]}
+                            maxFileSize={100*1024*1024}
+                            dropzoneText="Drop your GIF file here"
+                            showPreviewsInDropzone={true}
+                            useChipsForPreview={true}
+                            showFileNames={true}
+                        />
+                        <TextField
+                            id="gifLink"
+                            label="GIF Link"
+                            variant="outlined"
+                            fullWidth
+                            onChange={(e) => setGifLink(e.target.value)}
+                        />
+                    </Box>
                 </Box>
                 <Button
                     variant="contained"
                     color="primary"
                     onClick={handleUpload}
-                    disabled={isUploading || !solutionFile || !gifFile || !author}
+                    disabled={isUploading || !solutionFile || !(gifFile || gifLink) || !author}
                     type="submit"
                 >
                     Upload
