@@ -283,6 +283,17 @@ enum class OmPuzzle(
     BULK_TRANSMUTATION(TOURNAMENT_2025, NORMAL, "Bulk Transmutation", "w3446278995", "OM2025_6_Bulk_Transmutation"),
     PASS_THROUGH_ALLOY(TOURNAMENT_2025, NORMAL, "Pass-Through Alloy", "w3446279881", "OM2025_7_Pass-Through_Alloy"),
 
+    SNOW_AMPUTATION(TOURNAMENT_2026, NORMAL, "Snow Amputation", "w3728198961", "OM2026_W1_Snow_Amputation"),
+    QUIET_HOURS(TOURNAMENT_2026, NORMAL, "Quiet Hours", "w3728199426", "OM2026_W2_Quiet_Hours"),
+    ALCHEMIST_S_CLAY(TOURNAMENT_2026, PRODUCTION, "Alchemist's Clay", "w3728200093", "OM2026_W3_Clusterfgold"),
+    ROSHAMBONITE(TOURNAMENT_2026, NORMAL, "Roshambonite", "w3728200145", "OM2026_W4_Roshambonite"),
+    TAX_FRAUD(TOURNAMENT_2026, NORMAL, "Tax Fraud", "w3728200215", "OM2026_W5_Tax_Fraud"),
+    AMELIA_S_CATALYST(TOURNAMENT_2026, NORMAL, "Amelia's Catalyst", "w3728200264", "OM2026_W6_Amelia's_Catalayst"),
+    IMMORTAL_FILAMENT(TOURNAMENT_2026, POLYMER, "Immortal Filament", "w3728200326", "OM2026_W7_Immortal_Filament"),
+    ORANGE_VITRIOL(TOURNAMENT_2026, NORMAL, "Orange Vitriol", "w3728200375", "OM2026_W8_Orange_Vitriol"),
+    INTUMESCENT_LEAD(TOURNAMENT_2026, NORMAL, "Intumescent Lead", "w3728200437", "OM2026_W9_Intumescent_Lead"),
+    ONE_LAST_FAVOR(TOURNAMENT_2026, NORMAL, "One Last Favor", "w3728200519", "OM2026_W10_One_Last_Favor"),
+
     HORN_SILVER(WEEKLIES_1, NORMAL, "Horn Silver", "w2513871683", "OM2021Demo_HornSilver"),
     // GREEN_VITRIOL(WEEKLIES_1, NORMAL, "Green Vitriol", "w2539581468", "OM2021Demo_GreenVitriol"),
     FERROUS_WHEEL(WEEKLIES_1, NORMAL, "Ferrous Wheel", "w2565611826", "OM2021Demo_FerrousWheel"),
