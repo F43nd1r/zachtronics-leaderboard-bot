@@ -157,10 +157,10 @@ sealed interface OmMetric<T> : Metric where T : Comparable<T> {
     ) : Computed<T>
 
     /** true constants */
-    open class Constant<T : Comparable<T>>(
+    open class Constant<T : Comparable<T>?>(
         override val displayName: String,
         val value: T,
-    ) : OmMetric<T> {
+    ) : OmMetric<T & Any> {
         override val collapsible: Boolean = false
         override val measurePoint = MeasurePoint.START
         override val getValueFrom: (OmScore) -> T = { value }

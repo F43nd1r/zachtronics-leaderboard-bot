@@ -38,6 +38,7 @@ import kotlin.math.pow
  * - `[A*B]`: Define a custom metric. Can be used inside other constructs, e.g., `{[A+B]<100}` or `[A*B]` (to minimize the product).
  * - `true`/`false`: Boolean constants.
  * - `123`: Numeric constants.
+ * - `null`: Value of untracked metrics, like B in production.
  *
  * Metrics are identified by their display names (e.g., `C`, `G`, `S`, `A`, `L`, `I`), common aliases are supported.
  * The measure point can be appended to a metric name to disambiguate them or just because (e.g. `A@INF`, `C@V`)
@@ -53,6 +54,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
     companion object {
         private val TRUE = OmMetric.Constant("true", true)
         private val FALSE = OmMetric.Constant("false", false)
+        private val NULL = OmMetric.Constant<Comparable<Any?>?>("null", null)
 
         private val NUMBER_FORMAT = NumberFormat.getInstance(Locale.ENGLISH)
 
@@ -90,7 +92,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
                 put("$name@INF", m)
         }
 
-        for (m in possibleMetrics + TRUE + FALSE) {
+        for (m in possibleMetrics + listOf(TRUE, FALSE, NULL)) {
             putAll(m, m.displayName)
             if (m is OmMetric.Value<*> && m.alias != null) {
                 putAll(m, m.alias)
@@ -258,11 +260,11 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
         sealed interface Binary<I> : Operator {
             val func: (I, I) -> Comparable<*>
 
-            sealed class BinaryAny(override val func: (Any, Any) -> Boolean,
+            sealed class BinaryAny(override val func: (Any?, Any?) -> Boolean,
                                    override val precedence: Int,
                                    override val rightAssociative: Boolean = false
-            ) : Binary<Any> {
-                data object EQ : BinaryAny(Any::equals, 3)
+            ) : Binary<Any?> {
+                data object EQ : BinaryAny({ a, b -> a == b }, 3)
                 data object NE : BinaryAny({ a, b -> a != b }, 3)
             }
 
@@ -325,10 +327,16 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
                     val left = valueStack.removeLast()
 
                     valueStack.addLast {
-                        val l = left(it) ?: return@addLast null
-                        val r = right(it) ?: return@addLast null
+                        val l = left(it)
+                        val r = right(it)
 
-                        when (op) {
+                        if (l == null || r == null) {
+                            if (op is Operator.Binary.BinaryAny) { // we can try it
+                                op.func(l, r)
+                            }
+                            else null
+                        }
+                        else when (op) {
                             is Operator.Binary.BinaryBoolean ->
                                 op.func(l.booleanOrBust(context), r.booleanOrBust(context))
                             is Operator.Binary.BinaryDouble ->

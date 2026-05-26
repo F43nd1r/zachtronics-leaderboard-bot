@@ -27,12 +27,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import strikt.api.expectDoesNotThrow
 import strikt.api.expectThat
 import strikt.api.expectThrows
-import strikt.assertions.contains
-import strikt.assertions.containsExactly
-import strikt.assertions.containsExactlyInAnyOrder
-import strikt.assertions.hasSize
-import strikt.assertions.isA
-import strikt.assertions.isEqualTo
+import strikt.assertions.*
 
 class OmQLTest {
 
@@ -149,7 +144,7 @@ class OmQLTest {
     }
 
     @ParameterizedTest(name = "{0}")
-    @ValueSource(strings = ["[0-C]", "(CGAI)", "[C]", "[!T]", "[ ! ! T]"])
+    @ValueSource(strings = ["[0-C]", "(CGAI)", "[C]", "[!T]", "[ ! ! T]", "null"])
     fun `valid stuff`(query: String) {
         expectDoesNotThrow {
             parser.parseQuery(query)
