@@ -22,15 +22,15 @@ package com.faendir.zachtronics.bot.utils
 class Trie<T> {
     private class TrieNode<T>(
         val children: MutableMap<Char, TrieNode<T>> = mutableMapOf(),
-        var data: MutableList<T> = mutableListOf()
+        val data: MutableList<T> = mutableListOf()
     )
 
     private val root = TrieNode<T>()
 
-    fun get(word: CharSequence): List<T>? {
+    operator fun get(word: CharSequence): List<T> {
         var current = root
         for (c in word) {
-            current = current.children[c.uppercaseChar()] ?: return null
+            current = current.children[c.uppercaseChar()] ?: return emptyList()
         }
         return current.data
     }
