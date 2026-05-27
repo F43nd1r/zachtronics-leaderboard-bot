@@ -116,7 +116,7 @@ function Categories() {
                                             primary={`${category.displayName} (${category.metrics.filter(Boolean).join("→")})${
                                                 {'["NORMAL"]':' (Normal)',
                                                  '["PRODUCTION"]':' (Production)',
-                                                 '["NORMAL","HEIGHT_POLYMER","WIDTH_POLYMER","POLYMER"]':' (Freespace)'
+                                                 '["NORMAL","POLYMER_HEIGHT","POLYMER_WIDTH","POLYMER_SKEW"]':' (Freespace)'
                                                 }[JSON.stringify(category.puzzleTypes)] ?? " (All)"
                                             }`}
                                         />

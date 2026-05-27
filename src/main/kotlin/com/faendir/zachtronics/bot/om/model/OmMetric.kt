@@ -264,7 +264,7 @@ object OmMetrics {
     private val ALL_SCORE_PARTS = FULL_SCORE + listOf(OmMetric.A0_INF, OmMetric.A1_INF, OmMetric.A2_INF)
 
     fun userFacing(type: OmType? = null) = ALL_SCORE_PARTS + when (type) {
-        OmType.NORMAL, OmType.HEIGHT_POLYMER, OmType.WIDTH_POLYMER, OmType.POLYMER -> listOf(
+        OmType.NORMAL, OmType.POLYMER_HEIGHT, OmType.POLYMER_WIDTH, OmType.POLYMER_SKEW -> listOf(
             OmMetric.SUM3A,
             OmMetric.SUM4,
             OmMetric.PRODUCT_GCA,
