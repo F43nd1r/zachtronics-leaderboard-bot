@@ -17,9 +17,11 @@
 package com.faendir.zachtronics.bot.om.validation
 
 import com.faendir.om.parser.solution.SolutionParser
-import com.faendir.om.parser.solution.model.Position
 import com.faendir.om.parser.solution.model.SolvedSolution
-import com.faendir.om.parser.solution.model.part.*
+import com.faendir.om.parser.solution.model.part.Arm
+import com.faendir.om.parser.solution.model.part.ArmType
+import com.faendir.om.parser.solution.model.part.Glyph
+import com.faendir.om.parser.solution.model.part.GlyphType
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmSubmission
@@ -32,7 +34,6 @@ import okio.sink
 import okio.source
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import kotlin.math.abs
 import kotlin.math.ceil
 
 
@@ -90,8 +91,10 @@ fun OmSolutionVerifier.getScore(type: OmType): OmScore {
     )
 }
 
-fun createSubmission(inputSolData: ByteArray, author: String, allowGifUpdate: Boolean = false,
-                     gif: String? = null, gifData: ByteArray? = null): OmSubmission {
+fun createSubmission(
+    inputSolData: ByteArray, author: String, allowGifUpdate: Boolean = false,
+    gif: String? = null, gifData: ByteArray? = null
+): OmSubmission {
     val solution = try {
         SolutionParser.parse(ByteArrayInputStream(inputSolData).source().buffer())
     } catch (e: Exception) {
@@ -115,12 +118,6 @@ fun createSubmission(inputSolData: ByteArray, author: String, allowGifUpdate: Bo
     if (solution.parts.count { it is Glyph && it.type == GlyphType.PROLIFERATION } > 1) {
         throw IllegalArgumentException("Multiple Proliferation glyphs are banned.")
     }
-    if (solution.parts.filterIsInstance<IO>().groupBy { it.type to it.index }.values.any { it.size > 1 }) {
-        throw IllegalArgumentException("Duplicated Inputs or Outputs are banned.")
-    }
-    if (solution.parts.any { (abs(it.position.x) >= 16384) or (abs(it.position.y) >= 16384) or (abs(it.position.z) >= 16384) }) {
-        throw IllegalArgumentException("Parts farther than 2^14 from the origin are banned.")
-    }
     val (puzzle, solutionData) = OmPuzzle.entries.find { it.id == solution.puzzle }?.let { it to inputSolData }
         ?: OmPuzzle.entries.find { it.altIds.contains(solution.puzzle) }?.let {
             solution.puzzle = it.id
@@ -131,8 +128,20 @@ fun createSubmission(inputSolData: ByteArray, author: String, allowGifUpdate: Bo
         ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
     val puzzleFile = puzzle.file
     OmSolutionVerifier(puzzleFile.readBytes(), solutionData).use { verifier ->
+        if (verifier.getMetric(OmSimMetric.DUPLICATE_REAGENTS) > 0) {
+            throw IllegalArgumentException("Duplicated Reagents are banned.")
+        }
+        if (verifier.getMetric(OmSimMetric.DUPLICATE_PRODUCTS) > 0) {
+            throw IllegalArgumentException("Duplicated Products are banned.")
+        }
         if (verifier.getMetric(OmSimMetric.MAXIMUM_TRACK_GAP_POW_2) > 1) {
             throw IllegalArgumentException("Quantum Tracks are banned.")
+        }
+        if (verifier.getMetric(OmSimMetric.MAXIMUM_ABSOLUTE_PART_COORDINATE) >= 16384) {
+            throw IllegalArgumentException("Parts farther than 2^14 from the origin are banned.")
+        }
+        if (verifier.getMetric(OmSimMetric.CABINET_VIOLATIONS) != 0) {
+            throw IllegalArgumentException("Violating production restrictions is banned.")
         }
         return OmSubmission(
             puzzle,
@@ -145,5 +154,3 @@ fun createSubmission(inputSolData: ByteArray, author: String, allowGifUpdate: Bo
         )
     }
 }
-
-val Position.z get() = -x - y

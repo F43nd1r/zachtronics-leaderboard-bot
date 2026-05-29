@@ -65,6 +65,9 @@ sealed class OmSimMetric<T: Number>(val id: String) {
     object DUPLICATE_REAGENTS : OmSimMetric<Int>("duplicate reagents")
     object DUPLICATE_PRODUCTS : OmSimMetric<Int>("duplicate products")
     object MAXIMUM_TRACK_GAP_POW_2 : OmSimMetric<Int>("maximum track gap^2")
+    object MAXIMUM_ABSOLUTE_PART_COORDINATE : OmSimMetric<Int>("maximum absolute part coordinate")
+    object CONDUIT_VIOLATIONS : OmSimMetric<Int>("conduit violations")
+    object CABINET_VIOLATIONS : OmSimMetric<Int>("cabinet violations")
     object VISUAL_LOOP_START_CYCLE : OmSimMetric<Int>("visual loop start cycle")
     object VISUAL_LOOP_END_CYCLE : OmSimMetric<Int>("visual loop end cycle")
 }
