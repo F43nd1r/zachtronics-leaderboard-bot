@@ -18,12 +18,11 @@ package com.faendir.zachtronics.bot.om.rest.dto
 
 import com.faendir.zachtronics.bot.om.model.OmCategory
 
-data class OmCategoryDTO(val id: String, val displayName: String, val metrics: List<String>, val puzzleTypes: List<String>, val manifold: OmScoreManifoldDTO)
+data class OmCategoryDTO(val id: String, val displayName: String, val metrics: List<String>, val manifold: OmScoreManifoldDTO)
 
 fun OmCategory.toDTO() = OmCategoryDTO(
     id = name,
     displayName = displayName,
     metrics = metrics.map { metric -> metric.description },
-    puzzleTypes = supportedTypes.map { it.displayName },
     manifold = manifold.toDTO()
 )

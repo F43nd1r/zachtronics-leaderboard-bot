@@ -19,5 +19,9 @@ package com.faendir.zachtronics.bot.om.model
 import com.faendir.zachtronics.bot.model.Type
 
 enum class OmType(override val displayName: String) : Type {
-    NORMAL("normal"), POLYMER("polymer"), PRODUCTION("production"),
+    NORMAL("normal"),
+    POLYMER_HEIGHT("polymer height"),
+    POLYMER_WIDTH("polymer width"),
+    POLYMER_SKEW("polymer skew"),
+    PRODUCTION("production"),
 }

@@ -38,8 +38,8 @@ data class OmScore(
     // @V
     val cycles: Int,
     val area: Int,
-    val height: Int?,      // tracked for NORMAL,POLYMER
-    val width: Double?,    // tracked for NORMAL
+    val height: Int?,      // tracked for NORMAL,POLYMER_HEIGHT
+    val width: Double?,    // tracked for NORMAL,POLYMER_WIDTH
     val boundingHex: Int?, // tracked for NORMAL
 
     // @INF
@@ -58,8 +58,8 @@ data class OmScore(
      * represented as (level, value)
      */
     val areaINF: LevelValue?,
-    val heightINF: InfinInt?,      // tracked for NORMAL,POLYMER
-    val widthINF: Double?,         // tracked for NORMAL
+    val heightINF: InfinInt?,      // tracked for NORMAL,POLYMER_HEIGHT
+    val widthINF: Double?,         // tracked for NORMAL,POLYMER_WIDTH
     val boundingHexINF: InfinInt?, // tracked for NORMAL
 ) : Score<OmCategory> {
     @Transient

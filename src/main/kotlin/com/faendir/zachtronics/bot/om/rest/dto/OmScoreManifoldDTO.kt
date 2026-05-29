@@ -18,6 +18,13 @@ package com.faendir.zachtronics.bot.om.rest.dto
 
 import com.faendir.zachtronics.bot.om.model.OmScoreManifold
 
-data class OmScoreManifoldDTO(val id: String, val displayName: String, val metrics: List<String>)
+data class OmScoreManifoldDTO(
+    val id: String,
+    val displayName: String,
+    val measurePoint: Int,
+    val puzzleTypes: List<String>,
+    val metrics: List<String>,
+)
 
-fun OmScoreManifold.toDTO() = OmScoreManifoldDTO(name, displayName, scoreParts.map { it.description })
+fun OmScoreManifold.toDTO() =
+    OmScoreManifoldDTO(name, displayName, measurePoint.ordinal, supportedTypes.map { it.name }, scoreParts.map { it.description })

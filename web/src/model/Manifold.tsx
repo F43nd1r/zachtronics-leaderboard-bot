@@ -17,4 +17,6 @@
 export default interface Manifold {
     id: string
     displayName: string
+    measurePoint: number
+    puzzleTypes: ("NORMAL" | "POLYMER_HEIGHT" | "POLYMER_WIDTH" | "POLYMER_SKEW" | "PRODUCTION")[]
 }

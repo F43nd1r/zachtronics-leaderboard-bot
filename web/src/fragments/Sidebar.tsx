@@ -88,11 +88,13 @@ function Puzzles({ group, puzzles, selectedPuzzleId }: PuzzlesProps) {
 }
 
 function groupCategories(categories: Category[]) {
-    return categories.reduce<CustomMap<Manifold, Category[]>>((acc, category) => {
+    const map = categories.reduce<CustomMap<Manifold, Category[]>>((acc, category) => {
         if (!acc.has(category.manifold)) acc.set(category.manifold, [category])
         else acc.get(category.manifold)!.push(category)
         return acc
     }, new CustomMap((manifold) => manifold.id))
+    return [...map].sort((a, b) =>
+        a[0].measurePoint - b[0].measurePoint || a[0].displayName.localeCompare(b[0].displayName))
 }
 
 function Categories() {
@@ -103,22 +105,17 @@ function Categories() {
             <ApiResource<Category[]>
                 url={"/om/categories"}
                 element={(categories) =>
-                    groupCategories(categories).map((manifold, categories) => (
+                    groupCategories(categories).map(([manifold, categories]) => (
                         <ExpandableListItem
                             key={manifold.id}
                             title={`Categories ${manifold.displayName}`}
                             icon={<CategoryIcon />}
                             content={categories
-                                .sort((a, b) => (b.puzzleTypes.length - a.puzzleTypes.length)) // all then freespace then prods
                                 .map((category) => (
                                     <LinkListItem sx={{ pl: 4 }} key={category.id} to={`/categories/${category.id}`} selected={categoryId === category.id}>
                                         <ListItemText
-                                            primary={`${category.displayName} (${category.metrics.filter(Boolean).join("→")})${
-                                                {'["NORMAL"]':' (Normal)',
-                                                 '["PRODUCTION"]':' (Production)',
-                                                 '["NORMAL","POLYMER"]':' (Freespace)'
-                                                }[JSON.stringify(category.puzzleTypes)] ?? " (All)"
-                                            }`}
+                                            primary={`${category.displayName} (${category.metrics.filter(Boolean).join("→")})
+                                             (${manifold.puzzleTypes.includes("PRODUCTION") ? 'Prod' : 'Normal'})`}
                                         />
                                     </LinkListItem>
                                 ))}

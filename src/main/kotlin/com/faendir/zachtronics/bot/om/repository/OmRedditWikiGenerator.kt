@@ -20,17 +20,18 @@ import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.StringFormat
 import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.om.model.OmCategory.*
-import com.faendir.zachtronics.bot.om.model.OmType.PRODUCTION
+import com.faendir.zachtronics.bot.om.model.OmType.*
 import com.faendir.zachtronics.bot.reddit.RedditService
 import com.faendir.zachtronics.bot.reddit.Subreddit.OPUS_MAGNUM
 import com.faendir.zachtronics.bot.utils.Markdown
+import com.faendir.zachtronics.bot.utils.runIf
 import org.springframework.stereotype.Component
 import org.springframework.util.ResourceUtils
 
 @Component
 class OmRedditWikiGenerator(private val reddit: RedditService) {
     companion object {
-        private const val wikiPage = "index"
+        private const val WIKI_PAGE = "index"
     }
 
     private val costCategories = setOf(GC, GC_P, GA, GX, GX_P, GI_P)
@@ -49,7 +50,8 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
     private fun Pair<OmRecord, List<OmCategory>>?.toMarkdown(): String {
         if (this == null) return ""
         val score = first.score.toDisplayString(DisplayContext(StringFormat.REDDIT, second))
-        return "${Markdown.linkOrText(score, first.displayLink)}${if (second.any { it.name.contains("X") }) "*" else ""}"
+        return Markdown.linkOrText(score, first.displayLink)
+            .runIf(second.any { it.metrics.any { m -> m is OmMetric.Product } }) { "$this*" }
     }
 
     internal fun update(categories: List<OmCategory>, data: Map<OmPuzzle, Set<OmMemoryRecord>>) {
@@ -64,7 +66,7 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
                     val puzzles = OmPuzzle.entries.filter { it.group == group }
                     val thirdCategory = puzzles.map {
                         when (it.type) {
-                            OmType.NORMAL, OmType.POLYMER -> "Area"
+                            NORMAL, POLYMER_HEIGHT, POLYMER_WIDTH, POLYMER_SKEW -> "Area"
                             PRODUCTION -> "Instructions"
                         }
                     }.distinct().joinToString("/")
@@ -91,8 +93,8 @@ class OmRedditWikiGenerator(private val reddit: RedditService) {
                 append("\n")
                 append(suffix)
             }
-            if (content.lines() != reddit.getWikiPage(OPUS_MAGNUM, wikiPage).lines()) {
-                reddit.updateWikiPage(OPUS_MAGNUM, wikiPage, content, "bot update")
+            if (content.lines() != reddit.getWikiPage(OPUS_MAGNUM, WIKI_PAGE).lines()) {
+                reddit.updateWikiPage(OPUS_MAGNUM, WIKI_PAGE, content, "bot update")
             }
         }
     }

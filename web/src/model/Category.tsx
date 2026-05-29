@@ -20,6 +20,5 @@ export default interface Category {
     id: string
     displayName: string
     metrics: string[]
-    puzzleTypes: ("NORMAL" | "INFINITE" | "PRODUCTION")[]
     manifold: Manifold
 }
