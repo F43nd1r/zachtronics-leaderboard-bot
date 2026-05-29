@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Divider, IconButton, styled, SwipeableDrawer, Toolbar, Typography, useTheme } from "@mui/material"
+import {Button, Divider, IconButton, styled, SwipeableDrawer, Toolbar, Typography, useTheme } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
@@ -134,9 +134,9 @@ export default function App() {
                             </IconButton>
                         </UnstyledLink>
                         <UnstyledLink to={"upload"} aria-label="upload">
-                            <IconButton sx={{ ml: 1 }} color="inherit">
-                                <Upload />
-                            </IconButton>
+                            <Button sx={{ ml: 1, textTransform: 'none' }} color="inherit" startIcon={<Upload />}>
+                                Upload
+                            </Button>
                         </UnstyledLink>
                     </div>
                     <IconButton onClick={handleDrawerClose}>{theme.direction === "ltr" ? <ChevronLeftIcon /> : <ChevronRightIcon />}</IconButton>
