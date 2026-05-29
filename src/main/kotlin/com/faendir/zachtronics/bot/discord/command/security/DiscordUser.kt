@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,12 +42,13 @@ enum class DiscordUser(val id: Long, val getSpecialEmoji: (Guild?) -> Emoji? = {
     A_SNOWBALL(136186716334587904),
     ROLAMNI(177824842370777088),
     HUETOBI(229031957445476352),
+    CRAZYBOT27(591393700131635210)
     ;
 
     companion object {
         @JvmField
         val BOT_OWNERS = setOf(F43ND1R, IEEE12345)
-        val OM_LB_ADMINS = BOT_OWNERS + setOf(BIGGIE, GRIMMY, RP0, PANIC, SYX)
+        val OM_LB_ADMINS = BOT_OWNERS + setOf(BIGGIE, GRIMMY, RP0, PANIC, SYX, CRAZYBOT27)
     }
 }
 
