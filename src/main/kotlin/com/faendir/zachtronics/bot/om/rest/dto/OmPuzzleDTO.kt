@@ -27,4 +27,4 @@ data class OmPuzzleDTO(
     @JsonInclude(JsonInclude.Include.NON_EMPTY) val altIds: List<String>
 )
 
-fun OmPuzzle.toDTO() = OmPuzzleDTO(id, displayName, group.toDTO(), type.displayName, altIds.toList())
+fun OmPuzzle.toDTO() = OmPuzzleDTO(id, displayName, group.toDTO(), type.name, altIds.toList())
