@@ -30,7 +30,6 @@ import com.faendir.zachtronics.bot.om.OmQualifier
 import com.faendir.zachtronics.bot.om.model.OmMetrics
 import com.faendir.zachtronics.bot.om.omMeasurePointOptionBuilder
 import com.faendir.zachtronics.bot.om.omPuzzleOptionBuilder
-import com.faendir.zachtronics.bot.om.repository.OmMemoryRecord
 import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.om.validation.OmQL
 import com.faendir.zachtronics.bot.utils.Markdown
@@ -50,11 +49,23 @@ class OmQueryCommand(private val repository: OmSolutionRepository, val discordAc
 
     val puzzleOption = omPuzzleOptionBuilder().required().build()
     val queryOption = CommandOptionBuilder.string("query")
-        .description("Query string in the form A{B=3}[C*D]E(FG)[H@V], O is false unless specified")
+        .description("Query string in the form A{B=3}[C*D]\"arms\"(FG)[H@V], O is false unless specified")
         .required().build()
     val measurePointOption = omMeasurePointOptionBuilder().build()
 
     override val options = listOf(puzzleOption, queryOption, measurePointOption)
+
+    companion object {
+        private val deepQuotes = listOf(
+            "*You stare into the abyss.*\n" +
+                    "*The abyss can't stare back, as it has no eyes.*",
+            "*Started with nothing, still got most of it.*",
+            "*A blank space, it seems.*\n" +
+                    "*Perhaps something to explore?*",
+            "*A null result.*\n" +
+                    "*Could be impossible, could be unknown.*"
+        )
+    }
 
     override fun handleEvent(event: ChatInputInteractionEvent): SafeMessageBuilder {
         val puzzle = puzzleOption.get(event)
@@ -65,15 +76,14 @@ class OmQueryCommand(private val repository: OmSolutionRepository, val discordAc
         val queryElements = OmQL(possibleMetrics, measurePoint).parseQuery(query)
         val name = Markdown.escape(queryElements.joinToString("", "", measurePoint?.displayName.orEmpty()))
 
-        val data: Collection<OmMemoryRecord> = repository.immutableData[puzzle]!!
-        val records = queryElements.fold(data) { acc, el -> el.filter(acc) }
+        val records = repository.executeOmQL(puzzle, queryElements)
 
         return when (records.size) {
             0 -> MultiMessageSafeEmbedMessageBuilder()
                 .title("*${puzzle.displayName}* $name")
                 .url(puzzle.link)
                 .color(Colors.UNCHANGED)
-                .description("*You stare into the abyss*\n*The abyss can't stare back, as it has no eyes*")
+                .description(deepQuotes.random())
             1 -> {
                 val record = records.first().record
                 val categories = records.first().categories
@@ -90,7 +100,7 @@ class OmQueryCommand(private val repository: OmSolutionRepository, val discordAc
                 .title("*${puzzle.displayName}* $name")
                 .url(puzzle.link)
                 .color(Colors.READ)
-                .embedRecords(records.map { it.toCategoryRecord() }, puzzle.supportedCategories)
+                .embedRecords(records, puzzle.supportedCategories)
         }
     }
 }

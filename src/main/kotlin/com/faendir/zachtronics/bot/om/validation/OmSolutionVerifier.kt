@@ -40,48 +40,45 @@ class OmSolutionVerifier(puzzle: ByteArray, solution: ByteArray) : Closeable {
         return arena.allocateFrom(s)
     }
 
-    private fun throwIfError(verifier: MemorySegment) {
+    private fun <T> evaluate(eval: (MemorySegment, MemorySegment) -> T, command: String): T {
+        val result = eval(verifier, toMemorySegment(command))
         val error = OmSimWrapper.verifier_error(verifier)
         if (error != MemorySegment.NULL) {
             val errorString = error.getString(0)
             OmSimWrapper.verifier_error_clear(verifier)
             throw ValidationException(errorString)
         }
-    }
-
-    fun getMetric(metric: OmSimMetric<Int>): Int {
-        val result = OmSimWrapper.verifier_evaluate_metric(verifier, toMemorySegment(metric.id))
-        throwIfError(verifier)
         return result
     }
 
-    fun getApproximateMetric(metric: OmSimMetric<*>): Double {
-        val result = OmSimWrapper.verifier_evaluate_approximate_metric(verifier, toMemorySegment(metric.id))
-        throwIfError(verifier)
+    fun getMetric(metric: OmSimMetric<Int>) = evaluate(OmSimWrapper::verifier_evaluate_metric, metric.id)
+
+    fun getApproximateMetric(metric: OmSimMetric<*>) =
+        evaluate(OmSimWrapper::verifier_evaluate_approximate_metric, metric.id)
+
+    private fun <T> evaluateSafe(eval: (MemorySegment, MemorySegment) -> T, command: String): T? {
+        val result = eval(verifier, toMemorySegment(command))
+        val error = OmSimWrapper.verifier_error(verifier)
+        if (error != MemorySegment.NULL) {
+            val errorString = error.getString(0)
+            val source = OmSimWrapper.verifier_error_source(verifier)
+            OmSimWrapper.verifier_error_clear(verifier)
+            if (source == OmSimWrapper.verifier_error_source_simulation()) {
+                return null
+            } else {
+                throw IllegalArgumentException("$errorString: \"$command\"")
+            }
+        }
         return result
     }
 
-    fun getMetricSafe(metric: OmSimMetric<Int>): Int? {
-        val result = OmSimWrapper.verifier_evaluate_metric(verifier, toMemorySegment(metric.id))
-        val error = OmSimWrapper.verifier_error(verifier)
-        if (error != MemorySegment.NULL) {
-            OmSimWrapper.verifier_error_clear(verifier)
-            return null
-        } else {
-            return result
-        }
-    }
+    fun getMetricSafe(metric: OmSimMetric<Int>) = evaluateSafe(OmSimWrapper::verifier_evaluate_metric, metric.id)
 
-    fun getApproximateMetricSafe(metric: OmSimMetric<*>): Double? {
-        val result = OmSimWrapper.verifier_evaluate_approximate_metric(verifier, toMemorySegment(metric.id))
-        val error = OmSimWrapper.verifier_error(verifier)
-        if (error != MemorySegment.NULL) {
-            OmSimWrapper.verifier_error_clear(verifier)
-            return null
-        } else {
-            return result
-        }
-    }
+    /** this is generic and safe enough that we can expose it taking arbitrary commands */
+    fun getApproximateMetricSafe(command: String) =
+        evaluateSafe(OmSimWrapper::verifier_evaluate_approximate_metric, command)
+
+    fun getApproximateMetricSafe(metric: OmSimMetric<*>) = getApproximateMetricSafe(metric.id)
 
     override fun close() {
         OmSimWrapper.verifier_destroy(verifier)

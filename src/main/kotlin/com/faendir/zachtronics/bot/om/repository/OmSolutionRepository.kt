@@ -22,6 +22,8 @@ import com.faendir.zachtronics.bot.mors.GifValidationService
 import com.faendir.zachtronics.bot.mors.MorsService
 import com.faendir.zachtronics.bot.om.model.*
 import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
+import com.faendir.zachtronics.bot.om.validation.OmQL
+import com.faendir.zachtronics.bot.om.validation.OmSolutionVerifier
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
@@ -39,6 +41,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import java.io.File
 import java.util.*
+import kotlin.io.path.readBytes
 
 @OptIn(ExperimentalSerializationApi::class)
 @Component
@@ -410,26 +413,61 @@ class OmSolutionRepository(
     private fun OmRecord.fileStem() = fileStemOf(puzzle, score)
 
     override fun find(puzzle: OmPuzzle, category: OmCategory): OmRecord? {
-        leaderboard.acquireReadAccess().use { l -> loadDataIfNecessary(l) }
-        return data[puzzle]?.find { category in it.categories }?.record
+        return leaderboard.acquireReadAccess().use { l ->
+            loadDataIfNecessary(l)
+            data[puzzle]?.find { category in it.categories }?.record
+        }
     }
 
     override fun findCategoryHolders(puzzle: OmPuzzle, includeFrontier: Boolean): List<CategoryRecord<OmRecord, OmCategory>> {
-        leaderboard.acquireReadAccess().use { l -> loadDataIfNecessary(l) }
-        return data[puzzle]
-            ?.filter { includeFrontier || it.categories.isNotEmpty() }
-            ?.map(OmMemoryRecord::toCategoryRecord)
-            ?: emptyList()
+        return leaderboard.acquireReadAccess().use { l ->
+            loadDataIfNecessary(l)
+            data[puzzle]
+                ?.filter { includeFrontier || it.categories.isNotEmpty() }
+                ?.map(OmMemoryRecord::toCategoryRecord)
+                ?: emptyList()
+        }
     }
 
     fun findAll(category: OmCategory): Map<OmPuzzle, OmRecord?> {
-        leaderboard.acquireReadAccess().use { l -> loadDataIfNecessary(l) }
-        return data.entries.filter { category.supportsPuzzle(it.key) }
-            .associate { it.key to it.value.find { mr -> category in mr.categories }?.record }
+        return leaderboard.acquireReadAccess().use { l ->
+            loadDataIfNecessary(l)
+            data.filterKeys(category::supportsPuzzle).mapValues {
+                it.value.find { mr -> category in mr.categories }?.record
+            }
+        }
     }
 
     val records: List<CategoryRecord<OmRecord, OmCategory>>
-        get() = data.values.flatten().map(OmMemoryRecord::toCategoryRecord)
+        get() = leaderboard.acquireReadAccess().use { l ->
+            loadDataIfNecessary(l)
+            data.values.flatten().map(OmMemoryRecord::toCategoryRecord)
+        }
+
+    internal fun executeOmQL(
+        puzzle: OmPuzzle, queryElements: Collection<OmQL.QueryElement>
+    ): Collection<CategoryRecord<OmRecord, OmCategory>> {
+        return leaderboard.acquireReadAccess().use { l ->
+            loadDataIfNecessary(l)
+            var records: Collection<OmMemoryRecord> = data[puzzle]!!
+
+            for (element in queryElements) {
+                // ensure runtime metrics are filled
+                for (metric in element.scoreParts.filterIsInstance<OmMetric.Omsim>()) {
+                    for (mr in records) {
+                        mr.score.extraKnownMetrics.computeIfAbsent(metric.command) {
+                            OmSolutionVerifier(puzzle.file.readBytes(), mr.record.dataPath.readBytes()).use { v ->
+                                v.getApproximateMetricSafe(metric.command) ?: Double.NaN
+                            }
+                        }
+                    }
+                }
+                records = element.filter(records)
+            }
+
+            records.map(OmMemoryRecord::toCategoryRecord)
+        }
+    }
 }
 
 enum class OmRecordChangeType {

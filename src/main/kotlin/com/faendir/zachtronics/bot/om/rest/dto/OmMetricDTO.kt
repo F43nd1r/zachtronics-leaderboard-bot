@@ -24,9 +24,10 @@ fun OmMetric<*>.toDTO() = OmMetricDTO(
     id = this::class.simpleName!!,
     displayName = displayName,
     description = description,
-    type = when(this) {
+    type = when (this) {
         is OmMetric.Value<*> -> "VALUE"
         is OmMetric.Modifier -> "MODIFIER"
+        is OmMetric.Omsim -> "OMSIM"
         is OmMetric.Computed<*> -> "COMPUTED"
         is OmMetric.Constant<*> -> "CONSTANT"
     }

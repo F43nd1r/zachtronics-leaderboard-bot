@@ -114,6 +114,5 @@ enum class OmCategory(
 
     fun supportsPuzzle(puzzle: OmPuzzle) = supportedTypes.contains(puzzle.type)
 
-    fun supportsScore(score: OmScore) =
-        manifold.supportsScore(score) && admission.getValueFrom(score) == true
+    fun supportsScore(score: OmScore) = manifold.supportsScore(score) && admission.getValueFrom(score)
 }

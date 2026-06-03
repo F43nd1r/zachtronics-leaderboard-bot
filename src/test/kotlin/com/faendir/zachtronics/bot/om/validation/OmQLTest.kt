@@ -145,7 +145,7 @@ class OmQLTest {
 
     @ParameterizedTest(name = "{0}")
     @ValueSource(strings = ["[0-C]", "(CGAI)", "[C]", "[!T]", "[ ! ! T]", "null"])
-    fun `valid stuff`(query: String) {
+    fun `valid queries`(query: String) {
         expectDoesNotThrow {
             parser.parseQuery(query)
         }
@@ -153,10 +153,10 @@ class OmQLTest {
 
     @ParameterizedTest(name = "{0}")
     @ValueSource(strings = ["[C*A", "(CA", "((CA)", "U", "{CG}", "}", "{C}"])
-    fun `invalid stuff`(query: String) {
+    fun `invalid queries`(query: String) {
         expectThrows<IllegalArgumentException> {
             parser.parseQuery(query)
-        }.subject.printStackTrace()
+        }.subject.run { println("$query -> $message") }
     }
 
     @ParameterizedTest(name = "[{0}]")
@@ -164,7 +164,7 @@ class OmQLTest {
     fun `invalid expressions`(query: String) {
         expectThrows<IllegalArgumentException> {
             parser.parseQuery("[$query]")
-        }.subject.printStackTrace()
+        }.subject.run { println("[$query] -> $message") }
     }
 
     @ParameterizedTest(name = "[{index}] input={0}, expected={1}")

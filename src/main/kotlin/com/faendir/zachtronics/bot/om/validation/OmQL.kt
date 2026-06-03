@@ -25,24 +25,35 @@ import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
 import java.text.NumberFormat
 import java.text.ParsePosition
 import java.util.*
+import java.util.Collections.emptyMap
 import kotlin.math.pow
 
 
 /**
- * A query language for filtering and selecting Opus Magnum records.
+ * OmQL, the overengineered query language for filtering and selecting Opus Magnum records.
  *
- * Syntax:
+ * **Elements syntax:**
  * - `X`: Select records with the minimum value of metric `X`.
  * - `(XYZ)`: Select records on the Pareto frontier of metrics `X`, `Y`, and `Z`.
- * - `{X=val}`: Filter records where metric `X` equals `val`. Supports `==`, `!=`, `<`, `>`, `<=`, `>=`, `&&`.
- * - `[A*B]`: Define a custom metric. Can be used inside other constructs, e.g., `{[A+B]<100}` or `[A*B]` (to minimize the product).
+ * - `{X=val}`: Select records where the inner expression is true, in this case if metric `X` equals `val`.
+ *
+ * If no Overlap-related constraint or minimization is specified, `{O=false}` is added automatically.
+ *
+ * **Metrics syntax:**
+ * - `C`/`C@V`/`G@0`/`R@INF`/`B@∞`: Native metrics (see below).
+ * - `[A*B]`: Define a custom metric. Can be used anywhere a native metric could, e.g. `{[A+B]<100}` or `[A*B]`.
+ * - `"omsim expression"`: Call any valid [Omsim metric](https://events.critelli.technology/static/metrics.html),
+ *                         with some restrictions to avoid excessive computation.
  * - `true`/`false`: Boolean constants.
  * - `123`: Numeric constants.
  * - `null`: Value of untracked metrics, like B in production.
  *
- * Metrics are identified by their display names (e.g., `C`, `G`, `S`, `A`, `L`, `I`), common aliases are supported.
+ * Metrics are identified by their display names (e.g., `C`, `G`, `A`, `R`, `L`, `I`), common aliases are supported.
  * The measure point can be appended to a metric name to disambiguate them or just because (e.g. `A@INF`, `C@V`)
- * If no overlap-related constraint or minimization is specified, `{O=false}` is added automatically.
+ * Custom metrics and expressions support the following operators, precedence can be overrided by nesting `[]`:
+ * - Logical: `&&`, `||`, `!`
+ * - Comparison: `=`/`==`, `!=`, `<`, `>`, `<=`, `>=`
+ * - Arithmetic: `+`, `-`, `*`, `/`, `%`, `**`
  *
  * Examples:
  * - `CG{A<8}`: Among records with minimum Cost then minimum Cycles, filter for Area < 8.
@@ -54,7 +65,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
     companion object {
         private val TRUE = OmMetric.Constant("true", true)
         private val FALSE = OmMetric.Constant("false", false)
-        private val NULL = OmMetric.Constant<Comparable<Any?>?>("null", null)
+        private val NULL = OmMetric.Constant<Comparable<Any>?>("null", null)
 
         private val NUMBER_FORMAT = NumberFormat.getInstance(Locale.ENGLISH)
 
@@ -76,10 +87,16 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
             put("**", Operator.Binary.BinaryDouble.POW)
         }
 
+        private val allOnesMap = object : MutableMap<String, Double> by emptyMap() {
+            override val size = Int.MAX_VALUE
+            override fun get(key: String): Double = 1.0
+        }
+
         val allOnes = OmScore(
             1, 1, overlap = true, trackless = true,
             1, 1, 1, 1.0, 1,
-            1.0, 1.toLevelValue(), 1.toInfinInt(), 1.0, 1.toInfinInt()
+            1.0, 1.toLevelValue(), 1.toInfinInt(), 1.0, 1.toInfinInt(),
+            extraKnownMetrics = allOnesMap
         )
     }
 
@@ -102,7 +119,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
 
     val OmMetric<*>.unambiguousName: String
         get() {
-            if (this is OmMetric.Custom<*> || this is OmMetric.Constant)
+            if (this is OmMetric.Custom<*> || this is OmMetric.Constant || this is OmMetric.Omsim)
                 return displayName
             val metrics = metricTrie[displayName]
             return when (metrics.size) {
@@ -115,6 +132,9 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
 
     internal sealed interface QueryElement {
         val metrics: Collection<OmMetric<*>>
+        val scoreParts: Set<OmMetric.ScorePart<*>>
+            get() = metrics.flatMapTo(HashSet()) { it.scoreParts }
+
         fun filter(records: Collection<OmMemoryRecord>): Collection<OmMemoryRecord>
     }
 
@@ -139,7 +159,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
             metrics.joinToString("", "(", ")") { it.unambiguousName.run { if (length > 1) "[$this]" else this } }
     }
 
-    inner class Constraint(val metric: OmMetric<Boolean>) : QueryElement {
+    inner class Constraint(val metric: OmMetric<Boolean?>) : QueryElement {
         override val metrics: Collection<OmMetric<*>>
             get() = listOf(metric)
 
@@ -166,20 +186,17 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
                 ' ' -> {
                     idx++
                 }
-
                 '{' -> { // {X=val} or {[bool expr]}
                     unloadMetrics()
                     val (foundMetric, end) = parseCustomMetric(query, idx + 1, '}')
                     elements.add(Constraint(foundMetric.asCustom<Boolean>(context = "Constraint")))
                     idx = end
                 }
-
                 '(' -> { // (AB) as pareto
                     unloadMetrics()
                     paretoContext++
                     idx++
                 }
-
                 ')' -> {
                     if (paretoContext != 1)
                         throw IllegalArgumentException("Missing/extra opening ( in query: $query")
@@ -188,7 +205,6 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
                     currMetrics.clear()
                     idx++
                 }
-
                 else -> { // XYZ or [A*B] as custom metric
                     val (foundMetric, end) = parseMetric(query, idx)
                     currMetrics.add(foundMetric)
@@ -200,7 +216,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
             throw IllegalArgumentException("Missing closing ) in query: $query")
         unloadMetrics()
 
-        if (elements.none { qe -> OmMetric.OVERLAP in qe.metrics.flatMap { it.scoreParts } }) {
+        if (elements.none { qe -> OmMetric.OVERLAP in qe.scoreParts }) {
             elements.addFirst(Constraint(OmMetric.NOVERLAP))
         }
         return elements
@@ -212,6 +228,16 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
             idx++
         if (query[idx] == '[') {
             return parseCustomMetric(query, idx + 1, ']')
+        }
+        if (query[idx] == '"') {
+            val end = query.indexOf('"', idx + 1)
+            if (end == -1)
+                throw IllegalArgumentException("Missing closing \" in: ${query.substring(idx)}")
+            val command = query.substring(idx + 1, end).replace(Regex("\\s+"), " ")
+            if (Regex("\\d{3,}").containsMatchIn(command)) {
+                throw IllegalArgumentException("Omsim command \"$command\" contains numbers over 99, reconsider")
+            }
+            return OmMetric.Omsim(command) to end + 1
         }
         return parseSingleMetric(query, idx)
     }
@@ -231,7 +257,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
         if (number != null) {
             return OmMetric.Constant(number.toString(), number.toDouble()) to pp.index
         }
-        throw IllegalArgumentException("Unknown metric(s): ${query.substring(idx)}")
+        throw IllegalArgumentException("Invalid metric(s): ${query.substring(idx)}")
     }
 
     /**
@@ -240,6 +266,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
     private sealed interface Operator {
         val precedence: Int
         val rightAssociative: Boolean
+
         sealed interface Unary<T : Comparable<T>> : Operator {
             val func: (T) -> T
             override val precedence: Int
@@ -260,25 +287,28 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
         sealed interface Binary<I> : Operator {
             val func: (I, I) -> Comparable<*>
 
-            sealed class BinaryAny(override val func: (Any?, Any?) -> Boolean,
-                                   override val precedence: Int,
-                                   override val rightAssociative: Boolean = false
+            sealed class BinaryAny(
+                override val func: (Any?, Any?) -> Boolean,
+                override val precedence: Int,
+                override val rightAssociative: Boolean = false
             ) : Binary<Any?> {
                 data object EQ : BinaryAny({ a, b -> a == b }, 3)
                 data object NE : BinaryAny({ a, b -> a != b }, 3)
             }
 
-            sealed class BinaryBoolean(override val func: (Boolean, Boolean) -> Boolean,
-                                       override val precedence: Int,
-                                       override val rightAssociative: Boolean = false
+            sealed class BinaryBoolean(
+                override val func: (Boolean, Boolean) -> Boolean,
+                override val precedence: Int,
+                override val rightAssociative: Boolean = false
             ) : Binary<Boolean> {
                 data object AND : BinaryBoolean(Boolean::and, 2)
                 data object OR : BinaryBoolean(Boolean::or, 1)
             }
 
-            sealed class BinaryDouble(override val func: (Double, Double) -> Comparable<*>,
-                                      override val precedence: Int,
-                                      override val rightAssociative: Boolean = false
+            sealed class BinaryDouble(
+                override val func: (Double, Double) -> Comparable<*>,
+                override val precedence: Int,
+                override val rightAssociative: Boolean = false
             ) : Binary<Double> {
                 data object LT : BinaryDouble({ a, b -> a < b }, 4)
                 data object GT : BinaryDouble({ a, b -> a > b }, 4)
@@ -333,10 +363,8 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
                         if (l == null || r == null) {
                             if (op is Operator.Binary.BinaryAny) { // we can try it
                                 op.func(l, r)
-                            }
-                            else null
-                        }
-                        else when (op) {
+                            } else null
+                        } else when (op) {
                             is Operator.Binary.BinaryBoolean ->
                                 op.func(l.booleanOrBust(context), r.booleanOrBust(context))
                             is Operator.Binary.BinaryDouble ->
@@ -417,23 +445,22 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
                     break
                 continue
             }
-            throw IllegalArgumentException("Unknown token in query: $query")
+            throw IllegalArgumentException("Invalid token(s): ${query.substring(idx)}")
         }
 
         // final reduction
         pushOperator(null)
 
         @Suppress("UNCHECKED_CAST")
-        val expression = valueStack.single() as (OmScore) -> Comparable<Any>
+        val expression = valueStack.single() as (OmScore) -> Comparable<Any>?
 
         // if it throws it throws here
         expression(allOnes)
 
         val descr = query.substring(startIdx, idx)
         return OmMetric.Custom(
-            subMetrics = metrics.toTypedArray(),
-            description = descr,
             displayName = descr,
+            subMetrics = metrics,
             getValueFrom = expression,
         ) to idx + 1
     }
@@ -441,7 +468,8 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
     private fun Comparable<*>.booleanOrBust(context: String? = null): Boolean {
         return when (this) {
             is Boolean -> this
-            else -> throw IllegalArgumentException("Invalid type: ${this::class.simpleName}" + (context?.let { " for $it" } ?: ""))
+            else -> throw IllegalArgumentException("Invalid type: ${this::class.simpleName}" + (context?.let { " for $it" }
+                ?: ""))
         }
     }
 
@@ -450,15 +478,18 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
             is Number -> toDouble()
             is InfinInt -> toDouble()
             is LevelValue -> 100_000.0.pow(level) * value
-            else -> throw IllegalArgumentException("Invalid type: ${this::class.simpleName}" + (context?.let { " for $it" } ?: ""))
+            else -> throw IllegalArgumentException("Invalid type: ${this::class.simpleName}" + (context?.let { " for $it" }
+                ?: ""))
         }
     }
 
-    private inline fun <reified T : Comparable<T>> OmMetric.Custom<*>.asCustom(context: String? = null): OmMetric.Custom<T> {
+    private inline fun <reified T : Comparable<T>> OmMetric.Custom<*>.asCustom(context: String? = null): OmMetric.Custom<T?> {
         @Suppress("UNCHECKED_CAST")
-        when (val v = getValueFrom(allOnes)!!) {
-            is T -> return this as OmMetric.Custom<T>
-            else -> throw IllegalArgumentException("Invalid type: ${v::class.simpleName}" + (context?.let { " for $it" } ?: ""))
+        when (val v = getValueFrom(allOnes)) {
+            null -> throw IllegalArgumentException("Invalid type: <null>" + (context?.let { " for $it" } ?: ""))
+            is T -> return this as OmMetric.Custom<T?>
+            else -> throw IllegalArgumentException("Invalid type: ${v::class.simpleName}" + (context?.let { " for $it" }
+                ?: ""))
         }
     }
 }

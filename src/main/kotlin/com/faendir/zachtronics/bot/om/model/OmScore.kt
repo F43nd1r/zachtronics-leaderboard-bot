@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,10 @@ data class OmScore(
     val heightINF: InfinInt?,      // tracked for NORMAL,POLYMER_HEIGHT
     val widthINF: Double?,         // tracked for NORMAL,POLYMER_WIDTH
     val boundingHexINF: InfinInt?, // tracked for NORMAL
+
+    /** more stuff we learn from omsim at runtime, uses [Double.NaN] as a stand-in for `null` */
+    @Transient
+    val extraKnownMetrics: MutableMap<String, Double> = hashMapOf()
 ) : Score<OmCategory> {
     @Transient
     val looping: Boolean = rate != null
