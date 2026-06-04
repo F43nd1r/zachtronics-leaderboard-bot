@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,19 +20,17 @@ import com.faendir.zachtronics.bot.model.Category;
 import com.faendir.zachtronics.bot.model.Metric;
 import com.faendir.zachtronics.bot.model.Type;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
 @Value
 public class CategoryDTO {
-    @NonNull String id;
-    @NonNull String displayName;
-    @NonNull List<String> metrics;
-    @NonNull List<String> puzzleTypes;
+    String id;
+    String displayName;
+    List<String> metrics;
+    List<String> puzzleTypes;
 
-    @NonNull
-    public static <C extends Enum<C> & Category> CategoryDTO fromCategory(@NonNull C category) {
+    public static <C extends Enum<C> & Category> CategoryDTO fromCategory(C category) {
         return new CategoryDTO(category.name(),
                                category.getDisplayName(),
                                category.getMetrics().stream().map(Metric::getDisplayName).toList(),

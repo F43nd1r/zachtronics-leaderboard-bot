@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.utils.LambdaUtils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +37,10 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @BotTest
 @Disabled("Massive tests only for manual testing or migrations")
@@ -53,7 +52,7 @@ class FcManualTest {
     @TestConfiguration
     static class RepositoryConfiguration {
         @Bean("fcRepository")
-        public static @NonNull GitRepository tisRepository(GitProperties gitProperties) {
+        public static GitRepository tisRepository(GitProperties gitProperties) {
             return TestConfigurationKt.readOnlyLocalClone("../bbs/foodcourt-leaderboard", gitProperties);
         }
     }
@@ -76,8 +75,7 @@ class FcManualTest {
         System.out.println("Done");
     }
 
-    @NonNull
-    private static FcSubmission recordToSubmissions(@NonNull FcRecord record) {
+    private static FcSubmission recordToSubmissions(FcRecord record) {
         assert record.getDataPath() != null;
         byte[] data = LambdaUtils.uncheckIOException(Files::readAllBytes).apply(record.getDataPath());
         return new FcSubmission(record.getPuzzle(), record.getScore(), record.getAuthor(),
@@ -115,7 +113,7 @@ class FcManualTest {
 
     @Test
     public void submitSaveFolder() throws IOException {
-        Path savesRoot = Paths.get("../bbs/saves");
+        Path savesRoot = Path.of("../bbs/saves");
 //        List<String> authors = Files.list(savesRoot)
 //                                    .filter(Files::isDirectory)
 //                                    .map(p -> p.getFileName().toString())
@@ -127,16 +125,17 @@ class FcManualTest {
             System.out.println("Starting " + author);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Files.list(savesRoot.resolve(author))
-                 .filter(p -> p.getFileName().toString().endsWith(".solution"))
-                 .forEach((p -> {
-                     try {
-                         baos.write(Files.readAllBytes(p));
-                     }
-                     catch (IOException e) {
-                         throw new UncheckedIOException(e);
-                     }
-                 }));
+            try (Stream<Path> files = Files.list(savesRoot.resolve(author))) {
+                files.filter(p -> p.getFileName().toString().endsWith(".solution"))
+                     .forEach(p -> {
+                         try {
+                             Files.copy(p, baos);
+                         }
+                         catch (IOException e) {
+                             throw new UncheckedIOException(e);
+                         }
+                     });
+            }
 
             Collection<ValidationResult<FcSubmission>> submissions = FcSubmission.fromData(baos.toByteArray(), author);
             for (SubmitResult<FcRecord, FcCategory> result : repository.submitAll(submissions)) {

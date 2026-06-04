@@ -18,10 +18,9 @@ package com.faendir.zachtronics.bot.tis.ai;
 
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -68,15 +67,15 @@ class TISSave {
     static final int MAX_NODES = 12;
     static final int MAX_NODE_INSTR = 15;
 
-    @NonNull List<TISNode> nodes;
+    List<TISNode> nodes;
     int instructions;
 
     Stream<TISLine> codeAsStream() {
         return nodes.stream().flatMap(node -> node.getCodeLines().stream());
     }
 
-    static @NonNull TISSave unmarshal(@NonNull String solution) {
-        List<TISNode> nodes = new ArrayList<>(Collections.nCopies(MAX_NODES, null));
+    static TISSave unmarshal(String solution) {
+        @Nullable TISNode[] nodesSet = new TISNode[MAX_NODES];
 
         TISNode currentNode = null;
         int instructions = 0;
@@ -87,7 +86,7 @@ class TISSave {
                 if (id < 0 || id >= MAX_NODES)
                     throw new ValidationException("Invalid node id: @" + id);
                 currentNode = new TISNode(id);
-                nodes.set(id, currentNode);
+                nodesSet[id] = currentNode;
             }
             else if (currentNode != null) {
                 TISLine cl = TISLine.unmarshal(line);
@@ -98,7 +97,7 @@ class TISSave {
                 }
             }
         }
-        nodes.removeIf(Objects::isNull);
+        List<TISNode> nodes = Arrays.stream(nodesSet).filter(Objects::nonNull).toList();
         for (TISNode node : nodes) {
             // clean up ending newlines but leave nodes not fully empty
             for (int l = node.getLines().size() - 1; l >= 1; l--) {
@@ -111,7 +110,7 @@ class TISSave {
         return new TISSave(nodes, instructions);
     }
 
-    @NonNull String marshal() {
+    String marshal() {
         StringBuilder sb = new StringBuilder();
         for (TISNode node : nodes) {
             node.marshalInto(sb);

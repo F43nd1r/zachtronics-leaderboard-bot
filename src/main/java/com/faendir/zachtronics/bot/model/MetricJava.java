@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,12 @@
 
 package com.faendir.zachtronics.bot.model;
 
-import org.jspecify.annotations.NonNull;
 
 import java.util.Comparator;
 import java.util.function.Function;
 
 public interface MetricJava<S extends Score<?>, T extends Comparable<T>> extends Metric {
-    @NonNull Function<S, T> getExtract();
+    Function<S, T> getExtract();
 
     default T get(S score) {
         return getExtract().apply(score);

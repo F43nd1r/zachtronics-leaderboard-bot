@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Value;
 import lombok.With;
 import org.checkerframework.common.value.qual.IntRange;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.regex.Matcher;
@@ -43,9 +42,8 @@ public class TISScore implements Score<TISCategory> {
     @With boolean hardcoded;
 
     /** ccc/nn/ii[/ach] */
-    @NonNull
     @Override
-    public String toDisplayString(@NonNull DisplayContext<TISCategory> context) {
+    public String toDisplayString(DisplayContext<TISCategory> context) {
         String separator = context.getSeparator();
         int formatId = Utils.getScoreFormatId(context);
 
@@ -60,14 +58,13 @@ public class TISScore implements Score<TISCategory> {
 
     /** <tt>ccc/nn/ii[/ach]</tt>, tolerates extra <tt>*</tt> */
     @Nullable
-    public static TISScore parseScore(@NonNull String string) {
+    public static TISScore parseScore(String string) {
         Matcher m = REGEX_SCORE.matcher(string);
         return m.matches() ? parseScore(m) : null;
     }
 
     /** we assume m matches */
-    @NonNull
-    public static TISScore parseScore(@NonNull Matcher m) {
+    public static TISScore parseScore(Matcher m) {
         int cycles = Integer.parseInt(m.group("cycles"));
         int nodes = Integer.parseInt(m.group("nodes"));
         int instructions = Integer.parseInt(m.group("instructions"));
@@ -82,7 +79,6 @@ public class TISScore implements Score<TISCategory> {
     /**
      * @return <tt>""</tt> or <tt>"/a"</tt> or <tt>"/c"</tt> or <tt>"/h"</tt> or <tt>"/ac"</tt> or <tt>"/ah"</tt>
      */
-    @NonNull
     public static String sepFlags(String separator, boolean achievement, boolean cheating, boolean hardcoded) {
         if (achievement || cheating) {
             String result = separator;

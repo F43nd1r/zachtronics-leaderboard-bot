@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import com.faendir.zachtronics.bot.validation.ValidationResult;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -42,7 +42,7 @@ import static com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt
 public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPuzzle, IfSubmission, IfRecord> {
     private final CommandOption<String, String> solutionOption = solutionOptionBuilder().required().build();
     private final CommandOption<String, String> authorOption = authorOptionBuilder().required().build();
-    private final CommandOption<String, IfScore> scoreOption = CommandOptionBuilder.string("score")
+    private final CommandOption<@Nullable String, @Nullable IfScore> scoreOption = CommandOptionBuilder.string("score")
             .description("Score of the solution in ccc/fff/bbb[/OGF] format")
             .convert((event, score) -> {
                 IfScore ifScore = IfScore.parseScore(score);
@@ -51,7 +51,7 @@ public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPu
                 throw new IllegalArgumentException("Invalid score: " + score);
             })
             .build();
-    private final CommandOption<String, List<String>> videosOption = CommandOptionBuilder.string("videos")
+    private final CommandOption<@Nullable String, @Nullable List<String>> videosOption = CommandOptionBuilder.string("videos")
             .description("Link(s) to the video(s) of the solution, accepts multiple separated by `,`")
             .convert((event, links) -> Pattern.compile(",").splitAsStream(links)
                                               .map(l -> resolveLink(event, l, false))
@@ -64,9 +64,8 @@ public class IfSubmitCommand extends AbstractMultiSubmitCommand<IfCategory, IfPu
     @Getter
     private final IfSolutionRepository repository;
 
-    @NonNull
     @Override
-    public Collection<ValidationResult<IfSubmission>> parseSubmissions(@NonNull ChatInputInteractionEvent event) {
+    public Collection<ValidationResult<IfSubmission>> parseSubmissions(ChatInputInteractionEvent event) {
         IfScore score = scoreOption.get(event);
         List<String> videos = videosOption.get(event);
         boolean isAdmin = IfSecured.WIKI_ADMINS_ONLY.hasExecutionPermission(event);

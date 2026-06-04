@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.faendir.zachtronics.bot.inf.validation;
 
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -57,17 +56,15 @@ import java.util.Base64;
 @Value
 public class IfSave {
     int version;
-    @NonNull IfBlock[] blocks;
+    IfBlock[] blocks;
 
-    @NonNull
     public static IfSave unmarshal(String solution) {
         byte[] bytes = Base64.getDecoder().decode(solution);
         ByteBuffer byteBuffer = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
         return unmarshal(byteBuffer);
     }
 
-    @NonNull
-    static IfSave unmarshal(@NonNull ByteBuffer byteBuffer) {
+    static IfSave unmarshal(ByteBuffer byteBuffer) {
         int version = byteBuffer.getInt();
         if (version != 3)
             throw new IllegalStateException("Version is not 3");

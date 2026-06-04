@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Score;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.regex.Matcher;
@@ -34,9 +33,8 @@ public class FcScore implements Score<FcCategory> {
     int wires;
 
     /** tT/ck/sS/wW */
-    @NonNull
     @Override
-    public String toDisplayString(@NonNull DisplayContext<FcCategory> context) {
+    public String toDisplayString(DisplayContext<FcCategory> context) {
         String separator = context.getSeparator();
         int formatId = Utils.getScoreFormatId(context);
 
@@ -49,14 +47,13 @@ public class FcScore implements Score<FcCategory> {
 
     /** <tt>tT/ck/sS/wW</tt>, tolerates extra <tt>*</tt> */
     @Nullable
-    public static FcScore parseScore(@NonNull String string) {
+    public static FcScore parseScore(String string) {
         Matcher m = REGEX_SCORE.matcher(string);
         return m.matches() ? parseScore(m) : null;
     }
 
     /** we assume m matches */
-    @NonNull
-    public static FcScore parseScore(@NonNull Matcher m) {
+    public static FcScore parseScore(Matcher m) {
         int rules = Integer.parseInt(m.group("time"));
         int conditionalRules = Integer.parseInt(m.group("cost"));
         int frames = Integer.parseInt(m.group("sumTimes"));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.sc.model;
 import com.faendir.zachtronics.bot.model.Puzzle;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
 import lombok.Getter;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -423,13 +422,11 @@ public enum ScPuzzle implements Puzzle<ScCategory> {
         this.link = "https://zlbb.faendir.com/sc/" + name();
     }
 
-    @NonNull
-    public static List<ScPuzzle> findMatchingPuzzles(@NonNull String name) {
+    public static List<ScPuzzle> findMatchingPuzzles(String name) {
         return UtilsKt.fuzzyMatch(Arrays.stream(ScPuzzle.values()).toList(), name.trim(), ScPuzzle::getDisplayName);
     }
 
-    @NonNull
-    public static ScPuzzle findUniqueMatchingPuzzle(@NonNull String name) {
+    public static ScPuzzle findUniqueMatchingPuzzle(String name) {
         List<ScPuzzle> puzzles = findMatchingPuzzles(name);
         return switch (puzzles.size()) {
             case 0 -> throw new IllegalStateException("I did not recognize the puzzle \"" + name + "\".");
@@ -439,7 +436,6 @@ public enum ScPuzzle implements Puzzle<ScCategory> {
         };
     }
 
-    @NonNull
     public String getExportName() {
         return displayName.replaceFirst(" \\(.+\\)$", "");
     }

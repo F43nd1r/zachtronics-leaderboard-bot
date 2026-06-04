@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.tis.model;
 
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
@@ -38,6 +37,6 @@ public class TISMetric<T extends Comparable<T>> implements MetricJava<TISScore, 
     public static final TISMetric<Boolean> NOT_HARDCODED = new TISMetric<>("c", s -> !s.isHardcoded());
     public static final TISMetric<Boolean> CAN_HARDCODE = new TISMetric<>("h", s -> true);
 
-    @NonNull String displayName;
-    @NonNull Function<TISScore, T> extract;
+    String displayName;
+    Function<TISScore, T> extract;
 }

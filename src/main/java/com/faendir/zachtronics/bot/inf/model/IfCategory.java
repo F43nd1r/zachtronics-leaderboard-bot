@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.inf.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
@@ -43,7 +42,7 @@ public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric<?>>
     BNF(NO_FLAGS, List.of(BLOCKS, NO_FLAGS, FOOTPRINT, CYCLES), 0b001);
 
     /** contains <tt>%d%s%d%s%d%s</tt> plus a bunch of <tt>*</tt> most likely */
-    static final String[] FORMAT_STRINGS = {"%d%s%d%s%d%s", "%d%s%d%s**%d**%s", "%d%s**%d**%s%d%s", null, "**%d**%s%d%s%d%s"};
+    static final String[] FORMAT_STRINGS = {"%d%s%d%s%d%s", "%d%s%d%s**%d**%s", "%d%s**%d**%s%d%s", "", "**%d**%s%d%s%d%s"};
 
     private final String displayName = name();
     private final IfMetric<Boolean> admission;
@@ -52,7 +51,7 @@ public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric<?>>
     private final Set<IfType> supportedTypes;
     private final int scoreFormatId;
 
-    IfCategory(@NonNull IfMetric<Boolean> admission, @NonNull List<IfMetric<?>> metrics, int scoreFormatId) {
+    IfCategory(IfMetric<Boolean> admission, List<IfMetric<?>> metrics, int scoreFormatId) {
         this.admission = admission;
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
@@ -62,7 +61,7 @@ public enum IfCategory implements CategoryJava<IfCategory, IfScore, IfMetric<?>>
     }
 
     @Override
-    public boolean supportsScore(@NonNull IfScore score) {
+    public boolean supportsScore(IfScore score) {
         return !admission.get(score);
     }
 }

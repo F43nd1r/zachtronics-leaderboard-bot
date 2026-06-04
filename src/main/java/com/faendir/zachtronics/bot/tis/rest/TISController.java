@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import com.faendir.zachtronics.bot.tis.rest.dto.TISSubmissionDTO;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -59,13 +59,12 @@ public class TISController implements GameRestController<GroupDTO, TISPuzzleDTO,
     private final List<TISPuzzleDTO> puzzles = Arrays.stream(TISPuzzle.values()).map(TISPuzzleDTO::fromPuzzle).toList();
 
     @Override
-    public TISPuzzleDTO getPuzzle(@NonNull String puzzleId) {
+    public TISPuzzleDTO getPuzzle(String puzzleId) {
         return TISPuzzleDTO.fromPuzzle(findPuzzle(puzzleId));
     }
 
     @Override
-    @NonNull
-    public List<TISPuzzleDTO> listPuzzlesByGroup(@NonNull String groupId) {
+    public List<TISPuzzleDTO> listPuzzlesByGroup(String groupId) {
         TISGroup group = findGroup(groupId);
         return Arrays.stream(TISPuzzle.values()).filter(p -> p.getGroup() == group).map(TISPuzzleDTO::fromPuzzle).toList();
     }
@@ -74,13 +73,12 @@ public class TISController implements GameRestController<GroupDTO, TISPuzzleDTO,
     private final List<CategoryDTO> categories = Arrays.stream(TISCategory.values()).map(CategoryDTO::fromCategory).toList();
 
     @Override
-    public CategoryDTO getCategory(@NonNull String categoryId) {
+    public CategoryDTO getCategory(String categoryId) {
         return CategoryDTO.fromCategory(findCategory(categoryId));
     }
 
     @Override
-    @NonNull
-    public List<TISRecordDTO> listRecords(@NonNull String puzzleId, Boolean includeFrontier) {
+    public List<TISRecordDTO> listRecords(String puzzleId, @Nullable Boolean includeFrontier) {
         TISPuzzle puzzle = findPuzzle(puzzleId);
         return repository.findCategoryHolders(puzzle, includeFrontier != null && includeFrontier).stream()
                          .map(TISRecordDTO::fromCategoryRecord)
@@ -88,7 +86,7 @@ public class TISController implements GameRestController<GroupDTO, TISPuzzleDTO,
     }
 
     @Override
-    public TISRecordDTO getRecord(@NonNull String puzzleId, @NonNull String categoryId) {
+    public @Nullable TISRecordDTO getRecord(String puzzleId, String categoryId) {
         TISPuzzle puzzle = findPuzzle(puzzleId);
         TISCategory category = findCategory(categoryId);
         TISRecord record = repository.find(puzzle, category);
@@ -99,7 +97,7 @@ public class TISController implements GameRestController<GroupDTO, TISPuzzleDTO,
     }
 
     @PostMapping(path = "/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Object submit(@NonNull @ModelAttribute TISSubmissionDTO submissionDTO) throws IOException {
+    public Object submit(@ModelAttribute TISSubmissionDTO submissionDTO) throws IOException {
         if (submissionDTO.getImage() != null && !UtilsKt.isValidLink(submissionDTO.getImage()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid image link");
         TISPuzzle puzzle = findPuzzle(submissionDTO.getPuzzleId());

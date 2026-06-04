@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.validation;
 
-import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +29,7 @@ import java.nio.file.StandardCopyOption;
 
 public class NativeLoader {
 
-    public static @NonNull SymbolLookup loadLibrary(@NonNull String libName, Arena arena) {
+    public static SymbolLookup loadLibrary(String libName, Arena arena) {
         try {
             return SymbolLookup.libraryLookup(libName, arena);
         }

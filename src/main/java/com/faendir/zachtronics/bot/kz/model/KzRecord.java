@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,22 +20,21 @@ import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.utils.Markdown;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 
 @Value
 public class KzRecord implements Record<KzCategory> {
-    @NonNull KzPuzzle puzzle;
-    @NonNull KzScore score;
-    @NonNull String author;
-    String displayLink;
-    String dataLink;
-    Path dataPath;
+    KzPuzzle puzzle;
+    KzScore score;
+    String author;
+    @Nullable String displayLink;
+    @Nullable String dataLink;
+    @Nullable Path dataPath;
 
-    @NonNull
     @Override
-    public String toDisplayString(@NonNull DisplayContext<KzCategory> context) {
+    public String toDisplayString(DisplayContext<KzCategory> context) {
         return Markdown.fileLinkOrEmpty(dataLink) +
                Markdown.linkOrText(score.toDisplayString(context) + " " + Markdown.escape(author), displayLink);
     }

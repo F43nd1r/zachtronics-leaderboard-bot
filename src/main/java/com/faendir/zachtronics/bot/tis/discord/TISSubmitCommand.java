@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import com.faendir.zachtronics.bot.tis.repository.TISSolutionRepository;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -42,8 +42,8 @@ import static com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt
 public class TISSubmitCommand extends AbstractSubmitCommand<TISCategory, TISPuzzle, TISSubmission, TISRecord> {
     private final CommandOption<String, String> solutionOption = solutionOptionBuilder().required().build();
     private final CommandOption<String, String> authorOption = authorOptionBuilder().required().build();
-    private final CommandOption<String, TISPuzzle> puzzleOption = TISOptionBuilders.puzzleOptionBuilder().build();
-    private final CommandOption<String, String> imageOption = imageOptionBuilder().build();
+    private final CommandOption<@Nullable String, @Nullable TISPuzzle> puzzleOption = TISOptionBuilders.puzzleOptionBuilder().build();
+    private final CommandOption<@Nullable String, @Nullable String> imageOption = imageOptionBuilder().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, puzzleOption, imageOption);
     @Getter
@@ -51,9 +51,8 @@ public class TISSubmitCommand extends AbstractSubmitCommand<TISCategory, TISPuzz
     @Getter
     private final TISSolutionRepository repository;
 
-    @NonNull
     @Override
-    public TISSubmission parseSubmission(@NonNull ChatInputInteractionEvent event) {
+    public TISSubmission parseSubmission(ChatInputInteractionEvent event) {
         return TISSubmission.fromLink(solutionOption.get(event), puzzleOption.get(event), authorOption.get(event), imageOption.get(event));
     }
 }

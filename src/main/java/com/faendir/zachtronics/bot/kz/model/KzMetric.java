@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.kz.model;
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
@@ -30,6 +29,6 @@ public enum KzMetric implements MetricJava<KzScore, Integer> {
     COST("C", KzScore::getCost),
     AREA("A", KzScore::getArea);
 
-    @NonNull private final String displayName;
-    @NonNull private final Function<KzScore, Integer> extract;
+    private final String displayName;
+    private final Function<KzScore, Integer> extract;
 }

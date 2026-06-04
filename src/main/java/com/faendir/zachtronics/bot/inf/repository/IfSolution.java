@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,37 +22,37 @@ import com.faendir.zachtronics.bot.inf.model.IfRecord;
 import com.faendir.zachtronics.bot.inf.model.IfScore;
 import com.faendir.zachtronics.bot.repository.Solution;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
+
 @Value
 public class IfSolution implements Solution<IfCategory, IfPuzzle, IfScore, IfRecord> {
-    @NonNull IfScore score;
-    @NonNull String author;
-    @NonNull List<String> displayLinks;
+    IfScore score;
+    String author;
+    List<String> displayLinks;
     /** empty if it holds no categories */
     EnumSet<IfCategory> categories = EnumSet.noneOf(IfCategory.class);
 
     @Override
-    public IfRecord extendToRecord(IfPuzzle puzzle, String dataLink, Path dataPath) {
+    public IfRecord extendToRecord(IfPuzzle puzzle, @Nullable String dataLink, @Nullable Path dataPath) {
         if (dataPath != null)
             return new IfRecord(puzzle, score, author, displayLinks, dataLink, dataPath);
         else
             return new IfRecord(puzzle, score, author, displayLinks, null, null);
     }
 
-    @NonNull
-    public static IfSolution unmarshal(String @NonNull [] fields) {
+    public static IfSolution unmarshal(@Nullable String[] fields) {
         assert fields.length == 4;
-        IfScore score = Objects.requireNonNull(IfScore.parseScore(fields[0]));
-        String author = fields[1];
+        IfScore score = requireNonNull(IfScore.parseScore(requireNonNull(fields[0])));
+        String author = requireNonNull(fields[1]);
         String displayLinksStr = fields[2];
         String categories = fields[3];
 
@@ -65,7 +65,7 @@ public class IfSolution implements Solution<IfCategory, IfPuzzle, IfScore, IfRec
     }
 
     @Override
-    public String @NonNull [] marshal() {
+    public String[] marshal() {
         return new String[]{
                 score.toDisplayString(),
                 author,

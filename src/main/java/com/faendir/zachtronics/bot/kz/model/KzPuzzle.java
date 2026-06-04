@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.kz.model;
 
 import com.faendir.zachtronics.bot.model.Puzzle;
 import lombok.Getter;
-import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
@@ -99,7 +98,7 @@ public enum KzPuzzle implements Puzzle<KzCategory> {
     private final List<KzCategory> supportedCategories = List.of(KzCategory.values());
     private final String link;
 
-    KzPuzzle(int id, KzGroup group, @NonNull String displayName) {
+    KzPuzzle(int id, KzGroup group, String displayName) {
         this.id = id;
         this.group = group;
         this.prefix = displayName.toLowerCase().replace(' ', '-').replaceAll("[()]", "");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.fc.rest.dto;
 
 import com.faendir.zachtronics.bot.fc.model.FcScore;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 @Value
 public class FcScoreDTO {
@@ -27,8 +26,7 @@ public class FcScoreDTO {
     int sumTimes;
     int wires;
 
-    @NonNull
-    public static FcScoreDTO fromScore(@NonNull FcScore score) {
+    public static FcScoreDTO fromScore(FcScore score) {
         return new FcScoreDTO(score.getCost(), score.getTime(), score.getSumTimes(), score.getWires());
     }
 }

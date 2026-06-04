@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.kz.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,7 +39,7 @@ public enum KzCategory implements CategoryJava<KzCategory, KzScore, KzMetric> {
     AC(List.of(AREA, COST, TIME), 0b001);
 
     /** contains <tt>%d%s%d%s%d</tt> plus a bunch of <tt>*</tt> most likely */
-    static final String[] FORMAT_STRINGS = {"%d%s%d%s%d", "%d%s%d%s**%d**", "%d%s**%d**%s%d", null, "**%d**%s%d%s%d"};
+    static final String[] FORMAT_STRINGS = {"%d%s%d%s%d", "%d%s%d%s**%d**", "%d%s**%d**%s%d", "", "**%d**%s%d%s%d"};
 
 
     private final String displayName;
@@ -49,7 +48,7 @@ public enum KzCategory implements CategoryJava<KzCategory, KzScore, KzMetric> {
     private final Set<KzType> supportedTypes = Collections.singleton(STANDARD);
     private final int scoreFormatId;
 
-    KzCategory(@NonNull List<KzMetric> metrics, int scoreFormatId) {
+    KzCategory(List<KzMetric> metrics, int scoreFormatId) {
         this.displayName = name();
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
@@ -57,7 +56,7 @@ public enum KzCategory implements CategoryJava<KzCategory, KzScore, KzMetric> {
     }
 
     @Override
-    public boolean supportsScore(@NonNull KzScore score) {
+    public boolean supportsScore(KzScore score) {
         return true;
     }
 }

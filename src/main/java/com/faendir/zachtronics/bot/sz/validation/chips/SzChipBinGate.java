@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.faendir.zachtronics.bot.sz.validation.chips;
 
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Map;
 
@@ -37,12 +36,12 @@ import static com.faendir.zachtronics.bot.sz.validation.SzSave.getInt;
  */
 @Value
 class SzChipBinGate implements SzChip {
-    @NonNull SzChipType type;
+    SzChipType type;
     int x;
     int y;
     boolean rotated;
 
-    static @NonNull SzChipBinGate unmarshal(@NonNull SzChipType type, @NonNull Map<String, String> chipMap) {
+    static SzChipBinGate unmarshal(SzChipType type, Map<String, String> chipMap) {
         return new SzChipBinGate(type,
                                  getInt(chipMap, "x"),
                                  getInt(chipMap, "y"),

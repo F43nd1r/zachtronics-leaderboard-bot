@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.tis.rest.dto;
 
 import com.faendir.zachtronics.bot.tis.model.TISScore;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 @Value
 public class TISScoreDTO {
@@ -30,8 +29,7 @@ public class TISScoreDTO {
     boolean cheating;
     boolean hardcoded;
 
-    @NonNull
-    public static TISScoreDTO fromScore(@NonNull TISScore score) {
+    public static TISScoreDTO fromScore(TISScore score) {
         return new TISScoreDTO(score.getCycles(), score.getNodes(), score.getInstructions(),
                                score.isAchievement(), score.isCheating(), score.isHardcoded());
     }

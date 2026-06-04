@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,11 @@ import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
@@ -61,17 +60,17 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
     private final List<IfPuzzle> trackedPuzzles = List.of(IfPuzzle.values());
 
     @Override
-    protected @NonNull String wikiPageName(IfPuzzle puzzle) {
+    protected String wikiPageName(@Nullable IfPuzzle puzzle) {
         return "index";
     }
 
     @Override
-    protected IfSolution makeCandidateSolution(@NonNull IfSubmission submission) {
+    protected IfSolution makeCandidateSolution(IfSubmission submission) {
         return new IfSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLinks());
     }
 
     @Override
-    protected int frontierCompare(@NonNull IfScore s1, @NonNull IfScore s2) {
+    protected int frontierCompare(IfScore s1, IfScore s2) {
         int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
         int r2 = Integer.compare(s1.getFootprint(), s2.getFootprint());
         int r3 = Integer.compare(s1.getBlocks(), s2.getBlocks());
@@ -93,31 +92,27 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
     }
 
     @Override
-    protected boolean allowedSameScoreUpdate(@NonNull IfSolution candidate, @NonNull IfSolution solution) {
+    protected boolean allowedSameScoreUpdate(IfSolution candidate, IfSolution solution) {
         return !candidate.getDisplayLinks().isEmpty() ||
                (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLinks().isEmpty());
     }
 
     @Override
-    @NonNull
-    protected Path relativePuzzlePath(@NonNull IfPuzzle puzzle) {
-        return Paths.get(puzzle.getGroup().name(), puzzle.getId());
+    protected Path relativePuzzlePath(IfPuzzle puzzle) {
+        return Path.of(puzzle.getGroup().name(), puzzle.getId());
     }
 
-    @NonNull
-    static String makeScoreFilename(@NonNull IfScore score) {
+    static String makeScoreFilename(IfScore score) {
         return score.toDisplayString(DisplayContext.fileName()) + ".txt";
     }
 
-    @NonNull
     @Override
-    protected String makeArchiveLink(@NonNull IfPuzzle puzzle, @NonNull IfScore score) {
+    protected String makeArchiveLink(IfPuzzle puzzle, IfScore score) {
         return makeArchiveLink(puzzle, makeScoreFilename(score));
     }
 
     @Override
-    @NonNull
-    protected Path makeArchivePath(@NonNull Path puzzlePath, IfScore score) {
+    protected Path makeArchivePath(Path puzzlePath, IfScore score) {
         return puzzlePath.resolve(makeScoreFilename(score));
     }
 }

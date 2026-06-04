@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import com.faendir.zachtronics.bot.sc.model.ScPuzzle;
 import com.faendir.zachtronics.bot.sc.repository.ScSolutionRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,7 +32,7 @@ import org.springframework.stereotype.Component;
 @ScQualifier
 public class ScRebuildCommand extends AbstractRebuildCommand<ScPuzzle> {
     @Getter
-    private final CommandOption<String, ScPuzzle> puzzleOption = ScOptionBuilders.puzzleOptionBuilder().build();
+    private final CommandOption<@Nullable String, @Nullable ScPuzzle> puzzleOption = ScOptionBuilders.puzzleOptionBuilder().build();
     @Getter
     private final Secured secured = ScSecured.WIKI_ADMINS_ONLY;
     @Getter

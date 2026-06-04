@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,27 +21,24 @@ import com.faendir.zachtronics.bot.sz.validation.SzValidator;
 import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 @Value
 public class SzSubmission implements Submission<SzCategory, SzPuzzle> {
-    @NonNull SzPuzzle puzzle;
-    @NonNull SzScore score;
-    @NonNull String author;
+    SzPuzzle puzzle;
+    SzScore score;
+    String author;
     @Nullable String displayLink;
-    @NonNull String data;
+    String data;
 
     /**
      * @throws ValidationException if we can't correctly parse metadata
      */
-    @NonNull
-    public static SzSubmission fromData(@NonNull String data, @NonNull String author, String displayLink) throws ValidationException {
+    public static SzSubmission fromData(String data, String author, @Nullable String displayLink) throws ValidationException {
         return SzValidator.validate(data, author, displayLink);
     }
 
-    @NonNull
-    public static SzSubmission fromLink(@NonNull String link, String author, String displayLink) {
+    public static SzSubmission fromLink(String link, String author, @Nullable String displayLink) {
         String data = Utils.downloadFile(link).dataAsString();
         return fromData(data, author, displayLink);
     }

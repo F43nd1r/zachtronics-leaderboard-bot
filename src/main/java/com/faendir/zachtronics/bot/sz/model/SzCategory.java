@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.sz.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,7 +39,7 @@ public enum SzCategory implements CategoryJava<SzCategory, SzScore, SzMetric> {
     LP(List.of(LINES, POWER, COST), 0b001);
 
     /** contains <tt>%d%s%d%s%d</tt> plus a bunch of <tt>*</tt> most likely */
-    static final String[] FORMAT_STRINGS = {"%d%s%d%s%d", "%d%s%d%s**%d**", "%d%s**%d**%s%d", null, "**%d**%s%d%s%d"};
+    static final String[] FORMAT_STRINGS = {"%d%s%d%s%d", "%d%s%d%s**%d**", "%d%s**%d**%s%d", "", "**%d**%s%d%s%d"};
 
     private final String displayName;
     private final List<SzMetric> metrics;
@@ -48,7 +47,7 @@ public enum SzCategory implements CategoryJava<SzCategory, SzScore, SzMetric> {
     private final Set<SzType> supportedTypes = Collections.singleton(STANDARD);
     private final int scoreFormatId;
 
-    SzCategory(@NonNull List<SzMetric> metrics, int scoreFormatId) {
+    SzCategory(List<SzMetric> metrics, int scoreFormatId) {
         this.displayName = name();
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
@@ -56,7 +55,7 @@ public enum SzCategory implements CategoryJava<SzCategory, SzScore, SzMetric> {
     }
 
     @Override
-    public boolean supportsScore(@NonNull SzScore score) {
+    public boolean supportsScore(SzScore score) {
         return true;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -48,7 +47,7 @@ class ScCategoryTest {
         assertTrue(supportsFlags(RCNBP, false, false));
     }
 
-    private static boolean supportsFlags(@NonNull ScCategory category, boolean bugged, boolean precognitive) {
+    private static boolean supportsFlags(ScCategory category, boolean bugged, boolean precognitive) {
         return category.supportsScore(new ScScore(1, 1, 1, bugged, precognitive));
     }
 }

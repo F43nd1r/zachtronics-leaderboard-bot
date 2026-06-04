@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,15 @@ import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
 import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.tis.model.TISCategory;
 import com.faendir.zachtronics.bot.tis.model.TISPuzzle;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class TISOptionBuilders {
-    public static @NonNull CommandOptionBuilder<String, TISPuzzle> puzzleOptionBuilder() {
+    public static CommandOptionBuilder<@Nullable String, @Nullable TISPuzzle> puzzleOptionBuilder() {
         return OptionHelpersKt.enumOptionBuilder("puzzle", TISPuzzle.class, TISPuzzle::getDisplayName)
                               .description("Puzzle name. Can be shortened or abbreviated. E.g. `SIGN AMPL`, `ITP1`");
     }
 
-    public static @NonNull CommandOptionBuilder<String, TISCategory> categoryOptionBuilder() {
+    public static CommandOptionBuilder<@Nullable String, @Nullable TISCategory> categoryOptionBuilder() {
         return OptionHelpersKt.enumOptionBuilder("category", TISCategory.class, TISCategory::getDisplayName)
                               .description("Category. E.g. `CN`, `IC`");
     }

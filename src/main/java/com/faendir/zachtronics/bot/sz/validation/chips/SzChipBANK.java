@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.faendir.zachtronics.bot.sz.validation.chips;
 
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Map;
 
@@ -39,15 +38,14 @@ class SzChipBANK implements SzChip {
 
     int x;
     int y;
-    @NonNull String rom;
+    String rom;
 
-    static @NonNull SzChipBANK unmarshal(@NonNull Map<String, String> chipMap) {
+    static SzChipBANK unmarshal(Map<String, String> chipMap) {
         return new SzChipBANK(getInt(chipMap, "x"),
                               getInt(chipMap, "y"),
                               chipMap.get("rom"));
     }
 
-    @NonNull
     @Override
     public SzChipType getType() {
         return type;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import com.faendir.zachtronics.bot.sc.model.ScScore;
 import com.faendir.zachtronics.bot.sc.model.ScSubmission;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,8 +48,7 @@ public class ScMetadataReader {
      * @param data is the whole export, the first <tt>SOLUTION:</tt> match will dictate the metadata line
      * @throws ValidationException if we can't correctly parse metadata
      */
-    @NonNull
-    public static ScSubmission fromHeader(@NonNull String data, @Nullable ScPuzzle puzzle, String displayLink)
+    public static ScSubmission fromHeader(String data, @Nullable ScPuzzle puzzle, @Nullable String displayLink)
     throws ValidationException {
         Matcher m = SOLUTION_HEADER.matcher(data);
         if (!m.find()) {
@@ -57,11 +56,11 @@ public class ScMetadataReader {
         }
 
         if (puzzle == null) {
-            String puzzleStr = decode(m.group("puzzle"));
+            String puzzleStr = Objects.requireNonNull(decode(m.group("puzzle")));
             puzzle = ScPuzzle.findUniqueMatchingPuzzle(puzzleStr);
         }
 
-        String author = decode(m.group("author"));
+        String author = Objects.requireNonNull(decode(m.group("author")));
 
         ScScore score = ScScore.parseScore(m);
         if (score.getCycles() == 0) {
@@ -72,9 +71,8 @@ public class ScMetadataReader {
         return createSubmission(puzzle, author, score, description, displayLink, data);
     }
 
-    @NonNull
-    public static ScSubmission createSubmission(@NonNull ScPuzzle puzzle, String author, ScScore score, String description,
-                                                String displayLink, String data) {
+    public static ScSubmission createSubmission(ScPuzzle puzzle, String author, ScScore score, @Nullable String description,
+                                                @Nullable String displayLink, String data) {
         String commaDescr = "";
         if (description != null) {
             commaDescr = "," + encode(normalizeDescription(description));
@@ -87,15 +85,14 @@ public class ScMetadataReader {
         return new ScSubmission(puzzle, score, author, displayLink, data);
     }
 
-    private static String decode(String field) {
+    private static @Nullable String decode(@Nullable String field) {
         if (field != null && field.matches("'.+'"))
             return field.replaceAll("^'|'$", "").replace("''", "'");
         else
             return field;
     }
 
-    @NonNull
-    private static String encode(@NonNull String field) {
+    private static String encode(String field) {
         if (field.contains(","))
             return "'" + field.replace("'", "''") + "'";
         else
@@ -107,8 +104,7 @@ public class ScMetadataReader {
      * @param description must be decoded
      * @return normalized and cleaned description, not including comma
      */
-    @NonNull
-    private static String normalizeDescription(@NonNull String description) {
+    private static String normalizeDescription(String description) {
         String descr = description.replace(" (copy)", ""); // try to cut down on duplicate churn
         if (descr.length() > 100) {
             descr = descr.substring(0, 100) + "...";

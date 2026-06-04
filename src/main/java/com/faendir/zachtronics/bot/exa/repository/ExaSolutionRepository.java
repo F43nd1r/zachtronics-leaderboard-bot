@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,13 @@ import com.faendir.zachtronics.bot.utils.Markdown;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
 
@@ -55,17 +54,17 @@ public class ExaSolutionRepository extends AbstractSolutionRepository<ExaCategor
     private final List<ExaPuzzle> trackedPuzzles = Arrays.stream(ExaPuzzle.values()).filter(p -> p.getType() != ExaType.SANDBOX).toList();
 
     @Override
-    protected @NonNull String wikiPageName(ExaPuzzle puzzle) {
+    protected String wikiPageName(@Nullable ExaPuzzle puzzle) {
         return "index";
     }
 
     @Override
-    protected ExaSolution makeCandidateSolution(@NonNull ExaSubmission submission) {
+    protected ExaSolution makeCandidateSolution(ExaSubmission submission) {
         return new ExaSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
     }
 
     @Override
-    protected int frontierCompare(@NonNull ExaScore s1, @NonNull ExaScore s2) {
+    protected int frontierCompare(ExaScore s1, ExaScore s2) {
         int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
         int r2 = Integer.compare(s1.getSize(), s2.getSize());
         int r3 = Integer.compare(s1.getActivity(), s2.getActivity());
@@ -86,19 +85,19 @@ public class ExaSolutionRepository extends AbstractSolutionRepository<ExaCategor
 
     /** allow same-score solution changes only if you are the original author */
     @Override
-    protected boolean allowedSameScoreUpdate(@NonNull ExaSolution candidate, @NonNull ExaSolution solution) {
+    protected boolean allowedSameScoreUpdate(ExaSolution candidate, ExaSolution solution) {
         return candidate.getDisplayLink() != null ||
                (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
 
     @Override
-    protected void updateRedditLeaderboard(@NonNull List<String> lines, @NonNull ExaPuzzle puzzle,
-                                           GitRepository.@NonNull ReadWriteAccess access, @NonNull List<ExaSolution> solutions) {
+    protected void updateRedditLeaderboard(List<String> lines, ExaPuzzle puzzle,
+                                           GitRepository.ReadWriteAccess access, List<ExaSolution> solutions) {
         updateRedditLeaderboard(lines, puzzle, access, solutions, true);
     }
     
     @Override
-    protected @NonNull List<String> rebuildRedditPage(@NonNull String page, GitRepository.ReadWriteAccess access) throws IOException {
+    protected List<String> rebuildRedditPage(String page, GitRepository.ReadWriteAccess access) throws IOException {
         List<String> lines = readRedditWiki(page);
         for (ExaPuzzle puzzle : trackedPuzzles) {
             Path puzzlePath = getPuzzlePath(access, puzzle);
@@ -109,8 +108,8 @@ public class ExaSolutionRepository extends AbstractSolutionRepository<ExaCategor
         return lines;
     }
 
-    protected void updateRedditLeaderboard(@NonNull List<String> lines, @NonNull ExaPuzzle puzzle,
-                                           GitRepository.@NonNull ReadWriteAccess access, @NonNull List<ExaSolution> solutions,
+    protected void updateRedditLeaderboard(List<String> lines, ExaPuzzle puzzle,
+                                           GitRepository.ReadWriteAccess access, List<ExaSolution> solutions,
                                            boolean doCheese) {
         super.updateRedditLeaderboard(lines, puzzle, access, solutions);
 
@@ -124,7 +123,7 @@ public class ExaSolutionRepository extends AbstractSolutionRepository<ExaCategor
         }
     }
 
-    private void rebuildCheeseTable(@NonNull List<String> lines, GitRepository.ReadWriteAccess access) throws IOException {
+    private void rebuildCheeseTable(List<String> lines, GitRepository.ReadWriteAccess access) throws IOException {
         final String anchorPoint = "### Cheesy solutions";
         lines.subList(lines.indexOf(anchorPoint) + 4, lines.size()).clear();
         ListIterator<String> it = lines.listIterator(lines.size());
@@ -156,25 +155,21 @@ public class ExaSolutionRepository extends AbstractSolutionRepository<ExaCategor
     }
 
     @Override
-    @NonNull
-    protected Path relativePuzzlePath(@NonNull ExaPuzzle puzzle) {
-        return Paths.get(puzzle.getGroup().name()).resolve(puzzle.name());
+    protected Path relativePuzzlePath(ExaPuzzle puzzle) {
+        return Path.of(puzzle.getGroup().name()).resolve(puzzle.name());
     }
 
-    @NonNull
-    static String makeFilename(@NonNull ExaPuzzle puzzle, @NonNull ExaScore score) {
+    static String makeFilename(ExaPuzzle puzzle, ExaScore score) {
         return puzzle.getPrefix() + "-" + score.toDisplayString(DisplayContext.fileName()) + ".solution";
     }
 
-    @NonNull
     @Override
-    protected String makeArchiveLink(@NonNull ExaPuzzle puzzle, @NonNull ExaScore score) {
+    protected String makeArchiveLink(ExaPuzzle puzzle, ExaScore score) {
         return makeArchiveLink(puzzle, makeFilename(puzzle, score));
     }
 
     @Override
-    @NonNull
-    protected Path makeArchivePath(@NonNull Path puzzlePath, ExaScore score) {
+    protected Path makeArchivePath(Path puzzlePath, ExaScore score) {
         ExaPuzzle puzzle = ExaPuzzle.valueOf(puzzlePath.getFileName().toString());
         return puzzlePath.resolve(makeFilename(puzzle, score));
     }

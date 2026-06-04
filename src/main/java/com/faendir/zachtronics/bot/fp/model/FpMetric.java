@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.fp.model;
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
@@ -32,6 +31,6 @@ public enum FpMetric implements MetricJava<FpScore, Integer> {
     WASTE("W", FpScore::getWaste),
     MOST_WASTE("w", s -> -s.getWaste());
 
-    @NonNull private final String displayName;
-    @NonNull private final Function<FpScore, Integer> extract;
+    private final String displayName;
+    private final Function<FpScore, Integer> extract;
 }

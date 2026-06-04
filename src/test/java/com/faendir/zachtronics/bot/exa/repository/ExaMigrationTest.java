@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,6 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,14 +62,14 @@ class ExaMigrationTest {
     @TestConfiguration
     static class RepositoryConfiguration {
         @Bean("exaRepository")
-        public static @NonNull GitRepository exaRepository(GitProperties gitProperties) {
+        public static GitRepository exaRepository(GitProperties gitProperties) {
             return TestConfigurationKt.readOnlyLocalClone("../exapunks/leaderboard", gitProperties);
         }
     }
 
     @Test
     public void parseWiki() throws IOException {
-        Path pagePath = Paths.get("../exapunks/wiki.md");
+        Path pagePath = Path.of("../exapunks/wiki.md");
         List<String> lines = Files.readAllLines(pagePath);
 
         Pattern scorePattern = Pattern.compile("^(?<level>[^|]+[^| ])?\\s*\\|\\s*" +
@@ -110,7 +108,7 @@ class ExaMigrationTest {
         System.out.println("Done");
     }
 
-    private static ExaPuzzle findPuzzle(@NonNull String levelName) {
+    private static ExaPuzzle findPuzzle(String levelName) {
         List<ExaPuzzle> candidates = UtilsKt.fuzzyMatch(Arrays.asList(ExaPuzzle.values()), levelName, ExaPuzzle::getDisplayName);
         if (candidates.size() == 1)
             return candidates.get(0);
@@ -120,7 +118,7 @@ class ExaMigrationTest {
 
     @Test
     public void parseRedditScrape() throws IOException {
-        Path scrapePath = Paths.get("../exapunks/reddit_scrape.psv");
+        Path scrapePath = Path.of("../exapunks/reddit_scrape.psv");
 
         List<ExaSubmission> submissions;
         try (BufferedReader reader = Files.newBufferedReader(scrapePath)) {
@@ -140,7 +138,7 @@ class ExaMigrationTest {
         System.out.println("Done");
     }
 
-    private static @NonNull ExaSubmission submissionFromScrape(String @NonNull [] fields) {
+    private static ExaSubmission submissionFromScrape(String[] fields) {
         // PB050|887/106/4|mplain|https://i.imgur.com/bEOwU81.gifv|AS,cAS
         assert fields.length == 5;
 
@@ -155,7 +153,7 @@ class ExaMigrationTest {
 
     @Test
     public void parseBacardiRepo() throws IOException {
-        Path repoPath = Paths.get("../exapunks/text_saves/Bacardi-ExapunksRecords");
+        Path repoPath = Path.of("../exapunks/text_saves/Bacardi-ExapunksRecords");
         Pattern exaSeparator = Pattern.compile("\\n={4,}\\n");
 
         for (ExaPuzzle puzzle : repository.getTrackedPuzzles()) {
@@ -195,7 +193,7 @@ class ExaMigrationTest {
         System.out.println("Done");
     }
 
-    private static @NonNull ExaSave hydrateSolution(@NonNull ExaPuzzle puzzle, @NonNull String text, @NonNull Pattern exaSeparator) {
+    private static ExaSave hydrateSolution(ExaPuzzle puzzle, String text, Pattern exaSeparator) {
         List<ExaChip> exas = new ArrayList<>();
         char exaLetter = 'A';
         for (String code : exaSeparator.split(text)) {

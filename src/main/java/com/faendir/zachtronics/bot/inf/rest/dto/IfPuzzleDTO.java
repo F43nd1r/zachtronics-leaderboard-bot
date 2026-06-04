@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,15 @@ package com.faendir.zachtronics.bot.inf.rest.dto;
 import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
 import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 @Value
 public class IfPuzzleDTO {
-    @NonNull String id;
-    @NonNull String displayName;
-    @NonNull GroupDTO group;
-    @NonNull String type;
+    String id;
+    String displayName;
+    GroupDTO group;
+    String type;
 
-    @NonNull
-    public static IfPuzzleDTO fromPuzzle(@NonNull IfPuzzle puzzle) {
+    public static IfPuzzleDTO fromPuzzle(IfPuzzle puzzle) {
         return new IfPuzzleDTO(puzzle.getId(), puzzle.getDisplayName(), GroupDTO.fromGroup(puzzle.getGroup()), puzzle.getType().getDisplayName());
     }
 }

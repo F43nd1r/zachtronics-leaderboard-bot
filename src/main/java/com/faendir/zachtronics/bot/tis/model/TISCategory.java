@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.tis.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -92,7 +91,7 @@ public enum TISCategory implements CategoryJava<TISCategory, TISScore, TISMetric
     hIX(CAN_HARDCODE, List.of(CAN_HARDCODE, INSTRUCTIONS, PROD_CN), 0b001);
 
     /** contains <tt>%d%s%d%s%d%s</tt> plus a bunch of <tt>*</tt> most likely */
-    static final String[] FORMAT_STRINGS = {"%d%s%d%s%d%s", "%d%s%d%s**%d**%s", "%d%s**%d**%s%d%s", null, "**%d**%s%d%s%d%s"};
+    static final String[] FORMAT_STRINGS = {"%d%s%d%s%d%s", "%d%s%d%s**%d**%s", "%d%s**%d**%s%d%s", "", "**%d**%s%d%s%d%s"};
 
     private final String displayName;
     private final TISMetric<Boolean> admission;
@@ -101,7 +100,7 @@ public enum TISCategory implements CategoryJava<TISCategory, TISScore, TISMetric
     private final Set<TISType> supportedTypes;
     private final int scoreFormatId;
 
-    TISCategory(@NonNull TISMetric<Boolean> admission, @NonNull List<TISMetric<?>> metrics, int scoreFormatId) {
+    TISCategory(TISMetric<Boolean> admission, List<TISMetric<?>> metrics, int scoreFormatId) {
         this.displayName = name();
         this.admission = admission;
         this.metrics = metrics;
@@ -111,7 +110,7 @@ public enum TISCategory implements CategoryJava<TISCategory, TISScore, TISMetric
     }
 
     @Override
-    public boolean supportsScore(@NonNull TISScore score) {
+    public boolean supportsScore(TISScore score) {
         return admission.get(score);
     }
 }

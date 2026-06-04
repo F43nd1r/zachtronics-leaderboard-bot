@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import com.faendir.zachtronics.bot.sz.rest.dto.SzPuzzleDTO;
 import com.faendir.zachtronics.bot.sz.rest.dto.SzRecordDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,13 +53,12 @@ public class SzController implements GameRestController<GroupDTO, SzPuzzleDTO, C
     private final List<SzPuzzleDTO> puzzles = Arrays.stream(SzPuzzle.values()).map(SzPuzzleDTO::fromPuzzle).toList();
 
     @Override
-    public SzPuzzleDTO getPuzzle(@NonNull String puzzleId) {
+    public SzPuzzleDTO getPuzzle(String puzzleId) {
         return SzPuzzleDTO.fromPuzzle(findPuzzle(puzzleId));
     }
 
     @Override
-    @NonNull
-    public List<SzPuzzleDTO> listPuzzlesByGroup(@NonNull String groupId) {
+    public List<SzPuzzleDTO> listPuzzlesByGroup(String groupId) {
         SzGroup group = findGroup(groupId);
         return Arrays.stream(SzPuzzle.values()).filter(p -> p.getGroup() == group).map(SzPuzzleDTO::fromPuzzle).toList();
     }
@@ -68,13 +67,12 @@ public class SzController implements GameRestController<GroupDTO, SzPuzzleDTO, C
     private final List<CategoryDTO> categories = Arrays.stream(SzCategory.values()).map(CategoryDTO::fromCategory).toList();
 
     @Override
-    public CategoryDTO getCategory(@NonNull String categoryId) {
+    public CategoryDTO getCategory(String categoryId) {
         return CategoryDTO.fromCategory(findCategory(categoryId));
     }
 
     @Override
-    @NonNull
-    public List<SzRecordDTO> listRecords(@NonNull String puzzleId, Boolean includeFrontier) {
+    public List<SzRecordDTO> listRecords(String puzzleId, @Nullable Boolean includeFrontier) {
         SzPuzzle puzzle = findPuzzle(puzzleId);
         return repository.findCategoryHolders(puzzle, includeFrontier != null && includeFrontier).stream()
                          .map(SzRecordDTO::fromCategoryRecord)
@@ -82,7 +80,7 @@ public class SzController implements GameRestController<GroupDTO, SzPuzzleDTO, C
     }
 
     @Override
-    public SzRecordDTO getRecord(@NonNull String puzzleId, @NonNull String categoryId) {
+    public @Nullable SzRecordDTO getRecord(String puzzleId, String categoryId) {
         SzPuzzle puzzle = findPuzzle(puzzleId);
         SzCategory category = findCategory(categoryId);
         SzRecord record = repository.find(puzzle, category);

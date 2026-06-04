@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import com.faendir.zachtronics.bot.model.Puzzle
 import com.faendir.zachtronics.bot.model.Record
 import com.faendir.zachtronics.bot.model.Submission
 import com.faendir.zachtronics.bot.validation.ValidationResult
+import org.jspecify.annotations.NullUnmarked
 
 interface SolutionRepository<C : Category, P : Puzzle<C>, S : Submission<C, P>, R: Record<C>> {
     fun submit(submission: S) : SubmitResult<R, C>
@@ -43,4 +44,5 @@ sealed class SubmitResult<R: Record<C>, C: Category> {
     data class Failure<R: Record<C>, C: Category>(val message: String): SubmitResult<R, C>()
 }
 
+@NullUnmarked // java can't figure out `record`'s nullability
 data class CategoryRecord<R: Record<C>?, C: Category>(val record: R, val categories: Set<C>)

@@ -21,28 +21,25 @@ import com.faendir.zachtronics.bot.model.Submission;
 import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 @Value
 public class KzSubmission implements Submission<KzCategory, KzPuzzle> {
-    @NonNull KzPuzzle puzzle;
-    @NonNull KzScore score;
-    @NonNull String author;
+    KzPuzzle puzzle;
+    KzScore score;
+    String author;
     @Nullable String displayLink;
-    byte @NonNull [] data;
+    byte[] data;
 
     /**
      * @throws ValidationException if we can't correctly parse metadata
      */
-    @NonNull
-    public static KzSubmission fromData(byte @NonNull [] data, @NonNull String author, String displayLink) throws ValidationException {
+    public static KzSubmission fromData(byte[] data, String author, @Nullable String displayLink) throws ValidationException {
         return KzValidator.validate(data, author, displayLink);
     }
 
-    @NonNull
-    public static KzSubmission fromLink(@NonNull String link, String author, String displayLink) {
-        byte @NonNull [] data = Utils.downloadFile(link).getData();
+    public static KzSubmission fromLink(String link, String author, @Nullable String displayLink) {
+        byte[] data = Utils.downloadFile(link).getData();
         return fromData(data, author, displayLink);
     }
 }

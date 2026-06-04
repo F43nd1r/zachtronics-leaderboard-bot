@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import com.faendir.zachtronics.bot.rest.dto.CategoryDTO;
 import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,13 +53,12 @@ public class KzController implements GameRestController<GroupDTO, KzPuzzleDTO, C
     private final List<KzPuzzleDTO> puzzles = Arrays.stream(KzPuzzle.values()).map(KzPuzzleDTO::fromPuzzle).toList();
 
     @Override
-    public KzPuzzleDTO getPuzzle(@NonNull String puzzleId) {
+    public KzPuzzleDTO getPuzzle(String puzzleId) {
         return KzPuzzleDTO.fromPuzzle(findPuzzle(puzzleId));
     }
 
     @Override
-    @NonNull
-    public List<KzPuzzleDTO> listPuzzlesByGroup(@NonNull String groupId) {
+    public List<KzPuzzleDTO> listPuzzlesByGroup(String groupId) {
         KzGroup group = findGroup(groupId);
         return Arrays.stream(KzPuzzle.values()).filter(p -> p.getGroup() == group).map(KzPuzzleDTO::fromPuzzle).toList();
     }
@@ -68,13 +67,12 @@ public class KzController implements GameRestController<GroupDTO, KzPuzzleDTO, C
     private final List<CategoryDTO> categories = Arrays.stream(KzCategory.values()).map(CategoryDTO::fromCategory).toList();
 
     @Override
-    public CategoryDTO getCategory(@NonNull String categoryId) {
+    public CategoryDTO getCategory(String categoryId) {
         return CategoryDTO.fromCategory(findCategory(categoryId));
     }
 
     @Override
-    @NonNull
-    public List<KzRecordDTO> listRecords(@NonNull String puzzleId, Boolean includeFrontier) {
+    public List<KzRecordDTO> listRecords(String puzzleId, @Nullable Boolean includeFrontier) {
         KzPuzzle puzzle = findPuzzle(puzzleId);
         return repository.findCategoryHolders(puzzle, includeFrontier != null && includeFrontier).stream()
                          .map(KzRecordDTO::fromCategoryRecord)
@@ -82,7 +80,7 @@ public class KzController implements GameRestController<GroupDTO, KzPuzzleDTO, C
     }
 
     @Override
-    public KzRecordDTO getRecord(@NonNull String puzzleId, @NonNull String categoryId) {
+    public @Nullable KzRecordDTO getRecord(String puzzleId, String categoryId) {
         KzPuzzle puzzle = findPuzzle(puzzleId);
         KzCategory category = findCategory(categoryId);
         KzRecord record = repository.find(puzzle, category);

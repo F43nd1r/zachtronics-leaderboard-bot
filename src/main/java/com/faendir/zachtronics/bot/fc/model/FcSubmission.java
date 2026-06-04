@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,25 +22,23 @@ import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Value;
 import lombok.With;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 
 @Value
 public class FcSubmission implements Submission<FcCategory, FcPuzzle> {
-    @NonNull FcPuzzle puzzle;
-    @NonNull FcScore score;
-    @NonNull String author;
-    @With String displayLink;
-    byte @NonNull [] data;
+    FcPuzzle puzzle;
+    FcScore score;
+    String author;
+    @With @Nullable String displayLink;
+    byte[] data;
 
-    @NonNull
-    public static Collection<ValidationResult<FcSubmission>> fromData(byte @NonNull [] data, String author) {
+    public static Collection<ValidationResult<FcSubmission>> fromData(byte[] data, String author) {
         return FoodCourtSim.validateMultiExport(data, author);
     }
 
-    @NonNull
-    public static Collection<ValidationResult<FcSubmission>> fromLink(@NonNull String link, String author) {
+    public static Collection<ValidationResult<FcSubmission>> fromLink(String link, String author) {
         byte[] data = Utils.downloadFile(link).getData();
         return fromData(data, author);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import com.faendir.zachtronics.bot.model.Puzzle;
 import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,9 +37,8 @@ public abstract class AbstractRebuildCommand<P extends Puzzle<?>> extends Comman
 
     protected abstract AbstractSolutionRepository<?, P, ?, ?, ?, ?> getRepository();
 
-    @NonNull
     @Override
-    public SafeMessageBuilder handleEvent(@NonNull ChatInputInteractionEvent event) {
+    public SafeMessageBuilder handleEvent(ChatInputInteractionEvent event) {
         P maybePuzzle = getPuzzleOption().get(event);
         getRepository().rebuildRedditLeaderboard(maybePuzzle);
         return new MultiMessageSafeEmbedMessageBuilder()
@@ -47,10 +46,8 @@ public abstract class AbstractRebuildCommand<P extends Puzzle<?>> extends Comman
             .color(Colors.SUCCESS);
     }
 
-    @NonNull
-    protected abstract CommandOption<String, P> getPuzzleOption();
+    protected abstract CommandOption<@Nullable String, @Nullable P> getPuzzleOption();
 
-    @NonNull
     @Override
     public List<CommandOption<?, ?>> getOptions() {
         return Collections.singletonList(getPuzzleOption());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import com.faendir.zachtronics.bot.rest.dto.CategoryDTO;
 import com.faendir.zachtronics.bot.rest.dto.GroupDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,13 +53,12 @@ public class ExaController implements GameRestController<GroupDTO, ExaPuzzleDTO,
     private final List<ExaPuzzleDTO> puzzles = Arrays.stream(ExaPuzzle.values()).map(ExaPuzzleDTO::fromPuzzle).toList();
 
     @Override
-    public ExaPuzzleDTO getPuzzle(@NonNull String puzzleId) {
+    public ExaPuzzleDTO getPuzzle(String puzzleId) {
         return ExaPuzzleDTO.fromPuzzle(findPuzzle(puzzleId));
     }
 
     @Override
-    @NonNull
-    public List<ExaPuzzleDTO> listPuzzlesByGroup(@NonNull String groupId) {
+    public List<ExaPuzzleDTO> listPuzzlesByGroup(String groupId) {
         ExaGroup group = findGroup(groupId);
         return Arrays.stream(ExaPuzzle.values()).filter(p -> p.getGroup() == group).map(ExaPuzzleDTO::fromPuzzle).toList();
     }
@@ -68,13 +67,12 @@ public class ExaController implements GameRestController<GroupDTO, ExaPuzzleDTO,
     private final List<CategoryDTO> categories = Arrays.stream(ExaCategory.values()).map(CategoryDTO::fromCategory).toList();
 
     @Override
-    public CategoryDTO getCategory(@NonNull String categoryId) {
+    public CategoryDTO getCategory(String categoryId) {
         return CategoryDTO.fromCategory(findCategory(categoryId));
     }
 
     @Override
-    @NonNull
-    public List<ExaRecordDTO> listRecords(@NonNull String puzzleId, Boolean includeFrontier) {
+    public List<ExaRecordDTO> listRecords(String puzzleId, @Nullable Boolean includeFrontier) {
         ExaPuzzle puzzle = findPuzzle(puzzleId);
         return repository.findCategoryHolders(puzzle, includeFrontier != null && includeFrontier).stream()
                          .map(ExaRecordDTO::fromCategoryRecord)
@@ -82,7 +80,7 @@ public class ExaController implements GameRestController<GroupDTO, ExaPuzzleDTO,
     }
 
     @Override
-    public ExaRecordDTO getRecord(@NonNull String puzzleId, @NonNull String categoryId) {
+    public @Nullable ExaRecordDTO getRecord(String puzzleId, String categoryId) {
         ExaPuzzle puzzle = findPuzzle(puzzleId);
         ExaCategory category = findCategory(categoryId);
         ExaRecord record = repository.find(puzzle, category);

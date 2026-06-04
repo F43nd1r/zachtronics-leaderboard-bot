@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.cw.validation;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 /**
  <pre>  {
@@ -51,11 +50,11 @@ import org.jspecify.annotations.NonNull;
 @Value
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CwSimResult {
-    @NonNull String levelName;
+    String levelName;
     int levelId;
     int slotId;
     /** present only if <tt>--include-solution</tt> is given */
-    @NonNull String solution;
+    String solution;
     boolean isCorrect;
     boolean isUnstable;
     int numMetal;

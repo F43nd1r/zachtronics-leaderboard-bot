@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,11 @@ import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -54,17 +53,17 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
     private final List<FpPuzzle> trackedPuzzles = Arrays.stream(FpPuzzle.values()).filter(p -> p.getType() != FpType.EDITOR).toList();
 
     @Override
-    protected @NonNull String wikiPageName(FpPuzzle puzzle) {
+    protected String wikiPageName(@Nullable FpPuzzle puzzle) {
         return "forbidden-path";
     }
 
     @Override
-    protected FpSolution makeCandidateSolution(@NonNull FpSubmission submission) {
+    protected FpSolution makeCandidateSolution(FpSubmission submission) {
         return new FpSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
     }
 
     @Override
-    protected int frontierCompare(@NonNull FpScore s1, @NonNull FpScore s2) {
+    protected int frontierCompare(FpScore s1, FpScore s2) {
         int r1 = Integer.compare(s1.getRules(), s2.getRules());
         int r2 = Integer.compare(s1.getConditionalRules(), s2.getConditionalRules());
         int r3 = Integer.compare(s1.getFrames(), s2.getFrames());
@@ -86,31 +85,27 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
     }
 
     @Override
-    protected boolean allowedSameScoreUpdate(@NonNull FpSolution candidate, @NonNull FpSolution solution) {
+    protected boolean allowedSameScoreUpdate(FpSolution candidate, FpSolution solution) {
         return candidate.getDisplayLink() != null ||
                (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
 
     @Override
-    @NonNull
-    protected Path relativePuzzlePath(@NonNull FpPuzzle puzzle) {
-        return Paths.get(puzzle.getGroup().name()).resolve(puzzle.name());
+    protected Path relativePuzzlePath(FpPuzzle puzzle) {
+        return Path.of(puzzle.getGroup().name()).resolve(puzzle.name());
     }
 
-    @NonNull
-    static String makeScoreFilename(@NonNull FpScore score) {
+    static String makeScoreFilename(FpScore score) {
         return score.toDisplayString(DisplayContext.fileName()) + ".txt";
     }
 
-    @NonNull
     @Override
-    protected String makeArchiveLink(@NonNull FpPuzzle puzzle, @NonNull FpScore score) {
+    protected String makeArchiveLink(FpPuzzle puzzle, FpScore score) {
         return makeArchiveLink(puzzle, makeScoreFilename(score));
     }
 
     @Override
-    @NonNull
-    protected Path makeArchivePath(@NonNull Path puzzlePath, FpScore score) {
+    protected Path makeArchivePath(Path puzzlePath, FpScore score) {
         return puzzlePath.resolve(makeScoreFilename(score));
     }
 }

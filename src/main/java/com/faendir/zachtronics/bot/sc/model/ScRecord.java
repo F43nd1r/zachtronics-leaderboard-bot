@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,32 +20,30 @@ import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.utils.Markdown;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 
 @Value
 public class ScRecord implements Record<ScCategory> {
-    @NonNull ScPuzzle puzzle;
-    @NonNull ScScore score;
-    @NonNull String author;
-    String displayLink;
+    ScPuzzle puzzle;
+    ScScore score;
+    String author;
+    @Nullable String displayLink;
     /** <tt>null</tt> if the solution holds a video spot but has since been out-pareto'd */
-    String dataLink;
+    @Nullable String dataLink;
     /** <tt>null</tt> if the solution holds a video spot but has since been out-pareto'd */
-    Path dataPath;
+    @Nullable Path dataPath;
 
-    @NonNull
     @Override
-    public String toDisplayString(@NonNull DisplayContext<ScCategory> context) {
+    public String toDisplayString(DisplayContext<ScCategory> context) {
         return toDisplayString(context, "");
     }
 
     /**
      * @param reactorPrefix will be put between the archive and the video link
      */
-    @NonNull
-    public String toDisplayString(@NonNull DisplayContext<ScCategory> context, String reactorPrefix) {
+    public String toDisplayString(DisplayContext<ScCategory> context, String reactorPrefix) {
         String scoreAuthor = "(" + score.toDisplayString(context) + ") " + Markdown.escape(author);
         return Markdown.fileLinkOrEmpty(dataLink) +
                reactorPrefix + Markdown.linkOrText(scoreAuthor, displayLink);

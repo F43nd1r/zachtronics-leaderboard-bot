@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,20 @@ import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 @Value
 public class SzRecordDTO implements RecordDTO<SzScoreDTO> {
-    @NonNull SzScoreDTO score;
-    @NonNull String fullFormattedScore;
-    @NonNull String author;
+    SzScoreDTO score;
+    String fullFormattedScore;
+    String author;
     @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
 
-    @NonNull
-    public static SzRecordDTO fromCategoryRecord(@NonNull CategoryRecord<SzRecord, SzCategory> categoryRecord) {
+    public static SzRecordDTO fromCategoryRecord(CategoryRecord<SzRecord, SzCategory> categoryRecord) {
         SzRecord record = categoryRecord.getRecord();
         Set<SzCategory> categories = categoryRecord.getCategories();
         return new SzRecordDTO(
@@ -51,8 +49,7 @@ public class SzRecordDTO implements RecordDTO<SzScoreDTO> {
         );
     }
 
-    @NonNull
-    public static SzRecordDTO fromRecord(@NonNull SzRecord record) {
+    public static SzRecordDTO fromRecord(SzRecord record) {
         return new SzRecordDTO(SzScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
                                record.getAuthor(),

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,15 @@ import com.faendir.zachtronics.bot.cw.model.CwCategory;
 import com.faendir.zachtronics.bot.cw.model.CwPuzzle;
 import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
 import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class CwOptionBuilders {
-    public static @NonNull CommandOptionBuilder<String, CwPuzzle> puzzleOptionBuilder() {
+    public static CommandOptionBuilder<@Nullable String, @Nullable CwPuzzle> puzzleOptionBuilder() {
         return OptionHelpersKt.enumOptionBuilder("puzzle", CwPuzzle.class, CwPuzzle::getDisplayName)
                               .description("Puzzle name. Can be shortened or abbreviated. E.g. `Sig Cross`, `SNR`");
     }
 
-    public static @NonNull CommandOptionBuilder<String, CwCategory> categoryOptionBuilder() {
+    public static CommandOptionBuilder<@Nullable String, @Nullable CwCategory> categoryOptionBuilder() {
         return OptionHelpersKt.enumOptionBuilder("category", CwCategory.class, CwCategory::getDisplayName)
                               .description("Category. E.g. `Size`, `Footprint`");
     }

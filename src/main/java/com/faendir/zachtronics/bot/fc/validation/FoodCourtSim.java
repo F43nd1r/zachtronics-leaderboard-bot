@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import com.faendir.zachtronics.bot.fc.model.FcSubmission;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.faendir.zachtronics.bot.validation.ValidationUtils;
-import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,18 +34,16 @@ public class FoodCourtSim {
      * @param data content to check
      * @param author author to override all imports
      */
-    @NonNull
-    public static Collection<ValidationResult<FcSubmission>> validateMultiExport(byte @NonNull [] data, @NonNull String author) {
+    public static Collection<ValidationResult<FcSubmission>> validateMultiExport(byte[] data, String author) {
         FcSimResult[] results = validate(data);
         if (results.length == 0)
             throw new ValidationException("No valid solution provided");
         return Arrays.stream(results)
                      .map(r -> validationResultFrom(r, author))
-                     .collect(Collectors.toCollection(LinkedHashSet::new));    }
+                     .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
 
-    @NonNull
-    static ValidationResult<FcSubmission> validationResultFrom(@NonNull FcSimResult result, @NonNull String author)
-    throws ValidationException {
+    static ValidationResult<FcSubmission> validationResultFrom(FcSimResult result, String author) throws ValidationException {
         // check the solution was parseable
         if (result.getErrorMessage() != null) {
             return new ValidationResult.Unparseable<>(result.getErrorMessage());
@@ -81,8 +78,7 @@ public class FoodCourtSim {
      * @return results, arrays of size 1 are correctly generated
      * @throws ValidationException if there is a communication error, solution errors are handled in the onject
      */
-    @NonNull
-    static FcSimResult[] validate(byte @NonNull [] data) throws ValidationException {
+    static FcSimResult[] validate(byte[] data) throws ValidationException {
         List<String> command = List.of("python3", "-m", "foodcourt_sim", "simulate", "--json", "--include-solution", "-");
         return ValidationUtils.callValidator(FcSimResult[].class, data, command);
     }

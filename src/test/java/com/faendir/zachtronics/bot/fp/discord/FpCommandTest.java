@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.fp.discord;
 
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.testutils.RunCommandKt;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +42,7 @@ public class FpCommandTest {
         assertThat(result).contains("1-1", "5R/0C/8F/0W");
     }
 
-    @NonNull
-    private String runCommand(String commandName, @NonNull Map<String, ? extends Serializable> args) {
+    private String runCommand(String commandName, Map<String, ? extends Serializable> args) {
         return RunCommandKt.mockGameCommandRun(fpCommand, commandName, args);
     }
 

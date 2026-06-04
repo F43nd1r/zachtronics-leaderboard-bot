@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,11 @@ import com.faendir.zachtronics.bot.sz.model.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -54,17 +53,17 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
     private final List<SzPuzzle> trackedPuzzles = Arrays.stream(SzPuzzle.values()).filter(p -> p.getType() != SzType.SANDBOX).toList();
 
     @Override
-    protected @NonNull String wikiPageName(SzPuzzle puzzle) {
+    protected String wikiPageName(@Nullable SzPuzzle puzzle) {
         return "index";
     }
 
     @Override
-    protected SzSolution makeCandidateSolution(@NonNull SzSubmission submission) {
+    protected SzSolution makeCandidateSolution(SzSubmission submission) {
         return new SzSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
     }
 
     @Override
-    protected int frontierCompare(@NonNull SzScore s1, @NonNull SzScore s2) {
+    protected int frontierCompare(SzScore s1, SzScore s2) {
         int r1 = Integer.compare(s1.getCost(), s2.getCost());
         int r2 = Integer.compare(s1.getPower(), s2.getPower());
         int r3 = Integer.compare(s1.getLines(), s2.getLines());
@@ -84,31 +83,27 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
 
     /** allow same-score solution changes only if you are the original author */
     @Override
-    protected boolean allowedSameScoreUpdate(@NonNull SzSolution candidate, @NonNull SzSolution solution) {
+    protected boolean allowedSameScoreUpdate(SzSolution candidate, SzSolution solution) {
         return candidate.getDisplayLink() != null ||
                (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
     
     @Override
-    @NonNull
-    protected Path relativePuzzlePath(@NonNull SzPuzzle puzzle) {
-        return Paths.get(puzzle.getGroup().name()).resolve(puzzle.getId());
+    protected Path relativePuzzlePath(SzPuzzle puzzle) {
+        return Path.of(puzzle.getGroup().name()).resolve(puzzle.getId());
     }
 
-    @NonNull
-    static String makeFilename(@NonNull String puzzleId, @NonNull SzScore score) {
+    static String makeFilename(String puzzleId, SzScore score) {
         return puzzleId + "-" + score.toDisplayString(DisplayContext.fileName()) + ".txt";
     }
 
-    @NonNull
     @Override
-    protected String makeArchiveLink(@NonNull SzPuzzle puzzle, @NonNull SzScore score) {
+    protected String makeArchiveLink(SzPuzzle puzzle, SzScore score) {
         return makeArchiveLink(puzzle, makeFilename(puzzle.getId(), score));
     }
 
     @Override
-    @NonNull
-    protected Path makeArchivePath(@NonNull Path puzzlePath, SzScore score) {
+    protected Path makeArchivePath(Path puzzlePath, SzScore score) {
         return puzzlePath.resolve(makeFilename(puzzlePath.getFileName().toString(), score));
     }
 }

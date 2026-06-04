@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Value;
 import lombok.experimental.Accessors;
-import org.jspecify.annotations.NonNull;
 
 @Value
 public class IfScoreDTO {
@@ -35,8 +34,7 @@ public class IfScoreDTO {
     boolean usesGRA;
     boolean finite;
 
-    @NonNull
-    public static IfScoreDTO fromScore(@NonNull IfScore score) {
+    public static IfScoreDTO fromScore(IfScore score) {
         return new IfScoreDTO(score.getCycles(), score.getFootprint(), score.getBlocks(),
                               score.isOutOfBounds(), score.usesGRA(), score.isFinite());
     }

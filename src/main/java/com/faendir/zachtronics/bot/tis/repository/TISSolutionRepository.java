@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,14 +28,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.VisibleForTesting;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.*;
@@ -67,17 +66,17 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
     private final List<TISPuzzle> trackedPuzzles = Arrays.stream(TISPuzzle.values()).filter(p -> p.getType() != TISType.SANDBOX).toList();
 
     @Override
-    protected @NonNull String wikiPageName(TISPuzzle puzzle) {
+    protected String wikiPageName(@Nullable TISPuzzle puzzle) {
         return "index";
     }
 
     @Override
-    protected TISSolution makeCandidateSolution(@NonNull TISSubmission submission) {
+    protected TISSolution makeCandidateSolution(TISSubmission submission) {
         return new TISSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
     }
 
     @Override
-    protected int frontierCompare(@NonNull TISScore s1, @NonNull TISScore s2) {
+    protected int frontierCompare(TISScore s1, TISScore s2) {
         int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
         int r2 = Integer.compare(s1.getNodes(), s2.getNodes());
         int r3 = Integer.compare(s1.getInstructions(), s2.getInstructions());
@@ -100,14 +99,14 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
     }
 
     @Override
-    protected boolean allowedSameScoreUpdate(@NonNull TISSolution candidate, @NonNull TISSolution solution) {
+    protected boolean allowedSameScoreUpdate(TISSolution candidate, TISSolution solution) {
         return candidate.getDisplayLink() != null ||
                (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
 
     @Override
-    protected void updateRedditLeaderboard(@NonNull List<String> lines, @NonNull TISPuzzle puzzle,
-                                           GitRepository.@NonNull ReadWriteAccess access, @NonNull List<TISSolution> solutions) {
+    protected void updateRedditLeaderboard(List<String> lines, TISPuzzle puzzle,
+                                           GitRepository.ReadWriteAccess access, List<TISSolution> solutions) {
         // we need to update data that relies on the whole solution list (like totals), don't even try a single update
         lines.clear();
         try {
@@ -119,7 +118,7 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
     }
 
     @Override
-    protected @NonNull List<String> rebuildRedditPage(@NonNull String page, GitRepository.ReadWriteAccess access) throws IOException {
+    protected List<String> rebuildRedditPage(String page, GitRepository.ReadWriteAccess access) throws IOException {
         final String anchorPoint = "# TIS-100 SEGMENT MAP";
         List<String> lines = readRedditWiki(page).stream()
                                                  .takeWhile(l -> !l.equals(anchorPoint))
@@ -252,7 +251,7 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
 
     private static final DecimalFormat format = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.ENGLISH));
     @CheckReturnValue
-    private static Stream<String> metaLeaderboardStream(@NonNull List<TISSolution> allSolutions, Predicate<TISSolution> filterSol) {
+    private static Stream<String> metaLeaderboardStream(List<TISSolution> allSolutions, Predicate<TISSolution> filterSol) {
         Map<String, Double> authorToAmount = new HashMap<>();
         for (TISSolution solution: allSolutions) {
             if (filterSol.test(solution)) {
@@ -282,25 +281,21 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
     }
 
     @Override
-    @NonNull
-    protected Path relativePuzzlePath(@NonNull TISPuzzle puzzle) {
-        return Paths.get(puzzle.getGroup().name()).resolve(puzzle.getId());
+    protected Path relativePuzzlePath(TISPuzzle puzzle) {
+        return Path.of(puzzle.getGroup().name()).resolve(puzzle.getId());
     }
 
-    @NonNull
-    static String makeFilename(@NonNull String puzzleId, @NonNull TISScore score) {
+    static String makeFilename(String puzzleId, TISScore score) {
         return puzzleId + "." + score.toDisplayString(DisplayContext.fileName()) + ".txt";
     }
 
-    @NonNull
     @Override
-    protected String makeArchiveLink(@NonNull TISPuzzle puzzle, @NonNull TISScore score) {
+    protected String makeArchiveLink(TISPuzzle puzzle, TISScore score) {
         return makeArchiveLink(puzzle, makeFilename(puzzle.getId(), score));
     }
 
     @Override
-    @NonNull
-    protected Path makeArchivePath(@NonNull Path puzzlePath, TISScore score) {
+    protected Path makeArchivePath(Path puzzlePath, TISScore score) {
         return puzzlePath.resolve(makeFilename(puzzlePath.getFileName().toString(), score));
     }
 }

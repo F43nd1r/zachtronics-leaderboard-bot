@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import com.faendir.zachtronics.bot.fp.model.*;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.utils.LambdaUtils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
 import java.util.List;
@@ -61,8 +59,7 @@ class FpManualTest {
         System.out.println("Done");
     }
 
-    @NonNull
-    private static FpSubmission recordToSubmissions(@NonNull FpRecord record) {
+    private static FpSubmission recordToSubmissions(FpRecord record) {
         assert record.getDataPath() != null;
         String data = LambdaUtils.<Path, String>uncheckIOException(Files::readString).apply(record.getDataPath());
         return new FpSubmission(record.getPuzzle(), record.getScore(), record.getAuthor(),
@@ -71,7 +68,7 @@ class FpManualTest {
 
     @Test
     public void addLevelPrefixToSolutionFiles() throws IOException {
-        Path repoPath = Paths.get("../bbs/forbidden-path-leaderboard");
+        Path repoPath = Path.of("../bbs/forbidden-path-leaderboard");
 
         for (FpPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(puzzle.getGroup().name()).resolve(puzzle.name());
@@ -117,7 +114,7 @@ class FpManualTest {
 
     @Test
     public void tagNewCategories() throws IOException {
-        Path repoPath = Paths.get("../bbs/forbidden-path-leaderboard");
+        Path repoPath = Path.of("../bbs/forbidden-path-leaderboard");
 
         for (FpPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));

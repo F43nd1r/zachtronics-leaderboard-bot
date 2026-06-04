@@ -26,7 +26,6 @@ import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.faendir.zachtronics.bot.validation.ValidationException;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,6 @@ import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -61,7 +59,7 @@ public class KzManualTest {
     @TestConfiguration
     static class RepositoryConfiguration {
         @Bean("kzRepository")
-        public static @NonNull GitRepository kzRepository(GitProperties gitProperties) {
+        public static GitRepository kzRepository(GitProperties gitProperties) {
             return TestConfigurationKt.readOnlyLocalClone("../kaizen/leaderboard", gitProperties);
         }
     }
@@ -87,7 +85,7 @@ public class KzManualTest {
     @Test
     public void rebuildRedditWiki() {
         repository.rebuildRedditLeaderboard(null);
-        String page = redditService.getWikiPage(Subreddit.KAIZEN, "index")
+        String page = redditService.getWikiPage(Subreddit.KAIZEN, repository.wikiPageName(null))
                                    .replaceAll("file:[^()]+/leaderboard/",
                                                "https://raw.githubusercontent.com/12345ieee/kaizen-leaderboard/master");
         System.out.println(page);
@@ -115,7 +113,7 @@ public class KzManualTest {
 
     @Test
     public void initLeaderboard() throws IOException {
-        Path repoPath = Paths.get("../kaizen/leaderboard");
+        Path repoPath = Path.of("../kaizen/leaderboard");
         for (KzPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
             if (!Files.exists(puzzlePath)) {
@@ -134,7 +132,7 @@ public class KzManualTest {
 
     @Test
     public void validateLeaderboard() throws IOException {
-        Path repoPath = Paths.get("../kaizen/leaderboard");
+        Path repoPath = Path.of("../kaizen/leaderboard");
 
         for (KzPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
@@ -163,7 +161,7 @@ public class KzManualTest {
 
     @Test
     public void tagNewCategories() throws IOException {
-        Path repoPath = Paths.get("../kaizen/leaderboard");
+        Path repoPath = Path.of("../kaizen/leaderboard");
 
         for (KzPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
@@ -187,11 +185,11 @@ public class KzManualTest {
     @Test
     public void submitSaveFolder() throws IOException {
         List<String> authors = List.of("someGuy");
-//        List<String> authors = Files.list(Paths.get("../kaizen/saves/")).map(p -> p.getFileName().toString()).sorted().toList();
+//        List<String> authors = Files.list(Path.of("../kaizen/saves/")).map(p -> p.getFileName().toString()).sorted().toList();
 
         for (String author : authors) {
             System.out.println("Starting: " + author);
-            Path basePath = Paths.get("../kaizen/saves/" + author);
+            Path basePath = Path.of("../kaizen/saves/" + author);
 
             try (Stream<Path> walkStream = Files.walk(basePath, FileVisitOption.FOLLOW_LINKS)) {
                 Iterable<Path> paths = walkStream.filter(p -> p.getFileName().toString().endsWith(".solution"))
@@ -232,7 +230,7 @@ public class KzManualTest {
     public void importFromObsoleteLb() throws IOException {
         // Portable Radio     | [(1/10/18) Community](https://imgur.com/a/xI5sG3k)
         Pattern pattern = Pattern.compile("\\[?\\(" + KzScore.REGEX_SCORE + "\\) (?<author>[^]]+)(?:\\]\\((?<displayLink>[^)]+)\\))?");
-        Path obsoletePath = Paths.get("../kaizen/Obsolete_Kaizen_Leaderboard.md");
+        Path obsoletePath = Path.of("../kaizen/Obsolete_Kaizen_Leaderboard.md");
         List<String> lines = Files.readAllLines(obsoletePath);
         for (String line : lines) {
             String[] fields = line.split(" *\\| *");
@@ -253,7 +251,7 @@ public class KzManualTest {
         // find . -size 0 -print -delete
     }
 
-    private static KzPuzzle findPuzzle(@NonNull String levelName) {
+    private static KzPuzzle findPuzzle(String levelName) {
         List<KzPuzzle> candidates = UtilsKt.fuzzyMatch(Arrays.asList(KzPuzzle.values()), levelName, KzPuzzle::getDisplayName);
         if (candidates.size() == 1)
             return candidates.get(0);

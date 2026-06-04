@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +39,6 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -59,7 +57,7 @@ public class SzManualTest {
     @TestConfiguration
     static class RepositoryConfiguration {
         @Bean("szRepository")
-        public static @NonNull GitRepository szRepository(GitProperties gitProperties) {
+        public static GitRepository szRepository(GitProperties gitProperties) {
             return TestConfigurationKt.readOnlyLocalClone("../shenzhenIO/leaderboard", gitProperties);
         }
     }
@@ -93,7 +91,7 @@ public class SzManualTest {
 
     @Test
     public void validateLeaderboard() throws IOException {
-        Path repoPath = Paths.get("../shenzhenIO/leaderboard");
+        Path repoPath = Path.of("../shenzhenIO/leaderboard");
 
         for (SzPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
@@ -112,7 +110,7 @@ public class SzManualTest {
 
     @Test
     public void tagNewCategories() throws IOException {
-        Path repoPath = Paths.get("../shenzhenIO/leaderboard");
+        Path repoPath = Path.of("../shenzhenIO/leaderboard");
 
         for (SzPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
@@ -137,7 +135,7 @@ public class SzManualTest {
     public void submitSaveFolder() throws IOException {
         String author = "someGuy";
 
-        Path savesPath = Paths.get("../shenzhenIO/saves/" + author);
+        Path savesPath = Path.of("../shenzhenIO/saves/" + author);
 
         for (SzPuzzle puzzle : repository.getTrackedPuzzles()) {
             try (DirectoryStream<Path> paths = Files.newDirectoryStream(savesPath, puzzle.getId() + "*")) {
@@ -172,7 +170,7 @@ public class SzManualTest {
 
     @Test
     public void bootstrapPsv() throws IOException {
-        Path repoPath = Paths.get("../shenzhenIO/leaderboard");
+        Path repoPath = Path.of("../shenzhenIO/leaderboard");
 
         for (SzPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path indexPath = repoPath.resolve(repository.relativePuzzlePath(puzzle)).resolve("solutions.psv");
@@ -207,7 +205,7 @@ public class SzManualTest {
 
     @Test
     public void attach837951602Images() throws IOException {
-        Path repoPath = Paths.get("../shenzhenIO/leaderboard");
+        Path repoPath = Path.of("../shenzhenIO/leaderboard");
         String baseURL = "https://raw.githubusercontent.com/837951602/shenzhenIO-leaderboard-images/master/Images/";
         // +  "airline-cocktail-mixer-16-115-13.png";
 

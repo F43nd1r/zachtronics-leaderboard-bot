@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -48,16 +48,15 @@ public class RestartCommand extends Command.Single {
     private final ApplicationContext applicationContext;
     private final List<GitRepository> repositories;
 
-    private final CommandOption<Boolean, Boolean> sudoOption = CommandOptionBuilder.bool("sudo")
+    private final CommandOption<@Nullable Boolean, @Nullable Boolean> sudoOption = CommandOptionBuilder.bool("sudo")
             .description("Restarts immediately without waiting process termination")
             .build();
 
     @Getter
-    private final List<CommandOption<?,?>> options = List.of(sudoOption);
+    private final List<CommandOption<?, ?>> options = List.of(sudoOption);
 
-    @NonNull
     @Override
-    public Mono<Void> handle(@NonNull ChatInputInteractionEvent event) {
+    public Mono<Void> handle(ChatInputInteractionEvent event) {
         Boolean sudo = sudoOption.get(event);
         if (sudo == null || !sudo) {
             // acquire and hold all the repo write locks, which ensures no write operations are concurrently running

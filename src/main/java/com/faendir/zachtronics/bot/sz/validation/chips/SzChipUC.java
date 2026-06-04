@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.sz.validation.chips;
 
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -40,22 +39,21 @@ import java.util.regex.Pattern;
  * </pre>
  */
 public interface SzChipUC extends SzChip {
-    Pattern LINE_REGEX = Pattern.compile(
-            String.join("\\s*", new String[]{"", "(?:(?<label>[^#:]+):)?", "(?<code>[^#:]+)?", "(?:#(?<comment>.*))?", ""}));
+    Pattern LINE_REGEX = Pattern.compile(String.join("\\s*",
+            "", "(?:(?<label>[^#:]+):)?", "(?<code>[^#:]+)?", "(?:#(?<comment>.*))?", ""));
 
     @Value
     class SzCodeLine {
-        @NonNull String rawLine;
+        String rawLine;
 
         @Nullable String label;
         @Nullable String code;
         @Nullable String comment;
     }
 
-    @NonNull List<SzCodeLine> getLines();
+    List<SzCodeLine> getLines();
 
-    @NonNull
-    static List<SzCodeLine> readLines(@NonNull Map<String, String> chipMap, int limit) {
+    static List<SzCodeLine> readLines(Map<String, String> chipMap, int limit) {
         String[] rawLines = chipMap.get("code").split("\\n");
         if (rawLines.length > limit)
             throw new ValidationException("UC has " + rawLines.length + " LOC when the limit is " + limit);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,15 @@ import com.faendir.zachtronics.bot.discord.command.option.CommandOptionBuilder;
 import com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt;
 import com.faendir.zachtronics.bot.inf.model.IfCategory;
 import com.faendir.zachtronics.bot.inf.model.IfPuzzle;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class IfOptionBuilders {
-    public static @NonNull CommandOptionBuilder<String, IfPuzzle> puzzleOptionBuilder() {
+    public static CommandOptionBuilder<@Nullable String, @Nullable IfPuzzle> puzzleOptionBuilder() {
         return OptionHelpersKt.enumOptionBuilder("puzzle", IfPuzzle.class, IfPuzzle::getDisplayName)
                               .description("Puzzle name. Can be shortened or abbreviated. E.g. `Gne ch`, `TBB`");
     }
 
-    public static @NonNull CommandOptionBuilder<String, IfCategory> categoryOptionBuilder() {
+    public static CommandOptionBuilder<@Nullable String, @Nullable IfCategory> categoryOptionBuilder() {
         return OptionHelpersKt.enumOptionBuilder("category", IfCategory.class, IfCategory::getDisplayName)
                               .description("Category. E.g. `CNG`, `F`");
     }

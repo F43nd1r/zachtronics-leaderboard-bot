@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import com.faendir.zachtronics.bot.fp.model.FpPuzzle;
 import com.faendir.zachtronics.bot.fp.repository.FpSolutionRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,7 +32,7 @@ import org.springframework.stereotype.Component;
 @FpQualifier
 public class FpRebuildCommand extends AbstractRebuildCommand<FpPuzzle> {
     @Getter
-    private final CommandOption<String, FpPuzzle> puzzleOption = FpOptionBuilders.puzzleOptionBuilder().build();
+    private final CommandOption<@Nullable String, @Nullable FpPuzzle> puzzleOption = FpOptionBuilders.puzzleOptionBuilder().build();
     @Getter
     private final Secured secured = FpSecured.ADMINS_ONLY;
     @Getter

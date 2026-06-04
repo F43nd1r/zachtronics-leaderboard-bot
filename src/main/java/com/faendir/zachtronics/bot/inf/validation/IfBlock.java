@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.inf.validation;
 
 import lombok.Value;
 import org.checkerframework.common.value.qual.IntRange;
-import org.jspecify.annotations.NonNull;
 
 import java.nio.ByteBuffer;
 
@@ -45,10 +44,9 @@ class IfBlock {
     short positionZ;
     @IntRange(from = 0, to = 3) byte facing;
     byte toggleState;
-    @NonNull IfDecal[] decals;
+    IfDecal[] decals;
 
-    @NonNull
-    static IfBlock unmarshal(@NonNull ByteBuffer byteBuffer) {
+    static IfBlock unmarshal(ByteBuffer byteBuffer) {
         short type = byteBuffer.getShort();
         short positionX = byteBuffer.getShort();
         short positionY = byteBuffer.getShort();

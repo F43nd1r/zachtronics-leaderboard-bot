@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import kotlin.Pair;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -43,9 +42,8 @@ public class FpShowCommand extends AbstractShowCommand<FpCategory, FpPuzzle, FpR
     @Getter
     private final FpSolutionRepository repository;
 
-    @NonNull
     @Override
-    public Pair<FpPuzzle, FpCategory> findPuzzleAndCategory(@NonNull ChatInputInteractionEvent event) {
+    public Pair<FpPuzzle, FpCategory> findPuzzleAndCategory(ChatInputInteractionEvent event) {
         FpPuzzle puzzle = puzzleOption.get(event);
         FpCategory category = categoryOption.get(event);
         if (!puzzle.getSupportedCategories().contains(category))

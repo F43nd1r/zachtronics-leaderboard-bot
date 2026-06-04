@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,36 +23,36 @@ import com.faendir.zachtronics.bot.tis.model.TISRecord;
 import com.faendir.zachtronics.bot.tis.model.TISScore;
 import lombok.Value;
 import lombok.With;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
+
 @Value
 public class TISSolution implements Solution<TISCategory, TISPuzzle, TISScore, TISRecord> {
-    @NonNull TISScore score;
-    @NonNull String author;
-    @With String displayLink;
+    TISScore score;
+    String author;
+    @With @Nullable String displayLink;
     /** empty if it holds no categories */
     EnumSet<TISCategory> categories = EnumSet.noneOf(TISCategory.class);
 
     @Override
-    public TISRecord extendToRecord(TISPuzzle puzzle, String dataLink, Path dataPath) {
+    public TISRecord extendToRecord(TISPuzzle puzzle, @Nullable String dataLink, @Nullable Path dataPath) {
         if (dataPath != null && Files.exists(dataPath))
             return new TISRecord(puzzle, score, author, displayLink, dataLink, dataPath);
         else
             return new TISRecord(puzzle, score, author, displayLink, null, null);
     }
 
-    @NonNull
-    public static TISSolution unmarshal(String @NonNull [] fields) {
+    public static TISSolution unmarshal(@Nullable String[] fields) {
         assert fields.length == 4;
-        TISScore score = Objects.requireNonNull(TISScore.parseScore(fields[0]));
-        String author = fields[1];
+        TISScore score = requireNonNull(TISScore.parseScore(requireNonNull(fields[0])));
+        String author = requireNonNull(fields[1]);
         String displayLink = fields[2];
         String categories = fields[3];
 
@@ -63,8 +63,8 @@ public class TISSolution implements Solution<TISCategory, TISPuzzle, TISScore, T
     }
 
     @Override
-    public String @NonNull [] marshal() {
-        return new String[]{
+    public @Nullable String[] marshal() {
+        return new @Nullable String[]{
                 score.toDisplayString(),
                 author,
                 displayLink,

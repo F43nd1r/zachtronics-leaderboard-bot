@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,36 +23,36 @@ import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import lombok.Value;
 import lombok.With;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
+
 @Value
 public class ScSolution implements Solution<ScCategory, ScPuzzle, ScScore, ScRecord> {
-    @NonNull ScScore score;
-    @NonNull String author;
-    @With String displayLink;
+    ScScore score;
+    String author;
+    @With @Nullable String displayLink;
     @With boolean videoOnly;
     /** empty if it holds no categories */
     EnumSet<ScCategory> categories = EnumSet.noneOf(ScCategory.class);
 
     @Override
-    public ScRecord extendToRecord(ScPuzzle puzzle, String dataLink, Path dataPath) {
+    public ScRecord extendToRecord(ScPuzzle puzzle, @Nullable String dataLink, @Nullable Path dataPath) {
         if (videoOnly || dataPath == null)
             return new ScRecord(puzzle, score, author, displayLink, null, null);
         else
             return new ScRecord(puzzle, score, author, displayLink, dataLink, dataPath);
     }
 
-    @NonNull
-    public static ScSolution unmarshal(String @NonNull [] fields) {
+    public static ScSolution unmarshal(@Nullable String[] fields) {
         assert fields.length == 5;
-        ScScore score = Objects.requireNonNull(ScScore.parseScore(fields[0]));
-        String author = fields[1];
+        ScScore score = requireNonNull(ScScore.parseScore(requireNonNull(fields[0])));
+        String author = requireNonNull(fields[1]);
         String displayLink = fields[2];
         boolean videoOnly = fields[3] != null;
         String categories = fields[4];
@@ -64,8 +64,8 @@ public class ScSolution implements Solution<ScCategory, ScPuzzle, ScScore, ScRec
     }
 
     @Override
-    public String @NonNull [] marshal() {
-        return new String[]{
+    public @Nullable String[] marshal() {
+        return new @Nullable String[]{
                 score.toDisplayString(),
                 author,
                 displayLink,

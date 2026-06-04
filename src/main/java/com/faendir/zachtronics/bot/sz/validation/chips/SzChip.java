@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.faendir.zachtronics.bot.sz.validation.chips;
 
 import com.faendir.zachtronics.bot.validation.ValidationException;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Map;
 
@@ -32,14 +31,13 @@ import java.util.Map;
  * then type-specific information
  */
 public interface SzChip {
-    @NonNull SzChipType getType();
+    SzChipType getType();
     /** min 1 at left */
     int getX();
     /** min 1 at the bottom */
     int getY();
 
-    @NonNull
-    static SzChip unmarshal(@NonNull Map<String, String> chipMap) {
+    static SzChip unmarshal(Map<String, String> chipMap) {
         SzChipType type;
         try {
             type = SzChipType.valueOf(chipMap.get("type"));

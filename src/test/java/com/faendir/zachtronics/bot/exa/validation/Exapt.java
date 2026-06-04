@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import com.faendir.zachtronics.bot.exa.model.ExaSubmission;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationUtils;
 import lombok.SneakyThrows;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,7 +35,7 @@ public class Exapt {
     /**
      * @param untrustedData the score is assumed to be potentially wrong and will be patched
      */
-    public static @NonNull ExaSubmission validateData(byte @NonNull [] untrustedData, boolean cheesy, String author, String displayLink) {
+    public static ExaSubmission validateData(byte[] untrustedData, boolean cheesy, String author, @Nullable String displayLink) {
         ExaSave save = ExaSave.unmarshal(untrustedData);
         return validateImpl(save, untrustedData, cheesy, author, displayLink);
     }
@@ -43,13 +43,13 @@ public class Exapt {
     /**
      * @param save the score is assumed to be potentially wrong and will be patched
      */
-    public static @NonNull ExaSubmission validateSave(@NonNull ExaSave save, boolean cheesy, String author, String displayLink) {
-        byte @NonNull [] untrustedData = save.marshal();
+    public static ExaSubmission validateSave(ExaSave save, boolean cheesy, String author, @Nullable String displayLink) {
+        byte[] untrustedData = save.marshal();
         return validateImpl(save, untrustedData, cheesy, author, displayLink);
     }
 
-    static @NonNull ExaSubmission validateImpl(@NonNull ExaSave save, byte @NonNull [] untrustedData, boolean cheesy, String author,
-                                               String displayLink) {
+    static ExaSubmission validateImpl(ExaSave save, byte[] untrustedData, boolean cheesy, String author,
+                                      @Nullable String displayLink) {
         ExaptResult.ExaptStatistics stats = validate(untrustedData);
 
         byte[] trustedData;
@@ -67,7 +67,7 @@ public class Exapt {
     }
 
     @SneakyThrows
-    static ExaptResult.@NonNull ExaptStatistics validate(byte @NonNull [] data) {
+    static ExaptResult.ExaptStatistics validate(byte[] data) {
         Path f = Files.createTempFile("exafile", ".solution");
         Files.write(f, data);
         List<String> command = List.of(exaptPath, "-e", gameDir, "-t", "500000", f.toString());

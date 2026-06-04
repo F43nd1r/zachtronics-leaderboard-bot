@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import com.faendir.zachtronics.bot.kz.repository.KzSolutionRepository;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -41,7 +41,7 @@ import static com.faendir.zachtronics.bot.discord.command.option.OptionHelpersKt
 public class KzSubmitCommand extends AbstractSubmitCommand<KzCategory, KzPuzzle, KzSubmission, KzRecord> {
     private final CommandOption<String, String> solutionOption = solutionOptionBuilder().required().build();
     private final CommandOption<String, String> authorOption = authorOptionBuilder().required().build();
-    private final CommandOption<String, String> imageOption = imageOptionBuilder().build();
+    private final CommandOption<@Nullable String, @Nullable String> imageOption = imageOptionBuilder().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, imageOption);
     @Getter
@@ -49,9 +49,8 @@ public class KzSubmitCommand extends AbstractSubmitCommand<KzCategory, KzPuzzle,
     @Getter
     private final KzSolutionRepository repository;
 
-    @NonNull
     @Override
-    public KzSubmission parseSubmission(@NonNull ChatInputInteractionEvent event) {
+    public KzSubmission parseSubmission(ChatInputInteractionEvent event) {
         return KzSubmission.fromLink(solutionOption.get(event), authorOption.get(event), imageOption.get(event));
     }
 }

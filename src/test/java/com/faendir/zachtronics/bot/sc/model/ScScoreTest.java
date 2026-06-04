@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.sc.model;
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.StringFormat;
 import org.apache.commons.lang3.StringUtils;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +51,7 @@ class ScScoreTest {
         assertBoldMetrics(score, 0, null);
     }
 
-    private static void assertBoldMetrics(@NonNull ScScore score, int number, @Nullable Collection<ScCategory> categories) {
+    private static void assertBoldMetrics(ScScore score, int number, @Nullable Collection<ScCategory> categories) {
         String result = score.toDisplayString(new DisplayContext<>(StringFormat.REDDIT, categories));
         assertEquals(number, StringUtils.countMatches(result, "**") / 2);
     }

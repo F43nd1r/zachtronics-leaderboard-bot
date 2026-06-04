@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import com.faendir.zachtronics.bot.inf.model.IfScore;
 import com.faendir.zachtronics.bot.inf.model.IfSubmission;
 import com.faendir.zachtronics.bot.inf.model.IfType;
 import com.faendir.zachtronics.bot.utils.UtilsKt;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,7 +44,7 @@ class IfRedditMigrationTest {
 
     @Test
     public void parseFootprintPage() throws IOException {
-        Path pagePath = Paths.get("../infinifactory/footprint.md");
+        Path pagePath = Path.of("../infinifactory/footprint.md");
         List<String> lines = Files.readAllLines(pagePath);
 
         // cp -a ../infinifactory/leaderboard/* src/test/resources/repositories/if-leaderboard/
@@ -80,7 +78,7 @@ class IfRedditMigrationTest {
 
     @Test
     public void parseBlocksPage() throws IOException {
-        Path pagePath = Paths.get("../infinifactory/blocks.md");
+        Path pagePath = Path.of("../infinifactory/blocks.md");
         List<String> lines = Files.readAllLines(pagePath);
 
         // cp -a ../infinifactory/leaderboard/* src/test/resources/repositories/if-leaderboard/
@@ -120,7 +118,7 @@ class IfRedditMigrationTest {
 
     @Test
     public void parseCyclesPage() throws IOException {
-        Path pagePath = Paths.get("../infinifactory/cycles.md");
+        Path pagePath = Path.of("../infinifactory/cycles.md");
         List<String> lines = Files.readAllLines(pagePath);
 
         // cp -a ../infinifactory/leaderboard/* src/test/resources/repositories/if-leaderboard/
@@ -157,7 +155,7 @@ class IfRedditMigrationTest {
                                                                  "(?: *\\[\\^\\[2\\]\\]\\((?<link2>[^)]+)\\))?" +
                                                                  "(?: *\\[\\^\\[3\\]\\]\\((?<link3>[^)]+)\\))?" +
                                                                  "(?: *\\[\\^\\[4\\]\\]\\((?<link4>[^)]+)\\))?");
-    private void loadCylesSol(IfPuzzle puzzle, @NonNull String piece1, String piece2, boolean usesGRA) {
+    private void loadCylesSol(IfPuzzle puzzle, String piece1, String piece2, boolean usesGRA) {
         Matcher ma = LINKS_PATTERN.matcher(piece2);
         if (piece1.matches("\\d+") && ma.matches()) {
             int cycles = Integer.parseInt(piece1);
@@ -176,7 +174,7 @@ class IfRedditMigrationTest {
 
     @Test
     public void parseAllPage() throws IOException {
-        Path pagePath = Paths.get("../infinifactory/all.md");
+        Path pagePath = Path.of("../infinifactory/all.md");
         List<String> lines = Files.readAllLines(pagePath);
 
         // cp -a ../infinifactory/leaderboard/* src/test/resources/repositories/if-leaderboard/
@@ -221,7 +219,7 @@ class IfRedditMigrationTest {
     }
 
     private static boolean terrestrialSurveySeen = false;
-    private static IfPuzzle findPuzzle(@NonNull String levelName) {
+    private static IfPuzzle findPuzzle(String levelName) {
         if (levelName.equals("Terrestrial Surveyor")) { // same name, 2 levels
             if (!terrestrialSurveySeen) {
                 terrestrialSurveySeen = true;

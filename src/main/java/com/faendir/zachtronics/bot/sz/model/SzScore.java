@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Score;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.regex.Matcher;
@@ -33,9 +32,8 @@ public class SzScore implements Score<SzCategory> {
     int lines;
 
     /** cc/ppp/ll */
-    @NonNull
     @Override
-    public String toDisplayString(@NonNull DisplayContext<SzCategory> context) {
+    public String toDisplayString(DisplayContext<SzCategory> context) {
         String separator = context.getSeparator();
         int formatId = Utils.getScoreFormatId(context);
 
@@ -48,14 +46,13 @@ public class SzScore implements Score<SzCategory> {
 
     /** <tt>cc/ppp/ll</tt>, tolerates extra <tt>*</tt> */
     @Nullable
-    public static SzScore parseScore(@NonNull String string) {
+    public static SzScore parseScore(String string) {
         Matcher m = REGEX_SCORE.matcher(string);
         return m.matches() ? parseScore(m) : null;
     }
 
     /** we assume m matches */
-    @NonNull
-    public static SzScore parseScore(@NonNull Matcher m) {
+    public static SzScore parseScore(Matcher m) {
         int cost = Integer.parseInt(m.group("cost"));
         int power = Integer.parseInt(m.group("power"));
         int lines = Integer.parseInt(m.group("lines"));

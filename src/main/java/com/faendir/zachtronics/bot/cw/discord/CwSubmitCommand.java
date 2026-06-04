@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import com.faendir.zachtronics.bot.validation.ValidationResult;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -48,11 +48,11 @@ public class CwSubmitCommand extends AbstractMultiSubmitCommand<CwCategory, CwPu
 
     private final CommandOption<String, String> solutionOption = CommandOptionBuilder.string("solution")
             .description("Link to the solution file, can be `m1` to scrape it from your last message or single solution text")
-            .required()
             .convert((event, link) -> link.startsWith(SOLUTION_PREFIX) ? link : resolveLink(event, link, true))
+            .required()
             .build();
     private final CommandOption<String, String> authorOption = authorOptionBuilder().required().build();
-    private final CommandOption<String, String> imageOption = imageOptionBuilder().build();
+    private final CommandOption<@Nullable String, @Nullable String> imageOption = imageOptionBuilder().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(solutionOption, authorOption, imageOption);
     @Getter
@@ -60,9 +60,8 @@ public class CwSubmitCommand extends AbstractMultiSubmitCommand<CwCategory, CwPu
     @Getter
     private final CwSolutionRepository repository;
 
-    @NonNull
     @Override
-    public Collection<ValidationResult<CwSubmission>> parseSubmissions(@NonNull ChatInputInteractionEvent event) {
+    public Collection<ValidationResult<CwSubmission>> parseSubmissions(ChatInputInteractionEvent event) {
         String solution = solutionOption.get(event);
         String author = authorOption.get(event);
         String image = imageOption.get(event);

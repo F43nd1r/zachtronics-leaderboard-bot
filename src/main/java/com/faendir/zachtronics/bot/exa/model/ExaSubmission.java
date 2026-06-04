@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,29 +21,26 @@ import com.faendir.zachtronics.bot.model.Submission;
 import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 @Value
 public class ExaSubmission implements Submission<ExaCategory, ExaPuzzle> {
-    @NonNull ExaPuzzle puzzle;
-    @NonNull ExaScore score;
-    @NonNull String author;
+    ExaPuzzle puzzle;
+    ExaScore score;
+    String author;
     @Nullable String displayLink;
-    byte @NonNull [] data;
+    byte[] data;
 
     /**
      * @throws ValidationException if we can't correctly parse metadata
      */
-    @NonNull
-    public static ExaSubmission fromData(byte @NonNull [] data, boolean cheesy, @NonNull String author, String displayLink)
+    public static ExaSubmission fromData(byte[] data, boolean cheesy, String author, @Nullable String displayLink)
     throws ValidationException {
         return ExaValidator.validate(data, cheesy, author, displayLink);
     }
 
-    @NonNull
-    public static ExaSubmission fromLink(@NonNull String link, boolean cheesy, String author, String displayLink) {
-        byte @NonNull [] data = Utils.downloadFile(link).getData();
+    public static ExaSubmission fromLink(String link, boolean cheesy, String author, @Nullable String displayLink) {
+        byte[] data = Utils.downloadFile(link).getData();
         return fromData(data, cheesy, author, displayLink);
     }
 }

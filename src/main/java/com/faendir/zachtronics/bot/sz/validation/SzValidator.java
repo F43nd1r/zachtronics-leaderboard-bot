@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzScore;
 import com.faendir.zachtronics.bot.sz.model.SzSubmission;
 import com.faendir.zachtronics.bot.validation.ValidationException;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class SzValidator {
     private SzValidator() {}
 
-    public static @NonNull SzSubmission validate(String data, String author, String displayLink) {
+    public static SzSubmission validate(String data, String author, @Nullable String displayLink) {
         SzSave save = SzSave.unmarshal(data);
 
         SzPuzzle puzzle;

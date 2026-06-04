@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
 import org.apache.commons.text.StringEscapeUtils;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -72,8 +71,7 @@ class ScManualTest {
         System.out.println("Done");
     }
 
-    @NonNull
-    private static ScSubmission recordToSubmissions(@NonNull ScRecord record) {
+    private static ScSubmission recordToSubmissions(ScRecord record) {
         assert record.getDataPath() != null;
         String data = LambdaUtils.<Path, String>uncheckIOException(Files::readString).apply(record.getDataPath());
         return new ScSubmission(record.getPuzzle(), record.getScore(), record.getAuthor(),
@@ -96,7 +94,7 @@ class ScManualTest {
 
     @Test
     public void bootstrapPsv() throws IOException {
-        Path repoPath = Paths.get("../spacechem/archive");
+        Path repoPath = Path.of("../spacechem/archive");
 
         for (ScPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path indexPath = repoPath.resolve(puzzle.getGroup().name()).resolve(puzzle.name()).resolve("solutions.psv");
@@ -109,11 +107,11 @@ class ScManualTest {
                                           .map(ScCategory::name)
                                           .collect(Collectors.joining(","));
 
-                    String[] csvRecord = {record.getScore().toDisplayString(),
-                                          author,
-                                          record.getDisplayLink(),
-                                          record.getDataPath() == null ? "video" : null,
-                                          categories};
+                    @Nullable String[] csvRecord = {record.getScore().toDisplayString(),
+                                                    author,
+                                                    record.getDisplayLink(),
+                                                    record.getDataPath() == null ? "video" : null,
+                                                    categories};
                     writer.writeNext(csvRecord, false);
                 }
             }
@@ -122,7 +120,7 @@ class ScManualTest {
 
     @Test
     public void validateLeaderboard() throws IOException {
-        Path repoPath = Paths.get("../spacechem/archive");
+        Path repoPath = Path.of("../spacechem/archive");
 
         for (ScPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
@@ -149,7 +147,7 @@ class ScManualTest {
 
     @Test
     public void tagNewCategories() throws IOException {
-        Path repoPath = Paths.get("../spacechem/archive");
+        Path repoPath = Path.of("../spacechem/archive");
 
         for (ScPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
@@ -172,7 +170,7 @@ class ScManualTest {
 
     @Test
     public void markVideoOnly() throws IOException {
-        Path repoPath = Paths.get("../spacechem/archive");
+        Path repoPath = Path.of("../spacechem/archive");
 
         for (ScPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
@@ -196,8 +194,8 @@ class ScManualTest {
 
     @Test
     public void loadSolnetVideos() throws IOException {
-        Path solnetDumpPath = Paths.get("../spacechem/solutionnet/data/score_dump.csv");
-        Path repoPath = Paths.get("../spacechem/archive");
+        Path solnetDumpPath = Path.of("../spacechem/solutionnet/data/score_dump.csv");
+        Path repoPath = Path.of("../spacechem/archive");
 
         try (CSVReader reader = new CSVReaderBuilder(Files.newBufferedReader(solnetDumpPath)).withFieldAsNull(
             CSVReaderNullFieldIndicator.BOTH).withSkipLines(1).build()) {
@@ -244,8 +242,7 @@ class ScManualTest {
         }
     }
 
-    @NonNull
-    private static ScSubmission fromSolnetData(@NonNull String[] fields) {
+    private static ScSubmission fromSolnetData(String[] fields) {
         // Username,Level Category,Level Number,Level Name,Reactor Count,Cycle Count,Symbol Count,Upload Time,Youtube Link
         // Iridium,63corvi,1,QT-1,1,20,5,2011-07-09 07:51:58.320983,https://www.youtube.com/watch?v=hRM5IpSv5aU
         // ToughThought,researchnet,1-7-2,Glyoxylic Acid,1,167,23,2014-01-17 09:32:10.854625,https://youtu.be/GUz4sihkigQ

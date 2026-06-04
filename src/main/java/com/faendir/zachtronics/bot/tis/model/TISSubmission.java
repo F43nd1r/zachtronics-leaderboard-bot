@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.Value;
 import lombok.With;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
@@ -30,21 +29,19 @@ import java.util.function.Supplier;
 
 @Value
 public class TISSubmission implements Submission<TISCategory, TISPuzzle> {
-    @NonNull TISPuzzle puzzle;
-    @NonNull TISScore score;
-    @NonNull String author;
-    @With String displayLink;
-    @NonNull String data;
+    TISPuzzle puzzle;
+    TISScore score;
+    String author;
+    @With @Nullable String displayLink;
+    String data;
 
-    @NonNull
-    public static TISSubmission fromData(@NonNull String data, @NonNull TISPuzzle puzzle, @NonNull String author, String displayLink)
+    public static TISSubmission fromData(String data, TISPuzzle puzzle, String author, @Nullable String displayLink)
     throws ValidationException {
         TISScore score = TISValidator.validate(data, puzzle);
         return new TISSubmission(puzzle, score, author, displayLink, data);
     }
 
-    @NonNull
-    public static TISSubmission fromLink(@NonNull String link, @Nullable TISPuzzle puzzle, @NonNull String author, String displayLink)
+    public static TISSubmission fromLink(String link, @Nullable TISPuzzle puzzle, String author, @Nullable String displayLink)
     throws ValidationException {
         Utils.FileInfo info = Utils.downloadFile(link);
         if (puzzle == null) {

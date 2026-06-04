@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.exa.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -52,7 +51,7 @@ public enum ExaCategory implements CategoryJava<ExaCategory, ExaScore, ExaMetric
 
 
     /** contains <tt>%d%s%d%s%d%s</tt> plus a bunch of <tt>*</tt> most likely */
-    static final String[] FORMAT_STRINGS = {"%d%s%d%s%d%s", "%d%s%d%s**%d**%s", "%d%s**%d**%s%d%s", null, "**%d**%s%d%s%d%s"};
+    static final String[] FORMAT_STRINGS = {"%d%s%d%s%d%s", "%d%s%d%s**%d**%s", "%d%s**%d**%s%d%s", "", "**%d**%s%d%s%d%s"};
 
     private final String displayName;
     private final ExaMetric<Boolean> admission;
@@ -61,7 +60,7 @@ public enum ExaCategory implements CategoryJava<ExaCategory, ExaScore, ExaMetric
     private final Set<ExaType> supportedTypes;
     private final int scoreFormatId;
 
-    ExaCategory(@NonNull ExaMetric<Boolean> admission, @NonNull List<ExaMetric<?>> metrics, Set<ExaType> supportedTypes, int scoreFormatId) {
+    ExaCategory(ExaMetric<Boolean> admission, List<ExaMetric<?>> metrics, Set<ExaType> supportedTypes, int scoreFormatId) {
         this.supportedTypes = supportedTypes;
         this.displayName = name();
         this.admission = admission;
@@ -71,7 +70,7 @@ public enum ExaCategory implements CategoryJava<ExaCategory, ExaScore, ExaMetric
     }
 
     @Override
-    public boolean supportsScore(@NonNull ExaScore score) {
+    public boolean supportsScore(ExaScore score) {
         return admission.get(score);
     }
 }

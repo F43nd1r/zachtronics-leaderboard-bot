@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,20 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.dto.RecordDTO;
 import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 @Value
 public class CwRecordDTO implements RecordDTO<CwScoreDTO> {
-    @NonNull CwScoreDTO score;
-    @NonNull String fullFormattedScore;
-    @NonNull String author;
+    CwScoreDTO score;
+    String fullFormattedScore;
+    String author;
     @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
 
-    @NonNull
-    public static CwRecordDTO fromCategoryRecord(@NonNull CategoryRecord<CwRecord, CwCategory> categoryRecord) {
+    public static CwRecordDTO fromCategoryRecord(CategoryRecord<CwRecord, CwCategory> categoryRecord) {
         CwRecord record = categoryRecord.getRecord();
         Set<CwCategory> categories = categoryRecord.getCategories();
         return new CwRecordDTO(
@@ -51,8 +49,7 @@ public class CwRecordDTO implements RecordDTO<CwScoreDTO> {
         );
     }
 
-    @NonNull
-    public static CwRecordDTO fromRecord(@NonNull CwRecord record) {
+    public static CwRecordDTO fromRecord(CwRecord record) {
         return new CwRecordDTO(CwScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
                                record.getAuthor(),

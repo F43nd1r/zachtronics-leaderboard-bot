@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import com.faendir.zachtronics.bot.exa.model.ExaSubmission;
 import com.faendir.zachtronics.bot.exa.model.ExaType;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import org.jetbrains.annotations.VisibleForTesting;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.regex.Pattern;
 
@@ -31,13 +31,13 @@ public class ExaValidator {
 
     private static final Pattern CHEESE_REGEX = Pattern.compile("(?:/C|\\bchees[ey])\\b", Pattern.CASE_INSENSITIVE);
 
-    public static @NonNull ExaSubmission validate(byte[] data, boolean cheesy, String author, String displayLink) {
+    public static ExaSubmission validate(byte[] data, boolean cheesy, String author, @Nullable String displayLink) {
         ExaSave save = ExaSave.unmarshal(data);
         return validateImpl(data, save, cheesy, author, displayLink);
     }
 
     @VisibleForTesting
-    public static @NonNull ExaSubmission validateImpl(byte[] data, @NonNull ExaSave save, boolean cheesy, String author, String displayLink) {
+    public static ExaSubmission validateImpl(byte[] data, ExaSave save, boolean cheesy, String author, @Nullable String displayLink) {
         ExaPuzzle puzzle;
         try {
             puzzle = ExaPuzzle.valueOf(save.getPuzzle());

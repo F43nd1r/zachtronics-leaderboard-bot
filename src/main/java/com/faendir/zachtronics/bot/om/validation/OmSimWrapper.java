@@ -31,7 +31,7 @@ import static java.lang.foreign.ValueLayout.JAVA_BYTE;
  * * remove the unused downcall tracer (optional)
  * * add `@SuppressWarnings("unused")` (optional)
  */
-@SuppressWarnings("unused")
+@SuppressWarnings("all")
 public class OmSimWrapper {
 
     OmSimWrapper() {

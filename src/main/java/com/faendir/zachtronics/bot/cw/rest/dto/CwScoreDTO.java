@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.cw.rest.dto;
 
 import com.faendir.zachtronics.bot.cw.model.CwScore;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 @Value
 public class CwScoreDTO {
@@ -26,8 +25,7 @@ public class CwScoreDTO {
     int height;
     int footprint;
 
-    @NonNull
-    public static CwScoreDTO fromScore(@NonNull CwScore score) {
+    public static CwScoreDTO fromScore(CwScore score) {
         return new CwScoreDTO(score.getWidth(), score.getHeight(), score.getFootprint());
     }
 }

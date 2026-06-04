@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.sc.discord;
 import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.testutils.RunCommandKt;
 import org.apache.commons.lang3.StringUtils;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,8 +128,7 @@ public class ScCommandTest {
         assertThat(result).contains("Passivation", "`156/1/45/B`");
     }
 
-    @NonNull
-    private String runCommand(String commandName, @NonNull Map<String, ? extends Serializable> args) {
+    private String runCommand(String commandName, Map<String, ? extends Serializable> args) {
         return RunCommandKt.mockGameCommandRun(scCommand, commandName, args);
     }
 

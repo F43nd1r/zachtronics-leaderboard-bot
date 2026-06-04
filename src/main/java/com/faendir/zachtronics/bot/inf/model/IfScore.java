@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
 import lombok.With;
 import lombok.experimental.Accessors;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.regex.Matcher;
@@ -40,9 +39,8 @@ public class IfScore implements Score<IfCategory> {
     @With boolean finite;
 
     /** ccc/ff/bb[/OGF] */
-    @NonNull
     @Override
-    public String toDisplayString(@NonNull DisplayContext<IfCategory> context) {
+    public String toDisplayString(DisplayContext<IfCategory> context) {
         String separator = context.getSeparator();
         int formatId = Utils.getScoreFormatId(context);
 
@@ -59,14 +57,13 @@ public class IfScore implements Score<IfCategory> {
 
     /** <tt>ccc/ff/bb[/OGF]</tt>, tolerates extra <tt>*</tt> */
     @Nullable
-    public static IfScore parseScore(@NonNull String string) {
+    public static IfScore parseScore(String string) {
         Matcher m = REGEX_SCORE.matcher(string);
         return m.matches() ? parseScore(m) : null;
     }
 
     /** we assume m matches */
-    @NonNull
-    public static IfScore parseScore(@NonNull Matcher m) {
+    public static IfScore parseScore(Matcher m) {
         int cycles = Integer.parseInt(m.group("cycles"));
         int footprint = Integer.parseInt(m.group("footprint"));
         int blocks = Integer.parseInt(m.group("blocks"));
@@ -81,7 +78,6 @@ public class IfScore implements Score<IfCategory> {
     /**
      * @return <tt>""</tt> or <tt>"/[O][G][F]"</tt>
      */
-    @NonNull
     public static String sepFlags(String separator, boolean outOfBounds, boolean usesGRA, boolean finite) {
         if (outOfBounds || usesGRA || finite) {
             String result = separator;

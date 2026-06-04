@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.sc.rest.dto;
 
 import com.faendir.zachtronics.bot.sc.model.ScScore;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 @Value
 public class ScScoreDTO {
@@ -29,8 +28,7 @@ public class ScScoreDTO {
     boolean bugged;
     boolean precognitive;
 
-    @NonNull
-    public static ScScoreDTO fromScore(@NonNull ScScore score) {
+    public static ScScoreDTO fromScore(ScScore score) {
         return new ScScoreDTO(score.getCycles(), score.getReactors(), score.getSymbols(), score.isBugged(), score.isPrecognitive());
     }
 }

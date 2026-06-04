@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.faendir.zachtronics.bot.exa.validation;
 
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -33,7 +32,7 @@ import org.jspecify.annotations.Nullable;
  */
 @Value
 public class ExaptResult {
-    @NonNull String puzzleId;
+    String puzzleId;
     /** true IFF {@link #statistics} is present */
     boolean completed;
     @Nullable ExaptStatistics statistics;

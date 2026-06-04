@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,20 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.dto.RecordDTO;
 import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 @Value
 public class IfRecordDTO implements RecordDTO<IfScoreDTO> {
-    @NonNull IfScoreDTO score;
-    @NonNull String fullFormattedScore;
-    @NonNull String author;
+    IfScoreDTO score;
+    String fullFormattedScore;
+    String author;
     @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
 
-    @NonNull
-    public static IfRecordDTO fromCategoryRecord(@NonNull CategoryRecord<IfRecord, IfCategory> categoryRecord) {
+    public static IfRecordDTO fromCategoryRecord(CategoryRecord<IfRecord, IfCategory> categoryRecord) {
         IfRecord record = categoryRecord.getRecord();
         Set<IfCategory> categories = categoryRecord.getCategories();
         return new IfRecordDTO(
@@ -51,8 +49,7 @@ public class IfRecordDTO implements RecordDTO<IfScoreDTO> {
         );
     }
 
-    @NonNull
-    public static IfRecordDTO fromRecord(@NonNull IfRecord record) {
+    public static IfRecordDTO fromRecord(IfRecord record) {
         return new IfRecordDTO(IfScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
                                record.getAuthor(),

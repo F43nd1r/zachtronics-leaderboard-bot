@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.exa.model;
 
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
@@ -31,6 +30,6 @@ public class ExaMetric<T extends Comparable<T>> implements MetricJava<ExaScore, 
     public static final ExaMetric<Boolean> LEGIT = new ExaMetric<>("", s -> !s.isCheesy());
     public static final ExaMetric<Boolean> CAN_CHEESE = new ExaMetric<>("c", s -> true);
 
-    @NonNull String displayName;
-    @NonNull Function<ExaScore, T> extract;
+    String displayName;
+    Function<ExaScore, T> extract;
 }

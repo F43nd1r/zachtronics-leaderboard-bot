@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import com.faendir.zachtronics.bot.model.Score;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
 import lombok.With;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.regex.Matcher;
@@ -36,9 +35,8 @@ public class ExaScore implements Score<ExaCategory> {
     @With boolean cheesy;
 
     /** cc/ss/aa[/c] */
-    @NonNull
     @Override
-    public String toDisplayString(@NonNull DisplayContext<ExaCategory> context) {
+    public String toDisplayString(DisplayContext<ExaCategory> context) {
         String separator = context.getSeparator();
         int formatId = Utils.getScoreFormatId(context);
 
@@ -53,14 +51,13 @@ public class ExaScore implements Score<ExaCategory> {
 
     /** <tt>cc/ss/aa[/c]</tt>, tolerates extra <tt>*</tt> */
     @Nullable
-    public static ExaScore parseScore(@NonNull String string) {
+    public static ExaScore parseScore(String string) {
         Matcher m = REGEX_SCORE.matcher(string);
         return m.matches() ? parseScore(m) : null;
     }
 
     /** we assume m matches */
-    @NonNull
-    public static ExaScore parseScore(@NonNull Matcher m) {
+    public static ExaScore parseScore(Matcher m) {
         int cycles = Integer.parseInt(m.group("cycles"));
         int size = Integer.parseInt(m.group("size"));
         int activity = Integer.parseInt(m.group("activity"));
@@ -74,7 +71,6 @@ public class ExaScore implements Score<ExaCategory> {
     /**
      * @return <tt>""</tt> or <tt>"/c"</tt>
      */
-    @NonNull
     public static String sepFlags(String separator, boolean cheesy) {
         return cheesy ? separator + "c" : "";
     }

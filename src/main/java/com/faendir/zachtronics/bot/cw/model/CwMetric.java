@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,17 @@ package com.faendir.zachtronics.bot.cw.model;
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
-public enum CwMetric implements MetricJava<CwScore, @NonNull Integer> {
+public enum CwMetric implements MetricJava<CwScore, Integer> {
     WIDTH("W", CwScore::getWidth),
     HEIGHT("H", CwScore::getHeight),
     SIZE("S", CwScore::getSize),
     FOOTPRINT("F", CwScore::getFootprint);
 
-    @NonNull private final String displayName;
-    @NonNull private final Function<CwScore, @NonNull Integer> extract;
+    private final String displayName;
+    private final Function<CwScore, Integer> extract;
 }

@@ -19,10 +19,10 @@ package com.faendir.zachtronics.bot.tis.ai;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,7 +40,7 @@ class TISLine {
         "(?:[\\s,!]+(?<arg2>[^#:\\s,!]+))?)?" +
         "[\\s,!]*(?:#(?<comment>.*))?");
 
-    @NonNull String rawLine;
+    String rawLine;
 
     @Nullable String label;
     @Nullable String comment;
@@ -52,7 +52,7 @@ class TISLine {
     @Nullable TISPort port2;
 
     /** we assume m matches */
-    static @NonNull TISLine unmarshal(@NonNull String line) {
+    static TISLine unmarshal(String line) {
         Matcher m = LINE_REGEX.matcher(line);
         if (m.matches()) {
             String label = m.group("label");
@@ -110,7 +110,7 @@ class TISLine {
     String arg1() {
         assert port1 != null;
         return switch (port1) {
-            case LABEL -> jumpTarget;
+            case LABEL -> Objects.requireNonNull(jumpTarget);
             case IMMEDIATE -> Short.toString(immediate);
             default -> port1.name();
         };
@@ -121,7 +121,7 @@ class TISLine {
         return port2.name();
     }
 
-    @NonNull String code() {
+    String code() {
         assert op != null;
         return op + (port1 == null ? "" : " " + arg1()) + (port2 == null ? "" : " " + arg2());
     }
@@ -144,16 +144,16 @@ class TISLine {
         return op != null;
     }
 
-    boolean is(@NonNull TISOperation op) {
+    boolean is(TISOperation op) {
         return op == this.op;
     }
 
-    boolean is(TISOperation op, @NonNull TISPort port1) {
+    boolean is(@Nullable TISOperation op, TISPort port1) {
         return (op == null || op == this.op) &&
                port1 == this.port1;
     }
 
-    boolean is(TISOperation op, TISPort port1, TISPort port2) {
+    boolean is(@Nullable TISOperation op, @Nullable TISPort port1, @Nullable TISPort port2) {
         return (op == null || op == this.op) &&
                (port1 == null || port1 == this.port1) &&
                (port2 == null || port2 == this.port2);

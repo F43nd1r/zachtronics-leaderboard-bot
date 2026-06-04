@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.fp.rest.dto;
 
 import com.faendir.zachtronics.bot.fp.model.FpScore;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 @Value
 public class FpScoreDTO {
@@ -27,8 +26,7 @@ public class FpScoreDTO {
     int frames;
     int waste;
 
-    @NonNull
-    public static FpScoreDTO fromScore(@NonNull FpScore score) {
+    public static FpScoreDTO fromScore(FpScore score) {
         return new FpScoreDTO(score.getRules(), score.getConditionalRules(), score.getFrames(), score.getWaste());
     }
 }

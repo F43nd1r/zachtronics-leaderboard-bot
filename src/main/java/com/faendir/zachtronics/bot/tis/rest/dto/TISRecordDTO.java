@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,20 @@ import com.faendir.zachtronics.bot.tis.model.TISCategory;
 import com.faendir.zachtronics.bot.tis.model.TISRecord;
 import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 @Value
 public class TISRecordDTO implements RecordDTO<TISScoreDTO> {
-    @NonNull TISScoreDTO score;
-    @NonNull String fullFormattedScore;
-    @NonNull String author;
+    TISScoreDTO score;
+    String fullFormattedScore;
+    String author;
     @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
 
-    @NonNull
-    public static TISRecordDTO fromCategoryRecord(@NonNull CategoryRecord<TISRecord, TISCategory> categoryRecord) {
+    public static TISRecordDTO fromCategoryRecord(CategoryRecord<TISRecord, TISCategory> categoryRecord) {
         TISRecord record = categoryRecord.getRecord();
         Set<TISCategory> categories = categoryRecord.getCategories();
         return new TISRecordDTO(
@@ -51,8 +49,7 @@ public class TISRecordDTO implements RecordDTO<TISScoreDTO> {
         );
     }
 
-    @NonNull
-    public static TISRecordDTO fromRecord(@NonNull TISRecord record) {
+    public static TISRecordDTO fromRecord(TISRecord record) {
         return new TISRecordDTO(TISScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
                                record.getAuthor(),

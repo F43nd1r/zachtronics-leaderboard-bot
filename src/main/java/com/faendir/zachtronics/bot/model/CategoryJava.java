@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,17 @@
 
 package com.faendir.zachtronics.bot.model;
 
-import org.jspecify.annotations.NonNull;
 
 import java.util.Comparator;
 import java.util.List;
 
 public interface CategoryJava<C extends Enum<C> & Category, S extends Score<C>, M extends MetricJava<S, ?>> extends Category {
-    @NonNull Comparator<S> getScoreComparator();
+    Comparator<S> getScoreComparator();
     int getScoreFormatId();
 
-    boolean supportsScore(@NonNull S score);
+    boolean supportsScore(S score);
 
-    default Comparator<S> makeCategoryComparator(@NonNull List<M> metrics) {
+    default Comparator<S> makeCategoryComparator(List<M> metrics) {
         return metrics.stream()
                       .map(M::comparator)
                       .reduce(Comparator::thenComparing)

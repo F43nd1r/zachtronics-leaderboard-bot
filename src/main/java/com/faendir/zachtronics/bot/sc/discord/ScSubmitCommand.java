@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import com.faendir.zachtronics.bot.validation.ValidationResult;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -48,11 +48,11 @@ public class ScSubmitCommand extends AbstractMultiSubmitCommand<ScCategory, ScPu
             .description("Link or `m1` to scrape it from your last message. Start the solution name with `/B?P?` to set flags")
             .required()
             .build();
-    private final CommandOption<String, String> authorOption = authorOptionBuilder().build();
-    private final CommandOption<String, String> videoOption = displayLinkOptionBuilder("video")
+    private final CommandOption<@Nullable String, @Nullable String> authorOption = authorOptionBuilder().build();
+    private final CommandOption<@Nullable String, @Nullable String> videoOption = displayLinkOptionBuilder("video")
             .description("Link to your video of the solution")
             .build();
-    private final CommandOption<Boolean, Boolean> bypassValidationOption = CommandOptionBuilder.bool("bypass-validation")
+    private final CommandOption<@Nullable Boolean, @Nullable Boolean> bypassValidationOption = CommandOptionBuilder.bool("bypass-validation")
             .description("Skips running SChem on the solutions. Admin-only")
             .convert((event, bypass) -> {
                 if (bypass && !ScSecured.WIKI_ADMINS_ONLY.hasExecutionPermission(event)) {
@@ -68,9 +68,8 @@ public class ScSubmitCommand extends AbstractMultiSubmitCommand<ScCategory, ScPu
     @Getter
     private final ScSolutionRepository repository;
 
-    @NonNull
     @Override
-    public Collection<ValidationResult<ScSubmission>> parseSubmissions(@NonNull ChatInputInteractionEvent event) {
+    public Collection<ValidationResult<ScSubmission>> parseSubmissions(ChatInputInteractionEvent event) {
         String export = exportOption.get(event);
         String video = videoOption.get(event);
         String author = authorOption.get(event);

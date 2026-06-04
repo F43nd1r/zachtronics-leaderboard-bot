@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,25 +22,23 @@ import com.faendir.zachtronics.bot.utils.Utils;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import lombok.Value;
 import lombok.With;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 
 @Value
 public class CwSubmission implements Submission<CwCategory, CwPuzzle> {
-    @NonNull CwPuzzle puzzle;
-    @NonNull CwScore score;
-    @NonNull String author;
-    @With String displayLink;
-    @NonNull String data;
+    CwPuzzle puzzle;
+    CwScore score;
+    String author;
+    @With @Nullable String displayLink;
+    String data;
 
-    @NonNull
-    public static Collection<ValidationResult<CwSubmission>> fromData(@NonNull String data, String author) {
+    public static Collection<ValidationResult<CwSubmission>> fromData(String data, String author) {
         return ChipWizardSim.validateMultiExport(data, author);
     }
 
-    @NonNull
-    public static Collection<ValidationResult<CwSubmission>> fromLink(@NonNull String link, String author) {
+    public static Collection<ValidationResult<CwSubmission>> fromLink(String link, String author) {
         String data = Utils.downloadFile(link).dataAsString();
         return fromData(data, author);
     }

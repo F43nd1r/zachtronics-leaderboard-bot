@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,17 @@ package com.faendir.zachtronics.bot.fc.model;
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
 @Getter
 @RequiredArgsConstructor
-public enum FcMetric implements MetricJava<FcScore, @NonNull Integer> {
+public enum FcMetric implements MetricJava<FcScore, Integer> {
     TIME("T", FcScore::getTime),
     COST("C", FcScore::getCost),
     SUM_TIMES("S", FcScore::getSumTimes),
     WIRES("W", FcScore::getWires);
 
-    @NonNull private final String displayName;
-    @NonNull private final Function<FcScore, @NonNull Integer> extract;
+    private final String displayName;
+    private final Function<FcScore, Integer> extract;
 }

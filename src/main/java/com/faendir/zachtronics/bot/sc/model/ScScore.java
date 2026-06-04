@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import com.faendir.zachtronics.bot.model.StringFormat;
 import com.faendir.zachtronics.bot.utils.Utils;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.text.NumberFormat;
@@ -42,9 +41,8 @@ public class ScScore implements Score<ScCategory> {
     boolean precognitive;
 
     /** ccc/r/ss[/BP] */
-    @NonNull
     @Override
-    public String toDisplayString(@NonNull DisplayContext<ScCategory> context) {
+    public String toDisplayString(DisplayContext<ScCategory> context) {
         String separator = context.getSeparator();
         String cyclesStr = context.getFormat() != StringFormat.FILE_NAME && cycles >= 100000 ?
                            NumberFormat.getNumberInstance(Locale.ROOT).format(cycles) :
@@ -56,7 +54,6 @@ public class ScScore implements Score<ScCategory> {
     }
 
     /** </tt>ccc-r-ss,[/BP]</tt>, includes comma in any case */
-    @NonNull
     public String toExportString() {
         return String.format("%d-%d-%d,%s", cycles, reactors, symbols, sepFlags("/"));
     }
@@ -70,14 +67,13 @@ public class ScScore implements Score<ScCategory> {
 
     /** <tt>ccc/r/ss[/BP]</tt>, tolerates extra <tt>*</tt> */
     @Nullable
-    public static ScScore parseScore(@NonNull String string) {
+    public static ScScore parseScore(String string) {
         Matcher m = REGEX_BP_SCORE.matcher(string);
         return m.matches() ? parseScore(m) : null;
     }
 
     /** we assume m matches */
-    @NonNull
-    public static ScScore parseScore(@NonNull Matcher m) {
+    public static ScScore parseScore(Matcher m) {
         int cycles = Integer.parseInt(m.group("cycles").replace(",", ""));
         int reactors = Integer.parseInt(m.group("reactors"));
         int symbols = Integer.parseInt(m.group("symbols"));

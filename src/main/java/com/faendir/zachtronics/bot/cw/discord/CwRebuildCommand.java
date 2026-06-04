@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import com.faendir.zachtronics.bot.discord.command.option.CommandOption;
 import com.faendir.zachtronics.bot.discord.command.security.Secured;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,7 +32,7 @@ import org.springframework.stereotype.Component;
 @CwQualifier
 public class CwRebuildCommand extends AbstractRebuildCommand<CwPuzzle> {
     @Getter
-    private final CommandOption<String, CwPuzzle> puzzleOption = CwOptionBuilders.puzzleOptionBuilder().build();
+    private final CommandOption<@Nullable String, @Nullable CwPuzzle> puzzleOption = CwOptionBuilders.puzzleOptionBuilder().build();
     @Getter
     private final Secured secured = CwSecured.ADMINS_ONLY;
     @Getter

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.Score;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.regex.Matcher;
@@ -33,9 +32,8 @@ public class KzScore implements Score<KzCategory> {
     int area;
 
     /** tt/cc/aa */
-    @NonNull
     @Override
-    public String toDisplayString(@NonNull DisplayContext<KzCategory> context) {
+    public String toDisplayString(DisplayContext<KzCategory> context) {
         String separator = context.getSeparator();
         int formatId = Utils.getScoreFormatId(context);
 
@@ -48,14 +46,13 @@ public class KzScore implements Score<KzCategory> {
 
     /** <tt>tt/cc/aa</tt>, tolerates extra <tt>*</tt> */
     @Nullable
-    public static KzScore parseScore(@NonNull String string) {
+    public static KzScore parseScore(String string) {
         Matcher m = REGEX_SCORE.matcher(string);
         return m.matches() ? parseScore(m) : null;
     }
 
     /** we assume m matches */
-    @NonNull
-    public static KzScore parseScore(@NonNull Matcher m) {
+    public static KzScore parseScore(Matcher m) {
         int time = Integer.parseInt(m.group("time"));
         int cost = Integer.parseInt(m.group("cost"));
         int area = Integer.parseInt(m.group("area"));

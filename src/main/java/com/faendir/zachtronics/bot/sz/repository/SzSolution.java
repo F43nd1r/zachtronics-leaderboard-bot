@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,35 +23,35 @@ import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.sz.model.SzScore;
 import lombok.Value;
 import lombok.With;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
+
 @Value
 public class SzSolution implements Solution<SzCategory, SzPuzzle, SzScore, SzRecord> {
-    @NonNull SzScore score;
-    @NonNull String author;
-    @With String displayLink;
+    SzScore score;
+    String author;
+    @With @Nullable String displayLink;
     /** empty if it holds no categories */
     EnumSet<SzCategory> categories = EnumSet.noneOf(SzCategory.class);
 
     @Override
-    public SzRecord extendToRecord(SzPuzzle puzzle, String dataLink, Path dataPath) {
+    public SzRecord extendToRecord(SzPuzzle puzzle, @Nullable String dataLink, @Nullable Path dataPath) {
         if (dataPath != null)
             return new SzRecord(puzzle, score, author, displayLink, dataLink, dataPath);
         else
             return new SzRecord(puzzle, score, author, displayLink, null, null);
     }
 
-    @NonNull
-    public static SzSolution unmarshal(String @NonNull [] fields) {
+    public static SzSolution unmarshal(@Nullable String[] fields) {
         assert fields.length == 4;
-        SzScore score = Objects.requireNonNull(SzScore.parseScore(fields[0]));
-        String author = fields[1];
+        SzScore score = requireNonNull(SzScore.parseScore(requireNonNull(fields[0])));
+        String author = requireNonNull(fields[1]);
         String displayLink = fields[2];
         String categories = fields[3];
 
@@ -62,8 +62,8 @@ public class SzSolution implements Solution<SzCategory, SzPuzzle, SzScore, SzRec
     }
 
     @Override
-    public String @NonNull [] marshal() {
-        return new String[]{
+    public @Nullable String[] marshal() {
+        return new @Nullable String[]{
                 score.toDisplayString(),
                 author,
                 displayLink,

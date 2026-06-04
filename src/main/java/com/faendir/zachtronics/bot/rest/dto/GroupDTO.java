@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,13 @@ package com.faendir.zachtronics.bot.rest.dto;
 
 import com.faendir.zachtronics.bot.model.Group;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 @Value
 public class GroupDTO {
-    @NonNull String id;
-    @NonNull String displayName;
+    String id;
+    String displayName;
 
-    @NonNull
-    public static <G extends Enum<G> & Group> GroupDTO fromGroup(@NonNull G group) {
+    public static <G extends Enum<G> & Group> GroupDTO fromGroup(G group) {
         return new GroupDTO(group.name(), group.getDisplayName());
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,35 +23,35 @@ import com.faendir.zachtronics.bot.cw.model.CwScore;
 import com.faendir.zachtronics.bot.repository.Solution;
 import lombok.Value;
 import lombok.With;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
+
 @Value
 public class CwSolution implements Solution<CwCategory, CwPuzzle, CwScore, CwRecord> {
-    @NonNull CwScore score;
-    @NonNull String author;
-    @With String displayLink;
+    CwScore score;
+    String author;
+    @With @Nullable String displayLink;
     /** empty if it holds no categories */
     EnumSet<CwCategory> categories = EnumSet.noneOf(CwCategory.class);
 
     @Override
-    public CwRecord extendToRecord(CwPuzzle puzzle, String dataLink, Path dataPath) {
+    public CwRecord extendToRecord(CwPuzzle puzzle, @Nullable String dataLink, @Nullable Path dataPath) {
         if (dataPath != null)
             return new CwRecord(puzzle, score, author, displayLink, dataLink, dataPath);
         else
             return new CwRecord(puzzle, score, author, displayLink, null, null);
     }
 
-    @NonNull
-    public static CwSolution unmarshal(String @NonNull [] fields) {
+    public static CwSolution unmarshal(@Nullable String[] fields) {
         assert fields.length == 4;
-        CwScore score = Objects.requireNonNull(CwScore.parseScore(fields[0]));
-        String author = fields[1];
+        CwScore score = requireNonNull(CwScore.parseScore(requireNonNull(fields[0])));
+        String author = requireNonNull(fields[1]);
         String displayLink = fields[2];
         String categories = fields[3];
 
@@ -62,8 +62,8 @@ public class CwSolution implements Solution<CwCategory, CwPuzzle, CwScore, CwRec
     }
 
     @Override
-    public String @NonNull [] marshal() {
-        return new String[]{
+    public @Nullable String[] marshal() {
+        return new @Nullable String[]{
                 score.toDisplayString(),
                 author,
                 displayLink,

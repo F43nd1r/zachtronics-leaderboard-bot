@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.validation.ValidationException;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,6 @@ import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -58,7 +56,7 @@ public class ExaManualTest {
     @TestConfiguration
     static class RepositoryConfiguration {
         @Bean("exaRepository")
-        public static @NonNull GitRepository exaRepository(GitProperties gitProperties) {
+        public static GitRepository exaRepository(GitProperties gitProperties) {
             return TestConfigurationKt.readOnlyLocalClone("../exapunks/leaderboard", gitProperties);
         }
     }
@@ -114,7 +112,7 @@ public class ExaManualTest {
 
     @Test
     public void validateLeaderboard() throws IOException {
-        Path repoPath = Paths.get("../exapunks/leaderboard");
+        Path repoPath = Path.of("../exapunks/leaderboard");
 
         for (ExaPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
@@ -136,7 +134,7 @@ public class ExaManualTest {
 
     @Test
     public void tagNewCategories() throws IOException {
-        Path repoPath = Paths.get("../exapunks/leaderboard");
+        Path repoPath = Path.of("../exapunks/leaderboard");
 
         for (ExaPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
@@ -160,11 +158,11 @@ public class ExaManualTest {
     @Test
     public void submitSaveFolder() throws IOException {
         List<String> authors = List.of("someGuy");
-//        List<String> authors = Files.list(Paths.get("../exapunks/saves/")).map(p -> p.getFileName().toString()).sorted().toList();
+//        List<String> authors = Files.list(Path.of("../exapunks/saves/")).map(p -> p.getFileName().toString()).sorted().toList();
 
         for (String author : authors) {
             System.out.println("Starting: " + author);
-            Path basePath = Paths.get("../exapunks/saves/" + author);
+            Path basePath = Path.of("../exapunks/saves/" + author);
 
             try (Stream<Path> walkStream = Files.walk(basePath, FileVisitOption.FOLLOW_LINKS)) {
                 Iterable<Path> paths = walkStream.filter(p -> p.getFileName().toString().endsWith(".solution"))

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.fp.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -48,8 +47,8 @@ public enum FpCategory implements CategoryJava<FpCategory, FpScore, FpMetric> {
     /** contains <tt>%dR%s%dC%s%dF%s%dW</tt> plus a bunch of <tt>*</tt> most likely */
     static final String[] FORMAT_STRINGS = {"%dR%s%dC%s%dF%s%dW",
                                             "%dR%s%dC%s%dF%s**%dW**",
-                                            "%dR%s%dC%s**%dF**%s%dW", null,
-                                            "%dR%s**%dC**%s%dF%s%dW", null, null, null,
+                                            "%dR%s%dC%s**%dF**%s%dW", "",
+                                            "%dR%s**%dC**%s%dF%s%dW", "", "", "",
                                             "**%dR**%s%dC%s%dF%s%dW"};
 
     private final String displayName;
@@ -58,7 +57,7 @@ public enum FpCategory implements CategoryJava<FpCategory, FpScore, FpMetric> {
     private final Set<FpType> supportedTypes;
     private final int scoreFormatId;
 
-    FpCategory(@NonNull List<FpMetric> metrics, @NonNull Set<FpType> supportedTypes, int scoreFormatId) {
+    FpCategory(List<FpMetric> metrics, Set<FpType> supportedTypes, int scoreFormatId) {
         this.displayName = name();
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
@@ -67,7 +66,7 @@ public enum FpCategory implements CategoryJava<FpCategory, FpScore, FpMetric> {
     }
 
     @Override
-    public boolean supportsScore(@NonNull FpScore score) {
+    public boolean supportsScore(FpScore score) {
         return true;
     }
 }

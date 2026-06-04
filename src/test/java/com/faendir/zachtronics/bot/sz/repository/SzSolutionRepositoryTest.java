@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import com.faendir.zachtronics.bot.sz.model.SzCategory;
 import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.model.SzRecord;
 import com.faendir.zachtronics.bot.sz.model.SzSubmission;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -70,7 +69,6 @@ public class SzSolutionRepositoryTest {
         assertThrows(RuntimeException.class, () -> doSubmit(finalContent)); // nonsensical
     }
 
-    @NonNull
     private SubmitResult<SzRecord, SzCategory> doSubmit(String content) {
         return repository.submit(SzSubmission.fromData(content, "someguy", null));
     }

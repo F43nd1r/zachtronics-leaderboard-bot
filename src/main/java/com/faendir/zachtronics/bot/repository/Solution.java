@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +20,21 @@ import com.faendir.zachtronics.bot.model.Category;
 import com.faendir.zachtronics.bot.model.Puzzle;
 import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.model.Score;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
 
 public interface Solution<C extends Enum<C> & Category, P extends Puzzle<C>, S extends Score<C>, R extends Record<C>> {
-    @NonNull S getScore();
+    S getScore();
     String getAuthor();
-    @NonNull EnumSet<C> getCategories();
+    EnumSet<C> getCategories();
 
-    R extendToRecord(P puzzle, String dataLink, Path dataPath);
+    R extendToRecord(P puzzle, @Nullable String dataLink, @Nullable Path dataPath);
 
-    default CategoryRecord<R, C> extendToCategoryRecord(P puzzle, String dataLink, Path dataPath) {
+    default CategoryRecord<R, C> extendToCategoryRecord(P puzzle, @Nullable String dataLink, @Nullable Path dataPath) {
         return new CategoryRecord<>(extendToRecord(puzzle, dataLink, dataPath), getCategories());
     }
 
-    String @NonNull [] marshal();
+    @Nullable String[] marshal();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.sc.model;
 
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
@@ -33,6 +32,6 @@ public class ScMetric<T extends Comparable<T>> implements MetricJava<ScScore, T>
     public static final ScMetric<Boolean> NO_PRECOG = new ScMetric<>("NP", ScScore::isPrecognitive);
     public static final ScMetric<Boolean> NO_FLAGS = new ScMetric<>("NBP", s -> s.isBugged() || s.isPrecognitive());
 
-    @NonNull String displayName;
-    @NonNull Function<ScScore, T> extract;
+    String displayName;
+    Function<ScScore, T> extract;
 }

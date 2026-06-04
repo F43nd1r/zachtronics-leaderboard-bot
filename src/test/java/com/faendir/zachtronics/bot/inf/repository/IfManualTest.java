@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
@@ -103,7 +102,7 @@ class IfManualTest {
 
     @Test
     public void tagNewCategories() throws IOException {
-        Path repoPath = Paths.get("../infinifactory/leaderboard");
+        Path repoPath = Path.of("../infinifactory/leaderboard");
 
         for (IfPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
@@ -126,7 +125,7 @@ class IfManualTest {
 
     @Test
     public void unGRATheUnGRAable() throws IOException {
-        Path repoPath = Paths.get("../infinifactory/leaderboard");
+        Path repoPath = Path.of("../infinifactory/leaderboard");
 
         for (IfPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
@@ -155,7 +154,7 @@ class IfManualTest {
 
     @Test
     public void reflagSomeone() throws IOException {
-        Path repoPath = Paths.get("../infinifactory/leaderboard");
+        Path repoPath = Path.of("../infinifactory/leaderboard");
         String author = "NAME";
 
         for (IfPuzzle puzzle : repository.getTrackedPuzzles()) {

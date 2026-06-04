@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,20 @@ import com.faendir.zachtronics.bot.sc.model.ScCategory;
 import com.faendir.zachtronics.bot.sc.model.ScRecord;
 import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 @Value
 public class ScRecordDTO implements RecordDTO<ScScoreDTO> {
-    @NonNull ScScoreDTO score;
-    @NonNull String fullFormattedScore;
-    @NonNull String author;
+    ScScoreDTO score;
+    String fullFormattedScore;
+    String author;
     @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
 
-    @NonNull
-    public static ScRecordDTO fromCategoryRecord(@NonNull CategoryRecord<ScRecord, ScCategory> categoryRecord) {
+    public static ScRecordDTO fromCategoryRecord(CategoryRecord<ScRecord, ScCategory> categoryRecord) {
         ScRecord record = categoryRecord.getRecord();
         Set<ScCategory> categories = categoryRecord.getCategories();
         return new ScRecordDTO(
@@ -51,8 +49,7 @@ public class ScRecordDTO implements RecordDTO<ScScoreDTO> {
         );
     }
 
-    @NonNull
-    public static ScRecordDTO fromRecord(@NonNull ScRecord record) {
+    public static ScRecordDTO fromRecord(ScRecord record) {
         return new ScRecordDTO(ScScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
                                record.getAuthor(),

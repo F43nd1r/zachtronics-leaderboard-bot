@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import com.faendir.zachtronics.bot.cw.model.CwSubmission;
 import com.faendir.zachtronics.bot.validation.ValidationException;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.faendir.zachtronics.bot.validation.ValidationUtils;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,8 +37,7 @@ public class ChipWizardSim {
      * @param data content to check
      * @param author author to override all imports
      */
-    @NonNull
-    public static Collection<ValidationResult<CwSubmission>> validateMultiExport(@NonNull String data, @NonNull String author) {
+    public static Collection<ValidationResult<CwSubmission>> validateMultiExport(String data, String author) {
         CwSimResult[] results = validate(data);
         if (results.length == 0)
             throw new ValidationException("No valid solution provided");
@@ -48,9 +46,7 @@ public class ChipWizardSim {
                      .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    @NonNull
-    static ValidationResult<CwSubmission> validationResultFrom(@NonNull CwSimResult result, @NonNull String author) throws
-                                                                                                                  ValidationException {
+    static ValidationResult<CwSubmission> validationResultFrom(CwSimResult result, String author) throws ValidationException {
         // puzzle
         CwPuzzle puzzle = Arrays.stream(CwPuzzle.values())
                                 .filter(p -> p.getId() == result.getLevelId())
@@ -79,8 +75,7 @@ public class ChipWizardSim {
      * @return results, arrays of size 1 are correctly generated
      * @throws ValidationException if there is a communication error, solution errors are handled in the onject
      */
-    @NonNull
-    static CwSimResult[] validate(@NonNull String data) throws ValidationException {
+    static CwSimResult[] validate(String data) throws ValidationException {
         List<String> command = List.of("python3", "-m", "chipwizard_sim", "validate_all", "--json", "--include-solution", "-");
         return ValidationUtils.callValidator(CwSimResult[].class, data.getBytes(), command);
     }

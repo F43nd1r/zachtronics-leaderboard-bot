@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.cw.model;
 
 import com.faendir.zachtronics.bot.model.CategoryJava;
 import lombok.Getter;
-import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -43,7 +42,7 @@ public enum CwCategory implements CategoryJava<CwCategory, CwScore, CwMetric> {
     private final Set<CwType> supportedTypes = Collections.singleton(STANDARD);
     private final int scoreFormatId;
 
-    CwCategory(String displayName, @NonNull List<CwMetric> metrics, int scoreFormatId) {
+    CwCategory(String displayName, List<CwMetric> metrics, int scoreFormatId) {
         this.displayName = displayName;
         this.metrics = metrics;
         this.scoreComparator = makeCategoryComparator(metrics);
@@ -51,7 +50,7 @@ public enum CwCategory implements CategoryJava<CwCategory, CwScore, CwMetric> {
     }
 
     @Override
-    public boolean supportsScore(@NonNull CwScore score) {
+    public boolean supportsScore(CwScore score) {
         return true;
     }
 }

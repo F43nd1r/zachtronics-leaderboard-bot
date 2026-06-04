@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import com.faendir.zachtronics.bot.utils.UtilsKt;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -47,7 +45,7 @@ class TISMigrationTest {
 
     @Test
     public void parsePage() throws IOException {
-        Path pagePath = Paths.get("../tis100/wiki.md");
+        Path pagePath = Path.of("../tis100/wiki.md");
         List<String> lines = Files.readAllLines(pagePath);
 
         // cp -a ../tis100/leaderboard/* src/test/resources/repositories/tis-leaderboard/
@@ -109,7 +107,7 @@ class TISMigrationTest {
             .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
             .configure(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, true);
 
-        Path pagePath = Paths.get("../tis100/frontier.dat");
+        Path pagePath = Path.of("../tis100/frontier.dat");
         List<String> lines = Files.readAllLines(pagePath);
 
         // cp -a ../tis100/leaderboard/* src/test/resources/repositories/tis-leaderboard/
@@ -156,7 +154,7 @@ class TISMigrationTest {
         System.out.println("Done");
     }
 
-    private static TISPuzzle findPuzzle(@NonNull String levelName) {
+    private static TISPuzzle findPuzzle(String levelName) {
         List<TISPuzzle> candidates = UtilsKt.fuzzyMatch(Arrays.asList(TISPuzzle.values()), levelName, TISPuzzle::getDisplayName);
         if (candidates.size() == 1)
             return candidates.get(0);

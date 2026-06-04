@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,35 +23,35 @@ import com.faendir.zachtronics.bot.fp.model.FpScore;
 import com.faendir.zachtronics.bot.repository.Solution;
 import lombok.Value;
 import lombok.With;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
+
 @Value
 public class FpSolution implements Solution<FpCategory, FpPuzzle, FpScore, FpRecord> {
-    @NonNull FpScore score;
-    @NonNull String author;
-    @With String displayLink;
+    FpScore score;
+    String author;
+    @With @Nullable String displayLink;
     /** empty if it holds no categories */
     EnumSet<FpCategory> categories = EnumSet.noneOf(FpCategory.class);
 
     @Override
-    public FpRecord extendToRecord(FpPuzzle puzzle, String dataLink, Path dataPath) {
+    public FpRecord extendToRecord(FpPuzzle puzzle, @Nullable String dataLink, @Nullable Path dataPath) {
         if (dataPath != null)
             return new FpRecord(puzzle, score, author, displayLink, dataLink, dataPath);
         else
             return new FpRecord(puzzle, score, author, displayLink, null, null);
     }
 
-    @NonNull
-    public static FpSolution unmarshal(String @NonNull [] fields) {
+    public static FpSolution unmarshal(@Nullable String[] fields) {
         assert fields.length == 4;
-        FpScore score = Objects.requireNonNull(FpScore.parseScore(fields[0]));
-        String author = fields[1];
+        FpScore score = requireNonNull(FpScore.parseScore(requireNonNull(fields[0])));
+        String author = requireNonNull(fields[1]);
         String displayLink = fields[2];
         String categories = fields[3];
 
@@ -62,8 +62,8 @@ public class FpSolution implements Solution<FpCategory, FpPuzzle, FpScore, FpRec
     }
 
     @Override
-    public String @NonNull [] marshal() {
-        return new String[]{
+    public @Nullable String[] marshal() {
+        return new @Nullable String[]{
                 score.toDisplayString(),
                 author,
                 displayLink,

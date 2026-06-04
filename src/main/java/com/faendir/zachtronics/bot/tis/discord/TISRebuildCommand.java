@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import com.faendir.zachtronics.bot.tis.model.TISPuzzle;
 import com.faendir.zachtronics.bot.tis.repository.TISSolutionRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -33,7 +34,7 @@ import java.util.List;
 @TISQualifier
 public class TISRebuildCommand extends AbstractRebuildCommand<TISPuzzle> {
     @Getter
-    private final CommandOption<String, TISPuzzle> puzzleOption = TISOptionBuilders.puzzleOptionBuilder().build();
+    private final CommandOption<@Nullable String, @Nullable TISPuzzle> puzzleOption = TISOptionBuilders.puzzleOptionBuilder().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(puzzleOption);
     @Getter

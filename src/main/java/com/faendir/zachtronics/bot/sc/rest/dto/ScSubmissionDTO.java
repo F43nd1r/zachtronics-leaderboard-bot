@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,12 @@
 package com.faendir.zachtronics.bot.sc.rest.dto;
 
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 @Value
 public class ScSubmissionDTO {
-    @NonNull MultipartFile export;
+    MultipartFile export;
     @Nullable String author;
     @Nullable String video;
 }

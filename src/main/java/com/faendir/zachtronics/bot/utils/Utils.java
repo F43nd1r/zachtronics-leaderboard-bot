@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,15 @@ import com.faendir.zachtronics.bot.model.CategoryJava;
 import com.faendir.zachtronics.bot.model.DisplayContext;
 import com.faendir.zachtronics.bot.model.StringFormat;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.ContentDisposition;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLConnection;
 import java.util.EnumSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,8 +38,8 @@ public final class Utils {
 
     private static final Pattern PASTEBIN_PATTERN = Pattern.compile("(?:https?://)?pastebin.com/(?:(?:raw|dl)/)?(\\w+)");
     private static final Pattern GDOCS_PATTERN = Pattern.compile("(?:https?://)?docs.google.com/document/d/([\\w-]+)(?:/.*)?");
-    @NonNull
-    public static String rawContentURL(@NonNull String link) {
+
+    public static String rawContentURL(String link) {
         Matcher m = PASTEBIN_PATTERN.matcher(link);
         if (m.matches()) { // pastebin has an easy way to get raw text
             return "https://pastebin.com/raw/" + m.group(1);
@@ -54,9 +56,9 @@ public final class Utils {
     @Value
     public static class FileInfo {
         @Nullable String filename;
-        byte @NonNull [] data;
+        byte[] data;
 
-        public @NonNull String dataAsString() {
+        public String dataAsString() {
             String content = new String(data).replace("\r\n", "\n");
             content = content.replaceFirst("\\s*$", "\n"); // ensure there is one and only one newline at the end
             if (!content.isEmpty() && content.charAt(0) == '\uFEFF') // remove BOM
@@ -65,7 +67,7 @@ public final class Utils {
         }
     }
 
-    public static @NonNull FileInfo downloadFile(@NonNull String link) {
+    public static FileInfo downloadFile(String link) {
         try {
             URLConnection connection = new URI(Utils.rawContentURL(link)).toURL().openConnection();
             try (InputStream is = connection.getInputStream()) { // we're connected now
@@ -82,14 +84,13 @@ public final class Utils {
         }
     }
 
-    @NonNull
     public static <T extends Enum<T>> EnumSet<T> enumSetUnion(EnumSet<T> s1, EnumSet<T> s2) {
         EnumSet<T> res = EnumSet.copyOf(s1);
         res.addAll(s2);
         return res;
     }
 
-    public static <Cat extends CategoryJava<?, ?, ?>> int getScoreFormatId(@NonNull DisplayContext<Cat> context) {
+    public static <Cat extends CategoryJava<?, ?, ?>> int getScoreFormatId(DisplayContext<Cat> context) {
         int formatId = 0b000;
         if (context.getFormat() == StringFormat.REDDIT && context.getCategories() != null) {
             formatId = context.getCategories().stream()

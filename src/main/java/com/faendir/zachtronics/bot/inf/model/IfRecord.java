@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.model.StringFormat;
 import com.faendir.zachtronics.bot.utils.Markdown;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
@@ -29,12 +28,12 @@ import java.util.List;
 
 @Value
 public class IfRecord implements Record<IfCategory> {
-    @NonNull IfPuzzle puzzle;
-    @NonNull IfScore score;
-    @NonNull String author;
-    @NonNull List<String> displayLinks;
-    String dataLink;
-    Path dataPath;
+    IfPuzzle puzzle;
+    IfScore score;
+    String author;
+    List<String> displayLinks;
+    @Nullable String dataLink;
+    @Nullable Path dataPath;
 
     @Nullable
     @Override
@@ -42,14 +41,14 @@ public class IfRecord implements Record<IfCategory> {
         return displayLinks.isEmpty() ? null : displayLinks.get(0);
     }
 
-    @NonNull
     @Override
-    public String toDisplayString(@NonNull DisplayContext<IfCategory> context) {
+    public String toDisplayString(DisplayContext<IfCategory> context) {
         String result = Markdown.fileLinkOrEmpty(dataLink) +
                         Markdown.linkOrText(score.toDisplayString(context) + " " + Markdown.escape(author), getDisplayLink());
         if (displayLinks.size() > 1) {
             for (int i = 1; i < displayLinks.size(); i++) {
                 String text = (context.getFormat() == StringFormat.REDDIT ?  "^" : "") + "[" + (i + 1) + "]";
+                //noinspection StringConcatenationInLoop
                 result += " " + Markdown.link(text, displayLinks.get(i));
             }
         }

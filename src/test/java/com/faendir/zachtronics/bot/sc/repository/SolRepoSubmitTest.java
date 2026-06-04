@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import com.faendir.zachtronics.bot.BotTest;
 import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.repository.SubmitResult;
 import com.faendir.zachtronics.bot.sc.model.*;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -105,19 +105,16 @@ public class SolRepoSubmitTest {
         assertInstanceOf(SubmitResult.AlreadyPresent.class, doSubmitDataVideo(data, null)); // cannot regress video state
     }
 
-    @NonNull
-    private SubmitResult<ScRecord, ScCategory> doSubmitScore(@NonNull ScScore score) {
+    private SubmitResult<ScRecord, ScCategory> doSubmitScore(ScScore score) {
         String data = "SOLUTION:A Most Unfortunate Malfunction,12345ieee," + score.toExportString();
         return doSubmitData(data);
     }
 
-    @NonNull
     private SubmitResult<ScRecord, ScCategory> doSubmitData(String data) {
         return doSubmitDataVideo(data, null);
     }
 
-    @NonNull
-    private SubmitResult<ScRecord, ScCategory> doSubmitDataVideo(String data, String displayLink) {
+    private SubmitResult<ScRecord, ScCategory> doSubmitDataVideo(String data, @Nullable String displayLink) {
         return repository.submit(ScSubmission.fromDataNoValidation(data, null, displayLink));
     }
 }

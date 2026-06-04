@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.exa.validation;
 
 import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.io.DataOutput;
@@ -37,12 +36,12 @@ import java.nio.ByteBuffer;
  */
 @Value
 public class ExaChip {
-    @NonNull String name;
-    @NonNull String code;
+    String name;
+    String code;
     boolean globalCommMode;
 
     @Nullable
-    static ExaChip unmarshal(@NonNull ByteBuffer byteBuffer) {
+    static ExaChip unmarshal(ByteBuffer byteBuffer) {
         if (byteBuffer.get() == 0xB) {
             // empty EXA of some sort, burn 4B and go on
             byteBuffer.position(byteBuffer.position() + 4);
@@ -57,7 +56,7 @@ public class ExaChip {
         return new ExaChip(name, code, globalCommMode);
     }
 
-    void marshal(@NonNull DataOutput out) throws IOException {
+    void marshal(DataOutput out) throws IOException {
         out.writeByte(0xA);
         ExaSave.writeString(out, name);
         ExaSave.writeString(out, code);

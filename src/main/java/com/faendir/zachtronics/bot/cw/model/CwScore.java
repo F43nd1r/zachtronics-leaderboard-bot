@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import com.faendir.zachtronics.bot.model.Score;
 import com.faendir.zachtronics.bot.utils.Utils;
 import lombok.Value;
 import org.checkerframework.common.value.qual.IntRange;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.regex.Matcher;
@@ -39,9 +38,8 @@ public class CwScore implements Score<CwCategory> {
     }
 
     /** WxH/FF */
-    @NonNull
     @Override
-    public String toDisplayString(@NonNull DisplayContext<CwCategory> context) {
+    public String toDisplayString(DisplayContext<CwCategory> context) {
         String separator = context.getSeparator();
         int formatId = Utils.getScoreFormatId(context);
 
@@ -54,14 +52,13 @@ public class CwScore implements Score<CwCategory> {
 
     /** <tt>WxH/FF</tt>, tolerates extra <tt>*</tt> */
     @Nullable
-    public static CwScore parseScore(@NonNull String string) {
+    public static CwScore parseScore(String string) {
         Matcher m = REGEX_SCORE.matcher(string);
         return m.matches() ? parseScore(m) : null;
     }
 
     /** we assume m matches */
-    @NonNull
-    public static CwScore parseScore(@NonNull Matcher m) {
+    public static CwScore parseScore(Matcher m) {
         int width = Integer.parseInt(m.group("width"));
         int height = Integer.parseInt(m.group("height"));
         int footprint = Integer.parseInt(m.group("footprint"));

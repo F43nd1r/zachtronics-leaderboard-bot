@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.tis.model.*;
 import com.faendir.zachtronics.bot.tis.validation.TISValidator;
 import com.faendir.zachtronics.bot.validation.ValidationException;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +34,6 @@ import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
@@ -52,7 +50,7 @@ class TISManualTest {
     @TestConfiguration
     static class RepositoryConfiguration {
         @Bean("tisRepository")
-        public static @NonNull GitRepository tisRepository(GitProperties gitProperties) {
+        public static GitRepository tisRepository(GitProperties gitProperties) {
             return TestConfigurationKt.readOnlyLocalClone("../tis100/leaderboard", gitProperties);
         }
     }
@@ -93,7 +91,7 @@ class TISManualTest {
 
     @Test
     public void tagNewCategories() throws IOException {
-        Path repoPath = Paths.get("../tis100/leaderboard");
+        Path repoPath = Path.of("../tis100/leaderboard");
 
         for (TISPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
@@ -114,7 +112,7 @@ class TISManualTest {
 
     @Test
     public void reverifyLeaderboard() throws IOException {
-        Path repoPath = Paths.get("../tis100/leaderboard");
+        Path repoPath = Path.of("../tis100/leaderboard");
 
         for (TISPuzzle puzzle : List.of(TISPuzzle.SIGNAL_PRESCALER)) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
@@ -143,7 +141,7 @@ class TISManualTest {
 
     @Test
     public void submitSaveFolder() throws IOException {
-        Path savesRoot = Paths.get("../tis100/saves");
+        Path savesRoot = Path.of("../tis100/saves");
 //        List<String> authors = Files.list(savesRoot)
 //                                    .filter(Files::isDirectory)
 //                                    .map(p -> p.getFileName().toString())

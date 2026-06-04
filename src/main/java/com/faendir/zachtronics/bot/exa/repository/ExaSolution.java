@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,36 +23,36 @@ import com.faendir.zachtronics.bot.exa.model.ExaScore;
 import com.faendir.zachtronics.bot.repository.Solution;
 import lombok.Value;
 import lombok.With;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
+
 @Value
 public class ExaSolution implements Solution<ExaCategory, ExaPuzzle, ExaScore, ExaRecord> {
-    @NonNull ExaScore score;
-    @With @NonNull String author;
-    @With String displayLink;
+    ExaScore score;
+    @With String author;
+    @With @Nullable String displayLink;
     /** empty if it holds no categories */
     EnumSet<ExaCategory> categories = EnumSet.noneOf(ExaCategory.class);
 
     @Override
-    public ExaRecord extendToRecord(ExaPuzzle puzzle, String dataLink, Path dataPath) {
+    public ExaRecord extendToRecord(ExaPuzzle puzzle, @Nullable String dataLink, @Nullable Path dataPath) {
         if (dataPath != null && Files.exists(dataPath))
             return new ExaRecord(puzzle, score, author, displayLink, dataLink, dataPath);
         else
             return new ExaRecord(puzzle, score, author, displayLink, null, null);
     }
 
-    @NonNull
-    public static ExaSolution unmarshal(String @NonNull [] fields) {
+    public static ExaSolution unmarshal(@Nullable String[] fields) {
         assert fields.length == 4;
-        ExaScore score = Objects.requireNonNull(ExaScore.parseScore(fields[0]));
-        String author = fields[1];
+        ExaScore score = requireNonNull(ExaScore.parseScore(requireNonNull(fields[0])));
+        String author = requireNonNull(fields[1]);
         String displayLink = fields[2];
         String categories = fields[3];
 
@@ -63,8 +63,8 @@ public class ExaSolution implements Solution<ExaCategory, ExaPuzzle, ExaScore, E
     }
 
     @Override
-    public String @NonNull [] marshal() {
-        return new String[]{
+    public @Nullable String[] marshal() {
+        return new @Nullable String[]{
                 score.toDisplayString(),
                 author,
                 displayLink,

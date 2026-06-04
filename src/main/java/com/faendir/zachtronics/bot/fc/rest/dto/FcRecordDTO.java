@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,20 @@ import com.faendir.zachtronics.bot.repository.CategoryRecord;
 import com.faendir.zachtronics.bot.rest.dto.RecordDTO;
 import com.faendir.zachtronics.bot.utils.MetricsTreeKt;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
 @Value
 public class FcRecordDTO implements RecordDTO<FcScoreDTO> {
-    @NonNull FcScoreDTO score;
-    @NonNull String fullFormattedScore;
-    @NonNull String author;
+    FcScoreDTO score;
+    String fullFormattedScore;
+    String author;
     @Nullable String gif;
     @Nullable String solution;
     @Nullable String smartFormattedCategories;
 
-    @NonNull
-    public static FcRecordDTO fromCategoryRecord(@NonNull CategoryRecord<FcRecord, FcCategory> categoryRecord) {
+    public static FcRecordDTO fromCategoryRecord(CategoryRecord<FcRecord, FcCategory> categoryRecord) {
         FcRecord record = categoryRecord.getRecord();
         Set<FcCategory> categories = categoryRecord.getCategories();
         return new FcRecordDTO(
@@ -51,8 +49,7 @@ public class FcRecordDTO implements RecordDTO<FcScoreDTO> {
         );
     }
 
-    @NonNull
-    public static FcRecordDTO fromRecord(@NonNull FcRecord record) {
+    public static FcRecordDTO fromRecord(FcRecord record) {
         return new FcRecordDTO(FcScoreDTO.fromScore(record.getScore()),
                                record.getScore().toDisplayString(DisplayContext.plainText()),
                                record.getAuthor(),

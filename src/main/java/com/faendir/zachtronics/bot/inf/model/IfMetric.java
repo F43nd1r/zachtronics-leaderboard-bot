@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.inf.model;
 
 import com.faendir.zachtronics.bot.model.MetricJava;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 import java.util.function.Function;
 
@@ -35,6 +34,6 @@ public class IfMetric<T extends Comparable<T>> implements MetricJava<IfScore, T>
     public static final IfMetric<Boolean> NO_OOB_GRA = new IfMetric<>("N", s -> s.isOutOfBounds() || s.usesGRA());
     public static final IfMetric<Boolean> NO_FLAGS = new IfMetric<>("N", s -> s.isOutOfBounds() || s.usesGRA() || s.isFinite());
 
-    @NonNull String displayName;
-    @NonNull Function<IfScore, T> extract;
+    String displayName;
+    Function<IfScore, T> extract;
 }

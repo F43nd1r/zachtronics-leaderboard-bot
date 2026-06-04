@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import com.faendir.zachtronics.bot.sz.model.SzPuzzle;
 import com.faendir.zachtronics.bot.sz.repository.SzSolutionRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,7 +32,7 @@ import org.springframework.stereotype.Component;
 @SzQualifier
 public class SzRebuildCommand extends AbstractRebuildCommand<SzPuzzle> {
     @Getter
-    private final CommandOption<String, SzPuzzle> puzzleOption = SzOptionBuilders.puzzleOptionBuilder().build();
+    private final CommandOption<@Nullable String, @Nullable SzPuzzle> puzzleOption = SzOptionBuilders.puzzleOptionBuilder().build();
     @Getter
     private final Secured secured = SzSecured.WIKI_ADMINS_ONLY;
     @Getter

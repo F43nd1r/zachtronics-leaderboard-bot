@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.faendir.zachtronics.bot.utils;
 
-import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -30,8 +29,7 @@ public final class LambdaUtils {
         R apply(T t) throws IOException;
     }
 
-    @NonNull
-    public static <T, R> Function<T, R> uncheckIOException(@NonNull FunctionIOException<T, R> excFunction) {
+    public static <T, R> Function<T, R> uncheckIOException(FunctionIOException<T, R> excFunction) {
         return t -> {
             try {
                 return excFunction.apply(t);

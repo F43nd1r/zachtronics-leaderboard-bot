@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.faendir.zachtronics.bot.sz.rest.dto;
 
 import com.faendir.zachtronics.bot.sz.model.SzScore;
 import lombok.Value;
-import org.jspecify.annotations.NonNull;
 
 @Value
 public class SzScoreDTO {
@@ -26,8 +25,7 @@ public class SzScoreDTO {
     int power;
     int lines;
 
-    @NonNull
-    public static SzScoreDTO fromScore(@NonNull SzScore score) {
+    public static SzScoreDTO fromScore(SzScore score) {
         return new SzScoreDTO(score.getCost(), score.getPower(), score.getLines());
     }
 }

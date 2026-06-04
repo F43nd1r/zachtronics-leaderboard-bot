@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,11 @@ import com.faendir.zachtronics.bot.repository.AbstractSolutionRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
@@ -54,18 +53,17 @@ public class CwSolutionRepository extends AbstractSolutionRepository<CwCategory,
     private final List<CwPuzzle> trackedPuzzles = List.of(CwPuzzle.values());
 
     @Override
-    @NonNull
-    protected String wikiPageName(CwPuzzle puzzle) {
+    protected String wikiPageName(@Nullable CwPuzzle puzzle) {
         return "chipwizard";
     }
 
     @Override
-    protected CwSolution makeCandidateSolution(@NonNull CwSubmission submission) {
+    protected CwSolution makeCandidateSolution(CwSubmission submission) {
         return new CwSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
     }
 
     @Override
-    protected int frontierCompare(@NonNull CwScore s1, @NonNull CwScore s2) {
+    protected int frontierCompare(CwScore s1, CwScore s2) {
         int r1 = Integer.compare(s1.getWidth(), s2.getWidth());
         int r2 = Integer.compare(s1.getHeight(), s2.getHeight());
         int r3 = Integer.compare(s1.getFootprint(), s2.getFootprint());
@@ -85,31 +83,27 @@ public class CwSolutionRepository extends AbstractSolutionRepository<CwCategory,
     }
 
     @Override
-    protected boolean allowedSameScoreUpdate(@NonNull CwSolution candidate, @NonNull CwSolution solution) {
+    protected boolean allowedSameScoreUpdate(CwSolution candidate, CwSolution solution) {
         return candidate.getDisplayLink() != null ||
                (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
 
     @Override
-    @NonNull
-    protected Path relativePuzzlePath(@NonNull CwPuzzle puzzle) {
-        return Paths.get(puzzle.getGroup().name()).resolve(puzzle.name());
+    protected Path relativePuzzlePath(CwPuzzle puzzle) {
+        return Path.of(puzzle.getGroup().name()).resolve(puzzle.name());
     }
 
-    @NonNull
-    static String makeScoreFilename(@NonNull CwScore score) {
+    static String makeScoreFilename(CwScore score) {
         return score.toDisplayString(DisplayContext.fileName()) + ".txt";
     }
 
-    @NonNull
     @Override
-    protected String makeArchiveLink(@NonNull CwPuzzle puzzle, @NonNull CwScore score) {
+    protected String makeArchiveLink(CwPuzzle puzzle, CwScore score) {
         return makeArchiveLink(puzzle, makeScoreFilename(score));
     }
 
     @Override
-    @NonNull
-    protected Path makeArchivePath(@NonNull Path puzzlePath, CwScore score) {
+    protected Path makeArchivePath(Path puzzlePath, CwScore score) {
         return puzzlePath.resolve(makeScoreFilename(score));
     }
 }

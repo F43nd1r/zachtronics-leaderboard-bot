@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import com.faendir.zachtronics.bot.exa.repository.ExaSolutionRepository;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public class ExaSubmitCommand extends AbstractSubmitCommand<ExaCategory, ExaPuzz
             .required()
             .build();
     private final CommandOption<String, String> authorOption = authorOptionBuilder().required().build();
-    private final CommandOption<String, String> imageOption = imageOptionBuilder().build();
+    private final CommandOption<@Nullable String, @Nullable String> imageOption = imageOptionBuilder().build();
     @Getter
     private final List<CommandOption<?, ?>> options = List.of(solutionOption, cheesyOption, authorOption, imageOption);
     @Getter
@@ -54,9 +54,8 @@ public class ExaSubmitCommand extends AbstractSubmitCommand<ExaCategory, ExaPuzz
     @Getter
     private final ExaSolutionRepository repository;
 
-    @NonNull
     @Override
-    public ExaSubmission parseSubmission(@NonNull ChatInputInteractionEvent event) {
+    public ExaSubmission parseSubmission(ChatInputInteractionEvent event) {
         return ExaSubmission.fromLink(solutionOption.get(event), cheesyOption.get(event), authorOption.get(event), imageOption.get(event));
     }
 }
