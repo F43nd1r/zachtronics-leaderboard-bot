@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.faendir.zachtronics.bot.discord.embed
 
 import com.faendir.zachtronics.bot.utils.clear
 import com.faendir.zachtronics.bot.utils.ifEmptyZeroWidthSpace
+import com.faendir.zachtronics.bot.utils.runIf
 import com.faendir.zachtronics.bot.utils.truncateWithEllipsis
 import com.google.common.annotations.VisibleForTesting
 import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
@@ -38,6 +39,7 @@ class MultiMessageSafeEmbedMessageBuilder : SafeEmbedMessageBuilder<MultiMessage
     private var total = 0
     private var fields = 0
     private var color: Color? = null
+    private var content: String? = null
     private var actions = mutableListOf<ActionRow>()
 
     override fun title(title: String) = apply {
@@ -90,10 +92,16 @@ class MultiMessageSafeEmbedMessageBuilder : SafeEmbedMessageBuilder<MultiMessage
 
     fun image(image: String) = apply {
         current.image(image)
+        increaseTotal(image.length)
+    }
+
+    /** will appear only in the first message */
+    fun content(content: String) = apply {
+        this.content = content
     }
 
     private val rewritableMp4 = Regex("""https?://(?<host>i\.imgur\.com|files\.mors\.technology)/(?<id>.*)\.mp4""")
-    private val allowedImageTypes = Regex(""".+\.(gif|png|jpg)(?:\?.*)?""")
+    private val allowedImageTypes = Regex(""".+\.(gif|png|jpe?g)(?:\?.*)?""")
 
     fun link(link: String?) = apply {
         if (link != null) {
@@ -108,6 +116,7 @@ class MultiMessageSafeEmbedMessageBuilder : SafeEmbedMessageBuilder<MultiMessage
         }
     }
 
+    /** will appear only in the first message */
     fun action(action: ActionRow) = apply {
         actions.add(action)
     }
@@ -140,7 +149,8 @@ class MultiMessageSafeEmbedMessageBuilder : SafeEmbedMessageBuilder<MultiMessage
 
     override fun send(event: DeferrableInteractionEvent): Mono<Void> = mono {
         val embeds = getEmbeds().toMutableList()
-        event.editReply().clear().withEmbedsOrNull(embeds.removeFirst()).withComponentsOrNull(actions).awaitSingleOrNull()
+        event.editReply().clear().withEmbedsOrNull(embeds.removeFirst()).withContentOrNull(content)
+            .withComponentsOrNull(actions).awaitSingleOrNull()
         for (embed in embeds) {
             event.createFollowup().withEmbeds(embed).awaitSingleOrNull()
         }
@@ -150,7 +160,10 @@ class MultiMessageSafeEmbedMessageBuilder : SafeEmbedMessageBuilder<MultiMessage
         getEmbeds().mapIndexed { index, embed ->
             channel.createMessage()
                 .withEmbeds(embed)
-                .run { if (index == 0) withComponents(actions) else this }
+                .runIf(index == 0) {
+                    withComponents(actions)
+                    content?.let { withContent(it) } ?: this
+                }
                 .awaitSingle()
         }
     }

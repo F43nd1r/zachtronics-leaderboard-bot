@@ -39,6 +39,7 @@ import com.faendir.zachtronics.bot.utils.url
 import com.faendir.zachtronics.bot.utils.user
 import discord4j.core.GatewayDiscordClient
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
+import discord4j.core.`object`.emoji.Emoji
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import org.springframework.stereotype.Component
@@ -79,12 +80,14 @@ class OmSubmitCommand(private val repository: OmSolutionRepository, private val 
         val result = repository.submit(submission)
         val messages = discordClient.notifyOf(result)
         return when (result) {
-            is SubmitResult.Success ->
+            is SubmitResult.Success -> {
+                if (result.beatenRecords.size >= 5)
+                    messages.lastOrNull()?.addReaction(Emoji.unicode("\uD83E\uDDF9"))?.awaitSingleOrNull() // :broom:
                 MultiMessageSafeEmbedMessageBuilder()
                     .title("Successfully submitted!")
                     .color(Colors.SUCCESS)
                     .description("I have posted about your solution ${messages.firstOrNull()?.url?.let { "[here]($it)" } ?: "nowhere :thinking:"}")
-
+            }
             is SubmitResult.Updated ->
                 MultiMessageSafeEmbedMessageBuilder()
                     .title("Successfully Updated!")

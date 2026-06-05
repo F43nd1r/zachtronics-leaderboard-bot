@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ enum class Channel(idLong: Long) {
     PARETO(1135224098088288348),
     UPDATE(1135224154010955786),
     MAIN(370367639073062922),
+    //    TESTING(754791991988060240),
     ;
 
     val id = Snowflake.of(idLong)
