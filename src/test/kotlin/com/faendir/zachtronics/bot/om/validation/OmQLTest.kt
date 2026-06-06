@@ -27,7 +27,12 @@ import org.junit.jupiter.params.provider.ValueSource
 import strikt.api.expectDoesNotThrow
 import strikt.api.expectThat
 import strikt.api.expectThrows
-import strikt.assertions.*
+import strikt.assertions.contains
+import strikt.assertions.containsExactly
+import strikt.assertions.containsExactlyInAnyOrder
+import strikt.assertions.hasSize
+import strikt.assertions.isA
+import strikt.assertions.isEqualTo
 
 class OmQLTest {
 
@@ -208,6 +213,31 @@ class OmQLTest {
         "'false&&false||true', 'true'",
     )
     fun `custom metric operator precedence`(query: String, expected: String) {
+        val elements = parser.parseQuery("[$query]")
+        val customMetric = elements[1].metrics.first()
+        val result = customMetric.getValueFrom(OmQL.allOnes)
+        if (result is Double)
+            expectThat(result).isEqualTo(expected.toDouble())
+        else
+            expectThat(result).isEqualTo(expected.toBoolean())
+    }
+
+    @ParameterizedTest(name = "[{index}] input={0}, expected={1}")
+    @CsvSource(
+        // working
+        "'abs(-11)', '11'",
+        "'min(-1, 30)', '-1'",
+        "'max(10, 30)', '30'",
+        // lowest precedence possible
+        "'abs(-1-5)', '6'",
+        "'min(3+7, 5/2)', '2.5'",
+        // correct nesting
+        "'min(max(1, 10), 100)', '10'",
+        "'min(10, max(1, 100))', '10'",
+        "'min(max(1, 10), max(30, 100))', '10'",
+        "'abs(abs(abs(1)))', '1'",
+    )
+    fun `function calls`(query: String, expected: String) {
         val elements = parser.parseQuery("[$query]")
         val customMetric = elements[1].metrics.first()
         val result = customMetric.getValueFrom(OmQL.allOnes)
