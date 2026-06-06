@@ -157,7 +157,7 @@ class OmQLTest {
     }
 
     @ParameterizedTest(name = "{0}")
-    @ValueSource(strings = ["[C*A", "(CA", "((CA)", "U", "{CG}", "}", "{C}"])
+    @ValueSource(strings = ["[C*A", "(CA", "((CA)", "U", "{CG}", "}", "{C}", "[+"])
     fun `invalid queries`(query: String) {
         expectThrows<IllegalArgumentException> {
             parser.parseQuery(query)

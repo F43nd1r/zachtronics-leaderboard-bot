@@ -424,8 +424,12 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
         while (true) {
             if (idx >= query.length)
                 throw IllegalArgumentException("Missing closing $boundary in query: $query")
-            if (query[idx] == boundary)
-                break
+            if (query[idx] == boundary) {
+                if (allowedTokens.contains(Token.METRIC))
+                    throw IllegalArgumentException("Missing final metric in query: $query")
+                else
+                    break
+            }
 
             if (query[idx] == ' ') {
                 idx++
