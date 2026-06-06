@@ -42,6 +42,11 @@ public class IfSolution implements Solution<IfCategory, IfPuzzle, IfScore, IfRec
     EnumSet<IfCategory> categories = EnumSet.noneOf(IfCategory.class);
 
     @Override
+    public @Nullable String getDisplayLink() {
+        return displayLinks.isEmpty() ? null : displayLinks.get(0);
+    }
+
+    @Override
     public IfRecord extendToRecord(IfPuzzle puzzle, @Nullable String dataLink, @Nullable Path dataPath) {
         if (dataPath != null)
             return new IfRecord(puzzle, score, author, displayLinks, dataLink, dataPath);

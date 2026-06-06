@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.faendir.zachtronics.bot.inf.model.IfCategory.*;
+import static com.faendir.zachtronics.bot.inf.model.IfMetric.*;
 
 
 @Component
@@ -51,12 +52,8 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
     private final GitRepository gitRepo;
     private final Class<IfCategory> categoryClass = IfCategory.class;
     private final Function<String[], IfSolution> solUnmarshaller = IfSolution::unmarshal;
-    private final Comparator<IfSolution> archiveComparator =
-        Comparator.comparing(IfSolution::getScore, Comparator.comparing(IfScore::getCycles)
-                                                             .thenComparing(IfScore::getFootprint)
-                                                             .thenComparing(IfScore::getBlocks)
-                                                             .thenComparing(IfScore::isOutOfBounds)
-                                                             .thenComparing(IfScore::usesGRA));
+    private final List<Comparator<IfScore>> frontierComparators = List.of(CYCLES, FOOTPRINT, BLOCKS,
+                                                                          INBOUNDS, NO_GRA, INFINITE);
     private final List<IfPuzzle> trackedPuzzles = List.of(IfPuzzle.values());
 
     @Override
@@ -67,34 +64,6 @@ public class IfSolutionRepository extends AbstractSolutionRepository<IfCategory,
     @Override
     protected IfSolution makeCandidateSolution(IfSubmission submission) {
         return new IfSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLinks());
-    }
-
-    @Override
-    protected int frontierCompare(IfScore s1, IfScore s2) {
-        int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
-        int r2 = Integer.compare(s1.getFootprint(), s2.getFootprint());
-        int r3 = Integer.compare(s1.getBlocks(), s2.getBlocks());
-        int r4 = Boolean.compare(s1.isOutOfBounds(), s2.isOutOfBounds());
-        int r5 = Boolean.compare(s1.usesGRA(), s2.usesGRA());
-        int r6 = Boolean.compare(s1.isFinite(), s2.isFinite());
-        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0 && r5 <= 0 && r6 <= 0) {
-            // s1 dominates
-            return -1;
-        }
-        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0 && r5 >= 0 && r6 >= 0) {
-            // s2 dominates
-            return 1;
-        }
-        else {
-            // equal is already captured by the 1st check, this is for "not comparable"
-            return 0;
-        }
-    }
-
-    @Override
-    protected boolean allowedSameScoreUpdate(IfSolution candidate, IfSolution solution) {
-        return !candidate.getDisplayLinks().isEmpty() ||
-               (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLinks().isEmpty());
     }
 
     @Override

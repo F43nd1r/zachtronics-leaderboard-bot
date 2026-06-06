@@ -27,6 +27,8 @@ public class ExaMetric<T extends Comparable<T>> implements MetricJava<ExaScore, 
     public static final ExaMetric<Integer> SIZE = new ExaMetric<>("S", ExaScore::getSize);
     public static final ExaMetric<Integer> ACTIVITY = new ExaMetric<>("A", ExaScore::getActivity);
 
+    public static final ExaMetric<Boolean> CHEESY = new ExaMetric<>("c", ExaScore::isCheesy);
+
     public static final ExaMetric<Boolean> LEGIT = new ExaMetric<>("", s -> !s.isCheesy());
     public static final ExaMetric<Boolean> CAN_CHEESE = new ExaMetric<>("c", s -> true);
 

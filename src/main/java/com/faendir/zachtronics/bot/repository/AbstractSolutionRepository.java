@@ -21,7 +21,9 @@ import com.faendir.zachtronics.bot.model.*;
 import com.faendir.zachtronics.bot.model.Record;
 import com.faendir.zachtronics.bot.reddit.RedditService;
 import com.faendir.zachtronics.bot.reddit.Subreddit;
+import com.faendir.zachtronics.bot.utils.CompareResult;
 import com.faendir.zachtronics.bot.utils.Markdown;
+import com.faendir.zachtronics.bot.utils.OrderingKt;
 import com.faendir.zachtronics.bot.validation.ValidationResult;
 import com.opencsv.*;
 import com.opencsv.enums.CSVReaderNullFieldIndicator;
@@ -59,7 +61,7 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
     protected abstract Class<C> getCategoryClass();
     protected abstract Function<String[], Sol> getSolUnmarshaller();
     /** Sorting order of the solutions index */
-    protected abstract Comparator<Sol> getArchiveComparator();
+    protected abstract List<Comparator<S>> getFrontierComparators();
     protected abstract List<P> getTrackedPuzzles();
 
     protected abstract String wikiPageName(P puzzle);
@@ -149,16 +151,12 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
     }
 
     protected abstract Sol makeCandidateSolution(Sub submission);
-    /**
-     * <ul>
-     *  <li>-1: s1 is strictly better OR equal
-     *  <li> 0: incomparable
-     *  <li>+1: s2 is strictly better
-     *  </ul>
-     */
-    protected abstract int frontierCompare(S s1, S s2);
+
     /** Allow same-score changes if you bring a display link or you are the original author and don't regress the display link state */
-    protected abstract boolean allowedSameScoreUpdate(Sol candidate, Sol solution);
+    protected boolean allowedSameScoreUpdate(Sol candidate, Sol solution) {
+        return candidate.getDisplayLink() != null ||
+               (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
+    }
 
     protected void removeOrReplaceFromIndex(Sol candidate, Sol solution, ListIterator<Sol> it) {
         it.remove();
@@ -180,8 +178,11 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         try {
             for (ListIterator<Sol> it = solutions.listIterator(); it.hasNext(); ) {
                 Sol solution = it.next();
-                int r = frontierCompare(candidate.getScore(), solution.getScore());
-                if (r > 0) {
+                CompareResult cr = OrderingKt.partialCompare(getFrontierComparators(), candidate.getScore(), solution.getScore());
+                if (cr == CompareResult.UNCOMPARABLE) {
+                    continue;
+                }
+                if (cr == CompareResult.BIGGER) {
                     // TODO actually return all of the beating sols
                     CategoryRecord<R, C> categoryRecord =
                             solution.extendToCategoryRecord(puzzle,
@@ -189,23 +190,22 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
                                                             makeArchivePath(puzzlePath, solution.getScore()));
                     return new SubmitResult.NothingBeaten<>(Collections.singletonList(categoryRecord));
                 }
-                else if (r < 0) {
-                    Path solutionFile = makeArchivePath(puzzlePath, solution.getScore());
-                    if (candidate.getScore().equals(solution.getScore())) {
-                        if (!Files.exists(solutionFile) || allowedSameScoreUpdate(candidate, solution)) {
-                            submissionIsUpdate = true;
-                        }
-                        else {
-                            return new SubmitResult.AlreadyPresent<>();
-                        }
-                    }
 
-                    // remove beaten score and get categories
-                    candidate.getCategories().addAll(solution.getCategories());
-                    Files.deleteIfExists(solutionFile);
-                    beatenCategoryRecords.add(solution.extendToCategoryRecord(puzzle, null, null)); // the beaten record has no data anymore
-                    removeOrReplaceFromIndex(candidate, solution, it);
+                Path solutionFile = makeArchivePath(puzzlePath, solution.getScore());
+                if (cr == CompareResult.EQUAL) {
+                    if (!Files.exists(solutionFile) || allowedSameScoreUpdate(candidate, solution)) {
+                        submissionIsUpdate = true;
+                    }
+                    else {
+                        return new SubmitResult.AlreadyPresent<>();
+                    }
                 }
+
+                // remove beaten score and get categories
+                candidate.getCategories().addAll(solution.getCategories());
+                Files.deleteIfExists(solutionFile);
+                beatenCategoryRecords.add(solution.extendToCategoryRecord(puzzle, null, null)); // the beaten record has no data anymore
+                removeOrReplaceFromIndex(candidate, solution, it);
             }
 
             // the new record may have gained categories of records it didn't pareto-beat, do the transfers
@@ -242,7 +242,10 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
                 candidate.getCategories().addAll(missingCategories);
             }
 
-            int index = Collections.binarySearch(solutions, candidate, getArchiveComparator());
+            Comparator<S> scoreOrder = getFrontierComparators().stream()
+                                                               .reduce(Comparator::thenComparing)
+                                                               .orElseThrow();
+            int index = Collections.binarySearch(solutions, candidate, Comparator.comparing(Sol::getScore, scoreOrder));
             if (index < 0) {
                 index = -index - 1;
             }
@@ -293,8 +296,8 @@ public abstract class AbstractSolutionRepository<C extends Enum<C> & CategoryJav
         RevCommit rev = access.commit("Added " + submission.getScore().toDisplayString() +
                                       " for " + submission.getPuzzle().getDisplayName() +
                                       " by " + submission.getAuthor());
-        result += "\n[commit " + rev.name().substring(0, 7) + "]" +
-                  "(" + getGitRepo().getUrl().replaceFirst(".git$", "") + "/commit/" + rev.name() + ")";
+        result += "\n" + Markdown.link("commit " + rev.name().substring(0, 7),
+                                       getGitRepo().getUrl().replaceFirst(".git$", "") + "/commit/" + rev.name());
         return result;
     }
 

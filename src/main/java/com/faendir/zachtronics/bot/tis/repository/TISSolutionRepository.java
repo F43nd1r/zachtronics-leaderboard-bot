@@ -44,6 +44,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static com.faendir.zachtronics.bot.tis.model.TISCategory.*;
+import static com.faendir.zachtronics.bot.tis.model.TISMetric.*;
 import static java.util.stream.Collectors.*;
 
 @Component
@@ -58,10 +59,8 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
     private final GitRepository gitRepo;
     private final Class<TISCategory> categoryClass = TISCategory.class;
     private final Function<String[], TISSolution> solUnmarshaller = TISSolution::unmarshal;
-    private final Comparator<TISSolution> archiveComparator =
-        Comparator.comparing(TISSolution::getScore, CN.getScoreComparator()
-                                                      .thenComparing(s -> !s.isAchievement())
-                                                      .thenComparing(TISScore::isCheating));
+    private final List<Comparator<TISScore>> frontierComparators = List.of(CYCLES, NODES, INSTRUCTIONS,
+                                                                           ACHIEVEMENT.reversed(), CHEATING, HARDCODED);
     @Getter(AccessLevel.PUBLIC) @VisibleForTesting
     private final List<TISPuzzle> trackedPuzzles = Arrays.stream(TISPuzzle.values()).filter(p -> p.getType() != TISType.SANDBOX).toList();
 
@@ -73,35 +72,6 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
     @Override
     protected TISSolution makeCandidateSolution(TISSubmission submission) {
         return new TISSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
-    }
-
-    @Override
-    protected int frontierCompare(TISScore s1, TISScore s2) {
-        int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
-        int r2 = Integer.compare(s1.getNodes(), s2.getNodes());
-        int r3 = Integer.compare(s1.getInstructions(), s2.getInstructions());
-        int r4 = Boolean.compare(!s1.isAchievement(), !s2.isAchievement());
-        int r5 = Boolean.compare(s1.isCheating(), s2.isCheating());
-        int r6 = Boolean.compare(s1.isHardcoded(), s2.isHardcoded());
-
-        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0 && r5 <= 0 && r6 <= 0) {
-            // s1 dominates
-            return -1;
-        }
-        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0 && r5 >= 0 && r6 >= 0) {
-            // s2 dominates
-            return 1;
-        }
-        else {
-            // equal is already captured by the 1st check, this is for "not comparable"
-            return 0;
-        }
-    }
-
-    @Override
-    protected boolean allowedSameScoreUpdate(TISSolution candidate, TISSolution solution) {
-        return candidate.getDisplayLink() != null ||
-               (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
 
     @Override
@@ -244,7 +214,7 @@ public class TISSolutionRepository extends AbstractSolutionRepository<TISCategor
         metaLeaderboardStream(allSolutions, s -> !s.getCategories().isEmpty()).forEach(it::add);
         it.add("");
         addLbTableHeader.accept("Most frontier solutions");
-        metaLeaderboardStream(allSolutions, s -> true).forEach(it::add);
+        metaLeaderboardStream(allSolutions, _ -> true).forEach(it::add);
 
         return lines;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,12 @@
 
 package com.faendir.zachtronics.bot.om.model
 
-import com.faendir.zachtronics.bot.om.model.MeasurePoint.*
+import com.faendir.zachtronics.bot.om.model.MeasurePoint.INFINITY
+import com.faendir.zachtronics.bot.om.model.MeasurePoint.VICTORY
 import com.faendir.zachtronics.bot.om.model.OmMetric.*
 import com.faendir.zachtronics.bot.om.model.OmType.*
+import com.faendir.zachtronics.bot.utils.CompareResult
+import com.faendir.zachtronics.bot.utils.partialCompare
 
 private val FREESPACE_TYPES = setOf(NORMAL, POLYMER_HEIGHT, POLYMER_WIDTH, POLYMER_SKEW)
 
@@ -47,14 +50,8 @@ enum class OmScoreManifold(
     /** Either [VICTORY] or [INFINITY] */
     val measurePoint: MeasurePoint = scoreParts.findMeasurePoint()
 
-    /**
-     *  list of metric-by-metric comparation results, with meaning:
-     *  * `<0`: s1 is strictly better
-     *  * `0`: equal
-     *  * `>0`: s2 is strictly better
-     */
-    fun frontierCompare(s1: OmScore, s2: OmScore): List<Int> {
-        return scoreParts.map { it.comparator.compare(s1, s2) }
+    fun frontierCompare(s1: OmScore, s2: OmScore): CompareResult {
+        return scoreParts.partialCompare(s1, s2)
     }
 
     fun supportsScore(score: OmScore) = scoreParts.all { it.getValueFrom(score) != null }

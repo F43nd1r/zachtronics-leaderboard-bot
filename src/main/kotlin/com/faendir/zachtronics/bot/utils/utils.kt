@@ -16,23 +16,6 @@
 
 package com.faendir.zachtronics.bot.utils
 
-import com.faendir.zachtronics.bot.discord.Colors
-import com.faendir.zachtronics.bot.discord.embed.EmbedLimits
-import com.faendir.zachtronics.bot.discord.embed.SafeEmbedMessageBuilder
-import com.faendir.zachtronics.bot.model.Category
-import com.faendir.zachtronics.bot.model.DisplayContext
-import com.faendir.zachtronics.bot.model.Record
-import com.faendir.zachtronics.bot.model.StringFormat
-import com.faendir.zachtronics.bot.repository.CategoryRecord
-import discord4j.core.event.domain.interaction.ChatInputInteractionEvent
-import discord4j.core.event.domain.interaction.DeferrableInteractionEvent
-import discord4j.core.event.domain.interaction.InteractionCreateEvent
-import discord4j.core.`object`.command.ApplicationCommandOption
-import discord4j.core.`object`.entity.Message
-import discord4j.core.`object`.entity.User
-import discord4j.core.spec.EmbedCreateFields
-import discord4j.core.spec.EmbedCreateSpec
-import discord4j.core.spec.InteractionReplyEditMono
 import java.net.HttpURLConnection
 import java.net.URI
 import java.util.*
@@ -62,61 +45,6 @@ fun <P> Collection<P>.fuzzyMatch(search: String, name: P.() -> String): List<P> 
         }
 }
 
-@Suppress("UNCHECKED_CAST")
-fun <B : SafeEmbedMessageBuilder<B>, R : Record<C>?, C : Category> B.embedCategoryRecords(
-    records: Iterable<CategoryRecord<R, C>>,
-    supportedCategories: Collection<C> = emptyList()
-): B {
-    return embedRecords(
-        records = records.sortedWith(
-            compareBy(nullsLast()) { it.categories.minByOrNull { c -> c as Comparable<Any> } as? Comparable<Any> }
-        ),
-        supportedCategories = supportedCategories,
-        formatCategorySpecific = true
-    )
-}
-
-fun <B : SafeEmbedMessageBuilder<B>, R : Record<C>?, C : Category> B.embedRecords(
-    records: Iterable<CategoryRecord<R, C>>,
-    supportedCategories: Collection<C> = emptyList(),
-    formatCategorySpecific: Boolean = false
-): B {
-    return this.addFields(
-        records.map { (record, categories) ->
-            EmbedCreateFields.Field.of(
-                categories.smartFormat(supportedCategories).ifEmptyZeroWidthSpace(),
-                record?.toDisplayString(DisplayContext(StringFormat.DISCORD, categories.takeIf { formatCategorySpecific })) ?: "none",
-                true
-            )
-        }
-    )
-}
-
-fun InteractionCreateEvent.user(): User =
-    this.interaction.member.map { it as User }.orElse(this.interaction.user)
-
-fun InteractionReplyEditMono.clear() = withContentOrNull(null).withComponentsOrNull(null).withEmbedsOrNull(null)
-
-fun DeferrableInteractionEvent.editReplyWithFailure(message: String?) =
-    editReply().withEmbeds(
-        EmbedCreateSpec.builder()
-            .title("Failed")
-            .color(Colors.FAILURE)
-            .description(message?.truncateWithEllipsis(EmbedLimits.DESCRIPTION) ?: "Something went wrong")
-            .build()
-    ).then()
-
-val ChatInputInteractionEvent.completeName: String
-    get() {
-        var ret = commandName
-        var opt = options.singleOrNull { it.type == ApplicationCommandOption.Type.SUB_COMMAND }
-        while (opt != null) {
-            ret += " ${opt.name}"
-            opt = opt.options.singleOrNull { it.type == ApplicationCommandOption.Type.SUB_COMMAND }
-        }
-        return ret
-    }
-
 fun String.truncateWithEllipsis(maxLength: Int) = if (length > maxLength) substring(0, maxLength - 1) + "…" else this
 
 fun String.ifEmptyZeroWidthSpace() = ifEmpty { "\u200B" }
@@ -124,47 +52,6 @@ fun String.ifEmptyZeroWidthSpace() = ifEmpty { "\u200B" }
 fun String?.orEmpty(prefix: String = "", suffix: String = "") = this?.let { prefix + it + suffix } ?: ""
 
 inline fun <T> T.runIf(condition: Boolean, transform: T.() -> T): T = if (condition) transform() else this
-
-fun <T> Iterable<T>.allMinsWith(comparator: Comparator<in T>): List<T> {
-    val iterator = iterator()
-    if (!iterator.hasNext()) return emptyList()
-
-    val result = mutableListOf(iterator.next())
-    while (iterator.hasNext()) {
-        val next = iterator.next()
-        val comparison = comparator.compare(next, result[0])
-        if (comparison < 0) {
-            result.clear()
-            result.add(next)
-        } else if (comparison == 0) {
-            result.add(next)
-        }
-    }
-    return result
-}
-
-fun <T> Iterable<T>.paretoFrontierWith(comparators: Collection<Comparator<in T>>): List<T> {
-    val frontier = mutableListOf<T>()
-    candidates@ for (candidate in this) {
-        val iter = frontier.listIterator()
-        while (iter.hasNext()) {
-            val point = iter.next()
-            val compares = comparators.map { it.compare(candidate, point) }
-            val identical = compares.all { it == 0 }
-            if (identical) {
-                break
-            }
-            if (compares.all { it <= 0 }) {
-                iter.remove()
-            }
-            else if (compares.all { it >= 0 }) {
-                continue@candidates
-            }
-        }
-        frontier.add(candidate)
-    }
-    return frontier
-}
 
 inline fun <reified T : Enum<T>> newEnumSet(): EnumSet<T> = EnumSet.noneOf(T::class.java)
 
@@ -177,10 +64,7 @@ fun isValidLink(string: String): Boolean {
         connection.requestMethod = "HEAD"
         connection.setRequestProperty("Accept", "*/*")
         connection.responseCode in (200 until 400) // accept all redirects as well
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         false
     }
 }
-
-val Message.url
-    get() = "https://discord.com/channels/${guild.map { it.id.asString() }.block() ?: "@me"}/${channelId.asString()}/${id.asString()}"

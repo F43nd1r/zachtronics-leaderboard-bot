@@ -28,6 +28,7 @@ import java.util.EnumSet;
 public interface Solution<C extends Enum<C> & Category, P extends Puzzle<C>, S extends Score<C>, R extends Record<C>> {
     S getScore();
     String getAuthor();
+    @Nullable String getDisplayLink();
     EnumSet<C> getCategories();
 
     R extendToRecord(P puzzle, @Nullable String dataLink, @Nullable Path dataPath);

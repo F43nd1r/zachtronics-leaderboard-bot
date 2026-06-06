@@ -20,8 +20,13 @@ import com.faendir.zachtronics.bot.om.model.MeasurePoint
 import com.faendir.zachtronics.bot.om.model.OmMetric
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.repository.OmMemoryRecord
-import com.faendir.zachtronics.bot.utils.*
+import com.faendir.zachtronics.bot.utils.InfinInt
 import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
+import com.faendir.zachtronics.bot.utils.LevelValue
+import com.faendir.zachtronics.bot.utils.Trie
+import com.faendir.zachtronics.bot.utils.allMinsWith
+import com.faendir.zachtronics.bot.utils.paretoFrontierWith
+import com.faendir.zachtronics.bot.utils.toLevelValue
 import java.text.NumberFormat
 import java.text.ParsePosition
 import java.util.*
@@ -143,7 +148,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
             get() = listOf(metric)
 
         override fun filter(records: Collection<OmMemoryRecord>): List<OmMemoryRecord> {
-            return records.allMinsWith(compareBy(metric.comparator) { it.score })
+            return records.allMinsWith(compareBy(metric) { it.score })
         }
 
         override fun toString() =
@@ -152,7 +157,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
 
     inner class Pareto(override val metrics: Collection<OmMetric<*>>) : QueryElement {
         override fun filter(records: Collection<OmMemoryRecord>): List<OmMemoryRecord> {
-            return records.paretoFrontierWith(metrics.map { m -> compareBy(m.comparator) { it.score } })
+            return records.paretoFrontierWith(metrics.map { m -> compareBy(m) { it.score } })
         }
 
         override fun toString() =

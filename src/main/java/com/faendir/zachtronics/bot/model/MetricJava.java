@@ -20,14 +20,15 @@ package com.faendir.zachtronics.bot.model;
 import java.util.Comparator;
 import java.util.function.Function;
 
-public interface MetricJava<S extends Score<?>, T extends Comparable<T>> extends Metric {
+public interface MetricJava<S extends Score<?>, T extends Comparable<T>> extends Metric, Comparator<S> {
     Function<S, T> getExtract();
 
     default T get(S score) {
         return getExtract().apply(score);
     }
 
-    default Comparator<S> comparator() {
-        return Comparator.comparing(getExtract());
+    @Override
+    default int compare(S s1, S s2) {
+        return get(s1).compareTo(get(s2));
     }
 }

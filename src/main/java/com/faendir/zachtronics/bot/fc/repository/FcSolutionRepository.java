@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.faendir.zachtronics.bot.fc.model.FcCategory.*;
+import static com.faendir.zachtronics.bot.fc.model.FcMetric.*;
 
 @Component
 @RequiredArgsConstructor
@@ -51,7 +52,7 @@ public class FcSolutionRepository extends AbstractSolutionRepository<FcCategory,
     private final GitRepository gitRepo;
     private final Class<FcCategory> categoryClass = FcCategory.class;
     private final Function<String[], FcSolution> solUnmarshaller = FcSolution::unmarshal;
-    private final Comparator<FcSolution> archiveComparator = Comparator.comparing(FcSolution::getScore, TCS.getScoreComparator());
+    private final List<Comparator<FcScore>> frontierComparators = List.of(TIME, COST, SUM_TIMES, WIRES);
     private final List<FcPuzzle> trackedPuzzles = List.of(FcPuzzle.values());
 
     @Override
@@ -62,33 +63,6 @@ public class FcSolutionRepository extends AbstractSolutionRepository<FcCategory,
     @Override
     protected FcSolution makeCandidateSolution(FcSubmission submission) {
         return new FcSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
-    }
-
-    @Override
-    protected int frontierCompare(FcScore s1, FcScore s2) {
-        int r1 = Integer.compare(s1.getCost(), s2.getCost());
-        int r2 = Integer.compare(s1.getTime(), s2.getTime());
-        int r3 = Integer.compare(s1.getSumTimes(), s2.getSumTimes());
-        int r4 = Integer.compare(s1.getWires(), s2.getWires());
-
-        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0) {
-            // s1 dominates
-            return -1;
-        }
-        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0) {
-            // s2 dominates
-            return 1;
-        }
-        else {
-            // equal is already captured by the 1st check, this is for "not comparable"
-            return 0;
-        }
-    }
-
-    @Override
-    protected boolean allowedSameScoreUpdate(FcSolution candidate, FcSolution solution) {
-        return candidate.getDisplayLink() != null ||
-               (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
 
     @Override

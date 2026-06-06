@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.faendir.zachtronics.bot.kz.model.KzCategory.*;
+import static com.faendir.zachtronics.bot.kz.model.KzMetric.*;
 
 @Component
 @RequiredArgsConstructor
@@ -48,7 +49,7 @@ public class KzSolutionRepository extends AbstractSolutionRepository<KzCategory,
     private final GitRepository gitRepo;
     private final Class<KzCategory> categoryClass = KzCategory.class;
     private final Function<String[], KzSolution> solUnmarshaller = KzSolution::unmarshal;
-    private final Comparator<KzSolution> archiveComparator = Comparator.comparing(KzSolution::getScore, TC.getScoreComparator());
+    private final List<Comparator<KzScore>> frontierComparators = List.of(TIME, COST, AREA);
     private final List<KzPuzzle> trackedPuzzles = List.of(KzPuzzle.values());
 
     @Override
@@ -59,32 +60,6 @@ public class KzSolutionRepository extends AbstractSolutionRepository<KzCategory,
     @Override
     protected KzSolution makeCandidateSolution(KzSubmission submission) {
         return new KzSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
-    }
-
-    @Override
-    protected int frontierCompare(KzScore s1, KzScore s2) {
-        int r1 = Integer.compare(s1.getTime(), s2.getTime());
-        int r2 = Integer.compare(s1.getCost(), s2.getCost());
-        int r3 = Integer.compare(s1.getArea(), s2.getArea());
-
-        if (r1 <= 0 && r2 <= 0 && r3 <= 0) {
-            // s1 dominates
-            return -1;
-        }
-        else if (r1 >= 0 && r2 >= 0 && r3 >= 0) {
-            // s2 dominates
-            return 1;
-        }
-        else {
-            // equal is already captured by the 1st check, this is for "not comparable"
-            return 0;
-        }
-    }
-
-    @Override
-    protected boolean allowedSameScoreUpdate(KzSolution candidate, KzSolution solution) {
-        return candidate.getDisplayLink() != null ||
-               (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
 
     @Override

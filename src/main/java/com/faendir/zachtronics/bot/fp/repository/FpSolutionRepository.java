@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.faendir.zachtronics.bot.fp.model.FpCategory.*;
+import static com.faendir.zachtronics.bot.fp.model.FpMetric.*;
 
 @Component
 @RequiredArgsConstructor
@@ -49,7 +50,8 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
     private final GitRepository gitRepo;
     private final Class<FpCategory> categoryClass = FpCategory.class;
     private final Function<String[], FpSolution> solUnmarshaller = FpSolution::unmarshal;
-    private final Comparator<FpSolution> archiveComparator = Comparator.comparing(FpSolution::getScore, RCF.getScoreComparator());
+    // waste is a special boy, the metric has no direction, so different waste = uncomparable
+    private final List<Comparator<FpScore>> frontierComparators = List.of(RULES, CONDITIONAL_RULES, FRAMES, WASTE, MOST_WASTE);
     private final List<FpPuzzle> trackedPuzzles = Arrays.stream(FpPuzzle.values()).filter(p -> p.getType() != FpType.EDITOR).toList();
 
     @Override
@@ -60,34 +62,6 @@ public class FpSolutionRepository extends AbstractSolutionRepository<FpCategory,
     @Override
     protected FpSolution makeCandidateSolution(FpSubmission submission) {
         return new FpSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
-    }
-
-    @Override
-    protected int frontierCompare(FpScore s1, FpScore s2) {
-        int r1 = Integer.compare(s1.getRules(), s2.getRules());
-        int r2 = Integer.compare(s1.getConditionalRules(), s2.getConditionalRules());
-        int r3 = Integer.compare(s1.getFrames(), s2.getFrames());
-        // waste is a special boy, the metric has no direction, so different waste = uncomparable
-        int r4 = Integer.compare(s1.getWaste(), s2.getWaste());
-
-        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 == 0) {
-            // s1 dominates
-            return -1;
-        }
-        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 == 0) {
-            // s2 dominates
-            return 1;
-        }
-        else {
-            // equal is already captured by the 1st check, this is for "not comparable"
-            return 0;
-        }
-    }
-
-    @Override
-    protected boolean allowedSameScoreUpdate(FpSolution candidate, FpSolution solution) {
-        return candidate.getDisplayLink() != null ||
-               (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
 
     @Override

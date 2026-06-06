@@ -20,14 +20,24 @@ import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.mors.GifValidationService
 import com.faendir.zachtronics.bot.mors.MorsService
-import com.faendir.zachtronics.bot.om.model.*
+import com.faendir.zachtronics.bot.om.model.OmCategory
+import com.faendir.zachtronics.bot.om.model.OmMetric
+import com.faendir.zachtronics.bot.om.model.OmMetrics
+import com.faendir.zachtronics.bot.om.model.OmPuzzle
+import com.faendir.zachtronics.bot.om.model.OmRecord
+import com.faendir.zachtronics.bot.om.model.OmScore
+import com.faendir.zachtronics.bot.om.model.OmScoreManifold
+import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
 import com.faendir.zachtronics.bot.om.validation.OmQL
 import com.faendir.zachtronics.bot.om.validation.OmSolutionVerifier
 import com.faendir.zachtronics.bot.repository.CategoryRecord
 import com.faendir.zachtronics.bot.repository.SolutionRepository
 import com.faendir.zachtronics.bot.repository.SubmitResult
+import com.faendir.zachtronics.bot.utils.CompareResult
+import com.faendir.zachtronics.bot.utils.CompareResult.*
 import com.faendir.zachtronics.bot.utils.newEnumSet
+import com.faendir.zachtronics.bot.utils.partialCompare
 import com.google.common.hash.Hashing
 import jakarta.annotation.PostConstruct
 import kotlinx.datetime.Clock
@@ -58,9 +68,7 @@ class OmSolutionRepository(
             allowSpecialFloatingPointValues = true
         }
         /** overlap scores last, trackless in the mix */
-        private val dataOrder = (listOf(OmMetric.OVERLAP) + OmMetrics.VALUE)
-            .map { it.comparator }
-            .reduce(Comparator<OmScore>::then)
+        private val dataOrder = (listOf(OmMetric.OVERLAP) + OmMetrics.VALUE).reduce(Comparator<OmScore>::then)
         private val memoryRecordOrder = compareBy(dataOrder) { r: OmMemoryRecord -> r.score }
     }
 
@@ -94,8 +102,8 @@ class OmSolutionRepository(
             for (mRecord in memoryRecords) {
                 manifolds@ for (manifold in possibleManifolds.filter { it.supportsScore(mRecord.score) }) {
                     for (otherMRecord in memoryRecords) {
-                        val compares = manifold.frontierCompare(mRecord.score, otherMRecord.score)
-                        if (compares.all { it >= 0 } && compares.any { it > 0 })
+                        val cr = manifold.frontierCompare(mRecord.score, otherMRecord.score)
+                        if (cr == BIGGER)
                             continue@manifolds
                     }
                     mRecord.frontierManifolds.add(manifold)
@@ -223,9 +231,9 @@ class OmSolutionRepository(
         val mRecords = data.getValue(puzzle)
         for (mRecord in mRecords.toSet()) {
             val record = mRecord.record
-            val fullCompares = OmMetrics.FULL_SCORE.map { it.comparator.compare(submission.score, record.score) }
+            val fullCompRes = OmMetrics.FULL_SCORE.partialCompare(submission.score, record.score)
 
-            if (fullCompares.all { it == 0 }) { // candidate is identical to record
+            if (fullCompRes == EQUAL) { // candidate is identical to record
                 if (submission.allowGifUpdate && (submission.displayLink != record.displayLink || submission.gifData != null)) {
                     handleBeatenRecord(mRecord, mRecord.categories, mRecord.frontierManifolds)
                     return SubmitResult.Updated(null, null, mRecord.toCategoryRecord())
@@ -233,11 +241,11 @@ class OmSolutionRepository(
                     return SubmitResult.AlreadyPresent()
                 }
             }
-            if (fullCompares.all { it >= 0 }) { // candidate is strictly worse all around, give up immediately
+            if (fullCompRes == BIGGER) { // candidate is strictly worse all around, give up immediately
                 return SubmitResult.NothingBeaten(listOf(mRecord.toCategoryRecord()))
             }
             unclaimedCategories -= mRecord.categories
-            if (fullCompares.all { it <= 0 }) { // candidate beats the old record all around, use that and skip the details
+            if (fullCompRes == SMALLER) { // candidate beats the old record all around, use that and skip the details
                 handleBeatenRecord(mRecord, mRecord.categories, mRecord.frontierManifolds)
                 beatenCR.add(CategoryRecord(record, mRecord.categories))
                 continue
@@ -245,7 +253,7 @@ class OmSolutionRepository(
 
             // we were not lucky, at this point we go manifold by manifold
             for (manifold in possibleManifolds.intersect(mRecord.frontierManifolds)) {
-                val compares: List<Int> = manifold.frontierCompare(submission.score, record.score)
+                val compareResult: CompareResult = manifold.frontierCompare(submission.score, record.score)
                 /* If we let the identical case just go below, we allow overlapping-domino edit wars
                  * where 2 solves that are both paretos in manifold 1 but identical in manifold 2
                  * can keep beating each other.
@@ -254,11 +262,9 @@ class OmSolutionRepository(
                  * This isn't symmetrical, as the incoming solution is at a disadvantage wrt
                  * the ones in the leaderboard, but finding a minimal graph covering is out of my abilities.
                  */
-                val identical = compares.all { it == 0 } // subscores identical
-                val strictlyWorse = !identical && compares.all { it >= 0 } // candidate loses
 
-                if (strictlyWorse || identical) {
-                    if (strictlyWorse) {
+                if (compareResult == BIGGER || compareResult == EQUAL) {
+                    if (compareResult == BIGGER) {
                         possibleManifolds.remove(manifold)
                     }
                     beatingWitnesses[manifold] = mRecord
@@ -267,7 +273,7 @@ class OmSolutionRepository(
                             beatingWitnesses.values.distinctBy { it.score }.map { it.toCategoryRecord() })
                 }
 
-                if (!strictlyWorse) {
+                if (compareResult != BIGGER) {
                     val beatenCategories = mRecord.categories.filterTo(newEnumSet()) {
                         it.manifold == manifold && it.supportsScore(submission.score) &&
                                 // for scores that are exactly equal in this manifold we choose the first in the data order
@@ -276,9 +282,8 @@ class OmSolutionRepository(
                                     .compare(submission.score, record.score) < 0
                     }
 
-                    val strictlyBetter = !identical && compares.all { it <= 0 } // exactly equal is taken by the branch above
-                    if (strictlyBetter || beatenCategories.isNotEmpty()) {
-                        val lostManifolds = if (strictlyBetter) setOf(manifold) else emptySet()
+                    if (compareResult == SMALLER || beatenCategories.isNotEmpty()) {
+                        val lostManifolds = if (compareResult == SMALLER) setOf(manifold) else emptySet()
                         handleBeatenRecord(mRecord, beatenCategories, lostManifolds)
                         beatenCR.add(CategoryRecord(record, beatenCategories))
                     }
@@ -371,7 +376,7 @@ class OmSolutionRepository(
 
                         else -> null
                     }
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     null
                 }
             }

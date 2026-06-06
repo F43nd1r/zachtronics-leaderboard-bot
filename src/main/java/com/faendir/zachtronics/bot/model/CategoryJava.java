@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.model;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 
 public interface CategoryJava<C extends Enum<C> & Category, S extends Score<C>, M extends MetricJava<S, ?>> extends Category {
     Comparator<S> getScoreComparator();
@@ -28,7 +29,7 @@ public interface CategoryJava<C extends Enum<C> & Category, S extends Score<C>, 
 
     default Comparator<S> makeCategoryComparator(List<M> metrics) {
         return metrics.stream()
-                      .map(M::comparator)
+                      .<Comparator<S>>map(Function.identity())
                       .reduce(Comparator::thenComparing)
                       .orElseThrow();
     }

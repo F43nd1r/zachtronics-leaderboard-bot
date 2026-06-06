@@ -423,7 +423,7 @@ public enum ScPuzzle implements Puzzle<ScCategory> {
     }
 
     public static List<ScPuzzle> findMatchingPuzzles(String name) {
-        return UtilsKt.fuzzyMatch(Arrays.stream(ScPuzzle.values()).toList(), name.trim(), ScPuzzle::getDisplayName);
+        return UtilsKt.fuzzyMatch(Arrays.asList(ScPuzzle.values()), name.trim(), ScPuzzle::getDisplayName);
     }
 
     public static ScPuzzle findUniqueMatchingPuzzle(String name) {

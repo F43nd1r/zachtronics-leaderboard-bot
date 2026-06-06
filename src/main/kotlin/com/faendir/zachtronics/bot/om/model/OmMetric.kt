@@ -32,14 +32,14 @@ import java.util.*
  * @property description `c` or `T` or `g+c+a`
  */
 @Suppress("ClassName")
-sealed interface OmMetric<out T> : Metric where T : Comparable<T & Any>? {
+sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Comparable<T & Any>? {
     val description: String
     val scoreParts: Collection<ScorePart<*>>
     val measurePoint: MeasurePoint
     val getValueFrom: (OmScore) -> T
 
-    val comparator: Comparator<OmScore>
-        get() = compareBy(nullsLast(), getValueFrom)
+    override fun compare(o1: OmScore, o2: OmScore) =
+        compareValuesBy(o1, o2, nullsLast(), getValueFrom)
 
     /** `34c` or `O` or `g+c+a=215`, no spaces/separators */
     fun describe(score: OmScore, format: StringFormat): String?
@@ -85,11 +85,13 @@ sealed interface OmMetric<out T> : Metric where T : Comparable<T & Any>? {
         override val displayName: String,
         override val measurePoint: MeasurePoint,
         override val getValueFrom: (OmScore) -> Boolean,
-        reverseOrder: Boolean = false
+        private val reverseOrder: Boolean = false
     ) : ScorePart<Boolean> {
-        override val comparator: Comparator<OmScore> = compareBy(getValueFrom).runIf(reverseOrder) { reversed() }
         override val description: String = displayName
         override val collapsible: Boolean = false
+
+        override fun compare(o1: OmScore, o2: OmScore) =
+            compareValuesBy(o1, o2, if (reverseOrder) reverseOrder() else naturalOrder(), getValueFrom)
 
         override fun describe(score: OmScore, format: StringFormat): String? =
             if (getValueFrom(score)) displayName else null
@@ -152,13 +154,13 @@ sealed interface OmMetric<out T> : Metric where T : Comparable<T & Any>? {
         private val modifier: Modifier,
         override val displayName: String = "!${modifier.displayName}"
     ) : Computed<Boolean> {
-        override val collapsible: Boolean = modifier.collapsible
+        override val collapsible = modifier.collapsible
         override val measurePoint = modifier.measurePoint
         override val subMetrics = listOf(modifier)
         override val getValueFrom = { score: OmScore -> !modifier.getValueFrom(score) }
-        override val comparator: Comparator<OmScore> = modifier.comparator
         override val description = displayName
 
+        override fun compare(o1: OmScore, o2: OmScore) = modifier.compare(o1, o2)
         override fun describe(score: OmScore, format: StringFormat): String? = null
     }
 

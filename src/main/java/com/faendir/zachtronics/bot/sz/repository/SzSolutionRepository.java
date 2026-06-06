@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.faendir.zachtronics.bot.sz.model.SzCategory.*;
+import static com.faendir.zachtronics.bot.sz.model.SzMetric.*;
 
 @Component
 @RequiredArgsConstructor
@@ -49,7 +50,7 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
     private final GitRepository gitRepo;
     private final Class<SzCategory> categoryClass = SzCategory.class;
     private final Function<String[], SzSolution> solUnmarshaller = SzSolution::unmarshal;
-    private final Comparator<SzSolution> archiveComparator = Comparator.comparing(SzSolution::getScore, SzCategory.CP.getScoreComparator());
+    private final List<Comparator<SzScore>> frontierComparators = List.of(COST, POWER, LINES);
     private final List<SzPuzzle> trackedPuzzles = Arrays.stream(SzPuzzle.values()).filter(p -> p.getType() != SzType.SANDBOX).toList();
 
     @Override
@@ -62,32 +63,6 @@ public class SzSolutionRepository extends AbstractSolutionRepository<SzCategory,
         return new SzSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
     }
 
-    @Override
-    protected int frontierCompare(SzScore s1, SzScore s2) {
-        int r1 = Integer.compare(s1.getCost(), s2.getCost());
-        int r2 = Integer.compare(s1.getPower(), s2.getPower());
-        int r3 = Integer.compare(s1.getLines(), s2.getLines());
-        if (r1 <= 0 && r2 <= 0 && r3 <= 0) {
-            // s1 dominates
-            return -1;
-        }
-        else if (r1 >= 0 && r2 >= 0 && r3 >= 0) {
-            // s2 dominates
-            return 1;
-        }
-        else {
-            // equal is already captured by the 1st check, this is for "not comparable"
-            return 0;
-        }
-    }
-
-    /** allow same-score solution changes only if you are the original author */
-    @Override
-    protected boolean allowedSameScoreUpdate(SzSolution candidate, SzSolution solution) {
-        return candidate.getDisplayLink() != null ||
-               (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
-    }
-    
     @Override
     protected Path relativePuzzlePath(SzPuzzle puzzle) {
         return Path.of(puzzle.getGroup().name()).resolve(puzzle.getId());

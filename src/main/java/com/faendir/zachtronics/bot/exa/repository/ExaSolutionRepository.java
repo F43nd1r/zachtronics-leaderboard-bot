@@ -37,6 +37,7 @@ import java.util.*;
 import java.util.function.Function;
 
 import static com.faendir.zachtronics.bot.exa.model.ExaCategory.*;
+import static com.faendir.zachtronics.bot.exa.model.ExaMetric.*;
 
 @Component
 @RequiredArgsConstructor
@@ -50,7 +51,7 @@ public class ExaSolutionRepository extends AbstractSolutionRepository<ExaCategor
     private final GitRepository gitRepo;
     private final Class<ExaCategory> categoryClass = ExaCategory.class;
     private final Function<String[], ExaSolution> solUnmarshaller = ExaSolution::unmarshal;
-    private final Comparator<ExaSolution> archiveComparator = Comparator.comparing(ExaSolution::getScore, ExaCategory.CS.getScoreComparator());
+    private final List<Comparator<ExaScore>> frontierComparators = List.of(CYCLES, SIZE, ACTIVITY, CHEESY);
     private final List<ExaPuzzle> trackedPuzzles = Arrays.stream(ExaPuzzle.values()).filter(p -> p.getType() != ExaType.SANDBOX).toList();
 
     @Override
@@ -61,33 +62,6 @@ public class ExaSolutionRepository extends AbstractSolutionRepository<ExaCategor
     @Override
     protected ExaSolution makeCandidateSolution(ExaSubmission submission) {
         return new ExaSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
-    }
-
-    @Override
-    protected int frontierCompare(ExaScore s1, ExaScore s2) {
-        int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
-        int r2 = Integer.compare(s1.getSize(), s2.getSize());
-        int r3 = Integer.compare(s1.getActivity(), s2.getActivity());
-        int r4 = Boolean.compare(s1.isCheesy(), s2.isCheesy());
-        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0) {
-            // s1 dominates
-            return -1;
-        }
-        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0) {
-            // s2 dominates
-            return 1;
-        }
-        else {
-            // equal is already captured by the 1st check, this is for "not comparable"
-            return 0;
-        }
-    }
-
-    /** allow same-score solution changes only if you are the original author */
-    @Override
-    protected boolean allowedSameScoreUpdate(ExaSolution candidate, ExaSolution solution) {
-        return candidate.getDisplayLink() != null ||
-               (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
 
     @Override

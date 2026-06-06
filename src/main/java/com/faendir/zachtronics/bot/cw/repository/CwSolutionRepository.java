@@ -49,7 +49,7 @@ public class CwSolutionRepository extends AbstractSolutionRepository<CwCategory,
     private final GitRepository gitRepo;
     private final Class<CwCategory> categoryClass = CwCategory.class;
     private final Function<String[], CwSolution> solUnmarshaller = CwSolution::unmarshal;
-    private final Comparator<CwSolution> archiveComparator = Comparator.comparing(CwSolution::getScore, SIZE.getScoreComparator());
+    private final List<Comparator<CwScore>> frontierComparators = List.of(CwMetric.SIZE, CwMetric.FOOTPRINT, CwMetric.WIDTH);
     private final List<CwPuzzle> trackedPuzzles = List.of(CwPuzzle.values());
 
     @Override
@@ -60,32 +60,6 @@ public class CwSolutionRepository extends AbstractSolutionRepository<CwCategory,
     @Override
     protected CwSolution makeCandidateSolution(CwSubmission submission) {
         return new CwSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink());
-    }
-
-    @Override
-    protected int frontierCompare(CwScore s1, CwScore s2) {
-        int r1 = Integer.compare(s1.getWidth(), s2.getWidth());
-        int r2 = Integer.compare(s1.getHeight(), s2.getHeight());
-        int r3 = Integer.compare(s1.getFootprint(), s2.getFootprint());
-
-        if (r1 <= 0 && r2 <= 0 && r3 <= 0) {
-            // s1 dominates
-            return -1;
-        }
-        else if (r1 >= 0 && r2 >= 0 && r3 >= 0) {
-            // s2 dominates
-            return 1;
-        }
-        else {
-            // equal is already captured by the 1st check, this is for "not comparable"
-            return 0;
-        }
-    }
-
-    @Override
-    protected boolean allowedSameScoreUpdate(CwSolution candidate, CwSolution solution) {
-        return candidate.getDisplayLink() != null ||
-               (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
 
     @Override

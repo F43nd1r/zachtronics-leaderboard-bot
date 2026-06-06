@@ -110,7 +110,7 @@ enum class OmCategory(
     override val metrics: List<OmMetric<*>> = listOf(admission) + metricsVararg
     val requiredParts: Set<ScorePart<*>> = metrics.flatMapTo(HashSet()) { it.scoreParts }
     val scoreComparator: Comparator<OmScore> =
-        (metrics + (manifold.scoreParts - metrics)).map(OmMetric<*>::comparator).reduce(Comparator<OmScore>::then)
+        (metrics + (manifold.scoreParts - metrics)).reduce(Comparator<OmScore>::then)
 
     fun supportsPuzzle(puzzle: OmPuzzle) = supportedTypes.contains(puzzle.type)
 

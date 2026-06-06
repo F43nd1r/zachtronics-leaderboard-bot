@@ -40,6 +40,7 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static com.faendir.zachtronics.bot.sc.model.ScCategory.*;
+import static com.faendir.zachtronics.bot.sc.model.ScMetric.*;
 
 @Component
 @RequiredArgsConstructor
@@ -54,10 +55,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     private final GitRepository gitRepo;
     private final Class<ScCategory> categoryClass = ScCategory.class;
     private final Function<String[], ScSolution> solUnmarshaller = ScSolution::unmarshal;
-    private final Comparator<ScSolution> archiveComparator =
-            Comparator.comparing(ScSolution::getScore, ScCategory.C.getScoreComparator()
-                                                                   .thenComparing(ScScore::isBugged)
-                                                                   .thenComparing(ScScore::isPrecognitive));
+    private final List<Comparator<ScScore>> frontierComparators = List.of(CYCLES, REACTORS, SYMBOLS, NO_BUGS, NO_PRECOG);
     private final List<ScPuzzle> trackedPuzzles = Arrays.stream(ScPuzzle.values()).filter(p -> p.getType() != ScType.BOSS_RANDOM).toList();
 
     @Override
@@ -234,34 +232,6 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     @Override
     protected ScSolution makeCandidateSolution(ScSubmission submission) {
         return new ScSolution(submission.getScore(), submission.getAuthor(), submission.getDisplayLink(), false);
-    }
-
-    @Override
-    protected int frontierCompare(ScScore s1, ScScore s2) {
-        int r1 = Integer.compare(s1.getCycles(), s2.getCycles());
-        int r2 = Integer.compare(s1.getReactors(), s2.getReactors());
-        int r3 = Integer.compare(s1.getSymbols(), s2.getSymbols());
-        int r4 = Boolean.compare(s1.isBugged(), s2.isBugged());
-        int r5 = Boolean.compare(s1.isPrecognitive(), s2.isPrecognitive());
-
-        if (r1 <= 0 && r2 <= 0 && r3 <= 0 && r4 <= 0 && r5 <= 0) {
-            // s1 dominates
-            return -1;
-        }
-        else if (r1 >= 0 && r2 >= 0 && r3 >= 0 && r4 >= 0 && r5 >= 0) {
-            // s2 dominates
-            return 1;
-        }
-        else {
-            // equal is already captured by the 1st check, this is for "not comparable"
-            return 0;
-        }
-    }
-
-    @Override
-    protected boolean allowedSameScoreUpdate(ScSolution candidate, ScSolution solution) {
-        return candidate.getDisplayLink() != null ||
-               (candidate.getAuthor().equals(solution.getAuthor()) && solution.getDisplayLink() == null);
     }
 
     @Override
