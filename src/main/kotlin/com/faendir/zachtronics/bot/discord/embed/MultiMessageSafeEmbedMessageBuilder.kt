@@ -161,8 +161,9 @@ class MultiMessageSafeEmbedMessageBuilder : SafeEmbedMessageBuilder<MultiMessage
             channel.createMessage()
                 .withEmbeds(embed)
                 .runIf(index == 0) {
-                    withComponents(actions)
-                    content?.let { withContent(it) } ?: this
+                    withComponents(actions).apply {
+                        content?.let { withContent(it) } ?: this
+                    }
                 }
                 .awaitSingle()
         }

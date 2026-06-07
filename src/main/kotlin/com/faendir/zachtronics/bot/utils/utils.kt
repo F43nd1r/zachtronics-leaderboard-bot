@@ -19,6 +19,9 @@ package com.faendir.zachtronics.bot.utils
 import java.net.HttpURLConnection
 import java.net.URI
 import java.util.*
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.ExperimentalExtendedContracts
+import kotlin.contracts.contract
 
 private val wordSeparator = Regex("[\\s-/,:]+")
 
@@ -51,7 +54,13 @@ fun String.ifEmptyZeroWidthSpace() = ifEmpty { "\u200B" }
 
 fun String?.orEmpty(prefix: String = "", suffix: String = "") = this?.let { prefix + it + suffix } ?: ""
 
-inline fun <T> T.runIf(condition: Boolean, transform: T.() -> T): T = if (condition) transform() else this
+@OptIn(ExperimentalContracts::class, ExperimentalExtendedContracts::class)
+inline fun <T> T.runIf(condition: Boolean, transform: T.() -> T): T {
+    contract {
+        condition holdsIn transform
+    }
+    return if (condition) transform() else this
+}
 
 inline fun <reified T : Enum<T>> newEnumSet(): EnumSet<T> = EnumSet.noneOf(T::class.java)
 

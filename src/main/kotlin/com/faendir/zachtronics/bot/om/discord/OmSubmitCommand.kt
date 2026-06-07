@@ -82,7 +82,7 @@ class OmSubmitCommand(private val repository: OmSolutionRepository, private val 
         return when (result) {
             is SubmitResult.Success -> {
                 if (result.beatenRecords.size >= 5)
-                    messages.lastOrNull()?.addReaction(Emoji.unicode("\uD83E\uDDF9"))?.awaitSingleOrNull() // :broom:
+                    messages.lastOrNull()?.addReaction(Emoji.unicode("\uD83E\uDDF9"))?.block() // :broom:
                 MultiMessageSafeEmbedMessageBuilder()
                     .title("Successfully submitted!")
                     .color(Colors.SUCCESS)
