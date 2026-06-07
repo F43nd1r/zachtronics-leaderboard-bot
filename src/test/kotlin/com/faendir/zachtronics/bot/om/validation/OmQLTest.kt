@@ -172,6 +172,21 @@ class OmQLTest {
         }.subject.run { println("[$query] -> $message") }
     }
 
+    @Test
+    fun `omsim usage`() {
+        val elements = parser.parseQuery("""["cycles" + "does_not_exist"]""")
+        expectThat(elements[1].metrics.first()).isA<Custom<*>>()
+            .get { getValueFrom(OmQL.allOnes) }.isEqualTo(2.0)
+    }
+
+    @ParameterizedTest(name = "[\"{0}\"]")
+    @ValueSource(strings = ["product 10000 cycles"])
+    fun `omsim abuse`(query: String) {
+        expectThrows<IllegalArgumentException> {
+            parser.parseQuery("[\"$query\"]")
+        }.subject.run { println("[\"$query\"] -> $message") }
+    }
+
     @ParameterizedTest(name = "[{index}] input={0}, expected={1}")
     @CsvSource(
         // + - (higher: *, lower: <)

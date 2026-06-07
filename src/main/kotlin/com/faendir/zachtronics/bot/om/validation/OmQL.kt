@@ -240,8 +240,8 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
             if (end == -1)
                 throw IllegalArgumentException("Missing closing \" in: ${query.substring(idx)}")
             val command = query.substring(idx + 1, end).replace(Regex("\\s+"), " ")
-            if (Regex("\\d{3,}").containsMatchIn(command)) {
-                throw IllegalArgumentException("Omsim command \"$command\" contains numbers over 99, reconsider")
+            if (Regex("^product +\\d{3,}").containsMatchIn(command)) {
+                throw IllegalArgumentException("Omsim command \"$command\" is asking for products over 100, reconsider")
             }
             return OmMetric.Omsim(command) to end + 1
         }
