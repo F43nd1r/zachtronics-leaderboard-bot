@@ -22,10 +22,11 @@
         "react-plotly.js": "2.6.0",
         "react-router-dom": "7.17.0",
         "react-router-hash-link": "2.4.3",
-        "react-scripts": "5.0.1",
         "typescript": "6.0.3"
     },
     "devDependencies": {
+        "@rsbuild/core": "^1.7.5",
+        "@rsbuild/plugin-react": "^1.4.6",
         "@simbathesailor/use-what-changed": "2.0.0",
         "@types/d3-format": "3.0.4",
         "@types/jest": "30.0.0",
@@ -43,16 +44,11 @@
         "@types/plotly.js": "3.0.10"
     },
     "scripts": {
-        "start": "react-scripts start",
-        "build": "react-scripts build",
-        "clean": "rimraf build",
-        "eject": "react-scripts eject",
+        "start": "rsbuild start",
+        "build": "rsbuild build",
+        "clean": "rimraf dist",
+        "preview": "rsbuild preview",
         "analyze": "source-map-explorer 'build/static/js/*.js'"
-    },
-    "eslintConfig": {
-        "extends": [
-            "react-app"
-        ]
     },
     "prettier": {
         "printWidth": 160,
@@ -73,6 +69,5 @@
             "last 1 firefox version",
             "last 1 safari version"
         ]
-    },
-    "proxy": "http://localhost:8080/"
+    }
 }

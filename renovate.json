@@ -10,6 +10,7 @@
     "group:recommended",
     "packages:react",
     "workarounds:all",
+    "config:best-practices",
     ":dependencyDashboard"
   ],
   "rangeStrategy": "pin",

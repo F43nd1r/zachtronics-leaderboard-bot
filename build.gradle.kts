@@ -138,7 +138,7 @@ tasks.assembleFrontend {
         file("web/yarn.lock")
         file("web/.yarnrc.yml")
     }
-    outputs.dir("web/build")
+    outputs.dir("web/dist")
     doLast {
         if (outputs.files.asFileTree.none { it.isFile }) {
             throw GradleException("Failed to build frontend")
