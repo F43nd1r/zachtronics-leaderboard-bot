@@ -20,6 +20,7 @@ import com.faendir.zachtronics.bot.git.GitRepository
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.mors.GifValidationService
 import com.faendir.zachtronics.bot.mors.MorsService
+import com.faendir.zachtronics.bot.om.model.MeasurePoint
 import com.faendir.zachtronics.bot.om.model.OmCategory
 import com.faendir.zachtronics.bot.om.model.OmMetric
 import com.faendir.zachtronics.bot.om.model.OmMetrics
@@ -450,11 +451,12 @@ class OmSolutionRepository(
         }
 
     internal fun executeOmQL(
-        puzzle: OmPuzzle, queryElements: Collection<OmQL.QueryElement>
+        puzzle: OmPuzzle, measurePoint: MeasurePoint?, queryElements: Collection<OmQL.QueryElement>
     ): Collection<CategoryRecord<OmRecord, OmCategory>> {
         return leaderboard.acquireReadAccess().use { l ->
             loadDataIfNecessary(l)
-            var records: Collection<OmMemoryRecord> = data[puzzle]!!
+            var records: Collection<OmMemoryRecord> =
+                data[puzzle]!!.filter { measurePoint == null || measurePoint in it.score.measurePoints }
 
             for (element in queryElements) {
                 // ensure runtime metrics are filled

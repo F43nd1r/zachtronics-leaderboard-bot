@@ -69,11 +69,10 @@ data class OmScore(
     @Transient
     val looping: Boolean = rate != null
 
-    /** Values in {[MeasurePoint.VICTORY], [MeasurePoint.INFINITY]} */
     @Transient
     val measurePoints: EnumSet<MeasurePoint> =
         // with just 2 non-start measure points we can cut corners, hopefully we don't need to track more
-        EnumSet.of(MeasurePoint.VICTORY).apply { if (looping) add(MeasurePoint.INFINITY) }
+        EnumSet.of(MeasurePoint.START, MeasurePoint.VICTORY).apply { if (looping) add(MeasurePoint.INFINITY) }
 
     /**
      * humans: `12g/34c/56a/78i/3h/4w/8b/O/T/L@V 12g/34r/57a/78i/6h/7w/9b/O/T@∞`
@@ -97,7 +96,7 @@ data class OmScore(
         val desiredMeasurePoints = context.categories
             ?.ifEmpty { null }
             ?.mapTo(newEnumSet()) { it.manifold.measurePoint }
-            ?: measurePoints
+            ?: EnumSet.copyOf(measurePoints).apply { remove(MeasurePoint.START) }
 
         return desiredMeasurePoints.joinToString(" ") { measurePoint ->
             subScoreDisplay(OmMetrics.BY_MEASURE_POINT[measurePoint]!!.filter { it in desiredMetrics }, context.format)

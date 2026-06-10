@@ -76,7 +76,7 @@ class OmQueryCommand(private val repository: OmSolutionRepository, val discordAc
         val queryElements = OmQL(possibleMetrics, measurePoint).parseQuery(query)
         val name = Markdown.escape(queryElements.joinToString("", "", measurePoint?.displayName.orEmpty()))
 
-        val records = repository.executeOmQL(puzzle, queryElements)
+        val records = repository.executeOmQL(puzzle, measurePoint, queryElements)
 
         return when (records.size) {
             0 -> MultiMessageSafeEmbedMessageBuilder()
