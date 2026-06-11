@@ -795,7 +795,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rsbuild/core@npm:^1.7.5":
+"@rsbuild/core@npm:1.7.5":
   version: 1.7.5
   resolution: "@rsbuild/core@npm:1.7.5"
   dependencies:
@@ -810,7 +810,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rsbuild/plugin-react@npm:^1.4.6":
+"@rsbuild/plugin-react@npm:1.4.6":
   version: 1.4.6
   resolution: "@rsbuild/plugin-react@npm:1.4.6"
   dependencies:
@@ -2830,8 +2830,8 @@ __metadata:
     "@mui/lab": "npm:7.0.0"
     "@mui/material": "npm:9.0.1"
     "@mui/styles": "npm:6.4.8"
-    "@rsbuild/core": "npm:^1.7.5"
-    "@rsbuild/plugin-react": "npm:^1.4.6"
+    "@rsbuild/core": "npm:1.7.5"
+    "@rsbuild/plugin-react": "npm:1.4.6"
     "@simbathesailor/use-what-changed": "npm:2.0.0"
     "@sinclair/typebox": "npm:0.34.49"
     "@types/d3-format": "npm:3.0.4"

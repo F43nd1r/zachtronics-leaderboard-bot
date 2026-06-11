@@ -25,8 +25,8 @@
         "typescript": "6.0.3"
     },
     "devDependencies": {
-        "@rsbuild/core": "^1.7.5",
-        "@rsbuild/plugin-react": "^1.4.6",
+        "@rsbuild/core": "1.7.5",
+        "@rsbuild/plugin-react": "1.4.6",
         "@simbathesailor/use-what-changed": "2.0.0",
         "@types/d3-format": "3.0.4",
         "@types/jest": "30.0.0",
