@@ -6,12 +6,9 @@
     "org.jetbrains.kotlinx:kotlinx-coroutines-reactor"
   ],
   "extends": [
-    "group:monorepos",
-    "group:recommended",
     "packages:react",
-    "workarounds:all",
-    "config:best-practices",
-    ":dependencyDashboard"
+    "config:recommended",
+    "security:minimumReleaseAgeNpm"
   ],
   "rangeStrategy": "pin",
   "packageRules": [
