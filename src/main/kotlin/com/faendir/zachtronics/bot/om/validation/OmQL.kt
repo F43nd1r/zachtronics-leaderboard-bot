@@ -59,7 +59,7 @@ import kotlin.math.pow
  * - Logical: `&&`, `||`, `!`
  * - Comparison: `=`/`==`, `!=`, `<`, `>`, `<=`, `>=`
  * - Arithmetic: `+`, `-`, `*`, `/`, `%`, `**`
- * - Functions: `abs(x)`, `min(a,b)`, `max(a,b)`
+ * - Functions: `abs/log/exp(x)`, `min/max(a,b)`
  *
  * Examples:
  * - `CG{A<8}`: Among records with minimum Cost then minimum Cycles, filter for Area < 8.
@@ -277,22 +277,24 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
         sealed interface Unary<T : Comparable<T>> : Callable {
             val func: (T) -> T
             override val arity get() = 1
-            override val precedence get() = 100
+            override val precedence: Int
             override val rightAssociative get() = true
 
             sealed class UnaryBoolean(override val func: (Boolean) -> Boolean) : Unary<Boolean> {
+                override val precedence = 100
                 data object NOT : UnaryBoolean(Boolean::not)
             }
 
-            sealed class UnaryDouble(override val func: (Double) -> Double) : Unary<Double> {
+            sealed class UnaryDouble(override val func: (Double) -> Double, override val precedence: Int) :
+                Unary<Double> {
                 // operators
-                data object PLUS : UnaryDouble(Double::unaryPlus)
-                data object MINUS : UnaryDouble(Double::unaryMinus)
+                data object PLUS : UnaryDouble(Double::unaryPlus, 100)
+                data object MINUS : UnaryDouble(Double::unaryMinus, 100)
 
                 // functions
-                data object ABS : UnaryDouble(Math::abs) {
-                    override val precedence = Int.MIN_VALUE
-                }
+                data object ABS : UnaryDouble(Math::abs, Int.MIN_VALUE)
+                data object EXP : UnaryDouble(Math::exp, Int.MIN_VALUE)
+                data object LOG : UnaryDouble(Math::log, Int.MIN_VALUE)
             }
         }
 
@@ -465,6 +467,8 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
             if (allowedTokens.contains(Token.FUNCTION_CALL)) {
                 val op = when {
                     query.startsWith("abs(", idx, ignoreCase = true) -> Callable.Unary.UnaryDouble.ABS
+                    query.startsWith("exp(", idx, ignoreCase = true) -> Callable.Unary.UnaryDouble.EXP
+                    query.startsWith("log(", idx, ignoreCase = true) -> Callable.Unary.UnaryDouble.LOG
                     query.startsWith("min(", idx, ignoreCase = true) -> Callable.Binary.BinaryDouble.MIN
                     query.startsWith("max(", idx, ignoreCase = true) -> Callable.Binary.BinaryDouble.MAX
                     else -> null
