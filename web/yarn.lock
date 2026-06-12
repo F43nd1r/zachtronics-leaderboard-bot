@@ -2401,15 +2401,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-plotly.js@npm:2.6.0":
-  version: 2.6.0
-  resolution: "react-plotly.js@npm:2.6.0"
+"react-plotly.js@npm:3.0.0":
+  version: 3.0.0
+  resolution: "react-plotly.js@npm:3.0.0"
   dependencies:
     prop-types: "npm:^15.8.1"
   peerDependencies:
-    plotly.js: ">1.34.0"
-    react: ">0.13.0"
-  checksum: 10c0/9b5ba8e33782daa9624d79295975d08d4c7581bac41d67d497eec0a306e4d030465a1e8282fab145bc02705fe96262f6fb0d214133657c480982fc268763644a
+    plotly.js: ">=3.0.0"
+    react: ^18.0.0 || ^19.0.0
+  checksum: 10c0/952a4819e19d536ad348012bab2578837309e2fe588f7c47470980481b451a2857d6e952da6e04a5e84f758bf4d267859e5cf5b84a7c28764141c255a75c03e3
   languageName: node
   linkType: hard
 
@@ -2851,7 +2851,7 @@ __metadata:
     react-dom: "npm:19.2.7"
     react-intersection-observer: "npm:10.0.3"
     react-mui-dropzone: "npm:4.0.7"
-    react-plotly.js: "npm:2.6.0"
+    react-plotly.js: "npm:3.0.0"
     react-router-dom: "npm:7.17.0"
     react-router-hash-link: "npm:2.4.3"
     rimraf: "npm:6.1.3"
