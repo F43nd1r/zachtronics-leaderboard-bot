@@ -32,8 +32,10 @@ jobs:
           path: 'web/node_modules'
           key: ${{ runner.os }}-node-modules-${{ hashFiles('web/yarn.lock') }}
 
-      - name: Setup FFmpeg
-        uses: FedericoCarboni/setup-ffmpeg@v3
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg 
 
       - name: Gradle Tests
         run: ./gradlew test
