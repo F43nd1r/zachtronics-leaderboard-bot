@@ -11,6 +11,20 @@
     "security:minimumReleaseAgeNpm",
     ":preserveSemverRanges"
   ],
+  "customManagers": [
+    {
+      "customType": "jsonata",
+      "fileFormat": "toml",
+      "managerFilePatterns": [
+        "^gradle/libs\\.versions\\.toml$"
+      ],
+      "matchStrings": [
+        "{ \"currentValue\": nodejs }"
+      ],
+      "depNameTemplate": "node",
+      "datasourceTemplate": "node-version"
+    }
+  ],
   "rangeStrategy": "pin",
   "packageRules": [
     {
