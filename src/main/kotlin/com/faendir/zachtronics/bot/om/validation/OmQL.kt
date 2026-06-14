@@ -292,9 +292,9 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
                 data object MINUS : UnaryDouble(Double::unaryMinus, 100)
 
                 // functions
-                data object ABS : UnaryDouble(Math::abs, Int.MIN_VALUE)
-                data object EXP : UnaryDouble(Math::exp, Int.MIN_VALUE)
-                data object LOG : UnaryDouble(Math::log, Int.MIN_VALUE)
+                data object ABS : UnaryDouble(Math::abs, Int.MAX_VALUE)
+                data object EXP : UnaryDouble(Math::exp, Int.MAX_VALUE)
+                data object LOG : UnaryDouble(Math::log, Int.MAX_VALUE)
             }
         }
 
@@ -338,8 +338,8 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
                 data object POW : BinaryDouble(Double::pow, 101, true)
 
                 // functions
-                data object MIN : BinaryDouble(Math::min, Int.MIN_VALUE)
-                data object MAX : BinaryDouble(Math::max, Int.MIN_VALUE)
+                data object MIN : BinaryDouble(Math::min, Int.MAX_VALUE)
+                data object MAX : BinaryDouble(Math::max, Int.MAX_VALUE)
             }
         }
     }

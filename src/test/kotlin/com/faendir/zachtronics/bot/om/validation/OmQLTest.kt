@@ -27,7 +27,6 @@ import org.junit.jupiter.params.provider.ValueSource
 import strikt.api.expectDoesNotThrow
 import strikt.api.expectThat
 import strikt.api.expectThrows
-import strikt.assertions.contains
 import strikt.assertions.containsExactly
 import strikt.assertions.containsExactlyInAnyOrder
 import strikt.assertions.hasSize
@@ -71,7 +70,7 @@ class OmQLTest {
         val elements = parser.parseQuery("{C=3}")
         expectThat(elements).hasSize(2) // NOVERLAP + {C=3}
         expectThat(elements[1]).isA<OmQL.Constraint>()
-            .get { metric.scoreParts }.contains(CYCLES)
+            .get { metric.scoreParts }.containsExactly(CYCLES)
     }
 
     @Test
@@ -79,7 +78,7 @@ class OmQLTest {
         val elements = parser.parseQuery("(CA)")
         expectThat(elements).hasSize(2) // NOVERLAP + (CA)
         expectThat(elements[1]).isA<OmQL.Pareto>()
-            .get { metrics }.containsExactly(CYCLES, AREA)
+            .get { metrics }.containsExactlyInAnyOrder(CYCLES, AREA)
     }
 
     @Test
@@ -143,7 +142,7 @@ class OmQLTest {
         expectThat(elements[1]).isA<OmQL.Min>()
             .get { metric }.isEqualTo(CYCLES)
         expectThat(elements[2]).isA<OmQL.Constraint>()
-            .get { metric.scoreParts }.contains(AREA)
+            .get { metric.scoreParts }.containsExactly(AREA)
         expectThat(elements[3]).isA<OmQL.Pareto>()
             .get { metrics }.containsExactlyInAnyOrder(BOUNDING_HEX, HEIGHT_INF)
     }
@@ -251,6 +250,10 @@ class OmQLTest {
         "'min(10, max(1, 100))', '10'",
         "'min(max(1, 10), max(30, 100))', '10'",
         "'abs(abs(abs(1)))', '1'",
+        // mixing with operators
+        "'10 + max(1, 2)', '12'",
+        "'min(1, 2) + 10', '11'",
+        "'min(1, 2) + max(10, 20)', '21'",
     )
     fun `function calls`(query: String, expected: String) {
         val elements = parser.parseQuery("[$query]")
