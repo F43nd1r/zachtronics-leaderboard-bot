@@ -24,7 +24,8 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/': 'https://zlbb.faendir.com'
+      '/': 'https://zlbb.faendir.com',
+      // '/': 'http://localhost:8080',
     },
   },
 });

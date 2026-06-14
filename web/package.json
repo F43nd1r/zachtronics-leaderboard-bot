@@ -1,4 +1,5 @@
 {
+    "$schema": "https://www.schemastore.org/package.json",
     "name": "zlbb",
     "version": "0.1.0",
     "private": true,
@@ -45,11 +46,11 @@
         "@types/plotly.js": "3.0.10"
     },
     "scripts": {
-        "start": "rsbuild start",
+        "start": "rsbuild dev",
         "build": "rsbuild build",
         "clean": "rimraf dist",
         "preview": "rsbuild preview",
-        "analyze": "source-map-explorer 'build/static/js/*.js'"
+        "analyze": "source-map-explorer 'dist/static/js/*.js'"
     },
     "prettier": {
         "printWidth": 160,
