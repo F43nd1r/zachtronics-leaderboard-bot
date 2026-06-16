@@ -28,7 +28,7 @@
     },
     "devDependencies": {
         "@rsbuild/core": "2.0.13",
-        "@rsbuild/plugin-react": "1.4.6",
+        "@rsbuild/plugin-react": "2.0.1",
         "@simbathesailor/use-what-changed": "2.0.0",
         "@types/d3-format": "3.0.4",
         "@types/jest": "30.0.0",
