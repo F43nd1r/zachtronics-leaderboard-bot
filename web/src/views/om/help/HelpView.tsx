@@ -73,6 +73,7 @@ export default function HelpView() {
                     <>
                         Number of rows in the area footprint of the solution.
                         <p>Height is measured on all three axes, and the smallest value is taken. This means rotation of the solution doesn't matter.</p>
+                        <p>Height is not measured on polymer puzzles where finite height at infinity is impossible.</p>
                     </>
                 }
                 image={{ location: heightExplanation, alt: "Height Explanation" }}
@@ -84,7 +85,7 @@ export default function HelpView() {
                     <>
                         Number of columns in the area footprint of the solution. Note that half hexes are possible in this metric (see image).
                         <p>Width is measured on all three axes, and the smallest value is taken, same as height. This is often used to improve the aspect ratio of width gifs.</p>
-                        <p>Width is not measured on polymer puzzles.</p>
+                        <p>Width is not measured on polymer puzzles where finite width at infinity is impossible.</p>
                     </>
                 }
                 image={{ location: widthExplanation, alt: "Width Explanation" }}
@@ -161,7 +162,7 @@ export default function HelpView() {
                 }
             />
             <HelpCard id="looping" title="Looping (L), Steady State" description={<>
-                The leaderboard contains a simulator for the game which checks for the solution returning to a past state. If everything in the solution (instructions, arms, atoms) returns to the same state it was in at a previous point in time, the steady state is entered.
+                The leaderboard contains a <a href="https://github.com/ianh/omsim">simulator</a> for the game which checks for the solution returning to a past state. If everything in the solution (instructions, arms, atoms) returns to the same state it was in at a previous point in time, the steady state is entered.
                 <p>Infinitely growing chains, such as polymers, are allowed in the steady state as long as the growth is predictable and the same in every loop. For example, creating conditional wasteballs, where an action is performed with an increasingly long gap between each time, is not a steady state.</p>
                 <p>For polymer output, additional outputs past 6 count the same way as the ones before 6 normally do, just extended farther to the right.</p>
                 <p>Solutions which output (to each output) in the steady state are considered Looping. This is only used on the @V <HL to="manifold" text="manifolds" />, and indicates that a clean GIF of the solution (which outputs in the GIF) is possible to create.</p>
