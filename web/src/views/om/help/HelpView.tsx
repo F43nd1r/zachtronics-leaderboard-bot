@@ -73,6 +73,7 @@ export default function HelpView() {
                     <>
                         Number of rows in the area footprint of the solution.
                         <p>Height is measured on all three axes, and the smallest value is taken. This means rotation of the solution doesn't matter.</p>
+                        <p>Height is not measured on polymer puzzles where finite height at infinity is impossible.</p>
                     </>
                 }
                 image={{ location: heightExplanation, alt: "Height Explanation" }}
@@ -84,7 +85,7 @@ export default function HelpView() {
                     <>
                         Number of columns in the area footprint of the solution. Note that half hexes are possible in this metric (see image).
                         <p>Width is measured on all three axes, and the smallest value is taken, same as height. This is often used to improve the aspect ratio of width gifs.</p>
-                        <p>Width is not measured on polymer puzzles.</p>
+                        <p>Width is not measured on polymer puzzles where finite width at infinity is impossible.</p>
                     </>
                 }
                 image={{ location: widthExplanation, alt: "Width Explanation" }}
