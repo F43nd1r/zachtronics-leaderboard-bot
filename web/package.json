@@ -22,7 +22,7 @@
         "react-intersection-observer": "10.0.3",
         "react-mui-dropzone": "4.0.7",
         "react-plotly.js": "3.0.0",
-        "react-router-dom": "7.17.0",
+        "react-router-dom": "7.18.0",
         "react-router-hash-link": "2.4.3",
         "typescript": "6.0.3"
     },
