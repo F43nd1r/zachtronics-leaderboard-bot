@@ -21,7 +21,7 @@
         "react-dom": "19.2.7",
         "react-intersection-observer": "10.0.3",
         "react-mui-dropzone": "4.0.7",
-        "react-plotly.js": "3.0.0",
+        "react-plotly.js": "4.0.0",
         "react-router-dom": "7.18.1",
         "react-router-hash-link": "2.4.3",
         "typescript": "6.0.3"
