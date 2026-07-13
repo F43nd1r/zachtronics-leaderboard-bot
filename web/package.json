@@ -19,7 +19,7 @@
         "react": "19.2.7",
         "react-cool-dimensions": "3.0.1",
         "react-dom": "19.2.7",
-        "react-intersection-observer": "10.0.3",
+        "react-intersection-observer": "10.1.0",
         "react-mui-dropzone": "4.0.7",
         "react-plotly.js": "4.0.0",
         "react-router-dom": "7.18.1",
