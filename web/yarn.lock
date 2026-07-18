@@ -945,10 +945,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sinclair/typebox@npm:0.34.50":
-  version: 0.34.50
-  resolution: "@sinclair/typebox@npm:0.34.50"
-  checksum: 10c0/e0ceda245b9b1ba2431df4f77d48a01bc291374411a98a6a6b2d8635204eec2bef986d09353eeb82e20229762123820d443239592087221984ddf75c842bfc83
+"@sinclair/typebox@npm:0.34.52":
+  version: 0.34.52
+  resolution: "@sinclair/typebox@npm:0.34.52"
+  checksum: 10c0/03e9be17ffb536ddd6dc35b6131c88eb113b2ce6cbec4fa60b1d5219de99e59b2649fc40ad70a85db561104395faa3406608971dc7b0abef529b80fb001dc821
   languageName: node
   linkType: hard
 
@@ -3016,7 +3016,7 @@ __metadata:
     "@rsbuild/core": "npm:2.1.5"
     "@rsbuild/plugin-react": "npm:2.1.0"
     "@simbathesailor/use-what-changed": "npm:2.0.0"
-    "@sinclair/typebox": "npm:0.34.50"
+    "@sinclair/typebox": "npm:0.34.52"
     "@types/d3-format": "npm:3.0.4"
     "@types/jest": "npm:30.0.0"
     "@types/node": "npm:24.13.3"
