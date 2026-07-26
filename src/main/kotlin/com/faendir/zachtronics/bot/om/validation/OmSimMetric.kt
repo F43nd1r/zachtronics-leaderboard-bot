@@ -68,6 +68,8 @@ sealed class OmSimMetric<T: Number>(val id: String) {
     object MAXIMUM_ABSOLUTE_PART_COORDINATE : OmSimMetric<Int>("maximum absolute part coordinate")
     object CONDUIT_VIOLATIONS : OmSimMetric<Int>("conduit violations")
     object CABINET_VIOLATIONS : OmSimMetric<Int>("cabinet violations")
+    object TRACK_SELF_OVERLAP : OmSimMetric<Int>("track self-overlap")
+    object TRACK_LOOPS : OmSimMetric<Int>("track loops")
     object VISUAL_LOOP_START_CYCLE : OmSimMetric<Int>("visual loop start cycle")
     object VISUAL_LOOP_END_CYCLE : OmSimMetric<Int>("visual loop end cycle")
 }

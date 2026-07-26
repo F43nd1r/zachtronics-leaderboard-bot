@@ -18,10 +18,6 @@ package com.faendir.zachtronics.bot.om.validation
 
 import com.faendir.om.parser.solution.SolutionParser
 import com.faendir.om.parser.solution.model.SolvedSolution
-import com.faendir.om.parser.solution.model.part.Arm
-import com.faendir.om.parser.solution.model.part.ArmType
-import com.faendir.om.parser.solution.model.part.Glyph
-import com.faendir.om.parser.solution.model.part.GlyphType
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmSubmission
@@ -103,21 +99,6 @@ fun createSubmission(
     if (solution !is SolvedSolution) {
         throw IllegalArgumentException("Only solved solutions are accepted")
     }
-    if (solution.instructions >= 16384) {
-        throw IllegalArgumentException("Using more than 2^14 instructions is banned.")
-    }
-    if (solution.parts.count { it is Arm && it.type == ArmType.VAN_BERLOS_WHEEL } > 1) {
-        throw IllegalArgumentException("Multiple Van Berlo's Wheels are banned.")
-    }
-    if (solution.parts.count { it is Arm && it.type == ArmType.RAVARIS_WHEEL } > 1) {
-        throw IllegalArgumentException("Multiple Ravari's Wheels are banned.")
-    }
-    if (solution.parts.count { it is Glyph && it.type == GlyphType.DISPOSAL } > 1) {
-        throw IllegalArgumentException("Multiple Disposal glyphs are banned.")
-    }
-    if (solution.parts.count { it is Glyph && it.type == GlyphType.PROLIFERATION } > 1) {
-        throw IllegalArgumentException("Multiple Proliferation glyphs are banned.")
-    }
     val (puzzle, solutionData) = OmPuzzle.entries.find { it.id == solution.puzzle }?.let { it to inputSolData }
         ?: OmPuzzle.entries.find { it.altIds.contains(solution.puzzle) }?.let {
             solution.puzzle = it.id
@@ -126,8 +107,20 @@ fun createSubmission(
             it to out.toByteArray()
         }
         ?: throw IllegalArgumentException("I do not know the puzzle \"${solution.puzzle}\"")
-    val puzzleFile = puzzle.file
-    OmSolutionVerifier(puzzleFile.readBytes(), solutionData).use { verifier ->
+    
+    OmSolutionVerifier(puzzle.file.readBytes(), solutionData).use { verifier ->
+        if (verifier.getMetric(OmSimMetric.PARTS_OF_TYPE(PartType.VAN_BERLOS_WHEEL)) > 1) {
+            throw IllegalArgumentException("Multiple Van Berlo's Wheels are banned.")
+        }
+        if (verifier.getMetric(OmSimMetric.PARTS_OF_TYPE(PartType.RAVARI_WHEEL)) > 1) {
+            throw IllegalArgumentException("Multiple Ravari's Wheels are banned.")
+        }
+        if (verifier.getMetric(OmSimMetric.PARTS_OF_TYPE(PartType.DISPOSAL)) > 1) {
+            throw IllegalArgumentException("Multiple Disposal glyphs are banned.")
+        }
+        if (verifier.getMetric(OmSimMetric.PARTS_OF_TYPE(PartType.PROLIFERATION)) > 1) {
+            throw IllegalArgumentException("Multiple Proliferation glyphs are banned.")
+        }
         if (verifier.getMetric(OmSimMetric.DUPLICATE_REAGENTS) > 0) {
             throw IllegalArgumentException("Duplicated Reagents are banned.")
         }
@@ -137,11 +130,17 @@ fun createSubmission(
         if (verifier.getMetric(OmSimMetric.MAXIMUM_TRACK_GAP_POW_2) > 1) {
             throw IllegalArgumentException("Quantum Tracks are banned.")
         }
-        if (verifier.getMetric(OmSimMetric.MAXIMUM_ABSOLUTE_PART_COORDINATE) >= 16384) {
-            throw IllegalArgumentException("Parts farther than 2^14 from the origin are banned.")
-        }
         if (verifier.getMetric(OmSimMetric.CABINET_VIOLATIONS) != 0) {
             throw IllegalArgumentException("Violating production restrictions is banned.")
+        }
+        if (verifier.getMetric(OmSimMetric.TRACK_SELF_OVERLAP) != 0) {
+            throw IllegalArgumentException("Self-overlapped tracks are banned.")
+        }
+        if (verifier.getMetric(OmSimMetric.INSTRUCTIONS) >= 16384) {
+            throw IllegalArgumentException("Using more than 2^14 instructions is banned.")
+        }
+        if (verifier.getMetric(OmSimMetric.MAXIMUM_ABSOLUTE_PART_COORDINATE) >= 16384) {
+            throw IllegalArgumentException("Parts farther than 2^14 from the origin are banned.")
         }
         return OmSubmission(
             puzzle,
