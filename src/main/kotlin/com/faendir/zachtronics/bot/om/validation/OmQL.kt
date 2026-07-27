@@ -239,7 +239,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
             val end = query.indexOf('"', idx + 1)
             if (end == -1)
                 throw IllegalArgumentException("Missing closing \" in: ${query.substring(idx)}")
-            val command = query.substring(idx + 1, end).replace(Regex("\\s+"), " ")
+            val command = query.substring(idx + 1, end).trim().replace(Regex("\\s+"), " ")
             if (Regex("^product +\\d{3,}").containsMatchIn(command)) {
                 throw IllegalArgumentException("Omsim command \"$command\" is asking for products over 100, reconsider")
             }
@@ -256,7 +256,10 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
         when (metrics.size) {
             0 -> {}
             1 -> return metrics[0] to end
-            else -> throw IllegalArgumentException("Ambiguous metric: ${query.substring(idx, end)}")
+            else -> throw IllegalArgumentException(
+                "Ambiguous metric: ${query.substring(idx, end)}.\n" +
+                        "Try one of: " + metrics.joinToString(", ") { it.displayName + it.measurePoint.displayName }
+            )
         }
         val pp = ParsePosition(idx)
         val number = NUMBER_FORMAT.parse(query, pp)
