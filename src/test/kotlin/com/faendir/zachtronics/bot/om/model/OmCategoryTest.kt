@@ -20,7 +20,7 @@ import com.faendir.zachtronics.bot.om.dummyOmScore
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.contains
-import strikt.assertions.isTrue
+import strikt.assertions.isFalse
 
 class OmCategoryTest {
 
@@ -35,7 +35,7 @@ class OmCategoryTest {
     fun `ensure admission consistency`() {
         val victoryOnly = dummyOmScore
         for (cat in OmCategory.entries) {
-            expectThat(cat.manifold.measurePoint == MeasurePoint.VICTORY || !cat.supportsScore(victoryOnly)).isTrue()
+            expectThat(cat.manifold.measurePoint == MeasurePoint.INFINITY && cat.supportsScore(victoryOnly)).isFalse()
         }
     }
 
