@@ -19,6 +19,7 @@ package com.faendir.zachtronics.bot.om.validation
 import com.faendir.zachtronics.bot.om.model.MeasurePoint
 import com.faendir.zachtronics.bot.om.model.OmMetric.*
 import com.faendir.zachtronics.bot.om.model.OmMetrics
+import com.faendir.zachtronics.bot.om.validation.OmQL.QueryElement
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -41,9 +42,9 @@ class OmQLTest {
     fun `valid C`() {
         val elements = parser.parseQuery("C")
         expectThat(elements).hasSize(2) // NOVERLAP + C
-        expectThat(elements[0]).isA<OmQL.Constraint>()
+        expectThat(elements[0]).isA<QueryElement.Constraint>()
             .get { metric }.isEqualTo(NOVERLAP)
-        expectThat(elements[1]).isA<OmQL.Min>()
+        expectThat(elements[1]).isA<QueryElement.Min>()
             .get { metric }.isEqualTo(CYCLES)
     }
 
@@ -51,7 +52,7 @@ class OmQLTest {
     fun `valid O`() {
         val elements = parser.parseQuery("O")
         expectThat(elements).hasSize(1) // OVERLAP
-        expectThat(elements[0]).isA<OmQL.Min>()
+        expectThat(elements[0]).isA<QueryElement.Min>()
             .get { metric }.isEqualTo(OVERLAP)
     }
 
@@ -59,9 +60,9 @@ class OmQLTest {
     fun `valid CA`() {
         val elements = parser.parseQuery("CA")
         expectThat(elements).hasSize(3) // NOVERLAP + C + A
-        expectThat(elements[1]).isA<OmQL.Min>()
+        expectThat(elements[1]).isA<QueryElement.Min>()
             .get { metric }.isEqualTo(CYCLES)
-        expectThat(elements[2]).isA<OmQL.Min>()
+        expectThat(elements[2]).isA<QueryElement.Min>()
             .get { metric }.isEqualTo(AREA)
     }
 
@@ -69,7 +70,7 @@ class OmQLTest {
     fun `valid {C=3}`() {
         val elements = parser.parseQuery("{C=3}")
         expectThat(elements).hasSize(2) // NOVERLAP + {C=3}
-        expectThat(elements[1]).isA<OmQL.Constraint>()
+        expectThat(elements[1]).isA<QueryElement.Constraint>()
             .get { metric.scoreParts }.containsExactly(CYCLES)
     }
 
@@ -77,7 +78,7 @@ class OmQLTest {
     fun `valid (CA)`() {
         val elements = parser.parseQuery("(CA)")
         expectThat(elements).hasSize(2) // NOVERLAP + (CA)
-        expectThat(elements[1]).isA<OmQL.Pareto>()
+        expectThat(elements[1]).isA<QueryElement.Pareto>()
             .get { metrics }.containsExactlyInAnyOrder(CYCLES, AREA)
     }
 
@@ -86,7 +87,7 @@ class OmQLTest {
     fun `non integer constraint`() {
         val elements = parser.parseQuery("{W<=3.5}")
         expectThat(elements).hasSize(2) // NOVERLAP + {W<=3.5}
-        expectThat(elements[1]).isA<OmQL.Constraint>()
+        expectThat(elements[1]).isA<QueryElement.Constraint>()
             .get { metric }.isA<Custom<*>>()
             .get { displayName }.isEqualTo("W<=3.5")
     }
@@ -96,7 +97,7 @@ class OmQLTest {
     fun `valid square 1`() {
         val elements = parser.parseQuery("[C*A]")
         expectThat(elements).hasSize(2) // NOVERLAP + [C*A]
-        expectThat(elements[1]).isA<OmQL.Min>()
+        expectThat(elements[1]).isA<QueryElement.Min>()
             .get { metric }.isA<Custom<*>>()
             .get { displayName }.isEqualTo("C*A")
     }
@@ -106,7 +107,7 @@ class OmQLTest {
     fun `valid square 2`() {
         val elements = parser.parseQuery("[C+[A*B]]")
         expectThat(elements).hasSize(2) // NOVERLAP + [C+A]
-        expectThat(elements[1]).isA<OmQL.Min>()
+        expectThat(elements[1]).isA<QueryElement.Min>()
             .get { metric }.isA<Custom<*>>()
             .get { displayName }.isEqualTo("C+[A*B]")
     }
@@ -116,7 +117,7 @@ class OmQLTest {
     fun `nested custom metric in constraint`() {
         val elements = parser.parseQuery("{[A*B] <= 30}")
         expectThat(elements).hasSize(2) // NOVERLAP + {[A*B]<=30}
-        expectThat(elements[1]).isA<OmQL.Constraint>()
+        expectThat(elements[1]).isA<QueryElement.Constraint>()
             .get { metric }.isA<Custom<*>>()
             .get { displayName }.isEqualTo("[A*B] <= 30")
     }
@@ -126,7 +127,7 @@ class OmQLTest {
     fun `nested custom metric in pareto`() {
         val elements = parser.parseQuery("([[A*B]+C]HW)")
         expectThat(elements).hasSize(2) // NOVERLAP + ([C+[A*B]]HW)
-        expectThat(elements[1]).isA<OmQL.Pareto>()
+        expectThat(elements[1]).isA<QueryElement.Pareto>()
             .get { metrics }.and {
                 get { elementAt(0) }.isA<Custom<*>>()
                     .get { displayName }.isEqualTo("[A*B]+C")
@@ -139,11 +140,11 @@ class OmQLTest {
     fun `valid C{A=3}(B@V H@INF)`() {
         val elements = parser.parseQuery("C{A=3}(B@V H@INF)")
         expectThat(elements).hasSize(4) // NOVERLAP + C + {A=3} + (BH)
-        expectThat(elements[1]).isA<OmQL.Min>()
+        expectThat(elements[1]).isA<QueryElement.Min>()
             .get { metric }.isEqualTo(CYCLES)
-        expectThat(elements[2]).isA<OmQL.Constraint>()
+        expectThat(elements[2]).isA<QueryElement.Constraint>()
             .get { metric.scoreParts }.containsExactly(AREA)
-        expectThat(elements[3]).isA<OmQL.Pareto>()
+        expectThat(elements[3]).isA<QueryElement.Pareto>()
             .get { metrics }.containsExactlyInAnyOrder(BOUNDING_HEX, HEIGHT_INF)
     }
 

@@ -1,3 +1,6 @@
+scheduling:
+  pareto: '0 0 14 * * *'
+
 server:
   forward-headers-strategy: framework
   tomcat:

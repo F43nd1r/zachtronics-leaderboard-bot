@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.slf4j.LoggerFactory
-import java.util.EnumSet
+import java.util.*
 
 
 private val logger = LoggerFactory.getLogger("OM Utils")
@@ -127,7 +127,7 @@ suspend fun GatewayDiscordClient.notifyOf(submitResult: SubmitResult<OmRecord, O
     }
 }
 
-private suspend fun GatewayDiscordClient.sendDiscordMessage(message: MultiMessageSafeEmbedMessageBuilder, channel: Channel): List<Message> {
+internal suspend fun GatewayDiscordClient.sendDiscordMessage(message: MultiMessageSafeEmbedMessageBuilder, channel: Channel): List<Message> {
     val discordChannel = guilds.asFlow().mapNotNull {
         try {
             it.getChannelById(channel.id).awaitSingleOrNull()

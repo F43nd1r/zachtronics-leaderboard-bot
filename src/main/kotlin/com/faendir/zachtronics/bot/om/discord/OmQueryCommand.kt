@@ -73,8 +73,9 @@ class OmQueryCommand(private val repository: OmSolutionRepository, val discordAc
         val measurePoint = measurePointOption.get(event)
 
         val possibleMetrics = OmMetrics.userFacing(puzzle.type)
-        val queryElements = OmQL(possibleMetrics, measurePoint).parseQuery(query)
-        val name = Markdown.escape(queryElements.joinToString("", "", measurePoint?.displayName.orEmpty()))
+        val parser = OmQL(possibleMetrics, measurePoint)
+        val queryElements = parser.parseQuery(query)
+        val name = Markdown.escape(parser.displayNameOf(queryElements))
 
         val records = repository.executeOmQL(puzzle, measurePoint, queryElements)
 

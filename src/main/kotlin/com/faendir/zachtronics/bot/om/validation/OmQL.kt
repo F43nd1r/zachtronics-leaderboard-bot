@@ -62,12 +62,13 @@ import kotlin.math.pow
  * - Functions: `abs/log/exp(x)`, `min/max(a,b)`
  *
  * Examples:
- * - `CG{A<8}`: Among records with minimum Cost then minimum Cycles, filter for Area < 8.
+ * - `GC{A<8}`: Among records with minimum Cost then minimum Cycles, filter for Area < 8.
  * - `(C Sum)`: Find the Pareto frontier of Cycles and Sum.
- * - `{[C+G]<500}A`: Among records where Cost + Cycles < 500, find the minimum Area.
+ * - `{[C+G]<500}A@V`: Among records where Cost + Cycles < 500, find the minimum Area.
  * - `[C*G]`: Find the record(s) with the minimum product of Cost and Cycles.
+ * - `{"parts of type bonder-speed"=0}H@INF`: Pretend tribonders do not exist, find the minimum Height @INF
  */
-internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoint? = null) {
+internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint: MeasurePoint? = null) {
     companion object {
         private val TRUE = OmMetric.Constant("true", true)
         private val FALSE = OmMetric.Constant("false", false)
@@ -123,7 +124,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
         }
     }
 
-    val OmMetric<*>.unambiguousName: String
+    private val OmMetric<*>.unambiguousName: String
         get() {
             if (this is OmMetric.Custom<*> || this is OmMetric.Constant || this is OmMetric.Omsim)
                 return displayName
@@ -142,39 +143,52 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
             get() = metrics.flatMapTo(HashSet()) { it.scoreParts }
 
         fun filter(records: Collection<OmMemoryRecord>): Collection<OmMemoryRecord>
-    }
+        fun toDisplayString(nameMetric: (OmMetric<*>) -> String): String
 
-    inner class Min(val metric: OmMetric<*>) : QueryElement {
-        override val metrics: Collection<OmMetric<*>>
-            get() = listOf(metric)
+        class Min(val metric: OmMetric<*>) : QueryElement {
+            override val metrics: Collection<OmMetric<*>>
+                get() = listOf(metric)
 
-        override fun filter(records: Collection<OmMemoryRecord>): List<OmMemoryRecord> {
-            return records.allMinsWith(compareBy(metric) { it.score })
+            override fun filter(records: Collection<OmMemoryRecord>): List<OmMemoryRecord> {
+                return records.allMinsWith(compareBy(metric) { it.score })
+            }
+
+            override fun toDisplayString(nameMetric: (OmMetric<*>) -> String) =
+                nameMetric(metric).run { if (length > 1) "[$this]" else this }
+
+            override fun toString() = toDisplayString(OmMetric<*>::displayName)
         }
 
-        override fun toString() =
-            metric.unambiguousName.run { if (length > 1) "[$this]" else this }
-    }
+        class Pareto(override val metrics: Collection<OmMetric<*>>) : QueryElement {
+            override fun filter(records: Collection<OmMemoryRecord>): List<OmMemoryRecord> {
+                return records.paretoFrontierWith(metrics.map { m -> compareBy(m) { it.score } })
+            }
 
-    inner class Pareto(override val metrics: Collection<OmMetric<*>>) : QueryElement {
-        override fun filter(records: Collection<OmMemoryRecord>): List<OmMemoryRecord> {
-            return records.paretoFrontierWith(metrics.map { m -> compareBy(m) { it.score } })
+            override fun toDisplayString(nameMetric: (OmMetric<*>) -> String) =
+                metrics.joinToString("", "(", ")") { nameMetric(it).run { if (length > 1) "[$this]" else this } }
+
+            override fun toString() = toDisplayString(OmMetric<*>::displayName)
         }
 
-        override fun toString() =
-            metrics.joinToString("", "(", ")") { it.unambiguousName.run { if (length > 1) "[$this]" else this } }
-    }
+        class Constraint(val metric: OmMetric<Boolean?>) : QueryElement {
+            override val metrics: Collection<OmMetric<*>>
+                get() = listOf(metric)
 
-    inner class Constraint(val metric: OmMetric<Boolean?>) : QueryElement {
-        override val metrics: Collection<OmMetric<*>>
-            get() = listOf(metric)
+            override fun filter(records: Collection<OmMemoryRecord>): List<OmMemoryRecord> {
+                return records.filter { r -> metric.getValueFrom(r.score) ?: false }
+            }
 
-        override fun filter(records: Collection<OmMemoryRecord>): List<OmMemoryRecord> {
-            return records.filter { r -> metric.getValueFrom(r.score) ?: false }
+            override fun toDisplayString(nameMetric: (OmMetric<*>) -> String) =
+                if (metric.displayName.isNotEmpty()) "{${nameMetric(metric)}}" else ""
+
+            override fun toString() = toDisplayString(OmMetric<*>::displayName)
         }
-
-        override fun toString() = if (metric.displayName.isNotEmpty()) "{${metric.unambiguousName}}" else ""
     }
+
+    fun displayNameOf(queryElements: List<QueryElement>) =
+        queryElements.joinToString(
+            "", postfix = measurePoint?.displayName.orEmpty()
+        ) { it.toDisplayString { m -> m.unambiguousName } }
 
     internal fun parseQuery(query: String): List<QueryElement> {
         val elements = mutableListOf<QueryElement>()
@@ -183,7 +197,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
 
         val currMetrics = mutableListOf<OmMetric<*>>()
         fun unloadMetrics() {
-            currMetrics.forEach { elements.add(Min(it)) }
+            currMetrics.forEach { elements.add(QueryElement.Min(it)) }
             currMetrics.clear()
         }
 
@@ -195,7 +209,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
                 '{' -> { // {X=val} or {[bool expr]}
                     unloadMetrics()
                     val (foundMetric, end) = parseCustomMetric(query, idx + 1, '}')
-                    elements.add(Constraint(foundMetric.asCustom<Boolean>(context = "Constraint")))
+                    elements.add(QueryElement.Constraint(foundMetric.asCustom<Boolean>(context = "Constraint")))
                     idx = end
                 }
                 '(' -> { // (AB) as pareto
@@ -207,7 +221,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
                     if (paretoContext != 1)
                         throw IllegalArgumentException("Missing/extra opening ( in query: $query")
                     paretoContext--
-                    elements.add(Pareto(currMetrics.toList()))
+                    elements.add(QueryElement.Pareto(currMetrics.toList()))
                     currMetrics.clear()
                     idx++
                 }
@@ -223,7 +237,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, measurePoint: MeasurePoi
         unloadMetrics()
 
         if (elements.none { qe -> OmMetric.OVERLAP in qe.scoreParts }) {
-            elements.addFirst(Constraint(OmMetric.NOVERLAP))
+            elements.addFirst(QueryElement.Constraint(OmMetric.NOVERLAP))
         }
         return elements
     }

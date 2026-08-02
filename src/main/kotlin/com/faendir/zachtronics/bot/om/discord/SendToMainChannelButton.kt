@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import kotlin.jvm.optionals.getOrNull
 
 @Component
 class SendToMainChannelButton(private val discord: GatewayDiscordClient) : StatelessComponent {
-    override val id: String = "send-to-main-channel"
+    override val id: String = ID
 
     override suspend fun trigger(event: ComponentInteractionEvent) {
         if (event is ButtonInteractionEvent) {
@@ -56,6 +56,7 @@ class SendToMainChannelButton(private val discord: GatewayDiscordClient) : State
     }
 
     companion object {
-        fun createAction() = ActionRow.of(Button.primary("send-to-main-channel", "Send to main channel"))
+        const val ID = "send-to-main-channel"
+        fun createAction() = ActionRow.of(Button.primary(ID, "Send to main channel"))
     }
 }
