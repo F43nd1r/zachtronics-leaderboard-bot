@@ -68,7 +68,7 @@ dependencies {
 tasks.withType<KotlinCompile> {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_25
-        freeCompilerArgs = listOf("-Xjsr305=strict", "-Xannotation-default-target=param-property")
+        freeCompilerArgs = listOf("-Xjsr305=strict")
     }
 }
 
@@ -146,7 +146,7 @@ tasks.assembleFrontend {
     }
 }
 
-val downloadLibraries by tasks.registering(Download::class) {
+val downloadLibraries = tasks.register<Download>("downloadLibraries") {
     val os = OperatingSystem.current()
     val omsimLib = os.getSharedLibraryName("verify")
     val tisLib = os.getSharedLibraryName("TIS100")
