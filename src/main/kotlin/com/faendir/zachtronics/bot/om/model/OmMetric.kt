@@ -164,6 +164,7 @@ sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Compara
 
         // intentionally not inverted to keep logical metric order
         override fun compare(o1: OmScore, o2: OmScore) = modifier.compare(o1, o2)
+        override fun describe(score: OmScore, format: StringFormat): String? = null
     }
 
     sealed class And(vararg metrics: OmMetric<Boolean>) : Computed<Boolean> {
@@ -172,6 +173,8 @@ sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Compara
             { score: OmScore -> subMetrics.all { part -> part.getValueFrom(score) } }
         override val displayName = subMetrics.joinToString("") { it.displayName }
         override val description = subMetrics.joinToString("") { it.description }
+
+        override fun describe(score: OmScore, format: StringFormat): String? = null
     }
 
     data class Custom<T : Comparable<T & Any>?>(
