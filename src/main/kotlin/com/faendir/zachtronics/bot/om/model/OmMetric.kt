@@ -114,12 +114,15 @@ sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Compara
             }
         }
 
-        override fun describe(score: OmScore, format: StringFormat) = null
+        override fun describe(score: OmScore, format: StringFormat) =
+            getValueFrom(score)?.let { "$description=${numberFormat.format(it)}" }
     }
 
     /** functions of other [OmMetric]s */
     sealed interface Computed<T : Comparable<T & Any>?> : OmMetric<T> {
         val subMetrics: List<OmMetric<*>>
+        override val collapsible
+            get() = subMetrics.all { it.collapsible }
         override val measurePoint
             get() = subMetrics.findMeasurePoint()
         override val scoreParts
@@ -130,7 +133,7 @@ sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Compara
     }
 
     sealed class Sum(override val displayName: String, vararg metrics: OmMetric<Int?>) : Computed<Int?> {
-        override val subMetrics = metrics.toList()
+        override val subMetrics = metrics.asList()
         override val getValueFrom = l@{ score: OmScore ->
             subMetrics.sumOf { it.getValueFrom(score) ?: return@l null }
         }
@@ -139,7 +142,7 @@ sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Compara
     }
 
     sealed class Product(vararg metrics: OmMetric<*>) : Computed<Double?> {
-        override val subMetrics = metrics.toList()
+        override val subMetrics = metrics.asList()
         override val getValueFrom = l@{ score: OmScore ->
             subMetrics.fold(1.0) { acc, part ->
                 val value = (part.getValueFrom(score) as? Number)?.toDouble() ?: return@l null
@@ -154,28 +157,24 @@ sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Compara
         private val modifier: Modifier,
         override val displayName: String = "!${modifier.displayName}"
     ) : Computed<Boolean> {
-        override val collapsible = modifier.collapsible
         override val measurePoint = modifier.measurePoint
         override val subMetrics = listOf(modifier)
         override val getValueFrom = { score: OmScore -> !modifier.getValueFrom(score) }
         override val description = displayName
 
+        // intentionally not inverted to keep logical metric order
         override fun compare(o1: OmScore, o2: OmScore) = modifier.compare(o1, o2)
-        override fun describe(score: OmScore, format: StringFormat): String? = null
     }
 
     sealed class And(vararg metrics: OmMetric<Boolean>) : Computed<Boolean> {
-        override val subMetrics = metrics.toList()
-        override val collapsible: Boolean = subMetrics.all { it.collapsible }
+        override val subMetrics = metrics.asList()
         override val getValueFrom =
             { score: OmScore -> subMetrics.all { part -> part.getValueFrom(score) } }
         override val displayName = subMetrics.joinToString("") { it.displayName }
         override val description = subMetrics.joinToString("") { it.description }
-
-        override fun describe(score: OmScore, format: StringFormat): String? = null
     }
 
-    open class Custom<T : Comparable<T & Any>?>(
+    data class Custom<T : Comparable<T & Any>?>(
         override val subMetrics: List<OmMetric<*>>,
         override val displayName: String,
         override val getValueFrom: (OmScore) -> T
@@ -193,7 +192,7 @@ sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Compara
         override val getValueFrom: (OmScore) -> T = { value }
         override val scoreParts = emptyList<ScorePart<*>>()
         override val description = displayName
-        override fun describe(score: OmScore, format: StringFormat): String? = null
+        override fun describe(score: OmScore, format: StringFormat): String? = value.toString()
     }
 
     data object COST : Value<Int>("G", MeasurePoint.START, OmScore::cost)
@@ -230,6 +229,7 @@ sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Compara
     data object ANYTHING_GOES : Constant<Boolean>("O", true)
     data object NOVERLAP : Not(OVERLAP, displayName = "")
     data object NOVERLAP_TRACKLESS : And(NOVERLAP, TRACKLESS)
+    data object NOVERLAP_LOOPING : And(NOVERLAP, LOOPING)
 
     data object SUM3A : Sum("Sum", COST, CYCLES, AREA)
     data object SUM3I : Sum("Sum", COST, CYCLES, INSTRUCTIONS)

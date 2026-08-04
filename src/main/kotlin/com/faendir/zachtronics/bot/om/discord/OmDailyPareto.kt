@@ -60,7 +60,7 @@ class OmDailyPareto(
 
     private var previousRunInfo: RunInfo? = null
 
-    @Scheduled(cron = "\${scheduling.pareto}")
+    @Scheduled(cron = "\${scheduling.pareto}", zone = "Europe/Berlin")
 //    @Scheduled(cron = "0 * * * * *")
     fun dailyParetoTask() {
         synchronized(discordClient) {
@@ -118,12 +118,13 @@ class OmDailyPareto(
 
         val frontier = mutableListOf<QueryElement>()
         // modifiers
-        when (Random.nextInt(10)) {
-            0 -> frontier.add(QueryElement.Constraint(OmMetric.Constant("O||!O", true)))
-            in 1..2 -> frontier.add(QueryElement.Constraint(NOVERLAP_TRACKLESS))
-            in 3..4 if (measurePoint == MeasurePoint.VICTORY) -> frontier.add(QueryElement.Constraint(LOOPING))
-            else -> frontier.add(QueryElement.Constraint(NOVERLAP))
-        }
+        frontier.add(QueryElement.Constraint(
+            when (Random.nextInt(10)) {
+                0 -> OmMetric.Constant("O||!O", true)
+                in 1..2 -> NOVERLAP_TRACKLESS
+                in 3..4 if (measurePoint == MeasurePoint.VICTORY) -> NOVERLAP_LOOPING
+                else -> NOVERLAP
+            }))
         // minimized
         fun addMin(m: OmMetric<*>) {
             frontier.add(QueryElement.Min(m))
