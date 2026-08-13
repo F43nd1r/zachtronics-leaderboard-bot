@@ -18,6 +18,8 @@ package com.faendir.zachtronics.bot.om.validation
 
 import com.faendir.om.parser.solution.SolutionParser
 import com.faendir.om.parser.solution.model.SolvedSolution
+import com.faendir.zachtronics.bot.om.model.OmMetric
+import com.faendir.zachtronics.bot.om.model.OmMetrics
 import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmSubmission
@@ -46,7 +48,8 @@ private fun OmSolutionVerifier.getAreaINF(outputsAtINF: Int?): LevelValue? {
 
 fun OmSolutionVerifier.getScore(type: OmType): OmScore {
     // null or 0 PER_REPETITION_OUTPUTS means the solution doesn't output infinite products, hence cannot have a @INF point
-    val outputsAtINF: Int? = getMetricSafe(OmSimMetric.PER_REPETITION_OUTPUTS)?.takeIf { it != 0 }
+    val outputsAtINF = getMetricSafe(OmSimMetric.PER_REPETITION_OUTPUTS)?.takeIf { it != 0 }
+    val areaLikes = OmMetrics.areaLikes(type)
 
     return OmScore(
         cost = getMetric(OmSimMetric.COST).also {
@@ -69,20 +72,20 @@ fun OmSolutionVerifier.getScore(type: OmType): OmScore {
             if (it != getMetric(OmSimMetric.PARSED_AREA))
                 throw IllegalArgumentException("Stored area value does not match simulation. Run your solution to completion before submitting.")
         },
-        height = if (type == OmType.NORMAL || type == OmType.POLYMER_HEIGHT) getMetric(OmSimMetric.HEIGHT) else null,
-        width = if (type == OmType.NORMAL || type == OmType.POLYMER_WIDTH) getApproximateMetric(OmSimMetric.WIDTH) else null,
-        boundingHex = if (type == OmType.NORMAL) getMetric(OmSimMetric.MINIMUM_HEXAGON) else null,
+        height = if (OmMetric.HEIGHT in areaLikes) getMetric(OmSimMetric.HEIGHT) else null,
+        width = if (OmMetric.WIDTH in areaLikes) getApproximateMetric(OmSimMetric.WIDTH) else null,
+        boundingHex = if (OmMetric.BOUNDING_HEX in areaLikes) getMetric(OmSimMetric.MINIMUM_HEXAGON) else null,
 
         rate = outputsAtINF?.run {
             val precision = 100.0
             ceil((precision * getMetric(OmSimMetric.PER_REPETITION_CYCLES).toDouble() / this)) / precision
         },
         areaINF = getAreaINF(outputsAtINF),
-        heightINF = if (outputsAtINF == null || !(type == OmType.NORMAL || type == OmType.POLYMER_HEIGHT)) null
+        heightINF = if (outputsAtINF == null || OmMetric.HEIGHT_INF !in areaLikes) null
         else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.HEIGHT))?.toInfinInt() ?: InfinInt.INFINITY,
-        widthINF = if (outputsAtINF == null || !(type == OmType.NORMAL || type == OmType.POLYMER_WIDTH)) null
+        widthINF = if (outputsAtINF == null || OmMetric.WIDTH_INF !in areaLikes) null
         else getApproximateMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.WIDTH)) ?: Double.POSITIVE_INFINITY,
-        boundingHexINF = if (outputsAtINF == null || type != OmType.NORMAL) null
+        boundingHexINF = if (outputsAtINF == null || OmMetric.BOUNDING_HEX_INF !in areaLikes) null
         else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.MINIMUM_HEXAGON))?.toInfinInt() ?: InfinInt.INFINITY,
     )
 }

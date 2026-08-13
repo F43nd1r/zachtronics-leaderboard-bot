@@ -34,7 +34,7 @@ import java.util.*
 @Suppress("ClassName")
 sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Comparable<T & Any>? {
     val description: String
-    val scoreParts: Collection<ScorePart<*>>
+    val scoreParts: Set<ScorePart<*>>
     val measurePoint: MeasurePoint
     val getValueFrom: (OmScore) -> T
 
@@ -51,7 +51,7 @@ sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Compara
     /** Values and modifiers */
     sealed interface ScorePart<T : Comparable<T & Any>?> : OmMetric<T> {
         override val scoreParts
-            get() = listOf(this)
+            get() = setOf(this)
     }
 
     sealed class Value<T>(
@@ -125,8 +125,8 @@ sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Compara
             get() = subMetrics.all { it.collapsible }
         override val measurePoint
             get() = subMetrics.findMeasurePoint()
-        override val scoreParts
-            get() = subMetrics.flatMap { it.scoreParts }
+        override val scoreParts: Set<ScorePart<*>>
+            get() = subMetrics.flatMapTo(HashSet()) { it.scoreParts }
 
         override fun describe(score: OmScore, format: StringFormat): String? =
             getValueFrom(score)?.let { "$description=${numberFormat.format(it)}" }
@@ -193,7 +193,7 @@ sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Compara
         override val collapsible = false
         override val measurePoint = MeasurePoint.START
         override val getValueFrom: (OmScore) -> T = { value }
-        override val scoreParts = emptyList<ScorePart<*>>()
+        override val scoreParts = emptySet<ScorePart<*>>()
         override val description = displayName
         override fun describe(score: OmScore, format: StringFormat): String? = value.toString()
     }
@@ -220,9 +220,9 @@ sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Compara
     }
 
     // convenience
-    data object A0_INF : Value<InfinInt?>("A0", MeasurePoint.INFINITY, { it.areaINF?.get(0)?.toInfinInt() })
-    data object A1_INF : Value<Double?>("A1", MeasurePoint.INFINITY, { it.areaINF?.get(1) }, alias = "A'")
-    data object A2_INF : Value<Double?>("A2", MeasurePoint.INFINITY, { it.areaINF?.get(2) }, alias = "A''")
+    data object A0_INF : Value<InfinInt?>("A°", MeasurePoint.INFINITY, { it.areaINF?.get(0)?.toInfinInt() }, alias = "A0")
+    data object A1_INF : Value<Double?>("A'", MeasurePoint.INFINITY, { it.areaINF?.get(1) }, alias = "A1")
+    data object A2_INF : Value<Double?>("A''", MeasurePoint.INFINITY, { it.areaINF?.get(2) }, alias = "A2")
 
     data object OVERLAP : Modifier("O", MeasurePoint.START, OmScore::overlap)
     data object TRACKLESS : Modifier("T", MeasurePoint.START, OmScore::trackless, reverseOrder = true)
@@ -291,9 +291,31 @@ object OmMetrics {
     val MODIFIER = listOf(OmMetric.OVERLAP, OmMetric.TRACKLESS, OmMetric.LOOPING)
     val FULL_SCORE = VALUE + MODIFIER
 
-    private val ALL_SCORE_PARTS = FULL_SCORE + listOf(OmMetric.A0_INF, OmMetric.A1_INF, OmMetric.A2_INF)
+    private val COMMON_VALUES = listOf(
+        OmMetric.COST,
+        OmMetric.INSTRUCTIONS,
+        OmMetric.CYCLES,
+        OmMetric.AREA,
+        OmMetric.RATE,
+        OmMetric.AREA_INF,
+    )
+    private val AREA_INF_PARTS = listOf(OmMetric.A0_INF, OmMetric.A1_INF, OmMetric.A2_INF)
+    
+    fun areaLikes(type: OmType? = null) = when (type) {
+        null, OmType.NORMAL -> listOf(
+            OmMetric.HEIGHT, OmMetric.WIDTH, OmMetric.BOUNDING_HEX,
+            OmMetric.HEIGHT_INF, OmMetric.WIDTH_INF, OmMetric.BOUNDING_HEX_INF,
+        )
+        OmType.POLYMER_HEIGHT -> listOf(
+            OmMetric.HEIGHT, OmMetric.HEIGHT_INF,
+        )
+        OmType.POLYMER_WIDTH -> listOf(
+            OmMetric.WIDTH, OmMetric.WIDTH_INF,
+        )
+        OmType.POLYMER_SKEW, OmType.PRODUCTION -> emptyList()
+    }
 
-    fun userFacing(type: OmType? = null) = ALL_SCORE_PARTS + when (type) {
+    private fun computed(type: OmType? = null) = when (type) {
         OmType.NORMAL, OmType.POLYMER_HEIGHT, OmType.POLYMER_WIDTH, OmType.POLYMER_SKEW -> listOf(
             OmMetric.SUM3A,
             OmMetric.SUM4,
@@ -315,6 +337,10 @@ object OmMetrics {
             OmMetric.PRODUCT_INF,
         )
     }
+
+    /** Metrics shown in user facing commands and API endpoints */
+    fun userFacing(type: OmType? = null) =
+        COMMON_VALUES + areaLikes(type) + MODIFIER + AREA_INF_PARTS + computed(type)
 
     /** Score printing order for humans */
     val BY_MEASURE_POINT = mapOf(
