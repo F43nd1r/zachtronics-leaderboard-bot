@@ -123,7 +123,7 @@ enum class OmPuzzle(
 
     PROOF_OF_COMPLETENESS(JOURNAL_IV, NORMAL, "Proof of Completeness", "P069"),
     WHEEL_REPRESENTATION(JOURNAL_IV, NORMAL, "Wheel Representation", "P070"),
-    SYNTHESIS_VIA_ALCOHOL(JOURNAL_IV, NORMAL, "Synthesis via Alcohol", "P071"),
+    SYNTHESIS_VIA_ALCOHOL(JOURNAL_IV, NORMAL, "Synthesis Via Alcohol", "P071"),
     UNIVERSAL_COMPOUND(JOURNAL_IV, NORMAL, "Universal Compound", "P072"),
 
     GENERAL_ANAESTHETIC(JOURNAL_V, NORMAL, "General Anaesthetic", "P086"),
