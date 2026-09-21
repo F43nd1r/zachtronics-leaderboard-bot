@@ -748,11 +748,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rsbuild/core@npm:2.2.7":
-  version: 2.2.7
-  resolution: "@rsbuild/core@npm:2.2.7"
+"@rsbuild/core@npm:2.2.8":
+  version: 2.2.8
+  resolution: "@rsbuild/core@npm:2.2.8"
   dependencies:
-    "@rspack/core": "npm:~2.2.5"
+    "@rspack/core": "npm:~2.2.6"
     "@swc/helpers": "npm:^0.5.23"
   peerDependencies:
     core-js: ">= 3.0.0"
@@ -761,7 +761,7 @@ __metadata:
       optional: true
   bin:
     rsbuild: ./bin/rsbuild.js
-  checksum: 10c0/a794cbbd3b63a40753b572669839f8a9e38d2f252bdedd36abe56b7acbc061767281c9a7fd81455081578a13b9b347ab494de16a75a0b2dcedc02d40addcd326
+  checksum: 10c0/49ae761e2beb74c9e285f5d76e3a69fcad56db551ef4f4e651c049813a07ed6f4f6f0aff05dbe98a92e8f17f33a004cf60f2e9f372b035831ef4d5d79624fb3d
   languageName: node
   linkType: hard
 
@@ -933,7 +933,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rspack/core@npm:~2.2.5":
+"@rspack/core@npm:~2.2.6":
   version: 2.2.6
   resolution: "@rspack/core@npm:2.2.6"
   dependencies:
@@ -3040,7 +3040,7 @@ __metadata:
     "@mui/lab": "npm:7.0.0"
     "@mui/material": "npm:9.4.0"
     "@mui/styles": "npm:6.4.8"
-    "@rsbuild/core": "npm:2.2.7"
+    "@rsbuild/core": "npm:2.2.8"
     "@rsbuild/plugin-react": "npm:2.1.0"
     "@simbathesailor/use-what-changed": "npm:2.0.0"
     "@sinclair/typebox": "npm:0.34.52"
