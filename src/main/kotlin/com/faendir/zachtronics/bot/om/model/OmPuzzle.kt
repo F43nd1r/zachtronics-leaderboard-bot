@@ -94,8 +94,8 @@ enum class OmPuzzle(
     METAL_DIVISION(DRM_CHAPTER_2, NORMAL, "Metal Division", "P208"),
     SOLDER_WIRE(DRM_CHAPTER_2, POLYMER_HEIGHT, "Solder Wire", "P209"),
     REACTIVE_LEAD(DRM_CHAPTER_2, NORMAL, "Reactive Lead", "P210"),
-    FIREWORKS_POWDER(DRM_CHAPTER_2, NORMAL, "Fireworks Powder", "P211"),
     ARMOR_POLISH(DRM_CHAPTER_2, NORMAL, "Armor Polish", "P213"),
+    FIREWORKS_POWDER(DRM_CHAPTER_2, NORMAL, "Fireworks Powder", "P211"),
 
     INVARIANT_METAL(DRM_CHAPTER_3, NORMAL, "Invariant Metal", "P215"),
     VIA_QUICKSILVER(DRM_CHAPTER_3, NORMAL, "Via Quicksilver", "P216"),
@@ -334,6 +334,19 @@ enum class OmPuzzle(
     IGNITION_CORD(WEEKLIES_1, POLYMER_HEIGHT, "Ignition Cord", "w2839120106", "OM2022Weeklies_IgnitionCord"),
     // CUPRITE(WEEKLIES_1, NORMAL, "Cuprite", "w2868328394", "OM2022Weeklies_Cuprite"),
     LUSTROUS_SYRUP(WEEKLIES_1, NORMAL, "Lustrous Syrup", "w2868331650", "OM2022Weeklies_LustrousSyrup"),
+
+    LOGISTICS(WEEKLIES_2, PRODUCTION, "Logistics", "w2818265313", "SpeedSolve-2.1-Logistics"),
+    BLACK_POWDER(WEEKLIES_2, NORMAL, "Black Powder", "w3088257476", "OM2023Weeklies_BlackPowder"),
+    EYEDROPS_OF_IRRITATION(WEEKLIES_2, NORMAL, "Eyedrops of Irritation", "w3817959733", "OM2023Weeklies_EyedropsOfIrritation"),
+    VACCINE_TEMPLATE(WEEKLIES_2, PRODUCTION, "Vaccine Template", "w3033141056", "OM2023Weeklies_VaccineTemplate"),
+    BREATHABLE_FLUID(WEEKLIES_2, NORMAL, "Breathable Fluid", "w3303849741", "OM2024Weeklies_BreathableFluid"),
+    FAERO_FILAMENT(WEEKLIES_2, POLYMER_HEIGHT, "Faero Filament", "w3817956797", "OM2024Weeklies_FaeroFilament"),
+    SMOG_NEUTRALIZATION(WEEKLIES_2, NORMAL, "Smog Neutralization", "w3584644954", "Weeklies2025_SmogNeutralization"),
+    RAVARI_S_ROAD(WEEKLIES_2, NORMAL, "Ravari's Road", "w3584639567", "Weeklies2025_RavarisRoad"),
+    DOWSING_RODS(WEEKLIES_2, POLYMER_HEIGHT, "Dowsing Rods", "w3817954313", "weeklies2026_dowsing-rods"),
+    PRISMATIC_CATALYST(WEEKLIES_2, NORMAL, "Prismatic Catalyst", "w3817955190", "weeklies2026_prismatic-catalyst"),
+    VAN_BERLO_S_ROTOR(WEEKLIES_2, NORMAL, "Van Berlo's Rotor", "w3817954043", "weeklies2026_van-berlos-rotor"),
+    PAINT_PRESERVER(WEEKLIES_2, PRODUCTION, "Paint Preserver", "w3817955175", "weeklies2026_paint-preserver"),
     ;
 
     override val supportedCategories: List<OmCategory> = OmCategory.entries.filter { it.supportsPuzzle(this) }
