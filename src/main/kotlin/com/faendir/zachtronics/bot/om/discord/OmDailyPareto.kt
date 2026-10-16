@@ -112,7 +112,7 @@ class OmDailyPareto(
                 when (element) {
                     is QueryElement.Constraint -> {
                         for (modifier in listOf(OVERLAP, TRACKLESS) intersect element.metric.scoreParts) {
-                            val name = this::class.simpleName!!.lowercase()
+                            val name = modifier.internalName.lowercase()
                             val value = records.first().record.score[modifier]
                             append("visualizerFilter-${puzzle.id}.modifiers.${name}=${value}&")
                         }
@@ -164,8 +164,14 @@ class OmDailyPareto(
                 0 -> OmMetric.Constant("O||!O", true)
                 in 1..2 -> NOVERLAP_TRACKLESS
                 in 3..4 if (measurePoint == MeasurePoint.VICTORY) -> NOVERLAP_LOOPING
-                3 if (puzzle.type != OmType.PRODUCTION) -> Custom(listOf(A2_INF), "A''==0") { it[A2_INF] == 0.0 }
-                4 if (puzzle.type == OmType.NORMAL) -> Custom(listOf(A1_INF), "A'==0") { it[A1_INF] == 0.0 }
+                3 if (puzzle.type != OmType.PRODUCTION) -> {
+                    frontierMetrics.remove(AREA_INF)
+                    Custom(listOf(A2_INF), "A''==0") { !it.overlap && it[A2_INF] == 0.0 }
+                }
+                4 if (puzzle.type == OmType.NORMAL) -> {
+                    frontierMetrics.remove(AREA_INF)
+                    Custom(listOf(A1_INF), "A'==0") { !it.overlap && it[A1_INF] == 0.0 }
+                }
                 else -> NOVERLAP
             })
         // minimized, or nearly so

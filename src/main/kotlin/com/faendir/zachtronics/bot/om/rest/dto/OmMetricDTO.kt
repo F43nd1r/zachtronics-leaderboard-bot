@@ -21,7 +21,7 @@ import com.faendir.zachtronics.bot.om.model.OmMetric
 data class OmMetricDTO(val id: String, val displayName: String, val description: String, val type: String)
 
 fun OmMetric<*>.toDTO() = OmMetricDTO(
-    id = this::class.simpleName!!,
+    id = internalName,
     displayName = displayName,
     description = description,
     type = when (this) {

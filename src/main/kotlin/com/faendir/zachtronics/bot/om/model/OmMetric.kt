@@ -30,10 +30,12 @@ import java.util.*
 /**
  * @property displayName `C` or `T` or `Sum`
  * @property description `c` or `T` or `g+c+a`
+ * @property internalName `CYCLES` or `TRACKLESS` or `SUM3A`
  */
 @Suppress("ClassName")
 sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Comparable<T & Any>? {
     val description: String
+    val internalName get() = this::class.simpleName!!
     val scoreParts: Set<ScorePart<*>>
     val measurePoint: MeasurePoint
     val getValueFrom: (OmScore) -> T
