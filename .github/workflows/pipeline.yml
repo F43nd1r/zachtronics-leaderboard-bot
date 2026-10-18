@@ -77,6 +77,6 @@ jobs:
         with:
           context: "."
           push: true
-          tags: docker.io/f43nd1r/zachtronics-leaderboard-bot:latest
+          tags: ghcr.io/zachtronics-leaderboards/zachtronics-leaderboard-bot:latest
           platforms: |
             linux/amd64
