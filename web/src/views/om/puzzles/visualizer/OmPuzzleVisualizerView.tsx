@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,13 +73,13 @@ export default function OmPuzzleVisualizerView() {
                     looping: {
                         get: (score) => score?.looping,
                         name: "looping",
-                        color: VisualizerColor.BAD3,
+                        color: VisualizerColor.DEFAULT,
                         legendOrder: 2,
                         option1: "Looping",
                         option2: "Not Looping",
                     },
                 }}
-                defaultColor={VisualizerColor.DEFAULT}
+                defaultColor={VisualizerColor.BAD3} // default is looping
                 RecordCardComponent={OmRecordCard}
             />
         </>
