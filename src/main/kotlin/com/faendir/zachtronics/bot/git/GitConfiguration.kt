@@ -43,11 +43,11 @@ class GitConfiguration(private val gitProperties: GitProperties) {
     @Bean("kzRepository")
     fun kzRepository() = GitRepository(gitProperties, "kaizen-leaderboard", "https://github.com/zachtronics-leaderboards/kaizen-leaderboard.git")
 
-    @Bean("omLeaderboardRepository")
-    fun omLeaderboardRepository() = GitRepository(gitProperties, "om-leaderboard", "https://github.com/zachtronics-leaderboards/om-leaderboard.git")
+    @Bean("omRepository")
+    fun omRepository() = GitRepository(gitProperties, "om-leaderboard", "https://github.com/zachtronics-leaderboards/om-leaderboard.git")
 
-    @Bean("scLeaderboardRepository")
-    fun scLeaderboardRepository() = GitRepository(gitProperties, "sc-leaderboard", "https://github.com/zachtronics-leaderboards/spacechem-leaderboard.git")
+    @Bean("scRepository")
+    fun scRepository() = GitRepository(gitProperties, "sc-leaderboard", "https://github.com/zachtronics-leaderboards/spacechem-leaderboard.git")
 
     @Bean("szRepository")
     fun szRepository() = GitRepository(gitProperties, "shenzhenIO-leaderboard", "https://github.com/zachtronics-leaderboards/shenzhenIO-leaderboard.git")
