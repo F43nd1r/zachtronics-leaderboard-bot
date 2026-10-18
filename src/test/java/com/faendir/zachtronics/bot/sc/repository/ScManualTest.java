@@ -80,13 +80,13 @@ class ScManualTest {
 
     @Test
     public void rebuildAllWiki() {
-        // cp -a ../spacechem/archive/* src/test/resources/repositories/spacechem-leaderboard/
+        // cp -a ../spacechem/archive/* src/test/resources/repositories/sc-leaderboard/
         repository.rebuildRedditLeaderboard(null);
 
         String pages = Arrays.stream(ScGroup.values())
                              .map(ScGroup::getWikiPage).distinct()
                              .map(p -> redditService.getWikiPage(Subreddit.SPACECHEM, p))
-                             .map(s -> s.replaceAll("file:/tmp/spacechem-leaderboard[0-9]+/",
+                             .map(s -> s.replaceAll("file:/tmp/sc-leaderboard[0-9]+/",
                                                     "https://raw.githubusercontent.com/zachtronics-leaderboards/spacechem-leaderboard/master"))
                              .collect(Collectors.joining("\n\n---\n"));
         System.out.println(pages);

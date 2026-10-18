@@ -57,7 +57,7 @@ import kotlin.io.path.readBytes
 @OptIn(ExperimentalSerializationApi::class)
 @Component
 class OmSolutionRepository(
-    @Qualifier("omLeaderboardRepository") private val leaderboard: GitRepository,
+    @Qualifier("omRepository") private val leaderboard: GitRepository,
     private val pageGenerator: OmRedditWikiGenerator,
     private val omUrlMapper: OmUrlMapper,
     private val morsService: MorsService,
