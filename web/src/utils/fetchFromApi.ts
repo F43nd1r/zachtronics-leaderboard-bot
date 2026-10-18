@@ -25,5 +25,8 @@ export default function fetchFromApi<T>(url: string): Promise<T> {
 }
 
 export function fetchFromApiRaw(url: string, requestInit?: RequestInit): Promise<Response> {
-    return fetch(`${window.location.protocol}//${window.location.host}${url}`, requestInit)
+    const headers = new Headers(requestInit?.headers)
+    headers.set("X-Zlbb-Api", "true")
+
+    return fetch(`${window.location.protocol}//${window.location.host}${url}`, {...requestInit, headers})
 }
