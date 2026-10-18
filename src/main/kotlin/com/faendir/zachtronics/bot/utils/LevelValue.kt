@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.utils
 
 import kotlinx.serialization.Serializable
+import kotlin.math.pow
 
 /** Represents a pair (int, double) with lexicographical order */
 @Serializable
@@ -34,6 +35,8 @@ data class LevelValue(val level: Int, val value: Double) : Comparable<LevelValue
             else -> return 0.0
         }
     }
+
+    fun marshal() = 100_000.0.pow(level) * value
 }
 
 fun Number.toLevelValue() = LevelValue(0, toDouble())

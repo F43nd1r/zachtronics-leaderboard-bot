@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ function SizeAwarePlotView<SCORE, RECORD extends RecordDTO<SCORE>>({
     const gridColor = theme.palette.mode === "light" ? theme.palette.grey["200"] : theme.palette.grey["800"]
     const makeAxis = (axis: { metric: Metric<SCORE>; scale: "linear" | "log" }): Partial<LayoutAxis> => {
         return {
-            title: axis.metric.name,
+            title: { text: axis.metric.name },
             color: theme.palette.text.primary,
             gridcolor: gridColor,
             zerolinecolor: gridColor,

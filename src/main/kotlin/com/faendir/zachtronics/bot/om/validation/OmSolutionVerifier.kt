@@ -80,6 +80,16 @@ class OmSolutionVerifier(puzzle: ByteArray, solution: ByteArray) : Closeable {
 
     fun getApproximateMetricSafe(metric: OmSimMetric<*>) = getApproximateMetricSafe(metric.id)
 
+    fun getLooping(): Boolean {
+        val numOutputs = OmSimWrapper.verifier_number_of_outputs(verifier)
+        for (i in 0 until numOutputs) {
+            val repeatsAfter = OmSimWrapper.verifier_output_intervals_for_output_repeat_after(verifier, i)
+            if (repeatsAfter != 0 && repeatsAfter != 1)
+                return false
+        }
+        return true
+    }
+
     override fun close() {
         OmSimWrapper.verifier_destroy(verifier)
         arena.close()

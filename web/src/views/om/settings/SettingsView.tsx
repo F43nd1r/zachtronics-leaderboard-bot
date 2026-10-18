@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,12 @@ export default function SettingsView() {
                         {appSettings.autoPlay ? <PlayArrow /> : <PlayDisabled />}
                     </IconButton>{" "}
                     Autoplay
+                </div>
+                <div>
+                    <IconButton sx={{ ml: 1 }} onClick={() => appSettings.setShowMedia(!appSettings.showMedia)} color="inherit">
+                        {appSettings.showMedia ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>{" "}
+                    Show solution media
                 </div>
                 <div>
                     <IconButton sx={{ ml: 1 }} onClick={() => appSettings.setShowControls(!appSettings.showControls)} color="inherit">

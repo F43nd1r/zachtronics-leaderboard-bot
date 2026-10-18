@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,8 @@ createRoot(document.getElementById("root")!).render(
                             <Route path="categories/:categoryId" element={<CategoryView />} />
                             <Route path="settings" element={<SettingsView />} />
                             <Route path="help" element={<HelpView />} />
+                            <Route path="upload" element={<UploadView />} />
                         </Route>
-                        <Route path="upload" element={<UploadView />} />
                         <Route path="cw/:puzzleId" element={<CwPuzzleVisualizerView />} />
                         <Route path="exa/:puzzleId" element={<ExaPuzzleVisualizerView />} />
                         <Route path="fc/:puzzleId" element={<FcPuzzleVisualizerView />} />

@@ -29,7 +29,7 @@ import static java.lang.foreign.ValueLayout.JAVA_BYTE;
  * * run `./jextract omsim/verifier.h --header-class-name OmSimWrapper`
  * * replace the default `SYMBOL_LOOKUP` with `NativeLoader.loadLibrary("verify", LIBRARY_ARENA);`
  * * remove the unused downcall tracer (optional)
- * * add `@SuppressWarnings("unused")` (optional)
+ * * add `@SuppressWarnings("all")` (optional)
  */
 @SuppressWarnings("all")
 public class OmSimWrapper {
@@ -49,15 +49,15 @@ public class OmSimWrapper {
     public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT;
     public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE;
     public static final AddressLayout C_POINTER = ValueLayout.ADDRESS.withTargetLayout(
-            MemoryLayout.sequenceLayout(java.lang.Long.MAX_VALUE, JAVA_BYTE));
+        MemoryLayout.sequenceLayout(java.lang.Long.MAX_VALUE, JAVA_BYTE));
     public static final ValueLayout.OfLong C_LONG = ValueLayout.JAVA_LONG;
 
     private static class verifier_find_puzzle_name_in_solution_bytes {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_INT,
-                OmSimWrapper.C_POINTER
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_POINTER
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_find_puzzle_name_in_solution_bytes");
@@ -100,22 +100,25 @@ public class OmSimWrapper {
      * const char *verifier_find_puzzle_name_in_solution_bytes(const char *solution_bytes, int solution_length, int *name_length)
      *}
      */
-    public static MemorySegment verifier_find_puzzle_name_in_solution_bytes(MemorySegment solution_bytes, int solution_length, MemorySegment name_length) {
+    public static MemorySegment verifier_find_puzzle_name_in_solution_bytes(MemorySegment solution_bytes, int solution_length,
+                                                                            MemorySegment name_length) {
         var mh$ = verifier_find_puzzle_name_in_solution_bytes.HANDLE;
         try {
             return (MemorySegment) mh$.invokeExact(solution_bytes, solution_length, name_length);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_create {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_POINTER
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_POINTER
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_create");
@@ -162,20 +165,22 @@ public class OmSimWrapper {
         var mh$ = verifier_create.HANDLE;
         try {
             return (MemorySegment) mh$.invokeExact(puzzle_filename, solution_filename);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_create_from_bytes {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_INT,
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_INT
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_INT
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_create_from_bytes");
@@ -218,24 +223,27 @@ public class OmSimWrapper {
      * void *verifier_create_from_bytes(const char *puzzle_bytes, int puzzle_length, const char *solution_bytes, int solution_length)
      *}
      */
-    public static MemorySegment verifier_create_from_bytes(MemorySegment puzzle_bytes, int puzzle_length, MemorySegment solution_bytes, int solution_length) {
+    public static MemorySegment verifier_create_from_bytes(MemorySegment puzzle_bytes, int puzzle_length, MemorySegment solution_bytes,
+                                                           int solution_length) {
         var mh$ = verifier_create_from_bytes.HANDLE;
         try {
             return (MemorySegment) mh$.invokeExact(puzzle_bytes, puzzle_length, solution_bytes, solution_length);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_create_from_bytes_without_copying {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_INT,
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_INT
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_INT
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_create_from_bytes_without_copying");
@@ -278,20 +286,23 @@ public class OmSimWrapper {
      * void *verifier_create_from_bytes_without_copying(const char *puzzle_bytes, int puzzle_length, const char *solution_bytes, int solution_length)
      *}
      */
-    public static MemorySegment verifier_create_from_bytes_without_copying(MemorySegment puzzle_bytes, int puzzle_length, MemorySegment solution_bytes, int solution_length) {
+    public static MemorySegment verifier_create_from_bytes_without_copying(MemorySegment puzzle_bytes, int puzzle_length,
+                                                                           MemorySegment solution_bytes, int solution_length) {
         var mh$ = verifier_create_from_bytes_without_copying.HANDLE;
         try {
             return (MemorySegment) mh$.invokeExact(puzzle_bytes, puzzle_length, solution_bytes, solution_length);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_destroy {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-                OmSimWrapper.C_POINTER
+            OmSimWrapper.C_POINTER
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_destroy");
@@ -338,17 +349,19 @@ public class OmSimWrapper {
         var mh$ = verifier_destroy.HANDLE;
         try {
             mh$.invokeExact(verifier);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_set_cycle_limit {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_INT
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_INT
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_set_cycle_limit");
@@ -395,16 +408,18 @@ public class OmSimWrapper {
         var mh$ = verifier_set_cycle_limit.HANDLE;
         try {
             mh$.invokeExact(verifier, cycle_limit);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_disable_limits {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-                OmSimWrapper.C_POINTER
+            OmSimWrapper.C_POINTER
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_disable_limits");
@@ -451,18 +466,20 @@ public class OmSimWrapper {
         var mh$ = verifier_disable_limits.HANDLE;
         try {
             mh$.invokeExact(verifier);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_set_fails_on_wrong_output {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_INT,
-                OmSimWrapper.C_INT
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_INT
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_set_fails_on_wrong_output");
@@ -509,18 +526,20 @@ public class OmSimWrapper {
         var mh$ = verifier_set_fails_on_wrong_output.HANDLE;
         try {
             mh$.invokeExact(verifier, output_index, fails_on_wrong_output);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_set_fails_on_wrong_output_bonds {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_INT,
-                OmSimWrapper.C_INT
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_INT
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_set_fails_on_wrong_output_bonds");
@@ -563,21 +582,24 @@ public class OmSimWrapper {
      * void verifier_set_fails_on_wrong_output_bonds(void *verifier, int output_index, int fails_on_wrong_output_bonds)
      *}
      */
-    public static void verifier_set_fails_on_wrong_output_bonds(MemorySegment verifier, int output_index, int fails_on_wrong_output_bonds) {
+    public static void verifier_set_fails_on_wrong_output_bonds(MemorySegment verifier, int output_index,
+                                                                int fails_on_wrong_output_bonds) {
         var mh$ = verifier_set_fails_on_wrong_output_bonds.HANDLE;
         try {
             mh$.invokeExact(verifier, output_index, fails_on_wrong_output_bonds);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_wrong_output_index {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                OmSimWrapper.C_INT,
-                OmSimWrapper.C_POINTER
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_POINTER
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_wrong_output_index");
@@ -624,19 +646,21 @@ public class OmSimWrapper {
         var mh$ = verifier_wrong_output_index.HANDLE;
         try {
             return (int) mh$.invokeExact(verifier);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_wrong_output_atom {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                OmSimWrapper.C_INT,
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_INT,
-                OmSimWrapper.C_INT
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_INT
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_wrong_output_atom");
@@ -683,16 +707,18 @@ public class OmSimWrapper {
         var mh$ = verifier_wrong_output_atom.HANDLE;
         try {
             return (int) mh$.invokeExact(verifier, u, v);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_wrong_output_clear {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-                OmSimWrapper.C_POINTER
+            OmSimWrapper.C_POINTER
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_wrong_output_clear");
@@ -739,17 +765,19 @@ public class OmSimWrapper {
         var mh$ = verifier_wrong_output_clear.HANDLE;
         try {
             mh$.invokeExact(verifier);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_error {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_POINTER
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_POINTER
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_error");
@@ -796,17 +824,19 @@ public class OmSimWrapper {
         var mh$ = verifier_error.HANDLE;
         try {
             return (MemorySegment) mh$.invokeExact(verifier);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_error_cycle {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                OmSimWrapper.C_INT,
-                OmSimWrapper.C_POINTER
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_POINTER
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_error_cycle");
@@ -853,17 +883,19 @@ public class OmSimWrapper {
         var mh$ = verifier_error_cycle.HANDLE;
         try {
             return (int) mh$.invokeExact(verifier);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_error_location_u {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                OmSimWrapper.C_INT,
-                OmSimWrapper.C_POINTER
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_POINTER
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_error_location_u");
@@ -910,17 +942,19 @@ public class OmSimWrapper {
         var mh$ = verifier_error_location_u.HANDLE;
         try {
             return (int) mh$.invokeExact(verifier);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_error_location_v {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                OmSimWrapper.C_INT,
-                OmSimWrapper.C_POINTER
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_POINTER
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_error_location_v");
@@ -967,17 +1001,19 @@ public class OmSimWrapper {
         var mh$ = verifier_error_location_v.HANDLE;
         try {
             return (int) mh$.invokeExact(verifier);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_error_source {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_POINTER
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_POINTER
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_error_source");
@@ -1024,22 +1060,25 @@ public class OmSimWrapper {
         var mh$ = verifier_error_source.HANDLE;
         try {
             return (MemorySegment) mh$.invokeExact(verifier);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_error_source_puzzle_file$constants {
         public static final AddressLayout LAYOUT = OmSimWrapper.C_POINTER;
-        public static final MemorySegment SEGMENT = SYMBOL_LOOKUP.findOrThrow("verifier_error_source_puzzle_file").reinterpret(LAYOUT.byteSize());
+        public static final MemorySegment SEGMENT = SYMBOL_LOOKUP.findOrThrow("verifier_error_source_puzzle_file")
+                                                                 .reinterpret(LAYOUT.byteSize());
     }
 
     /**
      * Layout for variable:
      * {@snippet lang = c:
-     * const char *verifier_error_source_puzzle_file
+     * extern const char *verifier_error_source_puzzle_file
      *}
      */
     public static AddressLayout verifier_error_source_puzzle_file$layout() {
@@ -1049,7 +1088,7 @@ public class OmSimWrapper {
     /**
      * Segment for variable:
      * {@snippet lang = c:
-     * const char *verifier_error_source_puzzle_file
+     * extern const char *verifier_error_source_puzzle_file
      *}
      */
     public static MemorySegment verifier_error_source_puzzle_file$segment() {
@@ -1059,7 +1098,7 @@ public class OmSimWrapper {
     /**
      * Getter for variable:
      * {@snippet lang = c:
-     * const char *verifier_error_source_puzzle_file
+     * extern const char *verifier_error_source_puzzle_file
      *}
      */
     public static MemorySegment verifier_error_source_puzzle_file() {
@@ -1069,7 +1108,7 @@ public class OmSimWrapper {
     /**
      * Setter for variable:
      * {@snippet lang = c:
-     * const char *verifier_error_source_puzzle_file
+     * extern const char *verifier_error_source_puzzle_file
      *}
      */
     public static void verifier_error_source_puzzle_file(MemorySegment varValue) {
@@ -1078,13 +1117,14 @@ public class OmSimWrapper {
 
     private static class verifier_error_source_solution_file$constants {
         public static final AddressLayout LAYOUT = OmSimWrapper.C_POINTER;
-        public static final MemorySegment SEGMENT = SYMBOL_LOOKUP.findOrThrow("verifier_error_source_solution_file").reinterpret(LAYOUT.byteSize());
+        public static final MemorySegment SEGMENT = SYMBOL_LOOKUP.findOrThrow("verifier_error_source_solution_file")
+                                                                 .reinterpret(LAYOUT.byteSize());
     }
 
     /**
      * Layout for variable:
      * {@snippet lang = c:
-     * const char *verifier_error_source_solution_file
+     * extern const char *verifier_error_source_solution_file
      *}
      */
     public static AddressLayout verifier_error_source_solution_file$layout() {
@@ -1094,7 +1134,7 @@ public class OmSimWrapper {
     /**
      * Segment for variable:
      * {@snippet lang = c:
-     * const char *verifier_error_source_solution_file
+     * extern const char *verifier_error_source_solution_file
      *}
      */
     public static MemorySegment verifier_error_source_solution_file$segment() {
@@ -1104,7 +1144,7 @@ public class OmSimWrapper {
     /**
      * Getter for variable:
      * {@snippet lang = c:
-     * const char *verifier_error_source_solution_file
+     * extern const char *verifier_error_source_solution_file
      *}
      */
     public static MemorySegment verifier_error_source_solution_file() {
@@ -1114,7 +1154,7 @@ public class OmSimWrapper {
     /**
      * Setter for variable:
      * {@snippet lang = c:
-     * const char *verifier_error_source_solution_file
+     * extern const char *verifier_error_source_solution_file
      *}
      */
     public static void verifier_error_source_solution_file(MemorySegment varValue) {
@@ -1123,13 +1163,14 @@ public class OmSimWrapper {
 
     private static class verifier_error_source_metric$constants {
         public static final AddressLayout LAYOUT = OmSimWrapper.C_POINTER;
-        public static final MemorySegment SEGMENT = SYMBOL_LOOKUP.findOrThrow("verifier_error_source_metric").reinterpret(LAYOUT.byteSize());
+        public static final MemorySegment SEGMENT = SYMBOL_LOOKUP.findOrThrow("verifier_error_source_metric")
+                                                                 .reinterpret(LAYOUT.byteSize());
     }
 
     /**
      * Layout for variable:
      * {@snippet lang = c:
-     * const char *verifier_error_source_metric
+     * extern const char *verifier_error_source_metric
      *}
      */
     public static AddressLayout verifier_error_source_metric$layout() {
@@ -1139,7 +1180,7 @@ public class OmSimWrapper {
     /**
      * Segment for variable:
      * {@snippet lang = c:
-     * const char *verifier_error_source_metric
+     * extern const char *verifier_error_source_metric
      *}
      */
     public static MemorySegment verifier_error_source_metric$segment() {
@@ -1149,7 +1190,7 @@ public class OmSimWrapper {
     /**
      * Getter for variable:
      * {@snippet lang = c:
-     * const char *verifier_error_source_metric
+     * extern const char *verifier_error_source_metric
      *}
      */
     public static MemorySegment verifier_error_source_metric() {
@@ -1159,7 +1200,7 @@ public class OmSimWrapper {
     /**
      * Setter for variable:
      * {@snippet lang = c:
-     * const char *verifier_error_source_metric
+     * extern const char *verifier_error_source_metric
      *}
      */
     public static void verifier_error_source_metric(MemorySegment varValue) {
@@ -1168,13 +1209,14 @@ public class OmSimWrapper {
 
     private static class verifier_error_source_simulation$constants {
         public static final AddressLayout LAYOUT = OmSimWrapper.C_POINTER;
-        public static final MemorySegment SEGMENT = SYMBOL_LOOKUP.findOrThrow("verifier_error_source_simulation").reinterpret(LAYOUT.byteSize());
+        public static final MemorySegment SEGMENT = SYMBOL_LOOKUP.findOrThrow("verifier_error_source_simulation")
+                                                                 .reinterpret(LAYOUT.byteSize());
     }
 
     /**
      * Layout for variable:
      * {@snippet lang = c:
-     * const char *verifier_error_source_simulation
+     * extern const char *verifier_error_source_simulation
      *}
      */
     public static AddressLayout verifier_error_source_simulation$layout() {
@@ -1184,7 +1226,7 @@ public class OmSimWrapper {
     /**
      * Segment for variable:
      * {@snippet lang = c:
-     * const char *verifier_error_source_simulation
+     * extern const char *verifier_error_source_simulation
      *}
      */
     public static MemorySegment verifier_error_source_simulation$segment() {
@@ -1194,7 +1236,7 @@ public class OmSimWrapper {
     /**
      * Getter for variable:
      * {@snippet lang = c:
-     * const char *verifier_error_source_simulation
+     * extern const char *verifier_error_source_simulation
      *}
      */
     public static MemorySegment verifier_error_source_simulation() {
@@ -1204,7 +1246,7 @@ public class OmSimWrapper {
     /**
      * Setter for variable:
      * {@snippet lang = c:
-     * const char *verifier_error_source_simulation
+     * extern const char *verifier_error_source_simulation
      *}
      */
     public static void verifier_error_source_simulation(MemorySegment varValue) {
@@ -1213,7 +1255,7 @@ public class OmSimWrapper {
 
     private static class verifier_error_clear {
         public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-                OmSimWrapper.C_POINTER
+            OmSimWrapper.C_POINTER
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_error_clear");
@@ -1260,18 +1302,20 @@ public class OmSimWrapper {
         var mh$ = verifier_error_clear.HANDLE;
         try {
             mh$.invokeExact(verifier);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_evaluate_metric {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                OmSimWrapper.C_INT,
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_POINTER
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_POINTER
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_evaluate_metric");
@@ -1318,18 +1362,20 @@ public class OmSimWrapper {
         var mh$ = verifier_evaluate_metric.HANDLE;
         try {
             return (int) mh$.invokeExact(verifier, metric);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_evaluate_approximate_metric {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                OmSimWrapper.C_DOUBLE,
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_POINTER
+            OmSimWrapper.C_DOUBLE,
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_POINTER
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_evaluate_approximate_metric");
@@ -1376,17 +1422,19 @@ public class OmSimWrapper {
         var mh$ = verifier_evaluate_approximate_metric.HANDLE;
         try {
             return (double) mh$.invokeExact(verifier, metric);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_number_of_output_intervals {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                OmSimWrapper.C_INT,
-                OmSimWrapper.C_POINTER
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_POINTER
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_number_of_output_intervals");
@@ -1433,18 +1481,20 @@ public class OmSimWrapper {
         var mh$ = verifier_number_of_output_intervals.HANDLE;
         try {
             return (int) mh$.invokeExact(verifier);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_output_interval {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                OmSimWrapper.C_INT,
-                OmSimWrapper.C_POINTER,
-                OmSimWrapper.C_INT
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_INT
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_output_interval");
@@ -1491,17 +1541,19 @@ public class OmSimWrapper {
         var mh$ = verifier_output_interval.HANDLE;
         try {
             return (int) mh$.invokeExact(verifier, which_interval);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class verifier_output_intervals_repeat_after {
         public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                OmSimWrapper.C_INT,
-                OmSimWrapper.C_POINTER
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_POINTER
         );
 
         public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_output_intervals_repeat_after");
@@ -1548,9 +1600,251 @@ public class OmSimWrapper {
         var mh$ = verifier_output_intervals_repeat_after.HANDLE;
         try {
             return (int) mh$.invokeExact(verifier);
-        } catch (Error | RuntimeException ex) {
+        }
+        catch (Error | RuntimeException ex) {
             throw ex;
-        } catch (Throwable ex$) {
+        }
+        catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class verifier_number_of_output_intervals_for_output {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_INT
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_number_of_output_intervals_for_output");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang = c:
+     * int verifier_number_of_output_intervals_for_output(void *verifier, int output)
+     *}
+     */
+    public static FunctionDescriptor verifier_number_of_output_intervals_for_output$descriptor() {
+        return verifier_number_of_output_intervals_for_output.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang = c:
+     * int verifier_number_of_output_intervals_for_output(void *verifier, int output)
+     *}
+     */
+    public static MethodHandle verifier_number_of_output_intervals_for_output$handle() {
+        return verifier_number_of_output_intervals_for_output.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang = c:
+     * int verifier_number_of_output_intervals_for_output(void *verifier, int output)
+     *}
+     */
+    public static MemorySegment verifier_number_of_output_intervals_for_output$address() {
+        return verifier_number_of_output_intervals_for_output.ADDR;
+    }
+
+    /**
+     * {@snippet lang = c:
+     * int verifier_number_of_output_intervals_for_output(void *verifier, int output)
+     *}
+     */
+    public static int verifier_number_of_output_intervals_for_output(MemorySegment verifier, int output) {
+        var mh$ = verifier_number_of_output_intervals_for_output.HANDLE;
+        try {
+            return (int) mh$.invokeExact(verifier, output);
+        }
+        catch (Error | RuntimeException ex) {
+            throw ex;
+        }
+        catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class verifier_output_interval_for_output {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_INT
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_output_interval_for_output");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang = c:
+     * int verifier_output_interval_for_output(void *verifier, int output, int which_interval)
+     *}
+     */
+    public static FunctionDescriptor verifier_output_interval_for_output$descriptor() {
+        return verifier_output_interval_for_output.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang = c:
+     * int verifier_output_interval_for_output(void *verifier, int output, int which_interval)
+     *}
+     */
+    public static MethodHandle verifier_output_interval_for_output$handle() {
+        return verifier_output_interval_for_output.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang = c:
+     * int verifier_output_interval_for_output(void *verifier, int output, int which_interval)
+     *}
+     */
+    public static MemorySegment verifier_output_interval_for_output$address() {
+        return verifier_output_interval_for_output.ADDR;
+    }
+
+    /**
+     * {@snippet lang = c:
+     * int verifier_output_interval_for_output(void *verifier, int output, int which_interval)
+     *}
+     */
+    public static int verifier_output_interval_for_output(MemorySegment verifier, int output, int which_interval) {
+        var mh$ = verifier_output_interval_for_output.HANDLE;
+        try {
+            return (int) mh$.invokeExact(verifier, output, which_interval);
+        }
+        catch (Error | RuntimeException ex) {
+            throw ex;
+        }
+        catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class verifier_output_intervals_for_output_repeat_after {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_POINTER,
+            OmSimWrapper.C_INT
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_output_intervals_for_output_repeat_after");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang = c:
+     * int verifier_output_intervals_for_output_repeat_after(void *verifier, int output)
+     *}
+     */
+    public static FunctionDescriptor verifier_output_intervals_for_output_repeat_after$descriptor() {
+        return verifier_output_intervals_for_output_repeat_after.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang = c:
+     * int verifier_output_intervals_for_output_repeat_after(void *verifier, int output)
+     *}
+     */
+    public static MethodHandle verifier_output_intervals_for_output_repeat_after$handle() {
+        return verifier_output_intervals_for_output_repeat_after.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang = c:
+     * int verifier_output_intervals_for_output_repeat_after(void *verifier, int output)
+     *}
+     */
+    public static MemorySegment verifier_output_intervals_for_output_repeat_after$address() {
+        return verifier_output_intervals_for_output_repeat_after.ADDR;
+    }
+
+    /**
+     * {@snippet lang = c:
+     * int verifier_output_intervals_for_output_repeat_after(void *verifier, int output)
+     *}
+     */
+    public static int verifier_output_intervals_for_output_repeat_after(MemorySegment verifier, int output) {
+        var mh$ = verifier_output_intervals_for_output_repeat_after.HANDLE;
+        try {
+            return (int) mh$.invokeExact(verifier, output);
+        }
+        catch (Error | RuntimeException ex) {
+            throw ex;
+        }
+        catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class verifier_number_of_outputs {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
+            OmSimWrapper.C_INT,
+            OmSimWrapper.C_POINTER
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("verifier_number_of_outputs");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang = c:
+     * int verifier_number_of_outputs(void *verifier)
+     *}
+     */
+    public static FunctionDescriptor verifier_number_of_outputs$descriptor() {
+        return verifier_number_of_outputs.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang = c:
+     * int verifier_number_of_outputs(void *verifier)
+     *}
+     */
+    public static MethodHandle verifier_number_of_outputs$handle() {
+        return verifier_number_of_outputs.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang = c:
+     * int verifier_number_of_outputs(void *verifier)
+     *}
+     */
+    public static MemorySegment verifier_number_of_outputs$address() {
+        return verifier_number_of_outputs.ADDR;
+    }
+
+    /**
+     * {@snippet lang = c:
+     * int verifier_number_of_outputs(void *verifier)
+     *}
+     */
+    public static int verifier_number_of_outputs(MemorySegment verifier) {
+        var mh$ = verifier_number_of_outputs.HANDLE;
+        try {
+            return (int) mh$.invokeExact(verifier);
+        }
+        catch (Error | RuntimeException ex) {
+            throw ex;
+        }
+        catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
     }

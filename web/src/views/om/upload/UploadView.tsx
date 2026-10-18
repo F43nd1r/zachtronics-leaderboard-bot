@@ -23,10 +23,11 @@ import {
     CircularProgress,
     FormControlLabel,
     Grow,
+    Link as ExternalLink,
     TextField,
     Typography
 } from "@mui/material"
-import {DropzoneAreaBase, FileObject} from "react-mui-dropzone"
+import FileDropzone from "../../../components/FileDropzone"
 import {useState} from "react"
 import {fetchFromApiRaw} from "../../../utils/fetchFromApi"
 import {CheckCircle} from "@mui/icons-material"
@@ -34,11 +35,11 @@ import {usePersistedState} from "../../../utils/usePersistedState"
 import {Type} from "@sinclair/typebox"
 
 export default function UploadView() {
-    const [solutionFile, setSolutionFile] = useState<FileObject | undefined>(undefined)
-    const [gifFile, setGifFile] = useState<FileObject | undefined>(undefined)
+    const [solutionFile, setSolutionFile] = useState<File | undefined>(undefined)
+    const [gifFile, setGifFile] = useState<File | undefined>(undefined)
     const [gifLink, setGifLink] = useState<string>()
     const [author, setAuthor] = usePersistedState("om-upload-author", Type.String(), "")
-    const [allowGifUpdate, setAllowGifUpdate] = useState<boolean>(false)
+    const [allowGifOverwrite, setAllowGifOverwrite] = useState<boolean>(false)
     const [error, setError] = useState<string>()
     const [isUploading, setIsUploading] = useState<boolean>(false)
     const [successUrl, setSuccessUrl] = useState<string>()
@@ -65,13 +66,13 @@ export default function UploadView() {
         setIsUploading(true)
         const formData = new FormData()
         formData.append("author", author)
-        formData.append("solution", new Blob([await solutionFile.file.arrayBuffer()]))
+        formData.append("solution", new Blob([await solutionFile.arrayBuffer()]))
         if (gifFile) {
-            formData.append("gifData", new Blob([await gifFile.file.arrayBuffer()]))
+            formData.append("gifData", new Blob([await gifFile.arrayBuffer()]))
         } else {
             formData.append("gif", gifLink!)
         }
-        formData.append("allowGifUpdate", allowGifUpdate.toString());
+        formData.append("allowGifOverwrite", allowGifOverwrite.toString());
         const response = await fetchFromApiRaw("/om/submit", {
             method: "POST",
             body: formData,
@@ -125,49 +126,19 @@ export default function UploadView() {
                         sx={{ whiteSpace: 'nowrap' }}
                         control={
                             <Checkbox
-                                checked={allowGifUpdate}
-                                onChange={(e) => setAllowGifUpdate(e.target.checked)}
-                                name="allowGifUpdate"
+                                checked={allowGifOverwrite}
+                                onChange={(e) => setAllowGifOverwrite(e.target.checked)}
+                                name="allowGifOverwrite"
                                 color="primary"
                             />
                         }
-                        label="Allow GIF Update"
+                        label="Allow GIF Overwrite"
                     />
                 </Box>
                 <Box sx={{ display: "flex", gap: "1em" }}>
-                    <DropzoneAreaBase
-                        fileObjects={solutionFile ? [solutionFile] : []}
-                        onAdd={(newFiles) => {
-                            if (newFiles.length > 0) setSolutionFile(newFiles[0])
-                        }}
-                        onDelete={() => {
-                            setSolutionFile(undefined)
-                        }}
-                        filesLimit={1}
-                        acceptedFiles={[".solution"]}
-                        maxFileSize={1024*1024}
-                        dropzoneText="Drop your solution file here"
-                        showPreviewsInDropzone={true}
-                        useChipsForPreview={true}
-                        showFileNames={true}
-                    />
+                    <FileDropzone file={solutionFile} onChange={setSolutionFile} accept=".solution" maxSize={1024 * 1024} text="Drop your solution file here" />
                     <Box sx={{ display: "flex", gap: "1em", flexDirection: "column", minWidth: "40%" }}>
-                        <DropzoneAreaBase
-                            fileObjects={gifFile ? [gifFile] : []}
-                            onAdd={(newFiles) => {
-                                if (newFiles.length > 0) setGifFile(newFiles[0])
-                            }}
-                            onDelete={() => {
-                                setGifFile(undefined)
-                            }}
-                            filesLimit={1}
-                            acceptedFiles={[".gif"]}
-                            maxFileSize={100*1024*1024}
-                            dropzoneText="Drop your GIF file here"
-                            showPreviewsInDropzone={true}
-                            useChipsForPreview={true}
-                            showFileNames={true}
-                        />
+                        <FileDropzone file={gifFile} onChange={setGifFile} accept=".gif" maxSize={100 * 1024 * 1024} text="Drop your GIF file here" />
                         <TextField
                             id="gifLink"
                             label="GIF Link"
@@ -187,6 +158,14 @@ export default function UploadView() {
                     Upload
                 </Button>
                 {error ? <Alert severity="error">{error}</Alert> : undefined}
+                <ExternalLink
+                    href="https://events.critelli.technology/static/where.html"
+                    target="_blank"
+                    rel="noreferrer"
+                    sx={{ mt: "auto", alignSelf: "center" }}
+                >
+                    Where do I find my solution files?
+                </ExternalLink>
                 <Backdrop open={isUploading} color={"#000000"}>
                     {successUrl ? (
                         <Grow in {...(successUrl ? { timeout: 1000 } : {})}>
@@ -194,9 +173,9 @@ export default function UploadView() {
                                 <CheckCircle color={"success"} sx={{ fontSize: 200 }} />
                                 <Typography variant="h6" sx={{ mt: 2, textAlign: 'center' }}>
                                     Your solution has been added, see details in the{' '}
-                                    <a href={successUrl} target="_blank" rel="noopener noreferrer">
+                                    <ExternalLink href={successUrl} target="_blank" rel="noopener noreferrer">
                                         Discord Post
-                                    </a>
+                                    </ExternalLink>
                                 </Typography>
                             </Box>
                         </Grow>

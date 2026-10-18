@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 import Box from "@mui/material/Box"
-import { Button, Tab, Tabs } from "@mui/material"
+import { Button, Link as ExternalLink, Tab, Tabs } from "@mui/material"
 import { Link, Navigate, Outlet, useMatch } from "react-router-dom"
 import { usePersistedState } from "../../../utils/usePersistedState"
 import { lazy, ReactElement, useEffect } from "react"
@@ -103,6 +103,10 @@ export default function PuzzleView() {
                 )}
                 {puzzleId?.match(/w[0-9]+/) ? (
                     <Button
+                        component={ExternalLink}
+                        href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${puzzleId.substring(1)}`}
+                        target="_blank"
+                        rel="noreferrer"
                         size="small"
                         variant="outlined"
                         color="primary"
@@ -111,17 +115,7 @@ export default function PuzzleView() {
                             marginBottom: "auto",
                         }}
                     >
-                        <a
-                            href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${puzzleId.substring(1)}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            style={{
-                                color: "inherit",
-                                textDecoration: "none",
-                            }}
-                        >
-                            Get on Steam
-                        </a>
+                        Get on Steam
                     </Button>
                 ) : (
                     <Button

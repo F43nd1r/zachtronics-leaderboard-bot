@@ -19,7 +19,7 @@ The graphical leaderboard, frontier visualizer and API is hosted at https://zlbb
 The official leaderboard copies managed by the bot are in the wiki page of the game subreddits.
 
 ## Set up the leaderboard integration in Opus Magnum
-See https://github.com/F43nd1r/zachtronics-leaderboard-bot/wiki/How-to-submit-from-within-the-game
+See https://github.com/zachtronics-leaderboards/zachtronics-leaderboard-bot/wiki/How-to-submit-from-within-the-game
 
 ## Build
 0. Set up docker-compose, create a discord bot, create a reddit app, get a github personal access token. Follow respective guides.
@@ -30,7 +30,7 @@ See https://github.com/F43nd1r/zachtronics-leaderboard-bot/wiki/How-to-submit-fr
 ``` 
 2. Run via `docker-compose`:
 [docker-compose-example](docker-compose-example.yml)
-Alternatively to `build .` you can use prebuilt `image: f43nd1r/zachtronics-leaderboard-bot:latest`. This makes the gradle build obsolete.
+Alternatively to `build .` you can use prebuilt `image: ghcr.io/zachtronics-leaderboards/zachtronics-leaderboard-bot:latest`.
 
 ---
 

@@ -19,7 +19,6 @@ package com.faendir.zachtronics.bot.om.model
 import com.faendir.zachtronics.bot.model.DisplayContext
 import com.faendir.zachtronics.bot.model.Score
 import com.faendir.zachtronics.bot.model.StringFormat
-import com.faendir.zachtronics.bot.utils.InfinInt
 import com.faendir.zachtronics.bot.utils.LevelValue
 import com.faendir.zachtronics.bot.utils.newEnumSet
 import com.faendir.zachtronics.bot.utils.runIf
@@ -42,6 +41,9 @@ data class OmScore(
     val width: Double?,    // tracked for NORMAL,POLYMER_WIDTH
     val boundingHex: Int?, // tracked for NORMAL
 
+    // somewhere between @1 and @INF, see https://docs.google.com/document/d/1ujPMowWoO2gAcd-wLo9lw7wyurcbYwhrvd0xBkGNlOA
+    val looping: Boolean,
+
     // @INF
     /**
      * * FINITE: normal looping solve
@@ -58,33 +60,36 @@ data class OmScore(
      * represented as (level, value)
      */
     val areaINF: LevelValue?,
-    val heightINF: InfinInt?,      // tracked for NORMAL,POLYMER_HEIGHT
-    val widthINF: Double?,         // tracked for NORMAL,POLYMER_WIDTH
-    val boundingHexINF: InfinInt?, // tracked for NORMAL
+    /**
+     * the possibilities are:
+     * * H integer, H'=0
+     * * H=INF, H' float
+     *
+     * represented as (level, value)
+     */
+    val heightINF: LevelValue?,      // tracked for NORMAL,POLYMER_HEIGHT
+    val widthINF: LevelValue?,       // tracked for NORMAL,POLYMER_WIDTH
+    val boundingHexINF: LevelValue?, // tracked for NORMAL
 
     /** more stuff we learn from omsim at runtime, uses [Double.NaN] as a stand-in for `null` */
     @Transient
     val extraKnownMetrics: MutableMap<String, Double> = hashMapOf()
 ) : Score<OmCategory> {
     @Transient
-    val looping: Boolean = rate != null
-
-    @Transient
     val measurePoints: EnumSet<MeasurePoint> =
         // with just 2 non-start measure points we can cut corners, hopefully we don't need to track more
-        EnumSet.of(MeasurePoint.START, MeasurePoint.VICTORY).apply { if (looping) add(MeasurePoint.INFINITY) }
+        EnumSet.of(MeasurePoint.START, MeasurePoint.VICTORY).apply { if (rate != null) add(MeasurePoint.INFINITY) }
 
     /**
-     * humans: `12g/34c/56a/78i/3h/4w/8b/O/T/L@V 12g/34r/57a/78i/6h/7w/9b/O/T@∞`
+     * humans: `15g/34c/56a/78i/3h/4w/8b/OTL@V 15g/34r/57a''/78i/6h'/7w/9b/OT@∞`
      *
-     * machines: `12g-34i-15c-12a-3h-4w-8b[-15r-12a0-3h-4w-9b]-O-T`
+     * machines: `15g-78i-34c-56a-3h-4w-8b[-34r-57a2-6h1-7w-9b]-OTL`
      */
     override fun toDisplayString(context: DisplayContext<OmCategory>): String {
 
         if (context.format == StringFormat.FILE_NAME) {
             // we write a standard machine-readable deduplicated score
-            val allMetrics = OmMetrics.VALUE + listOf(OmMetric.OVERLAP, OmMetric.TRACKLESS)
-            return subScoreDisplay(allMetrics, context.format)
+            return subScoreDisplay(OmMetrics.VALUE, OmMetrics.MODIFIER, context.format)
         }
 
         val desiredMetrics = context.categories
@@ -99,15 +104,24 @@ data class OmScore(
             ?: EnumSet.copyOf(measurePoints).apply { remove(MeasurePoint.START) }
 
         return desiredMeasurePoints.joinToString(" ") { measurePoint ->
-            subScoreDisplay(OmMetrics.BY_MEASURE_POINT[measurePoint]!!.filter { it in desiredMetrics }, context.format)
+            val metrics = OmMetrics.BY_MEASURE_POINT[measurePoint]!!.filter { it in desiredMetrics }
+            subScoreDisplay(metrics.filterIsInstance<OmMetric.Value<*>>(),
+                            metrics.filterIsInstance<OmMetric.Modifier>(), context.format)
                 .runIf(desiredMeasurePoints.size > 1) { plus(measurePoint.displayName) }
         } + additionalMetricDescriptions(context)
     }
 
     private fun subScoreDisplay(
-        subScoreParts: List<OmMetric.ScorePart<*>>,
+        values: List<OmMetric.Value<*>>,
+        modifiers: List<OmMetric.Modifier>,
         format: StringFormat
-    ) = subScoreParts.mapNotNull { it.describe(this, format) }.joinToString(format.separator)
+    ): String {
+        val parts = values.mapNotNullTo(mutableListOf()) { it.describe(this, format) }
+        val modifierPart = modifiers.mapNotNull { it.describe(this) }
+        if (modifierPart.isNotEmpty())
+            parts += modifierPart.joinToString("")
+        return parts.joinToString(format.separator)
+    }
 
     /** @return extra descriptions of computed metrics, like ` (g+c+a=215)` */
     private fun additionalMetricDescriptions(context: DisplayContext<OmCategory>): String = when (context.format) {
@@ -124,11 +138,10 @@ data class OmScore(
     }
 
     /** `12g-15c-12a-34i[-O][-T]` to comply with Syx's desires */
-    fun toMorsString(): String = subScoreDisplay(
-        listOf(
-            OmMetric.COST, OmMetric.CYCLES, OmMetric.AREA, OmMetric.INSTRUCTIONS, OmMetric.OVERLAP, OmMetric.TRACKLESS
-        ), StringFormat.FILE_NAME
-    )
+    fun toMorsString() =
+        subScoreDisplay(listOf(OmMetric.COST, OmMetric.CYCLES, OmMetric.AREA, OmMetric.INSTRUCTIONS),
+                        listOf(OmMetric.OVERLAP, OmMetric.TRACKLESS),
+                        StringFormat.FILE_NAME)
 
     override fun toString() = toDisplayString()
 }

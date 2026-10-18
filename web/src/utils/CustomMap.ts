@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,19 +56,19 @@ export class CustomMap<K, V> implements Map<K, V> {
         return this._values.size
     }
 
-    public keys(): IterableIterator<K> {
+    public keys(): MapIterator<K> {
         return this._keys.values()
     }
 
-    public values(): IterableIterator<V> {
+    public values(): MapIterator<V> {
         return this._values.values()
     }
 
-    public entries(): IterableIterator<[K, V]> {
+    public entries(): MapIterator<[K, V]> {
         return mapIterator(this._values.entries(), (value) => [this._keys.get(value[0])!, value[1]])
     }
 
-    public [Symbol.iterator](): IterableIterator<[K, V]> {
+    public [Symbol.iterator](): MapIterator<[K, V]> {
         return this.entries()
     }
 
@@ -120,9 +120,28 @@ export class CustomMap<K, V> implements Map<K, V> {
         }
         return false
     }
+
+    public getOrInsert(key: K, defaultValue: V): V {
+        const value = this.get(key)
+        if (value !== undefined) {
+            return value
+        }
+        this.set(key, defaultValue)
+        return defaultValue
+    }
+
+    public getOrInsertComputed(key: K, callback: (key: K) => V): V {
+        const value = this.get(key)
+        if (value !== undefined) {
+            return value
+        }
+        const defaultValue = callback(key)
+        this.set(key, defaultValue)
+        return defaultValue
+    }
 }
 
-function* mapIterator<T1, T2>(iterable: IterableIterator<T1>, callback: (value: T1) => T2): IterableIterator<T2> {
+function* mapIterator<T1, T2>(iterable: MapIterator<T1>, callback: (value: T1) => T2): MapIterator<T2> {
     for (let x of iterable) {
         yield callback(x)
     }

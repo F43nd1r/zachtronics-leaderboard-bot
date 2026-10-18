@@ -27,6 +27,7 @@ import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.omSolutionRepoFor
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.testutils.TestGitRepository
+import com.faendir.zachtronics.bot.utils.toLevelValue
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -141,7 +142,7 @@ class OmSolutionRepositoryTest {
         val gif = "https://better.gif"
         val resultNo = repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score, displayLink = gif))
         expectThat(resultNo).isA<SubmitResult.AlreadyPresent<OmRecord, OmCategory>>()
-        val resultYes = repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score, displayLink = gif, allowGifUpdate = true))
+        val resultYes = repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score, displayLink = gif, allowGifOverwrite = true))
         expectThat(resultYes).isA<SubmitResult.Updated<OmRecord, OmCategory>>()
 
         expectThat(repository.findCategoryHolders(OmPuzzle.STABILIZED_WATER, true)) {
@@ -172,10 +173,11 @@ class OmSolutionRepositoryTest {
 
     @Test
     fun `outpareto on opposite manifold`() {
-        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cycles = 10, rate = 100.0, widthINF = 1.0)))
-        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cycles = 30, rate = 10.0, widthINF = 1.0)))
+        // we fill aV and aINF
+        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cycles = 10, rate = 100.0, areaINF = 10.toLevelValue())))
+        repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, dummyOmScore.copy(cycles = 30, rate = 10.0, areaINF = 10.toLevelValue())))
 
-        val score = dummyOmScore.copy(cycles = 20, rate = 10.0, widthINF = 1.0)
+        val score = dummyOmScore.copy(cycles = 20, rate = 10.0, areaINF = 10.toLevelValue())
 
         val result = repository.submit(dummyOmSubmission(OmPuzzle.STABILIZED_WATER, score))
 

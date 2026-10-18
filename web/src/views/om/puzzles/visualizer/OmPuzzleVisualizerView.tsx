@@ -20,9 +20,10 @@ import { VisualizerColor } from "../../../../utils/VisualizerColor"
 import OmScore from "../../../../model/om/OmScore"
 import { OmRecord } from "../../../../model/om/OmRecord"
 import OmRecordCard from "../../../../components/OmRecordCard"
+import { marshalLevelValue } from "../../../../model/LevelValue"
 
 export default function OmPuzzleVisualizerView() {
-    const puzzleId = useParams().puzzleId
+    const puzzleId = useParams().puzzleId!
 
     return (
         <>
@@ -47,14 +48,10 @@ export default function OmPuzzleVisualizerView() {
                     w: { name: "Width", get: (score) => score?.width },
                     b: { name: "Bounding Hex", get: (score) => score?.boundingHex },
                     r: { name: "Rate", get: (score) => score?.rate },
-                    aI: {
-                        name: "Area@∞",
-                        get: (score) =>
-                            score?.areaINFValue != null && score?.areaINFLevel != null ? score.areaINFValue * 10 ** (5 * score.areaINFLevel) : undefined,
-                    },
-                    hI: { name: "Height@∞", get: (score) => score?.heightINF },
-                    wI: { name: "Width@∞", get: (score) => score?.widthINF },
-                    bI: { name: "Bounding Hex@∞", get: (score) => score?.boundingHexINF },
+                    aI: { name: "Area@∞", get: (score) => marshalLevelValue(score?.areaINF) },
+                    hI: { name: "Height@∞", get: (score) => marshalLevelValue(score?.heightINF) },
+                    wI: { name: "Width@∞", get: (score) => marshalLevelValue(score?.widthINF) },
+                    bI: { name: "Bounding Hex@∞", get: (score) => marshalLevelValue(score?.boundingHexINF) },
                 }}
                 modifiers={{
                     overlap: {
@@ -72,6 +69,14 @@ export default function OmPuzzleVisualizerView() {
                         legendOrder: 1,
                         option1: "Trackless",
                         option2: "With Track",
+                    },
+                    looping: {
+                        get: (score) => score?.looping,
+                        name: "looping",
+                        color: VisualizerColor.BAD3,
+                        legendOrder: 2,
+                        option1: "Looping",
+                        option2: "Not Looping",
                     },
                 }}
                 defaultColor={VisualizerColor.DEFAULT}

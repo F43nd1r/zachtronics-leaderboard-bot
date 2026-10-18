@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,6 @@
  * limitations under the License.
  */
 
-/*
- * Copyright (c) 2022
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 import { useMemo } from "react"
 import ApiResource from "../../../utils/ApiResource"
 import OmRecordGrid from "../../../components/OmRecordGrid"
@@ -39,13 +24,14 @@ import { Type } from "@sinclair/typebox"
 import { Link } from "react-router-dom"
 
 enum SinceLast {
-    DAY = 1000 * 60 * 60 * 24,
+    HOUR = 1000 * 60 * 60,
+    DAY = HOUR * 24,
     WEEK = DAY * 7,
     MONTH = DAY * 30,
 }
 
 export default function RecentSubmissionsView() {
-    const [sinceLast, setSinceLast] = usePersistedState("submissionsSince", Type.Enum(SinceLast), SinceLast.WEEK)
+    const [sinceLast, setSinceLast] = usePersistedState("submissionsSince", Type.Enum(SinceLast), SinceLast.DAY)
 
     const dateSince: Date = useMemo(() => new Date(new Date().getTime() - sinceLast), [sinceLast])
 
@@ -67,6 +53,9 @@ export default function RecentSubmissionsView() {
                     label={"Show Submissions within last"}
                     fullWidth={false}
                 >
+                    <MenuItem value={SinceLast.HOUR} key={SinceLast.HOUR}>
+                        Hour
+                    </MenuItem>
                     <MenuItem value={SinceLast.DAY} key={SinceLast.DAY}>
                         Day
                     </MenuItem>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import CwScore from "../../model/cw/CwScore"
 import fetchFromApi from "../../utils/fetchFromApi"
 
 export default function CwPuzzleVisualizerView() {
-    const puzzleId = useParams().puzzleId
+    const puzzleId = useParams().puzzleId!
     fetchFromApi<Puzzle>(`/cw/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - ChipWizard™ Professional Leaderboard`))
 
     return (

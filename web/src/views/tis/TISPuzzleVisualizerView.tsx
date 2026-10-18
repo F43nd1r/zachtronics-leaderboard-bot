@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import TISScore from "../../model/tis/TISScore"
 import fetchFromApi from "../../utils/fetchFromApi"
 
 export default function TISPuzzleVisualizerView() {
-    const puzzleId = useParams().puzzleId
+    const puzzleId = useParams().puzzleId!
     fetchFromApi<Puzzle>(`/tis/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - TIS-100 Leaderboard`))
 
     return (

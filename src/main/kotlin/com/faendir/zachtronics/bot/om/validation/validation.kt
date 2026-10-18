@@ -24,8 +24,6 @@ import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.model.OmType
-import com.faendir.zachtronics.bot.utils.InfinInt
-import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
 import com.faendir.zachtronics.bot.utils.LevelValue
 import okio.buffer
 import okio.sink
@@ -44,6 +42,17 @@ private fun OmSolutionVerifier.getAreaINF(outputsAtINF: Int?): LevelValue? {
     if (a1 != 0) return LevelValue(1, a1.toDouble() / outputsAtINF)
     val a0 = getMetric(OmSimMetric.STEADY_STATE(OmSimMetric.AREA))
     return LevelValue(0, a0.toDouble())
+}
+
+private fun OmSolutionVerifier.getAreaLikeINF(
+    outputsAtINF: Int?, metric0: OmSimMetric<*>, metric1: OmSimMetric<Double>
+): LevelValue? {
+    if (outputsAtINF == null)
+        return null
+    val a1 = getApproximateMetric(metric1)
+    if (a1 != 0.0) return LevelValue(1, a1 / outputsAtINF)
+    val a0 = getApproximateMetric(OmSimMetric.STEADY_STATE(metric0))
+    return LevelValue(0, a0)
 }
 
 fun OmSolutionVerifier.getScore(type: OmType): OmScore {
@@ -76,22 +85,24 @@ fun OmSolutionVerifier.getScore(type: OmType): OmScore {
         width = if (OmMetric.WIDTH in areaLikes) getApproximateMetric(OmSimMetric.WIDTH) else null,
         boundingHex = if (OmMetric.BOUNDING_HEX in areaLikes) getMetric(OmSimMetric.MINIMUM_HEXAGON) else null,
 
+        looping = getLooping(),
+
         rate = outputsAtINF?.run {
             val precision = 100.0
             ceil((precision * getMetric(OmSimMetric.PER_REPETITION_CYCLES).toDouble() / this)) / precision
         },
         areaINF = getAreaINF(outputsAtINF),
-        heightINF = if (outputsAtINF == null || OmMetric.HEIGHT_INF !in areaLikes) null
-        else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.HEIGHT))?.toInfinInt() ?: InfinInt.INFINITY,
-        widthINF = if (outputsAtINF == null || OmMetric.WIDTH_INF !in areaLikes) null
-        else getApproximateMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.WIDTH)) ?: Double.POSITIVE_INFINITY,
-        boundingHexINF = if (outputsAtINF == null || OmMetric.BOUNDING_HEX_INF !in areaLikes) null
-        else getMetricSafe(OmSimMetric.STEADY_STATE(OmSimMetric.MINIMUM_HEXAGON))?.toInfinInt() ?: InfinInt.INFINITY,
+        heightINF = if (OmMetric.HEIGHT_INF !in areaLikes) null
+        else getAreaLikeINF(outputsAtINF, OmSimMetric.HEIGHT, OmSimMetric.PER_REPETITION_HEIGHT),
+        widthINF = if (OmMetric.WIDTH_INF !in areaLikes) null
+        else getAreaLikeINF(outputsAtINF, OmSimMetric.WIDTH, OmSimMetric.PER_REPETITION_WIDTH),
+        boundingHexINF = if (OmMetric.BOUNDING_HEX_INF !in areaLikes) null
+        else getAreaLikeINF(outputsAtINF, OmSimMetric.MINIMUM_HEXAGON, OmSimMetric.PER_REPETITION_MINIMUM_HEXAGON),
     )
 }
 
 fun createSubmission(
-    inputSolData: ByteArray, author: String, allowGifUpdate: Boolean = false,
+    inputSolData: ByteArray, author: String, allowGifOverwrite: Boolean = false,
     gif: String? = null, gifData: ByteArray? = null
 ): OmSubmission {
     val solution = try {
@@ -151,7 +162,7 @@ fun createSubmission(
             author,
             gif,
             solutionData,
-            allowGifUpdate,
+            allowGifOverwrite,
             gifData,
         )
     }

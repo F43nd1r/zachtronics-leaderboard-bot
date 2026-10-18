@@ -111,14 +111,14 @@ class OmDailyPareto(
             for (element in frontier) {
                 when (element) {
                     is QueryElement.Constraint -> {
-                        for (modifier in listOf(OVERLAP, TRACKLESS) intersect element.metric.scoreParts) {
+                        for (modifier in element.metric.scoreParts.filterIsInstance<Modifier>()) {
                             val name = modifier.internalName.lowercase()
                             val value = records.first().record.score[modifier]
                             append("visualizerFilter-${puzzle.id}.modifiers.${name}=${value}&")
                         }
                     }
                     is QueryElement.Min -> {
-                        if (element.metric is ScorePart<*>) {
+                        if (element.metric is Value<*>) {
                             val min = records.first().record.score[element.metric]
                             append("visualizerFilter-${puzzle.id}.range.${element.metric.description}.min=${min}&")
                             append("visualizerFilter-${puzzle.id}.range.${element.metric.description}.max=${min}&")

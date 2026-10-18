@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import LevelValue from "../LevelValue"
+
 export default interface OmScore {
     cost: number
     instructions: number
@@ -25,10 +27,11 @@ export default interface OmScore {
     width?: number
     boundingHex?: number
 
+    looping: boolean
+
     rate?: number
-    areaINFLevel?: number
-    areaINFValue?: number
-    heightINF?: number
-    widthINF?: number
-    boundingHexINF?: number
+    areaINF?: LevelValue
+    heightINF?: LevelValue
+    widthINF?: LevelValue
+    boundingHexINF?: LevelValue
 }

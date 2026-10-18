@@ -36,6 +36,8 @@ val dummyOmScore = OmScore(
     width = 0.0,
     boundingHex = 0,
 
+    looping = false,
+
     rate = null,
     areaINF = null,
     heightINF = null,
@@ -49,8 +51,8 @@ fun dummyOmSubmission(
     author: String? = null,
     displayLink: String = "https://no.link",
     data: ByteArray = ByteArray(0),
-    allowGifUpdate: Boolean = false,
-) = OmSubmission(puzzle, score, author, displayLink, data, allowGifUpdate)
+    allowGifOverwrite: Boolean = false,
+) = OmSubmission(puzzle, score, author, displayLink, data, allowGifOverwrite)
 
 fun omSolutionRepoFor(repo: GitRepository) =
     OmSolutionRepository(repo, mockk(relaxed = true), OmUrlMapper(), mockk(relaxed = true), mockk(relaxed = true))

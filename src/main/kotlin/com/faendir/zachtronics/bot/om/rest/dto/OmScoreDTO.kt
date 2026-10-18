@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.faendir.zachtronics.bot.om.rest.dto
 
 import com.faendir.zachtronics.bot.om.model.OmScore
+import com.faendir.zachtronics.bot.utils.LevelValue
 
 data class OmScoreDTO(
     // @0
@@ -32,13 +33,15 @@ data class OmScoreDTO(
     val width: Double?,
     val boundingHex: Int?,
 
+    // somewhere between @0 and @INF, see https://docs.google.com/document/d/1ujPMowWoO2gAcd-wLo9lw7wyurcbYwhrvd0xBkGNlOA
+    val looping: Boolean,
+
     // @INF
     val rate: Double?,
-    val areaINFLevel: Int?,
-    val areaINFValue: Double?,
-    val heightINF: Double?,
-    val widthINF: Double?,
-    val boundingHexINF: Double?
+    val areaINF: LevelValue?,
+    val heightINF: LevelValue?,
+    val widthINF: LevelValue?,
+    val boundingHexINF: LevelValue?
 )
 
 fun OmScore.toDTO() = OmScoreDTO(
@@ -47,6 +50,8 @@ fun OmScore.toDTO() = OmScoreDTO(
     trackless = trackless,
     overlap = overlap,
 
+    looping = looping,
+
     cycles = cycles,
     area = area,
     height = height,
@@ -54,9 +59,8 @@ fun OmScore.toDTO() = OmScoreDTO(
     boundingHex = boundingHex,
 
     rate = rate,
-    areaINFLevel = areaINF?.level,
-    areaINFValue = areaINF?.value,
-    heightINF = heightINF?.toDouble(),
+    areaINF = areaINF,
+    heightINF = heightINF,
     widthINF = widthINF,
-    boundingHexINF = boundingHexINF?.toDouble(),
+    boundingHexINF = boundingHexINF,
 )

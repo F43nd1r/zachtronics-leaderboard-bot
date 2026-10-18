@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import java.util.*
  * A [SystemReader] that does not read any external config files.
  * This is necessary because jgit does not support commit signing but still tries to read the gpg config when present.
  */
+@Suppress("OVERRIDE_DEPRECATION")
 class JGitNoExternalConfigReader(private val proxy: SystemReader) : SystemReader() {
     override fun getenv(key: String?): String? = proxy.getenv(key)
     override fun getProperty(key: String?): String? = proxy.getProperty(key)

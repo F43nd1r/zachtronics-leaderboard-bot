@@ -24,12 +24,10 @@ import com.faendir.zachtronics.bot.om.model.OmPuzzle
 import com.faendir.zachtronics.bot.om.model.OmRecord
 import com.faendir.zachtronics.bot.om.model.OmSubmission
 import com.faendir.zachtronics.bot.om.omSolutionRepoFor
-import com.faendir.zachtronics.bot.om.repository.OmSolutionRepository
 import com.faendir.zachtronics.bot.om.rest.OmUrlMapper
 import com.faendir.zachtronics.bot.om.validation.createSubmission
 import com.faendir.zachtronics.bot.repository.SubmitResult
 import com.faendir.zachtronics.bot.testutils.TestGitRepository
-import io.mockk.mockk
 import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
@@ -54,6 +52,10 @@ class OmLeaderboardFixer {
         prettyPrint = true
         allowSpecialFloatingPointValues = true
     }
+    private val gitProperties = GitProperties().apply {
+        accessToken = ""
+        username = "zachtronics-leaderboard-bot"
+    }
 
     private fun getAllRecordFiles(root: File, vararg puzzles: OmPuzzle = OmPuzzle.values()): Sequence<File> =
         puzzles.asSequence()
@@ -66,11 +68,8 @@ class OmLeaderboardFixer {
     fun resubmitAll() {
         val repo = File("../opus_magnum/leaderboard")
 
-        val gitRepo = TestGitRepository(GitProperties().apply {
-            accessToken = ""
-            username = "zachtronics-leaderboard-bot"
-        }, repo)
-        val repository = OmSolutionRepository(gitRepo, mockk(relaxed = true), OmUrlMapper(), mockk(relaxed = true), mockk(relaxed = true))
+        val gitRepo = TestGitRepository(gitProperties, repo)
+        val repository = omSolutionRepoFor(gitRepo)
 
         for (puzzle in OmPuzzle.entries) {
             println("Doing ${puzzle.name}")
@@ -99,12 +98,11 @@ class OmLeaderboardFixer {
         val repo = File("../opus_magnum/leaderboard")
         val newRepoFile = File("../opus_magnum/leaderboard-new")
 
-        val newRepo = createGitRepositoryFrom(newRepoFile, GitProperties().apply {
-            accessToken = ""
-            username = "zachtronics-leaderboard-bot"
-        })
-        val repository = OmSolutionRepository(newRepo, mockk(relaxed = true), OmUrlMapper(), mockk(relaxed = true), mockk(relaxed = true))
+        // to speed this up replace GitRepository#ensureUpToDate() with `return ReadWriteAccess(writeLock, repo)`
+        val newRepo = createGitRepositoryFrom(newRepoFile, gitProperties)
+        val repository = omSolutionRepoFor(newRepo)
 
+        var idx = 0
         for (file in getAllRecordFiles(repo)) {
             println("${file.name} is being processed")
             val oldRecord = json.parseToJsonElement(file.readText()) as JsonObject
@@ -114,6 +112,16 @@ class OmLeaderboardFixer {
             val submission = createSubmission(bytes, "Manifoldius", gif = displayLink)
             val result = repository.submit(submission)
             println(result)
+            if (result is SubmitResult.Success || result is SubmitResult.Updated) {
+                if (++idx % 50 == 0) {
+                    fun gc(f: File) {
+                        ProcessBuilder("git", "gc").directory(f.canonicalFile).start().waitFor()
+                        println("Solution ${idx}: Garbage collected ${f.canonicalPath}")
+                    }
+                    gc(newRepo.acquireReadAccess().use { it.repo })
+                    gc(newRepoFile)
+                }
+            }
         }
     }
 
@@ -122,17 +130,15 @@ class OmLeaderboardFixer {
         val folder = File("/tmp/outparetoed")
         val repoFile = File("../opus_magnum/leaderboard")
 
-        val repo = TestGitRepository(GitProperties().apply {
-            accessToken = ""
-            username = "zachtronics-leaderboard-bot"
-        }, repoFile)
+        val repo = TestGitRepository(gitProperties, repoFile)
         val repository = omSolutionRepoFor(repo)
 
-        for (solution in folder.listFiles()!!.sorted()) {
+        var idx = 0
+        for (solution in folder.listFiles { it.isFile }!!.sorted()) {
             println("${solution.name} is being processed")
             val bytes = solution.readBytes()
             val submission = try {
-                createSubmission(bytes, "Folderius", gif = "https://new.cool.score")
+                createSubmission(bytes, "Folderius", gif = "https://solution.media.missing")
             }
             catch (e: Exception) {
                 e.printStackTrace()
@@ -140,6 +146,16 @@ class OmLeaderboardFixer {
             }
             val result = repository.submit(submission)
             println(result)
+            if (result is SubmitResult.Success || result is SubmitResult.Updated) {
+                if (++idx % 50 == 0) {
+                    fun gc(f: File) {
+                        ProcessBuilder("git", "gc").directory(f.canonicalFile).start().waitFor()
+                        println("Solution ${idx}: Garbage collected ${f.canonicalPath}")
+                    }
+                    gc(repo.acquireReadAccess().use { it.repo })
+                    gc(repoFile)
+                }
+            }
         }
     }
 
@@ -177,9 +193,7 @@ class OmLeaderboardFixer {
                         }
                     }
                 } catch (e: Exception) {
-                    if ("MIRACULOUS" !in e.message!!) {
-                        println("warn: Failed to process ${file.name}: ${e.message}")
-                    }
+                    println("warn: Failed to process ${file.name}: ${e.message}")
                 }
             }
     }
@@ -198,9 +212,7 @@ class OmLeaderboardFixer {
                     val record = file.inputStream().buffered().use { stream -> json.decodeFromStream<OmRecord>(stream) }
                     file.writeText(json.encodeToString(record.copy(dataLink = mapper.createShortUrl(commitHash, record.puzzle, record.score))))
                 } catch (e: Exception) {
-                    if ("MIRACULOUS" !in e.message!!) {
-                        println("warn: Failed to process ${file.name}: ${e.message}")
-                    }
+                    println("warn: Failed to process ${file.name}: ${e.message}")
                 }
             }
     }

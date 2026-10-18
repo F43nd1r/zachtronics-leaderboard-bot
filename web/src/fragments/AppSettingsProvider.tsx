@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ export interface AppSettings {
     setColorMode: (value: ColorMode) => void
     autoPlay: boolean
     setAutoPlay: (value: boolean) => void
+    showMedia: boolean
+    setShowMedia: (value: boolean) => void
     showControls: boolean
     setShowControls: (value: boolean) => void
 }
@@ -37,6 +39,8 @@ export const AppSettingsContext = createContext<AppSettings>({
     setColorMode: () => {},
     autoPlay: true,
     setAutoPlay: () => {},
+    showMedia: true,
+    setShowMedia: () => {},
     showControls: false,
     setShowControls: () => {},
 })
@@ -45,6 +49,7 @@ export default function AppSettingsProvider(props: { children?: ReactNode | unde
     const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
     const [colorMode, setColorMode] = usePersistedState("colorMode", ColorModeSchema, prefersDarkMode ? "light" : "dark")
     const [autoPlay, setAutoPlay] = usePersistedState("autoPlay", Type.Boolean(), true)
+    const [showMedia, setShowMedia] = usePersistedState("showMedia", Type.Boolean(), true)
     const [showControls, setShowControls] = usePersistedState("showControls", Type.Boolean(), false)
     const context = useMemo<AppSettings>(
         () => ({
@@ -52,10 +57,12 @@ export default function AppSettingsProvider(props: { children?: ReactNode | unde
             setColorMode,
             autoPlay,
             setAutoPlay,
+            showMedia,
+            setShowMedia,
             showControls,
             setShowControls,
         }),
-        [autoPlay, colorMode, setAutoPlay, setColorMode, setShowControls, showControls],
+        [autoPlay, colorMode, setAutoPlay, setColorMode, setShowControls, setShowMedia, showControls, showMedia],
     )
 
     const theme = useMemo(

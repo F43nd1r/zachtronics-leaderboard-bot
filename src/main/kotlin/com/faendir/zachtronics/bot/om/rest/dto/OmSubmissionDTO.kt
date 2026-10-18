@@ -20,5 +20,5 @@ import org.springframework.web.multipart.MultipartFile
 
 data class OmSubmissionDTO(
     val solution: MultipartFile, val author: String,
-    val allowGifUpdate: Boolean?, val gif: String?, val gifData: MultipartFile?
+    val allowGifOverwrite: Boolean?, val gif: String?, val gifData: MultipartFile?
 )

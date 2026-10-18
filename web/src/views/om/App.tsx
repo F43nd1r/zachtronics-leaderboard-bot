@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ export default function App() {
                         </IconButton>
                     )}
                     {isNotTinyScreen && (
-                        <Typography sx={{ fontWeight: "bold" }} paddingRight={"1rem"}>
+                        <Typography component={Link} to="/" sx={{ fontWeight: "bold", paddingRight: 1, color: "inherit", textDecoration: "none" }}>
                             Opus Magnum Leaderboards
                         </Typography>
                     )}

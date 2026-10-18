@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,24 @@
  * limitations under the License.
  */
 
-import { Box, Button, Card, CardActionArea, CardActions, CardContent, CardHeader, CardMedia } from "@mui/material"
-import { SentimentVeryDissatisfied } from "@mui/icons-material"
+import {
+    Box,
+    Button,
+    Card,
+    CardActionArea,
+    CardActions,
+    CardContent,
+    CardHeader,
+    CardMedia,
+    Link as ExternalLink,
+    useTheme
+} from "@mui/material"
+import { SentimentNeutral, SentimentVeryDissatisfied } from "@mui/icons-material"
 import RecordDTO from "../model/RecordDTO"
 import { ReactNode } from "react"
 import { AppSettings, useAppSettings } from "../fragments/AppSettingsProvider"
 import { useInView } from "react-intersection-observer"
+import { Link } from "react-router-dom"
 
 export interface RecordCardProps<RECORD extends RecordDTO<any> = RecordDTO<any>> {
     record: RECORD
@@ -71,7 +83,8 @@ function getMediaUrl(gif: string, appSettings: AppSettings) {
 
 export default function RecordCard(props: RecordCardProps) {
     const appSettings = useAppSettings()
-    const { ref, inView } = useInView({ rootMargin: "100%" })
+    const theme = useTheme()
+    const { ref, inView } = useInView({ rootMargin: "100%", triggerOnce: true })
     return (
         <Card
             ref={ref}
@@ -81,7 +94,7 @@ export default function RecordCard(props: RecordCardProps) {
             }}
         >
             <CardHeader title={props.title} />
-            {props.record.gif ? (
+            {props.record.gif && appSettings.showMedia ? (
                 <CardActionArea
                     href={props.record.gif ?? ""}
                     target={"_blank"}
@@ -111,6 +124,23 @@ export default function RecordCard(props: RecordCardProps) {
                         }}
                     />
                 </CardActionArea>
+            ) : props.record.gif ? (
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "2.5rem",
+                        width: "100%",
+                        gap: 0.5,
+                    }}
+                >
+                    View the{" "}
+                    <ExternalLink href={props.record.gif} style={{ color: theme.palette.primary.main }}>
+                        media
+                    </ExternalLink>.
+                    Enable gif preview (<Link to="/settings" style={{ color: theme.palette.primary.main }}>settings</Link>).
+                </Box>
             ) : (
                 <Box
                     sx={{
@@ -137,17 +167,17 @@ export default function RecordCard(props: RecordCardProps) {
                     justifyContent: "end",
                 }}
             >
-                <Button size="small" variant="outlined" color="primary" disabled={!props.record.solution}>
-                    <a
-                        href={props.record.solution}
-                        download
-                        style={{
-                            color: "inherit",
-                            textDecoration: "none",
-                        }}
-                    >
-                        Download
-                    </a>
+                <Button
+                    component={ExternalLink}
+                    href={props.record.solution}
+                    download
+                    size="small"
+                    variant="outlined"
+                    color="primary"
+                    disabled={!props.record.solution}
+                    sx={{ color: "primary.main", textDecoration: "none" }}
+                >
+                    Download
                 </Button>
                 {props.additionalActions}
             </CardActions>

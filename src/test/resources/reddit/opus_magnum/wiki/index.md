@@ -12,7 +12,7 @@ Tiebreakers for the sum are cost, cycles, and area individually.
 
 If a solution holds multiple tiebreakers, it will only be displayed once per primary metric.
 
-The leaderboard is kept updated by the [Zachtronics Leaderboard Bot](https://github.com/F43nd1r/zachtronics-leaderboard-bot), maintained by u/F43nd1r and u/12345ieee .
+The leaderboard is kept updated by the [Zachtronics Leaderboard Bot](https://github.com/zachtronics-leaderboards/zachtronics-leaderboard-bot), maintained by u/F43nd1r and u/12345ieee .
 
 Long term Gif hosting is provided by Discord user Syx from the `files.mors.technology` domain.
 

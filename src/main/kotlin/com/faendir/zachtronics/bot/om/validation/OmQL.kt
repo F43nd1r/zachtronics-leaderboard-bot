@@ -20,8 +20,6 @@ import com.faendir.zachtronics.bot.om.model.MeasurePoint
 import com.faendir.zachtronics.bot.om.model.OmMetric
 import com.faendir.zachtronics.bot.om.model.OmScore
 import com.faendir.zachtronics.bot.om.repository.OmMemoryRecord
-import com.faendir.zachtronics.bot.utils.InfinInt
-import com.faendir.zachtronics.bot.utils.InfinInt.Companion.toInfinInt
 import com.faendir.zachtronics.bot.utils.LevelValue
 import com.faendir.zachtronics.bot.utils.Trie
 import com.faendir.zachtronics.bot.utils.allMinsWith
@@ -101,8 +99,8 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
 
         val allOnes = OmScore(
             1, 1, overlap = true, trackless = true,
-            1, 1, 1, 1.0, 1,
-            1.0, 1.toLevelValue(), 1.toInfinInt(), 1.0, 1.toInfinInt(),
+            1, 1, 1, 1.0, 1, looping = true,
+            1.0, 1.toLevelValue(), 1.toLevelValue(), 1.toLevelValue(), 1.toLevelValue(),
             extraKnownMetrics = allOnesMap
         )
     }
@@ -541,8 +539,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
     private fun Comparable<*>.doubleOrBust(context: String? = null): Double {
         return when (this) {
             is Number -> toDouble()
-            is InfinInt -> toDouble()
-            is LevelValue -> 100_000.0.pow(level) * value
+            is LevelValue -> marshal()
             else -> throw IllegalArgumentException("Invalid type: ${this::class.simpleName}" + (context?.let { " for $it" }
                 ?: ""))
         }

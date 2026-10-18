@@ -130,7 +130,7 @@ class OmController(
         val submission = createSubmission(
             submissionDTO.solution.bytes,
             submissionDTO.author,
-            allowGifUpdate = submissionDTO.allowGifUpdate ?: false,
+            allowGifOverwrite = submissionDTO.allowGifOverwrite ?: false,
             gif = submissionDTO.gif,
             gifData = submissionDTO.gifData?.bytes
         )

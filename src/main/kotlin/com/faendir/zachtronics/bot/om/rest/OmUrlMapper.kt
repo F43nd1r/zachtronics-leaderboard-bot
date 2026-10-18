@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,8 @@ class OmUrlMapper : UrlMapper {
         if (segments.size != 3) return null
         val (commit, puzzleId, record) = segments
         val puzzle = OmPuzzle.entries.find { it.id.equals(puzzleId, ignoreCase = true) } ?: return null
-        val fileName = if(record.endsWith(puzzle.name)) record else "${record}_${puzzle.name}"
-        return "https://raw.githubusercontent.com/f43nd1r/om-leaderboard/${commit}/${puzzle.group.name}/${puzzle.name}/${fileName}.solution"
+        val fileName = if (record.startsWith(puzzle.name)) record else "${puzzle.name}_${record}"
+        return "https://raw.githubusercontent.com/zachtronics-leaderboards/om-leaderboard/${commit}/${puzzle.group.name}/${puzzle.name}/${fileName}.solution"
     }
 
     fun createShortUrl(commitId: String, puzzle: OmPuzzle, score: OmScore): String = buildUrl("$commitId/${puzzle.id}/${score.toDisplayString(DisplayContext.fileName())}")

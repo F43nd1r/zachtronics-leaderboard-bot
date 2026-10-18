@@ -52,24 +52,24 @@ class OmSubmitCommand(private val repository: OmSolutionRepository, private val 
     override val ephemeral = true
 
     private val solutionOption = omSolutionOptionBuilder().required().build()
-    private val allowGifUpdateOption = CommandOptionBuilder.boolean("allow-gif-update").build()
+    private val allowGifOverwriteOption = CommandOptionBuilder.boolean("allow-gif-overwrite").build()
     private val gifLinkOption = displayLinkOptionBuilder("gif-link")
         .description("Link to your solution gif/mp4")
         .build()
     private val gifDataOption = CommandOptionBuilder.attachment("gif-data")
         .description("Your solution gif")
         .build()
-    override val options = listOf(solutionOption, allowGifUpdateOption, gifLinkOption, gifDataOption)
+    override val options = listOf(solutionOption, allowGifOverwriteOption, gifLinkOption, gifDataOption)
 
     override val secured: Secured = NotSecured
 
     override fun handle(event: ChatInputInteractionEvent) = mono {
         val data = downloadFile(solutionOption.get(event).url).data
-        val allowGifUpdate = allowGifUpdateOption.get(event) ?: false
+        val allowGifOverwrite = allowGifOverwriteOption.get(event) ?: false
         val gifLink = gifLinkOption.get(event)
         val gifData = gifDataOption.get(event)?.run { downloadFile(this.url).data }
 
-        val submission = createSubmission(data, event.user().username, allowGifUpdate, gifLink, gifData)
+        val submission = createSubmission(data, event.user().username, allowGifOverwrite, gifLink, gifData)
         if (gifLink != null || gifData != null)
             submitToRepository(submission).send(event).awaitSingleOrNull()
         else

@@ -25,6 +25,6 @@ data class OmSubmission(
     override var displayLink: String?,
     override val data: ByteArray,
 
-    val allowGifUpdate: Boolean = false,
+    val allowGifOverwrite: Boolean = false,
     val gifData: ByteArray? = null,
 ) : Submission<OmCategory, OmPuzzle>
