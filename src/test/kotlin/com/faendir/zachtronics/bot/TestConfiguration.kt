@@ -75,9 +75,9 @@ class TestConfiguration(private val gitProperties: GitProperties) {
         return createTestGitRepository("repositories/om-leaderboard")
     }
 
-    @Bean("scArchiveRepository")
-    fun scArchiveRepository(): GitRepository {
-        return createTestGitRepository("repositories/sc-archive")
+    @Bean("scLeaderboardRepository")
+    fun scLeaderboardRepository(): GitRepository {
+        return createTestGitRepository("repositories/sc-leaderboard")
     }
 
     @Bean("szRepository")

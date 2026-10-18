@@ -51,7 +51,7 @@ public class ScSolutionRepository extends AbstractSolutionRepository<ScCategory,
     private final RedditService redditService;
     private final Subreddit subreddit = Subreddit.SPACECHEM;
 
-    @Qualifier("scArchiveRepository")
+    @Qualifier("scLeaderboardRepository")
     private final GitRepository gitRepo;
     private final Class<ScCategory> categoryClass = ScCategory.class;
     private final Function<String[], ScSolution> solUnmarshaller = ScSolution::unmarshal;
