@@ -80,21 +80,21 @@ class ScManualTest {
 
     @Test
     public void rebuildAllWiki() {
-        // cp -a ../spacechem/archive/* src/test/resources/repositories/sc-archive/
+        // cp -a ../spacechem/leaderboard/* src/test/resources/repositories/sc-leaderboard/
         repository.rebuildRedditLeaderboard(null);
 
         String pages = Arrays.stream(ScGroup.values())
                              .map(ScGroup::getWikiPage).distinct()
                              .map(p -> redditService.getWikiPage(Subreddit.SPACECHEM, p))
-                             .map(s -> s.replaceAll("file:/tmp/sc-archive[0-9]+/",
-                                                    "https://raw.githubusercontent.com/spacechem-community-developers/spacechem-archive/master"))
+                             .map(s -> s.replaceAll("file:/tmp/sc-leaderboard[0-9]+/",
+                                                    "https://raw.githubusercontent.com/zachtronics-leaderboards/spacechem-leaderboard/master"))
                              .collect(Collectors.joining("\n\n---\n"));
         System.out.println(pages);
     }
 
     @Test
     public void bootstrapPsv() throws IOException {
-        Path repoPath = Path.of("../spacechem/archive");
+        Path repoPath = Path.of("../spacechem/leaderboard");
 
         for (ScPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path indexPath = repoPath.resolve(puzzle.getGroup().name()).resolve(puzzle.name()).resolve("solutions.psv");
@@ -120,7 +120,7 @@ class ScManualTest {
 
     @Test
     public void validateLeaderboard() throws IOException {
-        Path repoPath = Path.of("../spacechem/archive");
+        Path repoPath = Path.of("../spacechem/leaderboard");
 
         for (ScPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
@@ -147,7 +147,7 @@ class ScManualTest {
 
     @Test
     public void tagNewCategories() throws IOException {
-        Path repoPath = Path.of("../spacechem/archive");
+        Path repoPath = Path.of("../spacechem/leaderboard");
 
         for (ScPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
@@ -170,7 +170,7 @@ class ScManualTest {
 
     @Test
     public void markVideoOnly() throws IOException {
-        Path repoPath = Path.of("../spacechem/archive");
+        Path repoPath = Path.of("../spacechem/leaderboard");
 
         for (ScPuzzle puzzle : repository.getTrackedPuzzles()) {
             Path puzzlePath = repoPath.resolve(repository.relativePuzzlePath(puzzle));
@@ -195,7 +195,7 @@ class ScManualTest {
     @Test
     public void loadSolnetVideos() throws IOException {
         Path solnetDumpPath = Path.of("../spacechem/solutionnet/data/score_dump.csv");
-        Path repoPath = Path.of("../spacechem/archive");
+        Path repoPath = Path.of("../spacechem/leaderboard");
 
         try (CSVReader reader = new CSVReaderBuilder(Files.newBufferedReader(solnetDumpPath)).withFieldAsNull(
             CSVReaderNullFieldIndicator.BOTH).withSkipLines(1).build()) {
