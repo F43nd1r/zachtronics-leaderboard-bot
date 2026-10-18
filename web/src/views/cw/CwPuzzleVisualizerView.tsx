@@ -21,14 +21,10 @@ import { VisualizerColor } from "../../utils/VisualizerColor"
 import Puzzle from "../../model/Puzzle"
 import CwScore from "../../model/cw/CwScore"
 import fetchFromApi from "../../utils/fetchFromApi"
-import { useState } from "react"
-import RecordDTO from "../../model/RecordDTO"
-import { RecordModal } from "../../components/RecordModal"
 
 export default function CwPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId
     fetchFromApi<Puzzle>(`/cw/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - ChipWizard™ Professional Leaderboard`))
-    const [activeRecords, setActiveRecords] = useState<RecordDTO<CwScore>[] | undefined>(undefined)
 
     return (
         <Box
@@ -58,9 +54,7 @@ export default function CwPuzzleVisualizerView() {
                 }}
                 modifiers={{}}
                 defaultColor={VisualizerColor.DEFAULT}
-                onClick={setActiveRecords}
             />
-            <RecordModal records={activeRecords} setRecords={setActiveRecords} />
         </Box>
     )
 }

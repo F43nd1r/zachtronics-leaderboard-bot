@@ -21,14 +21,10 @@ import { VisualizerColor } from "../../utils/VisualizerColor"
 import Puzzle from "../../model/Puzzle"
 import FcScore from "../../model/fc/FcScore"
 import fetchFromApi from "../../utils/fetchFromApi"
-import { useState } from "react"
-import RecordDTO from "../../model/RecordDTO"
-import { RecordModal } from "../../components/RecordModal"
 
 export default function FcPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId
     fetchFromApi<Puzzle>(`/fc/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - 20th Century Food Court Leaderboard`))
-    const [activeRecords, setActiveRecords] = useState<RecordDTO<FcScore>[] | undefined>(undefined)
 
     return (
         <Box
@@ -58,9 +54,7 @@ export default function FcPuzzleVisualizerView() {
                 }}
                 modifiers={{}}
                 defaultColor={VisualizerColor.DEFAULT}
-                onClick={setActiveRecords}
             />
-            <RecordModal records={activeRecords} setRecords={setActiveRecords} />
         </Box>
     )
 }

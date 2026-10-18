@@ -26,6 +26,10 @@ import Metric from "../../model/Metric"
 import Modifier from "../../model/Modifier"
 import { LegendView } from "./partials/LegendView"
 import { usePersistedUrlState } from "../../utils/usePersistedUrlState"
+import { useState } from "react"
+import { RecordModal } from "../RecordModal"
+import { RecordCardProps } from "../RecordCard"
+import { FC } from "react"
 
 export interface VisualizerProps<SCORE, RECORD extends RecordDTO<SCORE>> {
     url: string
@@ -40,7 +44,7 @@ export interface VisualizerProps<SCORE, RECORD extends RecordDTO<SCORE>> {
     metrics: Record<string, Metric<SCORE>>
     modifiers: Record<string, Modifier<SCORE>>
     defaultColor: string
-    onClick: (records: RECORD[]) => void
+    RecordCardComponent?: FC<RecordCardProps<RECORD>>
 }
 
 export function Visualizer<SCORE, RECORD extends RecordDTO<SCORE> = RecordDTO<SCORE>>({
@@ -49,74 +53,78 @@ export function Visualizer<SCORE, RECORD extends RecordDTO<SCORE> = RecordDTO<SC
     filter: filterConfig,
     metrics,
     modifiers,
-    onClick,
+    RecordCardComponent,
     url,
 }: VisualizerProps<SCORE, RECORD>) {
     const [configuration, setConfiguration] = usePersistedUrlState(config.key, ConfigurationSchema, config.default)
     const [filter, setFilter] = usePersistedUrlState(filterConfig.key, FilterSchema, filterConfig.default)
+    const [activeRecords, setActiveRecords] = useState<RECORD[] | undefined>(undefined)
 
     return (
-        <Box
-            sx={(theme) => ({
-                display: "flex",
-                minHeight: 0,
-                flexGrow: 1,
-                flexShrink: 1,
-                [theme.breakpoints.down("md")]: {
-                    flexDirection: "column",
-                    minHeight: "unset",
-                },
-            })}
-        >
-            <ApiResource<RECORD[]>
-                url={url}
-                element={(records) => (
-                    <>
-                        <Stack
-                            spacing={1}
-                            sx={(theme) => ({
-                                width: "100%",
-                                [theme.breakpoints.up("md")]: {
-                                    width: "16rem",
-                                    height: "100%",
-                                    overflowY: "auto",
-                                },
-                                [theme.breakpoints.up("lg")]: {
-                                    width: "20rem",
-                                },
-                                [theme.breakpoints.up("xl")]: {
-                                    width: "24rem",
-                                },
-                            })}
-                        >
-                            <ConfigurationView metrics={metrics} configuration={configuration} setConfiguration={setConfiguration} />
-                            <FilterView
+        <>
+            <Box
+                sx={(theme) => ({
+                    display: "flex",
+                    minHeight: 0,
+                    flexGrow: 1,
+                    flexShrink: 1,
+                    [theme.breakpoints.down("md")]: {
+                        flexDirection: "column",
+                        minHeight: "unset",
+                    },
+                })}
+            >
+                <ApiResource<RECORD[]>
+                    url={url}
+                    element={(records) => (
+                        <>
+                            <Stack
+                                spacing={1}
+                                sx={(theme) => ({
+                                    width: "100%",
+                                    [theme.breakpoints.up("md")]: {
+                                        width: "16rem",
+                                        height: "100%",
+                                        overflowY: "auto",
+                                    },
+                                    [theme.breakpoints.up("lg")]: {
+                                        width: "20rem",
+                                    },
+                                    [theme.breakpoints.up("xl")]: {
+                                        width: "24rem",
+                                    },
+                                })}
+                            >
+                                <ConfigurationView metrics={metrics} configuration={configuration} setConfiguration={setConfiguration} />
+                                <FilterView
+                                    metrics={metrics}
+                                    modifiers={modifiers}
+                                    records={records}
+                                    filter={filter}
+                                    setFilter={(filter) => {
+                                        if (applyFilter(metrics, modifiers, filter, configuration, records).length) {
+                                            setFilter(filter)
+                                            return true
+                                        }
+                                        return false
+                                    }}
+                                />
+                                <LegendView modifiers={modifiers} defaultColor={defaultColor} />
+                            </Stack>
+                            <PlotView
                                 metrics={metrics}
                                 modifiers={modifiers}
+                                defaultColor={defaultColor}
                                 records={records}
+                                configuration={configuration}
                                 filter={filter}
-                                setFilter={(filter) => {
-                                    if (applyFilter(metrics, modifiers, filter, configuration, records).length) {
-                                        setFilter(filter)
-                                        return true
-                                    }
-                                    return false
-                                }}
+                                onClick={setActiveRecords}
                             />
-                            <LegendView modifiers={modifiers} defaultColor={defaultColor} />
-                        </Stack>
-                        <PlotView
-                            metrics={metrics}
-                            modifiers={modifiers}
-                            defaultColor={defaultColor}
-                            records={records}
-                            configuration={configuration}
-                            filter={filter}
-                            onClick={onClick}
-                        />
-                    </>
-                )}
-            />
-        </Box>
+                        </>
+                    )}
+                />
+            </Box>
+            <RecordModal records={activeRecords} setRecords={setActiveRecords} RecordCardComponent={RecordCardComponent} />
+        </>
     )
 }

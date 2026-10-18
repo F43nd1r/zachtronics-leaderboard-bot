@@ -21,14 +21,10 @@ import { VisualizerColor } from "../../utils/VisualizerColor"
 import Puzzle from "../../model/Puzzle"
 import KzScore from "../../model/kz/KzScore"
 import fetchFromApi from "../../utils/fetchFromApi"
-import { useState } from "react"
-import RecordDTO from "../../model/RecordDTO"
-import { RecordModal } from "../../components/RecordModal"
 
 export default function FcPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId
     fetchFromApi<Puzzle>(`/kz/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - Kaizen Leaderboard`))
-    const [activeRecords, setActiveRecords] = useState<RecordDTO<KzScore>[] | undefined>(undefined)
 
     return (
         <Box
@@ -57,9 +53,7 @@ export default function FcPuzzleVisualizerView() {
                 }}
                 modifiers={{}}
                 defaultColor={VisualizerColor.DEFAULT}
-                onClick={setActiveRecords}
             />
-            <RecordModal records={activeRecords} setRecords={setActiveRecords} />
         </Box>
     )
 }

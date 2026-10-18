@@ -18,14 +18,11 @@ import { useParams } from "react-router-dom"
 import { Visualizer } from "../../../../components/visualizer/Visualizer"
 import { VisualizerColor } from "../../../../utils/VisualizerColor"
 import OmScore from "../../../../model/om/OmScore"
-import { useState } from "react"
 import { OmRecord } from "../../../../model/om/OmRecord"
-import { RecordModal } from "../../../../components/RecordModal"
 import OmRecordCard from "../../../../components/OmRecordCard"
 
 export default function OmPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId
-    const [activeRecords, setActiveRecords] = useState<OmRecord[] | undefined>(undefined)
 
     return (
         <>
@@ -50,8 +47,11 @@ export default function OmPuzzleVisualizerView() {
                     w: { name: "Width", get: (score) => score?.width },
                     b: { name: "Bounding Hex", get: (score) => score?.boundingHex },
                     r: { name: "Rate", get: (score) => score?.rate },
-                    aI: { name: "Area@∞", get: (score) => score?.areaINFValue != null && score?.areaINFLevel != null ?
-                                                          score.areaINFValue * 10 ** (5 * score.areaINFLevel) : undefined},
+                    aI: {
+                        name: "Area@∞",
+                        get: (score) =>
+                            score?.areaINFValue != null && score?.areaINFLevel != null ? score.areaINFValue * 10 ** (5 * score.areaINFLevel) : undefined,
+                    },
                     hI: { name: "Height@∞", get: (score) => score?.heightINF },
                     wI: { name: "Width@∞", get: (score) => score?.widthINF },
                     bI: { name: "Bounding Hex@∞", get: (score) => score?.boundingHexINF },
@@ -75,9 +75,8 @@ export default function OmPuzzleVisualizerView() {
                     },
                 }}
                 defaultColor={VisualizerColor.DEFAULT}
-                onClick={setActiveRecords}
+                RecordCardComponent={OmRecordCard}
             />
-            <RecordModal records={activeRecords} setRecords={setActiveRecords} RecordCardComponent={OmRecordCard} />
         </>
     )
 }

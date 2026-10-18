@@ -21,14 +21,10 @@ import { VisualizerColor } from "../../utils/VisualizerColor"
 import Puzzle from "../../model/Puzzle"
 import ExaScore from "../../model/exa/ExaScore"
 import fetchFromApi from "../../utils/fetchFromApi"
-import { RecordModal } from "../../components/RecordModal"
-import { useState } from "react"
-import RecordDTO from "../../model/RecordDTO"
 
 export default function ExaPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId
     fetchFromApi<Puzzle>(`/exa/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - Exapunks Leaderboard`))
-    const [activeRecords, setActiveRecords] = useState<RecordDTO<ExaScore>[] | undefined>(undefined)
 
     return (
         <Box
@@ -66,9 +62,7 @@ export default function ExaPuzzleVisualizerView() {
                     },
                 }}
                 defaultColor={VisualizerColor.DEFAULT}
-                onClick={setActiveRecords}
             />
-            <RecordModal records={activeRecords} setRecords={setActiveRecords} />
         </Box>
     )
 }
