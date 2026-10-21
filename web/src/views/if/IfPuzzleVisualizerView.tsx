@@ -18,13 +18,12 @@ import { Box } from "@mui/material"
 import { useParams } from "react-router-dom"
 import { Visualizer } from "../../components/visualizer/Visualizer"
 import { VisualizerColor } from "../../utils/VisualizerColor"
-import Puzzle from "../../model/Puzzle"
 import IfScore from "../../model/if/IfScore"
-import fetchFromApi from "../../utils/fetchFromApi"
+import useDocumentTitle from "../../utils/useDocumentTitle"
 
 export default function IfPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId!
-    fetchFromApi<Puzzle>(`/if/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - Infinifactory Leaderboard`))
+    useDocumentTitle("Infinifactory Leaderboard", `/if/puzzle/${puzzleId}`)
 
     return (
         <Box

@@ -18,13 +18,12 @@ import { Box } from "@mui/material"
 import { useParams } from "react-router-dom"
 import { Visualizer } from "../../components/visualizer/Visualizer"
 import { VisualizerColor } from "../../utils/VisualizerColor"
-import Puzzle from "../../model/Puzzle"
 import TISScore from "../../model/tis/TISScore"
-import fetchFromApi from "../../utils/fetchFromApi"
+import useDocumentTitle from "../../utils/useDocumentTitle"
 
 export default function TISPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId!
-    fetchFromApi<Puzzle>(`/tis/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - TIS-100 Leaderboard`))
+    useDocumentTitle("TIS-100 Leaderboard", `/tis/puzzle/${puzzleId}`)
 
     return (
         <Box

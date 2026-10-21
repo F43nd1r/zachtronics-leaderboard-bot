@@ -18,13 +18,12 @@ import { Box } from "@mui/material"
 import { useParams } from "react-router-dom"
 import { Visualizer } from "../../components/visualizer/Visualizer"
 import { VisualizerColor } from "../../utils/VisualizerColor"
-import Puzzle from "../../model/Puzzle"
 import ExaScore from "../../model/exa/ExaScore"
-import fetchFromApi from "../../utils/fetchFromApi"
+import useDocumentTitle from "../../utils/useDocumentTitle"
 
 export default function ExaPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId!
-    fetchFromApi<Puzzle>(`/exa/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - Exapunks Leaderboard`))
+    useDocumentTitle("Exapunks Leaderboard", `/exa/puzzle/${puzzleId}`)
 
     return (
         <Box

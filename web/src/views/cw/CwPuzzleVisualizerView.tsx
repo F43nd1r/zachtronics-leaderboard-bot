@@ -18,13 +18,12 @@ import { Box } from "@mui/material"
 import { useParams } from "react-router-dom"
 import { Visualizer } from "../../components/visualizer/Visualizer"
 import { VisualizerColor } from "../../utils/VisualizerColor"
-import Puzzle from "../../model/Puzzle"
 import CwScore from "../../model/cw/CwScore"
-import fetchFromApi from "../../utils/fetchFromApi"
+import useDocumentTitle from "../../utils/useDocumentTitle"
 
 export default function CwPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId!
-    fetchFromApi<Puzzle>(`/cw/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - ChipWizard™ Professional Leaderboard`))
+    useDocumentTitle("ChipWizard™ Professional Leaderboard", `/cw/puzzle/${puzzleId}`)
 
     return (
         <Box

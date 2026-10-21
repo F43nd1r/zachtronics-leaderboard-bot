@@ -22,6 +22,7 @@ import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material"
 import { OmRecord } from "../../../model/om/OmRecord"
 import { Type } from "@sinclair/typebox"
 import { Link } from "react-router-dom"
+import useDocumentTitle from "../../../utils/useDocumentTitle"
 
 enum SinceLast {
     HOUR = 1000 * 60 * 60,
@@ -31,6 +32,7 @@ enum SinceLast {
 }
 
 export default function RecentSubmissionsView() {
+    useDocumentTitle("Opus Magnum Leaderboards")
     const [sinceLast, setSinceLast] = usePersistedState("submissionsSince", Type.Enum(SinceLast), SinceLast.DAY)
 
     const dateSince: Date = useMemo(() => new Date(new Date().getTime() - sinceLast), [sinceLast])

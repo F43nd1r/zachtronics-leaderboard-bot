@@ -23,6 +23,7 @@ import {LinkOutlined} from "@mui/icons-material"
 import {ReactNode, useEffect, useMemo, useState} from "react"
 import {Link, useLocation} from "react-router-dom"
 import {Masonry} from "@mui/lab"
+import useDocumentTitle from "../../../utils/useDocumentTitle"
 
 const G = () => (<HL to="cost" title="cost" text="G"/>);
 const C = () => (<HL to="cycles" title="cycles" text="C" />);
@@ -39,7 +40,7 @@ const SteadyState = () => (<HL to="steadystate" title="steady state" text="Stead
 
 
 export default function HelpView() {
-    document.title = "Help - Opus Magnum Leaderboards"
+    useDocumentTitle("Help - Opus Magnum Leaderboards")
     const location = useLocation()
 
     useEffect(() => {

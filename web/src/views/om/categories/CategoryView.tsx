@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021
+ * Copyright (c) 2026
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,13 @@
 import { Link, useParams } from "react-router-dom"
 import OmRecordGrid from "../../../components/OmRecordGrid"
 import ApiResource from "../../../utils/ApiResource"
-import fetchFromApi from "../../../utils/fetchFromApi"
-import { useEffect } from "react"
-import Category from "../../../model/Category"
 import { OmRecord } from "../../../model/om/OmRecord"
+import useDocumentTitle from "../../../utils/useDocumentTitle"
 
 export default function CategoryView() {
     const params = useParams()
-    const categoryId = params.categoryId
-
-    useEffect(() => {
-        fetchFromApi<Category>(`/om/category/${categoryId}`).then((category) => (document.title = `${category.displayName} - Opus Magnum Leaderboards`))
-    }, [categoryId])
+    const categoryId = params.categoryId!
+    useDocumentTitle("Opus Magnum Leaderboards", `/om/category/${categoryId}`)
 
     return (
         <ApiResource<OmRecord[]>

@@ -18,13 +18,12 @@ import { Box } from "@mui/material"
 import { useParams } from "react-router-dom"
 import { Visualizer } from "../../components/visualizer/Visualizer"
 import { VisualizerColor } from "../../utils/VisualizerColor"
-import Puzzle from "../../model/Puzzle"
 import SzScore from "../../model/sz/SzScore"
-import fetchFromApi from "../../utils/fetchFromApi"
+import useDocumentTitle from "../../utils/useDocumentTitle"
 
 export default function SzPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId!
-    fetchFromApi<Puzzle>(`/sz/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - Shenzhen I/O Leaderboard`))
+    useDocumentTitle("Shenzhen I/O Leaderboard", `/sz/puzzle/${puzzleId}`)
 
     return (
         <Box

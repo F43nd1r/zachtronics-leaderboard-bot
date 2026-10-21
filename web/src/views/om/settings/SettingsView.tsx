@@ -19,8 +19,10 @@ import { IconButton } from "@mui/material"
 import Brightness7Icon from "@mui/icons-material/Brightness7"
 import Brightness4Icon from "@mui/icons-material/Brightness4"
 import { PlayArrow, PlayDisabled, Visibility, VisibilityOff } from "@mui/icons-material"
+import useDocumentTitle from "../../../utils/useDocumentTitle"
 
 export default function SettingsView() {
+    useDocumentTitle("Settings - Opus Magnum Leaderboards")
     const appSettings = useAppSettings()
 
     return (

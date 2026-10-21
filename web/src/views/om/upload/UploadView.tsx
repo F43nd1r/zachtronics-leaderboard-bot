@@ -33,8 +33,10 @@ import {fetchFromApiRaw} from "../../../utils/fetchFromApi"
 import {CheckCircle} from "@mui/icons-material"
 import {usePersistedState} from "../../../utils/usePersistedState"
 import {Type} from "@sinclair/typebox"
+import useDocumentTitle from "../../../utils/useDocumentTitle"
 
 export default function UploadView() {
+    useDocumentTitle("Upload - Opus Magnum Leaderboards")
     const [solutionFile, setSolutionFile] = useState<File | undefined>(undefined)
     const [gifFile, setGifFile] = useState<File | undefined>(undefined)
     const [gifLink, setGifLink] = useState<string>()

@@ -19,11 +19,10 @@ import { Button, Link as ExternalLink, Tab, Tabs } from "@mui/material"
 import { Link, Navigate, Outlet, useMatch } from "react-router-dom"
 import { usePersistedState } from "../../../utils/usePersistedState"
 import { lazy, ReactElement, useEffect } from "react"
-import fetchFromApi from "../../../utils/fetchFromApi"
-import Puzzle from "../../../model/Puzzle"
 import LoadingIndicator from "../../../components/LoadingIndicator"
 import { Static, Type } from "@sinclair/typebox"
 import { castOrDefault } from "../../../utils/castOrDefault"
+import useDocumentTitle from "../../../utils/useDocumentTitle"
 
 const PuzzleRecordsView = lazy(() => import("./records/PuzzleRecordsView"))
 const PuzzleFrontierView = lazy(() => import("./frontier/PuzzleFrontierView"))
@@ -64,10 +63,7 @@ export default function PuzzleView() {
         lastSegment && setActiveTab(lastSegment)
     }, [setActiveTab, lastSegment])
     const puzzleId = match?.params?.puzzleId
-
-    useEffect(() => {
-        puzzleId && fetchFromApi<Puzzle>(`/om/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - Opus Magnum Leaderboards`))
-    }, [puzzleId])
+    useDocumentTitle("Opus Magnum Leaderboards", puzzleId ? `/om/puzzle/${puzzleId}` : undefined)
 
     if (!lastSegment || !PuzzleRoutes.some((route) => route.pathSegment === lastSegment)) {
         return <Navigate to={lastActiveTab} />

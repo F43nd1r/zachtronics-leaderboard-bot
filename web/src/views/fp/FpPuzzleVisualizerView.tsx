@@ -18,13 +18,12 @@ import { Box } from "@mui/material"
 import { useParams } from "react-router-dom"
 import { Visualizer } from "../../components/visualizer/Visualizer"
 import { VisualizerColor } from "../../utils/VisualizerColor"
-import Puzzle from "../../model/Puzzle"
 import FpScore from "../../model/fp/FpScore"
-import fetchFromApi from "../../utils/fetchFromApi"
+import useDocumentTitle from "../../utils/useDocumentTitle"
 
 export default function FpPuzzleVisualizerView() {
     const puzzleId = useParams().puzzleId!
-    fetchFromApi<Puzzle>(`/fp/puzzle/${puzzleId}`).then((puzzle) => (document.title = `${puzzle.displayName} - X'BPGH: The Forbidden Path Leaderboard`))
+    useDocumentTitle("X'BPGH: The Forbidden Path Leaderboard", `/fp/puzzle/${puzzleId}`)
 
     return (
         <Box
