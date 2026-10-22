@@ -534,9 +534,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rsbuild/core@npm:2.2.13":
-  version: 2.2.13
-  resolution: "@rsbuild/core@npm:2.2.13"
+"@rsbuild/core@npm:2.2.14":
+  version: 2.2.14
+  resolution: "@rsbuild/core@npm:2.2.14"
   dependencies:
     "@rspack/core": "npm:~2.2.9"
     "@swc/helpers": "npm:^0.5.23"
@@ -547,7 +547,7 @@ __metadata:
       optional: true
   bin:
     rsbuild: ./bin/rsbuild.js
-  checksum: 10c0/4de7821f4645641512bee22bf7efdfb959691c8a5b593f282264db57a1d52142d95002d9642e100e15719f1abac1d9f3375bb0ca16f0a7488ced3b67af61ba5d
+  checksum: 10c0/b54e0b44fef1f926eb34fd2b82a39eabacda0b32cf2dcff44fd241d2f6199ced653f9dfc620def0473ef4aa7b098a04f812c6e46850c3ff031671ce35e7bf96a
   languageName: node
   linkType: hard
 
@@ -2589,7 +2589,7 @@ __metadata:
     "@mui/icons-material": "npm:9.5.0"
     "@mui/lab": "npm:9.0.0-beta.10"
     "@mui/material": "npm:9.5.0"
-    "@rsbuild/core": "npm:2.2.13"
+    "@rsbuild/core": "npm:2.2.14"
     "@rsbuild/plugin-react": "npm:2.1.1"
     "@simbathesailor/use-what-changed": "npm:2.0.0"
     "@sinclair/typebox": "npm:0.34.52"
