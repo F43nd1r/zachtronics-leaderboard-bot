@@ -234,11 +234,12 @@ sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Compara
     data object B1_INF : Custom<Double?>("B'", listOf(BOUNDING_HEX_INF), { it.boundingHexINF?.get(1) }, alias = "B1")
 
     data object ANYTHING_GOES : Constant<Boolean>("O", true)
+    data object ANYTHING_GOES_TRACKLESS : And(ANYTHING_GOES, TRACKLESS)
     data object NOVERLAP : Not(OVERLAP, displayName = "")
     data object NOVERLAP_TRACKLESS : And(NOVERLAP, TRACKLESS)
     data object NOVERLAP_LOOPING : And(NOVERLAP, LOOPING)
     data object NOVERLAP_FINITE_AREA : And(NOVERLAP, FINITE_AREA)
-    data object NOVERLAP_TRACKLESS_FINITE_AREA : And(NOVERLAP, TRACKLESS, FINITE_AREA)
+    data object NOVERLAP_FINITE_AREA_TRACKLESS : And(NOVERLAP, FINITE_AREA, TRACKLESS)
 
     data object SUM3A : Sum("Sum", COST, CYCLES, AREA)
     data object SUM3I : Sum("Sum", COST, CYCLES, INSTRUCTIONS)
