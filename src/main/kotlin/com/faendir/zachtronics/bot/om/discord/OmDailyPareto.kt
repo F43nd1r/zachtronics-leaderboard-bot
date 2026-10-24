@@ -166,11 +166,11 @@ class OmDailyPareto(
                 in 3..4 if (measurePoint == MeasurePoint.VICTORY) -> NOVERLAP_LOOPING
                 3 if (puzzle.type != OmType.PRODUCTION) -> {
                     frontierMetrics.remove(AREA_INF)
-                    Custom(listOf(A2_INF), "A''==0") { !it.overlap && it[A2_INF] == 0.0 }
+                    Custom("A''==0", listOf(AREA_INF), { !it.overlap && it[A2_INF] == 0.0 })
                 }
                 4 if (puzzle.type == OmType.NORMAL) -> {
                     frontierMetrics.remove(AREA_INF)
-                    Custom(listOf(A1_INF), "A'==0") { !it.overlap && it[A1_INF] == 0.0 }
+                    NOVERLAP_FINITE_AREA
                 }
                 else -> NOVERLAP
             })

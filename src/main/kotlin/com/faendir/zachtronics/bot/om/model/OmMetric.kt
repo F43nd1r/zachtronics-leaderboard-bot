@@ -34,6 +34,7 @@ import java.util.*
 sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Comparable<T & Any>? {
     val description: String
     val internalName get() = this::class.simpleName!!
+    val alias: String? get() = null
     val scoreParts: Set<ScorePart<*>>
     val measurePoint: MeasurePoint
     val getValueFrom: (OmScore) -> T
@@ -55,7 +56,7 @@ sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Compara
         override val displayName: String, // X
         override val measurePoint: MeasurePoint,
         override val getValueFrom: (OmScore) -> T,
-        val alias: String? = null
+        override val alias: String? = null
     ) : ScorePart<T> where T : Comparable<T & Any>? {
         override val description: String = displayName.lowercase()
 
@@ -167,10 +168,11 @@ sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Compara
         override fun describe(score: OmScore, format: StringFormat): String? = null
     }
 
-    data class Custom<T : Comparable<T & Any>?>(
-        override val subMetrics: List<OmMetric<*>>,
+    open class Custom<T : Comparable<T & Any>?>(
         override val displayName: String,
-        override val getValueFrom: (OmScore) -> T
+        override val subMetrics: List<OmMetric<*>>,
+        override val getValueFrom: (OmScore) -> T,
+        override val alias: String? = null,
     ) : Computed<T> {
         override val description: String = displayName
     }
@@ -208,29 +210,35 @@ sealed interface OmMetric<out T> : Metric, Comparator<OmScore> where T : Compara
         override val collapsible: Boolean = false
     }
 
-    // convenience
-    data object A0_INF : Value<Double?>("A°", MeasurePoint.INFINITY, { it.areaINF?.get(0) }, alias = "A0")
-    data object A1_INF : Value<Double?>("A'", MeasurePoint.INFINITY, { it.areaINF?.get(1) }, alias = "A1")
-    data object A2_INF : Value<Double?>("A''", MeasurePoint.INFINITY, { it.areaINF?.get(2) }, alias = "A2")
-    
-    data object H0_INF : Value<Double?>("H°", MeasurePoint.INFINITY, { it.heightINF?.get(0) }, alias = "H0")
-    data object H1_INF : Value<Double?>("H'", MeasurePoint.INFINITY, { it.heightINF?.get(1) }, alias = "H1")
-    
-    data object W0_INF : Value<Double?>("W°", MeasurePoint.INFINITY, { it.widthINF?.get(0) }, alias = "W0")
-    data object W1_INF : Value<Double?>("W'", MeasurePoint.INFINITY, { it.widthINF?.get(1) }, alias = "W1")
-    
-    data object B0_INF : Value<Double?>("B°", MeasurePoint.INFINITY, { it.boundingHexINF?.get(0) }, alias = "B0")
-    data object B1_INF : Value<Double?>("B'", MeasurePoint.INFINITY, { it.boundingHexINF?.get(1) }, alias = "B1")
-
     data object OVERLAP : Modifier("O", MeasurePoint.START, OmScore::overlap)
     data object TRACKLESS : Modifier("T", MeasurePoint.START, OmScore::trackless, reverseOrder = true)
     /** it's not properly a @V quantity, but in 99% of the solves it is determined before 6 outputs */
     data object LOOPING : Modifier("L", MeasurePoint.VICTORY, OmScore::looping, reverseOrder = true)
 
+    // convenience
+    data object A0_INF : Custom<Double?>("A°", listOf(AREA_INF), { it.areaINF?.get(0) }, alias = "A0")
+    data object A1_INF : Custom<Double?>("A'", listOf(AREA_INF), { it.areaINF?.get(1) }, alias = "A1")
+    data object A2_INF : Custom<Double?>("A''", listOf(AREA_INF), { it.areaINF?.get(2) }, alias = "A2")
+
+    data object FINITE_AREA : Custom<Boolean>("F", listOf(AREA_INF), OmScore::finiteAreaINF) {
+        override fun compare(o1: OmScore, o2: OmScore) = -super.compare(o1, o2)
+    }
+
+    data object H0_INF : Custom<Double?>("H°", listOf(HEIGHT_INF), { it.heightINF?.get(0) }, alias = "H0")
+    data object H1_INF : Custom<Double?>("H'", listOf(HEIGHT_INF), { it.heightINF?.get(1) }, alias = "H1")
+
+    data object W0_INF : Custom<Double?>("W°", listOf(WIDTH_INF), { it.widthINF?.get(0) }, alias = "W0")
+    data object W1_INF : Custom<Double?>("W'", listOf(WIDTH_INF), { it.widthINF?.get(1) }, alias = "W1")
+
+    data object B0_INF : Custom<Double?>("B°", listOf(BOUNDING_HEX_INF), { it.boundingHexINF?.get(0) }, alias = "B0")
+    data object B1_INF : Custom<Double?>("B'", listOf(BOUNDING_HEX_INF), { it.boundingHexINF?.get(1) }, alias = "B1")
+
     data object ANYTHING_GOES : Constant<Boolean>("O", true)
     data object NOVERLAP : Not(OVERLAP, displayName = "")
     data object NOVERLAP_TRACKLESS : And(NOVERLAP, TRACKLESS)
     data object NOVERLAP_LOOPING : And(NOVERLAP, LOOPING)
+    data object NOVERLAP_FINITE_AREA : And(NOVERLAP, FINITE_AREA)
+    data object NOVERLAP_TRACKLESS_FINITE_AREA : And(NOVERLAP, TRACKLESS, FINITE_AREA)
 
     data object SUM3A : Sum("Sum", COST, CYCLES, AREA)
     data object SUM3I : Sum("Sum", COST, CYCLES, INSTRUCTIONS)
@@ -297,7 +305,7 @@ object OmMetrics {
         OmMetric.RATE,
         OmMetric.AREA_INF,
     )
-    private val AREA_INF_PARTS = listOf(OmMetric.A0_INF, OmMetric.A1_INF, OmMetric.A2_INF)
+    private val AREA_INF_PARTS = listOf(OmMetric.A0_INF, OmMetric.A1_INF, OmMetric.A2_INF, OmMetric.FINITE_AREA)
     
     fun areaLikes(type: OmType? = null) = when (type) {
         null, OmType.NORMAL -> listOf(

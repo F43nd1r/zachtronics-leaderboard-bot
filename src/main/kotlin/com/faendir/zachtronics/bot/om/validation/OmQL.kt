@@ -116,9 +116,7 @@ internal class OmQL(possibleMetrics: List<OmMetric<*>>, private val measurePoint
 
         for (m in possibleMetrics + listOf(TRUE, FALSE, NULL)) {
             putAll(m, m.displayName)
-            if (m is OmMetric.Value<*> && m.alias != null) {
-                putAll(m, m.alias)
-            }
+            m.alias?.also { putAll(m, it) }
         }
     }
 

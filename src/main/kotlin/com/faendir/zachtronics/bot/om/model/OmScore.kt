@@ -80,6 +80,8 @@ data class OmScore(
         // with just 2 non-start measure points we can cut corners, hopefully we don't need to track more
         EnumSet.of(MeasurePoint.START, MeasurePoint.VICTORY).apply { if (rate != null) add(MeasurePoint.INFINITY) }
 
+    val finiteAreaINF get() = areaINF?.level?.equals(0) ?: false
+
     /**
      * humans: `15g/34c/56a/78i/3h/4w/8b/OTL@V 15g/34r/57a''/78i/6h'/7w/9b/OT@∞`
      *
