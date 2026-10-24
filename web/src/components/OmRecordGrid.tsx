@@ -49,7 +49,7 @@ function getCategoryElement(category: string): ReactNode {
         category = category.replaceAll("Sum4", "").replaceAll("Sum", "");
     }
 
-    category = category.replaceAll("O", "").replaceAll("L", "").replaceAll("T", "");
+    category = category.replaceAll(/[OLTF]/g, "");
     category
         .split("")
         .forEach(letter => rootTitleElements.push(metricDescriptions[letter] ?? letter));
@@ -63,6 +63,9 @@ function getCategoryElement(category: string): ReactNode {
     }
     if (originalCategory.includes("O")) {
         rootTitleElements.push("overlapping");
+    }
+    if (originalCategory.includes("F")) {
+        rootTitleElements.push("finite area");
     }
     if (originalCategory.includes("L")) {
         rootTitleElements.push("looping");
